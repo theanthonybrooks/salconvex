@@ -79,11 +79,14 @@ importers:
         specifier: ^19
         version: 19.0.4(@types/react@19.0.10)
       eslint:
-        specifier: ^9
+        specifier: ^9.21.0
         version: 9.21.0(jiti@1.21.7)
       eslint-config-next:
         specifier: 15.1.7
         version: 15.1.7(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3)
+      eslint-plugin-import:
+        specifier: ^2.31.0
+        version: 2.31.0(@typescript-eslint/parser@8.24.1(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@1.21.7))
       postcss:
         specifier: ^8
         version: 8.5.3

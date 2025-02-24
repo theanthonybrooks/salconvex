@@ -21,7 +21,7 @@ const inputVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "basic",
+      variant: "default",
       inputHeight: "default",
     },
   }
