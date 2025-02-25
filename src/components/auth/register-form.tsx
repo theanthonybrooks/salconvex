@@ -91,7 +91,7 @@ export const RegisterForm = () => {
             onSubmit,
             (errors) => console.log("Validation Errors:", errors) // ✅ Log validation issues
           )}
-          className='space-y-6'>
+          className='space-y-6 '>
           <div className='space-y-4'>
             <div className='flex w-full space-y-4 flex-col md:flex-row md:space-y-0 gap-x-4 '>
               <FormField
