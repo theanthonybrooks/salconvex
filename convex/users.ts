@@ -1,4 +1,5 @@
-import { query } from "./_generated/server"
+import { v } from "convex/values"
+import { MutationCtx, query } from "./_generated/server"
 import { auth } from "./auth"
 
 export const current = query({
@@ -13,3 +14,21 @@ export const current = query({
     return await ctx.db.get(userId)
   },
 })
+
+export const isNewUser = query({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.tokenIdentifier))
+      .unique()
+    return user === null
+  },
+})
+
+export async function findUserByEmail(ctx: MutationCtx, email: string) {
+  return await ctx.db
+    .query("users")
+    .withIndex("email", (q) => q.eq("email", email))
+    .unique()
+}

@@ -56,7 +56,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
   const onProviderSignUp = (value: "github" | "google") => {
     setPending(true)
-    signIn(value).finally(() => setPending(false))
+    signIn(value, { redirectTo: "/profile" }).finally(() => setPending(false))
   }
 
   return (

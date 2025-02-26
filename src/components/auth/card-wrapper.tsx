@@ -11,7 +11,8 @@ type CardWrapperProps = {
   headerLabel: string
   backButtonLabel: string
   backButtonQuestion: string
-  backButtonHref: string
+  backButtonHref?: string
+  backButtonAction?: () => void
   showSocial?: boolean
   className?: string
 }
@@ -22,6 +23,7 @@ export default function CardWrapper({
   backButtonLabel,
   backButtonQuestion,
   backButtonHref,
+  backButtonAction,
   showSocial,
   className,
   hasHeader,
@@ -47,10 +49,24 @@ export default function CardWrapper({
       </CardContent>
       <CardContent> {children}</CardContent>
       <CardFooter className='flex justify-center items-center gap-2 text-sm text-black'>
-        <p>{backButtonQuestion}</p>
-        <Link href={backButtonHref} className='hover:underline '>
-          {backButtonLabel}
-        </Link>
+        {backButtonHref && (
+          <>
+            <p>{backButtonQuestion}</p>
+            <Link href={backButtonHref} className='hover:underline '>
+              {backButtonLabel}
+            </Link>
+          </>
+        )}
+        {backButtonAction && (
+          <p className='flex gap-1'>
+            {backButtonQuestion}
+            <span
+              onClick={backButtonAction}
+              className='text-sky-700 hover:underline cursor-pointer'>
+              {backButtonLabel}
+            </span>
+          </p>
+        )}
       </CardFooter>
     </Card>
   )

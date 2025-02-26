@@ -23,21 +23,21 @@ export const UserBtn = () => {
     return null
   }
 
-  const { image, name, email } = data
-  const nameParts = name!.split(" ")
-  const avatarFallback = nameParts
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("")
+  const { image, firstName, lastName, email } = data
+
+  const avatarFallback =
+    firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase()
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className='outline-none relative'>
         <Avatar className='size=10 hover:opacity-75 transition'>
-          <AvatarImage src={image} alt={name} />
+          <AvatarImage src={image} alt={firstName + " " + lastName} />
           <AvatarFallback className='bg-sky-500 text-white'>
             {avatarFallback}
           </AvatarFallback>
         </Avatar>
+        <h1>Welcome back, {firstName}</h1>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='center' side='right' className='w-60'>
         <DropdownMenuItem

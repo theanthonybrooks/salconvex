@@ -1,10 +1,11 @@
 "use client"
 
-import { register } from "@/actions/register"
 import CardWrapper from "@/components/auth/card-wrapper"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 import { MultiSelect } from "@/components/multi-select"
+import { useAuthActions } from "@convex-dev/auth/react"
+
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -22,15 +23,27 @@ import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
+import { v4 as uuidv4 } from "uuid"
 
+import { SignInFlow } from "@/features/auth/types"
 import { z } from "zod"
 
-export const RegisterForm = () => {
+interface RegisterFormProps {
+  setState: (state: SignInFlow) => void
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({
+  setState,
+}: RegisterFormProps) => {
+  const { signIn } = useAuthActions()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
   const [showPassword, setShowPassword] = useState(false)
   const [selectedOption, setSelectedOption] = useState<string[]>(["artist"])
+  const [step, setStep] = useState<"signUp" | { email: string }>("signUp")
+  const [email, setEmail] = useState<string>("")
+  const [otp, setOtp] = useState<string>("")
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -39,7 +52,7 @@ export const RegisterForm = () => {
       password: "",
       firstName: "",
       lastName: "",
-      organizationName: "", // Ensure these fields always have a default value
+      organizationName: "",
       name: "",
       source: "",
       accountType: [],
@@ -52,20 +65,39 @@ export const RegisterForm = () => {
 
     const formData = {
       ...values,
-      accountType: selectedOption, // Extracting only values
+      accountType: selectedOption,
     }
 
+    const userId = uuidv4()
+
     startTransition(() => {
-      register(formData).then((data) => {
-        setError(data.error)
-        setSuccess(data.success)
+      signIn("password", {
+        ...formData,
+        userId: userId,
+        tokenIdentifier: userId,
+        flow: "signUp",
       })
+        .then((data) => {
+          if (!data) {
+            // If there's an error, do not reset the form
+            setError("Something went wrong.")
+            return
+          }
+
+          // If no error, proceed with success and reset form
+          setSuccess("Successfully signed up!")
+          form.reset()
+
+          setTimeout(() => {
+            setError("")
+            setSuccess("")
+          }, 2000)
+        })
+        .catch((err) => {
+          console.log("err", err)
+          setError("Something went wrong. Check if you already have an account")
+        })
     })
-    form.reset()
-    setTimeout(() => {
-      setError("")
-      setSuccess("")
-    }, 2000)
   }
 
   const options: { value: "artist" | "organizer"; label: string }[] = [
@@ -84,7 +116,8 @@ export const RegisterForm = () => {
       headerLabel='Create an account'
       backButtonQuestion='Already have an account?'
       backButtonLabel='Sign In'
-      backButtonHref='/login'>
+      // backButtonHref='/login'
+      backButtonAction={() => setState("signIn")}>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(
@@ -287,3 +320,5 @@ export const RegisterForm = () => {
     </CardWrapper>
   )
 }
+
+export default RegisterForm

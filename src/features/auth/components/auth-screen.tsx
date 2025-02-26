@@ -1,7 +1,7 @@
 "use client"
 
+import RegisterForm from "@/components/auth/register-form"
 import SignInCard from "@/features/auth/components/sign-in-card"
-import SignUpCard from "@/features/auth/components/sign-up-card"
 import { SignInFlow } from "@/features/auth/types"
 import { useState } from "react"
 
@@ -13,7 +13,7 @@ export const AuthScreen = () => {
         {state === "signIn" ? (
           <SignInCard setState={setState} />
         ) : (
-          <SignUpCard setState={setState} />
+          <RegisterForm setState={setState} />
         )}
       </div>
     </div>

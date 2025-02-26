@@ -13,7 +13,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { SignInFlow } from "@/features/auth/types"
-import { TriangleAlert } from "lucide-react"
+import { ConvexError } from "convex/values"
+import { Heart, LoaderPinwheel, TriangleAlert } from "lucide-react"
 import React, { useState } from "react"
 import { FaGithub } from "react-icons/fa"
 import { FcGoogle } from "react-icons/fc"
@@ -30,11 +31,46 @@ const SignInCard: React.FC<SignInCardProps> = ({
   const [password, setPassword] = useState("")
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | undefined>("")
+  const [success, setSuccess] = useState<string | undefined>("")
 
   const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setPending(true)
-    signIn("password", { email, password, flow: "signIn" })
+    setError("")
+    setSuccess("")
+
+    signIn("password", {
+      email,
+      password,
+      flow: "signIn",
+      redirectTo: "/profile",
+    })
+      .then(() => {
+        setSuccess("Successfully signed in!")
+      })
+      .catch((err) => {
+        const errorMessage =
+          // Check whether the error is an application error
+          err instanceof ConvexError
+            ? // Access data and cast it to the type we expect
+              (err.data as { message: string }).message
+            : // Must be some developer error,
+              // and prod deployments will not
+              // reveal any more information about it
+              // to the client
+              "Check your email/password and try again."
+        // do something with `errorMessage`
+        // }
+        setError(errorMessage)
+      })
+      .finally(() => {
+        setPending(false)
+      })
+  }
+
+  const onProviderSignIn = (value: "github" | "google") => {
+    setPending(true)
+    signIn(value)
       .catch((err) => {
         console.log("err", err)
         console.log("err.message", err.message)
@@ -47,14 +83,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
           setError("Invalid password")
           return
         }
-        // setError("Invalid email or password")
+        setError("Nope.")
       })
       .finally(() => setPending(false))
-  }
-
-  const onProviderSignIn = (value: "github" | "google") => {
-    setPending(true)
-    signIn(value).finally(() => setPending(false))
   }
 
   return (
@@ -69,6 +100,12 @@ const SignInCard: React.FC<SignInCardProps> = ({
         <div className='bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6'>
           <TriangleAlert className='size-4' />
           <p>{error}</p>
+        </div>
+      )}
+      {!!success && (
+        <div className='bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald mb-6'>
+          <Heart className='size-4' />
+          <p>{success}</p>
         </div>
       )}
       <CardContent className='space-y-5 px-0 pb-0'>
@@ -94,7 +131,11 @@ const SignInCard: React.FC<SignInCardProps> = ({
             type='submit'
             variant='black'
             disabled={pending}>
-            {pending ? "Signing in..." : "Continue"}
+            {pending ? (
+              <LoaderPinwheel className='animate-spin size-5' />
+            ) : (
+              "Continue"
+            )}
           </Button>
         </form>
         <Separator />
