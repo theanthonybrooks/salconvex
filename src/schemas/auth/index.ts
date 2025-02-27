@@ -31,3 +31,12 @@ export const RegisterSchema = z
       path: ["organizationName"],
     }
   )
+
+export const ResendOtpSchema = z.object({
+  email: z.string().email({ message: "Email is required" }),
+})
+
+export const VerifyOtpSchema = z.object({
+  email: z.string().email({ message: "Email is required" }),
+  otp: z.string().min(6, { message: "OTP must be 6 digits" }),
+})

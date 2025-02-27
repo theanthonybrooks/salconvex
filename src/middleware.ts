@@ -18,7 +18,7 @@ export default convexAuthNextjsMiddleware(async (request) => {
     return nextjsMiddlewareRedirect(request, "/auth")
   }
   if (isPublicPage(request) && isAuthenticated) {
-    return nextjsMiddlewareRedirect(request, "/")
+    return nextjsMiddlewareRedirect(request, "/verify")
   }
 })
 
