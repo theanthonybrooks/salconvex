@@ -1,9 +1,9 @@
-import { RegisterForm } from "@/components/auth/register-form"
+import RegisterForm from "@/components/auth/register-form"
 
 type Props = {}
 
 function RegisterPage({}: Props) {
-  return <RegisterForm />
+  return <RegisterForm switchFlow={() => console.log("switched!")} />
 }
 
 export default RegisterPage

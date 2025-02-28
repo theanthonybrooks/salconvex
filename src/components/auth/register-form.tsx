@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { SignInFlow } from "@/features/auth/types"
 import { RegisterSchema } from "@/schemas/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "convex/react"
+import { ConvexError } from "convex/values"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -27,18 +28,21 @@ import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { v4 as uuidv4 } from "uuid"
 import { z } from "zod"
+import { api } from "../../../convex/_generated/api"
 
 interface RegisterFormProps {
-  setState: (state: SignInFlow) => void
+  // setState: (state: SignInFlow) => void
+  switchFlow: () => void
 }
 
 type StepType = "signUp" | "verifyOtp"
 
 const RegisterForm: React.FC<RegisterFormProps> = ({
-  setState,
+  switchFlow,
 }: RegisterFormProps) => {
   const router = useRouter()
   const userId = uuidv4()
+  const updateVerification = useMutation(api.users.updateUserEmailVerification)
   const { signIn } = useAuthActions()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>("")
@@ -77,35 +81,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     setSubmitData(formData)
     setEmail(values.email)
-
-    // try {
-    //   await signIn("resend-otp", { email: formData.email }).then(() => {
-    //     setStep("verifyOtp")
-    //   })
-    //   // User is now signed in and verified
-    //   // Redirect or update UI as needed
-    // } catch (error) {
-    //   console.error("Verification failed:", error)
-    // }
     startTransition(() => {
-      // signIn("resend-otp", {
-      // email: formData.email,
-      // ...formData,
-      // flow: "email-verification",
-      // flow: "signUp",
-      // redirectTo: "/verify-otp",
       signIn("password", {
         ...formData,
         flow: "signUp",
       })
         .then(() => {
-          // router.push("/verify-otp")
           setSuccess("OTP sent to your email!")
           setStep("verifyOtp")
         })
         .catch((err) => {
-          console.error(err)
-          setError("Something went wrong. Please try again.")
+          if (err && err.name === "ConvexError") {
+            console.error(err.data)
+            setError(err.data)
+          } else if (err instanceof ConvexError) {
+            console.error(err.data)
+            setError(err.data)
+          } else {
+            console.error(err)
+            setError("Something went wrong. Please try again.")
+          }
         })
     })
   }
@@ -121,8 +116,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
 
     try {
-      console.log("otp", otp)
-      console.log("email", email)
+      await updateVerification({ email })
+
       const result = await signIn("password", {
         email,
         code: otp,
@@ -130,12 +125,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       })
 
       if (result) {
-        console.log("result", result)
         setSuccess("Successfully signed up and verified!")
         form.reset()
       }
     } catch (error) {
-      console.error(error)
+      console.error("Error in handleOtpSubmit:", error)
       setError("Invalid OTP or verification failed. Please try again.")
     }
 
@@ -163,7 +157,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       backButtonQuestion='Already have an account?'
       backButtonLabel='Sign In'
       // backButtonHref='/login'
-      backButtonAction={() => setState("signIn")}>
+      backButtonAction={switchFlow}>
       {step === "signUp" ? (
         <Form {...form}>
           <form

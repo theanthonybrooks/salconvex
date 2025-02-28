@@ -1,3 +1,39 @@
+import { authTables } from "@convex-dev/auth/server"
+import { defineSchema, defineTable } from "convex/server"
+import { v } from "convex/values"
+
+const customUserSchema = {
+  // Include Convex Auth fields you want to use
+  name: v.optional(v.string()),
+  email: v.string(),
+  emailVerificationTime: v.optional(v.union(v.string(), v.null())),
+
+  // Your custom fields
+  createdAt: v.string(),
+  updatedAt: v.optional(v.string()),
+  password: v.string(),
+  passwordChangedBy: v.optional(v.string()),
+  firstName: v.string(),
+  lastName: v.string(),
+  accountType: v.optional(v.array(v.string())),
+  organizationName: v.optional(v.string()),
+  source: v.optional(v.string()),
+  userId: v.string(),
+  role: v.array(v.string()),
+  subscription: v.optional(v.string()),
+  tokenIdentifier: v.string(),
+  image: v.optional(v.string()),
+}
+
+export default defineSchema({
+  ...authTables, // This includes other auth tables
+  users: defineTable(customUserSchema)
+    .index("email", ["email"])
+    .index("by_token", ["tokenIdentifier"]),
+
+  // Your other custom tables...
+})
+
 // import { authTables } from "@convex-dev/auth/server"
 // import { defineSchema, defineTable } from "convex/server"
 // import { v } from "convex/values"
@@ -9,17 +45,17 @@
 //   emailVerificationTime: v.optional(v.union(v.number(), v.null())),
 
 //   // Your custom fields
-//   createdAt: v.string(),
-//   password: v.string(),
-//   firstName: v.string(),
-//   lastName: v.string(),
+//   createdAt: v.optional(v.string()),
+//   password: v.optional(v.string()),
+//   firstName: v.optional(v.string()),
+//   lastName: v.optional(v.string()),
 //   accountType: v.optional(v.array(v.string())),
 //   organizationName: v.optional(v.string()),
 //   source: v.optional(v.string()),
-//   userId: v.string(),
-//   role: v.array(v.string()),
+//   userId: v.optional(v.string()),
+//   role: v.optional(v.array(v.string())),
 //   subscription: v.optional(v.string()),
-//   tokenIdentifier: v.string(),
+//   tokenIdentifier: v.optional(v.string()),
 //   image: v.optional(v.string()),
 // }
 
@@ -38,44 +74,3 @@
 
 //   // Your other custom tables...
 // })
-
-import { authTables } from "@convex-dev/auth/server"
-import { defineSchema, defineTable } from "convex/server"
-import { v } from "convex/values"
-
-const customUserSchema = {
-  // Include Convex Auth fields you want to use
-  name: v.optional(v.string()),
-  email: v.string(),
-  emailVerificationTime: v.optional(v.union(v.number(), v.null())),
-
-  // Your custom fields
-  createdAt: v.optional(v.string()),
-  password: v.optional(v.string()),
-  firstName: v.optional(v.string()),
-  lastName: v.optional(v.string()),
-  accountType: v.optional(v.array(v.string())),
-  organizationName: v.optional(v.string()),
-  source: v.optional(v.string()),
-  userId: v.optional(v.string()),
-  role: v.optional(v.array(v.string())),
-  subscription: v.optional(v.string()),
-  tokenIdentifier: v.optional(v.string()),
-  image: v.optional(v.string()),
-}
-
-export default defineSchema({
-  ...authTables, // This includes other auth tables
-  users: defineTable(customUserSchema)
-    .index("email", ["email"])
-    .index("by_token", ["tokenIdentifier"]),
-
-  otpCodes: defineTable({
-    email: v.string(),
-    otp: v.string(),
-    createdAt: v.string(),
-    expiresAt: v.number(),
-  }),
-
-  // Your other custom tables...
-})

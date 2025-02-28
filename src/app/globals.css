@@ -10,6 +10,12 @@ body,
 
 @layer base {
   :root {
+    --sal-yellow: 60 90% 75%; /* #f8f16b */
+    --sal-pink: 303, 100%, 82%; /* #ff7bff #f4a9f6 */
+    --sal-pink-hex: #f4a9f6;
+    --sal-green: 83, 51%, 88%; /* #e4f0d1 */
+    --sal-test: rgb(228, 240, 209);
+    --sal-yellow-hex: #f8f16b;
     --background: 0 0% 100%;
 
     --foreground: 222.2 84% 4.9%;

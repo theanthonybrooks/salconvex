@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { SignInFlow } from "@/features/auth/types"
 import { ConvexError } from "convex/values"
 import { Heart, LoaderPinwheel, TriangleAlert } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -21,11 +20,14 @@ import { FaGithub } from "react-icons/fa"
 import { FcGoogle } from "react-icons/fc"
 
 interface SignInCardProps {
-  setState: (state: SignInFlow) => void
+  // setState: (state: SignInFlow) => void
+  switchFlow: () => void
+  forgotPasswordHandler: () => void
 }
 
 const SignInCard: React.FC<SignInCardProps> = ({
-  setState,
+  switchFlow,
+  forgotPasswordHandler,
 }: SignInCardProps) => {
   const router = useRouter()
   const { signIn } = useAuthActions()
@@ -47,7 +49,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
     signIn("password", formData)
       .then(() => {
         setSuccess("Successfully signed in!")
-        router.push("/verify")
+        // router.push("/verify")
       })
       .catch((err) => {
         const errorMessage =
@@ -118,6 +120,13 @@ const SignInCard: React.FC<SignInCardProps> = ({
             )}
           </Button>
         </form>
+        <p className='w-full text-center text-xs text-muted-foreground'>
+          <span
+            onClick={forgotPasswordHandler}
+            className='text-sky-700 hover:underline cursor-pointer'>
+            Forgot your password?
+          </span>
+        </p>
         <Separator />
         <div className='flex items-center justify-center gap-2'>
           <Button
@@ -151,14 +160,23 @@ const SignInCard: React.FC<SignInCardProps> = ({
             Apple
           </Button> */}
         </div>
-        <p className='text-xs text-muted-foreground'>
-          Don&apos;t have an account?{" "}
-          <span
-            onClick={() => setState("signUp")}
-            className='text-sky-700 hover:underline cursor-pointer'>
-            Sign up
-          </span>
-        </p>
+        <div className='flex justify-between items-center'>
+          <p className='text-xs text-muted-foreground'>
+            Don&apos;t have an account?{" "}
+            <span
+              onClick={switchFlow}
+              className='text-sky-700 hover:underline cursor-pointer'>
+              Sign up
+            </span>
+          </p>
+          {/* <p className='text-xs text-muted-foreground'>
+            <span
+              onClick={() => setState("signUp")}
+              className='text-sky-700 hover:underline cursor-pointer'>
+              Forgot your password?
+            </span>
+          </p> */}
+        </div>
       </CardContent>
     </Card>
   )

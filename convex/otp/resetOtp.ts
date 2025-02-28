@@ -2,35 +2,7 @@ import Resend from "@auth/core/providers/resend"
 import { alphabet, generateRandomString } from "oslo/crypto"
 import { Resend as ResendAPI } from "resend"
 
-// export const ResendOTP = Resend({
-//   id: "resend-otp",
-//   apiKey: process.env.AUTH_RESEND_KEY,
-//   async generateVerificationToken() {
-//     return generateRandomString(6, alphabet("0-9"))
-//   },
-//   async sendVerificationRequest({ identifier: email, provider, token }) {
-//     const resend = new ResendAPI(provider.apiKey)
-
-//     const { error } = await resend.emails.send({
-//       from: "My App <onboarding@resend.dev>",
-//       to: [email],
-//       subject: `Verify your email for My App`,
-//       text: "Your verification code is " + token,
-//     })
-
-//     if (error) {
-//       throw new Error("Could not send verification email")
-//     }
-//   },
-// })
-
-// import Resend from "@auth/core/providers/resend"
-// import { alphabet, generateRandomString } from "oslo/crypto"
-// import { Resend as ResendAPI } from "resend"
-
-//------------------------------------------------------------------------------
-
-export const ResendOTP = Resend({
+export const ResetOTP = Resend({
   id: "resend-otp",
   apiKey: process.env.AUTH_RESEND_KEY,
   maxAge: 60 * 15, // 15 minutes
@@ -99,9 +71,9 @@ export const ResendOTP = Resend({
       <body>
           <div class="container">
               <div class="heading">The Street Art List</div>
-              <div class="text-sm">Please enter the following code to finish signing up.</div>
+              <div class="text-sm">Please enter the following code to proceed to password reset.</div>
               <div class="section">
-                  <div class="subtext">Verification code</div>
+                  <div class="subtext">Password reset code</div>
                   <div class="verification-code">${token}</div>
                   <div class="subtext">(This code is valid for ${validHours} minutes)</div>
               </div>
@@ -116,7 +88,7 @@ export const ResendOTP = Resend({
     const { error } = await resend.emails.send({
       from: "The Street Art List <onboarding@resend.dev>",
       to: [email],
-      subject: `${token} is your verification code`,
+      subject: `${token} is your pw reset code`,
       html: htmlContent,
     })
 

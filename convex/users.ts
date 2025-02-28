@@ -1,6 +1,17 @@
 import { v } from "convex/values"
+import { Scrypt } from "lucia"
 import { mutation, MutationCtx, query } from "./_generated/server"
 import { auth } from "./auth"
+
+const scrypt = new Scrypt()
+const scryptCrypto = {
+  hashSecret: async (secret: string): Promise<string> => {
+    return scrypt.hash(secret)
+  },
+  verifySecret: async (secret: string, hash: string): Promise<boolean> => {
+    return scrypt.verify(secret, hash)
+  },
+}
 
 export const current = query({
   args: {},
@@ -32,6 +43,43 @@ export async function findUserByEmail(ctx: MutationCtx, email: string) {
     .withIndex("email", (q) => q.eq("email", email))
     .unique()
 }
+
+export const updateUserEmailVerification = mutation({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await findUserByEmail(ctx, args.email)
+    console.log("user", user)
+    if (!user) {
+      console.log("user not found")
+      throw new Error("User not found")
+    }
+    await ctx.db.patch(user._id, {
+      emailVerificationTime: new Date().toISOString(),
+    })
+  },
+})
+
+export const updatePassword = mutation({
+  args: {
+    email: v.string(),
+    password: v.string(),
+    method: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await findUserByEmail(ctx, args.email)
+    if (!user) {
+      throw new Error("User not found")
+    }
+    const hashedPassword = await scryptCrypto.hashSecret(args.password)
+    await ctx.db.patch(user._id, {
+      password: hashedPassword,
+      updatedAt: new Date().toISOString(),
+      passwordChangedBy: args.method,
+    })
+  },
+})
 
 export const registerUser = mutation({
   args: {
