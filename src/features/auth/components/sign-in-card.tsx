@@ -7,17 +7,26 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { Label } from "@/components/ui/label"
 import { ConvexError } from "convex/values"
-import { Heart, LoaderPinwheel, TriangleAlert } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  Heart,
+  LoaderPinwheel,
+  LoaderPinwheelIcon,
+  TriangleAlert,
+  X,
+} from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { useState } from "react"
-import { FaGithub } from "react-icons/fa"
-import { FcGoogle } from "react-icons/fc"
+import { FaApple, FaGoogle } from "react-icons/fa"
 
 interface SignInCardProps {
   // setState: (state: SignInFlow) => void
@@ -33,7 +42,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
   const { signIn } = useAuthActions()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [pending, setPending] = useState(false)
+  const [isLoading, setIsLoading] = useState("")
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
 
@@ -63,17 +74,46 @@ const SignInCard: React.FC<SignInCardProps> = ({
       })
   }
 
-  const onProviderSignIn = (value: "github" | "google") => {
-    setPending(true)
-    signIn(value, { redirectTo: "/profile" }).finally(() => setPending(false))
+  const onProviderSignIn = (value: "github" | "google" | "apple") => {
+    setIsLoading(value)
+    signIn(value, { redirectTo: "/" }).finally(() => {
+      setPending(false)
+      setIsLoading("")
+    })
   }
 
   return (
-    <Card className='w-full h-full p-8'>
-      <CardHeader className='px-0 pt-0'>
-        <CardTitle>Login to continue</CardTitle>
-        <CardDescription>
-          Use your email or another service to continue
+    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-black bg-salYellow md:bg-white shadow-none  p-6'>
+      <button
+        className='absolute right-5 top-4 z-10 text-lg font-bold text-black hover:rounded-full hover:text-salPink focus-visible:bg-salPink'
+        aria-label='Back to homepage'
+        tabIndex={8}
+        onClick={() => router.push("/")}>
+        <X size={25} />
+      </button>
+      <CardHeader className='px-0 pt-0 items-center'>
+        <Link
+          href='/'
+          prefetch={true}
+          className='mb-5 flex flex-col items-center'>
+          <Image
+            src='/sitelogo.svg'
+            alt='The Street Art List'
+            width={80}
+            height={80}
+            className='mb-4'
+            priority={true}
+          />
+          <Image
+            src='/saltext.png'
+            alt='The Street Art List'
+            width={300}
+            height={100}
+            priority={true}
+          />
+        </Link>
+        <CardDescription className='mt-2 text-base text-black'>
+          Please sign in to continue
         </CardDescription>
       </CardHeader>
       {!!error && (
@@ -88,31 +128,110 @@ const SignInCard: React.FC<SignInCardProps> = ({
           <p>{success}</p>
         </div>
       )}
-      <CardContent className='space-y-5 px-0 pb-0'>
-        <form className='space-y-2.5' onSubmit={(e) => onPasswordSignIn(e)}>
-          <Input
-            name='email'
-            disabled={pending}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder='email@email.com'
-            type='email'
-          />
-          <Input
-            name='password'
-            disabled={pending}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder='********'
-            type='password'
-            required
-          />
+      <CardContent className='grid gap-y-4'>
+        <div className='grid grid-cols-2 gap-x-4'>
           <Button
-            className='w-full'
+            variant='salWithoutShadow'
+            size='lg'
+            type='button'
+            className='w-full flex justify-center items-center gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
+            onClick={() => onProviderSignIn("google")}
+            disabled={pending}
+            tabIndex={1}>
+            {isLoading === "google" ? (
+              <LoaderPinwheelIcon className='size-5 animate-spin' />
+            ) : (
+              <>
+                <FaGoogle size='5' />
+                Google
+              </>
+            )}
+          </Button>
+          <Button
+            variant='salWithoutShadow'
+            size='lg'
+            type='button'
+            className='w-full flex justify-center items-center gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
+            onClick={() => onProviderSignIn("apple")}
+            disabled={pending}
+            tabIndex={2}>
+            {isLoading === "apple" ? (
+              <LoaderPinwheelIcon className='size-5 animate-spin' />
+            ) : (
+              <>
+                <FaApple size='5' />
+                Apple
+              </>
+            )}
+          </Button>
+        </div>
+        <p className='flex items-center gap-x-3 text-sm text-black before:h-[1px] before:flex-1 before:bg-black after:h-[1px] after:flex-1 after:bg-black'>
+          or
+        </p>
+        <form className=' flex flex-col' onSubmit={(e) => onPasswordSignIn(e)}>
+          <div className='space-y-2.5'>
+            <Label htmlFor='email' className='text-black'>
+              Email address
+            </Label>
+            <Input
+              id='email'
+              name='email'
+              disabled={pending}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder=' '
+              type='email'
+              // inputHeight='sm'
+              className='border-[1.5px] border-black bg-white text-black focus:bg-white'
+              required
+              tabIndex={3}
+            />
+            <div className='flex flex-col space-y-2.5'>
+              <div className='flex justify-between items-center'>
+                <Label htmlFor='password' className='text-black'>
+                  Password
+                </Label>
+                <span
+                  onClick={forgotPasswordHandler}
+                  className='text-black text-sm hover:underline cursor-pointer'>
+                  Forgot password?
+                </span>
+              </div>
+              <div className='relative'>
+                <Input
+                  id='password'
+                  name='password'
+                  disabled={pending}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder=' '
+                  type={showPassword ? "text" : "password"}
+                  // inputHeight='sm'
+                  className='border-[1.5px] border-black bg-white text-black focus:bg-white'
+                  required
+                  tabIndex={4}
+                />
+                <button
+                  type='button'
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className='absolute inset-y-0 right-0 flex items-center pr-3'
+                  tabIndex={5}>
+                  {showPassword ? (
+                    <Eye className='size-4 text-black' />
+                  ) : (
+                    <EyeOff className='size-4 text-black' />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+          <Button
+            className='w-full mt-6 bg-white md:bg-salYellow'
             size='lg'
             type='submit'
-            variant='black'
-            disabled={pending}>
+            variant='salWithShadowYlw'
+            disabled={pending}
+            tabIndex={6}>
             {pending ? (
               <LoaderPinwheel className='animate-spin size-5' />
             ) : (
@@ -120,64 +239,18 @@ const SignInCard: React.FC<SignInCardProps> = ({
             )}
           </Button>
         </form>
-        <p className='w-full text-center text-xs text-muted-foreground'>
+      </CardContent>
+      <CardFooter className='justify-center pb-0'>
+        <p className='mt-3 text-center text-sm text-black'>
+          Don&apos;t have an account?{" "}
           <span
-            onClick={forgotPasswordHandler}
-            className='text-sky-700 hover:underline cursor-pointer'>
-            Forgot your password?
+            onClick={switchFlow}
+            className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+            tabIndex={7}>
+            Sign up
           </span>
         </p>
-        <Separator />
-        <div className='flex items-center justify-center gap-2'>
-          <Button
-            variant='outline'
-            size='sm'
-            type='button'
-            className='w-full flex justify-center items-center gap-2'
-            onClick={() => onProviderSignIn("google")}
-            disabled={pending}>
-            <FcGoogle size='5' />
-            Google
-          </Button>
-          <Button
-            variant='outline'
-            size='sm'
-            type='button'
-            className='w-full flex justify-center items-center gap-2'
-            onClick={() => onProviderSignIn("github")}
-            disabled={pending}>
-            <FaGithub size='5' />
-            Github
-          </Button>
-          {/* <Button
-            variant='outline'
-            size='sm'
-            type='button'
-            className='w-full flex justify-center items-center gap-2'
-            onClick={() => {}}
-            disabled={pending}>
-            <FaApple size='5' />
-            Apple
-          </Button> */}
-        </div>
-        <div className='flex justify-between items-center'>
-          <p className='text-xs text-muted-foreground'>
-            Don&apos;t have an account?{" "}
-            <span
-              onClick={switchFlow}
-              className='text-sky-700 hover:underline cursor-pointer'>
-              Sign up
-            </span>
-          </p>
-          {/* <p className='text-xs text-muted-foreground'>
-            <span
-              onClick={() => setState("signUp")}
-              className='text-sky-700 hover:underline cursor-pointer'>
-              Forgot your password?
-            </span>
-          </p> */}
-        </div>
-      </CardContent>
+      </CardFooter>
     </Card>
   )
 }

@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@convex-dev/auth/server"
 import { v } from "convex/values"
 import { Scrypt } from "lucia"
 import { mutation, MutationCtx, query } from "./_generated/server"
@@ -27,11 +28,11 @@ export const current = query({
 })
 
 export const isNewUser = query({
-  args: { tokenIdentifier: v.string() },
+  args: { email: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db
       .query("users")
-      .withIndex("email", (q) => q.eq("email", args.tokenIdentifier))
+      .withIndex("email", (q) => q.eq("email", args.email))
       .unique()
     return user === null
   },
@@ -57,9 +58,31 @@ export const updateUserEmailVerification = mutation({
     }
     await ctx.db.patch(user._id, {
       emailVerificationTime: new Date().toISOString(),
+      userId: user._id,
+      tokenIdentifier: user._id,
     })
   },
 })
+
+// export const updatePassword = mutation({
+//   args: {
+//     email: v.string(),
+//     password: v.string(),
+//     method: v.string(),
+//   },
+//   handler: async (ctx, args) => {
+//     const user = await findUserByEmail(ctx, args.email)
+//     if (!user) {
+//       throw new Error("User not found")
+//     }
+//     const hashedPassword = await scryptCrypto.hashSecret(args.password)
+//     await ctx.db.patch(user._id, {
+//       password: hashedPassword,
+//       updatedAt: new Date().toISOString(),
+//       passwordChangedBy: args.method,
+//     })
+//   },
+// })
 
 export const updatePassword = mutation({
   args: {
@@ -77,6 +100,30 @@ export const updatePassword = mutation({
       password: hashedPassword,
       updatedAt: new Date().toISOString(),
       passwordChangedBy: args.method,
+    })
+
+    const currentId = await getAuthUserId(ctx)
+    const identity = await ctx.auth.getUserIdentity()
+    console.log("identity", identity)
+    console.log("currentId", currentId)
+
+    const userAgent = !identity
+      ? "forgotForm"
+      : identity.email === args.email &&
+        currentId &&
+        identity.subject.includes(currentId)
+      ? "user"
+      : "admin"
+
+    //TODO: Come back to this and verify that how I'm approaching this is correct. I'm not certain that this is the best way to do this.
+
+    await ctx.db.insert("passwordResetLog", {
+      email: args.email,
+      userId: user._id,
+      timestamp: new Date().toISOString(),
+      // ipAddress: ipAddress as string, // ensure string type
+      userAgent, // "user" or "admin"
+      actionType: args.method,
     })
   },
 })

@@ -5,11 +5,7 @@ import React from "react"
 interface AuthPageProps {}
 
 const AuthPage: React.FC<AuthPageProps> = () => {
-  return (
-    <div className='h-screen'>
-      <AuthScreen />
-    </div>
-  )
+  return <AuthScreen />
 }
 
 export default AuthPage

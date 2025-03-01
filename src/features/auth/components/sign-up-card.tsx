@@ -108,7 +108,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
             className='w-full'
             size='lg'
             type='submit'
-            variant='black'
+            variant='salWithShadow'
             disabled={pending}>
             Continue
           </Button>

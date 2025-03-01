@@ -1,7 +1,6 @@
 "use client"
 
 import { login } from "@/actions/login"
-import CardWrapper from "@/components/auth/card-wrapper"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 import { Button } from "@/components/ui/button"
@@ -14,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import CardWrapper from "@/features/auth/components/card-wrapper"
 import { LoginSchema } from "@/schemas/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState, useTransition } from "react"

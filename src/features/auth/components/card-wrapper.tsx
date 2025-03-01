@@ -1,5 +1,5 @@
-import { Header } from "@/components/auth/header"
-import { Social } from "@/components/auth/social"
+import { Header } from "@/features/auth/components/header"
+import { Social } from "@/features/auth/components/social"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Link from "next/link"

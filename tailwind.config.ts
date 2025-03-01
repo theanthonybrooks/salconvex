@@ -70,6 +70,11 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        slg: "-5px 5px 0 0 #000000",
+        smd: "-3px 3px 0 0 #000000",
+        ssm: "-2px 2px 0 0 #000000",
+      },
       padding: {
         "10": "2.5rem",
         "12": "3rem",

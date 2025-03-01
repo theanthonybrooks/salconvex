@@ -29,8 +29,19 @@ export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
     .index("email", ["email"])
+    .index("by_userId", ["userId"])
     .index("by_token", ["tokenIdentifier"]),
 
+  passwordResetLog: defineTable({
+    email: v.string(),
+    userId: v.string(),
+    timestamp: v.string(),
+    ipAddress: v.optional(v.string()),
+    userAgent: v.string(),
+    actionType: v.string(),
+  })
+    .index("email", ["email"])
+    .index("userId", ["userId"]),
   // Your other custom tables...
 })
 

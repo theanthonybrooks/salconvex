@@ -125,3 +125,158 @@ body,
     @apply bg-background text-foreground;
   }
 }
+
+/* ----------- Components ------------ */
+
+.search {
+  & .scrollbar::-webkit-scrollbar {
+    width: 2px;
+  }
+  &.scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #f7f4ed;
+  }
+
+  &.scrollbar::-webkit-scrollbar-thumb {
+    background: #e6dcd5;
+    border-radius: 100vh;
+    /*  border: 3px solid #f6f7ed;  */
+  }
+
+  &.scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #e0cbcb;
+  }
+}
+
+/* For WebKit-based browsers (Chrome, Safari, Edge) */
+.scrollable::-webkit-scrollbar {
+  width: 1em;
+  height: 2px; /* if you also want horizontal scrollbars */
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: var(--sal-yellow-hex);
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: var(--sal-yellow-hex);
+  border-radius: 9999px; /* fully rounded */
+  border: 1px solid black;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* On hover, scale the thumb horizontally to appear thicker */
+.scrollable::-webkit-scrollbar-thumb:hover {
+  transform: scaleX(2); /* doubles the width from 2px to ~4px */
+  background-color: rgb(255, 252, 199);
+}
+
+@-moz-document url-prefix() {
+  .scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sal-yellow-hex) rgb(255, 252, 199);
+  }
+}
+
+.accordion-cont {
+  &:not(:last-of-type) {
+    padding-bottom: 10px;
+  }
+  &:not(:first-of-type) {
+    padding-top: 10px;
+  }
+}
+
+.price-card-cont {
+  &:not(:last-of-type) {
+    margin-bottom: 5em;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+:focus-visible {
+  outline: 2px solid var(--sal-pink-hex);
+  outline-offset: 2px;
+}
+
+:focus,
+:focus-within,
+:active {
+  &:not(button) {
+    box-shadow: none;
+  }
+  outline: none;
+  /* border: 2px solid black ; */
+}
+form {
+  input:focus,
+  textarea:focus {
+    outline: 1px solid black;
+    outline-offset: 0;
+  }
+  input:valid {
+    background-color: rgb(255, 255, 255);
+  }
+}
+input::-webkit-autofill,
+input::-webkit-autofill:hover,
+input::-webkit-autofill:focus,
+input::-webkit-autofill:active {
+  background-color: white;
+  color: black;
+  box-shadow: 0 0 0px 1000px white inset;
+}
+
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px white inset;
+  -webkit-text-fill-color: black;
+  caret-color: black; /* note-to-self: cursor styling*/
+
+  &.sal {
+    -webkit-box-shadow: 0 0 0 30px var(--sal-yellow-hex) inset;
+  }
+  font-weight: 400;
+  font-style: italic;
+}
+
+input::-moz-focus-inner {
+  border: 0;
+}
+
+input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input:not(:placeholder-shown):not(:valid) {
+  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2); /* outer offset outline */
+}
+
+::selection {
+  background: var(--sal-pink-hex); /* Yellow highlight */
+  color: black;
+}
+
+button:focus-visible,
+button:focus-within,
+button:active {
+  outline: var(--sal-pink) solid 2px;
+}
+/* 
+:focus-visible {
+  &:not(button) {
+    outline: rgba(0, 0, 0, 0.2) solid 2px;
+  }
+
+  border-radius: 5px;
+} */

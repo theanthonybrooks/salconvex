@@ -1,5 +1,9 @@
 import * as z from "zod"
 
+const passwordValidation = new RegExp(
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
+)
+
 export const LoginSchema = z.object({
   email: z.string().email({ message: "Email is required" }),
   password: z.string().min(8, { message: "Password is required" }),
@@ -10,7 +14,13 @@ export const RegisterSchema = z
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
     email: z.string().email({ message: "Email is required" }),
-    password: z.string().min(8, { message: "Minimum 8 characters required" }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .regex(passwordValidation, {
+        message:
+          "Password must contain at least one uppercase letter, one number, and one symbol.",
+      }),
     accountType: z
       .array(z.string())
       .min(1, { message: "At least one account type is required" }),
@@ -47,5 +57,11 @@ export const ForgotPasswordSchema = z.object({
 
 export const ResetPasswordSchema = z.object({
   code: z.string().min(6, { message: "OTP must be 6 digits" }),
-  newPassword: z.string().min(8, { message: "Password is required" }),
+  newPassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." })
+    .regex(passwordValidation, {
+      message:
+        "Password must contain at least one uppercase letter, one number, and one symbol.",
+    }),
 })

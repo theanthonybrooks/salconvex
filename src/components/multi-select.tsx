@@ -227,6 +227,7 @@ export const MultiSelect = React.forwardRef<
             className={cn(
               "flex w-full p-1 rounded-md border items-center justify-between bg-stone-100 hover:bg-stone-100 [&_svg]:pointer-events-auto",
               className,
+              variant === "basic" ? "border-black" : "",
               multiSelectVariants({ variant })
             )}>
             {selectedValues.length > 0 ? (
@@ -318,7 +319,8 @@ export const MultiSelect = React.forwardRef<
         <PopoverContent
           className={cn(
             "p-0 max-w-max",
-            hasSearch ? "w-auto" : "w-full min-w-[200px] "
+            hasSearch ? "w-auto" : "w-full min-w-[200px]",
+            variant === "basic" ? "border-black" : ""
           )}
           align='start'
           onEscapeKeyDown={() => setIsPopoverOpen(false)}>
