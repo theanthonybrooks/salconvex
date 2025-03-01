@@ -1,7 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { v } from "convex/values"
 import { Scrypt } from "lucia"
-import { Id } from "./_generated/dataModel"
 import {
   internalMutation,
   mutation,
@@ -213,70 +212,107 @@ export const deleteAccount = mutation({
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    let user: { _id: Id<"users">; email: string; createdAt: number } | null =
-      null
-    let deleteType = "deleteAccount"
-    let userAgent = "user-self"
+    // Define a type for valid methods
+    type MethodType =
+      | "deleteAccount"
+      | "ban"
+      | "cancelSignup"
+      | "resentOtp"
+      | "signupTimeout"
 
-    // Handle bans.
-    if (args.method === "ban") {
-      deleteType = "ban"
-      userAgent = "admin"
+    // Ensure the method is one of the valid ones
+    if (
+      ![
+        "deleteAccount",
+        "ban",
+        "cancelSignup",
+        "resentOtp",
+        "signupTimeout",
+      ].includes(args.method)
+    ) {
+      throw new Error("Invalid method")
     }
 
-    if (args.method === "deleteAccount") {
+    const method = args.method as MethodType
+
+    // Configuration map for each method
+    const methodConfigs: Record<
+      MethodType,
+      { deleteType: string; userAgent: string; requiresEmail: boolean }
+    > = {
+      deleteAccount: {
+        deleteType: "deleteAccount",
+        userAgent: "user-self",
+        requiresEmail: false,
+      },
+      ban: { deleteType: "ban", userAgent: "admin", requiresEmail: false },
+      cancelSignup: {
+        deleteType: "cancelSignup",
+        userAgent: "user-self",
+        requiresEmail: true,
+      },
+      resentOtp: {
+        deleteType: "resentOtp",
+        userAgent: "user-self",
+        requiresEmail: true,
+      },
+      signupTimeout: {
+        deleteType: "signupTimeout",
+        userAgent: "system",
+        requiresEmail: true,
+      },
+    }
+
+    const config = methodConfigs[method]
+
+    let queryKey: "email" | "userId"
+    let queryValue: string
+
+    if (config.requiresEmail) {
+      if (!args.email) {
+        throw new Error(`Email is required for ${method}`)
+      }
+      queryKey = "email"
+      queryValue = args.email
+    } else {
       const userId = await getAuthUserId(ctx)
       if (!userId) {
         throw new Error("Unauthenticated call to mutation")
       }
-      user = await ctx.db
-        .query("users")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
-        .unique()
-    } else if (args.method === "cancelSignup") {
-      deleteType = "cancelSignup"
-      if (!args.email) {
-        throw new Error("Email is required for cancelSignup")
-      }
-      user = await ctx.db
-        .query("users")
-        .withIndex("email", (q) => q.eq("email", args.email!))
-        .unique()
-    } else if (args.method === "signupTimeout") {
-      deleteType = "signupTimeout"
-      userAgent = "system"
-      if (!args.email) {
-        throw new Error("Email is required for signupTimeout")
-      }
-      user = await ctx.db
-        .query("users")
-        .withIndex("email", (q) => q.eq("email", args.email!))
-        .unique()
+      queryKey = "userId"
+      queryValue = userId
     }
 
+    // Query the user
+    const user = await ctx.db
+      .query("users")
+      .withIndex(queryKey === "email" ? "email" : "by_userId", (q) =>
+        q.eq(queryKey, queryValue)
+      )
+      .unique()
+
     if (!user) {
-      console.log("User not found")
       throw new Error("User not found")
     }
 
     const userId = user._id
 
-    // Delete related documents in batches.
+    // Delete related documents in batches
     await deleteRelatedDocuments(ctx, userId)
 
-    // Check and delete the user document (idempotency).
+    // Check and delete the user document (idempotency)
     const userDoc = await ctx.db.get(userId)
     if (userDoc) {
       await ctx.db.delete(userId)
     }
 
-    // Log the deletion.
+    // Log the deletion
     await ctx.db.insert("deleteAccountLog", {
       email: user.email ?? "unknown",
       userId,
       timestamp: Date.now(),
-      userAgent,
-      actionType: deleteType,
+      userAgent: config.userAgent,
+      actionType: config.deleteType,
       accountCreatedAt: user.createdAt,
     })
   },

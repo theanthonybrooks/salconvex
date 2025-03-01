@@ -4,9 +4,18 @@ import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 import { MultiSelect } from "@/components/multi-select"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { AnimatePresence, motion } from "framer-motion"
 
+import ResendTimer from "@/components/resend-timer"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -16,13 +25,21 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 import { Label } from "@/components/ui/label"
 import CloseBtn from "@/features/auth/components/close-btn"
+import SmileySvg from "@/features/auth/components/smiley-svg"
+import SpeechBubble from "@/features/auth/components/speech-bubble"
 import { RegisterSchema } from "@/schemas/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useConvex, useMutation } from "convex/react"
 import { ConvexError } from "convex/values"
-import { Eye, EyeOff } from "lucide-react"
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { ExternalLink, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -54,8 +71,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [showPassword, setShowPassword] = useState(false)
   const [selectedOption, setSelectedOption] = useState<string[]>(["artist"])
   const [submitData, setSubmitData] = useState<object>({})
+  // const [step, setStep] = useState<StepType>("verifyOtp")
   const [step, setStep] = useState<StepType>("signUp")
   const [email, setEmail] = useState<string>("")
+  const [obsEmail, setObsEmail] = useState("")
   const [otp, setOtp] = useState<string>("")
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -72,6 +91,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     },
     mode: "onBlur",
   })
+
+  const onEmailChange = (inputEmail: string) => {
+    if (inputEmail.includes("@")) {
+      const [username, domain] = inputEmail.split("@")
+      if (!username || username.length < 2) {
+        setObsEmail(inputEmail)
+        return
+      }
+      setObsEmail(`${username.slice(0, 2)}****@${domain}`)
+    }
+  }
 
   const handleStep1Submit = async (values: z.infer<typeof RegisterSchema>) => {
     setError("")
@@ -98,13 +128,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     setSubmitData(formData)
     setEmail(values.email)
+    onEmailChange(values.email)
     startTransition(() => {
       signIn("password", {
         ...formData,
         flow: "signUp",
       })
         .then(() => {
-          setSuccess("OTP sent to your email!")
+          // setSuccess("OTP sent to your email!")
           setStep("verifyOtp")
         })
         .catch((err) => {
@@ -121,6 +152,47 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         })
     })
   }
+  const handleOtpChange = (value: string) => {
+    setOtp(value)
+  }
+  // const handleOtpResend =
+  const handleResendCode = async () => {
+    if (!email) {
+      setError("No email found. Please try signing up again.")
+      return
+    }
+
+    setError("")
+    setSuccess("")
+
+    try {
+      // Step 1: Delete the existing account
+      await DeleteAccount({ method: "resentOtp", email })
+
+      // Step 2: Resubmit the signup request with stored `submitData`
+      startTransition(() => {
+        signIn("password", { ...submitData, flow: "signUp" })
+          .then(() => {
+            setSuccess("Verification code resent!")
+            setTimeout(() => {
+              setSuccess("")
+            }, 3000)
+          })
+          .catch((err) => {
+            if (err instanceof ConvexError) {
+              console.error(err.data)
+              setError(err.data)
+            } else {
+              console.error(err)
+              setError("Something went wrong while resending the code.")
+            }
+          })
+      })
+    } catch (err) {
+      console.error("Error resending verification code:", err)
+      setError("Could not resend verification code. Please try again.")
+    }
+  }
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -128,7 +200,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     setSuccess("")
 
     if (!otp || otp.length !== 6) {
-      setError("Please enter a valid 6-digit OTP.")
+      setError("Please enter a valid 6-digit code")
       return
     }
 
@@ -190,26 +262,57 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         actionTitle='Confirm'
         actionClassName='px-10'
       />
-      <CardHeader>
-        <section className='flex flex-col items-center justify-center space-y-2.5'>
-          <Image
-            src='/create-account.svg'
-            alt='The Street Art List'
-            width={300}
-            height={100}
-            priority={true}
-            className='ml-2'
-          />
-          <p className='text-sm'>
-            Read more about account types{" "}
-            <Link
-              href='/pricing'
-              className='underline font-medium text-zinc-950 decoration-black underline-offset-4 outline-none focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline-offset-2 hover:underline-offset-1 cursor-pointer'>
-              here
-            </Link>
-          </p>
-        </section>
-      </CardHeader>
+      {step === "signUp" && (
+        <CardHeader>
+          <section className='flex flex-col items-center justify-center space-y-2.5'>
+            <Image
+              src='/create-account.svg'
+              alt='The Street Art List'
+              width={300}
+              height={100}
+              priority={true}
+              className='ml-2'
+            />
+            {/* <p className='text-sm'>
+              Read more about account types{" "}
+              <Link
+                href='/pricing'
+                className='underline font-medium text-zinc-950 decoration-black underline-offset-4 outline-none focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline-offset-2 hover:underline-offset-1 cursor-pointer'>
+                here
+              </Link>
+            </p> */}
+            <p className='mt-2 mb-5 text-center text-base text-black'>
+              Already have an account?{" "}
+              <span
+                onClick={switchFlow}
+                className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+                tabIndex={7}>
+                Sign in
+              </span>
+            </p>
+          </section>
+        </CardHeader>
+      )}
+      {step === "verifyOtp" && (
+        <CardHeader className='relative h-[220px]'>
+          <div className='relative h-full w-full'>
+            <SpeechBubble
+              strokeWidth='4'
+              className='absolute left-[50%] top-[50%] h-auto w-[20em] -translate-x-1/2 -translate-y-1/2 md:w-[21.5em]'
+            />
+
+            {/* Adjust top offset to match the speech bubble’s center */}
+            <div className='absolute max-w-[300px] left-[50%] top-[37%] z-10 w-full -translate-x-1/2 -translate-y-1/2 transform text-center'>
+              <CardTitle className='mb-2 text-4xl'>Verify your email</CardTitle>
+              <CardDescription className='text-base text-black max-w-[300px] text-center text-balance'>
+                {email
+                  ? "We sent a code to " + obsEmail + "!"
+                  : "We sent you a verification code!"}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+      )}
       <CardContent className='flex flex-col gap-y-2.5'>
         {step === "signUp" ? (
           <Form {...form}>
@@ -393,8 +496,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   )}
                 />
               </div>
-              <FormSuccess message={success} />
-              <FormError message={error} />
+              <AnimatePresence>
+                {(success || error) && (
+                  <motion.div
+                    key={success ? "success" : "error"} // Unique key to trigger reanimation
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}>
+                    {success && <FormSuccess message={success} />}
+                    {error && <FormError message={error} />}
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <Button
                 disabled={isPending}
                 type='submit'
@@ -402,44 +516,75 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 Create Account
               </Button>
             </form>
+            <CardFooter className='justify-center p-4 pb-0 flex flex-col'>
+              <p className='mt-3 text-center text-sm text-black'>
+                By creating an account, you agree to our
+                <br />
+                <Link
+                  href='/terms'
+                  className='font-bold cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'>
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href='/privacy'
+                  className='font-bold inline-flex  items-center cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'>
+                  Privacy Policy <ExternalLink size={16} className='ml-[2px]' />
+                </Link>
+              </p>
+            </CardFooter>
           </Form>
         ) : (
           <Form {...form}>
             <form onSubmit={handleOtpSubmit} className='space-y-6'>
-              <FormLabel>Enter the OTP sent to {email}</FormLabel>
-              <Input
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder='6-digit code'
-                maxLength={6}
-                required
-                name='otp'
-              />
+              <div className='relative mx-auto mb-5 aspect-square w-full md:w-[90%] max-w-[25em]   md:min-w-[350px] md:max-w-[45em]'>
+                <SmileySvg
+                  width='100%'
+                  // className='absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]'
+                  className='relative min-w-[300px]'
+                />
+                <CardContent className='absolute left-1/2 top-[65.5%] grid -translate-x-1/2 -translate-y-1/2 transform gap-y-4'>
+                  <div className='grid items-center justify-center gap-y-2'></div>
+                  <InputOTP
+                    // {...resetForm.register("code")}
+                    id='otp'
+                    name='otp'
+                    maxLength={6}
+                    pattern={REGEXP_ONLY_DIGITS}
+                    value={otp}
+                    onChange={handleOtpChange}
+                    disabled={isPending}
+                    // tabIndex={step !== 'forgot' && 1}
+                    tabIndex={1}
+                    className='border-black '>
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} className='bg-white' border='2' />
+                      <InputOTPSlot index={1} className='bg-white' border='2' />
+                      <InputOTPSlot index={2} className='bg-white' border='2' />
+                      <InputOTPSlot index={3} className='bg-white' border='2' />
+                      <InputOTPSlot index={4} className='bg-white' border='2' />
+                      <InputOTPSlot index={5} className='bg-white' border='2' />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </CardContent>
+              </div>
+              {/* <FormLabel>Enter the OTP sent to {email}</FormLabel> */}
+              <ResendTimer initialTime={60} onResend={handleResendCode} />
+
               <FormSuccess message={success} />
               <FormError message={error} />
               <Button
+                variant='salWithShadowYlw'
                 disabled={isPending}
+                size='lg'
                 type='submit'
-                className='w-full text-white'>
-                Verify OTP
+                className='w-full bg-white sm:bg-salYellow text-base'>
+                Verify
               </Button>
             </form>
           </Form>
         )}
       </CardContent>
-      {step === "signUp" && (
-        <CardFooter className='justify-center pb-0'>
-          <p className='mt-3 text-center text-sm text-black'>
-            Already have an account?{" "}
-            <span
-              onClick={switchFlow}
-              className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
-              tabIndex={7}>
-              Sign in
-            </span>
-          </p>
-        </CardFooter>
-      )}
     </Card>
   )
 }

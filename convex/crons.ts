@@ -5,8 +5,7 @@ const crons = cronJobs()
 
 crons.daily(
   "Delete unconfirmed users",
-  { hourUTC: 17, minuteUTC: 9 },
-  //   { hourUTC: 0, minuteUTC: 0 }, // Run daily at midnight UTC
+  { hourUTC: 0, minuteUTC: 0 }, // Run daily at midnight UTC (-1 from Berlin)
   internal.users.deleteUnconfirmedUsers
 )
 
