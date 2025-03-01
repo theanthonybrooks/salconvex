@@ -71,7 +71,7 @@ export const registerUser = mutation({
     // If user doesn't exist, create a new one
     const userId = await ctx.db.insert("users", {
       role: ["guest"],
-      createdAt: new Date().toISOString(),
+      createdAt: Date.now(),
       email: args.email!,
       password: args.password!, // Note: You should hash this password before storing
       firstName: args.firstName!,
@@ -127,7 +127,7 @@ export const store = mutation({
       email: identity.email!,
       userId: identity.subject,
       tokenIdentifier: identity.subject,
-      createdAt: new Date().toISOString(),
+      createdAt: Date.now(),
       accountType: ["guest"],
       password: "password",
     })

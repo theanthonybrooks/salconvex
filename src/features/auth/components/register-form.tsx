@@ -46,6 +46,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const userId = uuidv4()
   const convex = useConvex()
   const updateVerification = useMutation(api.users.updateUserEmailVerification)
+  const DeleteAccount = useMutation(api.users.deleteAccount)
   const { signIn } = useAuthActions()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>("")
@@ -156,14 +157,28 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     // })
   }
 
+  const onCancelSignup = async () => {
+    if (step === "signUp") {
+      router.push("/")
+      return
+    }
+
+    try {
+      await DeleteAccount({ method: "cancelSignup", email })
+    } catch (err) {
+      console.error("Error deleting account:", err)
+    } finally {
+      router.push("/")
+    }
+  }
+
   const options: { value: "artist" | "organizer"; label: string }[] = [
     { value: "artist", label: "Artist" },
     { value: "organizer", label: "Organizer" },
   ]
 
   useEffect(() => {
-    // Update the RHF field with the current selected values
-    form.setValue("accountType", selectedOption) // ✅ No need for `.map()`
+    form.setValue("accountType", selectedOption)
   }, [selectedOption, form])
 
   return (
@@ -171,9 +186,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       <CloseBtn
         title='Are you sure?'
         description='You can always start again at any time though an account is required to apply to open calls. If you already have an account, you can also sign in.'
-        onAction={() => router.push("/")}
-        actionTitle='Login'
-        onPrimaryAction={switchFlow}
+        onAction={onCancelSignup}
+        actionTitle='Confirm'
+        actionClassName='px-10'
       />
       <CardHeader>
         <section className='flex flex-col items-center justify-center space-y-2.5'>
@@ -300,15 +315,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
                 <div className='w-full flex flex-col gap-y-3'>
                   <Label className=''>Account Type</Label>
-                  {/* <Select
-                  instanceId='accountTypeSelect'
-                  isMulti={true}
-                  value={selectedOption} // ✅ Explicitly control value
-                  options={options}
-                  onChange={handleChange}
-                  classNamePrefix='react-select'
-                  noOptionsMessage={() => "Out of options!"}
-                /> */}
+
                   <MultiSelect
                     options={options}
                     onValueChange={(value) => setSelectedOption(value)}
@@ -420,17 +427,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </Form>
         )}
       </CardContent>
-      <CardFooter className='justify-center pb-0'>
-        <p className='mt-3 text-center text-sm text-black'>
-          Already have an account?{" "}
-          <span
-            onClick={switchFlow}
-            className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
-            tabIndex={7}>
-            Sign in
-          </span>
-        </p>
-      </CardFooter>
+      {step === "signUp" && (
+        <CardFooter className='justify-center pb-0'>
+          <p className='mt-3 text-center text-sm text-black'>
+            Already have an account?{" "}
+            <span
+              onClick={switchFlow}
+              className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+              tabIndex={7}>
+              Sign in
+            </span>
+          </p>
+        </CardFooter>
+      )}
     </Card>
   )
 }

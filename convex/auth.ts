@@ -80,18 +80,17 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           : profile.firstName + " " + profile.lastName,
         email: profile.email,
         emailVerificationTime: null,
-        createdAt: new Date().toISOString(),
+        createdAt: Date.now(),
         password: hashedPassword,
         firstName: profile.firstName,
         lastName: profile.lastName,
         accountType: profile.accountType,
         organizationName: profile.organizationName,
         source: profile.source,
-        userId: currentId ? currentId : `temp${new Date().toISOString}`,
+        userId: currentId ? currentId : `temp${Date.now()}`,
         role: profile.role ?? ["user"],
-        tokenIdentifier: currentId
-          ? currentId
-          : `temp${new Date().toISOString}`,
+        tokenIdentifier: currentId ? currentId : `temp${Date.now()}`,
+        emailVerified: false,
       })
 
       return newUserId

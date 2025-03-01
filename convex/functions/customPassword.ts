@@ -19,7 +19,7 @@ export const CustomPassword = () =>
         name: params.name as string,
         email: params.email as string,
         emailVerificationTime: null,
-        createdAt: new Date().toISOString(),
+        createdAt: Date.now(),
         password: params.password as string,
         newPassword: params.newPassword as string,
         firstName: params.firstName as string,
@@ -31,7 +31,7 @@ export const CustomPassword = () =>
         role: ["user"],
         subscription: params.subscription as string,
         tokenIdentifier: params.userId as string,
-        updatedAt: new Date().toISOString(),
+        updatedAt: Date.now(),
       }
     },
   })

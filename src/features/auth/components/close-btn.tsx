@@ -20,6 +20,7 @@ interface CloseBtnProps {
   onPrimaryAction?: () => void | string
   primaryActionTitle?: string
   className?: string
+  actionClassName?: string
 }
 
 const CloseBtn: React.FC<CloseBtnProps> = ({
@@ -29,6 +30,7 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
   actionTitle = "Yes",
   onPrimaryAction,
   primaryActionTitle = "Return to homepage",
+  actionClassName,
   className,
 }) => {
   return (
@@ -51,7 +53,7 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onAction}>
+          <AlertDialogAction onClick={onAction} className={actionClassName}>
             {actionTitle}
           </AlertDialogAction>
           {onPrimaryAction && (

@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
 import type * as functions_customPassword from "../functions/customPassword.js";
 import type * as http from "../http.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
@@ -33,6 +34,7 @@ import type * as users from "../users.js";
 declare const fullApi: ApiFromModules<{
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
   auth: typeof auth;
+  crons: typeof crons;
   "functions/customPassword": typeof functions_customPassword;
   http: typeof http;
   "otp/resendOtp": typeof otp_resendOtp;
