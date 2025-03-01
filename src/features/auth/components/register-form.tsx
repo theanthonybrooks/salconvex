@@ -39,11 +39,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useConvex, useMutation } from "convex/react"
 import { ConvexError } from "convex/values"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
-import { ExternalLink, Eye, EyeOff } from "lucide-react"
+import { ExternalLink, Eye, EyeOff, LoaderCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState, useTransition } from "react"
+import { useEffect, useRef, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { v4 as uuidv4 } from "uuid"
 import { z } from "zod"
@@ -64,8 +64,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const convex = useConvex()
   const updateVerification = useMutation(api.users.updateUserEmailVerification)
   const DeleteAccount = useMutation(api.users.deleteAccount)
+  const otpInputRef = useRef<HTMLInputElement>(null)
   const { signIn } = useAuthActions()
   const [isPending, startTransition] = useTransition()
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
   const [showPassword, setShowPassword] = useState(false)
@@ -198,8 +200,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     e.preventDefault()
     setError("")
     setSuccess("")
+    setIsLoading(true)
 
     if (!otp || otp.length !== 6) {
+      setIsLoading(false)
       setError("Please enter a valid 6-digit code")
       return
     }
@@ -214,10 +218,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       })
 
       if (result) {
+        setIsLoading(false)
         setSuccess("Successfully signed up and verified!")
         form.reset()
       }
     } catch (error) {
+      setIsLoading(false)
       console.error("Error in handleOtpSubmit:", error)
       setError("Invalid OTP or verification failed. Please try again.")
     }
@@ -253,11 +259,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     form.setValue("accountType", selectedOption)
   }, [selectedOption, form])
 
+  useEffect(() => {
+    if (step === "verifyOtp" && otpInputRef.current) {
+      otpInputRef.current.focus()
+    }
+  }, [step])
+
   return (
     <Card className='md:relative w-full border-none md:border-solid md:border-2 border-black bg-salYellow md:bg-white shadow-none  p-6'>
       <CloseBtn
         title='Are you sure?'
-        description='You can always start again at any time though an account is required to apply to open calls. If you already have an account, you can also sign in.'
+        description='You can always start again at any time though an account is required to apply to open calls.'
         onAction={onCancelSignup}
         actionTitle='Confirm'
         actionClassName='px-10'
@@ -265,13 +277,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       {step === "signUp" && (
         <CardHeader>
           <section className='flex flex-col items-center justify-center space-y-2.5'>
+            <Link
+              href='/'
+              prefetch={true}
+              className='flex flex-col items-center'>
+              <Image
+                src='/sitelogo.svg'
+                alt='The Street Art List'
+                width={80}
+                height={80}
+                className='mb-2'
+                priority={true}
+              />
+            </Link>
             <Image
               src='/create-account.svg'
               alt='The Street Art List'
               width={300}
               height={100}
               priority={true}
-              className='ml-2'
+              className='ml-2 mb-5'
             />
             {/* <p className='text-sm'>
               Read more about account types{" "}
@@ -286,7 +311,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               <span
                 onClick={switchFlow}
                 className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
-                tabIndex={7}>
+                tabIndex={
+                  step === "signUp" && selectedOption.includes("organizer")
+                    ? 13
+                    : 12
+                }>
                 Sign in
               </span>
             </p>
@@ -326,7 +355,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     name='firstName'
                     render={({ field }) => (
                       <FormItem className='w-full'>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel className='font-bold'>First Name</FormLabel>
                         <FormControl>
                           <Input
                             disabled={isPending}
@@ -334,6 +363,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             placeholder='Given name(s)'
                             inputHeight='sm'
                             variant='basic'
+                            tabIndex={step === "signUp" ? 1 : -1}
                           />
                         </FormControl>
                         <FormMessage />
@@ -345,7 +375,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     name='lastName'
                     render={({ field }) => (
                       <FormItem className='w-full'>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel className='font-bold'>Last Name</FormLabel>
                         <FormControl>
                           <Input
                             disabled={isPending}
@@ -353,6 +383,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             placeholder='Family/Surname(s)'
                             inputHeight='sm'
                             variant='basic'
+                            tabIndex={step === "signUp" ? 2 : -1}
                           />
                         </FormControl>
                         <FormMessage />
@@ -365,7 +396,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   name='email'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className='font-bold'>Email</FormLabel>
                       <FormControl>
                         <Input
                           disabled={isPending}
@@ -374,6 +405,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                           type='email'
                           inputHeight='sm'
                           variant='basic'
+                          tabIndex={step === "signUp" ? 3 : -1}
                         />
                       </FormControl>
                       <FormMessage />
@@ -385,7 +417,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   name='password'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className='font-bold'>Password</FormLabel>
 
                       <FormControl>
                         <div className='relative'>
@@ -398,11 +430,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             type={showPassword ? "text" : "password"}
                             inputHeight='sm'
                             variant='basic'
+                            tabIndex={step === "signUp" ? 4 : -1}
                           />
                           <button
                             type='button'
                             onClick={() => setShowPassword((prev) => !prev)}
-                            className='absolute inset-y-0 right-0 flex items-center pr-3'>
+                            className='absolute inset-y-0 right-0 flex items-center pr-3'
+                            tabIndex={step === "signUp" ? 5 : -1}>
                             {showPassword ? (
                               <Eye className='size-4 text-black' />
                             ) : (
@@ -417,7 +451,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 />
 
                 <div className='w-full flex flex-col gap-y-3'>
-                  <Label className=''>Account Type</Label>
+                  <Label className='font-bold'>Account Type</Label>
 
                   <MultiSelect
                     options={options}
@@ -430,6 +464,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     height={8}
                     hasSearch={false}
                     selectAll={false}
+                    tabIndex={step === "signUp" ? 6 : -1}
                   />
                 </div>
                 {selectedOption.includes("artist") && (
@@ -438,7 +473,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     name='name'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Preferred/Artist Name</FormLabel>
+                        <FormLabel className='font-bold'>
+                          Preferred/Artist Name
+                        </FormLabel>
                         <FormControl>
                           <Input
                             disabled={isPending}
@@ -446,6 +483,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             placeholder='(optional)'
                             inputHeight='sm'
                             variant='basic'
+                            tabIndex={step === "signUp" ? 7 : -1}
                           />
                         </FormControl>
                         <FormMessage />
@@ -460,7 +498,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     name='organizationName'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Organization Name</FormLabel>
+                        <FormLabel className='font-bold'>
+                          Organization Name
+                        </FormLabel>
                         <FormControl>
                           <Input
                             disabled={isPending}
@@ -468,6 +508,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             placeholder='(required)'
                             inputHeight='sm'
                             variant='basic'
+                            tabIndex={
+                              step === "signUp" &&
+                              selectedOption.includes("organizer")
+                                ? 8
+                                : -1
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -481,7 +527,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   name='source'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Where did you hear about us?</FormLabel>
+                      <FormLabel className='font-bold'>
+                        Where did you hear about us?
+                      </FormLabel>
                       <FormControl>
                         <Input
                           disabled={isPending}
@@ -489,6 +537,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                           placeholder='IG, Google, Friends, etc? '
                           inputHeight='sm'
                           variant='basic'
+                          tabIndex={
+                            step === "signUp" &&
+                            selectedOption.includes("organizer")
+                              ? 9
+                              : 8
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -511,24 +565,45 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               </AnimatePresence>
               <Button
                 disabled={isPending}
+                className='w-full mt-6 bg-white md:bg-salYellow'
+                size='lg'
                 type='submit'
-                className='mt-4 w-full py-4 border-2 border-black bg-white text-md text-black shadow-[-5px_5px_black] hover:shadow-[-3px_3px_black] hover:bg-stone-100 rounded-md active:shadow-[-1px_1px_black]'>
-                Create Account
+                variant='salWithShadowYlw'
+                tabIndex={
+                  step === "signUp" && selectedOption.includes("organizer")
+                    ? 10
+                    : 9
+                }>
+                {isPending ? (
+                  <LoaderCircle className='animate-spin' />
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
-            <CardFooter className='justify-center p-4 pb-0 flex flex-col'>
+            <CardFooter className='justify-center pt-4 px-0 pb-0 flex flex-col'>
               <p className='mt-3 text-center text-sm text-black'>
                 By creating an account, you agree to our
                 <br />
                 <Link
                   href='/terms'
-                  className='font-bold cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'>
+                  className='font-bold cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'
+                  tabIndex={
+                    step === "signUp" && selectedOption.includes("organizer")
+                      ? 11
+                      : 10
+                  }>
                   Terms of Service
                 </Link>{" "}
                 and{" "}
                 <Link
                   href='/privacy'
-                  className='font-bold inline-flex  items-center cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'>
+                  className='font-bold inline-flex  items-center cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'
+                  tabIndex={
+                    step === "signUp" && selectedOption.includes("organizer")
+                      ? 12
+                      : 11
+                  }>
                   Privacy Policy <ExternalLink size={16} className='ml-[2px]' />
                 </Link>
               </p>
@@ -556,7 +631,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     disabled={isPending}
                     // tabIndex={step !== 'forgot' && 1}
                     tabIndex={1}
-                    className='border-black '>
+                    className='border-black '
+                    ref={otpInputRef}>
                     <InputOTPGroup>
                       <InputOTPSlot index={0} className='bg-white' border='2' />
                       <InputOTPSlot index={1} className='bg-white' border='2' />
@@ -575,11 +651,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               <FormError message={error} />
               <Button
                 variant='salWithShadowYlw'
-                disabled={isPending}
+                disabled={isPending || otp.length !== 6}
                 size='lg'
                 type='submit'
                 className='w-full bg-white sm:bg-salYellow text-base'>
-                Verify
+                {isLoading ? (
+                  <LoaderCircle className='animate-spin' />
+                ) : (
+                  "Verify"
+                )}
               </Button>
             </form>
           </Form>

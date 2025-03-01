@@ -3,6 +3,7 @@
 import ForgotPassword from "@/features/auth/components/forgot-password"
 import RegisterForm from "@/features/auth/components/register-form"
 import SignInCard from "@/features/auth/components/sign-in-card"
+import { cn } from "@/lib/utils"
 
 import { usePathname, useRouter } from "next/navigation"
 
@@ -26,7 +27,10 @@ export default function AuthScreen() {
   }
 
   return (
-    <div className='min-h-screen flex overflow-y-auto justify-center items-center bg-salYellow auth-cont scrollable'>
+    <div
+      className={cn(
+        "min-h-screen flex overflow-y-auto justify-center items-center bg-salYellow auth-cont scrollable"
+      )}>
       <div className='md:h-auto md:w-[500px] md:py-10'>
         {isRegister ? (
           <RegisterForm switchFlow={() => switchFlow("signIn")} />

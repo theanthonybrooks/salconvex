@@ -17,8 +17,7 @@ import {
   Eye,
   EyeOff,
   Heart,
-  LoaderPinwheel,
-  LoaderPinwheelIcon,
+  LoaderCircle,
   TriangleAlert,
   X,
 } from "lucide-react"
@@ -139,7 +138,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             disabled={pending}
             tabIndex={1}>
             {isLoading === "google" ? (
-              <LoaderPinwheelIcon className='size-5 animate-spin' />
+              <LoaderCircle className='size-5 animate-spin' />
             ) : (
               <>
                 <FaGoogle size='5' />
@@ -156,7 +155,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             disabled={pending}
             tabIndex={2}>
             {isLoading === "apple" ? (
-              <LoaderPinwheelIcon className='size-5 animate-spin' />
+              <LoaderCircle className='size-5 animate-spin' />
             ) : (
               <>
                 <FaApple size='5' />
@@ -233,7 +232,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             disabled={pending}
             tabIndex={6}>
             {pending ? (
-              <LoaderPinwheel className='animate-spin size-5' />
+              <LoaderCircle className='animate-spin size-5' />
             ) : (
               "Continue"
             )}
