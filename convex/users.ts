@@ -212,7 +212,6 @@ export const deleteAccount = mutation({
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Define a type for valid methods
     type MethodType =
       | "deleteAccount"
       | "ban"
@@ -220,7 +219,6 @@ export const deleteAccount = mutation({
       | "resentOtp"
       | "signupTimeout"
 
-    // Ensure the method is one of the valid ones
     if (
       ![
         "deleteAccount",
@@ -235,7 +233,6 @@ export const deleteAccount = mutation({
 
     const method = args.method as MethodType
 
-    // Configuration map for each method
     const methodConfigs: Record<
       MethodType,
       { deleteType: string; userAgent: string; requiresEmail: boolean }
@@ -297,16 +294,13 @@ export const deleteAccount = mutation({
 
     const userId = user._id
 
-    // Delete related documents in batches
     await deleteRelatedDocuments(ctx, userId)
 
-    // Check and delete the user document (idempotency)
     const userDoc = await ctx.db.get(userId)
     if (userDoc) {
       await ctx.db.delete(userId)
     }
 
-    // Log the deletion
     await ctx.db.insert("deleteAccountLog", {
       email: user.email ?? "unknown",
       userId,
@@ -324,7 +318,6 @@ async function deleteRelatedDocuments(
 ) {
   const pageSize = 50
 
-  // A helper to delete documents in batches for a given query.
   async function deleteInBatches(
     queryName: string,
     indexName: string,
