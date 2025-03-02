@@ -1,11 +1,9 @@
 "use client"
 
-import { useMutation, useQuery } from "convex/react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { FaFire } from "react-icons/fa"
 import { FiPlus, FiTrash } from "react-icons/fi"
-import { api } from "../../../convex/_generated/api"
 
 type ColumnType = "backlog" | "todo" | "doing" | "done"
 
@@ -15,17 +13,12 @@ interface Card {
   column: ColumnType
 }
 
-type ConvexCard = Omit<Card, "id"> & { _id: string }
-
 interface ColumnProps {
   title: string
   headingColor: string
   column: ColumnType
   cards: Card[]
-  userRole: string
-  moveCard: any // ✅ Add these
-  addCard: any
-  deleteCard: any // ✅ Fix the missing prop
+  setCards: React.Dispatch<React.SetStateAction<Card[]>>
 }
 
 interface CardProps {
@@ -33,7 +26,6 @@ interface CardProps {
   id: string
   column: ColumnType
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
-  handleDragEnd: () => void
 }
 
 interface DropIndicatorProps {
@@ -42,31 +34,21 @@ interface DropIndicatorProps {
 }
 
 interface BurnBarrelProps {
-  userRole: string
+  setCards: React.Dispatch<React.SetStateAction<Card[]>>
 }
 
 interface AddCardProps {
   column: ColumnType
-  userRole: string
+  setCards: React.Dispatch<React.SetStateAction<Card[]>>
 }
 
 interface KanbanBoardProps {
-  userRole?: string
+  userRole?: "admin" | "user"
 }
 
-const getColumnColor = (column: ColumnType) => {
-  const colors: Record<ColumnType, string> = {
-    backlog: "text-neutral-500",
-    todo: "text-yellow-200",
-    doing: "text-blue-200",
-    done: "text-emerald-200",
-  }
-  return colors[column] || "text-neutral-500" // Default color
-}
-
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({
+export const KanbanBoard2: React.FC = ({
   userRole = "user",
-}) => {
+}: KanbanBoardProps) => {
   // const userRole: "admin" | "user" = "admin" // Change this dynamically if needed
 
   return (
@@ -76,83 +58,190 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   )
 }
 
-const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
-  const rawCards = useQuery(api.kanban.cards.getCards) || []
-  const cards = rawCards.map(({ _id, ...rest }) => ({ id: _id, ...rest })) // ✅ Fix `_id` to `id`
-  const addCard = useMutation(api.kanban.cards.addCard)
-  const moveCard = useMutation(api.kanban.cards.moveCard)
-  const deleteCard = useMutation(api.kanban.cards.deleteCard)
+const Board: React.FC<{ userRole: "admin" | "user" }> = ({ userRole }) => {
+  const [cards, setCards] = useState<Card[]>(DEFAULT_CARDS)
 
-  //TODO: Fix the column names to what they're supposed to be, not this bs.
   return (
     <div className='flex h-full w-full gap-3 overflow-scroll p-12'>
-      {["backlog", "todo", "doing", "done"].map((column) => (
-        <Column
-          key={column}
-          title={column.charAt(0).toUpperCase() + column.slice(1)}
-          column={column as ColumnType}
-          headingColor={getColumnColor(column as ColumnType)}
-          cards={cards.filter((card) => card.column === column)} // ✅ Ensure correct column filtering
-          userRole={userRole}
-          moveCard={moveCard}
-          addCard={addCard}
-          deleteCard={deleteCard}
-        />
-      ))}
-      <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
+      <Column
+        title='Backlog'
+        column='backlog'
+        headingColor='text-neutral-500'
+        cards={cards}
+        setCards={setCards}
+        userRole={userRole}
+      />
+      <Column
+        title='TODO'
+        column='todo'
+        headingColor='text-yellow-200'
+        cards={cards}
+        setCards={setCards}
+        userRole={userRole}
+      />
+      <Column
+        title='In progress'
+        column='doing'
+        headingColor='text-blue-200'
+        cards={cards}
+        setCards={setCards}
+        userRole={userRole}
+      />
+      <Column
+        title='Complete'
+        column='done'
+        headingColor='text-emerald-200'
+        cards={cards}
+        setCards={setCards}
+        userRole={userRole}
+      />
+      <BurnBarrel setCards={setCards} userRole={userRole} />
     </div>
   )
 }
 
-const Column: React.FC<
-  ColumnProps & { moveCard: any; addCard: any; deleteCard: any }
-> = ({ title, headingColor, column, cards, userRole, moveCard, addCard }) => {
+interface ColumnProps {
+  title: string
+  headingColor: string
+  column: ColumnType
+  cards: Card[]
+  setCards: React.Dispatch<React.SetStateAction<Card[]>>
+  userRole: "admin" | "user" // Restrict actions based on role
+}
+
+const Column: React.FC<ColumnProps> = ({
+  title,
+  headingColor,
+  cards,
+  column,
+  setCards,
+  userRole,
+}) => {
   const [active, setActive] = useState(false)
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
-    if (userRole !== "admin") return
+    if (userRole !== "admin") return // Prevent non-admins from dragging
     e.dataTransfer.setData("cardId", card.id)
-    // setActive(true) // ✅ Shows the card being moved
   }
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
     if (userRole !== "admin") return // Prevent non-admins from moving cards
-    setActive(false) // ✅ Restore normal state after drag
-  }
-
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return
 
     const cardId = e.dataTransfer.getData("cardId")
-    if (!cardId) return
 
-    await moveCard({ id: cardId, column, userId: "admin" }) // ✅ Move in Convex
+    setActive(false)
+    clearHighlights()
+
+    const indicators = getIndicators()
+    const { element } = getNearestIndicator(e, indicators)
+
+    const before = element.dataset.before || "-1"
+
+    if (before !== cardId) {
+      let copy = [...cards]
+
+      let cardToTransfer = copy.find((c) => c.id === cardId)
+      if (!cardToTransfer) return
+      cardToTransfer = { ...cardToTransfer, column }
+
+      copy = copy.filter((c) => c.id !== cardId)
+      const moveToBack = before === "-1"
+
+      if (moveToBack) {
+        copy.push(cardToTransfer)
+      } else {
+        const insertAtIndex = copy.findIndex((el) => el.id === before)
+        if (insertAtIndex === undefined) return
+        copy.splice(insertAtIndex, 0, cardToTransfer)
+      }
+
+      setCards(copy)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (userRole !== "admin") return
+    e.preventDefault()
+    highlightIndicator(e)
+    setActive(true)
+  }
+
+  const handleDragLeave = () => {
+    clearHighlights()
     setActive(false)
   }
 
+  // 🛠️ Restore clearHighlights
+  const clearHighlights = (els?: HTMLElement[]) => {
+    const indicators = els || getIndicators()
+    indicators.forEach((i) => {
+      i.style.opacity = "0"
+    })
+  }
+
+  // 🛠️ Restore highlightIndicator
+  const highlightIndicator = (e: React.DragEvent<HTMLDivElement>) => {
+    const indicators = getIndicators()
+    clearHighlights(indicators)
+    const el = getNearestIndicator(e, indicators)
+    el.element.style.opacity = "1"
+  }
+
+  // 🛠️ Restore getNearestIndicator
+  const getNearestIndicator = (
+    e: React.DragEvent<HTMLDivElement>,
+    indicators: HTMLElement[]
+  ) => {
+    const DISTANCE_OFFSET = 50
+
+    return indicators.reduce<{ offset: number; element: HTMLElement }>(
+      (closest, child) => {
+        const box = child.getBoundingClientRect()
+        const offset = e.clientY - (box.top + DISTANCE_OFFSET)
+
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child }
+        } else {
+          return closest
+        }
+      },
+      {
+        offset: Number.NEGATIVE_INFINITY,
+        element: indicators[indicators.length - 1],
+      }
+    )
+  }
+
+  // 🛠️ Restore getIndicators
+  const getIndicators = () => {
+    return Array.from(
+      document.querySelectorAll(`[data-column="${column}"]`)
+    ) as HTMLElement[]
+  }
+
+  const filteredCards = cards.filter((c) => c.column === column)
+
   return (
-    <div
-      className='w-56 shrink-0'
-      onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}>
+    <div className='w-56 shrink-0'>
       <div className='mb-3 flex items-center justify-between'>
         <h3 className={`font-medium ${headingColor}`}>{title}</h3>
-        <span className='rounded text-sm text-neutral-400'>{cards.length}</span>
+        <span className='rounded text-sm text-neutral-400'>
+          {filteredCards.length}
+        </span>
       </div>
       <div
+        onDrop={handleDragEnd}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
         className={`h-full w-full transition-colors ${
           active ? "bg-neutral-800/50" : "bg-neutral-800/0"
         }`}>
-        {cards.map((c) => (
-          <Card
-            key={c.id}
-            {...c}
-            handleDragStart={handleDragStart}
-            handleDragEnd={handleDragEnd} // ✅ Fix disappearing issue
-          />
+        {filteredCards.map((c) => (
+          <Card key={c.id} {...c} handleDragStart={handleDragStart} />
         ))}
+        <DropIndicator beforeId={null} column={column} />
         {userRole === "admin" && (
-          <AddCard column={column} addCard={addCard} userRole={userRole} />
+          <AddCard column={column} setCards={setCards} userRole={userRole} />
         )}
       </div>
     </div>
@@ -191,35 +280,35 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
   )
 }
 
-const BurnBarrel: React.FC<{ deleteCard: any; userRole: string }> = ({
-  deleteCard,
-  userRole,
-}) => {
+interface BurnBarrelProps {
+  setCards: React.Dispatch<React.SetStateAction<Card[]>>
+  userRole: "admin" | "user" // Add userRole prop
+}
+
+const BurnBarrel: React.FC<BurnBarrelProps> = ({ setCards, userRole }) => {
   const [active, setActive] = useState(false)
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     if (userRole !== "admin") return
     e.preventDefault()
-    setActive(true) // ✅ Icon changes when hovering
+    setActive(true)
   }
 
   const handleDragLeave = () => {
-    setActive(false) // ✅ Restore normal state
+    setActive(false)
   }
 
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
     if (userRole !== "admin") return
-
     const cardId = e.dataTransfer.getData("cardId")
-    if (!cardId) return
 
-    await deleteCard({ id: cardId, userId: "admin" }) // ✅ Delete from Convex
+    setCards((prev) => prev.filter((c) => c.id !== cardId))
     setActive(false)
   }
 
   return (
     <div
-      onDrop={handleDrop}
+      onDrop={handleDragEnd}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={`mt-10 grid h-56 w-56 shrink-0 place-content-center rounded border text-3xl transition-colors ${
@@ -232,21 +321,27 @@ const BurnBarrel: React.FC<{ deleteCard: any; userRole: string }> = ({
   )
 }
 
-const AddCard: React.FC<AddCardProps & { addCard: any }> = ({
+const AddCard: React.FC<AddCardProps & { userRole: "admin" | "user" }> = ({
   column,
-  addCard,
+  setCards,
   userRole,
 }) => {
   const [text, setText] = useState("")
   const [adding, setAdding] = useState(false)
 
-  if (userRole !== "admin") return null
+  if (userRole !== "admin") return null // Only admins can add cards
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!text.trim().length) return
 
-    await addCard({ title: text.trim(), column, userId: "admin" }) // ✅ Add to Convex
+    const newCard: Card = {
+      column,
+      title: text.trim(),
+      id: Math.random().toString(),
+    }
+
+    setCards((prev) => [...prev, newCard])
     setAdding(false)
   }
 

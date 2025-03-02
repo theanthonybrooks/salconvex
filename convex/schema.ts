@@ -54,6 +54,20 @@ export default defineSchema({
   })
     .index("email", ["email"])
     .index("userId", ["userId"]),
+
+  todoKanban: defineTable({
+    title: v.string(),
+    column: v.union(
+      v.literal("backlog"),
+      v.literal("todo"),
+      v.literal("doing"),
+      v.literal("done")
+    ),
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+    lastUpdatedBy: v.string(), // Track the last person who modified it
+  }).index("byColumn", ["column"]),
+
   // Your other custom tables...
 })
 

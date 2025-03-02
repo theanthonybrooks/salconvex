@@ -18,6 +18,7 @@ import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as functions_customPassword from "../functions/customPassword.js";
 import type * as http from "../http.js";
+import type * as kanban_cards from "../kanban/cards.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   "functions/customPassword": typeof functions_customPassword;
   http: typeof http;
+  "kanban/cards": typeof kanban_cards;
   "otp/resendOtp": typeof otp_resendOtp;
   "otp/resetOtp": typeof otp_resetOtp;
   "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;
