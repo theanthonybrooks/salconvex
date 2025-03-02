@@ -33,7 +33,7 @@ interface CardProps {
   id: string
   column: ColumnType
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
-  handleDragEnd: () => void
+  handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
 }
 
 interface DropIndicatorProps {
@@ -112,29 +112,91 @@ const Column: React.FC<
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
     if (userRole !== "admin") return
     e.dataTransfer.setData("cardId", card.id)
-    // setActive(true) // ✅ Shows the card being moved
+    setActive(true)
   }
 
-  const handleDragEnd = () => {
-    if (userRole !== "admin") return // Prevent non-admins from moving cards
-    setActive(false) // ✅ Restore normal state after drag
-  }
-
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
     if (userRole !== "admin") return
 
     const cardId = e.dataTransfer.getData("cardId")
     if (!cardId) return
 
-    await moveCard({ id: cardId, column, userId: "admin" }) // ✅ Move in Convex
     setActive(false)
+    clearHighlights()
+
+    const indicators = getIndicators()
+    const { element } = getNearestIndicator(e, indicators)
+    const before = element.dataset.before || "-1"
+
+    if (before !== cardId) {
+      moveCard({ id: cardId, column, userId: "admin" }) // ✅ Convex update
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (userRole !== "admin") return
+    e.preventDefault()
+    highlightIndicator(e)
+    setActive(true)
+  }
+
+  const handleDragLeave = () => {
+    clearHighlights()
+    setActive(false)
+  }
+
+  // 🛠️ Restore clearHighlights function
+  const clearHighlights = (els?: HTMLElement[]) => {
+    const indicators = els || getIndicators()
+    indicators.forEach((i) => (i.style.opacity = "0"))
+  }
+
+  // 🛠️ Restore highlightIndicator function
+  const highlightIndicator = (e: React.DragEvent<HTMLDivElement>) => {
+    const indicators = getIndicators()
+    clearHighlights(indicators)
+    const el = getNearestIndicator(e, indicators)
+    el.element.style.opacity = "1"
+  }
+
+  // 🛠️ Restore getNearestIndicator function
+  const getNearestIndicator = (
+    e: React.DragEvent<HTMLDivElement>,
+    indicators: HTMLElement[]
+  ) => {
+    const DISTANCE_OFFSET = 50
+
+    return indicators.reduce<{ offset: number; element: HTMLElement }>(
+      (closest, child) => {
+        const box = child.getBoundingClientRect()
+        const offset = e.clientY - (box.top + DISTANCE_OFFSET)
+
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child }
+        } else {
+          return closest
+        }
+      },
+      {
+        offset: Number.NEGATIVE_INFINITY,
+        element: indicators[indicators.length - 1],
+      }
+    )
+  }
+
+  // 🛠️ Restore getIndicators function
+  const getIndicators = () => {
+    return Array.from(
+      document.querySelectorAll(`[data-column="${column}"]`)
+    ) as HTMLElement[]
   }
 
   return (
     <div
       className='w-56 shrink-0'
-      onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}>
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDragEnd}>
       <div className='mb-3 flex items-center justify-between'>
         <h3 className={`font-medium ${headingColor}`}>{title}</h3>
         <span className='rounded text-sm text-neutral-400'>{cards.length}</span>
@@ -148,7 +210,7 @@ const Column: React.FC<
             key={c.id}
             {...c}
             handleDragStart={handleDragStart}
-            handleDragEnd={handleDragEnd} // ✅ Fix disappearing issue
+            handleDragEnd={handleDragEnd}
           />
         ))}
         {userRole === "admin" && (
