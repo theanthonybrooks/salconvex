@@ -18,6 +18,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         salYellow: "hsl(var(--sal-yellow))",
         salPink: "hsl(var(--sal-pink))",
+        userIcon: "hsl(var(--user-icon))",
         customPurple: "#5C3B58",
         card: {
           DEFAULT: "hsl(var(--card))",

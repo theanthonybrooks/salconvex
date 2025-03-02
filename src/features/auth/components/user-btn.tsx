@@ -24,6 +24,7 @@ export const UserBtn = () => {
   }
 
   const { image, firstName, lastName, email } = data
+  console.log(data)
 
   const avatarFallback =
     firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase()
@@ -33,9 +34,12 @@ export const UserBtn = () => {
       <DropdownMenuTrigger className='outline-none relative'>
         <Avatar className='size=10 hover:opacity-75 transition'>
           <AvatarImage src={image} alt={firstName + " " + lastName} />
-          <AvatarFallback className='bg-sky-500 text-white'>
-            {avatarFallback}
-          </AvatarFallback>
+
+          {!image && (
+            <AvatarFallback className='bg-sky-500 text-white'>
+              {avatarFallback}
+            </AvatarFallback>
+          )}
         </Avatar>
         <h1>Welcome back, {firstName}</h1>
       </DropdownMenuTrigger>

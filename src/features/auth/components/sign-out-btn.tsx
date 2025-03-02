@@ -3,13 +3,15 @@ import { useAuthActions } from "@convex-dev/auth/react"
 
 import React from "react"
 
-interface SignOutBtnProps {}
+interface SignOutBtnProps {
+  children?: React.ReactNode
+}
 
-const SignOutBtn: React.FC<SignOutBtnProps> = () => {
+const SignOutBtn: React.FC<SignOutBtnProps> = ({ children }) => {
   const { signOut } = useAuthActions()
   return (
-    <Button variant='destructive' onClick={() => signOut()}>
-      Sign Out
+    <Button variant='link' onClick={() => signOut()}>
+      {children}
     </Button>
   )
 }

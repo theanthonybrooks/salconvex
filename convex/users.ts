@@ -7,7 +7,6 @@ import {
   MutationCtx,
   query,
 } from "./_generated/server"
-import { auth } from "./auth"
 
 const scrypt = new Scrypt()
 const scryptCrypto = {
@@ -19,16 +18,36 @@ const scryptCrypto = {
   },
 }
 
-export const current = query({
+export const currentUser = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await auth.getUserId(ctx)
+    const userId = await getAuthUserId(ctx)
 
     if (userId === null) {
       return null
     }
 
     return await ctx.db.get(userId)
+  },
+})
+
+export const getCurrentUser = query({
+  args: {
+    token: v.optional(v.string()),
+  },
+  handler: async (ctx, { token }) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) return null
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!userId || !user) {
+      return null
+    }
+
+    return { userId, user }
   },
 })
 

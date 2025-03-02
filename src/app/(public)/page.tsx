@@ -11,12 +11,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { UserBtn } from "@/features/auth/components/user-btn"
+import { Button } from "@/components/ui/button"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useMutation } from "convex/react"
 import { Poppins } from "next/font/google"
+import Image from "next/image"
 import { useState } from "react"
-import { api } from "../../convex/_generated/api"
+import { api } from "../../../convex/_generated/api"
 
 const font = Poppins({ subsets: ["latin"], weight: "600" })
 
@@ -42,16 +43,24 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <UserBtn />
+    <div className='flex flex-col items-center justify-center'>
+      <Image
+        src='/herotest.jpg'
+        alt='The Street Art List'
+        width={800}
+        height={400}
+        priority={true}
+        className='ml-2'
+      />
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <button
-            className='absolute right-5 top-4 z-10 rounded text-lg font-bold text-black hover:rounded-full hover:text-salPink focus:bg-salPink'
+          <Button
+            variant='salWithShadow'
+            className='absolute right-5 top-15  text-lg font-bold'
             aria-label='Close modal'
             disabled={isLoading}>
             Delete Account
-          </button>
+          </Button>
         </AlertDialogTrigger>
         <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
           <AlertDialogHeader>
