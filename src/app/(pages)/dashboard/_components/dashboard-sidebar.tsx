@@ -14,9 +14,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React, { useState } from "react"
 
-import { useQuery } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
-import { api } from "../../../../../convex/_generated/api"
 
 const sectionVariants = {
   hidden: { opacity: 0, y: -15 }, // starts slightly to the left
@@ -33,7 +31,12 @@ const sectionVariants = {
   exit: { opacity: 0, y: -15, transition: { type: "linear", duration: 0.1 } },
 }
 
-export default function DashboardSideBar() {
+interface DashboardSideBarProps {
+  subStatus: string | undefined
+}
+
+export default function DashboardSideBar({ subStatus }: DashboardSideBarProps) {
+  const [openSection, setOpenSection] = useState<string | null>(null)
   const { image, alt, width, height } = landingPageLogo[0]
   const {
     image: image2,
@@ -42,27 +45,20 @@ export default function DashboardSideBar() {
     height: height2,
   } = landingPageLogoText[0]
   const pathname = usePathname()
-  const { subStatus } =
-    useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
   const statusKey = subStatus ? subStatus : "none"
-
-  const [openSection, setOpenSection] = useState<string | null>(null)
-
-  // Filter nav items based on user's subscription status
   const filteredNavItems = navItems.filter(
     (item) =>
       item.sub.includes(statusKey) ||
       (item.sub.includes("all") && !item.label.includes("Help"))
   )
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"))
-
   const handleSectionToggle = (sectionCat: string) => {
     setOpenSection(openSection === sectionCat ? null : sectionCat)
   }
 
   return (
-    <div className='hidden h-full w-64 border-r bg-background min-[1024px]:block'>
-      <div className='flex h-full flex-col'>
+    <div className='hidden w-64 border-r bg-background min-[1024px]:block'>
+      <div className='flex h-full flex-col justify-between'>
         <div className='flex min-h-[55px] flex-shrink-0 items-center border-b px-4'>
           <Link
             prefetch={true}
@@ -73,15 +69,17 @@ export default function DashboardSideBar() {
           </Link>
         </div>
 
-        <nav className='flex flex-1 flex-col justify-between space-y-1 px-4 pt-4'>
-          <div>
-            <Search
-              title={"Search"}
-              source={dashboardNavItems}
-              groupName={"Heading"}
-              className='mb-5'
-              placeholder="Find what you're looking for!"
-            />
+        <nav
+          className='grid max-h-[calc(100vh-55px)]
+ h-full overflow-hidden grid-rows-[60px_1fr_80px] space-y-1 px-4 pt-4'>
+          <Search
+            title={"Search"}
+            source={dashboardNavItems}
+            groupName={"Heading"}
+            className='mb-5'
+            placeholder="Find what you're looking for!"
+          />
+          <div className='overflow-y-auto scrollable '>
             {/* Render main navigation items (excluding sections) */}
             {filteredNavItems
               .filter((item) => !item.sectionCat)

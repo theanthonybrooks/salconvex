@@ -3,15 +3,19 @@
 import { KanbanBoard } from "@/components/ui/kanban-board"
 import { changelog2024, changelog2025 } from "@/constants/accordions"
 import { AccordionComponent } from "@/features/homepage/accordion-component"
-import { useQuery } from "convex/react"
+import { useQuery } from "@/helpers/convexHelpers"
+// import { useQuery } from "convex-helpers/react/cache"
+// import { useQuery } from "convex/react"
 import { motion } from "framer-motion"
-import { api } from "../../../../convex/_generated/api"
+import { api } from "~/convex/_generated/api"
+// import { api } from "../../../../convex/_generated/api"
 
 export default function Changelog() {
   const userData = useQuery(api.users.getCurrentUser, {})
   return (
     <>
       <>
+        <KanbanBoard userRole={userData?.user?.role?.[0]} />
         <div className='container mx-auto px-4'>
           <section className='relative flex flex-col items-center justify-center py-20'>
             {/* Background gradient */}
@@ -40,7 +44,6 @@ export default function Changelog() {
             </div>
           </section>
         </div>
-        <KanbanBoard userRole={userData?.user?.role?.[0]} />
 
         <AccordionComponent src={changelog2025} />
         <AccordionComponent src={changelog2024} />

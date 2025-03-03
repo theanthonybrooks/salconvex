@@ -11,13 +11,15 @@ import {
 } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-import { useAction, useQuery } from "convex/react"
+import { useAction } from "convex/react"
+
+import { useQuery } from "convex-helpers/react/cache"
 import { motion } from "framer-motion"
 import { CheckCircle2, DollarSign } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { api } from "../../../convex/_generated/api"
+import { api } from "~/convex/_generated/api"
 
 type PricingSwitchProps = {
   onSwitch: (value: string) => void

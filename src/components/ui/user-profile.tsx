@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 // import { SignOutButton, useUser } from "@clerk/nextjs";
 import { LogOut, Settings, Sparkles, User } from "lucide-react"
 import Link from "next/link"
+import { FaUserNinja } from "react-icons/fa6"
 
 interface UserProfileProps {
   user: Record<string, any> | null
@@ -43,11 +44,30 @@ export function UserProfile({ user }: UserProfileProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56' align='end'>
         <DropdownMenuLabel className='font-normal'>
-          <div className='flex flex-col space-y-1'>
-            <p className='text-sm font-medium leading-none'>{user?.name}</p>
-            <p className='text-xs leading-none text-muted-foreground'>
-              {user?.email}
-            </p>
+          <div className='flex flex-row items-center gap-2'>
+            <Avatar className='h-9 w-9 rounded-full border border-border'>
+              <AvatarImage
+                src={user?.image}
+                alt={user?.name || "User Profile"}
+              />
+
+              <AvatarFallback
+                className={cn(
+                  "border-border border bg-userIcon  text-blue-900 font-bold dark:bg-blue-950 dark:text-blue-200"
+                )}>
+                {/* {user?.firstName?.[0]}
+                {user?.lastName?.[0]} */}
+                <FaUserNinja className='h-6 w-6' />
+                {/* <FaRegFaceFlushed className='h-6 w-6' /> */}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className='flex flex-col space-y-1'>
+              <p className='text-sm font-medium leading-none'>{user?.name}</p>
+              <p className='text-xs leading-none text-muted-foreground'>
+                {user?.email}
+              </p>
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

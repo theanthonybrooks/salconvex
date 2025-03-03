@@ -24,33 +24,27 @@ import {
 } from "@/constants/navbars"
 import { cn } from "@/lib/utils"
 import { Dialog } from "@radix-ui/react-dialog"
-import { Unauthenticated, useConvexAuth, useQuery } from "convex/react"
+// import { useQuery } from "convex-helpers/react/cache"
+import { Unauthenticated } from "convex/react"
 import { motion } from "framer-motion"
 import { Menu, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import React from "react"
 import { FaGithub, FaTwitter, FaYoutube } from "react-icons/fa"
-import { api } from "../../../../../convex/_generated/api"
 
 interface NavBarProps {
   userId: string | undefined
   user: Record<string, any> | null
+  subStatus: string | undefined
 }
 
-export default function NavBar({ userId, user }: NavBarProps) {
-  const { isLoading, isAuthenticated } = useConvexAuth()
-
-  console.log("userId from navbar", userId)
-
+export default function NavBar({ userId, user, subStatus }: NavBarProps) {
   const { path } = landingPageLogo[0]
-  // Fetch the user's subscription status
-  const { subStatus } =
-    useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
+  // const { subStatus } =
+  //   useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
 
   const statusKey = subStatus ? subStatus : "none"
-
-  // Filter landingPageNavbarLinks based on the user's subStatus; show link if its sub array includes statusKey or "all"
   const filteredNavbarLinks = landingPageNavbarLinks.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all")
   )
@@ -63,7 +57,7 @@ export default function NavBar({ userId, user }: NavBarProps) {
       initial={{ y: 0, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className='fixed left-0 right-0 top-0 z-50  bg-background backdrop-blur-md dark:bg-background'>
+      className='fixed left-0 right-0 top-0 z-50 border-b-2 border-black bg-background backdrop-blur-md dark:bg-background'>
       <div className='mx-auto flex w-screen items-center justify-between p-4 px-8'>
         {/* Mobile Logo and Navigation */}
         <div className='flex items-center gap-2 lg:hidden'>

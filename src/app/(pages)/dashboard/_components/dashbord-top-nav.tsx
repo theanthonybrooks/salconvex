@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose } from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogTitle } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet"
 // import ThemeToggle from "@/components/ui/theme-toggle"
@@ -12,10 +12,13 @@ import { useQuery } from "convex/react"
 import { Banknote, HomeIcon, Settings } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { ReactNode } from "react"
 import { api } from "../../../../../convex/_generated/api"
 
-export default function DashboardTopNav({ children }: { children: ReactNode }) {
+export default function DashboardTopNav({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const userData = useQuery(api.users.getCurrentUser, {})
   const user = userData?.user // This avoids destructuring null or undefined
 
@@ -39,6 +42,7 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
     <div className='flex flex-col'>
       <header className='flex h-14 items-center gap-4 border-b px-3 lg:h-[55px]'>
         <Dialog>
+          <DialogTitle className='sr-only'>Dashboard Menu</DialogTitle>
           <SheetTrigger className='p-2 transition min-[1024px]:hidden'>
             <HamburgerMenuIcon />
             <Link href='/dashboard'>

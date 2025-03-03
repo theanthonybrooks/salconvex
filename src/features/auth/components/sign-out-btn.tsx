@@ -10,9 +10,11 @@ interface SignOutBtnProps {
 const SignOutBtn: React.FC<SignOutBtnProps> = ({ children }) => {
   const { signOut } = useAuthActions()
   return (
-    <Button variant='link' onClick={() => signOut()}>
+    <span
+      className='hover:underline underline-offset-2 hover:cursor-pointer'
+      onClick={() => signOut()}>
       {children}
-    </Button>
+    </span>
   )
 }
 
