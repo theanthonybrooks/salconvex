@@ -1,6 +1,7 @@
 import { ConvexClientProvider } from "@/components/convex-client-provider"
 import { ThemedProvider } from "@/providers/themed-provider"
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
+import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider"
 import { GeistSans } from "geist/font/sans"
 import type { Metadata } from "next"
 import "./globals.css"
@@ -45,7 +46,9 @@ export default function RootLayout({
       <html lang='en' suppressHydrationWarning className='scrollable'>
         <body className={GeistSans.className}>
           <ConvexClientProvider>
-            <ThemedProvider>{children}</ThemedProvider>
+            <ConvexQueryCacheProvider>
+              <ThemedProvider>{children}</ThemedProvider>
+            </ConvexQueryCacheProvider>
           </ConvexClientProvider>
         </body>
       </html>

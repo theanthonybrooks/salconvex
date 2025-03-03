@@ -9,9 +9,9 @@ interface AccordionItem {
 }
 
 const iconOpenClass =
-  "open absolute transition-all duration-400 right-1 origin-center"
+  "open transition-all duration-400 absolute right-4 top-4 origin-center"
 const iconClosedClass =
-  "closed absolute transition-all duration-400 right-1 origin-center"
+  "closed transition-all duration-400 absolute right-4 top-4 origin-center"
 
 export interface AccordionSection {
   name?: string | null
@@ -68,12 +68,12 @@ export const faqs2: AccordionSection = {
 
 export const changelog2025: AccordionSection = {
   description: "2025",
-  iconClosed: <Plus className={cn("h-4 w-4 mr-1", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("h-4 w-4 mr-1", iconOpenClass)} />,
+  iconClosed: <Plus className={cn("h-4 w-4 mr-1 ", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("h-4 w-4 mr-1 ", iconOpenClass)} />,
   firstOpen: true,
   isList: true,
   listStyle: "list-none",
-  accordionWidth: "w-[800px] max-w-[90vw]",
+  accordionWidth: "w-3xl max-w-[90vw]",
 
   items: [
     {

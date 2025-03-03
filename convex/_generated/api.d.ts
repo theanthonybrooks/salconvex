@@ -22,6 +22,9 @@ import type * as kanban_cards from "../kanban/cards.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
+import type * as plans from "../plans.js";
+import type * as stripeSubscriptions from "../stripeSubscriptions.js";
+import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 
 /**
@@ -42,6 +45,9 @@ declare const fullApi: ApiFromModules<{
   "otp/resendOtp": typeof otp_resendOtp;
   "otp/resetOtp": typeof otp_resetOtp;
   "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;
+  plans: typeof plans;
+  stripeSubscriptions: typeof stripeSubscriptions;
+  subscriptions: typeof subscriptions;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

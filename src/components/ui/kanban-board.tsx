@@ -7,7 +7,7 @@ import { FaFire } from "react-icons/fa"
 import { FiPlus, FiTrash } from "react-icons/fi"
 import { api } from "../../../convex/_generated/api"
 
-type ColumnType = "backlog" | "todo" | "doing" | "done"
+type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done"
 
 interface Card {
   title: string
@@ -23,9 +23,9 @@ interface ColumnProps {
   column: ColumnType
   cards: Card[]
   userRole: string
-  moveCard: any // ✅ Add these
+  moveCard: any
   addCard: any
-  deleteCard: any // ✅ Fix the missing prop
+  deleteCard: any
 }
 
 interface CardProps {
@@ -37,7 +37,7 @@ interface CardProps {
 }
 
 interface DropIndicatorProps {
-  beforeId: string | null
+  beforeId: string | undefined
   column: ColumnType
 }
 
@@ -56,19 +56,18 @@ interface KanbanBoardProps {
 
 const getColumnColor = (column: ColumnType) => {
   const colors: Record<ColumnType, string> = {
+    proposed: "text-purple-400",
     backlog: "text-neutral-500",
     todo: "text-yellow-200",
     doing: "text-blue-200",
     done: "text-emerald-200",
   }
-  return colors[column] || "text-neutral-500" // Default color
+  return colors[column] || "text-neutral-500"
 }
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
-  // const userRole: "admin" | "user" = "admin" // Change this dynamically if needed
-
   return (
     <div className='h-screen w-full bg-neutral-900 text-neutral-50'>
       <Board userRole={userRole} />
@@ -78,35 +77,67 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
 const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   const rawCards = useQuery(api.kanban.cards.getCards) || []
-  const cards = rawCards.map(({ _id, ...rest }) => ({ id: _id, ...rest })) // ✅ Fix `_id` to `id`
+  const cards = rawCards
+    .map(({ _id, ...rest }) => ({ id: _id, ...rest }))
+    .sort((a, b) => a.order - b.order)
   const addCard = useMutation(api.kanban.cards.addCard)
   const moveCard = useMutation(api.kanban.cards.moveCard)
   const deleteCard = useMutation(api.kanban.cards.deleteCard)
 
-  //TODO: Fix the column names to what they're supposed to be, not this bs.
+  const [activeColumn, setActiveColumn] = useState<string | null>(null) // Track active add form
+
+  const columnDisplayNames: Record<ColumnType, string> = {
+    proposed: "Proposed",
+    backlog: "Backlog",
+    todo: "To Do",
+    doing: "In Progress",
+    done: "Complete",
+  }
+
   return (
-    <div className='flex h-full w-full gap-3 overflow-scroll p-12'>
-      {["backlog", "todo", "doing", "done"].map((column) => (
-        <Column
-          key={column}
-          title={column.charAt(0).toUpperCase() + column.slice(1)}
-          column={column as ColumnType}
-          headingColor={getColumnColor(column as ColumnType)}
-          cards={cards.filter((card) => card.column === column)} // ✅ Ensure correct column filtering
-          userRole={userRole}
-          moveCard={moveCard}
-          addCard={addCard}
-          deleteCard={deleteCard}
-        />
-      ))}
+    <div className='flex h-full w-full gap-3 overflow-auto p-12'>
+      {(["proposed", "backlog", "todo", "doing", "done"] as ColumnType[]).map(
+        (column) => (
+          <Column
+            key={column}
+            title={columnDisplayNames[column]}
+            column={column}
+            headingColor={getColumnColor(column)}
+            cards={cards.filter((card) => card.column === column)}
+            userRole={userRole}
+            moveCard={moveCard}
+            addCard={addCard}
+            deleteCard={deleteCard}
+            activeColumn={activeColumn} // Pass activeColumn state
+            setActiveColumn={setActiveColumn} // Function to update activeColumn
+          />
+        )
+      )}
+
       <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
     </div>
   )
 }
 
 const Column: React.FC<
-  ColumnProps & { moveCard: any; addCard: any; deleteCard: any }
-> = ({ title, headingColor, column, cards, userRole, moveCard, addCard }) => {
+  ColumnProps & {
+    moveCard: any
+    addCard: any
+    deleteCard: any
+    activeColumn: string | null
+    setActiveColumn: (col: string | null) => void
+  }
+> = ({
+  title,
+  headingColor,
+  column,
+  cards,
+  userRole,
+  moveCard,
+  addCard,
+  activeColumn,
+  setActiveColumn,
+}) => {
   const [active, setActive] = useState(false)
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
@@ -126,11 +157,14 @@ const Column: React.FC<
 
     const indicators = getIndicators()
     const { element } = getNearestIndicator(e, indicators)
-    const before = element.dataset.before || "-1"
+    let beforeId =
+      element.dataset.before !== "-1" ? element.dataset.before : undefined
 
-    if (before !== cardId) {
-      moveCard({ id: cardId, column, userId: "admin" }) // ✅ Convex update
+    if (cards.length === 0) {
+      beforeId = undefined
     }
+
+    moveCard({ id: cardId, column, beforeId, userId: "admin" })
   }
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -213,8 +247,17 @@ const Column: React.FC<
             handleDragEnd={handleDragEnd}
           />
         ))}
+
+        <DropIndicator beforeId={undefined} column={column} />
+
         {userRole === "admin" && (
-          <AddCard column={column} addCard={addCard} userRole={userRole} />
+          <AddCard
+            column={column}
+            addCard={addCard}
+            userRole={userRole}
+            activeColumn={activeColumn}
+            setActiveColumn={setActiveColumn}
+          />
         )}
       </div>
     </div>
@@ -294,13 +337,15 @@ const BurnBarrel: React.FC<{ deleteCard: any; userRole: string }> = ({
   )
 }
 
-const AddCard: React.FC<AddCardProps & { addCard: any }> = ({
-  column,
-  addCard,
-  userRole,
-}) => {
+const AddCard: React.FC<
+  AddCardProps & {
+    addCard: any
+    activeColumn: string | null
+    setActiveColumn: (col: string | null) => void
+  }
+> = ({ column, addCard, userRole, activeColumn, setActiveColumn }) => {
   const [text, setText] = useState("")
-  const [adding, setAdding] = useState(false)
+  const isOpen = activeColumn === column // Check if this column is the active one
 
   if (userRole !== "admin") return null
 
@@ -308,16 +353,25 @@ const AddCard: React.FC<AddCardProps & { addCard: any }> = ({
     e.preventDefault()
     if (!text.trim().length) return
 
-    await addCard({ title: text.trim(), column, userId: "admin" }) // ✅ Add to Convex
-    setAdding(false)
+    await addCard({ title: text.trim(), column, userId: "admin" })
+    setText("")
+    setActiveColumn(null) // Close the form after submission
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault() // Prevent new lines in textarea
+      handleSubmit(e)
+    }
   }
 
   return (
     <>
-      {adding ? (
+      {isOpen ? (
         <motion.form layout onSubmit={handleSubmit}>
           <textarea
             onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown} // Capture Enter key
             autoFocus
             placeholder='Add new task...'
             className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-50 placeholder-violet-300 focus:outline-0'
@@ -325,7 +379,7 @@ const AddCard: React.FC<AddCardProps & { addCard: any }> = ({
           <div className='mt-1.5 flex items-center justify-end gap-1.5'>
             <button
               type='button'
-              onClick={() => setAdding(false)}
+              onClick={() => setActiveColumn(null)} // Close only this form
               className='px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-50'>
               Close
             </button>
@@ -340,7 +394,7 @@ const AddCard: React.FC<AddCardProps & { addCard: any }> = ({
       ) : (
         <motion.button
           layout
-          onClick={() => setAdding(true)}
+          onClick={() => setActiveColumn(column)} // Set this column as active
           className='flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-50'>
           <span>Add card</span>
           <FiPlus />
@@ -349,58 +403,3 @@ const AddCard: React.FC<AddCardProps & { addCard: any }> = ({
     </>
   )
 }
-
-const DEFAULT_CARDS2 = [
-  // BACKLOG
-  { title: "Look into render bug in dashboard", id: "1", column: "backlog" },
-  { title: "SOX compliance checklist", id: "2", column: "backlog" },
-  { title: "[SPIKE] Migrate to Azure", id: "3", column: "backlog" },
-  { title: "Document Notifications service", id: "4", column: "backlog" },
-  // TODO
-  {
-    title: "Research DB options for new microservice",
-    id: "5",
-    column: "todo",
-  },
-  { title: "Postmortem for outage", id: "6", column: "todo" },
-  { title: "Sync with product on Q3 roadmap", id: "7", column: "todo" },
-
-  // DOING
-  {
-    title: "Refactor context providers to use Zustand",
-    id: "8",
-    column: "doing",
-  },
-  { title: "Add logging to daily CRON", id: "9", column: "doing" },
-  // DONE
-  {
-    title: "Set up DD dashboards for Lambda listener",
-    id: "10",
-    column: "done",
-  },
-]
-
-const DEFAULT_CARDS: Card[] = [
-  { title: "Look into render bug in dashboard", id: "1", column: "backlog" },
-  { title: "SOX compliance checklist", id: "2", column: "backlog" },
-  { title: "[SPIKE] Migrate to Azure", id: "3", column: "backlog" },
-  { title: "Document Notifications service", id: "4", column: "backlog" },
-  {
-    title: "Research DB options for new microservice",
-    id: "5",
-    column: "todo",
-  },
-  { title: "Postmortem for outage", id: "6", column: "todo" },
-  { title: "Sync with product on Q3 roadmap", id: "7", column: "todo" },
-  {
-    title: "Refactor context providers to use Zustand",
-    id: "8",
-    column: "doing",
-  },
-  { title: "Add logging to daily CRON", id: "9", column: "doing" },
-  {
-    title: "Set up DD dashboards for Lambda listener",
-    id: "10",
-    column: "done",
-  },
-]

@@ -12,7 +12,11 @@ interface ThemedProviderProps {
 export function ThemedProvider({ children }: ThemedProviderProps) {
   const pathname = usePathname()
   // If the pathname starts with /auth, force the 'sal' theme.
-  const forcedTheme = pathname.startsWith("/auth") ? "saltheme" : undefined
+  const forcedTheme = pathname.startsWith("/auth")
+    ? "saltheme"
+    : pathname.startsWith("/dashboard")
+    ? "light"
+    : undefined
 
   return (
     <ThemeProvider

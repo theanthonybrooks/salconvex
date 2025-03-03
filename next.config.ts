@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
+import path from "path"
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  webpack: (config) => {
+    // Allow module resolution from the root directory
+    config.resolve.modules.push(path.resolve(__dirname))
 
-export default nextConfig;
+    return config
+  },
+}
+
+export default nextConfig

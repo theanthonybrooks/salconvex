@@ -24,13 +24,14 @@ import {
 } from "@/constants/navbars"
 import { cn } from "@/lib/utils"
 import { Dialog } from "@radix-ui/react-dialog"
-import { Unauthenticated, useConvexAuth } from "convex/react"
+import { Unauthenticated, useConvexAuth, useQuery } from "convex/react"
 import { motion } from "framer-motion"
 import { Menu, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import React from "react"
 import { FaGithub, FaTwitter, FaYoutube } from "react-icons/fa"
+import { api } from "../../../../../convex/_generated/api"
 
 interface NavBarProps {
   userId: string | undefined
@@ -44,10 +45,9 @@ export default function NavBar({ userId, user }: NavBarProps) {
 
   const { path } = landingPageLogo[0]
   // Fetch the user's subscription status
-  //   const { subStatus } =
-  //     useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
-  // TODO: Add substatus when stripe is connected and tables are created
-  const subStatus = user?.subscription
+  const { subStatus } =
+    useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
+
   const statusKey = subStatus ? subStatus : "none"
 
   // Filter landingPageNavbarLinks based on the user's subStatus; show link if its sub array includes statusKey or "all"
@@ -60,7 +60,7 @@ export default function NavBar({ userId, user }: NavBarProps) {
 
   return (
     <motion.div
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: 0, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
       className='fixed left-0 right-0 top-0 z-50  bg-background backdrop-blur-md dark:bg-background'>
