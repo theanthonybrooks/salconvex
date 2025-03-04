@@ -33,7 +33,10 @@ const buttonVariants = cva(
         linkHover2:
           "relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:ease-in-out after:duration-300",
         salWithShadow:
-          "bg-white shadow-slg text-black hover:shadow-ssm active:shadow-smd border-2 border-black focus:shadow-smd font-medium",
+          "bg-white shadow-slg text-black hover:shadow-sxl hover:translate-y-[-3px] hover:translate-x-[3px] active:shadow-none border-2 border-black focus:shadow-none font-medium",
+        salWithShadowHidden:
+          "bg-white text-black border-2 border-black font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+
         salWithoutShadow:
           "bg-white text-black  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-black focus:bg-salyellow/70",
         salWithShadowYlw:

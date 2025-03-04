@@ -35,9 +35,6 @@ const customUserSchema = {
   tokenIdentifier: v.string(),
   image: v.optional(v.string()),
   emailVerified: v.optional(v.boolean()),
-  theme: v.optional(v.string()),
-  timezone: v.optional(v.string()),
-  currency: v.optional(v.string()),
 }
 
 export default defineSchema({
@@ -138,6 +135,14 @@ export default defineSchema({
   })
     .index("type", ["type"])
     .index("stripeEventId", ["stripeEventId"]),
+
+  userPreferences: defineTable({
+    userId: v.id("users"),
+    currency: v.optional(v.string()),
+    timezone: v.optional(v.string()),
+    language: v.optional(v.string()),
+    theme: v.optional(v.string()),
+  }).index("by_userId", ["userId"]),
 
   // Your other custom tables...
 })

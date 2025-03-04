@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button"
 import { motion as m } from "framer-motion"
 import { useTheme } from "next-themes"
 
-export default function ThemeToggle() {
+interface ThemeToggleProps {
+  userPref: Record<string, any> | null
+}
+
+export default function ThemeToggle({ userPref }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme()
 
   const raysVariants = {
@@ -72,7 +76,7 @@ export default function ThemeToggle() {
       <Button
         variant='ghost2'
         onClick={() =>
-          theme === "saltheme" ? setTheme("light") : setTheme("saltheme")
+          theme === "default" ? setTheme("light") : setTheme("default")
         }>
         <m.svg
           strokeWidth='4'
@@ -88,7 +92,7 @@ export default function ThemeToggle() {
             d={moonPath}
             className={"stroke-blue-100"}
             initial='hidden'
-            animate={theme === "saltheme" ? "visible" : "hidden"}
+            animate={theme === "default" ? "visible" : "hidden"}
           />
 
           <m.g
@@ -123,14 +127,14 @@ export default function ThemeToggle() {
               strokeWidth: 6,
             }}
             animate={{
-              d: theme === "saltheme" ? moonPath : sunPath, // Ensuring d is always valid
-              rotate: theme === "saltheme" ? -360 : 0,
-              strokeWidth: theme === "saltheme" ? 3 : 6,
-              stroke: theme === "saltheme" ? "#60A5FA" : "#D97706",
-              fill: theme === "saltheme" ? "#60A5FA" : "#D97706",
+              d: theme === "default" ? moonPath : sunPath, // Ensuring d is always valid
+              rotate: theme === "default" ? -360 : 0,
+              strokeWidth: theme === "default" ? 3 : 6,
+              stroke: theme === "default" ? "#60A5FA" : "#D97706",
+              fill: theme === "default" ? "#60A5FA" : "#D97706",
               fillOpacity: 0.35,
               strokeOpacity: 1,
-              scale: theme === "saltheme" ? 1.75 : 1,
+              scale: theme === "default" ? 1.75 : 1,
             }}
           />
         </m.svg>

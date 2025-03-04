@@ -93,6 +93,14 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         emailVerified: false,
       })
 
+      await ctx.db.insert("userPreferences", {
+        userId: newUserId,
+        currency: "USD",
+        timezone: "GMT",
+        language: "EN",
+        theme: "default",
+      })
+
       return newUserId
     },
   },

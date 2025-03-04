@@ -42,10 +42,14 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UpdatePasswordSchema, UpdateUserSchema } from "@/schemas/auth"
+import {
+  UpdatePasswordSchema,
+  UpdateUserPrefsSchema,
+  UpdateUserSchema,
+} from "@/schemas/auth"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useAction, useMutation, useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { ConvexError } from "convex/values"
 import {
   Bell,
@@ -60,7 +64,7 @@ import {
   Upload,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -76,27 +80,42 @@ export default function SettingsPage() {
   const { signOut } = useAuthActions()
   const router = useRouter()
   const userData = useQuery(api.users.getCurrentUser, {})
-  const user = userData?.user // This avoids destructuring null or undefined
+  const user = userData?.user
+  const userPrefs = userData?.userPref
   const sessionCount = useQuery(api.users.countSessions, {
     userId: user?.userId ?? "guest",
   })
   const updatePassword = useMutation(api.users.updatePassword)
+  const updateUserPrefs = useMutation(api.users.updateUserPrefs)
   const deleteSessions = useMutation(api.users.deleteSessions)
   const updateUser = useMutation(api.users.updateUser)
   const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage)
   const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl)
-  const invalidateSessions = useAction(api.users.invalidateSessionsAction)
-
-  const [selectedTimezone, setTimezone] = useState("GMT")
-  const [selectedCurrency, setCurrency] = useState("USD")
-  const [selectedTheme, setTheme] = useState("light")
+  const [selectedTimezone, setTimezone] = useState<string | undefined>(
+    undefined
+  )
+  const [selectedCurrency, setCurrency] = useState<string | undefined>(
+    undefined
+  )
+  const [selectedTheme, setTheme] = useState<string | undefined>(undefined)
+  const [selectedLanguage, setLanguage] = useState("en")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string>("")
   const [success, setSuccess] = useState<string>("")
-  const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [firstName, setFirstName] = useState<string | undefined>(undefined)
+  const [lastName, setLastName] = useState<string | undefined>(undefined)
+  const [email, setEmail] = useState<string | undefined>(undefined)
+  const [name, setName] = useState<string | undefined>(undefined)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const prevPrefs = useRef({
+    timezone: selectedTimezone,
+    currency: selectedCurrency,
+    theme: selectedTheme,
+  })
 
   const DeleteAccount = useMutation(api.users.deleteAccount)
   const onDeleteAccount = async () => {
@@ -127,6 +146,7 @@ export default function SettingsPage() {
     handleSubmit: updateHandleSubmit,
     reset: updateReset,
     formState: { errors: updateErrors },
+    setValue: updateSetValue,
   } = useForm<z.infer<typeof UpdateUserSchema>>({
     resolver: zodResolver(UpdateUserSchema),
   })
@@ -147,7 +167,11 @@ export default function SettingsPage() {
     })
 
     if (!response.ok) {
-      toast.error("Failed to upload profile image")
+      toast.error("Failed to upload profile image", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      })
       setUploading(false)
       return
     }
@@ -157,13 +181,18 @@ export default function SettingsPage() {
     await uploadProfileImage({ storageId })
 
     setUploading(false)
-    toast.success("Profile image updated successfully!")
+    toast.success("Profile image updated successfully!", {
+      autoClose: 2000,
+      pauseOnHover: false,
+      hideProgressBar: true,
+    })
   }
 
   const handleUpdateUserSubmit = async (
     data: z.infer<typeof UpdateUserSchema>
   ) => {
     setPending(true)
+    setIsSaving(true)
     setError("")
 
     if (!user || !user.email) {
@@ -179,6 +208,51 @@ export default function SettingsPage() {
       })
       // console.log("formData", formData)
       setPending(false)
+      setIsSaving(false)
+      toast.success("User updated!", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      })
+      reset()
+    } catch (err: unknown) {
+      // Type assertion: Explicitly check if it's a ConvexError
+      if (err instanceof ConvexError) {
+        toast.error(err.data || "An unexpected error occurred.", {
+          autoClose: 2000,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        })
+      }
+    } finally {
+      setPending(false)
+      setIsSaving(false)
+
+      setTimeout(() => {
+        setSuccess("")
+        setError("")
+      }, 5000)
+    }
+  }
+
+  const handleUpdateUserPrefs = async (
+    data: z.infer<typeof UpdateUserPrefsSchema>
+  ) => {
+    setPending(true)
+    setError("")
+    if (!user || !user.email) {
+      throw new Error("No user found")
+    }
+    try {
+      await updateUserPrefs({
+        currency: data.currency ?? "",
+        timezone: data.timezone ?? "",
+        language: data.language ?? "",
+        theme: data.theme ?? "",
+      })
+
+      // console.log("formData", formData)
+      setPending(false)
       setSuccess("User updated!")
       reset()
     } catch (err: unknown) {
@@ -192,7 +266,6 @@ export default function SettingsPage() {
       }
     } finally {
       setPending(false)
-
       setTimeout(() => {
         setSuccess("")
         setError("")
@@ -262,6 +335,53 @@ export default function SettingsPage() {
       setPending(false)
     }
   }
+
+  useEffect(() => {
+    if (userPrefs) {
+      setTimezone(userPrefs.timezone ?? "GMT")
+      setCurrency(userPrefs.currency ?? "USD")
+      setTheme(userPrefs.theme ?? "light")
+    }
+  }, [userPrefs])
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName ?? "")
+      setLastName(user.lastName ?? "")
+      setEmail(user.email ?? "")
+      setName(user.name ?? "")
+
+      updateSetValue("firstName", user.firstName ?? "")
+      updateSetValue("lastName", user.lastName ?? "")
+      updateSetValue("email", user.email ?? "")
+      updateSetValue("name", user.name ?? "")
+    }
+  }, [user, updateSetValue])
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const hasChanged =
+        prevPrefs.current.timezone !== selectedTimezone ||
+        prevPrefs.current.currency !== selectedCurrency ||
+        prevPrefs.current.theme !== selectedTheme
+
+      if (hasChanged) {
+        handleUpdateUserPrefs({
+          currency: selectedCurrency,
+          timezone: selectedTimezone,
+          theme: selectedTheme,
+        })
+
+        prevPrefs.current = {
+          timezone: selectedTimezone,
+          currency: selectedCurrency,
+          theme: selectedTheme,
+        }
+      }
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [selectedTheme, selectedTimezone, selectedCurrency])
 
   return (
     <div className='flex flex-col gap-6 p-6'>
@@ -339,8 +459,11 @@ export default function SettingsPage() {
                       <Input
                         id='firstName'
                         placeholder='Your first name/given name'
-                        defaultValue={user?.firstName ? user?.firstName : ""}
-                        {...updateRegister("firstName", { required: true })}
+                        defaultValue={firstName ?? ""}
+                        onChange={(e) => {
+                          setFirstName(e.target.value)
+                          updateSetValue("firstName", e.target.value)
+                        }}
                       />
                     </div>
                     <div className='space-y-2'>
@@ -348,8 +471,11 @@ export default function SettingsPage() {
                       <Input
                         id='lastName'
                         placeholder='Your last name/family name'
-                        defaultValue={user?.lastName ? user?.lastName : ""}
-                        {...updateRegister("lastName", { required: true })}
+                        defaultValue={lastName ?? ""}
+                        onChange={(e) => {
+                          setLastName(e.target.value)
+                          updateSetValue("lastName", e.target.value)
+                        }}
                       />
                     </div>
                     <div className='space-y-2'>
@@ -362,10 +488,13 @@ export default function SettingsPage() {
                       <Input
                         id='email'
                         type='email'
-                        readOnly
+                        // readOnly
                         placeholder='Your email'
-                        defaultValue={user?.email}
-                        {...updateRegister("email", { required: true })}
+                        defaultValue={email ?? ""}
+                        onChange={(e) => {
+                          setEmail(e.target.value)
+                          updateSetValue("email", e.target.value)
+                        }}
                       />
                     </div>
                     <div className='space-y-2'>
@@ -376,8 +505,11 @@ export default function SettingsPage() {
                       <Input
                         id='name'
                         placeholder='Artist Name/Preferred Name'
-                        defaultValue={user?.name!}
-                        {...updateRegister("name")}
+                        defaultValue={name ?? ""}
+                        onChange={(e) => {
+                          updateSetValue("name", e.target.value)
+                          setName(e.target.value)
+                        }}
                       />
                     </div>
                   </div>
@@ -385,7 +517,14 @@ export default function SettingsPage() {
                     type='submit'
                     variant='salWithShadow'
                     className='mt-4'>
-                    Save Changes
+                    {isSaving ? (
+                      <span className='flex items-center gap-2'>
+                        <LoaderPinwheel className='h-4 w-4 animate-spin' />
+                        "Saving..."
+                      </span>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </Button>
                 </form>
                 {/* <div className='space-y-2'>
@@ -412,7 +551,7 @@ export default function SettingsPage() {
                       Select your preferred language
                     </p>
                   </div> 
-                  <Select defaultValue='en'>
+                  <Select defaultValue='en' onChange={() => setLanguage(value)}>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select language' />
                     </SelectTrigger>
@@ -446,7 +585,7 @@ export default function SettingsPage() {
                   </Select> */}
 
                   <SearchMappedSelect<Timezone>
-                    value={selectedTimezone}
+                    value={selectedTimezone ?? "GMT"}
                     onChange={setTimezone}
                     data={timezones[0]}
                     getItemLabel={(timezone) =>
@@ -498,7 +637,7 @@ export default function SettingsPage() {
 
                   <SearchMappedSelect<Currency>
                     width={"w-[120px]"}
-                    value={selectedCurrency}
+                    value={selectedCurrency ?? "USD"}
                     onChange={setCurrency}
                     data={currencies[0]}
                     getItemLabel={(currency) =>
@@ -600,16 +739,20 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
-                  <Select defaultValue={selectedTheme} disabled>
+                  <Select
+                    defaultValue={selectedTheme ?? "light"}
+                    onValueChange={setTheme}>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select color' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='yellow'>Yellow</SelectItem>
+                      <SelectItem value='default'>
+                        Default (SAL Yellow)
+                      </SelectItem>
                       <SelectItem value='light'>Light</SelectItem>
                       <SelectItem value='dark'>Dark</SelectItem>
-                      <SelectItem value='green'>Green</SelectItem>
-                      <SelectItem value='orange'>Orange</SelectItem>
+                      {/* <SelectItem value='green'>Green</SelectItem>
+                      <SelectItem value='orange'>Orange</SelectItem> */}
                     </SelectContent>
                   </Select>
                 </div>

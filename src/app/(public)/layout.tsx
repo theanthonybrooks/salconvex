@@ -12,6 +12,10 @@ export default async function HomeLayout({
 }) {
   const token = await convexAuthNextjsToken()
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+  const userPref = userData?.userPref ?? null
+  const userId = userData?.userId ?? null
+  const user = userData?.user ?? null
+
   const subStatus = await fetchQuery(
     api.subscriptions.getUserSubscriptionStatus,
     {},
@@ -22,9 +26,10 @@ export default async function HomeLayout({
     // <ClientAuthWrapper>
     <>
       <NavBar
-        userId={userData?.userId ?? "guest"}
-        user={userData?.user ?? null}
+        userId={userId ?? "guest"}
+        user={user ?? null}
         subStatus={subStatus?.subStatus ?? "none"}
+        userPref={userPref ?? null}
       />
       <main className='flex min-w-screen min-h-screen flex-col pt-[4rem] items-center  justify-between'>
         {children}

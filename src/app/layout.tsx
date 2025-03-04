@@ -1,10 +1,15 @@
 import { ConvexClientProvider } from "@/components/convex-client-provider"
 import { ThemedProvider } from "@/providers/themed-provider"
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
+import {
+  ConvexAuthNextjsServerProvider,
+  convexAuthNextjsToken,
+} from "@convex-dev/auth/nextjs/server"
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider"
+import { fetchQuery } from "convex/nextjs"
 import { GeistSans } from "geist/font/sans"
 import type { Metadata } from "next"
 import { ToastContainer } from "react-toastify"
+import { api } from "~/convex/_generated/api"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -37,18 +42,25 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const token = await convexAuthNextjsToken()
+
+  // if (token !== null) {
+  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+  const userPref = userData?.userPref ?? null
+  // }
+
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang='en' suppressHydrationWarning className='scrollable'>
         <body className={GeistSans.className}>
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
-              <ThemedProvider>
+              <ThemedProvider user={userPref}>
                 {children}
                 <ToastContainer
                   position='top-right'

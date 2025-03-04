@@ -83,3 +83,10 @@ export const UpdatePasswordSchema = z.object({
         "Password must contain at least one uppercase letter, one number, and one symbol.",
     }),
 })
+
+export const UpdateUserPrefsSchema = z.object({
+  currency: z.string().optional(),
+  timezone: z.string().optional(),
+  language: z.string().optional(),
+  theme: z.string().optional(),
+})

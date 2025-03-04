@@ -36,10 +36,16 @@ import { FaGithub, FaTwitter, FaYoutube } from "react-icons/fa"
 interface NavBarProps {
   userId: string | undefined
   user: Record<string, any> | null
+  userPref: Record<string, any> | null
   subStatus: string | undefined
 }
 
-export default function NavBar({ userId, user, subStatus }: NavBarProps) {
+export default function NavBar({
+  userId,
+  user,
+  subStatus,
+  userPref,
+}: NavBarProps) {
   const { path } = landingPageLogo[0]
   // const { subStatus } =
   //   useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
@@ -135,7 +141,7 @@ export default function NavBar({ userId, user, subStatus }: NavBarProps) {
                 {/* < Unauthenticated> */}
                 {userId === "guest" && (
                   <Link href='/auth/sign-in' prefetch={true}>
-                    <Button className='font-bold' variant='salWithShadow'>
+                    <Button className='font-bold' variant='salWithShadowHidden'>
                       Sign in
                     </Button>
                   </Link>
@@ -209,13 +215,43 @@ export default function NavBar({ userId, user, subStatus }: NavBarProps) {
         <div className='flex items-center gap-2'>
           {/* <h1>{user?.image}</h1> */}
           {/* <ModeToggle /> */}
-          <ThemeToggle />
+          <ThemeToggle userPref={userPref} />
           {/* <Switch darkMode={true} /> */}
           <Unauthenticated>
             <Link href='/auth/sign-in' prefetch={true}>
-              <Button className='font-bold' variant='salWithShadow'>
+              <Button className='font-bold' variant='salWithShadowHidden'>
                 Sign in
               </Button>
+              {/* <motion.button
+                className='font-bold rounded-md px-4 py-2 text-center text-sm border-black border-2 bg-white text-black'
+                initial={{
+                  boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)",
+                  x: 0,
+                  y: 0,
+                }}
+                animate={{ boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }}
+                whileHover={{
+                  boxShadow: [
+                    "0px 0px 0px rgba(0, 0, 0, 0)",
+                    "-5px 5px 0px rgba(0, 0, 0, 1)",
+                  ],
+                  x: 3,
+                  y: -3,
+                }}
+                whileTap={{
+                  boxShadow: "0px 0px 0px rgba(0, 0, 0, 1)",
+                  x: 0,
+                  y: 0,
+                }}
+                transition={{
+                  boxShadow: {
+                    type: "keyframes",
+                    duration: 0.3,
+                    ease: "linear",
+                  },
+                }}>
+                Sign in
+              </motion.button> */}
             </Link>
           </Unauthenticated>
 

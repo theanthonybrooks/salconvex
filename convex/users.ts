@@ -24,11 +24,31 @@ export const currentUser = query({
   },
 })
 
+// export const getCurrentUser = query({
+//   args: {
+//     token: v.optional(v.string()),
+//   },
+//   handler: async (ctx, { token }) => {
+//     const userId = await getAuthUserId(ctx)
+//     if (!userId) return null
+//     const user = await ctx.db
+//       .query("users")
+//       .withIndex("by_userId", (q) => q.eq("userId", userId))
+//       .unique()
+
+//     if (!userId || !user) {
+//       return null
+//     }
+
+//     return { userId, user }
+//   },
+// })
+
 export const getCurrentUser = query({
   args: {
     token: v.optional(v.string()),
   },
-  handler: async (ctx, { token }) => {
+  handler: async (ctx) => {
     const userId = await getAuthUserId(ctx)
     if (!userId) return null
     const user = await ctx.db
@@ -36,11 +56,20 @@ export const getCurrentUser = query({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique()
 
-    if (!userId || !user) {
-      return null
+    if (!user) {
+      throw new ConvexError("User not found")
     }
 
-    return { userId, user }
+    const userPref = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!userPref) {
+      throw new ConvexError("User pref not found")
+    }
+
+    return { userId, user, userPref }
   },
 })
 
@@ -69,20 +98,17 @@ export const updateUser = mutation({
     email: v.optional(v.string()),
     name: v.optional(v.string()),
     organizationName: v.optional(v.string()),
-    currency: v.optional(v.string()),
-    timezone: v.optional(v.string()),
-    theme: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
-    if (!userId) throw new Error("Not authenticated")
+    if (!userId) throw new ConvexError("Not authenticated")
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique()
 
     if (!user) {
-      throw new Error("User not found")
+      throw new ConvexError("User not found")
     }
 
     await ctx.db.patch(user._id, {
@@ -91,9 +117,56 @@ export const updateUser = mutation({
       email: args.email,
       name: args.name,
       organizationName: args.organizationName,
+
+      updatedAt: Date.now(),
+    })
+  },
+})
+
+export const updateUserPrefs = mutation({
+  args: {
+    currency: v.optional(v.string()),
+    timezone: v.optional(v.string()),
+    theme: v.optional(v.string()),
+    language: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new ConvexError("Not authenticated")
+    console.log("args", args)
+    console.log("args.currency", args.currency)
+    console.log("args.timezone", args.timezone)
+    console.log("args.theme", args.theme)
+    console.log("args.language", args.language)
+    console.log("userId", userId)
+    const userPref = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!userPref) {
+      throw new ConvexError("User pref not found")
+    }
+
+    console.log("userPref._id", userPref._id)
+    console.log("userPref", userPref)
+
+    await ctx.db.patch(userPref._id, {
       currency: args.currency,
       timezone: args.timezone,
       theme: args.theme,
+      language: args.language,
+    })
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!user) {
+      throw new ConvexError("User not found")
+    }
+    await ctx.db.patch(user._id, {
       updatedAt: Date.now(),
     })
   },
@@ -130,7 +203,7 @@ export const updateUserEmailVerification = mutation({
     const user = await findUserByEmail(ctx, args.email)
     if (!user) {
       console.log("user not found")
-      throw new Error("User not found")
+      throw new ConvexError("User not found")
     }
     await ctx.db.patch(user._id, {
       emailVerified: true,
@@ -254,7 +327,7 @@ export const registerUser = mutation({
       .unique()
 
     if (existingUser) {
-      throw new Error("User already exists")
+      throw new ConvexError("User already exists")
     }
 
     // If user doesn't exist, create a new one
@@ -330,7 +403,7 @@ export const deleteAccount = mutation({
         "signupTimeout",
       ].includes(args.method)
     ) {
-      throw new Error("Invalid method")
+      throw new ConvexError("Invalid method")
     }
 
     const method = args.method as MethodType
@@ -369,14 +442,14 @@ export const deleteAccount = mutation({
 
     if (config.requiresEmail) {
       if (!args.email) {
-        throw new Error(`Email is required for ${method}`)
+        throw new ConvexError(`Email is required for ${method}`)
       }
       queryKey = "email"
       queryValue = args.email
     } else {
       const userId = await getAuthUserId(ctx)
       if (!userId) {
-        throw new Error("Unauthenticated call to mutation")
+        throw new ConvexError("Unauthenticated call to mutation")
       }
       queryKey = "userId"
       queryValue = userId
@@ -391,7 +464,7 @@ export const deleteAccount = mutation({
       .unique()
 
     if (!user) {
-      throw new Error("User not found")
+      throw new ConvexError("User not found")
     }
 
     const userId = user._id

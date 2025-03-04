@@ -8,10 +8,12 @@ import {
 import { landingPageLogo } from "@/constants/logos"
 import { footerCRText } from "@/constants/text"
 import { cn } from "@/lib/utils"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { FaInstagram, FaUser } from "react-icons/fa"
+import { FaInstagram, FaRegEnvelope } from "react-icons/fa"
+import { FaFacebookF, FaThreads } from "react-icons/fa6"
 
 export default function Footer() {
   const {
@@ -21,17 +23,25 @@ export default function Footer() {
     reset,
   } = useForm()
 
-  const onSubmit = async (data: any) => {
-    // Handle newsletter submission
-    console.log(data)
-    reset()
-  }
-
   const links = footerLinks
   const { image, alt, width, height, text, path } = landingPageLogo[0]
   const footerText = footerCRText()
   const numColumns = Object.keys(links).length
   const gridColsClass = getGridColsClass(numColumns)
+  const [subAction, setSubAction] = useState("cta")
+
+  const onSubscribe = async (data: any) => {
+    setSubAction("subbing")
+    setTimeout(() => {
+      setSubAction("done")
+    }, 2000)
+    // Handle newsletter submission
+    console.log(data)
+    setTimeout(() => {
+      setSubAction("cta")
+      reset()
+    }, 4000)
+  }
 
   return (
     <footer className='flex justify-center border-t border-border'>
@@ -76,7 +86,7 @@ export default function Footer() {
                 </p>
               </div>
               <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onSubscribe)}
                 className='mt-4 sm:flex sm:max-w-md md:w-full'>
                 <div className='flex-1'>
                   <Input
@@ -89,10 +99,20 @@ export default function Footer() {
                 <div className='mt-3 sm:ml-3 sm:mt-0'>
                   <Button
                     type='submit'
-                    variant='salWithShadow'
-                    className='font-bold'>
-                    Subscribe
-                    <ArrowRight className='ml-2 h-4 w-4' />
+                    variant='salWithShadowHidden'
+                    className='font-bold flex items-center gap-2 w-[150px] justify-center'>
+                    {subAction === "cta"
+                      ? "Subscribe"
+                      : subAction === "subbing"
+                      ? "Subscribing..."
+                      : "Subscribed"}
+                    {subAction === "cta" ? (
+                      <ArrowRight className='ml-2 h-4 w-4' />
+                    ) : subAction === "subbing" ? (
+                      <LoaderPinwheel className='h-4 w-4 animate-spin' />
+                    ) : (
+                      <CheckCircle className='h-4 w-4' />
+                    )}
                   </Button>
                 </div>
               </form>
@@ -100,11 +120,13 @@ export default function Footer() {
           </div>
         </div>
         <div className='mt-12 border-t border-border pt-8 dark:border-gray-800'>
-          <div className='px-6 grid grid-cols-3 items-center'>
+          <div className='px-6 flex justify-between items-center'>
             <div className='flex space-x-4'>
-              <Link href='https://theanthonybrooks.com' target='_blank'>
+              <Link
+                href='https://facebook.com/thestreetartlist'
+                target='_blank'>
                 <Button variant='ghost' size='icon'>
-                  <FaUser className='h-5 w-5' />
+                  <FaFacebookF className='h-5 w-5' />
                 </Button>
               </Link>
               <Link
@@ -113,6 +135,30 @@ export default function Footer() {
                 <Button variant='ghost' size='icon'>
                   <FaInstagram className='h-5 w-5' />
                 </Button>
+              </Link>
+              <Link href='https://threads.net/thestreetartlist' target='_blank'>
+                <Button variant='ghost' size='icon'>
+                  <FaThreads className='h-5 w-5' />
+                </Button>
+              </Link>
+              {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
+                <Button variant='ghost' size='icon'>
+                  <FaPatreon className='h-5 w-5' />
+                </Button>
+              </Link> */}
+              <Link href='mailto:info@thestreetartlist.com' target='_blank'>
+                <Button variant='ghost' size='icon'>
+                  <FaRegEnvelope className='h-5 w-5' />
+                </Button>
+              </Link>
+            </div>
+            <div className='flex space-x-2 text-sm items-center'>
+              <p>Made with ❤️ by</p>
+              <Link
+                href='https://theanthonybrooks.com'
+                target='_blank'
+                className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                Anthony Brooks
               </Link>
             </div>
             <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
