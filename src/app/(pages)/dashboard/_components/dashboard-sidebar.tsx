@@ -33,9 +33,14 @@ const sectionVariants = {
 
 interface DashboardSideBarProps {
   subStatus: string | undefined
+  role: string[] | undefined
 }
 
-export default function DashboardSideBar({ subStatus }: DashboardSideBarProps) {
+export default function DashboardSideBar({
+  subStatus,
+  role,
+}: DashboardSideBarProps) {
+  const pathname = usePathname()
   const [openSection, setOpenSection] = useState<string | null>(null)
   const { image, alt, width, height } = landingPageLogo[0]
   const {
@@ -44,11 +49,12 @@ export default function DashboardSideBar({ subStatus }: DashboardSideBarProps) {
     width: width2,
     height: height2,
   } = landingPageLogoText[0]
-  const pathname = usePathname()
   const statusKey = subStatus ? subStatus : "none"
+  const hasAdminRole = role?.includes("admin")
   const filteredNavItems = navItems.filter(
     (item) =>
       item.sub.includes(statusKey) ||
+      (item.sub.includes("admin") && hasAdminRole) ||
       (item.sub.includes("all") && !item.label.includes("Help"))
   )
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"))
