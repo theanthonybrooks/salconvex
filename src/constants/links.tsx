@@ -288,6 +288,16 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: ["active", "trialing"],
   },
   {
+    label: "Changelog",
+    href: "/changelog",
+    icon: FileText,
+    sectionIcon: FileText,
+    subsection: true,
+    sectionCat: "misc",
+    desc: "View the latest updates",
+    sub: ["all"],
+  },
+  {
     label: "Help & Support",
     href: "/dashboard/help",
     icon: HelpCircle,

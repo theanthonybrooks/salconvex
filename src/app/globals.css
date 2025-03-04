@@ -6,8 +6,8 @@ html,
 body,
 :root {
   height: 100%;
-  width: 100vw;
-  scrollbar-gutter: stable;
+  /* width: 100vw; */
+  /* scrollbar-gutter: stable; */
 
   /* overflow-y: auto; */
 }
@@ -355,7 +355,7 @@ input {
   appearance: none;
 }
 
-input:not(:placeholder-shown):not(:valid) {
+input:not(:placeholder-shown):not(:valid):not(:read-only) {
   box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2); /* outer offset outline */
 }
 

@@ -35,6 +35,9 @@ const customUserSchema = {
   tokenIdentifier: v.string(),
   image: v.optional(v.string()),
   emailVerified: v.optional(v.boolean()),
+  theme: v.optional(v.string()),
+  timezone: v.optional(v.string()),
+  currency: v.optional(v.string()),
 }
 
 export default defineSchema({

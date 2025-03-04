@@ -55,7 +55,6 @@ const SignInCard: React.FC<SignInCardProps> = ({
     const formData = new FormData(e.currentTarget)
     formData.append("redirectTo", "/dashboard")
     formData.append("flow", "signIn")
-    console.log("formData", formData)
     signIn("password", formData)
       .then(() => {
         setSuccess("Successfully signed in!")

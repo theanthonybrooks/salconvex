@@ -1,22 +1,15 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
-import { v } from "convex/values"
-import { Scrypt } from "lucia"
+import { action } from "./_generated/server"
+
+import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server"
+import { ConvexError, v } from "convex/values"
+import { scryptCrypto } from "~/convex/auth"
 import {
   internalMutation,
   mutation,
   MutationCtx,
   query,
 } from "./_generated/server"
-
-const scrypt = new Scrypt()
-const scryptCrypto = {
-  hashSecret: async (secret: string): Promise<string> => {
-    return scrypt.hash(secret)
-  },
-  verifySecret: async (secret: string, hash: string): Promise<boolean> => {
-    return scrypt.verify(secret, hash)
-  },
-}
 
 export const currentUser = query({
   args: {},
@@ -69,6 +62,66 @@ export async function findUserByEmail(ctx: MutationCtx, email: string) {
     .unique()
 }
 
+export const updateUser = mutation({
+  args: {
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    email: v.optional(v.string()),
+    name: v.optional(v.string()),
+    organizationName: v.optional(v.string()),
+    currency: v.optional(v.string()),
+    timezone: v.optional(v.string()),
+    theme: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Not authenticated")
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    await ctx.db.patch(user._id, {
+      firstName: args.firstName,
+      lastName: args.lastName,
+      email: args.email,
+      name: args.name,
+      organizationName: args.organizationName,
+      currency: args.currency,
+      timezone: args.timezone,
+      theme: args.theme,
+      updatedAt: Date.now(),
+    })
+  },
+})
+
+// export const updateUserPrefs = mutation({
+//   args: {
+//     currency: v.optional(v.string()),
+//     timezone: v.optional(v.string()),
+//     theme: v.optional(v.string()),
+//   },
+//   handler: async (ctx, args) => {
+//     const userId = await getAuthUserId(ctx)
+//     if (!userId) throw new ConvexError("Not authenticated")
+//     const user = await ctx.db
+//       .query("users")
+//       .withIndex("by_userId", (q) => q.eq("userId", userId))
+
+//     if (!user) throw new ConvexError("User not found")
+
+//       await ctx.db.patch(user._id, {
+//         currency: args.currency,
+//         timezone: args.timezone,
+//         theme: args.theme
+//       })
+//   },
+// })
+
 export const updateUserEmailVerification = mutation({
   args: {
     email: v.string(),
@@ -88,37 +141,59 @@ export const updateUserEmailVerification = mutation({
   },
 })
 
-// export const updatePassword = mutation({
-//   args: {
-//     email: v.string(),
-//     password: v.string(),
-//     method: v.string(),
-//   },
-//   handler: async (ctx, args) => {
-//     const user = await findUserByEmail(ctx, args.email)
-//     if (!user) {
-//       throw new Error("User not found")
-//     }
-//     const hashedPassword = await scryptCrypto.hashSecret(args.password)
-//     await ctx.db.patch(user._id, {
-//       password: hashedPassword,
-//       updatedAt: Date.now(),
-//       passwordChangedBy: args.method,
-//     })
-//   },
-// })
+export async function checkPassword(
+  ctx: MutationCtx,
+  userId: string,
+  password: string
+) {
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique()
+
+  if (!user) {
+    throw new ConvexError("User not found")
+  }
+
+  const isPasswordValid = await scryptCrypto.verifySecret(
+    password,
+    user.password
+  )
+  if (!isPasswordValid) {
+    throw new ConvexError("Incorrect current password")
+  }
+}
 
 export const updatePassword = mutation({
   args: {
     email: v.string(),
     password: v.string(),
+    currentPassword: v.optional(v.string()),
+    userId: v.optional(v.string()),
     method: v.string(),
   },
   handler: async (ctx, args) => {
     const user = await findUserByEmail(ctx, args.email)
     if (!user) {
-      throw new Error("User not found")
+      throw new ConvexError("User not found")
     }
+    const currentId = await getAuthUserId(ctx)
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (args.method === "userUpdate") {
+      if (args.userId && args.userId !== currentId) {
+        throw new ConvexError("Password change not allowed. Incorrect userId.")
+      }
+      if (args.currentPassword && args.userId) {
+        await checkPassword(ctx, args.userId, args.currentPassword)
+        if (args.currentPassword === args.password) {
+          throw new ConvexError(
+            "New password can't be the same as the old one."
+          )
+        }
+      }
+    }
+
     const hashedPassword = await scryptCrypto.hashSecret(args.password)
     await ctx.db.patch(user._id, {
       password: hashedPassword,
@@ -126,20 +201,28 @@ export const updatePassword = mutation({
       passwordChangedBy: args.method,
     })
 
-    const currentId = await getAuthUserId(ctx)
-    const identity = await ctx.auth.getUserIdentity()
-    console.log("identity", identity)
-    console.log("currentId", currentId)
+    if (args.method === "userUpdate") {
+      const authAccount = await ctx.db
+        .query("authAccounts")
+        .withIndex("userIdAndProvider", (q: any) =>
+          q.eq("provider", "password").eq("userId", user._id)
+        )
+        .unique()
+
+      if (authAccount) {
+        await ctx.db.patch(authAccount._id, {
+          secret: hashedPassword,
+        })
+      } else {
+        throw new ConvexError("Auth account not found for this user.")
+      }
+    }
 
     const userAgent = !identity
       ? "forgotForm"
-      : identity.email === args.email &&
-        currentId &&
-        identity.subject.includes(currentId)
+      : args.userId && currentId === args.userId
       ? "user"
       : "admin"
-
-    //TODO: Come back to this and verify that how I'm approaching this is correct. I'm not certain that this is the best way to do this.
 
     await ctx.db.insert("passwordResetLog", {
       email: args.email,
@@ -414,3 +497,57 @@ async function deleteRelatedDocuments(
     q.eq("userId", userId)
   )
 }
+
+export const deleteSessions = mutation({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const sessions = await ctx.db
+      .query("authSessions")
+      .withIndex("userId", (q: any) => q.eq("userId", args.userId))
+      .collect()
+
+    if (sessions.length === 0) {
+      throw new ConvexError("No active sessions found")
+    }
+
+    await Promise.all(sessions.map((session) => ctx.db.delete(session._id)))
+  },
+})
+
+export const invalidateSessionsAction = action({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    await invalidateSessions(ctx, { userId: args.userId })
+  },
+})
+
+export const countSessions = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const sessions = await ctx.db
+      .query("authSessions")
+      .withIndex("userId", (q: any) => q.eq("userId", args.userId))
+      .collect()
+
+    return sessions.length
+  },
+})
+
+// export const
+
+export const currentSession = query({
+  args: {},
+  handler: async (ctx) => {
+    const sessionId = await getAuthSessionId(ctx)
+    if (sessionId === null) {
+      return null
+    }
+    return await ctx.db.get(sessionId)
+  },
+})

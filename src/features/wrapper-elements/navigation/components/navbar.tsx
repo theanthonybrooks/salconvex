@@ -134,13 +134,11 @@ export default function NavBar({ userId, user, subStatus }: NavBarProps) {
                 </div>
                 {/* < Unauthenticated> */}
                 {userId === "guest" && (
-                  <div className='mt-auto border-t px-2 py-4'>
-                    <Link href='/auth/sign-in' prefetch={true}>
-                      <Button className='font-bold' variant='salWithShadow'>
-                        Sign in
-                      </Button>
-                    </Link>
-                  </div>
+                  <Link href='/auth/sign-in' prefetch={true}>
+                    <Button className='font-bold' variant='salWithShadow'>
+                      Sign in
+                    </Button>
+                  </Link>
                 )}
                 {/* </Unauthenticated> */}
               </div>
@@ -214,13 +212,11 @@ export default function NavBar({ userId, user, subStatus }: NavBarProps) {
           <ThemeToggle />
           {/* <Switch darkMode={true} /> */}
           <Unauthenticated>
-            <div className='mt-auto border-t px-2 py-4'>
-              <Link href='/auth/sign-in' prefetch={true}>
-                <Button className='font-bold' variant='salWithShadow'>
-                  Sign in
-                </Button>
-              </Link>
-            </div>
+            <Link href='/auth/sign-in' prefetch={true}>
+              <Button className='font-bold' variant='salWithShadow'>
+                Sign in
+              </Button>
+            </Link>
           </Unauthenticated>
 
           {userId !== "guest" && <UserProfile user={user} />}

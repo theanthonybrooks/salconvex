@@ -17,9 +17,9 @@ export default async function DashboardLayout({
     { token }
   )
   return (
-    <div className='flex h-screen w-screen overflow-hidden'>
+    <div className='flex h-screen overflow-hidden'>
       <DashboardSideBar subStatus={subStatus?.subStatus} />
-      <main className='flex-1 overflow-y-auto'>
+      <main className='flex-1 overflow-y-auto scrollable'>
         <DashboardTopNav>{children}</DashboardTopNav>
       </main>
     </div>

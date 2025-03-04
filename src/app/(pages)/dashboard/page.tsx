@@ -178,7 +178,7 @@ export default async function Dashboard() {
               asChild
               variant='outline'
               className='w-full justify-start gap-2'>
-              <Link href='/dashboard/settings'>
+              <Link href='/dashboard/account/settings'>
                 <Users className='h-4 w-4' />
                 Invite Team
               </Link>

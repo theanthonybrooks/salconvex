@@ -25,6 +25,7 @@ import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js
 import type * as plans from "../plans.js";
 import type * as stripeSubscriptions from "../stripeSubscriptions.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as uploads_user from "../uploads/user.js";
 import type * as users from "../users.js";
 
 /**
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   plans: typeof plans;
   stripeSubscriptions: typeof stripeSubscriptions;
   subscriptions: typeof subscriptions;
+  "uploads/user": typeof uploads_user;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

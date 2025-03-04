@@ -88,7 +88,7 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
 
   const columnDisplayNames: Record<ColumnType, string> = {
     proposed: "Proposed",
-    backlog: "Backlog",
+    backlog: "Considering",
     todo: "To Do",
     doing: "In Progress",
     done: "Complete",

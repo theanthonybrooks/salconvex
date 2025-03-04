@@ -7,13 +7,12 @@ import { CustomPassword } from "./functions/customPassword"
 import { ResendOTP } from "./otp/resendOtp"
 import { findUserByEmail } from "./users"
 
-const scrypt = new Scrypt()
-const scryptCrypto = {
-  hashSecret: async (secret: string): Promise<string> => {
-    return scrypt.hash(secret)
+export const scryptCrypto = {
+  async hashSecret(password: string) {
+    return await new Scrypt().hash(password)
   },
-  verifySecret: async (secret: string, hash: string): Promise<boolean> => {
-    return scrypt.verify(secret, hash)
+  async verifySecret(password: string, hash: string) {
+    return await new Scrypt().verify(hash, password)
   },
 }
 
@@ -40,6 +39,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       }
 
       const existingUser = await findUserByEmail(ctx, profile.email)
+      console.log("existingUser: ", existingUser)
       if (existingUser) {
         if (type === "credentials") {
           if (typeof profile.password !== "string") {

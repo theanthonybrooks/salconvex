@@ -4,6 +4,7 @@ import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider"
 import { GeistSans } from "geist/font/sans"
 import type { Metadata } from "next"
+import { ToastContainer } from "react-toastify"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -47,7 +48,21 @@ export default function RootLayout({
         <body className={GeistSans.className}>
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
-              <ThemedProvider>{children}</ThemedProvider>
+              <ThemedProvider>
+                {children}
+                <ToastContainer
+                  position='top-right'
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick={false}
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme='light'
+                />
+              </ThemedProvider>
             </ConvexQueryCacheProvider>
           </ConvexClientProvider>
         </body>

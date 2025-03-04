@@ -1,4 +1,6 @@
 "use client"
+import { FormError } from "@/components/form-error"
+import { FormSuccess } from "@/components/form-success"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -8,6 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -20,14 +42,226 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { useQuery } from "convex/react"
-import { Bell, Globe, Lock, Mail, Moon, Palette, Shield } from "lucide-react"
-import { api } from "../../../../../../convex/_generated/api"
+import { UpdatePasswordSchema, UpdateUserSchema } from "@/schemas/auth"
+import { useAuthActions } from "@convex-dev/auth/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useAction, useMutation, useQuery } from "convex/react"
+import { ConvexError } from "convex/values"
+import {
+  Bell,
+  Eye,
+  EyeOff,
+  Globe,
+  LoaderPinwheel,
+  Mail,
+  Moon,
+  Palette,
+  Shield,
+  Upload,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+
+import { currencies, Currency } from "@/app/data/currencies"
+import { Timezone, timezones } from "@/app/data/timezones"
+import { SearchMappedSelect } from "@/components/ui/mapped-select"
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
+import { FaUserNinja } from "react-icons/fa6"
+import { toast } from "react-toastify"
+import { api } from "~/convex/_generated/api"
 
 export default function SettingsPage() {
+  const { signOut } = useAuthActions()
+  const router = useRouter()
   const userData = useQuery(api.users.getCurrentUser, {})
   const user = userData?.user // This avoids destructuring null or undefined
+  const sessionCount = useQuery(api.users.countSessions, {
+    userId: user?.userId ?? "guest",
+  })
+  const updatePassword = useMutation(api.users.updatePassword)
+  const deleteSessions = useMutation(api.users.deleteSessions)
+  const updateUser = useMutation(api.users.updateUser)
+  const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage)
+  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl)
+  const invalidateSessions = useAction(api.users.invalidateSessionsAction)
+
+  const [selectedTimezone, setTimezone] = useState("GMT")
+  const [selectedCurrency, setCurrency] = useState("USD")
+  const [selectedTheme, setTheme] = useState("light")
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string>("")
+  const [success, setSuccess] = useState<string>("")
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+
+  const DeleteAccount = useMutation(api.users.deleteAccount)
+  const onDeleteAccount = async () => {
+    setPending(true)
+    setError("")
+
+    try {
+      await DeleteAccount({ method: "deleteAccount" })
+      signOut()
+    } catch (err) {
+      setError("Failed to delete account. Please try again.")
+      console.error(err)
+    } finally {
+      setPending(false)
+    }
+  }
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<z.infer<typeof UpdatePasswordSchema>>({
+    resolver: zodResolver(UpdatePasswordSchema),
+  })
+
+  const {
+    register: updateRegister,
+    handleSubmit: updateHandleSubmit,
+    reset: updateReset,
+    formState: { errors: updateErrors },
+  } = useForm<z.infer<typeof UpdateUserSchema>>({
+    resolver: zodResolver(UpdateUserSchema),
+  })
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files || event.target.files.length === 0) return
+
+    const file = event.target.files[0]
+
+    setUploading(true)
+
+    const uploadUrl = await generateUploadUrl()
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type },
+      body: file,
+    })
+
+    if (!response.ok) {
+      toast.error("Failed to upload profile image")
+      setUploading(false)
+      return
+    }
+
+    const { storageId } = await response.json()
+
+    await uploadProfileImage({ storageId })
+
+    setUploading(false)
+    toast.success("Profile image updated successfully!")
+  }
+
+  const handleUpdateUserSubmit = async (
+    data: z.infer<typeof UpdateUserSchema>
+  ) => {
+    setPending(true)
+    setError("")
+
+    if (!user || !user.email) {
+      throw new Error("No user found")
+    }
+    try {
+      await updateUser({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        name: data.name,
+        organizationName: data.organizationName ?? "",
+      })
+      // console.log("formData", formData)
+      setPending(false)
+      setSuccess("User updated!")
+      reset()
+    } catch (err: unknown) {
+      // Type assertion: Explicitly check if it's a ConvexError
+      if (err instanceof ConvexError) {
+        setError(err.data || "An unexpected error occurred.")
+      } else if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred.")
+      } else {
+        setError("An unknown error occurred.")
+      }
+    } finally {
+      setPending(false)
+
+      setTimeout(() => {
+        setSuccess("")
+        setError("")
+      }, 5000)
+    }
+  }
+
+  const handleUpdatePasswordSubmit = async (
+    data: z.infer<typeof UpdatePasswordSchema>
+  ) => {
+    setPending(true)
+    setError("")
+
+    if (!user || !user.email) {
+      throw new Error("No user found")
+    }
+    try {
+      await updatePassword({
+        email: user.email,
+        password: data.newPassword,
+        currentPassword: data.oldPassword,
+        userId: user.userId,
+        method: "userUpdate",
+      })
+      // console.log("formData", formData)
+      setPending(false)
+      setSuccess("Password reset!")
+
+      reset()
+    } catch (err: unknown) {
+      // Type assertion: Explicitly check if it's a ConvexError
+      if (err instanceof ConvexError) {
+        setError(err.data || "An unexpected error occurred.")
+      } else if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred.")
+      } else {
+        setError("An unknown error occurred.")
+      }
+    } finally {
+      setPending(false)
+
+      setTimeout(() => {
+        setSuccess("")
+        setError("")
+      }, 5000)
+    }
+  }
+
+  const handleDeleteSessions = async () => {
+    try {
+      if (!user) {
+        throw new Error("User not found")
+      }
+      await deleteSessions({ userId: user?.userId })
+      // await invalidateSessions({ userId: user?.userId })
+      setSuccess("Sessions deleted!")
+      signOut()
+    } catch (err: unknown) {
+      if (err instanceof ConvexError) {
+        setError(err.data || "An unexpected error occurred.")
+      } else if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred.")
+      } else {
+        setError("An unknown error occurred.")
+      }
+    } finally {
+      setPending(false)
+    }
+  }
 
   return (
     <div className='flex flex-col gap-6 p-6'>
@@ -43,6 +277,8 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value='account'>Account</TabsTrigger>
           <TabsTrigger value='notifications'>Notifications</TabsTrigger>
+          {/*          //NOTE: in order to disabled, just add "disabled" to the tabs trigger
+           */}
           <TabsTrigger value='appearance'>Appearance</TabsTrigger>
           <TabsTrigger value='security'>Security</TabsTrigger>
         </TabsList>
@@ -64,43 +300,98 @@ export default function SettingsPage() {
                       src={user?.image || "/avatars/default.jpg"}
                       alt='User'
                     />
-                    <AvatarFallback>UN</AvatarFallback>
+                    <AvatarFallback>
+                      <FaUserNinja />
+                    </AvatarFallback>
                   </Avatar>
-                  <Button variant='outline'>Change Avatar</Button>
+                  <div className='flex flex-col items-center'>
+                    {/* Hidden File Input */}
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleFileChange}
+                      className='hidden'
+                      id='file-upload'
+                    />
+
+                    <label
+                      htmlFor='file-upload'
+                      className='cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 hover:text-gray-900 transition'>
+                      {uploading ? (
+                        <div className='flex flex-row items-center gap-2'>
+                          <LoaderPinwheel className='h-4 w-4 animate-spin' />
+                          Uploading...
+                        </div>
+                      ) : (
+                        <div className='flex flex-row items-center gap-2'>
+                          <Upload className='h-4 w-4' />
+                          Change Avatar
+                        </div>
+                      )}
+                    </label>
+                  </div>
                 </div>
                 <Separator />
-                <div className='grid gap-4 md:grid-cols-2'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='name'>Name</Label>
-                    <Input
-                      id='name'
-                      placeholder='Your name'
-                      defaultValue={user?.firstName ? user?.firstName : ""}
-                    />
+                <form onSubmit={updateHandleSubmit(handleUpdateUserSubmit)}>
+                  <div className='grid gap-4 md:grid-cols-2'>
+                    <div className='space-y-2'>
+                      <Label htmlFor='firstName'>First Name</Label>
+                      <Input
+                        id='firstName'
+                        placeholder='Your first name/given name'
+                        defaultValue={user?.firstName ? user?.firstName : ""}
+                        {...updateRegister("firstName", { required: true })}
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label htmlFor='lastName'>Last Name</Label>
+                      <Input
+                        id='lastName'
+                        placeholder='Your last name/family name'
+                        defaultValue={user?.lastName ? user?.lastName : ""}
+                        {...updateRegister("lastName", { required: true })}
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label htmlFor='email'>
+                        Email{" "}
+                        <i className='font-light text-xs'>
+                          (update to send new verification email when updated)
+                        </i>
+                      </Label>
+                      <Input
+                        id='email'
+                        type='email'
+                        readOnly
+                        placeholder='Your email'
+                        defaultValue={user?.email}
+                        {...updateRegister("email", { required: true })}
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <div className='flex justify-start gap-x-2 items-center'>
+                        <Label htmlFor='name'>Artist Name/Preferred Name</Label>
+                        <p className='text-sm font-light italic'>(Optional)</p>
+                      </div>
+                      <Input
+                        id='name'
+                        placeholder='Artist Name/Preferred Name'
+                        defaultValue={user?.name!}
+                        {...updateRegister("name")}
+                      />
+                    </div>
                   </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='email'>Email</Label>
-                    <Input
-                      id='email'
-                      type='email'
-                      placeholder='Your email'
-                      defaultValue={user?.email}
-                    />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='username'>Username</Label>
-                    <Input
-                      id='username'
-                      placeholder='Username'
-                      defaultValue={user?.name!}
-                    />
-                  </div>
-                </div>
-                <div className='space-y-2'>
+                  <Button
+                    type='submit'
+                    variant='salWithShadow'
+                    className='mt-4'>
+                    Save Changes
+                  </Button>
+                </form>
+                {/* <div className='space-y-2'>
                   <Label htmlFor='bio'>Bio</Label>
                   <Textarea id='bio' placeholder='Tell us about yourself' />
-                </div>
-                <Button>Save Changes</Button>
+                </div> */}
               </CardContent>
             </Card>
 
@@ -113,13 +404,14 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className='space-y-6'>
-                <div className='flex items-center justify-between'>
-                  <div className='space-y-0.5'>
+                {/* <div className='flex items-center justify-between'>
+                 //TODO: Add language selection in the future 
+                   <div className='space-y-0.5'>
                     <Label>Language</Label>
                     <p className='text-sm text-muted-foreground'>
                       Select your preferred language
                     </p>
-                  </div>
+                  </div> 
                   <Select defaultValue='en'>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select language' />
@@ -132,7 +424,7 @@ export default function SettingsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Separator />
+                <Separator />*/}
                 <div className='flex items-center justify-between'>
                   <div className='space-y-0.5'>
                     <Label>Timezone</Label>
@@ -140,17 +432,84 @@ export default function SettingsPage() {
                       Set your local timezone
                     </p>
                   </div>
-                  <Select defaultValue='est'>
+                  {/* <Select defaultValue='est'>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select timezone' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='pst'>Pacific Time (PST)</SelectItem>
-                      <SelectItem value='est'>Eastern Time (EST)</SelectItem>
-                      <SelectItem value='utc'>UTC</SelectItem>
-                      <SelectItem value='gmt'>GMT</SelectItem>
+                      {options.map((option) => (
+                        <SelectItem value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
-                  </Select>
+                  </Select> */}
+
+                  <SearchMappedSelect<Timezone>
+                    value={selectedTimezone}
+                    onChange={setTimezone}
+                    data={timezones[0]}
+                    getItemLabel={(timezone) =>
+                      `${timezone.gmtAbbreviation}  - ${timezone.name} (${
+                        timezone.abbreviation
+                      }${
+                        timezone.dstAbbreviation
+                          ? `/${timezone.dstAbbreviation}`
+                          : ""
+                      })`
+                    }
+                    searchFields={[
+                      "name",
+                      "region",
+                      "abbreviation",
+                      "gmtOffset",
+                      "gmtAbbreviation",
+                    ]}
+                    getItemDisplay={(timezone) =>
+                      `(${
+                        timezone.region !== "North America"
+                          ? timezone.gmtAbbreviation
+                          : timezone.abbreviation
+                      })  - ${timezone.name}`
+                    }
+                    getItemValue={(timezone) => timezone.abbreviation}
+                  />
+                </div>
+                <Separator />
+                <div className='flex items-center justify-between'>
+                  <div className='space-y-0.5'>
+                    <Label>Currency</Label>
+                    <p className='text-sm text-muted-foreground'>
+                      Set your preferred currency
+                    </p>
+                  </div>
+                  {/* <Select defaultValue='est'>
+                    <SelectTrigger className='w-[180px]'>
+                      <SelectValue placeholder='Select timezone' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.map((option) => (
+                        <SelectItem value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select> */}
+
+                  <SearchMappedSelect<Currency>
+                    width={"w-[120px]"}
+                    value={selectedCurrency}
+                    onChange={setCurrency}
+                    data={currencies[0]}
+                    getItemLabel={(currency) =>
+                      `${currency.symbol} (${currency.code}) - ${currency.name}`
+                    }
+                    searchFields={["name", "symbol", "code"]}
+                    getItemDisplay={(currency) =>
+                      `${currency.symbol} (${currency.code})`
+                    }
+                    getItemValue={(currency) => currency.code}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -213,7 +572,7 @@ export default function SettingsPage() {
         <TabsContent value='appearance'>
           <Card>
             <CardHeader>
-              <CardTitle>Appearance</CardTitle>
+              <CardTitle>Appearance </CardTitle>
               <CardDescription>Customize the look and feel</CardDescription>
             </CardHeader>
             <CardContent className='space-y-6'>
@@ -224,11 +583,11 @@ export default function SettingsPage() {
                     <div>
                       <Label>Dark Mode</Label>
                       <p className='text-sm text-muted-foreground'>
-                        Toggle dark mode
+                        Toggle dark mode <i>(coming soon)</i>
                       </p>
                     </div>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked disabled />
                 </div>
                 <Separator />
                 <div className='flex items-center justify-between'>
@@ -237,17 +596,18 @@ export default function SettingsPage() {
                     <div>
                       <Label>Theme Color</Label>
                       <p className='text-sm text-muted-foreground'>
-                        Choose your theme color
+                        Choose your theme color <i>(coming soon)</i>
                       </p>
                     </div>
                   </div>
-                  <Select defaultValue='blue'>
+                  <Select defaultValue={selectedTheme} disabled>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select color' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='blue'>Blue</SelectItem>
-                      <SelectItem value='purple'>Purple</SelectItem>
+                      <SelectItem value='yellow'>Yellow</SelectItem>
+                      <SelectItem value='light'>Light</SelectItem>
+                      <SelectItem value='dark'>Dark</SelectItem>
                       <SelectItem value='green'>Green</SelectItem>
                       <SelectItem value='orange'>Orange</SelectItem>
                     </SelectContent>
@@ -267,7 +627,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className='space-y-6'>
                 <div className='space-y-4'>
-                  <div className='flex items-center justify-between'>
+                  {/* <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
                       <Lock className='h-5 w-5 text-muted-foreground' />
                       <div>
@@ -277,9 +637,12 @@ export default function SettingsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant='outline'>Enable</Button>
+                    <Button variant='outline' disabled>
+                      /~ Enable ~/
+                      
+                    </Button>
                   </div>
-                  <Separator />
+                  <Separator />*/}
                   <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
                       <Shield className='h-5 w-5 text-muted-foreground' />
@@ -290,7 +653,108 @@ export default function SettingsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant='outline'>Update</Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant='outline' className='min-w-[150px]'>
+                          Update
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className='sm:max-w-[425px]'>
+                        <DialogHeader>
+                          <DialogTitle>Edit profile</DialogTitle>
+                          <DialogDescription>
+                            Make changes to your profile here. Click save when
+                            you're done.
+                          </DialogDescription>
+                          {success && <FormSuccess message={success} />}
+                          {error && <FormError message={error} />}
+                        </DialogHeader>
+
+                        <form
+                          onSubmit={handleSubmit(handleUpdatePasswordSubmit)}
+                          className='space-y-2'>
+                          <div className='space-y-1'>
+                            <Label htmlFor='current' className='text-right'>
+                              Current password
+                            </Label>
+                            <div className='relative'>
+                              <Input
+                                id='current'
+                                type='password'
+                                placeholder={
+                                  !showCurrentPassword
+                                    ? "********"
+                                    : "Old Password"
+                                }
+                                {...register("oldPassword", {
+                                  required: true,
+                                })}
+                              />
+                              <button
+                                type='button'
+                                onClick={() =>
+                                  setShowCurrentPassword((prev) => !prev)
+                                }
+                                className='absolute inset-y-0 right-0 flex items-center pr-3'>
+                                {showCurrentPassword ? (
+                                  <Eye className='size-4 text-black' />
+                                ) : (
+                                  <EyeOff className='size-4 text-black' />
+                                )}
+                              </button>
+                            </div>
+                            {errors.oldPassword && (
+                              <p className='text-destructive text-sm'>
+                                {errors.oldPassword.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className='space-y-1'>
+                            <Label htmlFor='new' className='text-right'>
+                              New password
+                            </Label>
+                            <div className='relative'>
+                              <Input
+                                id='new'
+                                type='password'
+                                placeholder={
+                                  !showNewPassword ? "********" : "New Password"
+                                }
+                                {...register("newPassword", {
+                                  required: true,
+                                })}
+                              />
+                              <button
+                                type='button'
+                                onClick={() =>
+                                  setShowNewPassword((prev) => !prev)
+                                }
+                                className='absolute inset-y-0 right-0 flex items-center pr-3'>
+                                {showNewPassword ? (
+                                  <Eye className='size-4 text-black' />
+                                ) : (
+                                  <EyeOff className='size-4 text-black' />
+                                )}
+                              </button>
+                            </div>
+                            {errors.newPassword && (
+                              <p className='text-destructive text-sm'>
+                                {errors.newPassword.message}
+                              </p>
+                            )}
+                          </div>
+
+                          <DialogFooter>
+                            <Button
+                              className='w-full mt-3'
+                              variant='salWithShadow'
+                              type='submit'>
+                              Update Password
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </CardContent>
@@ -304,13 +768,17 @@ export default function SettingsPage() {
               <CardContent>
                 <div className='space-y-4'>
                   <div className='flex items-center justify-between'>
+                    <p className='font-medium'>Current Session</p>
                     <div>
-                      <p className='font-medium'>Current Session</p>
-                      <p className='text-sm text-muted-foreground'>
+                      {/* <p className='text-sm text-muted-foreground'>
                         Last active: Just now
-                      </p>
+                      </p> */}
                     </div>
-                    <Button variant='outline' className='text-destructive'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      className='text-destructive min-w-[150px]'
+                      onClick={signOut}>
                       Sign Out
                     </Button>
                   </div>
@@ -319,12 +787,81 @@ export default function SettingsPage() {
                     <div>
                       <p className='font-medium'>Other Sessions</p>
                       <p className='text-sm text-muted-foreground'>
-                        2 active sessions
+                        {sessionCount ?? 0} active session
+                        {sessionCount && sessionCount > 1 ? "s" : ""}
                       </p>
                     </div>
-                    <Button variant='outline' className='text-destructive'>
-                      Sign Out All
-                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          className='text-destructive min-w-[150px]'>
+                          Sign Out All
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className='text-black'>
+                            Sign out all sessions?
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogDescription className='text-black'>
+                          Are you sure you want to sign out of all your
+                          sessions? You'll need to re-login on all devices.
+                        </AlertDialogDescription>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteSessions}>
+                            Yes, sign out all
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                  <Separator />
+                  <div className='flex items-center justify-between bg-destructive/10 p-4 rounded-lg'>
+                    <div>
+                      <p className='font-medium'>Delete Account</p>
+                      <p className='text-sm text-muted-foreground'>
+                        Permanently delete your account — any active
+                        subscriptions need to be canceled before this is
+                        possible
+                      </p>
+                    </div>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          type='button'
+                          variant='destructive'
+                          // className='text-destructive min-w-[150px] hover:bg-destructive/20 bg-destructive/10'
+                        >
+                          Delete Account
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className='text-black'>
+                            Sign out all sessions?
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogDescription className='text-black'>
+                          Are you sure you want to delete your account? Any
+                          active subscriptions need to be canceled before this
+                          is possible and all data will be permanently deleted.
+                        </AlertDialogDescription>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={onDeleteAccount}>
+                            Yes, Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </CardContent>

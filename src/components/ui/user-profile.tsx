@@ -83,7 +83,7 @@ export function UserProfile({ user }: UserProfileProps) {
           {subscription && (
             <>
               <Link
-                href='/dashboard/settings'
+                href='/dashboard/account/settings'
                 className='hover:underline underline-offset-2 hover:cursor-pointer'>
                 <DropdownMenuItem className='focus:bg-blue-50 dark:focus:bg-blue-950'>
                   <Settings className='mr-2 h-4 w-4' />
