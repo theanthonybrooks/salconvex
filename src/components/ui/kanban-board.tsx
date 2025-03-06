@@ -56,20 +56,20 @@ interface KanbanBoardProps {
 
 const getColumnColor = (column: ColumnType) => {
   const colors: Record<ColumnType, string> = {
-    proposed: "text-purple-400",
-    backlog: "text-neutral-500",
-    todo: "text-yellow-200",
-    doing: "text-blue-200",
-    done: "text-emerald-200",
+    proposed: "bg-purple-300",
+    backlog: "bg-neutral-200",
+    todo: "bg-yellow-200",
+    doing: "bg-blue-200",
+    done: "bg-emerald-200",
   }
-  return colors[column] || "text-neutral-500"
+  return colors[column] || "bg-neutral-500"
 }
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
   return (
-    <div className='h-screen w-full bg-neutral-900 text-neutral-50'>
+    <div className='h-screen w-full bg-background text-black'>
       <Board userRole={userRole} />
     </div>
   )
@@ -95,7 +95,7 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   }
 
   return (
-    <div className='flex h-full w-full gap-3 overflow-auto p-12'>
+    <div className='flex h-full w-full gap-3 overflow-auto scrollable invis p-12'>
       {(["proposed", "backlog", "todo", "doing", "done"] as ColumnType[]).map(
         (column) => (
           <Column
@@ -179,13 +179,11 @@ const Column: React.FC<
     setActive(false)
   }
 
-  // 🛠️ Restore clearHighlights function
   const clearHighlights = (els?: HTMLElement[]) => {
     const indicators = els || getIndicators()
     indicators.forEach((i) => (i.style.opacity = "0"))
   }
 
-  // 🛠️ Restore highlightIndicator function
   const highlightIndicator = (e: React.DragEvent<HTMLDivElement>) => {
     const indicators = getIndicators()
     clearHighlights(indicators)
@@ -193,7 +191,6 @@ const Column: React.FC<
     el.element.style.opacity = "1"
   }
 
-  // 🛠️ Restore getNearestIndicator function
   const getNearestIndicator = (
     e: React.DragEvent<HTMLDivElement>,
     indicators: HTMLElement[]
@@ -232,12 +229,16 @@ const Column: React.FC<
       onDragLeave={handleDragLeave}
       onDrop={handleDragEnd}>
       <div className='mb-3 flex items-center justify-between'>
-        <h3 className={`font-medium ${headingColor}`}>{title}</h3>
-        <span className='rounded text-sm text-neutral-400'>{cards.length}</span>
+        <h3 className={`font-medium ${headingColor} p-4 rounded-lg`}>
+          {title}
+        </h3>
+        <span className='rounded text-sm text-black'>{cards.length}</span>
       </div>
       <div
         className={`h-full w-full transition-colors ${
-          active ? "bg-neutral-800/50" : "bg-neutral-800/0"
+          active
+            ? "bg-[hsl(45,100%,71%)]/30"
+            : "bg-[hsl(60, 100%, 99.6078431372549%)]/0"
         }`}>
         {cards.map((c) => (
           <Card
@@ -279,8 +280,10 @@ const Card: React.FC<CardProps> = ({ title, id, column, handleDragStart }) => {
             column,
           })
         }
-        className='cursor-grab rounded border border-neutral-700 bg-neutral-800 p-3 active:cursor-grabbing'>
-        <p className='text-sm text-neutral-100'>{title}</p>
+        className={`cursor-grab rounded border border-black/20  ${getColumnColor(
+          column
+        )} p-3 active:cursor-grabbing`}>
+        <p className='text-sm text-black'>{title}</p>
       </motion.div>
     </>
   )
@@ -374,13 +377,13 @@ const AddCard: React.FC<
             onKeyDown={handleKeyDown} // Capture Enter key
             autoFocus
             placeholder='Add new task...'
-            className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-50 placeholder-violet-300 focus:outline-0'
+            className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-violet-800/60 placeholder-violet-300 focus:outline-0'
           />
           <div className='mt-1.5 flex items-center justify-end gap-1.5'>
             <button
               type='button'
               onClick={() => setActiveColumn(null)} // Close only this form
-              className='px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-50'>
+              className='px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-600'>
               Close
             </button>
             <button
@@ -395,7 +398,7 @@ const AddCard: React.FC<
         <motion.button
           layout
           onClick={() => setActiveColumn(column)} // Set this column as active
-          className='flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-50'>
+          className='flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 transition-colors hover:text-neutral-600'>
           <span>Add card</span>
           <FiPlus />
         </motion.button>

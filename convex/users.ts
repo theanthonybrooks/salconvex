@@ -56,6 +56,9 @@ export const getCurrentUser = query({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique()
 
+    // console.log("userId", userId)
+    // console.log("user", user)
+
     if (!user) {
       throw new ConvexError("User not found")
     }
@@ -66,7 +69,8 @@ export const getCurrentUser = query({
       .unique()
 
     if (!userPref) {
-      throw new ConvexError("User pref not found")
+      console.log("userPref not found")
+      return null
     }
 
     return { userId, user, userPref }
@@ -133,12 +137,12 @@ export const updateUserPrefs = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
     if (!userId) throw new ConvexError("Not authenticated")
-    console.log("args", args)
-    console.log("args.currency", args.currency)
-    console.log("args.timezone", args.timezone)
-    console.log("args.theme", args.theme)
-    console.log("args.language", args.language)
-    console.log("userId", userId)
+    // console.log("args", args)
+    // console.log("args.currency", args.currency)
+    // console.log("args.timezone", args.timezone)
+    // console.log("args.theme", args.theme)
+    // console.log("args.language", args.language)
+    // console.log("userId", userId)
     const userPref = await ctx.db
       .query("userPreferences")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -148,8 +152,8 @@ export const updateUserPrefs = mutation({
       throw new ConvexError("User pref not found")
     }
 
-    console.log("userPref._id", userPref._id)
-    console.log("userPref", userPref)
+    // console.log("userPref._id", userPref._id)
+    // console.log("userPref", userPref)
 
     await ctx.db.patch(userPref._id, {
       currency: args.currency,
@@ -202,7 +206,6 @@ export const updateUserEmailVerification = mutation({
   handler: async (ctx, args) => {
     const user = await findUserByEmail(ctx, args.email)
     if (!user) {
-      console.log("user not found")
       throw new ConvexError("User not found")
     }
     await ctx.db.patch(user._id, {

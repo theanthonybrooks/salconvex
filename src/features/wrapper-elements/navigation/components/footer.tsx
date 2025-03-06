@@ -93,7 +93,7 @@ export default function Footer() {
                     {...register("email", { required: true })}
                     type='email'
                     placeholder='Enter your email'
-                    className='w-full min-w-0 rounded-lg border-black'
+                    className='w-full min-w-0 rounded-lg bg-background border-black'
                   />
                 </div>
                 <div className='mt-3 sm:ml-3 sm:mt-0'>
@@ -119,7 +119,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className='mt-12 border-t border-border pt-8 dark:border-gray-800'>
+        <div className='mt-12 border-t border-border pt-4 dark:border-gray-800'>
           <div className='px-6 flex justify-between items-center'>
             <div className='flex space-x-4'>
               <Link

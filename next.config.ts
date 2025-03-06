@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
 
     return config
   },
+  images: {
+    unoptimized: true, // 🚀 Completely disables Next.js image optimization
+  },
 }
 
 export default nextConfig

@@ -56,8 +56,9 @@ export default async function RootLayout({
 
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang='en' suppressHydrationWarning className='scrollable'>
-        <body className={GeistSans.className}>
+      <html lang='en' suppressHydrationWarning>
+        <body
+          className={`${GeistSans.className} scrollable mini unscroll darkbar`}>
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
               <ThemedProvider user={userPref}>

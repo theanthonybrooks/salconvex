@@ -5,7 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useAction, useQuery } from "convex/react"
 import { format } from "date-fns"
 
-import { CreditCard, Database, Settings, Users } from "lucide-react"
+import { CreditCard, Users } from "lucide-react"
+import { FaStripeS } from "react-icons/fa6"
 import { api } from "../../../../../convex/_generated/api"
 
 export default function AccountPage() {
@@ -103,12 +104,12 @@ export default function AccountPage() {
                     {new Date(user?.createdAt || "").toLocaleDateString()}
                   </span>
                 </div>
-                <div className='space-y-1'>
+                {/* <div className='space-y-1'>
                   <span className='text-muted-foreground'>User ID:</span>
                   <span className='block break-all text-sm font-medium'>
                     {user?._id}
                   </span>
-                </div>
+                </div> */}
               </div>
             )}
           </CardContent>
@@ -252,7 +253,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Database User Info Card */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <Database className='h-5 w-5' />
@@ -294,14 +295,14 @@ export default function AccountPage() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
-        {/* Subscription Details Extended Card */}
-        <Card>
+        {/* Stripe Details Extended Card */}
+        <Card className='col-span-2'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
-              <Settings className='h-5 w-5' />
-              Additional Details
+              <FaStripeS className='h-5 w-5' />
+              Stripe Details
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -315,13 +316,16 @@ export default function AccountPage() {
             ) : (
               <div className='grid gap-4'>
                 <div className='space-y-1'>
-                  <span className='text-muted-foreground'>Customer ID:</span>
+                  <span className='text-muted-foreground'> Customer ID:</span>
                   <span className='block break-all text-sm font-medium'>
                     {subscription.customerId}
                   </span>
                 </div>
                 <div className='space-y-1'>
-                  <span className='text-muted-foreground'>Polar ID:</span>
+                  <span className='text-muted-foreground'>
+                    {" "}
+                    Subscription ID:
+                  </span>
                   <span className='block break-all text-sm font-medium'>
                     {subscription?.stripeId}
                   </span>

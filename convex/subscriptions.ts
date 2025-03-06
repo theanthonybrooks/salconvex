@@ -14,7 +14,7 @@ export const getStripeCustomerPortalUrl = async (
   returnUrl: string
 ): Promise<string> => {
   console.log("customerId: ", customerId)
-  console.log("returnUrl: ", returnUrl)
+  // console.log("returnUrl: ", returnUrl)
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
@@ -59,7 +59,7 @@ export const getUserSubscriptionStatus = query({
 export const getUserSubscription = query({
   handler: async (ctx) => {
     const identity = await getAuthUserId(ctx)
-    console.log("identity: ", identity)
+    // console.log("identity: ", identity)
     if (!identity) {
       return null
     }
@@ -69,7 +69,7 @@ export const getUserSubscription = query({
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity))
       .unique()
 
-    console.log("user: ", user)
+    // console.log("user: ", user)
     if (!user) {
       return null
     }
@@ -79,7 +79,7 @@ export const getUserSubscription = query({
       .withIndex("userId", (q) => q.eq("userId", user.tokenIdentifier))
       .first()
 
-    console.log("User: ", user, "Subscription: ", subscription)
+    // console.log("User : ", user, "Subscription: ", subscription)
     return subscription
   },
 })
@@ -92,9 +92,8 @@ export const getStripeDashboardUrl = action({
         process.env.FRONTEND_URL as string
       )
       return { url }
-    } catch (error) {
-      console.error("Error creating Stripe portal session:", error)
-      throw new Error("Failed to create Stripe portal session")
+    } catch (error: any) {
+      throw new Error("Stripe Error: " + error.message)
     }
   },
 })

@@ -189,7 +189,7 @@ export const subscriptionStoreWebhook = mutation({
     console.log("eventType once more: ", eventType)
     //NOTE: Check this part to ensure that the userId is being extracted correctly
     const userId = args.body.data.object.customer ?? null
-    console.log("userId: ", userId)
+    console.log("customer id: ", userId)
 
     switch (eventType) {
       case "customer.subscription.created":
@@ -286,18 +286,23 @@ export const subscriptionStoreWebhook = mutation({
             customerId: subscription.customer,
             lastEditedAt: new Date().getTime(),
           })
+
+          const existingUser = await ctx.db
+            .query("users")
+            .withIndex("by_token", (q) => q.eq("tokenIdentifier", userId))
+            .first()
+          console.log("updating user subscription: ", existingUser)
+          if (existingUser) {
+            const metadata = args.body.data.object.metadata
+            await ctx.db.patch(existingUser._id, {
+              subscription: `${metadata.interval}ly-${metadata.plan}`,
+            })
+          }
         }
         break
 
       case "checkout.session.completed":
-        // Find existing subscription
-        // const checkoutCompleted = await ctx.db
-        //   .query("userSubscriptions")
-        //   .withIndex("customerId", (q) =>
-        //     q.eq("customerId", args.body.data.object.customer)
-        //   )
-        //   .first()
-
+        const metadata = args.body.data.object.metadata
         const checkoutUser = await ctx.db
           .query("userSubscriptions")
           .withIndex("userId", (q) =>
@@ -320,6 +325,20 @@ export const subscriptionStoreWebhook = mutation({
             metadata: args.body.data.object.metadata ?? {},
             customerId: args.body.data.object.customer,
             paidStatus: args.body.data.object.paid,
+          })
+        }
+
+        const existingUser = await ctx.db
+          .query("users")
+          .withIndex("by_token", (q) =>
+            q.eq("tokenIdentifier", metadata.userId)
+          )
+          .first()
+        console.log("existingUser checkout: ", existingUser)
+        if (existingUser) {
+          console.log("metadata: ", metadata)
+          await ctx.db.patch(existingUser._id, {
+            subscription: `${metadata.interval}ly-${metadata.plan}`,
           })
         }
 

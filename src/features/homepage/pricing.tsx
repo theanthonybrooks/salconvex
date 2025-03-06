@@ -266,18 +266,28 @@ export default function Pricing() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           className='mt-10 flex justify-center gap-3'>
-          {plans.map((plan) => {
-            const { key, ...rest } = plan
-            return (
-              <PricingCard
-                key={plan.title}
-                user={user}
-                planKey={key}
-                {...rest}
-                isYearly={isYearly}
-              />
-            )
-          })}
+          {[...plans]
+            .sort((a, b) => {
+              const priceA = isYearly
+                ? a.prices.year?.usd?.amount ?? Infinity
+                : a.prices.month?.usd?.amount ?? Infinity
+              const priceB = isYearly
+                ? b.prices.year?.usd?.amount ?? Infinity
+                : b.prices.month?.usd?.amount ?? Infinity
+              return priceA - priceB
+            })
+            .map((plan) => {
+              const { key, ...rest } = plan
+              return (
+                <PricingCard
+                  key={plan.title}
+                  user={user}
+                  planKey={key}
+                  {...rest}
+                  isYearly={isYearly}
+                />
+              )
+            })}
         </motion.div>
       </div>
     </section>

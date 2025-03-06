@@ -5,6 +5,7 @@ import {
   CheckCircle,
   CheckSquare2,
   Clock,
+  Clock1,
   CreditCard,
   Ellipsis,
   FileText,
@@ -16,6 +17,7 @@ import {
   Instagram,
   LucideIcon,
   Settings,
+  Shield,
   Twitter,
   Upload,
   User,
@@ -157,7 +159,7 @@ export const dashboardNavItems: DashNavItem[] = [
     href: "/dashboard",
     icon: Home,
     desc: "Dashboard home",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "User Account",
@@ -169,7 +171,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionHead: true,
     heading: "Account",
     desc: "Manage your profile",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Settings",
@@ -178,7 +180,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "account",
     desc: "Customize preferences",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Billing",
@@ -187,14 +189,23 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "account",
     desc: "Manage your payments",
-    sub: ["active", "trialing", "cancelled"],
+    sub: ["active", "trialing", "cancelled", "admin"],
+  },
+  {
+    label: "Pending Applications",
+    href: "/dashboard/admin/pending",
+    icon: Clock1,
+    subsection: true,
+    sectionCat: "admin",
+    desc: "Submitted Applications",
+    sub: ["admin"],
   },
   {
     label: "Website To-Dos",
     href: "/dashboard/admin",
     icon: CheckSquare2,
     section: true,
-    sectionIcon: CheckSquare2,
+    sectionIcon: Shield,
     sectionCat: "admin",
     sectionHead: true,
     heading: "Admin",
@@ -211,7 +222,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionHead: true,
     heading: "Applications",
     desc: "Track your submissions",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Bookmarks",
@@ -220,7 +231,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "apps",
     desc: "Saved opportunities",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Submitted",
@@ -229,7 +240,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "apps",
     desc: "Your sent applications",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Pending",
@@ -238,7 +249,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "apps",
     desc: "Awaiting response",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Accepted",
@@ -247,7 +258,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "apps",
     desc: "Approved applications",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Rejected",
@@ -256,7 +267,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "apps",
     desc: "Declined applications",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "CV & Resume",
@@ -268,7 +279,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "portfolio",
     heading: "CV & Portfolio",
     desc: "Manage professional documents",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Portfolio",
@@ -277,7 +288,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "portfolio",
     desc: "Your uploaded works",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Artist Statement",
@@ -286,7 +297,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "portfolio",
     desc: "Define your artistic vision",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Other Stuff",
@@ -298,7 +309,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "misc",
     heading: "Miscellaneous",
     desc: "Extras & other tools",
-    sub: ["active", "trialing"],
+    sub: ["active", "trialing", "admin"],
   },
   {
     label: "Changelog",

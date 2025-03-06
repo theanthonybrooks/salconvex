@@ -1,29 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+  font-family: "Tanker-Regular";
+  src: url("/fonts/tanker/Tanker-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
 
 html,
 body,
 :root {
   height: 100%;
-  /* width: 100vw; */
-  /* scrollbar-gutter: stable; */
-
-  /* overflow-y: auto; */
 }
 
 /* body {
-  padding-left: calc(100vw - 100%);
+  scrollbar-gutter: auto;
 } */
-
-html {
-  scrollbar-gutter: stable;
-}
 
 @layer base {
   :root {
     --sal-yellow: 60 90% 75%; /* #f8f16b */
-    --sal-pink: 303, 100%, 82%; /* #ff7bff #f4a9f6 */
+    --sal-pink: 303 100% 82%; /* #ff7bff #f4a9f6 */
     --sal-pink-hex: #f4a9f6;
     --sal-green: 83, 51%, 88%; /* #e4f0d1 */
     --sal-test: rgb(228, 240, 209);
@@ -31,8 +30,9 @@ html {
     --background: 0 0% 100%;
     --user-icon: var(--sal-yellow);
     --foreground: 222.2 84% 4.9%;
-
+    --sal-progress: rgb(255, 247, 100);
     --card: 0 0% 100%;
+    --menu-background: var(--sal-yellow-hex);
 
     --card-foreground: 222.2 84% 4.9%;
 
@@ -161,8 +161,9 @@ html {
   }
   .default {
     --background: 60 90% 75%; /* #f8f16b */
-
+    --sal-progress: var(rgb(240, 121, 244));
     --user-icon: 0, 0%, 100%;
+    --menu-background: white;
 
     --foreground: 222.2 84% 4.9%;
 
@@ -245,6 +246,18 @@ html {
   }
 }
 
+.no-scroll {
+  overflow: hidden !important;
+}
+
+.scrollable {
+  overflow: auto;
+  scrollbar-gutter: auto;
+  /* &.boundless {
+    height: 100vh;
+  } */
+}
+
 /* For WebKit-based browsers (Chrome, Safari, Edge) */
 .scrollable::-webkit-scrollbar {
   width: 1em;
@@ -262,10 +275,36 @@ html {
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-/* On hover, scale the thumb horizontally to appear thicker */
 .scrollable::-webkit-scrollbar-thumb:hover {
   transform: scaleX(2); /* doubles the width from 2px to ~4px */
-  background-color: rgb(255, 252, 199);
+}
+.scrollable.mini::-webkit-scrollbar {
+  width: 0;
+}
+.scrollable.mini.darkbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.65);
+}
+
+.scrollable.mini::-webkit-scrollbar-thumb {
+  /* background: rgb(224, 220, 217); */
+  background: hsl(var(--primary) / 0.15);
+  border: none;
+}
+.scrollable.invis {
+  scrollbar-gutter: unset;
+  overflow: auto;
+}
+
+.scrollable.invis::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollable.invis {
+  scrollbar-width: none;
+}
+
+.scrollable.invis {
+  -ms-overflow-style: none;
 }
 
 @-moz-document url-prefix() {
@@ -318,10 +357,15 @@ form {
     outline: 1px solid black;
     outline-offset: 0;
   }
-  input:valid {
+  input:not(:placeholder-shown):valid {
     background-color: rgb(255, 255, 255);
   }
 }
+text-area::placeholder,
+input::placeholder {
+  color: foreground;
+}
+
 input::-webkit-autofill,
 input::-webkit-autofill:hover,
 input::-webkit-autofill:focus,

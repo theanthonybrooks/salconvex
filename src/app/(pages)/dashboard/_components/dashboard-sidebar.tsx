@@ -12,23 +12,38 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import { AnimatePresence, motion } from "framer-motion"
 
+// const sectionVariants = {
+//   hidden: { opacity: 0, y: -15 }, // starts slightly to the left
+//   visible: {
+//     opacity: 1,
+//     y: 0,
+//     transition: {
+//       type: "spring",
+//       stiffness: 260,
+//       damping: 20,
+//       // You can tweak these numbers to adjust the 'wind back' and spring effect
+//     },
+//   },
+//   exit: { opacity: 0, y: -15, transition: { type: "linear", duration: 0.1 } },
+// }
+
 const sectionVariants = {
-  hidden: { opacity: 0, y: -15 }, // starts slightly to the left
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 260,
-      damping: 20,
-      // You can tweak these numbers to adjust the 'wind back' and spring effect
-    },
+  collapsed: {
+    height: 0,
+    opacity: 0,
+    overflow: "hidden",
+    transition: { duration: 0.5, ease: "easeInOut" },
   },
-  exit: { opacity: 0, y: -15, transition: { type: "linear", duration: 0.1 } },
+  expanded: {
+    height: "auto",
+    opacity: 1,
+    overflow: "hidden",
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
 }
 
 interface DashboardSideBarProps {
@@ -58,8 +73,37 @@ export default function DashboardSideBar({
       (item.sub.includes("all") && !item.label.includes("Help"))
   )
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"))
+
+  useEffect(() => {
+    const matchingSection = filteredNavItems.find(
+      (item) =>
+        item.sectionCat && pathname.includes(`dashboard/${item.sectionCat}`)
+    )?.sectionCat
+
+    if (matchingSection) {
+      setOpenSection(matchingSection)
+    }
+  }, [pathname])
+
+  useEffect(() => {
+    if (!openSection) {
+      const matchingSection = filteredNavItems.find(
+        (item) =>
+          item.sectionCat && pathname.includes(`dashboard/${item.sectionCat}`)
+      )?.sectionCat
+      if (matchingSection) {
+        setOpenSection(matchingSection)
+      }
+    }
+  }, [openSection, pathname])
+
   const handleSectionToggle = (sectionCat: string) => {
-    setOpenSection(openSection === sectionCat ? null : sectionCat)
+    setOpenSection((prev) => {
+      if (prev === sectionCat) {
+        return null // Allow closing the section
+      }
+      return sectionCat // Open the new section
+    })
   }
 
   return (
@@ -85,7 +129,7 @@ export default function DashboardSideBar({
             className='mb-5'
             placeholder="Find what you're looking for!"
           />
-          <div className='overflow-y-auto scrollable '>
+          <div className='overflow-y-auto scrollable mini '>
             {/* Render main navigation items (excluding sections) */}
             {filteredNavItems
               .filter((item) => !item.sectionCat)
@@ -146,9 +190,9 @@ export default function DashboardSideBar({
                   <AnimatePresence>
                     {openSection === section.sectionCat && (
                       <motion.div
-                        initial='hidden'
-                        animate='visible'
-                        exit='exit'
+                        initial='collapsed'
+                        animate='expanded'
+                        exit='collapsed'
                         variants={sectionVariants}>
                         {filteredNavItems
                           .filter(

@@ -129,7 +129,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
       <CardContent className='grid gap-y-4'>
         <div className='grid grid-cols-2 gap-x-4'>
           <Button
-            variant='salWithoutShadow'
+            variant='salWithShadowHidden'
             size='lg'
             type='button'
             className='w-full flex justify-center items-center gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
@@ -146,7 +146,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             )}
           </Button>
           <Button
-            variant='salWithoutShadow'
+            variant='salWithShadowHidden'
             size='lg'
             type='button'
             className='w-full flex justify-center items-center gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'

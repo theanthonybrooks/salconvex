@@ -1,4 +1,4 @@
-//import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper"
+import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper"
 import Footer from "@/features/wrapper-elements/navigation/components/footer"
 import NavBar from "@/features/wrapper-elements/navigation/components/navbar"
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server"
@@ -23,20 +23,24 @@ export default async function HomeLayout({
   )
 
   return (
-    // <ClientAuthWrapper>
-    <>
+    <ClientAuthWrapper>
       <NavBar
         userId={userId ?? "guest"}
         user={user ?? null}
         subStatus={subStatus?.subStatus ?? "none"}
         userPref={userPref ?? null}
       />
-      <main className='flex min-w-screen min-h-screen flex-col pt-[4rem] items-center  justify-between'>
-        {children}
-      </main>
+      <div
+        //comment
+        className='scrollable mini unscroll boundless darkbar'
+        //comment
+      >
+        <main className='flex min-w-screen min-h-screen flex-col pt-[4rem] items-center  justify-between '>
+          {children}
+        </main>
 
-      <Footer />
-    </>
-    // </ClientAuthWrapper>
+        <Footer />
+      </div>
+    </ClientAuthWrapper>
   )
 }

@@ -10,6 +10,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        tanker: ["Tanker-Regular", "sans-serif"],
+      },
       screens: {
         "2xl": "1400px",
       },
@@ -17,6 +20,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         salYellow: "hsl(var(--sal-yellow))",
+        salYellowHex: "var(--sal-yellow-hex)",
         salPink: "hsl(var(--sal-pink))",
         userIcon: "hsl(var(--user-icon))",
         customPurple: "#5C3B58",

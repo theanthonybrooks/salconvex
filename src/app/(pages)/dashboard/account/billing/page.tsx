@@ -5,7 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useAction, useQuery } from "convex/react"
 import { format } from "date-fns"
 
+import { ConvexError } from "convex/values"
 import { CreditCard } from "lucide-react"
+import { toast } from "react-toastify"
 import { api } from "../../../../../../convex/_generated/api"
 
 export default function AccountPage() {
@@ -44,8 +46,25 @@ export default function AccountPage() {
       if (result?.url) {
         window.location.href = result.url
       }
-    } catch (error) {
-      console.error("Error getting dashboard URL:", error)
+    } catch (err: unknown) {
+      if (err instanceof ConvexError) {
+        toast.error(
+          typeof err.data === "string" &&
+            err.data.toLowerCase().includes("no such customer")
+            ? "Your account was cancelled. Contact support for assistance."
+            : err.data || "An unexpected error occurred."
+        )
+      } else if (err instanceof Error) {
+        toast.error(
+          typeof err.message === "string" &&
+            err.message.toLowerCase().includes("no such customer")
+            ? "Your account was cancelled. Contact support for assistance."
+            : err.message || "An unexpected error occurred."
+        )
+      } else {
+        toast.error("An unknown error occurred.")
+      }
+      return
     }
   }
 

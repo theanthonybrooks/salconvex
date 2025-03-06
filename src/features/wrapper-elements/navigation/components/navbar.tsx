@@ -1,5 +1,6 @@
 "use client"
 
+import FullPageNav from "@/components/full-page-nav"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -15,7 +16,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import ThemeToggle from "@/components/ui/theme-toggle"
 import { UserProfile } from "@/components/ui/user-profile"
 import { landingPageLogo } from "@/constants/logos"
 import {
@@ -24,8 +24,8 @@ import {
 } from "@/constants/navbars"
 import { cn } from "@/lib/utils"
 import { Dialog } from "@radix-ui/react-dialog"
-// import { useQuery } from "convex-helpers/react/cache"
 import { Unauthenticated } from "convex/react"
+// import { useQuery } from "convex-helpers/react/cache"
 import { motion } from "framer-motion"
 import { Menu, Sparkles } from "lucide-react"
 import Image from "next/image"
@@ -60,10 +60,10 @@ export default function NavBar({
 
   return (
     <motion.div
-      initial={{ y: 0, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className='fixed left-0 right-0 top-0 z-50 border-b-2 border-black bg-background backdrop-blur-md dark:bg-background'>
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
+      className='fixed left-0 right-0 top-0 z-50  border-black bg-background/0  dark:bg-background'>
       <div className='mx-auto flex w-screen items-center justify-between p-4 px-8'>
         {/* Mobile Logo and Navigation */}
         <div className='flex items-center gap-2 lg:hidden'>
@@ -212,51 +212,27 @@ export default function NavBar({
         </div>
 
         {/* Right Side */}
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-4'>
           {/* <h1>{user?.image}</h1> */}
           {/* <ModeToggle /> */}
-          <ThemeToggle userPref={userPref} />
+
           {/* <Switch darkMode={true} /> */}
+
+          {/* {isLoading && <LucideLoaderCircle className='h-6 w-6 animate-spin' />} */}
+          {userId !== "guest" && user && <UserProfile user={user} />}
           <Unauthenticated>
             <Link href='/auth/sign-in' prefetch={true}>
               <Button className='font-bold' variant='salWithShadowHidden'>
                 Sign in
               </Button>
-              {/* <motion.button
-                className='font-bold rounded-md px-4 py-2 text-center text-sm border-black border-2 bg-white text-black'
-                initial={{
-                  boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)",
-                  x: 0,
-                  y: 0,
-                }}
-                animate={{ boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }}
-                whileHover={{
-                  boxShadow: [
-                    "0px 0px 0px rgba(0, 0, 0, 0)",
-                    "-5px 5px 0px rgba(0, 0, 0, 1)",
-                  ],
-                  x: 3,
-                  y: -3,
-                }}
-                whileTap={{
-                  boxShadow: "0px 0px 0px rgba(0, 0, 0, 1)",
-                  x: 0,
-                  y: 0,
-                }}
-                transition={{
-                  boxShadow: {
-                    type: "keyframes",
-                    duration: 0.3,
-                    ease: "linear",
-                  },
-                }}>
-                Sign in
-              </motion.button> */}
             </Link>
           </Unauthenticated>
-
-          {userId !== "guest" && <UserProfile user={user} />}
-          {/* {isLoading && <LucideLoaderCircle className='h-6 w-6 animate-spin' />} */}
+          <FullPageNav
+            userId={userId}
+            user={user}
+            userPref={userPref}
+            subStatus={subStatus}
+          />
         </div>
       </div>
     </motion.div>

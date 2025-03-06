@@ -823,7 +823,7 @@ export default function SettingsPage() {
                             <div className='relative'>
                               <Input
                                 id='current'
-                                type='password'
+                                type={showCurrentPassword ? "text" : "password"}
                                 placeholder={
                                   !showCurrentPassword
                                     ? "********"
@@ -859,7 +859,7 @@ export default function SettingsPage() {
                             <div className='relative'>
                               <Input
                                 id='new'
-                                type='password'
+                                type={showNewPassword ? "text" : "password"}
                                 placeholder={
                                   !showNewPassword ? "********" : "New Password"
                                 }

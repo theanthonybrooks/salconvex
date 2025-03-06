@@ -29,7 +29,7 @@ export function ThemedProvider({ children, user }: ThemedProviderProps) {
   //   }
   // }, [theme, userTheme])
 
-  console.log("userTheme", userTheme)
+  // console.log("userTheme", userTheme)
   // console.log("theme", theme)
 
   return (

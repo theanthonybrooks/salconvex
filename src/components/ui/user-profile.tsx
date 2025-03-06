@@ -12,19 +12,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import SignOutBtn from "@/features/auth/components/sign-out-btn"
+import { useQuery } from "@/helpers/convexHelpers"
 import { cn } from "@/lib/utils"
 // import { SignOutButton, useUser } from "@clerk/nextjs";
 import { LogOut, Settings, Sparkles, User } from "lucide-react"
 import Link from "next/link"
 import { FaUserNinja } from "react-icons/fa6"
+import { api } from "~/convex/_generated/api"
 
 interface UserProfileProps {
   user: Record<string, any> | null
 }
 
 export function UserProfile({ user }: UserProfileProps) {
-  // const subscription = useQuery(api.subscriptions.getUserSubscription)?.status
-  const subscription = user?.subscription
+  const subscription = useQuery(api.subscriptions.getUserSubscription)?.status
+  // const subscription = user?.subscription
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
