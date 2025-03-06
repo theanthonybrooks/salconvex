@@ -90,7 +90,7 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
           <m.path
             variants={shineVariant}
             d={moonPath}
-            className={"stroke-blue-100"}
+            className={"stroke-black"}
             initial='hidden'
             animate={theme === "default" ? "visible" : "hidden"}
           />
@@ -99,7 +99,7 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
             variants={raysVariants}
             initial='hidden'
             animate={theme === "light" ? "visible" : "hidden"}
-            className='stroke-6 stroke-yellow-600'
+            className='stroke-6 stroke-black'
             style={{ strokeLinecap: "round", strokeWidth: 8 }}>
             <m.path
               className='origin-center'
@@ -130,8 +130,8 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
               d: theme === "default" ? moonPath : sunPath, // Ensuring d is always valid
               rotate: theme === "default" ? -360 : 0,
               strokeWidth: theme === "default" ? 3 : 6,
-              stroke: theme === "default" ? "#60A5FA" : "#D97706",
-              fill: theme === "default" ? "#60A5FA" : "#D97706",
+              stroke: theme === "default" ? "black" : "black",
+              fill: "transparent",
               fillOpacity: 0.35,
               strokeOpacity: 1,
               scale: theme === "default" ? 1.75 : 1,

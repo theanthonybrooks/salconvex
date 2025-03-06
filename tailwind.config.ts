@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss"
 
+import { fontFamily } from "tailwindcss/defaultTheme"
+
 export default {
   darkMode: ["class"],
   content: [
@@ -11,7 +13,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        tanker: ["Tanker-Regular", "sans-serif"],
+        tanker: ["var(--font-tanker-reg)", ...fontFamily.sans],
+        spaceGrotesk: ["var(--font-space-grotesk)", ...fontFamily.sans],
+        spaceMono: ["var(--font-space-mono)", ...fontFamily.mono],
       },
       screens: {
         "2xl": "1400px",
@@ -212,5 +216,27 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"), // Keep existing plugin
+    function ({
+      addUtilities,
+    }: {
+      addUtilities: (utilities: Record<string, Record<string, string>>) => void
+    }) {
+      addUtilities({
+        ".stroked": {
+          "-webkit-text-stroke": "0.5px black",
+        },
+        // ".hover\\:stroked:hover": {
+        //   "-webkit-text-stroke": "1px black", // Optional: Make stroke thicker on hover
+        // },
+        // ".wshadow": {
+        //   "text-shadow": "black -5px 5px",
+        // },
+        // ".hover\\:wshadow:hover": {
+        //   "text-shadow": "black -7px 7px", // Optional: Increase shadow on hover
+        // },
+      })
+    },
+  ],
 } satisfies Config

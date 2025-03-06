@@ -176,40 +176,43 @@ export default function NavBar({
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <div className='hidden items-center gap-6 lg:flex'>
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-                    {filteredNavbarMenu.map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}>
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+        {userId === "snail" && (
+          <div className='hidden items-center gap-6 lg:flex'>
+            {/* Desktop Navigation */}
 
-          {filteredNavbarLinks.map((link) => (
-            <Link key={link.title} href={link.href} prefetch={true}>
-              {!link.isIcon ? (
-                <Button variant='ghost'>{link.title}</Button>
-              ) : (
-                <Button variant='ghost' size='icon'>
-                  {link.icon}
-                </Button>
-              )}
-            </Link>
-          ))}
-        </div>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+                      {filteredNavbarMenu.map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}>
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            {filteredNavbarLinks.map((link) => (
+              <Link key={link.title} href={link.href} prefetch={true}>
+                {!link.isIcon ? (
+                  <Button variant='ghost'>{link.title}</Button>
+                ) : (
+                  <Button variant='ghost' size='icon'>
+                    {link.icon}
+                  </Button>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* Right Side */}
         <div className='flex items-center gap-4'>

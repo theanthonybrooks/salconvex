@@ -7,6 +7,7 @@ import { SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet"
 // import ThemeToggle from "@/components/ui/theme-toggle"
 import { HamburgerMenuIcon } from "@radix-ui/react-icons"
 // import { useAction, useQuery } from "convex/react";
+import FullPageNav from "@/components/full-page-nav"
 import { UserProfile } from "@/components/ui/user-profile"
 import { useQuery } from "convex/react"
 import { Banknote, HomeIcon, Settings } from "lucide-react"
@@ -40,7 +41,7 @@ export default function DashboardTopNav({
 
   return (
     <div className='flex flex-col'>
-      <header className='flex h-14 items-center gap-4 border-b px-3 lg:h-[55px]'>
+      <header className='flex h-14 items-center gap-4 border-b px-3 lg:h-[72px]'>
         <Dialog>
           <DialogTitle className='sr-only'>Dashboard Menu</DialogTitle>
           <SheetTrigger className='p-2 transition min-[1024px]:hidden'>
@@ -92,6 +93,7 @@ export default function DashboardTopNav({
           {/* <ModeToggle /> */}
           {/* <ThemeToggle /> */}
           {<UserProfile user={user ?? null} />}
+          <FullPageNav user={user} userPref={userData?.userPref} />
         </div>
       </header>
       {children}

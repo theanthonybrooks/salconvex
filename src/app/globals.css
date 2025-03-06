@@ -279,7 +279,7 @@ body,
   transform: scaleX(2); /* doubles the width from 2px to ~4px */
 }
 .scrollable.mini::-webkit-scrollbar {
-  width: 0;
+  width: 4px;
 }
 .scrollable.mini.darkbar::-webkit-scrollbar-thumb {
   background: hsl(var(--primary) / 0.65);
@@ -297,10 +297,7 @@ body,
 
 .scrollable.invis::-webkit-scrollbar {
   display: none;
-}
-
-.scrollable.invis {
-  scrollbar-width: none;
+  width: 0;
 }
 
 .scrollable.invis {
@@ -428,5 +425,20 @@ button:active {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.stroked {
+  -webkit-text-stroke: 0.5px black;
+  &.wshadow {
+    text-shadow: black -5px 5px;
+  }
+}
+
+@-moz-document url-prefix() {
+  .stroked {
+    /* -moz-text-stroke: 2px black; */
+    -webkit-text-stroke: 2px black;
+    /* text-shadow: none!important; */
   }
 }

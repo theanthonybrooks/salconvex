@@ -1,4 +1,6 @@
+import { tankerReg } from "@/assets/fonts"
 import { ConvexClientProvider } from "@/components/convex-client-provider"
+import { cn } from "@/lib/utils"
 import { ThemedProvider } from "@/providers/themed-provider"
 import {
   ConvexAuthNextjsServerProvider,
@@ -58,7 +60,11 @@ export default async function RootLayout({
     <ConvexAuthNextjsServerProvider>
       <html lang='en' suppressHydrationWarning>
         <body
-          className={`${GeistSans.className} scrollable mini unscroll darkbar`}>
+          className={cn(
+            GeistSans.className,
+            " scrollable invis unscroll darkbar antialiased",
+            tankerReg.variable
+          )}>
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
               <ThemedProvider user={userPref}>
