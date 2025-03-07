@@ -7,6 +7,7 @@ export interface FullPageNavMenuItem {
   category: string
   slug?: string
   public?: boolean
+  view?: string
 }
 
 interface FullPageNavMenuSection {
@@ -65,6 +66,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         path: "/dashboard",
         category: "artist",
         public: false,
+        view: "dashboard",
       },
       {
         title: "Applications",
@@ -106,6 +108,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         path: "/dashboard",
         category: "organizer",
         public: false,
+        view: "dashboard",
       },
       {
         title: "My Open Calls",
@@ -147,6 +150,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         path: "/dashboard/admin",
         category: "admin",
         public: false,
+        view: "dashboard",
       },
       {
         title: "Submissions",

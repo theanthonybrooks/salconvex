@@ -6,9 +6,10 @@ import { useTheme } from "next-themes"
 
 interface ThemeToggleProps {
   userPref: Record<string, any> | null
+  className?: string
 }
 
-export default function ThemeToggle({ userPref }: ThemeToggleProps) {
+export default function ThemeToggle({ userPref, className }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme()
 
   const raysVariants = {
@@ -34,7 +35,7 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
       scale: 0,
     },
     visible: {
-      pathLength: 1,
+      pathLength: 2,
       opacity: 1,
       scale: 1,
       transition: {
@@ -50,7 +51,7 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
   const shineVariant = {
     hidden: {
       opacity: 0,
-      scale: 1.75,
+      scale: 3,
       strokeDasharray: "20, 1000",
       strokeDashoffset: 0,
       filter: "blur(0px)",
@@ -75,25 +76,26 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
     <div className='flex items-center justify-center'>
       <Button
         variant='ghost2'
+        className={className}
         onClick={() =>
           theme === "default" ? setTheme("light") : setTheme("default")
         }>
         <m.svg
           strokeWidth='4'
           strokeLinecap='round'
-          width={25}
-          height={25}
+          width={100}
+          height={100}
           viewBox='0 0 100 100'
           fill='none'
           xmlns='http://www.w3.org/2000/svg'
-          className='relative'>
-          <m.path
+          className='relative  !w-6 !h-6 md:w-4 md:h-4 overflow-visible'>
+          {/* <m.path
             variants={shineVariant}
             d={moonPath}
             className={"stroke-black"}
             initial='hidden'
             animate={theme === "default" ? "visible" : "hidden"}
-          />
+          /> */}
 
           <m.g
             variants={raysVariants}
@@ -116,26 +118,41 @@ export default function ThemeToggle({ userPref }: ThemeToggleProps) {
           </m.g>
 
           <m.path
-            d={sunPath} // Set a default d attribute
+            d={sunPath}
             fill='transparent'
             transition={{ duration: 1, type: "spring" }}
             initial={{
-              d: sunPath, // Ensure an initial valid path
+              d: sunPath,
               fillOpacity: 0,
               strokeOpacity: 0,
               transformOrigin: "50% 50%",
               strokeWidth: 6,
             }}
-            animate={{
-              d: theme === "default" ? moonPath : sunPath, // Ensuring d is always valid
-              rotate: theme === "default" ? -360 : 0,
-              strokeWidth: theme === "default" ? 3 : 6,
-              stroke: theme === "default" ? "black" : "black",
-              fill: "transparent",
-              fillOpacity: 0.35,
-              strokeOpacity: 1,
-              scale: theme === "default" ? 1.75 : 1,
-            }}
+            animate={
+              theme === "default"
+                ? {
+                    d: moonPath,
+                    rotate: -360,
+                    strokeWidth: 3,
+                    stroke: "black",
+                    fill: "transparent",
+                    fillOpacity: 0.35,
+                    strokeOpacity: 1,
+
+                    scale: 2.25,
+                  }
+                : {
+                    d: sunPath,
+                    rotate: 0,
+                    strokeWidth: 6,
+                    stroke: "black",
+                    fill: "transparent",
+                    fillOpacity: 0.35,
+                    strokeOpacity: 1,
+
+                    scale: 1,
+                  }
+            }
           />
         </m.svg>
       </Button>

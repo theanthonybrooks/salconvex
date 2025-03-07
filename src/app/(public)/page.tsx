@@ -1,6 +1,8 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
+import { useTheme } from "next-themes"
 import { Poppins } from "next/font/google"
 import Link from "next/link"
 import { useRef } from "react"
@@ -8,6 +10,7 @@ import { useRef } from "react"
 const font = Poppins({ subsets: ["latin"], weight: "600" })
 
 export default function Home() {
+  const { theme } = useTheme()
   const targetRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: targetRef })
   const { scrollY } = useScroll()
@@ -43,7 +46,10 @@ export default function Home() {
     <motion.div ref={targetRef}>
       <motion.div
         id='scroll-indicator'
-        className='z-50'
+        className={cn(
+          "z-20",
+          theme === "default" ? "bg-salPink" : "bg-salProgress"
+        )}
         transition={{ duration: 0.5, ease: "easeInOut" }}
         style={{
           scaleX: smoothScrollProgress,
@@ -53,7 +59,7 @@ export default function Home() {
           right: 0,
           height: 10,
           originX: 0,
-          backgroundColor: "var(--sal-progress)",
+          // backgroundColor: "var(--sal-progress)",
         }}
       />
       <motion.div

@@ -16,15 +16,22 @@ export default {
         tanker: ["var(--font-tanker-reg)", ...fontFamily.sans],
         spaceGrotesk: ["var(--font-space-grotesk)", ...fontFamily.sans],
         spaceMono: ["var(--font-space-mono)", ...fontFamily.mono],
+        libreFranklin: ["var(--font-libre-franklin)", ...fontFamily.sans],
+        bebasNeue: ["var(--font-bebas-neue)", ...fontFamily.sans],
       },
       screens: {
-        "2xl": "1400px",
+        "2xl": "1536px",
+        "3xl": "1920px",
+        "4xl": "2560px",
+        "5xl": "3200px",
+        "6xl": "3840px",
       },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         salYellow: "hsl(var(--sal-yellow))",
         salYellowHex: "var(--sal-yellow-hex)",
+        salProgress: "var(--sal-progress)",
         salPink: "hsl(var(--sal-pink))",
         userIcon: "hsl(var(--user-icon))",
         customPurple: "#5C3B58",
@@ -230,9 +237,9 @@ export default {
         // ".hover\\:stroked:hover": {
         //   "-webkit-text-stroke": "1px black", // Optional: Make stroke thicker on hover
         // },
-        // ".wshadow": {
-        //   "text-shadow": "black -5px 5px",
-        // },
+        ".wshadow": {
+          "text-shadow": "black -5px 5px",
+        },
         // ".hover\\:wshadow:hover": {
         //   "text-shadow": "black -7px 7px", // Optional: Increase shadow on hover
         // },

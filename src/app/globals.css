@@ -1,13 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@font-face {
+/* @font-face {
   font-family: "Tanker-Regular";
   src: url("/fonts/tanker/Tanker-Regular.ttf") format("truetype");
   font-weight: 400;
   font-display: swap;
   font-style: normal;
-}
+} */
 
 html,
 body,
@@ -429,7 +429,7 @@ button:active {
 }
 
 .stroked {
-  -webkit-text-stroke: 0.5px black;
+  -webkit-text-stroke: 2px black;
   &.wshadow {
     text-shadow: black -5px 5px;
   }

@@ -1,23 +1,20 @@
 "use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import { mainMenuItems } from "@/constants/menu"
 import { footerCRText } from "@/constants/text"
 import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "framer-motion"
+import { CheckCircle, XCircle } from "lucide-react"
 import { useTheme } from "next-themes"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { FaRegEnvelope } from "react-icons/fa"
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaThreads,
-  FaUserNinja,
-} from "react-icons/fa6"
+import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
 
 interface FullPageNavProps {
   userId?: string | undefined
@@ -33,16 +30,18 @@ const menuVariants = {
     top: [17, 0, 0, 0],
     right: [41, 0, 0, 0],
     borderRadius: [40, 40, 20, 0],
-    transition: { duration: 0.75, ease: [0.76, 0, 0.24, 1] },
+    transition: { duration: 0.75, ease: [0.1, 0, 0.36, 1] },
     opacity: [1, 1, 1, 1],
   },
   closed: {
-    width: ["100vw", "99vw", "97vw", "4em"],
-    height: ["100vh", "5.5vh", 40, 39],
+    width: ["100vw", "99vw", "98vw", "4em"],
+    height: ["100vh", 40, 40, 39],
     top: [0, 17, 17, 17],
-    right: [0, 41, 41, 41],
+    right: [0, 0, 41, 41],
     borderRadius: [0, 20, 40, 40],
-    transition: { duration: 0.75, ease: [0.76, 0, 0.24, 1] },
+    // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+    transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
+
     opacity: [1, 1, 1, 1],
   },
   initial: {
@@ -56,6 +55,29 @@ const menuVariants = {
   },
 }
 
+const screenOverlayVariants = {
+  overlayInitial: {
+    display: "none",
+    opacity: 0,
+    height: "100vh",
+    width: "100vw",
+  },
+  open: {
+    display: ["block", "block", "block"],
+    opacity: [1, 1, 1],
+    height: ["100vh", "100vh", "100vh"],
+    width: ["100vw", "100vw", "100vw"],
+    transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+  },
+  closed: {
+    display: ["block", "block", "none"],
+    opacity: [1, 1, 0],
+    height: ["100vh", "100vh", "100vh"],
+    width: ["100vw", "100vw", "100vw"],
+    transition: { duration: 1.55, ease: [0.68, -0.55, 0.27, 1.55] },
+  },
+}
+
 const FullPageNav = ({
   userId,
   user,
@@ -65,12 +87,13 @@ const FullPageNav = ({
   const { theme } = useTheme()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState("initial")
-  const [activeCategory, setActiveCategory] = useState(
+  const [freshOpen, setFreshOpen] = useState(false)
+  const [activeCategory, setActiveCategory] = useState<string | null>(
     mainMenuItems.find((section) =>
       section.items.some((item) => item.path === pathname)
-    )?.title || "General"
+    )?.title || "The List"
   )
-  const [isActive, setIsActive] = useState(pathname)
+
   const footerText = footerCRText()
 
   const activeMenuItems = mainMenuItems.find(
@@ -79,16 +102,18 @@ const FullPageNav = ({
 
   useEffect(() => {
     if (isOpen === "open") {
+      setFreshOpen(true)
       document.body.classList.add("no-scroll")
       setActiveCategory(
         () =>
           mainMenuItems.find((section) =>
             section.items.some((item) => item.path === pathname)
-          )?.title || "General"
+          )?.title || "The List"
       )
     } else {
       document.body.classList.remove("no-scroll")
       setActiveCategory("")
+      setFreshOpen(false)
     }
     return () => {
       document.body.classList.remove("no-scroll")
@@ -102,302 +127,512 @@ const FullPageNav = ({
   }
 
   return (
-    <div className='z-[100]'>
-      {/* Menu Button */}
-      <div className='flex flex-row gap-x-4 items-center justify-between relative w-full z-20'>
-        {/* <ThemeToggle userPref={themePref} /> */}
-
-        {/* //NOTE: Add sliding up animation later; will require making a button
-        lookalike with two divs/spans inside that move up and down and have an
-        overflow of hidden */}
-        {isOpen === "open" && user && (
-          <div className='flex flex-row items-center gap-2 mr-16'>
-            <Avatar className='h-9 w-9 rounded-full border border-border '>
-              <AvatarImage
-                src={user?.image}
-                alt={user?.name || "User Profile"}
-              />
-
-              <AvatarFallback
-                className={cn(
-                  "border-border border bg-userIcon  text-blue-900 font-bold dark:bg-blue-950 dark:text-blue-200"
-                )}>
-                {/* {user?.firstName?.[0]}
-                {user?.lastName?.[0]} */}
-                <FaUserNinja className='h-6 w-6' />
-                {/* <FaRegFaceFlushed className='h-6 w-6' /> */}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className='flex flex-col space-y-1'>
-              <p className='text-sm font-medium leading-none'>{user?.name}</p>
-              <p className='text-xs leading-none text-muted-foreground'>
-                {user?.email}
-              </p>
-            </div>
-          </div>
-        )}
-        <div className='flex items-center justify-center'>
-          {isOpen === "open" && <ThemeToggle userPref={userPref?.theme} />}
-          <Button
-            variant='salWithShadowHidden'
-            onClick={() =>
-              setIsOpen(
-                isOpen === "initial"
-                  ? "open"
-                  : isOpen === "open"
-                  ? "closed"
-                  : "open"
-              )
-            }
-            className={cn(
-              "w-[6em] bg-background font-bold",
-              isOpen === "open" ? "bg-salPink" : "bg-background"
-            )}>
-            {isOpen === "open" ? "CLOSE" : "MENU"}
-          </Button>
-        </div>
-      </div>
-
-      {/* /~ Fullscreen Menu Overlay ~/ */}
+    <>
       <AnimatePresence>
         <motion.div
-          className={cn(
-            "top-5 right-5 w-full h-full fixed flex flex-col box-border bg-background",
-            isOpen === "open" || isOpen === "closed"
-              ? "bg-background"
-              : "bg-none",
-            "bg-background"
-          )}
-          variants={menuVariants}
-          initial='initial'
-          // initial={{ width: "4em", height: 30 }}
+          initial='overlayInitial'
+          variants={screenOverlayVariants}
           animate={isOpen}
-          // exit='closed'
-          transition={{ duration: 0.4, ease: "easeInOut" }}>
+          className='absolute w-screen h-screen z-[1] backdrop-blur-md bg-black/20 right-0 top-0 origin-top-right'
+        />
+      </AnimatePresence>
+
+      <div className='z-[100]'>
+        {/* Menu Button */}
+        <div className='flex flex-row gap-x-4 items-center justify-between relative w-full z-20'>
+          {/* <ThemeToggle userPref={themePref} /> */}
+
+          {/* //NOTE: Add sliding up animation later; will require making a button
+          lookalike with two divs/spans inside that move up and down and have an
+          overflow of hidden */}
+
+          <div className='mt-3 md:mt-0 flex items-center justify-center gap-x-4 md:gap-x-2'>
+            {isOpen === "open" && !pathname.includes("/dashboard") && (
+              <ThemeToggle userPref={userPref?.theme} />
+            )}
+            <Button
+              variant='salWithShadowHidden'
+              onClick={() =>
+                setIsOpen(
+                  isOpen === "initial"
+                    ? "open"
+                    : isOpen === "open"
+                    ? "closed"
+                    : "open"
+                )
+              }
+              className={cn(
+                "w-[6em] bg-background font-bold",
+                isOpen === "open" ? "bg-salPink" : "bg-background"
+              )}>
+              {isOpen === "open" ? "CLOSE" : "MENU"}
+            </Button>
+          </div>
+        </div>
+
+        {/* /~ Fullscreen Menu Overlay ~/ */}
+        <AnimatePresence>
           {/* Expanding content */}
+          {/* *
+           *
+           *
+           *
+           * */}
+          {/* //---------------------- Block/Flex? (Mobile) Layout ---------------------- */}
+          {/* *
+           *
+           *
+           *
+           * */}
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "100%" }}
-            transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
-            className='w-full h-full flex flex-col'>
-            {/* Grid Layout */}
-            {isOpen === "open" && (
-              <>
-                <div className='flex-1 grid grid-cols-3 gap-4 divide-x-1.5 divide-solid divide-black overflow-hidden'>
+            key='mobile-menu'
+            className={cn(
+              "md:hidden top-5 right-5 w-full h-full fixed  box-border bg-background",
+              isOpen === "open" || isOpen === "closed"
+                ? "bg-background"
+                : "bg-none",
+              "bg-background"
+            )}
+            variants={menuVariants}
+            initial='initial'
+            // initial={{ width: "4em", height: 30 }}
+            animate={isOpen}
+            // exit='closed'
+          >
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: "100%" }}
+              transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
+              className='w-full h-full  md:hidden'>
+              {isOpen === "open" && (
+                <>
                   {/* Column 1 - Main Titles */}
-                  <motion.div
-                    className='p-4 ml-20 flex items-center justify-start'
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7, duration: 0.4 }}>
-                    <ul
-                      className={cn(
-                        "font-black text-[3rem] lg:text-[4.5rem] space-y-3",
-                        "font-tanker lowercase"
-                      )}>
-                      {mainMenuItems.map((section) => {
-                        const filteredItems = section.items.filter((item) => {
-                          const itemCategory = item.category.toLowerCase()
-                          return (
-                            item.public === true ||
-                            itemCategory === "thelist" ||
-                            user?.accountType?.some(
-                              (type: any) => type.toLowerCase() === itemCategory
+
+                  <div className='grid grid-rows-[100px_auto_100px] grid-cols-1 h-screen w-screen '>
+                    <section className='w-full border-b-2 border-black'>
+                      <Image
+                        src='/sitelogo.svg'
+                        alt='The Street Art List'
+                        width={60}
+                        height={60}
+                        className='absolute left-5 top-5'
+                        priority={true}
+                      />
+                    </section>
+                    <motion.div
+                      className='p-4 py-8 flex justify-center scrollable invis  h-full w-full '
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7, duration: 0.4 }}>
+                      <ul
+                        className={cn(
+                          "font-black m-x-auto text-[4rem] space-y-3",
+                          "font-tanker tracking-wide lowercase"
+                        )}>
+                        {mainMenuItems.map((section, index) => {
+                          const isExpanded =
+                            activeCategory === section.title && !freshOpen
+                          const filteredItems = section.items.filter((item) => {
+                            const itemCategory = item.category.toLowerCase()
+                            return (
+                              item.view !== "dashboard" &&
+                              (item.public === true ||
+                                itemCategory === "thelist" ||
+                                user?.accountType?.some(
+                                  (type: any) =>
+                                    type.toLowerCase() === itemCategory
+                                ))
                             )
-                          )
-                        })
+                          })
 
-                        if (filteredItems.length === 0) return null
+                          if (filteredItems.length === 0) return null
 
-                        return (
-                          <li key={section.title} className='cursor-pointer'>
-                            <div
-                              onClick={() => setActiveCategory(section.title)}
-                              className={cn(
-                                "cursor-pointer flex items-center gap-1 hover:translate-x-3 transition-transform ease-in-out duration-300",
-                                activeCategory === section.title &&
-                                  "stroked wshadow ",
-                                activeCategory === section.title &&
-                                  theme === "default" &&
-                                  "text-white",
-                                activeCategory === section.title &&
-                                  theme === "light" &&
-                                  "text-salYellow"
-                              )}>
-                              {/* {activeCategory === section.title && (
-                                <GoDotFill className='text-black size-8 md:size-14' />
-                              )} */}
-                              {section.title}
-                            </div>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  </motion.div>
-
-                  {/* Column 2 - Secondary Titles */}
-                  <motion.div
-                    className='p-4 flex items-center justify-center scrollable mini max-h-screen'
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9, duration: 0.4 }}>
-                    <ul className='font-black text-[1.2rem] lg:text-[3rem] space-y-3 font-tanker lowercase'>
-                      {activeMenuItems?.items
-                        .filter((item) => {
-                          const itemCategory = item.category.toLowerCase()
                           return (
-                            item.public === true || // Always show public items
-                            itemCategory === "thelist" || // Always show thelist items
-                            user?.accountType?.some(
-                              (type: any) => type.toLowerCase() === itemCategory // Show if user matches item category
-                            )
-                          )
-                        })
-                        .map((item) => (
-                          <li key={item.title}>
-                            <div
-                              className={cn(
-                                "cursor-pointer transition-all duration-100 ease-in-out hover:translate-x-2 ",
-                                pathname === item.path &&
-                                  "stroked text-background"
-                                // item.path.includes("dashboard") &&
-                                //   "text-salPink"
-                              )}>
-                              <Link
-                                onClick={onHandleLinkClick}
-                                href={item.path}
+                            <li
+                              key={`${section.title}-mobileCat`}
+                              className='border-b-2 border-black last:border-b-0'>
+                              <div
+                                onClick={() => {
+                                  return (
+                                    setFreshOpen(false),
+                                    setActiveCategory(
+                                      isExpanded ? null : section.title
+                                    )
+                                  )
+                                }}
                                 className={cn(
-                                  "cursor-pointer  ",
-                                  pathname === item.path &&
-                                    "stroked text-background translate-x-2"
+                                  "cursor-pointer ",
+                                  activeCategory === section.title &&
+                                    "stroked ",
+                                  activeCategory === section.title &&
+                                    theme === "default" &&
+                                    "text-white",
+                                  activeCategory === section.title &&
+                                    theme === "light" &&
+                                    "text-salYellow"
+                                )}>
+                                {section.title}
+                              </div>
+
+                              {/* Animate the dropdown items */}
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{
+                                      duration: 0.4,
+                                      ease: "easeInOut",
+                                    }}
+                                    className='overflow-hidden pl-4 text-[2.5rem]'>
+                                    <ul>
+                                      {filteredItems.map((item) => (
+                                        <li
+                                          key={`${item.title}-${item.category}-mobileItem`}>
+                                          <Link
+                                            href={item.path}
+                                            onClick={onHandleLinkClick}
+                                            className={cn(
+                                              "cursor-pointer block py-2 transition-all duration-200 ease-in-out ",
+                                              pathname === item.path &&
+                                                "underline underline-offset-4 decoration-6 text-black"
+                                              // item.path.includes("dashboard") &&
+                                              //   "text-salPink"
+                                            )}>
+                                            {item.title}
+                                          </Link>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </motion.div>
+                    {/* Fixed Bottom Row */}
+                    <motion.div
+                      // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-black text-foreground w-full'
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.1, duration: 0.4 }}
+                      className='flex space-x-5 items-center justify-center'>
+                      <Link
+                        href='https://facebook.com/thestreetartlist'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaFacebookF size={22} />
+                        </Button>
+                      </Link>
+                      <Link
+                        href='https://instagram.com/thestreetartlist'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaInstagram size={22} />
+                        </Button>
+                      </Link>
+                      <Link
+                        href='https://threads.net/thestreetartlist'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaThreads size={22} />
+                        </Button>
+                      </Link>
+
+                      <Link
+                        href='mailto:info@thestreetartlist.com'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaRegEnvelope size={22} />
+                        </Button>
+                      </Link>
+
+                      {/*    <div className='flex space-x-2 text-sm items-center'>
+                        <p>Made with ❤️ by</p>
+                        <Link
+                          href='https://theanthonybrooks.com'
+                          target='_blank'
+                          className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                          Anthony Brooks
+                        </Link>
+                      </div>
+                      <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
+                        {footerText.text}
+                      </div>*/}
+                    </motion.div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+
+          {/* *
+           *
+           *
+           *
+           * */}
+          {/* //---------------------- Grid (Desktop) Layout ---------------------- */}
+          {/* *
+           *
+           *
+           *
+           * */}
+          <motion.div
+            key='desktop-menu'
+            className={cn(
+              "hidden md:block top-5 right-5 w-full h-full fixed  box-border bg-background",
+              isOpen === "open" || isOpen === "closed"
+                ? "bg-background"
+                : "bg-none",
+              "bg-background"
+            )}
+            variants={menuVariants}
+            initial='initial'
+            // initial={{ width: "4em", height: 30 }}
+            animate={isOpen}
+            // exit='closed'
+          >
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: "100%" }}
+              transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
+              className='w-full h-full hidden md:grid grid-row-1 md:grid-rows-[auto_90px] '>
+              {isOpen === "open" && (
+                <>
+                  <div className='grid grid-cols-1 md:grid-cols-3 divide-x-1.5 divide-solid row-span-1 w-screen px-5 divide-black overflow-hidden'>
+                    {/* Column 1 - Main Titles */}
+                    <motion.div
+                      className='p-4 py-8 flex items-start justify-center scrollable mini darkbar'
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7, duration: 0.4 }}>
+                      <ul
+                        className={cn(
+                          "font-black m-auto text-[3rem] lg:text-[4.5rem] space-y-3 ",
+                          "font-tanker tracking-wide  lowercase select-none"
+                        )}>
+                        {mainMenuItems.map((section, index) => {
+                          const filteredItems = section.items.filter((item) => {
+                            const itemCategory = item.category.toLowerCase()
+                            return (
+                              item.public === true ||
+                              itemCategory === "thelist" ||
+                              user?.accountType?.some(
+                                (type: any) =>
+                                  type.toLowerCase() === itemCategory
+                              )
+                            )
+                          })
+
+                          if (filteredItems.length === 0) return null
+
+                          return (
+                            <li
+                              key={`${section.title}-desktopCat`}
+                              className='cursor-pointer'>
+                              <div
+                                onClick={() => setActiveCategory(section.title)}
+                                className={cn(
+                                  "cursor-pointer hover:translate-x-3 transition-transform ease-in-out duration-300",
+                                  activeCategory === section.title &&
+                                    "stroked wshadow ",
+                                  activeCategory === section.title &&
+                                    theme === "default" &&
+                                    "text-white",
+                                  activeCategory === section.title &&
+                                    theme === "light" &&
+                                    "text-salYellow"
+                                )}>
+                                {/* {activeCategory === section.title && (
+                                      <GoDotFill className='text-black size-8 md:size-14' />
+                                    )} */}
+                                {section.title}
+                              </div>
+                            </li>
+                          )
+                        })}
+                        {!user && (
+                          <Link onClick={onHandleLinkClick} href={"/pricing"}>
+                            Pricing
+                          </Link>
+                        )}
+                      </ul>
+                    </motion.div>
+
+                    {/* Column 2 - Secondary Titles */}
+                    <motion.div
+                      className='p-4 py-8 flex items-start justify-center scrollable mini darkbar '
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.9, duration: 0.4 }}>
+                      <ul className='font-black m-auto text-[1.2rem] lg:text-[3rem] space-y-3 select-none font-tanker tracking-wide  lowercase'>
+                        {activeMenuItems?.items
+                          .filter((item) => {
+                            const itemCategory = item.category.toLowerCase()
+                            return (
+                              item.public === true || // Always show public items
+                              itemCategory === "thelist" || // Always show thelist items
+                              user?.accountType?.some(
+                                (type: any) =>
+                                  type.toLowerCase() === itemCategory // Show if user matches item category
+                              )
+                            )
+                          })
+                          .map((item, index) => (
+                            <li
+                              key={`${item.title}-${item.category}-desktopItem`}>
+                              <div
+                                className={cn(
+                                  " cursor-pointer transition-all duration-100 ease-in-out hover:translate-x-2 ",
+                                  pathname === item.path && "text-background"
                                   // item.path.includes("dashboard") &&
                                   //   "text-salPink"
                                 )}>
-                                {item.title}
-                              </Link>
-                            </div>
+                                <Link
+                                  onClick={onHandleLinkClick}
+                                  href={item.path}
+                                  className={cn(
+                                    "cursor-pointer  ",
+                                    pathname === item.path &&
+                                      "underline underline-offset-4 decoration-6 text-black translate-x-2"
+                                    // item.path.includes("dashboard") &&
+                                    //   "text-salPink"
+                                  )}>
+                                  {item.title}
+                                </Link>
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                    </motion.div>
+
+                    {/* Column 3 */}
+                    <motion.div
+                      className='p-4 pb-8 flex flex-col gap-y-4 items-center justify-end'
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.1, duration: 0.4 }}>
+                      <div className='h-[30%] w-[80%] flex flex-col  border-black border-1.5 border-dotted rounded-lg p-8 scrollable mini'>
+                        <p>User Notifications</p>
+                        <Separator />
+                        <p className='italic text-sm'>
+                          Nothing to see here yet
+                        </p>
+                      </div>
+                      <div className='h-[50%] w-[80%] flex flex-col  border-black border-1.5 border-dotted rounded-lg p-8'>
+                        <p>Applications</p>
+                        <Separator className='mb-2' />
+                        <ol className='flex flex-col gap-y-3'>
+                          <li className='flex gap-x-4 text-emerald-500'>
+                            <p className=' text-sm'>Blah Event</p> -{" "}
+                            <span className='text-sm flex gap-x-2'>
+                              <CheckCircle />
+                              Accepted
+                            </span>
+                            <span className='text-sm flex gap-x-2'>
+                              1-25-2025
+                            </span>
                           </li>
-                        ))}
-                    </ul>
-                  </motion.div>
+                          <li className='flex gap-x-4 text-emerald-500'>
+                            <p className=' text-sm'>Blah Event</p> -{" "}
+                            <span className='text-sm flex gap-x-2'>
+                              <CheckCircle />
+                              Accepted
+                            </span>
+                            <span className='text-sm flex gap-x-2'>
+                              1-16-2025
+                            </span>
+                          </li>
+                          <li className='flex gap-x-4 text-red-500'>
+                            <p className=' text-sm'>Blah Event</p> -{" "}
+                            <span className='text-sm flex gap-x-2'>
+                              <XCircle />
+                              Rejected
+                            </span>
+                            <span className='text-sm flex gap-x-2'>
+                              1-8-2025
+                            </span>
+                          </li>
+                          <li className='flex gap-x-4 text-red-500'>
+                            <p className=' text-sm'>Blah Event</p> -{" "}
+                            <span className='text-sm flex gap-x-2'>
+                              <XCircle />
+                              Rejected
+                            </span>
+                            <span className='text-sm flex gap-x-2'>
+                              1-2-2025
+                            </span>
+                          </li>
+                        </ol>
+                      </div>
+                    </motion.div>
+                  </div>
 
-                  {/* Column 3 */}
+                  {/* Fixed Bottom Row */}
                   <motion.div
-                    className='p-4 pb-8 flex flex-col gap-y-4 items-center justify-end'
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.1, duration: 0.4 }}>
-                    {/* <div className='h-[30%] w-[80%] flex flex-col  border-black border-1.5 border-dotted rounded-lg p-8'>
-                      <p>User Notifications</p>
-                      <Separator />
-                      <p className='italic text-sm'>Nothing to see here yet</p>
+                    className='h-[55px] col-span-3 row-span-1 border-t-1.5 border-black text-foreground flex items-center justify-between px-8'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.9, duration: 0.4 }}>
+                    <div className='flex space-x-2 items-center'>
+                      <p className='text-sm'>Links:</p>
+                      <Link
+                        href='https://facebook.com/thestreetartlist'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaFacebookF className='h-5 w-5' />
+                        </Button>
+                      </Link>
+                      <Link
+                        href='https://instagram.com/thestreetartlist'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaInstagram className='h-5 w-5' />
+                        </Button>
+                      </Link>
+                      <Link
+                        href='https://threads.net/thestreetartlist'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaThreads className='h-5 w-5' />
+                        </Button>
+                      </Link>
+                      {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
+                    <Button variant='ghost' size='icon'>
+                      <FaPatreon className='h-5 w-5' />
+                    </Button>
+                  </Link> */}
+                      <Link
+                        href='mailto:info@thestreetartlist.com'
+                        target='_blank'>
+                        <Button variant='ghost' size='icon'>
+                          <FaRegEnvelope className='h-5 w-5' />
+                        </Button>
+                      </Link>
                     </div>
-                    <div className='h-[50%] w-[80%] flex flex-col  border-black border-1.5 border-dotted rounded-lg p-8'>
-                      <p>Applications</p>
-                      <Separator className='mb-2' />
-                      <ol className='flex flex-col gap-y-3'>
-                        <li className='flex gap-x-4 text-emerald-500'>
-                          <p className=' text-sm'>Blah Event</p> -{" "}
-                          <span className='text-sm flex gap-x-2'>
-                            <CheckCircle />
-                            Accepted
-                          </span>
-                          <span className='text-sm flex gap-x-2'>
-                            1-25-2025
-                          </span>
-                        </li>
-                        <li className='flex gap-x-4 text-emerald-500'>
-                          <p className=' text-sm'>Blah Event</p> -{" "}
-                          <span className='text-sm flex gap-x-2'>
-                            <CheckCircle />
-                            Accepted
-                          </span>
-                          <span className='text-sm flex gap-x-2'>
-                            1-16-2025
-                          </span>
-                        </li>
-                        <li className='flex gap-x-4 text-red-500'>
-                          <p className=' text-sm'>Blah Event</p> -{" "}
-                          <span className='text-sm flex gap-x-2'>
-                            <XCircle />
-                            Rejected
-                          </span>
-                          <span className='text-sm flex gap-x-2'>1-8-2025</span>
-                        </li>
-                        <li className='flex gap-x-4 text-red-500'>
-                          <p className=' text-sm'>Blah Event</p> -{" "}
-                          <span className='text-sm flex gap-x-2'>
-                            <XCircle />
-                            Rejected
-                          </span>
-                          <span className='text-sm flex gap-x-2'>1-2-2025</span>
-                        </li>
-                      </ol>
-                    </div> */}
+                    <div className='flex space-x-2 text-sm items-center'>
+                      <p>Made with ❤️ by</p>
+                      <Link
+                        href='https://theanthonybrooks.com'
+                        target='_blank'
+                        className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                        Anthony Brooks
+                      </Link>
+                    </div>
+                    <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
+                      {footerText.text}
+                    </div>
                   </motion.div>
-                </div>
-
-                {/* Fixed Bottom Row */}
-                <motion.div
-                  className='h-[55px]  border-t-1.5 border-black text-foreground flex items-center justify-between px-8'
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.1, duration: 0.4 }}>
-                  <div className='flex space-x-4'>
-                    <Link
-                      href='https://facebook.com/thestreetartlist'
-                      target='_blank'>
-                      <Button variant='ghost' size='icon'>
-                        <FaFacebookF className='h-5 w-5' />
-                      </Button>
-                    </Link>
-                    <Link
-                      href='https://instagram.com/thestreetartlist'
-                      target='_blank'>
-                      <Button variant='ghost' size='icon'>
-                        <FaInstagram className='h-5 w-5' />
-                      </Button>
-                    </Link>
-                    <Link
-                      href='https://threads.net/thestreetartlist'
-                      target='_blank'>
-                      <Button variant='ghost' size='icon'>
-                        <FaThreads className='h-5 w-5' />
-                      </Button>
-                    </Link>
-                    {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
-                <Button variant='ghost' size='icon'>
-                  <FaPatreon className='h-5 w-5' />
-                </Button>
-              </Link> */}
-                    <Link
-                      href='mailto:info@thestreetartlist.com'
-                      target='_blank'>
-                      <Button variant='ghost' size='icon'>
-                        <FaRegEnvelope className='h-5 w-5' />
-                      </Button>
-                    </Link>
-                  </div>
-                  <div className='flex space-x-2 text-sm items-center'>
-                    <p>Made with ❤️ by</p>
-                    <Link
-                      href='https://theanthonybrooks.com'
-                      target='_blank'
-                      className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
-                      Anthony Brooks
-                    </Link>
-                  </div>
-                  <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
-                    {footerText.text}
-                  </div>
-                </motion.div>
-              </>
-            )}
+                </>
+              )}
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
+        </AnimatePresence>
+      </div>
+    </>
   )
 }
 

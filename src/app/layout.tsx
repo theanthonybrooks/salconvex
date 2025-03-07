@@ -1,4 +1,10 @@
-import { tankerReg } from "@/assets/fonts"
+import {
+  bebasNeue,
+  libreFranklin,
+  spaceGrotesk,
+  spaceMono,
+  tankerReg,
+} from "@/assets/fonts"
 import { ConvexClientProvider } from "@/components/convex-client-provider"
 import { cn } from "@/lib/utils"
 import { ThemedProvider } from "@/providers/themed-provider"
@@ -63,7 +69,11 @@ export default async function RootLayout({
           className={cn(
             GeistSans.className,
             " scrollable invis unscroll darkbar antialiased",
-            tankerReg.variable
+            tankerReg.variable,
+            spaceMono.variable,
+            libreFranklin.variable,
+            spaceGrotesk.variable,
+            bebasNeue.variable
           )}>
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
