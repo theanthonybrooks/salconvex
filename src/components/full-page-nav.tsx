@@ -47,7 +47,7 @@ const menuVariants = {
   initial: {
     width: [0],
     height: [0],
-    top: [20],
+    top: [17],
     right: [35],
     borderRadius: [40],
     transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
@@ -76,8 +76,8 @@ const mobileMenuVariants = {
   //   opacity: [1, 1, 1, 1],
   // },
   closed: {
-    width: ["100vw"],
-    height: ["100vh"],
+    width: [0],
+    height: [0],
     top: [0],
     right: [0],
     borderRadius: [0],
@@ -182,35 +182,33 @@ const FullPageNav = ({
 
       <div className='z-[100]'>
         {/* Menu Button */}
-        <div className='flex flex-row gap-x-4 items-center justify-between relative w-full z-20'>
+        <div className='flex flex-row gap-x-2  items-center justify-between relative w-full z-20'>
           {/* <ThemeToggle userPref={themePref} /> */}
 
           {/* //NOTE: Add sliding up animation later; will require making a button
           lookalike with two divs/spans inside that move up and down and have an
           overflow of hidden */}
 
-          <div className='mt-3 md:mt-0 flex items-center justify-center gap-x-4 md:gap-x-2'>
-            {isOpen === "open" && !pathname.includes("/dashboard") && (
-              <ThemeToggle userPref={userPref?.theme} />
-            )}
-            <Button
-              variant='salWithShadowHidden'
-              onClick={() =>
-                setIsOpen(
-                  isOpen === "initial"
-                    ? "open"
-                    : isOpen === "open"
-                    ? "closed"
-                    : "open"
-                )
-              }
-              className={cn(
-                "w-[6em] bg-background font-bold",
-                isOpen === "open" ? "bg-salPink" : "bg-background"
-              )}>
-              {isOpen === "open" ? "CLOSE" : "MENU"}
-            </Button>
-          </div>
+          {isOpen === "open" && !pathname.includes("/dashboard") && (
+            <ThemeToggle userPref={userPref?.theme} />
+          )}
+          <Button
+            variant='salWithShadowHidden'
+            onClick={() =>
+              setIsOpen(
+                isOpen === "initial"
+                  ? "open"
+                  : isOpen === "open"
+                  ? "closed"
+                  : "open"
+              )
+            }
+            className={cn(
+              "w-[6em] bg-background font-bold",
+              isOpen === "open" ? "bg-salPink" : "bg-background"
+            )}>
+            {isOpen === "open" ? "CLOSE" : "MENU"}
+          </Button>
         </div>
 
         {/* /~ Fullscreen Menu Overlay ~/ */}
@@ -230,7 +228,7 @@ const FullPageNav = ({
           <motion.div
             key='mobile-menu'
             className={cn(
-              "md:hidden top-5 right-5 w-full h-full fixed  box-border bg-background"
+              "xl:hidden top-5 right-5 w-full h-full  fixed  box-border bg-background"
             )}
             variants={mobileMenuVariants}
             initial='mobileInitial'
@@ -242,7 +240,7 @@ const FullPageNav = ({
               // initial={{ height: 0 }}
               // animate={{ height: "100%" }}
               // transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
-              className='w-full h-full  md:hidden'>
+              className='w-full h-full  '>
               {isOpen === "open" && (
                 <>
                   {/* Column 1 - Main Titles */}
@@ -259,13 +257,13 @@ const FullPageNav = ({
                       />
                     </section>
                     <motion.div
-                      className='p-4 py-8 flex justify-center scrollable invis  h-full w-full '
+                      className='flex justify-center scrollable invis  h-full w-full '
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7, duration: 0.4 }}>
                       <ul
                         className={cn(
-                          "font-black m-x-auto text-[4rem] space-y-3",
+                          "font-black m-x-auto w-full text-[4rem]",
                           "font-tanker tracking-wide lowercase"
                         )}>
                         {mainMenuItems.map((section, index) => {
@@ -289,7 +287,7 @@ const FullPageNav = ({
                           return (
                             <li
                               key={`${section.title}-mobileCat`}
-                              className='border-b-2 border-black last:border-b-0'>
+                              className='border-b-2 border-black last:border-b-0 w-full'>
                               <div
                                 onClick={() => {
                                   return (
@@ -300,15 +298,15 @@ const FullPageNav = ({
                                   )
                                 }}
                                 className={cn(
-                                  "cursor-pointer ",
+                                  "cursor-pointer flex justify-start px-9 py-4",
                                   activeCategory === section.title &&
-                                    "stroked ",
-                                  activeCategory === section.title &&
-                                    theme === "default" &&
-                                    "text-white",
-                                  activeCategory === section.title &&
-                                    theme === "light" &&
-                                    "text-salYellow"
+                                    "bg-black text-background unstroked"
+                                  // activeCategory === section.title &&
+                                  //   theme === "default" &&
+                                  //   "text-white",
+                                  // activeCategory === section.title &&
+                                  //   theme === "light" &&
+                                  //   "text-salYellow"
                                 )}>
                                 {section.title}
                               </div>
@@ -324,16 +322,17 @@ const FullPageNav = ({
                                       duration: 0.4,
                                       ease: "easeInOut",
                                     }}
-                                    className='overflow-hidden pl-4 text-[2.5rem]'>
+                                    className='overflow-hidden pl-6 text-[2.5rem]'>
                                     <ul>
                                       {filteredItems.map((item) => (
                                         <li
-                                          key={`${item.title}-${item.category}-mobileItem`}>
+                                          key={`${item.title}-${item.category}-mobileItem`}
+                                          className=' pl-4 '>
                                           <Link
                                             href={item.path}
                                             onClick={onHandleLinkClick}
                                             className={cn(
-                                              "cursor-pointer block py-2 transition-all duration-200 ease-in-out ",
+                                              "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
                                               pathname === item.path &&
                                                 "underline underline-offset-4 decoration-6 text-black"
                                               // item.path.includes("dashboard") &&
@@ -422,7 +421,7 @@ const FullPageNav = ({
           <motion.div
             key='desktop-menu'
             className={cn(
-              "hidden md:block top-5 right-5 w-full h-full fixed  box-border bg-background",
+              "hidden xl:block top-5 right-5 w-full h-dvh fixed  box-border bg-background",
               isOpen === "open" || isOpen === "closed"
                 ? "bg-background"
                 : "bg-none",
@@ -660,8 +659,16 @@ const FullPageNav = ({
                         Anthony Brooks
                       </Link>
                     </div>
-                    <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
+                    <div className='flex gap-x-2 items-center text-center text-sm text-gray-600 dark:text-gray-400'>
                       {footerText.text}
+                      <Image
+                        src='/sitelogo.svg'
+                        alt='The Street Art List'
+                        width={40}
+                        height={40}
+                        className=''
+                        priority={true}
+                      />
                     </div>
                   </motion.div>
                 </>

@@ -10,12 +10,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import {
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
 import { UserProfile } from "@/components/ui/user-profile"
 import { landingPageLogo } from "@/constants/logos"
 import {
@@ -23,15 +17,12 @@ import {
   landingPageNavbarLinks,
 } from "@/constants/navbars"
 import { cn } from "@/lib/utils"
-import { Dialog } from "@radix-ui/react-dialog"
 import { Unauthenticated } from "convex/react"
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion } from "framer-motion"
-import { Menu, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import React from "react"
-import { FaGithub, FaTwitter, FaYoutube } from "react-icons/fa"
 
 interface NavBarProps {
   userId: string | undefined
@@ -63,95 +54,16 @@ export default function NavBar({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
-      className='fixed left-0 right-0 top-0 z-50  border-black bg-background/0  dark:bg-background'>
-      <div className='mx-auto flex w-screen items-center justify-between p-4 px-8'>
+      className='fixed left-0 right-0 top-0 z-50  border-black bg-transparent'>
+      <div className='mx-auto flex w-screen items-center justify-between pb-6 pt-8 sm:py-4 px-8'>
         {/* Mobile Logo and Navigation */}
-        <div className='flex items-center gap-2 lg:hidden'>
-          <Dialog>
-            <SheetTrigger asChild>
-              <Button variant='ghost' size='icon' className='lg:hidden'>
-                <Menu className='h-5 w-5' />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side='left' className='w-[300px]'>
-              <SheetHeader className='border-b pb-6'>
-                <SheetTitle className='flex items-center gap-2'>
-                  <Sparkles className='h-5 w-5 text-blue-600' />
-                  {/* <span>The Street Art List</span> */}
-                  <Image
-                    src='/saltext.png'
-                    alt='The Street Art List'
-                    width={100}
-                    height={40}
-                  />
-                </SheetTitle>
-              </SheetHeader>
-              <div className='mt-6 flex flex-col gap-1'>
-                <div className='px-2 pb-4'>
-                  <h2 className='mb-2 text-sm font-medium text-muted-foreground'>
-                    Navigation
-                  </h2>
-                  {filteredNavbarMenu.map((item) => (
-                    <Link key={item.href} href={item.href} prefetch={true}>
-                      <Button
-                        variant='ghost'
-                        className='mb-2 h-11 w-full justify-start border border-muted/40 text-base font-normal transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/50 dark:hover:text-blue-400'>
-                        {item.title}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
-                <div className='border-t px-2 py-4'>
-                  <h2 className='mb-2 text-sm font-medium text-muted-foreground'>
-                    Links
-                  </h2>
-                  <Link
-                    href='https://github.com/michaelshimeles/nextjs14-starter-template'
-                    target='_blank'
-                    prefetch={true}>
-                    <Button
-                      variant='ghost'
-                      className='mb-2 h-11 w-full justify-start border border-muted/40 text-base font-normal transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/50 dark:hover:text-blue-400'>
-                      <FaGithub className='mr-2 h-4 w-4' />
-                      GitHub
-                    </Button>
-                  </Link>
-                  <Link
-                    href='https://twitter.com/rasmickyy'
-                    target='_blank'
-                    prefetch={true}>
-                    <Button
-                      variant='ghost'
-                      className='mb-2 h-11 w-full justify-start border border-muted/40 text-base font-normal transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/50 dark:hover:text-blue-400'>
-                      <FaTwitter className='mr-2 h-4 w-4' />X (Twitter)
-                    </Button>
-                  </Link>
-                  <Link
-                    href='https://youtube.com/@rasmickyy'
-                    target='_blank'
-                    prefetch={true}>
-                    <Button
-                      variant='ghost'
-                      className='h-11 w-full justify-start border border-muted/40 text-base font-normal transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/50 dark:hover:text-blue-400'>
-                      <FaYoutube className='mr-2 h-4 w-4' />
-                      YouTube
-                    </Button>
-                  </Link>
-                </div>
-                {/* < Unauthenticated> */}
-                {userId === "guest" && (
-                  <Link href='/auth/sign-in' prefetch={true}>
-                    <Button className='font-bold' variant='salWithShadowHidden'>
-                      Sign in
-                    </Button>
-                  </Link>
-                )}
-                {/* </Unauthenticated> */}
-              </div>
-            </SheetContent>
-          </Dialog>
-          <Link href='/' prefetch={true} className='flex items-center gap-2'>
-            <Sparkles className='h-5 w-5 text-blue-600' />
+        <div className='flex items-center gap-2 sm:hidden'>
+          <div className='hidden mt-6 flex-col gap-1'></div>
+
+          <Link
+            href='/'
+            prefetch={true}
+            className='hidden sm:flex items-center gap-2'>
             {/* <span className='font-semibold'>The Street Art List</span> */}
             <Image
               src='/saltext.png'
@@ -224,7 +136,10 @@ export default function NavBar({
           {/* {isLoading && <LucideLoaderCircle className='h-6 w-6 animate-spin' />} */}
           {userId !== "guest" && user && <UserProfile user={user} />}
           <Unauthenticated>
-            <Link href='/auth/sign-in' prefetch={true}>
+            <Link
+              href='/auth/sign-in'
+              prefetch={true}
+              className='hidden sm:block'>
               <Button className='font-bold' variant='salWithShadowHidden'>
                 Sign in
               </Button>

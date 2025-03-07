@@ -1,8 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
-import { useTheme } from "next-themes"
 import { Poppins } from "next/font/google"
 import Link from "next/link"
 import { useRef } from "react"
@@ -10,63 +8,32 @@ import { useRef } from "react"
 const font = Poppins({ subsets: ["latin"], weight: "600" })
 
 export default function Home() {
-  const { theme } = useTheme()
   const targetRef = useRef(null)
-  const { scrollYProgress } = useScroll({ target: targetRef })
   const { scrollY } = useScroll()
 
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
-  // useMotionValueEvent(scrollYProgress, "change", (latest) => {
-  //   console.log("Page scroll: ", latest)
-  // })
-
-  // Apply smoothing with useSpring
-  const smoothScrollProgress = useSpring(scrollYProgress, {
-    stiffness: 100, // Lower stiffness for a softer feel
-    damping: 20, // Higher damping to prevent jumpiness
-    mass: 0.4, // Controls weight of the movement
-  })
 
   const smoothScrollY = useSpring(scrollY, {
     stiffness: 100,
     damping: 20,
     mass: 0.4,
   })
-
   const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
-  const left = useTransform(smoothScrollY, [0, 150, 450], ["0%", "0%", "50%"])
-  const transX = useTransform(
-    smoothScrollY,
-    [0, 150, 450],
-    ["0%", "0%", "-50%"]
-  )
+  // const left = useTransform(smoothScrollY, [0, 150, 450], ["0%", "0%", "50%"])
+  // const transX = useTransform(
+  //   smoothScrollY,
+  //   [0, 150, 450],
+  //   ["0%", "0%", "-50%"]
+  // )
   return (
     <motion.div ref={targetRef}>
-      <motion.div
-        id='scroll-indicator'
-        className={cn(
-          "z-20",
-          theme === "default" ? "bg-salPink" : "bg-salProgress"
-        )}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-        style={{
-          scaleX: smoothScrollProgress,
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 10,
-          originX: 0,
-          // backgroundColor: "var(--sal-progress)",
-        }}
-      />
       <motion.div
         initial={{ y: 0, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className='flex flex-col h-full items-center justify-center relative'>
+        className=' hidden sm:flex flex-col h-full items-center justify-center relative'>
         <motion.img
           src='/herotest2.jpg'
           alt='The Street Art List'

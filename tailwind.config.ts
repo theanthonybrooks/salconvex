@@ -234,6 +234,9 @@ export default {
         ".stroked": {
           "-webkit-text-stroke": "0.5px black",
         },
+        ".unstroked": {
+          "-webkit-text-stroke": "0px black",
+        },
         // ".hover\\:stroked:hover": {
         //   "-webkit-text-stroke": "1px black", // Optional: Make stroke thicker on hover
         // },
