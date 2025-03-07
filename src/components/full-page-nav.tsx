@@ -176,7 +176,7 @@ const FullPageNav = ({
           initial='overlayInitial'
           variants={screenOverlayVariants}
           animate={isOpen}
-          className='absolute w-screen h-screen z-[1] backdrop-blur-md bg-black/20 right-0 top-0 origin-top-right'
+          className='absolute w-screen h-dvh z-[1] backdrop-blur-md bg-black/20 right-0 top-0 origin-top-right'
         />
       </AnimatePresence>
 
@@ -245,8 +245,8 @@ const FullPageNav = ({
                 <>
                   {/* Column 1 - Main Titles */}
 
-                  <div className='grid grid-rows-[100px_auto_100px] grid-cols-1 h-screen w-screen '>
-                    <section className='w-full border-b-2 border-black'>
+                  <div className='grid grid-rows-[100px_auto_100px] grid-cols-1 h-dvh w-screen '>
+                    <section className='w-full border-b-2 border-black last:border-b-0'>
                       <Image
                         src='/sitelogo.svg'
                         alt='The Street Art List'
@@ -257,7 +257,7 @@ const FullPageNav = ({
                       />
                     </section>
                     <motion.div
-                      className='flex justify-center scrollable invis  h-full w-full '
+                      className='flex flex-col justify-center scrollable invis  h-full w-full '
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7, duration: 0.4 }}>
@@ -287,7 +287,7 @@ const FullPageNav = ({
                           return (
                             <li
                               key={`${section.title}-mobileCat`}
-                              className='border-b-2 border-black last:border-b-0 w-full'>
+                              className='border-b-2 border-black  w-full'>
                               <div
                                 onClick={() => {
                                   return (
@@ -357,7 +357,7 @@ const FullPageNav = ({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1.1, duration: 0.4 }}
-                      className='flex space-x-5 items-center justify-center'>
+                      className='flex space-x-5 py-2 items-center justify-center'>
                       <Link
                         href='https://facebook.com/thestreetartlist'
                         target='_blank'>
