@@ -54,6 +54,49 @@ const menuVariants = {
     opacity: [0],
   },
 }
+const mobileMenuVariants = {
+  open: {
+    width: ["4em", "100vw", "100vw", "100vw", "100vw"],
+    height: [40, 100, 100, 100, 100, 1000],
+    top: [17, 0, 0, 0],
+    right: [41, 0, 0, 0],
+    borderRadius: [40, 40, 20, 0],
+    transition: { duration: 1.25, ease: [0.5, 1, 0.56, 0.81] },
+    opacity: [1, 1, 1],
+  },
+  // closed: {
+  //   width: ["100vw", "99vw", "98vw", "4em"],
+  //   height: ["100vh", 40, 40, 39],
+  //   top: [0, 17, 17, 17],
+  //   right: [0, 0, 41, 41],
+  //   borderRadius: [0, 20, 40, 40],
+  //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+  //   transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
+
+  //   opacity: [1, 1, 1, 1],
+  // },
+  closed: {
+    width: ["100vw"],
+    height: ["100vh"],
+    top: [0],
+    right: [0],
+    borderRadius: [0],
+
+    // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+    transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
+
+    opacity: [1],
+  },
+  mobileInitial: {
+    width: [0],
+    height: [0],
+    top: [20],
+    right: [35],
+    borderRadius: [40],
+    transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
+    opacity: [0],
+  },
+}
 
 const screenOverlayVariants = {
   overlayInitial: {
@@ -187,22 +230,18 @@ const FullPageNav = ({
           <motion.div
             key='mobile-menu'
             className={cn(
-              "md:hidden top-5 right-5 w-full h-full fixed  box-border bg-background",
-              isOpen === "open" || isOpen === "closed"
-                ? "bg-background"
-                : "bg-none",
-              "bg-background"
+              "md:hidden top-5 right-5 w-full h-full fixed  box-border bg-background"
             )}
-            variants={menuVariants}
-            initial='initial'
+            variants={mobileMenuVariants}
+            initial='mobileInitial'
             // initial={{ width: "4em", height: 30 }}
             animate={isOpen}
             // exit='closed'
           >
             <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: "100%" }}
-              transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
+              // initial={{ height: 0 }}
+              // animate={{ height: "100%" }}
+              // transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
               className='w-full h-full  md:hidden'>
               {isOpen === "open" && (
                 <>
@@ -393,13 +432,12 @@ const FullPageNav = ({
             initial='initial'
             // initial={{ width: "4em", height: 30 }}
             animate={isOpen}
-            // exit='closed'
-          >
+            exit='initial'>
             <motion.div
               initial={{ height: 0 }}
               animate={{ height: "100%" }}
               transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
-              className='w-full h-full hidden md:grid grid-row-1 md:grid-rows-[auto_90px] '>
+              className='w-full h-full hidden md:grid grid-row-1 md:grid-rows-[auto_70px] '>
               {isOpen === "open" && (
                 <>
                   <div className='grid grid-cols-1 md:grid-cols-3 divide-x-1.5 divide-solid row-span-1 w-screen px-5 divide-black overflow-hidden'>
@@ -573,7 +611,7 @@ const FullPageNav = ({
 
                   {/* Fixed Bottom Row */}
                   <motion.div
-                    className='h-[55px] col-span-3 row-span-1 border-t-1.5 border-black text-foreground flex items-center justify-between px-8'
+                    className=' col-span-3 row-span-1 border-t-1.5 border-black text-foreground flex items-center justify-between px-8'
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9, duration: 0.4 }}>

@@ -405,6 +405,16 @@ input:not(:placeholder-shown):not(:valid):not(:read-only) {
   color: black;
 }
 
+button,
+img,
+svg,
+a {
+  user-select: none;
+}
+/* *:not(p, h1, h2, h3) {
+  user-select: none;
+} */
+
 button:focus-visible,
 button:focus-within,
 button:active {
@@ -429,7 +439,7 @@ button:active {
 }
 
 .stroked {
-  -webkit-text-stroke: 2px black;
+  -webkit-text-stroke: 0.5px black;
   &.wshadow {
     text-shadow: black -5px 5px;
   }
