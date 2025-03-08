@@ -132,12 +132,12 @@ const SignInCard: React.FC<SignInCardProps> = ({
             variant='salWithShadowHidden'
             size='lg'
             type='button'
-            className='w-full flex justify-center items-center gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
+            className='min-w-[8.5rem] w-full    gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
             onClick={() => onProviderSignIn("google")}
             disabled={pending}
             tabIndex={1}>
             {isLoading === "google" ? (
-              <LoaderCircle className='size-5 animate-spin' />
+              <LoaderCircle className='size-4 animate-spin' />
             ) : (
               <>
                 <FaGoogle size={16} />
@@ -149,12 +149,12 @@ const SignInCard: React.FC<SignInCardProps> = ({
             variant='salWithShadowHidden'
             size='lg'
             type='button'
-            className='w-full flex justify-center items-center gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
+            className='min-w-[8.5rem] w-full     gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
             onClick={() => onProviderSignIn("apple")}
             disabled={pending}
             tabIndex={2}>
             {isLoading === "apple" ? (
-              <LoaderCircle className='size-5 animate-spin' />
+              <LoaderCircle className='size-4 animate-spin' />
             ) : (
               <>
                 <FaApple size={16} />
@@ -167,7 +167,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
           or
         </p>
         <form className=' flex flex-col' onSubmit={(e) => onPasswordSignIn(e)}>
-          <div className='space-y-2.5'>
+          <div className='space-y-4 sm:space-y-2.5'>
             <Label htmlFor='email' className='text-black'>
               Email address
             </Label>
@@ -224,7 +224,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             </div>
           </div>
           <Button
-            className='w-full mt-6 bg-white md:bg-salYellow'
+            className='w-full py-6 text-base   sm:py-0 mt-8 sm:mt-6 bg-white md:bg-salYellow'
             size='lg'
             type='submit'
             variant='salWithShadowYlw'

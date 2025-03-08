@@ -223,9 +223,9 @@ export const MultiSelect = React.forwardRef<
             ref={ref}
             {...props}
             onClick={handleTogglePopover}
-            style={{ height: `${height * 4}px` }}
+            // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex w-full p-1 rounded-md border items-center justify-between bg-stone-100 hover:bg-stone-100 [&_svg]:pointer-events-auto",
+              "flex w-full p-1 rounded-md border items-center justify-between bg-stone-100 hover:bg-stone-100 [&_svg]:pointer-events-auto h-[40px] sm:h-[32px]",
               className,
               variant === "basic" ? "border-black" : "",
               multiSelectVariants({ variant })

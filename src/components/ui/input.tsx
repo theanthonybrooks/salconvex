@@ -16,7 +16,7 @@ const inputVariants = cva(
         destructive: "border-red-500 text-red-600 bg-red-100",
       },
       inputHeight: {
-        sm: "h-8 ",
+        sm: "h-10 sm:h-8 ",
         default: "h-10 ",
         lg: "h-12  text-base",
       },
