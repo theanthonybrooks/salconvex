@@ -80,7 +80,7 @@ export default function DashboardSideBar({
         (item.sub.includes("admin") && hasAdminRole) ||
         (item.sub.includes("all") && !item.label.includes("Help"))
     )
-  }, [statusKey, hasAdminRole, navItems]) // Dependencies to prevent unnecessary recalculations
+  }, [statusKey, hasAdminRole]) // Dependencies to prevent unnecessary recalculations
 
   useEffect(() => {
     const matchingSection = filteredNavItems.find(

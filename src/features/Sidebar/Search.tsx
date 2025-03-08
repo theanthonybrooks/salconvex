@@ -3,23 +3,23 @@ import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { FiCommand, FiSearch } from "react-icons/fi"
 
-interface SearchProps {
+interface SearchProps<T = unknown> {
   title: string
-  source: []
+  source: T[]
   shortcut?: string
   groupName: string
   className?: string
   placeholder?: string
 }
 
-export const Search = ({
+export const Search = <T,>({
   title,
   source,
   shortcut = "/",
   groupName,
   className,
   placeholder,
-}: SearchProps) => {
+}: SearchProps<T>) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("Search")
 
