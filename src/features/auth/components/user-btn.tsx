@@ -42,6 +42,7 @@ export const UserBtn = () => {
           )}
         </Avatar>
         <h1>Welcome back, {firstName}</h1>
+        <p className='text-xs'>{email}</p>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='center' side='right' className='w-60'>
         <DropdownMenuItem

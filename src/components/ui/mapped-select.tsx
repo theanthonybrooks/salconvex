@@ -154,7 +154,7 @@ export function SearchMappedSelect<T>({
               <CommandGroup key={group} heading={group}>
                 {items.map((item) => {
                   const itemValue = getItemValue(item)
-                  const itemKey = getItemKey?.(item) ?? itemValue
+                  // const itemKey = getItemKey?.(item) ?? itemValue
                   const isSelected = value === itemValue
 
                   return (

@@ -59,7 +59,7 @@ export default async function RootLayout({
 
   // if (token !== null) {
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
-  const userPref = userData?.userPref ?? null
+  const userPref = userData?.userPref ?? undefined
   // }
 
   return (
@@ -77,7 +77,7 @@ export default async function RootLayout({
           )}>
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
-              <ThemedProvider user={userPref}>
+              <ThemedProvider userPref={userPref}>
                 {children}
                 <ToastContainer
                   position='top-right'

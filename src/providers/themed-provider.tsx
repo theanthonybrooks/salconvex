@@ -7,11 +7,11 @@ import React from "react"
 
 interface ThemedProviderProps {
   children: React.ReactNode
-  user?: any
+  userPref?: UserPref
 }
 
-export function ThemedProvider({ children, user }: ThemedProviderProps) {
-  const userTheme = user?.theme
+export function ThemedProvider({ children, userPref }: ThemedProviderProps) {
+  const userTheme = userPref?.theme
   // const { setTheme, theme } = useTheme()
   const pathname = usePathname()
   // If the pathname starts with /auth, force the 'sal' theme.

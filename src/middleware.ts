@@ -5,7 +5,7 @@ import {
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server"
 
-const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
+// const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
 const isSubOnlyPage = createRouteMatcher(["/dashboard/:path*"])
 const isAuthPage = createRouteMatcher(["/auth/:path*"])
 

@@ -68,8 +68,8 @@ const CloseMsg: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
             Where would you like to go?
           </AlertDialogTitle>
           <AlertDialogDescription className='text-black'>
-            If you've remembered your password, you can login. Otherwise, you
-            can stay here to reset your password, or go to the homepage.
+            If you&apos;ve remembered your password, you can login. Otherwise,
+            you can stay here to reset your password, or go to the homepage.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -91,7 +91,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
   const { signIn } = useAuthActions()
   const [step, setStep] = useState<string>("forgot")
   const [email, setEmail] = useState<string>("")
-  const [newPassword, setNewPassword] = useState<string>("")
+  // const [newPassword, setNewPassword] = useState<string>("")
   const [otp, setOtp] = useState<string>("")
   const [success, setSuccess] = useState<string | undefined>("")
   const [error, setError] = useState<string | undefined>("")
@@ -116,7 +116,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
   } = forgotForm
 
   const {
-    formState: { errors: resetErrors, isValid: isResetValid },
+    formState: { errors: resetErrors },
   } = resetForm
 
   const handleOtpChange = (value: string) => {
@@ -153,7 +153,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
       setSuccess("Code sent!")
       setIsLoading(false)
       forgotForm.reset()
-    } catch (err) {
+    } catch {
       setError("Failed to send code. Please try again.")
       setIsLoading(false)
     }
@@ -186,7 +186,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
       setTimeout(() => {
         router.push("/")
       }, 2000)
-    } catch (err) {
+    } catch {
       setError("Failed to reset password")
       setIsLoading(false)
       setPending(false)
@@ -387,7 +387,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
                   name='newPassword'
                   disabled={pending}
                   // value={password}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  // onChange={(e) => setNewPassword(e.target.value)}
                   placeholder=' '
                   type={showPassword ? "text" : "password"}
                   // inputHeight='sm'

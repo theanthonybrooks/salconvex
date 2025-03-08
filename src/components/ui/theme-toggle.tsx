@@ -5,11 +5,10 @@ import { motion as m } from "framer-motion"
 import { useTheme } from "next-themes"
 
 interface ThemeToggleProps {
-  userPref: Record<string, any> | null
   className?: string
 }
 
-export default function ThemeToggle({ userPref, className }: ThemeToggleProps) {
+export default function ThemeToggle({ className }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme()
 
   const raysVariants = {
@@ -48,24 +47,24 @@ export default function ThemeToggle({ userPref, className }: ThemeToggleProps) {
     },
   }
 
-  const shineVariant = {
-    hidden: {
-      opacity: 0,
-      scale: 3,
-      strokeDasharray: "20, 1000",
-      strokeDashoffset: 0,
-      filter: "blur(0px)",
-    },
-    visible: {
-      opacity: [0, 1, 0],
-      strokeDashoffset: [0, -50, -100],
-      filter: ["blur(2px)", "blur(2px)", "blur(0px)"],
-      transition: {
-        duration: 0.75,
-        ease: "linear",
-      },
-    },
-  }
+  // const shineVariant = {
+  //   hidden: {
+  //     opacity: 0,
+  //     scale: 3,
+  //     strokeDasharray: "20, 1000",
+  //     strokeDashoffset: 0,
+  //     filter: "blur(0px)",
+  //   },
+  //   visible: {
+  //     opacity: [0, 1, 0],
+  //     strokeDashoffset: [0, -50, -100],
+  //     filter: ["blur(2px)", "blur(2px)", "blur(0px)"],
+  //     transition: {
+  //       duration: 0.75,
+  //       ease: "linear",
+  //     },
+  //   },
+  // }
 
   const sunPath =
     "M70 49.5C70 60.8218 60.8218 70 49.5 70C38.1782 70 29 60.8218 29 49.5C29 38.1782 38.1782 29 49.5 29C60 29 69.5 38 70 49.5Z"

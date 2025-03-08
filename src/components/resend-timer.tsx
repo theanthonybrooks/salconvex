@@ -26,7 +26,7 @@ const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [initialTime])
+  }, [initialTime, startTimer])
 
   const handleResend = () => {
     onResend()
@@ -37,7 +37,7 @@ const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
     <div className='mt-4 text-center'>
       {timeLeft > 0 ? (
         <p className='text-sm'>
-          Don't see the email? Resend in{" "}
+          Don&apos;t see the email? Resend in{" "}
           <span className='font-medium'>{timeLeft}</span> second
           {timeLeft !== 1 && "s"}
         </p>

@@ -145,7 +145,7 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 3,
       modalPopover = false,
-      asChild = false,
+      // asChild = false,
       className,
       ...props
     },
@@ -207,7 +207,7 @@ export const MultiSelect = React.forwardRef<
       if (defaultValue.length === 0) {
         handleClear()
       }
-    }, [defaultValue])
+    }, [defaultValue, handleClear])
 
     // useEffect(() => {
     //   setSelectedValues([...new Set([...defaultValue, ...lockedValue])]) /

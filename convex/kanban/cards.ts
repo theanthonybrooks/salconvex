@@ -62,7 +62,7 @@ export const moveCard = mutation({
     const card = await ctx.db.get(id)
     if (!card) throw new Error("Card not found")
 
-    console.log(`Moving card ${id} to column ${column}, before ${beforeId}`)
+    // console.log(`Moving card ${id} to column ${column}, before ${beforeId}`)
 
     let cardsInColumn = await ctx.db
       .query("todoKanban")
@@ -70,10 +70,10 @@ export const moveCard = mutation({
       .order("asc")
       .collect()
 
-    console.log(
-      "Current column cards before move:",
-      cardsInColumn.map((c) => ({ id: c._id, order: c.order }))
-    )
+    // console.log(
+    //   "Current column cards before move:",
+    //   cardsInColumn.map((c) => ({ id: c._id, order: c.order }))
+    // )
 
     let newOrder
 
@@ -81,13 +81,13 @@ export const moveCard = mutation({
       newOrder = cardsInColumn.length
         ? cardsInColumn[cardsInColumn.length - 1].order + 1
         : 0
-      console.log(`Assigning order ${newOrder} (placing at end)`)
+      // console.log(`Assigning order ${newOrder} (placing at end)`)
     } else {
       const beforeIndex = cardsInColumn.findIndex((c) => c._id === beforeId)
       if (beforeIndex === -1) throw new Error("Before card not found")
 
       newOrder = beforeIndex
-      console.log(`Assigning order ${newOrder} (before card ${beforeId})`)
+      // console.log(`Assigning order ${newOrder} (before card ${beforeId})`)
     }
 
     await ctx.db.patch(id, {
@@ -135,7 +135,7 @@ export const deleteCard = mutation({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    console.log(`Card ${args.id} deleted by ${args.userId}`)
+    // console.log(`Card ${args.id} deleted by ${args.userId}`)
     return await ctx.db.delete(args.id)
   },
 })

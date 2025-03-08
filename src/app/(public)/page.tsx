@@ -1,11 +1,10 @@
 "use client"
 
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
-import { Poppins } from "next/font/google"
 import Link from "next/link"
 import { useRef } from "react"
 
-const font = Poppins({ subsets: ["latin"], weight: "600" })
+// const font = Poppins({ subsets: ["latin"], weight: "600" })
 
 export default function Home() {
   const targetRef = useRef(null)

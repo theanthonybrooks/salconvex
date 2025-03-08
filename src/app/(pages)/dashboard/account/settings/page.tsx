@@ -63,7 +63,6 @@ import {
   Shield,
   Upload,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -78,7 +77,7 @@ import { api } from "~/convex/_generated/api"
 
 export default function SettingsPage() {
   const { signOut } = useAuthActions()
-  const router = useRouter()
+  // const router = useRouter()
   const userData = useQuery(api.users.getCurrentUser, {})
   const user = userData?.user
   const userPrefs = userData?.userPref
@@ -98,9 +97,10 @@ export default function SettingsPage() {
     undefined
   )
   const [selectedTheme, setTheme] = useState<string | undefined>(undefined)
-  const [selectedLanguage, setLanguage] = useState("en")
+  // const [selectedLanguage, setLanguage] = useState("en")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
+  // TODO: ensure that pending state isn't being misused
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string>("")
   const [success, setSuccess] = useState<string>("")
@@ -142,10 +142,10 @@ export default function SettingsPage() {
   })
 
   const {
-    register: updateRegister,
+    // register: updateRegister,
     handleSubmit: updateHandleSubmit,
-    reset: updateReset,
-    formState: { errors: updateErrors },
+    // reset: updateReset,
+    // formState: { errors: updateErrors },
     setValue: updateSetValue,
   } = useForm<z.infer<typeof UpdateUserSchema>>({
     resolver: zodResolver(UpdateUserSchema),
@@ -381,7 +381,7 @@ export default function SettingsPage() {
     }, 500)
 
     return () => clearTimeout(handler)
-  }, [selectedTheme, selectedTimezone, selectedCurrency])
+  }, [selectedTheme, selectedTimezone, selectedCurrency, handleUpdateUserPrefs])
 
   return (
     <div className='flex flex-col gap-6 p-6'>
@@ -457,6 +457,7 @@ export default function SettingsPage() {
                     <div className='space-y-2'>
                       <Label htmlFor='firstName'>First Name</Label>
                       <Input
+                        disabled={pending}
                         id='firstName'
                         placeholder='Your first name/given name'
                         defaultValue={firstName ?? ""}
@@ -469,6 +470,7 @@ export default function SettingsPage() {
                     <div className='space-y-2'>
                       <Label htmlFor='lastName'>Last Name</Label>
                       <Input
+                        disabled={pending}
                         id='lastName'
                         placeholder='Your last name/family name'
                         defaultValue={lastName ?? ""}
@@ -486,6 +488,7 @@ export default function SettingsPage() {
                         </i>
                       </Label>
                       <Input
+                        disabled={pending}
                         id='email'
                         type='email'
                         // readOnly
@@ -514,13 +517,14 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Button
+                    disabled={isSaving}
                     type='submit'
                     variant='salWithShadow'
                     className='mt-4'>
                     {isSaving ? (
                       <span className='flex items-center gap-2'>
                         <LoaderPinwheel className='h-4 w-4 animate-spin' />
-                        "Saving..."
+                        Saving...
                       </span>
                     ) : (
                       "Save Changes"
@@ -807,7 +811,7 @@ export default function SettingsPage() {
                           <DialogTitle>Edit profile</DialogTitle>
                           <DialogDescription>
                             Make changes to your profile here. Click save when
-                            you're done.
+                            you&apos;re done.
                           </DialogDescription>
                           {success && <FormSuccess message={success} />}
                           {error && <FormError message={error} />}
@@ -952,7 +956,7 @@ export default function SettingsPage() {
                         </AlertDialogHeader>
                         <AlertDialogDescription className='text-black'>
                           Are you sure you want to sign out of all your
-                          sessions? You'll need to re-login on all devices.
+                          sessions? You&apos;ll need to re-login on all devices.
                         </AlertDialogDescription>
 
                         <AlertDialogFooter>

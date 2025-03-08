@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client"
 
+import { Id } from "convex/_generated/dataModel"
 import { useMutation, useQuery } from "convex/react"
 import { motion } from "framer-motion"
 import { useState } from "react"
@@ -15,7 +18,25 @@ interface Card {
   column: ColumnType
 }
 
-type ConvexCard = Omit<Card, "id"> & { _id: string }
+interface MoveCardArgs {
+  id: Id<"todoKanban">
+  column: ColumnType
+  beforeId?: Id<"todoKanban"> | undefined
+  userId: string
+}
+
+interface AddCardArgs {
+  title: string
+  column: ColumnType
+  userId: string
+}
+
+interface DeleteCardArgs {
+  id: Id<"todoKanban">
+  userId: string
+}
+
+// type ConvexCard = Omit<Card, "id"> & { _id: string }
 
 interface ColumnProps {
   title: string
@@ -23,9 +44,9 @@ interface ColumnProps {
   column: ColumnType
   cards: Card[]
   userRole: string
-  moveCard: any
-  addCard: any
-  deleteCard: any
+  moveCard: (args: MoveCardArgs) => void
+  addCard: (args: AddCardArgs) => void
+  deleteCard: (args: DeleteCardArgs) => void
 }
 
 interface CardProps {
@@ -41,9 +62,9 @@ interface DropIndicatorProps {
   column: ColumnType
 }
 
-interface BurnBarrelProps {
-  userRole: string
-}
+// interface BurnBarrelProps {
+//   userRole: string
+// }
 
 interface AddCardProps {
   column: ColumnType

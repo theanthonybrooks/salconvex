@@ -21,7 +21,7 @@ import { FaUserNinja } from "react-icons/fa6"
 import { api } from "~/convex/_generated/api"
 
 interface UserProfileProps {
-  user: Record<string, any> | null
+  user: User | null
 }
 
 export function UserProfile({ user }: UserProfileProps) {

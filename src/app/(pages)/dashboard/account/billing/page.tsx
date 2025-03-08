@@ -12,7 +12,7 @@ import { api } from "../../../../../../convex/_generated/api"
 
 export default function AccountPage() {
   const userData = useQuery(api.users.getCurrentUser, {})
-  const user = userData?.user // This avoids destructuring null or undefined
+  // const user = userData?.user // This avoids destructuring null or undefined
 
   const subscription = useQuery(api.subscriptions.getUserSubscription)
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl)
@@ -25,13 +25,13 @@ export default function AccountPage() {
   const isCancelled = subscription?.status === "cancelled"
 
   let interval: string | undefined
-  let nextInterval: string | undefined
+  // let nextInterval: string | undefined
   let nextAmount: string | undefined
 
-  if (subscription?.intervalNext !== undefined) {
-    // intervalNext exists
-    nextInterval = subscription.intervalNext
-  }
+  // if (subscription?.intervalNext !== undefined) {
+  //   // intervalNext exists
+  //   nextInterval = subscription.intervalNext
+  // }
   if (subscription?.amountNext !== undefined) {
     // amountNext exists
     nextAmount = (subscription.amountNext! / 100).toFixed(0)
@@ -39,9 +39,16 @@ export default function AccountPage() {
   }
 
   const handleManageSubscription = async () => {
+    if (!subscription?.customerId) {
+      toast.error(
+        "No subscription found. Please contact support if this is incorrect."
+      )
+      return
+    }
+
     try {
       const result = await getDashboardUrl({
-        customerId: subscription?.customerId!,
+        customerId: subscription.customerId,
       })
       if (result?.url) {
         window.location.href = result.url
@@ -143,7 +150,7 @@ export default function AccountPage() {
                     Plan Amount:
                   </span>
                   <span className='flex flex-col items-end justify-start font-medium'>
-                    ${(subscription?.amount! / 100).toFixed(0)}
+                    ${(subscription?.amount ?? 0 / 100).toFixed(0)}
                     {nextAmount !== undefined && (
                       <>
                         <span className='text-sm font-light italic text-gray-400'>
@@ -190,17 +197,21 @@ export default function AccountPage() {
                     {isCancelled ? "Account Created:" : "Subscribed Since:"}
                   </span>
                   <span className='font-medium'>
-                    {format(new Date(subscription?.startedAt!), "MMM do, yyyy")}
+                    {subscription?.startedAt
+                      ? format(new Date(subscription.startedAt), "MMM do, yyyy")
+                      : "No Subscription"}
                   </span>
                 </div>
                 {!canceledAt ? (
                   <div className='flex items-center justify-between'>
                     <span className='text-muted-foreground'>Last Updated:</span>
                     <span className='font-medium'>
-                      {format(
-                        new Date(subscription?.lastEditedAt!),
-                        "MMM do, yyyy @ h:mm a"
-                      )}
+                      {subscription?.lastEditedAt
+                        ? format(
+                            new Date(subscription.lastEditedAt),
+                            "MMM do, yyyy @ h:mm a"
+                          )
+                        : "N/A"}
                     </span>
                   </div>
                 ) : (
@@ -209,10 +220,12 @@ export default function AccountPage() {
                       Cancellation Date:
                     </span>
                     <span className='font-medium text-red-500'>
-                      {format(
-                        new Date(subscription?.canceledAt!),
-                        "MMM do, yyyy @ h:mm a"
-                      )}
+                      {subscription?.canceledAt
+                        ? format(
+                            new Date(subscription.canceledAt),
+                            "MMM do, yyyy @ h:mm a"
+                          )
+                        : "N/A"}
                     </span>
                   </div>
                 )}

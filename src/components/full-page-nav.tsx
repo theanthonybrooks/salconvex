@@ -18,10 +18,10 @@ import { FaRegEnvelope } from "react-icons/fa"
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
 
 interface FullPageNavProps {
-  userId?: string | undefined
-  user?: Record<string, any> | null
-  userPref?: Record<string, any> | null
-  subStatus?: string | undefined
+  // userId?: string | undefined
+  user?: User | null
+  // userPref?: UserPref | null
+  // subStatus?: string | undefined
 }
 
 const menuVariants = {
@@ -183,12 +183,7 @@ const screenOverlayVariants = {
   },
 }
 
-const FullPageNav = ({
-  userId,
-  user,
-  subStatus,
-  userPref,
-}: FullPageNavProps) => {
+const FullPageNav = ({ user }: FullPageNavProps) => {
   const footerText = footerCRText()
   const { theme } = useTheme()
   const pathname = usePathname()
@@ -250,7 +245,7 @@ const FullPageNav = ({
           overflow of hidden */}
 
           {isOpen === "open" && !pathname.includes("/dashboard") && (
-            <ThemeToggle userPref={userPref?.theme} />
+            <ThemeToggle />
           )}
           <Button
             variant='salWithShadowHidden'
@@ -365,7 +360,7 @@ const FullPageNav = ({
                     "font-black m-x-auto w-full text-[4rem]",
                     "font-tanker tracking-wide lowercase"
                   )}>
-                  {mainMenuItems.map((section, index) => {
+                  {mainMenuItems.map((section) => {
                     const isExpanded =
                       activeCategory === section.title && !freshOpen
                     const filteredItems = section.items.filter((item) => {
@@ -375,7 +370,8 @@ const FullPageNav = ({
                         (item.public === true ||
                           itemCategory === "thelist" ||
                           user?.accountType?.some(
-                            (type: any) => type.toLowerCase() === itemCategory
+                            (type: string) =>
+                              type.toLowerCase() === itemCategory
                           ))
                       )
                     })
@@ -544,14 +540,14 @@ const FullPageNav = ({
                           "font-black m-auto text-[3rem] lg:text-[4.5rem] space-y-3 ",
                           "font-tanker tracking-wide  lowercase select-none"
                         )}>
-                        {mainMenuItems.map((section, index) => {
+                        {mainMenuItems.map((section) => {
                           const filteredItems = section.items.filter((item) => {
                             const itemCategory = item.category.toLowerCase()
                             return (
                               item.public === true ||
                               itemCategory === "thelist" ||
                               user?.accountType?.some(
-                                (type: any) =>
+                                (type: string) =>
                                   type.toLowerCase() === itemCategory
                               )
                             )
@@ -606,12 +602,12 @@ const FullPageNav = ({
                               item.public === true || // Always show public items
                               itemCategory === "thelist" || // Always show thelist items
                               user?.accountType?.some(
-                                (type: any) =>
+                                (type: string) =>
                                   type.toLowerCase() === itemCategory // Show if user matches item category
                               )
                             )
                           })
-                          .map((item, index) => (
+                          .map((item) => (
                             <li
                               key={`${item.title}-${item.category}-desktopItem`}>
                               <div

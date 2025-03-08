@@ -26,8 +26,8 @@ import React from "react"
 
 interface NavBarProps {
   userId: string | undefined
-  user: Record<string, any> | null
-  userPref: Record<string, any> | null
+  user: User | null
+  // userPref: UserPref | null
   subStatus: string | undefined
 }
 
@@ -35,8 +35,8 @@ export default function NavBar({
   userId,
   user,
   subStatus,
-  userPref,
-}: NavBarProps) {
+}: // userPref,
+NavBarProps) {
   const { path } = landingPageLogo[0]
   // const { subStatus } =
   //   useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
@@ -148,10 +148,10 @@ export default function NavBar({
             </Link>
           </Unauthenticated>
           <FullPageNav
-            userId={userId}
+            // userId={userId}
             user={user}
-            userPref={userPref}
-            subStatus={subStatus}
+            // userPref={userPref}
+            // subStatus={subStatus}
           />
         </div>
       </div>

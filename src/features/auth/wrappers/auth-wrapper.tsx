@@ -13,7 +13,7 @@ export default function ClientAuthWrapper({
   children: React.ReactNode
 }) {
   const { theme } = useTheme()
-  const { isLoading, isAuthenticated } = useConvexAuth()
+  const { isLoading } = useConvexAuth()
   const targetRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: targetRef })
   // useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -49,6 +49,7 @@ export default function ClientAuthWrapper({
             transition={{ duration: 0.3 }}>
             <motion.div
               id='scroll-indicator'
+              // initial={{ opacity: 0 }}
               className={cn(
                 "z-20",
                 theme === "default" ? "bg-salPink" : "bg-salProgress"
@@ -62,6 +63,7 @@ export default function ClientAuthWrapper({
                 right: 0,
                 height: 10,
                 originX: 0,
+
                 // backgroundColor: "var(--sal-progress)",
               }}
             />

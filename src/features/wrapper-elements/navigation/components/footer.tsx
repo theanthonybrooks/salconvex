@@ -5,7 +5,6 @@ import {
   FOOTER_LINKS as footerLinks,
   getGridColsClass,
 } from "@/constants/links"
-import { landingPageLogo } from "@/constants/logos"
 import { footerCRText } from "@/constants/text"
 import { cn } from "@/lib/utils"
 import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react"
@@ -15,22 +14,26 @@ import { useForm } from "react-hook-form"
 import { FaInstagram, FaRegEnvelope } from "react-icons/fa"
 import { FaFacebookF, FaThreads } from "react-icons/fa6"
 
+interface NewsletterFormProps {
+  email: string
+}
+
 export default function Footer() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    // formState: { errors },
     reset,
-  } = useForm()
+  } = useForm<NewsletterFormProps>()
 
   const links = footerLinks
-  const { image, alt, width, height, text, path } = landingPageLogo[0]
+  // const { image, alt, width, height, text, path } = landingPageLogo[0]
   const footerText = footerCRText()
   const numColumns = Object.keys(links).length
   const gridColsClass = getGridColsClass(numColumns)
   const [subAction, setSubAction] = useState("cta")
 
-  const onSubscribe = async (data: any) => {
+  const onSubscribe = async (data: NewsletterFormProps) => {
     setSubAction("subbing")
     setTimeout(() => {
       setSubAction("done")

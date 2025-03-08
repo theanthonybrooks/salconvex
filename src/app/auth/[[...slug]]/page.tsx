@@ -1,10 +1,9 @@
 // import { AuthScreen } from "@/features/auth/components/auth-screen"
 import AuthScreen from "@/features/auth/components/auth-screen"
-import React from "react"
 
-interface AuthPageProps {}
+// interface AuthPageProps {}
 
-const AuthPage: React.FC<AuthPageProps> = () => {
+const AuthPage = () => {
   return <AuthScreen />
 }
 

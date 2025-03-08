@@ -5,8 +5,8 @@ import { FiCommand, FiSearch } from "react-icons/fi"
 
 interface SearchProps {
   title: string
-  source: any[]
-  shortcut?: string // Default should be `/`
+  source: []
+  shortcut?: string
   groupName: string
   className?: string
   placeholder?: string
@@ -59,7 +59,7 @@ export const Search = ({
         title={title}
         source={source}
         shortcut={shortcut}
-        groupName={groupName}
+        // groupName={groupName}
         placeholder={placeholder}
         setSearch={setValue}
       />

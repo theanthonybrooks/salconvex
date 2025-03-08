@@ -15,21 +15,9 @@ interface CommandMenuProps {
   title: string
   source: any[]
   shortcut?: string // Default should be `/`
-  groupName: string
+  // groupName: string
   placeholder?: string
   setSearch: React.Dispatch<React.SetStateAction<string>>
-}
-
-const scrollbarColors =
-  "scrollbar-thumb-gray-300 scrollbar scrollbar-width-2 overflow-y-auto p-3"
-const scrollbarColorsDark =
-  "scrollbar-thumb-neutral-500 scrollbar scrollbar-width-2 overflow-y-auto p-3"
-const scrollbarSize = "max-h-60dvh"
-const scrollbarStyle =
-  "scrollbar-thumb-gray-300 scrollbar scrollbar-width-2 overflow-y-auto p-3"
-
-{
-  /* scrollbar-thumb-gray-300 max-h-[60vh] overflow-y-auto p-3 [&::-webkit-scrollbar-thumb]:rounded-full dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2 */
 }
 
 export const CommandMenuCustom = ({
@@ -38,7 +26,7 @@ export const CommandMenuCustom = ({
   title,
   source,
   shortcut = "/",
-  groupName,
+  // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
 }: CommandMenuProps) => {
@@ -191,7 +179,9 @@ export const CommandMenuCustom = ({
                   {Object.keys(groupedItems).length === 0 ? (
                     <Command.Empty>
                       No results found for{" "}
-                      <span className='text-violet-500'>"{value}"</span>
+                      <span className='text-violet-500 italic'>
+                        &quot;{value}&quot;
+                      </span>
                     </Command.Empty>
                   ) : (
                     Object.entries(groupedItems).map(
@@ -199,7 +189,7 @@ export const CommandMenuCustom = ({
                         <Command.Group
                           key={groupKey}
                           heading={groupKey.toUpperCase()}
-                          className='mb-5 text-sm text-stone-400'>
+                          className='mb-5 text-sm text-stone-400 border-t-1.5 border-stone-200 first:border-t-0 pt-2'>
                           {groupItems.map((item) => (
                             <Command.Item
                               key={item.path}

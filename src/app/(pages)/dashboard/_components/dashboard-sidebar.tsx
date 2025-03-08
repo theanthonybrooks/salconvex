@@ -8,13 +8,12 @@ import {
 import { landingPageLogo, landingPageLogoText } from "@/constants/logos"
 import { Search } from "@/features/Sidebar/Search"
 import clsx from "clsx"
+import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import React, { useEffect, useState } from "react"
-
-import { AnimatePresence, motion } from "framer-motion"
+import React, { useEffect, useMemo, useState } from "react"
 
 // const sectionVariants = {
 //   hidden: { opacity: 0, y: -15 }, // starts slightly to the left
@@ -66,13 +65,22 @@ export default function DashboardSideBar({
   } = landingPageLogoText[0]
   const statusKey = subStatus ? subStatus : "none"
   const hasAdminRole = role?.includes("admin")
-  const filteredNavItems = navItems.filter(
-    (item) =>
-      item.sub.includes(statusKey) ||
-      (item.sub.includes("admin") && hasAdminRole) ||
-      (item.sub.includes("all") && !item.label.includes("Help"))
-  )
+  // const filteredNavItems = navItems.filter(
+  //   (item) =>
+  //     item.sub.includes(statusKey) ||
+  //     (item.sub.includes("admin") && hasAdminRole) ||
+  //     (item.sub.includes("all") && !item.label.includes("Help"))
+  // )
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"))
+
+  const filteredNavItems = useMemo(() => {
+    return navItems.filter(
+      (item) =>
+        item.sub.includes(statusKey) ||
+        (item.sub.includes("admin") && hasAdminRole) ||
+        (item.sub.includes("all") && !item.label.includes("Help"))
+    )
+  }, [statusKey, hasAdminRole, navItems]) // Dependencies to prevent unnecessary recalculations
 
   useEffect(() => {
     const matchingSection = filteredNavItems.find(
@@ -83,7 +91,7 @@ export default function DashboardSideBar({
     if (matchingSection) {
       setOpenSection(matchingSection)
     }
-  }, [pathname])
+  }, [pathname, filteredNavItems])
 
   useEffect(() => {
     if (!openSection) {
@@ -95,15 +103,19 @@ export default function DashboardSideBar({
         setOpenSection(matchingSection)
       }
     }
-  }, [openSection, pathname])
+  }, [openSection, pathname, filteredNavItems])
+
+  // const handleSectionToggle = (sectionCat: string) => {
+  //   setOpenSection((prev) => {
+  //     if (prev === sectionCat) {
+  //       return null // Allow closing the section
+  //     }
+  //     return sectionCat // Open the new section
+  //   })
+  // }
 
   const handleSectionToggle = (sectionCat: string) => {
-    setOpenSection((prev) => {
-      if (prev === sectionCat) {
-        return null // Allow closing the section
-      }
-      return sectionCat // Open the new section
-    })
+    setOpenSection((prev) => (prev === sectionCat ? null : sectionCat))
   }
 
   return (
@@ -162,12 +174,21 @@ export default function DashboardSideBar({
                   <section className='py-2'>
                     <div
                       className={clsx(
-                        "flex cursor-pointer flex-col gap-2 rounded-lg px-3 py-2 pl-5 text-sm transition-colors",
+                        "flex flex-col gap-2 rounded-lg px-3 py-2 pl-5 text-sm transition-colors",
                         pathname.includes("dashboard/" + section.sectionCat)
                           ? "font-bold"
-                          : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+                          : "text-muted-foreground hover:bg-primary/10 hover:text-foreground",
+                        openSection === section.sectionCat &&
+                          pathname.includes("dashboard/" + section.sectionCat)
+                          ? "cursor-default"
+                          : "cursor-pointer"
                       )}
-                      onClick={() => handleSectionToggle(section.sectionCat!)}>
+                      onClick={
+                        openSection === section.sectionCat &&
+                        pathname.includes("dashboard/" + section.sectionCat)
+                          ? () => {}
+                          : () => handleSectionToggle(section.sectionCat!)
+                      }>
                       <div className='space-between flex justify-between gap-2'>
                         <div className='inline-flex gap-2'>
                           {section?.sectionIcon && (
@@ -178,7 +199,7 @@ export default function DashboardSideBar({
                         </div>
 
                         {openSection === section.sectionCat ? (
-                          <ChevronDown className='h-4 w-4' />
+                          <ChevronDown className='h-4 w-4 ' />
                         ) : (
                           <ChevronRight className='h-4 w-4' />
                         )}

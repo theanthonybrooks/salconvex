@@ -39,7 +39,7 @@ export default function Changelog() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className='text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto'>
-                What I've been up to and what's in the works.
+                What I&apos;ve been up to and what&apos;s in the works.
               </motion.p>
             </div>
           </section>

@@ -26,7 +26,7 @@ type PricingSwitchProps = {
 }
 
 type PricingCardProps = {
-  user: any
+  userExists: boolean
   isYearly?: boolean
   title: string
   planKey: string
@@ -94,7 +94,7 @@ const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => (
 )
 
 const PricingCard = ({
-  user,
+  userExists,
   isYearly,
   title,
   planKey,
@@ -109,15 +109,15 @@ const PricingCard = ({
   const getCheckoutUrl = useAction(
     api.stripeSubscriptions.createStripeCheckoutSession
   )
-  const subscriptionStatus = useQuery(
-    api.subscriptions.getUserSubscriptionStatus
-  )
+  // const subscriptionStatus = useQuery(
+  //   api.subscriptions.getUserSubscriptionStatus
+  // )
 
   const hadTrial = useQuery(api.stripeSubscriptions.getUserHadTrial)
 
-  const hasSubscription = useQuery(
-    api.stripeSubscriptions.getUserHasSubscription
-  )
+  // const hasSubscription = useQuery(
+  //   api.stripeSubscriptions.getUserHasSubscription
+  // )
 
   // console.log("hasSubscription: ", hasSubscription)
 
@@ -210,8 +210,8 @@ const PricingCard = ({
       <CardFooter>
         <Button
           onClick={() => {
-            if (!user) {
-              router.push("/sign-in")
+            if (!userExists) {
+              router.push("/auth/sign-in")
               return
             }
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false)
@@ -281,7 +281,7 @@ export default function Pricing() {
               return (
                 <PricingCard
                   key={plan.title}
-                  user={user}
+                  userExists={!!user}
                   planKey={key}
                   {...rest}
                   isYearly={isYearly}

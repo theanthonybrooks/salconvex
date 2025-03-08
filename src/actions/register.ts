@@ -3,7 +3,7 @@
 import { RegisterSchema } from "@/schemas/auth"
 import { fetchMutation } from "convex/nextjs"
 import { z } from "zod"
-import { api } from "../convex/_generated/api"
+import { api } from "~/convex/_generated/api"
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values)

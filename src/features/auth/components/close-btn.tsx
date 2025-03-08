@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
 
 interface CloseBtnProps {
@@ -37,7 +38,10 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <button
-          className='absolute right-5 top-4 z-10 rounded text-lg font-bold text-black hover:rounded-full hover:text-salPink focus:bg-salPink'
+          className={cn(
+            "absolute right-5 top-4 z-10 rounded text-lg font-bold text-black hover:rounded-full hover:text-salPink focus:bg-salPink",
+            className
+          )}
           aria-label='Close modal'
           // tabIndex={successfulCreation ? 6 : 4}
         >
