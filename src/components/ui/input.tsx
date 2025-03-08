@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
 const inputVariants = cva(
-  "w-full flex rounded-md border  px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+  "w-full flex rounded-md border  px-3 py-2 text-[16px] sm:text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -16,7 +16,7 @@ const inputVariants = cva(
         destructive: "border-red-500 text-red-600 bg-red-100",
       },
       inputHeight: {
-        sm: "h-10 sm:h-8 ",
+        sm: "h-10 sm:h-8",
         default: "h-10 ",
         lg: "h-12  text-base",
       },
