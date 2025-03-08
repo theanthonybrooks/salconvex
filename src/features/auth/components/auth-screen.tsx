@@ -29,7 +29,7 @@ export default function AuthScreen() {
   return (
     <div
       className={cn(
-        "min-h-screen flex overflow-y-auto justify-center items-start mt-4 bg-salYellow auth-cont scrollable"
+        "h-dvh  sm: min-h-screen flex overflow-y-auto justify-center items-center  bg-salYellow auth-cont scrollable invis"
       )}>
       <div className='md:h-auto md:w-[500px] md:py-10'>
         {isRegister ? (

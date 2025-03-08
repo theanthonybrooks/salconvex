@@ -448,7 +448,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                   <div
                     onClick={() => router.push("/auth/sign-in")}
                     className={cn(
-                      "pl-8 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                      "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
                     )}>
                     login/register
                   </div>

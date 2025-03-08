@@ -26,6 +26,12 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: true,
       },
       {
+        title: "This Week",
+        path: "/thelist",
+        category: "thelist",
+        public: true,
+      },
+      {
         title: "Archive",
         path: "/archive",
         category: "thelist",
@@ -86,17 +92,12 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "artist",
         public: false,
       },
-      {
-        title: "This Week",
-        path: "/artists/thelist",
-        category: "artist",
-        public: true,
-      },
+
       {
         title: "Resources",
         path: "/artists/resources",
         category: "artist",
-        public: true,
+        public: false,
       },
     ],
   },
@@ -132,12 +133,35 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         title: "Resources",
         path: "/organizers/resources",
         category: "organizer",
-        public: true,
+        public: false,
       },
       {
         title: "Submit",
         path: "/submit",
         category: "organizer",
+        public: false,
+      },
+    ],
+  },
+  {
+    title: "Resources",
+    items: [
+      {
+        title: "For Artists",
+        path: "/faq",
+        category: "resources",
+        public: true,
+      },
+      {
+        title: "For Organizers",
+        path: "/terms",
+        category: "resources",
+        public: true,
+      },
+      {
+        title: "Misc",
+        path: "/privacy",
+        category: "resources",
         public: true,
       },
     ],
