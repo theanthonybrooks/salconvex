@@ -1,6 +1,6 @@
 "use client"
+import { motion } from "framer-motion"
 import { Computer, Network, Sparkles } from "lucide-react"
-import { motion } from "motion/react"
 import { FaBusinessTime } from "react-icons/fa"
 import { OrbitingCirclesComponent } from "./orbiting-circles"
 
