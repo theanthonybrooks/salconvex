@@ -2,7 +2,6 @@
 import { motion } from "framer-motion"
 import { Computer, Network, Sparkles } from "lucide-react"
 import { FaBusinessTime } from "react-icons/fa"
-import { OrbitingCirclesComponent } from "./orbiting-circles"
 
 const features = [
   {
@@ -85,7 +84,7 @@ export default function SideBySide() {
             className='relative'>
             <div className='relative rounded-xl overflow-hidden'>
               <div className='absolute inset-0 bg-gradient-to-t from-background/20 via-background/5 to-background/0 z-10'></div>
-              <OrbitingCirclesComponent />
+              <p>Right Side</p>
             </div>
           </motion.div>
         </div>
