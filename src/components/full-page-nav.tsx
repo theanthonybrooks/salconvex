@@ -6,6 +6,7 @@ import ThemeToggle from "@/components/ui/theme-toggle"
 import { mainMenuItems } from "@/constants/menu"
 import { footerCRText } from "@/constants/text"
 import { cn } from "@/lib/utils"
+import { Unauthenticated } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle, XCircle } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -57,12 +58,14 @@ const menuVariants = {
 const mobileMenuVariants = {
   open: {
     width: ["4em", "100vw", "100vw", "100vw", "100vw"],
-    height: [40, 100, 100, 100, 100, 1000],
-    top: [17, 0, 0, 0],
-    right: [41, 0, 0, 0],
-    borderRadius: [40, 40, 20, 0],
+    // height: [40, 100, 100, 100, "100vh"],
+    height: ["40px", "100px", "100px", "100px", "100vh"],
+    // transform: ["translateX(0)"],
+    top: [17, 0, 0, 0, 0],
+    right: [41, 0, 0, 0, 0],
+    borderRadius: [40, 40, 20, 0, 0],
     transition: { duration: 1.25, ease: [0.5, 1, 0.56, 0.81] },
-    opacity: [1, 1, 1],
+    opacity: [1, 1, 1, 1, 1],
   },
   // closed: {
   //   width: ["100vw", "99vw", "98vw", "4em"],
@@ -75,18 +78,45 @@ const mobileMenuVariants = {
 
   //   opacity: [1, 1, 1, 1],
   // },
+  // closed: {
+  //   width: ["100vw", "100vw", "100vw", "100vw", "4em"],
+  //   height: ["100vh", "75vh", "50vh", "25vh", "40px"], // More gradual reduction
+  //   top: [0, 0, 0, 0, 17],
+  //   right: [0, 0, 0, 0, 41],
+  //   borderRadius: [0, 0, 20, 40, 40],
+  //   opacity: [1, 1, 1, 1, 1],
+
+  //   transition: { duration: 1.25, ease: [0.6, 0.05, 0.1, 1] }, // Smoother curve
+  // },
+
   closed: {
-    width: [0],
-    height: [0],
-    top: [0],
-    right: [0],
-    borderRadius: [0],
-
-    // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
-    transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
-
-    opacity: [1],
+    width: "100vw",
+    height: 0,
+    top: 0,
+    right: 0,
+    borderRadius: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.75,
+      ease: [0.6, 0.05, 0.1, 1],
+      type: "spring",
+      stiffness: 120, // Adjust this for bounciness
+      damping: 20, // Smooths the stop at the final height
+    },
   },
+
+  // closed: {
+  //   width: ["100vw"],
+  //   height: ["100px"],
+  //   top: [0],
+  //   right: [0],
+  //   // transform: ["translateX(-50%)"],
+  //   borderRadius: [0],
+  //   opacity: [1],
+
+  //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+  //   transition: { duration: 1.25, ease: [0.5, 1, 0.56, 0.81] },
+  // },
   mobileInitial: {
     width: [0],
     height: [0],
@@ -95,6 +125,38 @@ const mobileMenuVariants = {
     borderRadius: [40],
     transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
     opacity: [0],
+  },
+}
+const mobileTextVariants = {
+  open: {
+    opacity: 1,
+    y: 0,
+    height: "100%",
+    transition: {
+      delay: 0.9,
+      duration: 0.4,
+      ease: "easeInOut",
+    },
+  },
+  closed: {
+    opacity: 0,
+    y: 20,
+    height: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeInOut",
+    },
+  },
+}
+
+const mobileImageVariants = {
+  open: {
+    display: "block",
+    transition: { duration: 0.75, ease: "easeInOut" },
+  },
+  closed: {
+    display: "none",
+    transition: { duration: 0.3, ease: "easeInOut" },
   },
 }
 
@@ -127,6 +189,7 @@ const FullPageNav = ({
   subStatus,
   userPref,
 }: FullPageNavProps) => {
+  const footerText = footerCRText()
   const { theme } = useTheme()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState("initial")
@@ -136,9 +199,6 @@ const FullPageNav = ({
       section.items.some((item) => item.path === pathname)
     )?.title || "The List"
   )
-
-  const footerText = footerCRText()
-
   const activeMenuItems = mainMenuItems.find(
     (section) => section.title === activeCategory
   )
@@ -181,7 +241,7 @@ const FullPageNav = ({
       </AnimatePresence>
 
       <div className='z-[100]'>
-        {/* Menu Button */}
+        {/* Menu Button + Theme Toggle*/}
         <div className='flex flex-row gap-x-2  items-center justify-between relative w-full z-20'>
           {/* <ThemeToggle userPref={themePref} /> */}
 
@@ -226,169 +286,203 @@ const FullPageNav = ({
            *
            * */}
           <motion.div
+            id='mobile-menu'
             key='mobile-menu'
             className={cn(
               "xl:hidden top-5 right-5 w-full h-full  fixed  box-border bg-background"
             )}
             variants={mobileMenuVariants}
-            initial='mobileInitial'
-            // initial={{ width: "4em", height: 30 }}
             animate={isOpen}
-            // exit='closed'
+            initial='mobileInitial'
+            exit='mobileInitial'
+            // initial={{ width: "4em", height: 30 }}
           >
             <motion.div
-              // initial={{ height: 0 }}
-              // animate={{ height: "100%" }}
-              // transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
-              className='w-full h-full  '>
-              {isOpen === "open" && (
-                <>
-                  {/* Column 1 - Main Titles */}
+              initial={{ display: "none" }}
+              animate={
+                isOpen === "open" ? { display: "grid" } : { display: "none" }
+              }
+              transition={{
+                delay: 0.2,
+                duration: 0.75,
+                ease: [0.83, 0, 0.1, 1],
+              }}
+              className='grid grid-rows-[100px_auto] grid-cols-1 h-dvh w-screen '>
+              <motion.section
+                initial={{ display: "none" }}
+                variants={mobileImageVariants}
+                animate={isOpen}
+                transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
+                className='w-full border-b-2 border-black'>
+                <Image
+                  src='/sitelogo.svg'
+                  alt='The Street Art List'
+                  width={60}
+                  height={60}
+                  className='absolute left-5 top-5'
+                  priority={true}
+                />
+              </motion.section>
+              <motion.div
+                className='flex flex-col justify-center scrollable invis  h-full w-full '
+                initial={{ opacity: 0, y: 20, height: 0 }}
+                variants={mobileTextVariants}
+                animate={isOpen}
+                // exit={{
+                //   opacity: 0,
+                //   y: 20,
+                //   height: 0,
+                // }}
+              >
+                <Unauthenticated>
+                  <div className='flex gap-x-4 items-center justify-center w-screen p-8'>
+                    <Link
+                      href='/auth/sign-in'
+                      prefetch={true}
+                      className=' flex-1'>
+                      <Button
+                        className='font-bold text-lg w-full py-8'
+                        variant='salWithShadow'>
+                        Sign in
+                      </Button>
+                    </Link>
+                    <span className='font-bold'>OR</span>
 
-                  <div className='grid grid-rows-[100px_auto_100px] grid-cols-1 h-dvh w-screen '>
-                    <section className='w-full border-b-2 border-black last:border-b-0'>
-                      <Image
-                        src='/sitelogo.svg'
-                        alt='The Street Art List'
-                        width={60}
-                        height={60}
-                        className='absolute left-5 top-5'
-                        priority={true}
-                      />
-                    </section>
-                    <motion.div
-                      className='flex flex-col justify-center scrollable invis  h-full w-full '
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.7, duration: 0.4 }}>
-                      <ul
-                        className={cn(
-                          "font-black m-x-auto w-full text-[4rem]",
-                          "font-tanker tracking-wide lowercase"
-                        )}>
-                        {mainMenuItems.map((section, index) => {
-                          const isExpanded =
-                            activeCategory === section.title && !freshOpen
-                          const filteredItems = section.items.filter((item) => {
-                            const itemCategory = item.category.toLowerCase()
+                    <Link
+                      href='/auth/register'
+                      prefetch={true}
+                      className=' flex-1'>
+                      <Button
+                        className='font-bold text-lg w-full py-8'
+                        variant='salWithShadow'>
+                        Sign up
+                      </Button>
+                    </Link>
+                  </div>
+                </Unauthenticated>
+                <ul
+                  className={cn(
+                    "font-black m-x-auto w-full text-[4rem]",
+                    "font-tanker tracking-wide lowercase"
+                  )}>
+                  {mainMenuItems.map((section, index) => {
+                    const isExpanded =
+                      activeCategory === section.title && !freshOpen
+                    const filteredItems = section.items.filter((item) => {
+                      const itemCategory = item.category.toLowerCase()
+                      return (
+                        item.view !== "dashboard" &&
+                        (item.public === true ||
+                          itemCategory === "thelist" ||
+                          user?.accountType?.some(
+                            (type: any) => type.toLowerCase() === itemCategory
+                          ))
+                      )
+                    })
+
+                    if (filteredItems.length === 0) return null
+
+                    return (
+                      <li
+                        key={`${section.title}-mobileCat`}
+                        className='border-b-2 border-black  w-full'>
+                        <div
+                          onClick={() => {
                             return (
-                              item.view !== "dashboard" &&
-                              (item.public === true ||
-                                itemCategory === "thelist" ||
-                                user?.accountType?.some(
-                                  (type: any) =>
-                                    type.toLowerCase() === itemCategory
-                                ))
+                              setFreshOpen(false),
+                              setActiveCategory(
+                                isExpanded ? null : section.title
+                              )
                             )
-                          })
+                          }}
+                          className={cn(
+                            "cursor-pointer flex justify-start px-9 py-4",
+                            activeCategory === section.title &&
+                              "bg-black text-background unstroked"
+                            // activeCategory === section.title &&
+                            //   theme === "default" &&
+                            //   "text-white",
+                            // activeCategory === section.title &&
+                            //   theme === "light" &&
+                            //   "text-salYellow"
+                          )}>
+                          {section.title}
+                        </div>
 
-                          if (filteredItems.length === 0) return null
+                        {/* Animate the dropdown items */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{
+                                duration: 0.4,
+                                ease: "easeInOut",
+                              }}
+                              className='overflow-hidden pl-6 text-[2.5rem]'>
+                              <ul>
+                                {filteredItems.map((item) => (
+                                  <li
+                                    key={`${item.title}-${item.category}-mobileItem`}
+                                    className=' pl-4 '>
+                                    <Link
+                                      href={item.path}
+                                      onClick={onHandleLinkClick}
+                                      className={cn(
+                                        "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
+                                        pathname === item.path &&
+                                          "underline underline-offset-4 decoration-6 text-black"
+                                        // item.path.includes("dashboard") &&
+                                        //   "text-salPink"
+                                      )}>
+                                      {item.title}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </li>
+                    )
+                  })}
+                </ul>
+                <motion.div
+                  // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-black text-foreground w-full'
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.1, duration: 0.4 }}
+                  className='flex space-x-5 py-6 items-center justify-center'>
+                  <Link
+                    href='https://facebook.com/thestreetartlist'
+                    target='_blank'>
+                    <Button variant='ghost' size='icon'>
+                      <FaFacebookF size={22} />
+                    </Button>
+                  </Link>
+                  <Link
+                    href='https://instagram.com/thestreetartlist'
+                    target='_blank'>
+                    <Button variant='ghost' size='icon'>
+                      <FaInstagram size={22} />
+                    </Button>
+                  </Link>
+                  <Link
+                    href='https://threads.net/thestreetartlist'
+                    target='_blank'>
+                    <Button variant='ghost' size='icon'>
+                      <FaThreads size={22} />
+                    </Button>
+                  </Link>
 
-                          return (
-                            <li
-                              key={`${section.title}-mobileCat`}
-                              className='border-b-2 border-black  w-full'>
-                              <div
-                                onClick={() => {
-                                  return (
-                                    setFreshOpen(false),
-                                    setActiveCategory(
-                                      isExpanded ? null : section.title
-                                    )
-                                  )
-                                }}
-                                className={cn(
-                                  "cursor-pointer flex justify-start px-9 py-4",
-                                  activeCategory === section.title &&
-                                    "bg-black text-background unstroked"
-                                  // activeCategory === section.title &&
-                                  //   theme === "default" &&
-                                  //   "text-white",
-                                  // activeCategory === section.title &&
-                                  //   theme === "light" &&
-                                  //   "text-salYellow"
-                                )}>
-                                {section.title}
-                              </div>
+                  <Link href='mailto:info@thestreetartlist.com' target='_blank'>
+                    <Button variant='ghost' size='icon'>
+                      <FaRegEnvelope size={22} />
+                    </Button>
+                  </Link>
 
-                              {/* Animate the dropdown items */}
-                              <AnimatePresence>
-                                {isExpanded && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{
-                                      duration: 0.4,
-                                      ease: "easeInOut",
-                                    }}
-                                    className='overflow-hidden pl-6 text-[2.5rem]'>
-                                    <ul>
-                                      {filteredItems.map((item) => (
-                                        <li
-                                          key={`${item.title}-${item.category}-mobileItem`}
-                                          className=' pl-4 '>
-                                          <Link
-                                            href={item.path}
-                                            onClick={onHandleLinkClick}
-                                            className={cn(
-                                              "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
-                                              pathname === item.path &&
-                                                "underline underline-offset-4 decoration-6 text-black"
-                                              // item.path.includes("dashboard") &&
-                                              //   "text-salPink"
-                                            )}>
-                                            {item.title}
-                                          </Link>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </motion.div>
-                    {/* Fixed Bottom Row */}
-                    <motion.div
-                      // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-black text-foreground w-full'
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1.1, duration: 0.4 }}
-                      className='flex space-x-5 py-2 items-center justify-center'>
-                      <Link
-                        href='https://facebook.com/thestreetartlist'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaFacebookF size={22} />
-                        </Button>
-                      </Link>
-                      <Link
-                        href='https://instagram.com/thestreetartlist'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaInstagram size={22} />
-                        </Button>
-                      </Link>
-                      <Link
-                        href='https://threads.net/thestreetartlist'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaThreads size={22} />
-                        </Button>
-                      </Link>
-
-                      <Link
-                        href='mailto:info@thestreetartlist.com'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaRegEnvelope size={22} />
-                        </Button>
-                      </Link>
-
-                      {/*    <div className='flex space-x-2 text-sm items-center'>
+                  {/*    <div className='flex space-x-2 text-sm items-center'>
                         <p>Made with ❤️ by</p>
                         <Link
                           href='https://theanthonybrooks.com'
@@ -400,10 +494,9 @@ const FullPageNav = ({
                       <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
                         {footerText.text}
                       </div>*/}
-                    </motion.div>
-                  </div>
-                </>
-              )}
+                </motion.div>
+              </motion.div>
+              {/* Fixed Bottom Row */}
             </motion.div>
           </motion.div>
 

@@ -54,7 +54,9 @@ export default function NavBar({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
-      className='fixed left-0 right-0 top-0 z-50  border-black bg-transparent'>
+      className='fixed left-0 right-0 top-0 z-50  border-black  sm:bg-transparent bg-background'>
+      {/* add bg background for mobile */}
+
       <div className='mx-auto flex w-screen items-center justify-between pb-6 pt-8 sm:py-4 px-8'>
         {/* Mobile Logo and Navigation */}
         <div className='flex items-center gap-2 sm:hidden'>

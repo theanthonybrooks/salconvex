@@ -32,7 +32,7 @@ export default async function HomeLayout({
       />
       <div
         //comment
-        className='scrollable mini unscroll boundless darkbar'
+        className='scrollable mini boundless darkbar'
         //comment
       >
         <main className='flex min-w-screen min-h-screen flex-col pt-[4rem] items-center  justify-between '>

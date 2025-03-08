@@ -140,7 +140,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
               <LoaderCircle className='size-5 animate-spin' />
             ) : (
               <>
-                <FaGoogle size='5' />
+                <FaGoogle size={16} />
                 Google
               </>
             )}
@@ -157,7 +157,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
               <LoaderCircle className='size-5 animate-spin' />
             ) : (
               <>
-                <FaApple size='5' />
+                <FaApple size={16} />
                 Apple
               </>
             )}

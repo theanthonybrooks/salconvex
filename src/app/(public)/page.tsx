@@ -33,7 +33,7 @@ export default function Home() {
         initial={{ y: 0, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className=' hidden sm:flex flex-col h-full items-center justify-center relative'>
+        className='hidden  sm:flex flex-col h-full items-center justify-center relative '>
         <motion.img
           src='/herotest2.jpg'
           alt='The Street Art List'
@@ -58,7 +58,7 @@ export default function Home() {
           </span>
         </motion.span>
       </motion.div>
-      <div className='h-[50vh] w-full' />
+      <div className='h-[50vh] w-full ' />
     </motion.div>
   )
 }
