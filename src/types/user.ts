@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 interface User {
-  createdAt: string
+  createdAt: number
   email: string
   emailVerificationTime?: number
   password: string
