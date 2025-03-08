@@ -11,7 +11,7 @@ interface User {
   accountType: string[]
   organizationName?: string
   source?: string
-  emailVerified?: number
+  emailVerified?: boolean
   image?: string
   userId: string
   role: string[]

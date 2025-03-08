@@ -12,9 +12,9 @@ export default async function HomeLayout({
 }) {
   const token = await convexAuthNextjsToken()
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
-  const userPref = userData?.userPref ?? null
+  // const userPref = userData?.userPref ?? null
   const userId = userData?.userId ?? null
-  const user = userData?.user ?? null
+  const user = userData?.user ?? undefined
 
   const subStatus = await fetchQuery(
     api.subscriptions.getUserSubscriptionStatus,
@@ -28,7 +28,7 @@ export default async function HomeLayout({
         userId={userId ?? "guest"}
         user={user ?? null}
         subStatus={subStatus?.subStatus ?? "none"}
-        userPref={userPref ?? null}
+        // userPref={userPref ?? null}
       />
       <div
         //comment

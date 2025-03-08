@@ -26,7 +26,7 @@ import React from "react"
 
 interface NavBarProps {
   userId: string | undefined
-  user: User | null
+  user: User | undefined | null
   // userPref: UserPref | null
   subStatus: string | undefined
 }
