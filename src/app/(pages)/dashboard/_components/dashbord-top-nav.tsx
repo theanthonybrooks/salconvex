@@ -21,9 +21,9 @@ export default function DashboardTopNav({
   children: React.ReactNode
 }) {
   const userData = useQuery(api.users.getCurrentUser, {})
+  const user = userData?.user ? (userData.user as User) : null
+
   // const user = userData?.user // This avoids destructuring null or undefined
-  const { createdAt, ...safeUser } = userData?.user ?? {}
-  const user = userData?.user ? (safeUser as User) : null
 
   // const subscription = useQuery(api.subscriptions.getUserSubscription);
   // const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
