@@ -13,7 +13,7 @@ import schema from "./schema"
 
 // Initialize the Stripe client
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia" as any,
+  apiVersion: "2025-02-24.acacia",
 })
 
 // INTERNAL QUERY: Fetch a plan by key from the "userPlans" table.
