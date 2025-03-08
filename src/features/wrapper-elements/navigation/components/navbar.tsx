@@ -54,14 +54,21 @@ NavBarProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
-      className='fixed left-0 right-0 top-0 z-50  border-black  sm:bg-transparent bg-background'>
+      className='fixed left-0 right-0 top-0 z-20  border-black  sm:bg-transparent bg-background'>
       {/* add bg background for mobile */}
 
       <div className='mx-auto flex w-screen items-center justify-between pb-6 pt-8 sm:py-4 px-8'>
         {/* Mobile Logo and Navigation */}
         <div className='flex items-center gap-2 sm:hidden'>
           <div className='hidden mt-6 flex-col gap-1'></div>
-
+          <Image
+            src='/sitelogo.svg'
+            alt='The Street Art List'
+            width={60}
+            height={60}
+            className='absolute left-5 top-5 sm:hidden'
+            priority={true}
+          />
           <Link
             href='/'
             prefetch={true}
@@ -138,11 +145,13 @@ NavBarProps) {
           {/* {isLoading && <LucideLoaderCircle className='h-6 w-6 animate-spin' />} */}
           {userId !== "guest" && user && <UserProfile user={user} />}
           <Unauthenticated>
-            <Link
-              href='/auth/sign-in'
-              prefetch={true}
-              className='hidden sm:block'>
-              <Button className='font-bold' variant='salWithShadowHidden'>
+            <Link href='/auth/sign-in' prefetch={true}>
+              <Button
+                className='font-bold hidden sm:block'
+                variant='salWithShadowHidden'>
+                Sign in
+              </Button>
+              <Button className='font-bold sm:hidden text-base' variant='link'>
                 Sign in
               </Button>
             </Link>

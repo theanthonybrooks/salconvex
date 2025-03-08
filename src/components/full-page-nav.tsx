@@ -5,8 +5,9 @@ import { Separator } from "@/components/ui/separator"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import { mainMenuItems } from "@/constants/menu"
 import { footerCRText } from "@/constants/text"
+import SignOutBtn from "@/features/auth/components/sign-out-btn"
 import { cn } from "@/lib/utils"
-import { Unauthenticated } from "convex/react"
+import { Authenticated, Unauthenticated } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle, XCircle } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -57,15 +58,19 @@ const menuVariants = {
 }
 const mobileMenuVariants = {
   open: {
-    width: ["4em", "100vw", "100vw", "100vw", "100vw"],
+    width: ["4em", "100vw", "100vw", "100vw"],
     // height: [40, 100, 100, 100, "100vh"],
-    height: ["40px", "100px", "100px", "100px", "100vh"],
+    height: ["40px", "100px", "100px", "100vh"],
     // transform: ["translateX(0)"],
-    top: [17, 0, 0, 0, 0],
-    right: [41, 0, 0, 0, 0],
-    borderRadius: [40, 40, 20, 0, 0],
-    transition: { duration: 1.25, ease: [0.5, 1, 0.56, 0.81] },
-    opacity: [1, 1, 1, 1, 1],
+    top: [17, 0, 0, 0],
+    right: [41, 0, 0, 0],
+    borderRadius: [40, 40, 20, 0],
+    transition: {
+      duration: 1,
+      ease: [0.5, 1, 0.56, 0.81],
+      times: [0, 0.2, 0.4, 1],
+    },
+    opacity: [1, 1, 1, 1],
   },
   // closed: {
   //   width: ["100vw", "99vw", "98vw", "4em"],
@@ -133,7 +138,7 @@ const mobileTextVariants = {
     y: 0,
     height: "100%",
     transition: {
-      delay: 0.9,
+      delay: 0.3,
       duration: 0.4,
       ease: "easeInOut",
     },
@@ -152,10 +157,12 @@ const mobileTextVariants = {
 const mobileImageVariants = {
   open: {
     display: "block",
+
     transition: { duration: 0.75, ease: "easeInOut" },
   },
   closed: {
     display: "none",
+
     transition: { duration: 0.3, ease: "easeInOut" },
   },
 }
@@ -179,7 +186,7 @@ const screenOverlayVariants = {
     opacity: [1, 1, 0],
     height: ["100vh", "100vh", "100vh"],
     width: ["100vw", "100vw", "100vw"],
-    transition: { duration: 1.55, ease: [0.68, -0.55, 0.27, 1.55] },
+    transition: { duration: 1.15, ease: [0.68, -0.55, 0.27, 1.55] },
   },
 }
 
@@ -364,16 +371,15 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                     const isExpanded =
                       activeCategory === section.title && !freshOpen
                     const filteredItems = section.items.filter((item) => {
-                      const itemCategory = item.category.toLowerCase()
-                      return (
-                        item.view !== "dashboard" &&
-                        (item.public === true ||
-                          itemCategory === "thelist" ||
-                          user?.accountType?.some(
-                            (type: string) =>
-                              type.toLowerCase() === itemCategory
-                          ))
+                      const itemUserType = item?.userType
+                      const isPublic = itemUserType?.includes("public")
+                      const typeMatch = user?.accountType?.some((type) =>
+                        itemUserType?.some(
+                          (userType) =>
+                            userType.toLowerCase() === type.toLowerCase()
+                        )
                       )
+                      return isPublic || typeMatch
                     })
 
                     if (filteredItems.length === 0) return null
@@ -450,9 +456,22 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                     className={cn(
                       "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
                     )}>
-                    login/register
+                    login | register
                   </div>
                 </Unauthenticated>
+                <Authenticated>
+                  <SignOutBtn>
+                    <div
+                      onClick={() => {
+                        setTimeout(() => setIsOpen("closed"), 1000)
+                      }}
+                      className={cn(
+                        "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                      )}>
+                      log out
+                    </div>
+                  </SignOutBtn>
+                </Authenticated>
                 <motion.div
                   // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-black text-foreground w-full'
                   initial={{ opacity: 0 }}
@@ -551,15 +570,16 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                         )}>
                         {mainMenuItems.map((section) => {
                           const filteredItems = section.items.filter((item) => {
-                            const itemCategory = item.category.toLowerCase()
-                            return (
-                              item.public === true ||
-                              itemCategory === "thelist" ||
-                              user?.accountType?.some(
-                                (type: string) =>
-                                  type.toLowerCase() === itemCategory
+                            const itemUserType = item?.userType
+                            const isPublic = itemUserType?.includes("public")
+                            const typeMatch = user?.accountType?.some((type) =>
+                              itemUserType?.some(
+                                (userType) =>
+                                  userType.toLowerCase() === type.toLowerCase()
                               )
                             )
+
+                            return isPublic || typeMatch
                           })
 
                           if (filteredItems.length === 0) return null
