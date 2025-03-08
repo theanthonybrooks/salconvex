@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 
 const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
   initialTime = 60,
@@ -28,10 +28,10 @@ const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
     }
   }, [initialTime, startTimer])
 
-  const handleResend = () => {
+  const handleResend = useCallback(() => {
     onResend()
     startTimer()
-  }
+  }, [onResend, startTimer])
 
   return (
     <div className='mt-4 text-center'>

@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -170,7 +170,7 @@ export const MultiSelect = React.forwardRef<
     }
 
     const toggleOption = (option: string) => {
-      if (lockedValue.includes(option)) return // ✅ Prevent toggling locked values
+      if (lockedValue.includes(option)) return
       const newSelectedValues = selectedValues.includes(option)
         ? selectedValues.filter((value) => value !== option)
         : [...selectedValues, option]
@@ -178,10 +178,10 @@ export const MultiSelect = React.forwardRef<
       onValueChange(newSelectedValues)
     }
 
-    const handleClear = () => {
+    const handleClear = useCallback(() => {
       setSelectedValues([...lockedValue])
       onValueChange([])
-    }
+    }, [lockedValue, onValueChange])
 
     const handleTogglePopover = () => {
       setIsPopoverOpen((prev) => !prev)

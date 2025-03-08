@@ -11,7 +11,7 @@ import { toast } from "react-toastify"
 import { api } from "../../../../../../convex/_generated/api"
 
 export default function AccountPage() {
-  const userData = useQuery(api.users.getCurrentUser, {})
+  // const userData = useQuery(api.users.getCurrentUser, {})
   // const user = userData?.user // This avoids destructuring null or undefined
 
   const subscription = useQuery(api.subscriptions.getUserSubscription)

@@ -71,6 +71,7 @@ import { currencies, Currency } from "@/app/data/currencies"
 import { Timezone, timezones } from "@/app/data/timezones"
 import { SearchMappedSelect } from "@/components/ui/mapped-select"
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
+import { useCallback } from "react"
 import { FaUserNinja } from "react-icons/fa6"
 import { toast } from "react-toastify"
 import { api } from "~/convex/_generated/api"
@@ -235,43 +236,43 @@ export default function SettingsPage() {
     }
   }
 
-  const handleUpdateUserPrefs = async (
-    data: z.infer<typeof UpdateUserPrefsSchema>
-  ) => {
-    setPending(true)
-    setError("")
-    if (!user || !user.email) {
-      throw new Error("No user found")
-    }
-    try {
-      await updateUserPrefs({
-        currency: data.currency ?? "",
-        timezone: data.timezone ?? "",
-        language: data.language ?? "",
-        theme: data.theme ?? "",
-      })
+  const handleUpdateUserPrefs = useCallback(
+    async (data: z.infer<typeof UpdateUserPrefsSchema>) => {
+      setPending(true)
+      setError("")
 
-      // console.log("formData", formData)
-      setPending(false)
-      setSuccess("User updated!")
-      reset()
-    } catch (err: unknown) {
-      // Type assertion: Explicitly check if it's a ConvexError
-      if (err instanceof ConvexError) {
-        setError(err.data || "An unexpected error occurred.")
-      } else if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred.")
-      } else {
-        setError("An unknown error occurred.")
+      if (!user || !user.email) {
+        throw new Error("No user found")
       }
-    } finally {
-      setPending(false)
-      setTimeout(() => {
-        setSuccess("")
-        setError("")
-      }, 5000)
-    }
-  }
+      try {
+        await updateUserPrefs({
+          currency: data.currency ?? "",
+          timezone: data.timezone ?? "",
+          language: data.language ?? "",
+          theme: data.theme ?? "",
+        })
+
+        setPending(false)
+        setSuccess("User updated!")
+        reset()
+      } catch (err: unknown) {
+        if (err instanceof ConvexError) {
+          setError(err.data || "An unexpected error occurred.")
+        } else if (err instanceof Error) {
+          setError(err.message || "An unexpected error occurred.")
+        } else {
+          setError("An unknown error occurred.")
+        }
+      } finally {
+        setPending(false)
+        setTimeout(() => {
+          setSuccess("")
+          setError("")
+        }, 5000)
+      }
+    },
+    [user, updateUserPrefs, reset] // Dependencies: Only re-create function if these change
+  )
 
   const handleUpdatePasswordSubmit = async (
     data: z.infer<typeof UpdatePasswordSchema>
@@ -737,6 +738,8 @@ export default function SettingsPage() {
                   <div className='flex items-center gap-4'>
                     <Palette className='h-5 w-5 text-muted-foreground' />
                     <div>
+                      {/* 
+                      TODO: Add theme (just use useTheme() hook and set the theme to whatever they choose + add it to their preferences to load on startup on any new devices) */}
                       <Label>Theme Color</Label>
                       <p className='text-sm text-muted-foreground'>
                         Choose your theme color <i>(coming soon)</i>
