@@ -12,7 +12,7 @@ import { CheckCircle, XCircle } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { FaRegEnvelope } from "react-icons/fa"
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
@@ -184,6 +184,7 @@ const screenOverlayVariants = {
 }
 
 const FullPageNav = ({ user }: FullPageNavProps) => {
+  const router = useRouter()
   const footerText = footerCRText()
   const { theme } = useTheme()
   const pathname = usePathname()
@@ -319,7 +320,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                 />
               </motion.section>
               <motion.div
-                className='flex flex-col justify-center scrollable invis  h-full w-full '
+                className='flex flex-col justify-start scrollable invis  h-full w-full '
                 initial={{ opacity: 0, y: 20, height: 0 }}
                 variants={mobileTextVariants}
                 animate={isOpen}
@@ -329,7 +330,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                 //   height: 0,
                 // }}
               >
-                <Unauthenticated>
+                {/* <Unauthenticated>
                   <div className='flex gap-x-4 items-center justify-center w-screen p-8'>
                     <Link
                       href='/auth/sign-in'
@@ -354,11 +355,10 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                       </Button>
                     </Link>
                   </div>
-                </Unauthenticated>
+                </Unauthenticated> */}
                 <ul
                   className={cn(
-                    "font-black m-x-auto w-full text-[4rem]",
-                    "font-tanker tracking-wide lowercase"
+                    "font-black m-x-auto w-full text-[4rem] font-tanker tracking-wide lowercase"
                   )}>
                   {mainMenuItems.map((section) => {
                     const isExpanded =
@@ -444,6 +444,15 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                     )
                   })}
                 </ul>
+                <Unauthenticated>
+                  <div
+                    onClick={() => router.push("/auth/sign-in")}
+                    className={cn(
+                      "pl-8 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                    )}>
+                    login/register
+                  </div>
+                </Unauthenticated>
                 <motion.div
                   // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-black text-foreground w-full'
                   initial={{ opacity: 0 }}
