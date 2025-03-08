@@ -27,7 +27,7 @@ export const CustomPassword = () =>
       return {
         name: params.name as string,
         email: params.email as string,
-        emailVerificationTime: null,
+        emailVerificationTime: undefined,
         createdAt: Date.now(),
         password: params.password as string,
         newPassword: params.newPassword as string,
