@@ -13,7 +13,7 @@ import { CheckCircle, XCircle } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { FaRegEnvelope } from "react-icons/fa"
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
@@ -191,7 +191,6 @@ const screenOverlayVariants = {
 }
 
 const FullPageNav = ({ user }: FullPageNavProps) => {
-  const router = useRouter()
   const footerText = footerCRText()
   const { theme } = useTheme()
   const pathname = usePathname()
