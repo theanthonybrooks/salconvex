@@ -9,18 +9,28 @@ import { IoSearch } from "react-icons/io5"
 import { useRouter } from "next/navigation"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 
-interface CommandMenuProps {
+export interface CommandItem {
+  label?: string
+  name?: string
+  icon?: React.ComponentType<{ className?: string }>
+  path?: string
+  href?: string
+  sectionCat?: string
+  group?: string
+  desc?: string
+}
+
+interface CommandMenuProps<T extends CommandItem> {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   title: string
-  source: any[]
-  shortcut?: string // Default should be `/`
-  // groupName: string
+  source: T[] // Ensure all items in `source` match `CommandItem`
+  shortcut?: string
   placeholder?: string
   setSearch: React.Dispatch<React.SetStateAction<string>>
 }
 
-export const CommandMenuCustom = ({
+export const CommandMenuCustom = <T extends CommandItem>({
   open,
   setOpen,
   title,
@@ -29,7 +39,7 @@ export const CommandMenuCustom = ({
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
-}: CommandMenuProps) => {
+}: CommandMenuProps<T>) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState("")
   const shortcutRef = useRef(shortcut)
@@ -112,7 +122,7 @@ export const CommandMenuCustom = ({
       acc[grpName] = items
     } else {
       const filtered = items.filter((item) =>
-        item.title.toLowerCase().includes(searchTerm)
+        item?.title?.toLowerCase().includes(searchTerm)
       )
       if (filtered.length > 0) acc[grpName] = filtered
     }

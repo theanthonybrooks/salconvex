@@ -137,7 +137,7 @@ export default function DashboardSideBar({
           <Search
             title={"Search"}
             source={dashboardNavItems}
-            groupName={"Heading"}
+            // groupName={"Heading"}
             className='mb-5'
             placeholder="Find what you're looking for!"
           />

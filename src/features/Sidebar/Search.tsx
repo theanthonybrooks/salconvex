@@ -1,22 +1,25 @@
-import { CommandMenuCustom } from "@/features/Sidebar/CommandMenuCustom"
+import {
+  CommandItem,
+  CommandMenuCustom,
+} from "@/features/Sidebar/CommandMenuCustom"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { FiCommand, FiSearch } from "react-icons/fi"
 
-interface SearchProps<T = unknown> {
+interface SearchProps<T extends CommandItem> {
   title: string
   source: T[]
   shortcut?: string
-  groupName: string
+  // groupName: string
   className?: string
   placeholder?: string
 }
 
-export const Search = <T,>({
+export const Search = <T extends CommandItem>({
   title,
   source,
   shortcut = "/",
-  groupName,
+  // groupName,
   className,
   placeholder,
 }: SearchProps<T>) => {

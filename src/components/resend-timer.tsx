@@ -7,7 +7,7 @@ const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
   const [timeLeft, setTimeLeft] = useState(initialTime)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     setTimeLeft(initialTime)
     if (intervalRef.current) clearInterval(intervalRef.current)
     intervalRef.current = setInterval(() => {
@@ -19,7 +19,7 @@ const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
         return prev - 1
       })
     }, 1000)
-  }
+  }, [initialTime])
 
   useEffect(() => {
     startTimer()

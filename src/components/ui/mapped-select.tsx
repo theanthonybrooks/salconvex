@@ -68,7 +68,7 @@ interface SearchMappedSelectProps<T> {
   getItemLabel: (item: T) => string
   getItemDisplay: (item: T) => string
   getItemValue: (item: T) => string
-  getItemKey?: (item: T) => string
+  // getItemKey?: (item: T) => string
   onChange: (value: string) => void
   searchFields: (keyof T)[] // Specify which fields should be used for searching
   disabled?: boolean
@@ -81,7 +81,7 @@ export function SearchMappedSelect<T>({
   data,
   getItemLabel,
   getItemValue,
-  getItemKey,
+  // getItemKey,
   getItemDisplay,
   onChange,
   searchFields,
