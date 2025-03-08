@@ -379,6 +379,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                             userType.toLowerCase() === type.toLowerCase()
                         )
                       )
+
                       return isPublic || typeMatch
                     })
 
@@ -452,11 +453,20 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                 </ul>
                 <Unauthenticated>
                   <div
-                    onClick={() => router.push("/auth/sign-in")}
                     className={cn(
-                      "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                      "pl-8 py-5 font-black m-x-auto w-full text-[4rem] border-b-2 border-black font-tanker tracking-wide lowercase"
                     )}>
-                    login | register
+                    <Link onClick={onHandleLinkClick} href={"/pricing"}>
+                      Pricing
+                    </Link>
+                  </div>
+                  <div
+                    className={cn(
+                      "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] border-b-2 border-black font-tanker tracking-wide lowercase"
+                    )}>
+                    <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
+                      Login | Register
+                    </Link>
                   </div>
                 </Unauthenticated>
                 <Authenticated>
@@ -626,15 +636,16 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                       <ul className='font-black m-auto text-[1.2rem] lg:text-[3rem] space-y-3 select-none font-tanker tracking-wide  lowercase'>
                         {activeMenuItems?.items
                           .filter((item) => {
-                            const itemCategory = item.category.toLowerCase()
-                            return (
-                              item.public === true || // Always show public items
-                              itemCategory === "thelist" || // Always show thelist items
-                              user?.accountType?.some(
-                                (type: string) =>
-                                  type.toLowerCase() === itemCategory // Show if user matches item category
+                            const itemUserType = item?.userType
+                            const isPublic = itemUserType?.includes("public")
+                            const typeMatch = user?.accountType?.some((type) =>
+                              itemUserType?.some(
+                                (userType) =>
+                                  userType.toLowerCase() === type.toLowerCase()
                               )
                             )
+
+                            return isPublic || typeMatch
                           })
                           .map((item) => (
                             <li
