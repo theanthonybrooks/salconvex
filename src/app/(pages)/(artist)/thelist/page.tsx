@@ -5,9 +5,13 @@ import { Bookmark, CircleDollarSignIcon, EyeOff } from "lucide-react"
 const TheList = () => {
   return (
     <div className='px-6 '>
-      <Card className='bg-white/40 border-black/20  grid grid-rows-[auto_1fr] grid-cols-[75px_auto_75px] gap-x-2 rounded-3xl'>
+      <Card className='bg-white/40 border-black/20  grid grid-rows-[auto_1fr] grid-cols-[75px_auto_75px] gap-x-2 rounded-3xl my-6 '>
         <div className='row-span-2 col-span-1 flex flex-col items-center justify-between pt-2 pb-3 pl-2'>
-          <div className='rounded-full bg-white border-2 h-12 w-12' />
+          <div className='rounded-full bg-white border-2 h-12 w-12 relative'>
+            <p className='text-xs absolute left-0 top-0 translate-x-1/3 translate-y-[80%]'>
+              Logo
+            </p>
+          </div>
           <div className='border-dotted border-1.5 h-10 w-14 rounded-lg flex flex-col justify-center items-center'>
             <span className='text-2xs leading-[0.85rem]'>Call Type</span>
             <span className='text-lg font-black leading-[0.85rem]'>E</span>
