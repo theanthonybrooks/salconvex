@@ -65,7 +65,7 @@ NavBarProps) {
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='z-[19] fixed left-1/2 top-[34px] -translate-x-1/2 h-[90px] w-[90px] bg-background rounded-full sm:hidden'
+        className='z-[19] fixed left-1/2 top-[34px] -translate-x-1/2 h-[90px] w-[90px] bg-background rounded-full md:hidden'
       />
       <motion.div
         initial={{ boxShadow: "none" }}
@@ -73,12 +73,12 @@ NavBarProps) {
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-20 h-25  border-black  sm:bg-transparent bg-background '>
+        className='fixed left-0 right-0 top-0 z-20 h-25  border-black  md:bg-transparent bg-background '>
         {/* add bg background for mobile */}
 
-        <div className='mx-auto flex w-screen items-center justify-between h-full sm:py-4 px-8 relative'>
+        <div className='mx-auto flex w-screen items-center justify-between h-full md:py-4 px-8 relative'>
           {/* Mobile Logo and Navigation */}
-          <div className='sm:hidden items-center gap-2 flex'>
+          <div className='md:hidden items-center gap-2 flex'>
             <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] origin-center z-10'>
               {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
@@ -182,7 +182,7 @@ NavBarProps) {
               ))}
             </div>
           )}
-          <div className='hidden sm:block h-full w-fit bg-white rounded-full p-1 pr-5 border-2 border-black'>
+          <div className='hidden md:block h-full w-fit bg-white rounded-full p-1 pr-5 border-2 border-black'>
             {/* Right Side */}
             <div className='flex items-center gap-4'>
               {/* <h1>{user?.image}</h1> */}
@@ -196,7 +196,7 @@ NavBarProps) {
                 <Link href='/auth/sign-in' prefetch={true}>
                   <Button
                     variant='salWithShadowHidden'
-                    className='font-bold hidden sm:block ml-2 my-1 rounded-full '>
+                    className='font-bold hidden md:block ml-2 my-1 rounded-full '>
                     Sign in
                   </Button>
                 </Link>
@@ -209,7 +209,7 @@ NavBarProps) {
               />
             </div>
           </div>
-          <div className='flex items-center justify-end w-full  sm:hidden'>
+          <div className='flex items-center justify-end w-full  md:hidden'>
             {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
             {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>
