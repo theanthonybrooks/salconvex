@@ -1,0 +1,56 @@
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Bookmark, CircleDollarSignIcon, EyeOff } from "lucide-react"
+
+const EventCard = () => {
+  return (
+    <Card className='bg-white/40 border-black/20  grid grid-rows-[auto_1fr] grid-cols-[75px_auto_75px] gap-x-2 rounded-3xl my-6 '>
+      <div className='row-span-2 col-span-1 flex flex-col items-center justify-between pt-2 pb-3 pl-2'>
+        <div className='rounded-full bg-white border-2 h-12 w-12 relative'>
+          <p className='text-xs absolute left-0 top-0 translate-x-1/3 translate-y-[80%]'>
+            Logo
+          </p>
+        </div>
+        <div className='border-dotted border-1.5 h-10 w-14 rounded-lg flex flex-col justify-center items-center'>
+          <span className='text-2xs leading-[0.85rem]'>Call Type</span>
+          <span className='text-lg font-black leading-[0.85rem]'>E</span>
+          <span className='text-2xs leading-[0.85rem]'>Event</span>
+        </div>
+      </div>
+
+      {/* <CardHeader>
+          <CardTitle>The List</CardTitle>
+        </CardHeader>*/}
+      <div className='pt-2 pb-3 flex-col flex gap-y-3 '>
+        <div className='flex flex-col gap-y-1'>
+          <p className='text-base font-medium'>Event Name...</p>
+          <p className='text-sm'>City, (state), Country</p>
+          <p className='text-sm'>
+            <span className='font-medium'>Event:</span> June 5-18, 2025
+          </p>
+          <p className='text-sm'>
+            <span className='font-medium'>Deadline:</span> Feb 18, 2025
+          </p>
+          <p className='text-sm'>
+            <span className='font-medium'>Budget:</span> $10,000+
+          </p>
+          <p className='text-red-600 text-sm'>
+            <span className='font-medium'>Eligible:</span> US Artists
+          </p>
+        </div>
+        <Button variant='salWithShadowHidden' size='lg' className='bg-white/60'>
+          View More
+        </Button>
+      </div>
+      <div className='flex flex-col items-center justify-between pt-2 pb-5 pr-2'>
+        <CircleDollarSignIcon className='h-6 w-6 text-red-600' />
+        <div className='flex gap-x-2 items-center justify-center'>
+          <EyeOff className='h-6 w-6' />
+          <Bookmark className='h-6 w-6' />
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+export default EventCard
