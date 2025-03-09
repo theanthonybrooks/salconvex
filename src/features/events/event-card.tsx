@@ -11,7 +11,7 @@ const EventCard = () => {
             Logo
           </p>
         </div>
-        <div className='border-dotted border-1.5 h-10 w-14 rounded-lg flex flex-col justify-center items-center'>
+        <div className='border-dotted border-1.5 h-11 w-14 rounded-lg flex flex-col justify-center items-center py-[5px]'>
           <span className='text-2xs leading-[0.85rem]'>Call Type</span>
           <span className='text-lg font-black leading-[0.85rem]'>E</span>
           <span className='text-2xs leading-[0.85rem]'>Event</span>
