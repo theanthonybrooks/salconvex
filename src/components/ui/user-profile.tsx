@@ -30,8 +30,10 @@ export function UserProfile({ user }: UserProfileProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' className='relative h-9 w-9 rounded-full'>
-          <Avatar className='h-9 w-9 rounded-full border border-border'>
+        <Button
+          variant='ghost'
+          className='relative h-[50px] w-[50px] rounded-full'>
+          <Avatar className='h-[50px] w-[50px] border border-border'>
             <AvatarImage src={user?.image} alt={user?.name || "User Profile"} />
 
             <AvatarFallback

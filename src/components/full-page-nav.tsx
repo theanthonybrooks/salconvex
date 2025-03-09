@@ -29,7 +29,7 @@ interface FullPageNavProps {
 const menuVariants = {
   open: {
     width: [0, "100vw", "100vw", "100vw"],
-    height: [40, 80, "50vw", "100vh"],
+    height: [50, 80, "50vw", "100vh"],
     top: [17, 0, 0, 0],
     right: [41, 0, 0, 0],
     borderRadius: [40, 40, 20, 0],
@@ -58,7 +58,7 @@ const menuVariants = {
   // },
   closed: {
     width: ["100vw", "100vw", "100vw", 0, 0], // Shrinks width last
-    height: ["100vh", "100vh", 40, 40, 40], // Shrinks height first
+    height: ["100vh", "100vh", 50, 50, 50], // Shrinks height first
     top: [0, 0, 17, 17, 17],
     right: [0, 0, 0, 41, 41],
     borderRadius: [0, 20, 40, 40, 40],

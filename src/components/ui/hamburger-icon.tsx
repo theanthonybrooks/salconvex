@@ -42,7 +42,10 @@ const StyledWrapper = styled.div`
   }
 
   .hamburger svg {
-    height: 3em;
+    @media (max-width: 768px) {
+      height: 3em;
+    }
+    height: 2.5em;
     transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 

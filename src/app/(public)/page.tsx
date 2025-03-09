@@ -57,7 +57,7 @@ export default function Home() {
           </span>
         </motion.span>
       </motion.div>
-      <div className='h-[50vh] w-full ' />
+      <div className='h-[300vh] w-full '></div>
     </motion.div>
   )
 }
