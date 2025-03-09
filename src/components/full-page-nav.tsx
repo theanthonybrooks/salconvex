@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import MenuToggle from "@/components/ui/hamburger-icon"
 import { Separator } from "@/components/ui/separator"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import { mainMenuItems } from "@/constants/menu"
@@ -27,25 +28,51 @@ interface FullPageNavProps {
 
 const menuVariants = {
   open: {
-    width: ["4em", "100vw", "100vw", "100vw"],
+    width: [0, "100vw", "100vw", "100vw"],
     height: [40, 80, "50vw", "100vh"],
     top: [17, 0, 0, 0],
     right: [41, 0, 0, 0],
     borderRadius: [40, 40, 20, 0],
-    transition: { duration: 0.75, ease: [0.1, 0, 0.36, 1] },
-    opacity: [1, 1, 1, 1],
+    transition: {
+      duration: 0.75,
+      ease: [0.1, 0, 0.36, 1],
+      times: [0, 0.2, 0.6, 1],
+    },
+    opacity: [0, 1, 1, 1],
   },
-  closed: {
-    width: ["100vw", "99vw", "98vw", "4em"],
-    height: ["100vh", 40, 40, 39],
-    top: [0, 17, 17, 17],
-    right: [0, 0, 41, 41],
-    borderRadius: [0, 20, 40, 40],
-    // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
-    transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
+  // closed: {
+  //   width: ["100vw", "100vw", 0],
+  //   height: ["100vh", 40, 40],
+  //   top: [0, 17, 17],
+  //   right: [0, 0, 41],
+  //   borderRadius: [0, 20, 40],
+  //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+  //   transition: {
+  //     duration: 0.75,
+  //     ease: [0.68, -0.55, 0.27, 1.55],
+  //     // ease: [0.1, 0, 0.36, 1],
+  //     times: [0, 0.2, 1],
+  //   },
 
-    opacity: [1, 1, 1, 1],
+  //   opacity: [1, 1, 0],
+  // },
+  closed: {
+    width: ["100vw", "100vw", "100vw", 0, 0], // Shrinks width last
+    height: ["100vh", "100vh", 40, 40, 40], // Shrinks height first
+    top: [0, 0, 17, 17, 17],
+    right: [0, 0, 0, 41, 41],
+    borderRadius: [0, 20, 40, 40, 40],
+
+    transition: {
+      duration: 0.75,
+      ease: [0.68, -0.55, 0.27, 1.55],
+      times: [0, 0.2, 0.4, 0.9, 1], // Keeps width large longer before snapping shut
+    },
+
+    // ✨ Keep opacity at 1 until the last moment ✨
+    opacity: [1, 1, 1, 1, 0], // Only fades at the very end
   },
+
   initial: {
     width: [0],
     height: [0],
@@ -254,7 +281,11 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
           {isOpen === "open" && !pathname.includes("/dashboard") && (
             <ThemeToggle />
           )}
-          <Button
+          <MenuToggle
+            menuState={isOpen === "initial" ? "closed" : isOpen}
+            setState={setIsOpen}
+          />
+          {/* <Button
             variant='salWithShadowHidden'
             onClick={() =>
               setIsOpen(
@@ -270,7 +301,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
               isOpen === "open" ? "bg-salPink" : "bg-background"
             )}>
             {isOpen === "open" ? "CLOSE" : "MENU"}
-          </Button>
+          </Button> */}
         </div>
 
         {/* /~ Fullscreen Menu Overlay ~/ */}
