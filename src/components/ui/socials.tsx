@@ -5,21 +5,21 @@ import { PiPatreonLogoBold } from "react-icons/pi"
 
 export default function SocialsRow() {
   return (
-    <div className='flex justify-center items-center gap-4 mb-4'>
+    <div className='flex justify-center items-center gap-6 mb-4'>
       <Link href='https://instagram.com/thestreetartlist'>
-        <FaInstagram className='h-6 w-6' />
+        <FaInstagram className='h-8 w-8' />
       </Link>
       <Link href='https://facebook.com/thestreetartlist'>
-        <FiFacebook className='h-6 w-6' />
+        <FiFacebook className='h-8 w-8' />
       </Link>
       <Link href='https://threads.net/thestreetartlist'>
-        <FaThreads className='h-6 w-6' />
+        <FaThreads className='h-8 w-8' />
       </Link>
       <Link href='mailto:info@thestreetartlist.com'>
-        <FaRegEnvelope className='h-6 w-6' />
+        <FaRegEnvelope className='h-8 w-8' />
       </Link>
       <Link href='https://patreon.com/thestreetartlist'>
-        <PiPatreonLogoBold className='h-6 w-6' />
+        <PiPatreonLogoBold className='h-8 w-8' />
       </Link>
     </div>
   )
