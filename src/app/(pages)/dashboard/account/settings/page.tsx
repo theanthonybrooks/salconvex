@@ -395,7 +395,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue='account' className='space-y-6'>
-        <TabsList>
+        <TabsList className='max-w-full scrollable invis justify-start'>
           <TabsTrigger value='account'>Account</TabsTrigger>
           <TabsTrigger value='notifications'>Notifications</TabsTrigger>
           {/*          //NOTE: in order to disabled, just add "disabled" to the tabs trigger

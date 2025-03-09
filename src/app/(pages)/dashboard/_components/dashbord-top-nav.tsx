@@ -1,18 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose, DialogTitle } from "@/components/ui/dialog"
-import { Separator } from "@/components/ui/separator"
-import { SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet"
 // import ThemeToggle from "@/components/ui/theme-toggle"
-import { HamburgerMenuIcon } from "@radix-ui/react-icons"
 // import { useAction, useQuery } from "convex/react";
 import FullPageNav from "@/components/full-page-nav"
 import { UserProfile } from "@/components/ui/user-profile"
 import { useQuery } from "convex/react"
-import { Banknote, HomeIcon, Settings } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
 import { api } from "../../../../../convex/_generated/api"
 
 export default function DashboardTopNav({
@@ -44,7 +36,7 @@ export default function DashboardTopNav({
   return (
     <div className='flex flex-col'>
       <header className='flex h-14 items-center gap-4 border-b px-3 lg:h-[72px]'>
-        <Dialog>
+        {/*        <Dialog>
           <DialogTitle className='sr-only'>Dashboard Menu</DialogTitle>
           <SheetTrigger className='p-2 transition min-[1024px]:hidden'>
             <HamburgerMenuIcon />
@@ -55,7 +47,7 @@ export default function DashboardTopNav({
           <SheetContent side='left'>
             <SheetHeader>
               <Link href='/'>
-                {/* <SheetTitle>The Street Art List</SheetTitle> */}
+                /~ <SheetTitle>The Street Art List</SheetTitle> ~/
                 <Image src='/saltext.png' alt='sal' width={100} height={40} />
               </Link>
             </SheetHeader>
@@ -87,14 +79,14 @@ export default function DashboardTopNav({
               </DialogClose>
             </div>
           </SheetContent>
-        </Dialog>
+        </Dialog>*/}
         <div className='ml-auto flex items-center justify-center gap-2'>
           {/* <Button variant={"outline"} onClick={handleManageSubscription}>
             Manage Subscription
           </Button> */}
-          {/* <ModeToggle /> */}
+
           {/* <ThemeToggle /> */}
-          {<UserProfile user={user ?? null} />}
+          <UserProfile user={user ?? null} />
           <FullPageNav user={user} />
         </div>
       </header>
