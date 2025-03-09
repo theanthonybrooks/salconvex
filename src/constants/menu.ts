@@ -28,8 +28,15 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["public"],
       },
       {
-        title: "This Week",
+        title: "The List",
         path: "/thelist",
+        category: "thelist",
+        public: true,
+        userType: ["artist", "admin"],
+      },
+      {
+        title: "This Week",
+        path: "/thisweek",
         category: "thelist",
         public: true,
         userType: ["public"],

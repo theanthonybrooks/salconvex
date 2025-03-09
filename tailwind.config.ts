@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss"
 
+import tailwindcssAnimate from "tailwindcss-animate"
 import { fontFamily } from "tailwindcss/defaultTheme"
 
 export default {
@@ -101,6 +102,7 @@ export default {
         smd: "-3px 3px 0 0 #000000",
         ssm: "-2px 2px 0 0 #000000",
       },
+
       padding: {
         "10": "2.5rem",
         "12": "3rem",
@@ -108,6 +110,7 @@ export default {
         "16": "4rem",
         "18": "4.5rem",
         "20": "5rem",
+        "25": "100px",
       },
       margin: {
         "10": "2.5rem",
@@ -124,6 +127,12 @@ export default {
         "3px": "3px",
         "4px": "4px",
         "5px": "5px",
+      },
+      height: {
+        "25": "100px",
+      },
+      fontSize: {
+        "2xs": "0.6rem",
       },
       keyframes: {
         "background-shine": {
@@ -224,7 +233,7 @@ export default {
     },
   },
   plugins: [
-    require("tailwindcss-animate"), // Keep existing plugin
+    tailwindcssAnimate,
     function ({
       addUtilities,
     }: {

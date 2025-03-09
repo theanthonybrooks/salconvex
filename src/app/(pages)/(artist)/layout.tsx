@@ -1,9 +1,10 @@
+import SalHeader from "@/components/ui/sal-header"
 import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper"
 import Footer from "@/features/wrapper-elements/navigation/components/footer"
 import NavBar from "@/features/wrapper-elements/navigation/components/navbar"
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server"
 import { fetchQuery } from "convex/nextjs"
-import { api } from "../../../convex/_generated/api"
+import { api } from "~/convex/_generated/api"
 
 export default async function HomeLayout({
   children,
@@ -30,10 +31,9 @@ export default async function HomeLayout({
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className='scrollable mini boundless darkbar'>
-        <main className='flex min-w-screen min-h-screen flex-col pt-[4rem]'>
-          {children}
-        </main>
+      <div className='scrollable mini boundless darkbar pt-32'>
+        <SalHeader />
+        <main className='min-w-screen min-h-screen'>{children}</main>
 
         <Footer />
       </div>
