@@ -1,25 +1,31 @@
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { FaInstagram, FaRegEnvelope, FaThreads } from "react-icons/fa6"
 import { FiFacebook } from "react-icons/fi"
 import { PiPatreonLogoBold } from "react-icons/pi"
 
-export default function SocialsRow() {
+interface SocialsRowProps {
+  size?: number
+  className?: string
+}
+
+export default function SocialsRow({ size = 8, className }: SocialsRowProps) {
   return (
-    <div className='flex justify-center items-center gap-6 mb-4'>
+    <div className='flex justify-center items-center gap-6'>
       <Link href='https://instagram.com/thestreetartlist'>
-        <FaInstagram className='h-8 w-8' />
+        <FaInstagram className={cn(`h-${size} w-${size}`, className)} />
       </Link>
       <Link href='https://facebook.com/thestreetartlist'>
-        <FiFacebook className='h-8 w-8' />
+        <FiFacebook className={cn(`h-${size} w-${size}`, className)} />
       </Link>
       <Link href='https://threads.net/thestreetartlist'>
-        <FaThreads className='h-8 w-8' />
+        <FaThreads className={cn(`h-${size} w-${size}`, className)} />
       </Link>
       <Link href='mailto:info@thestreetartlist.com'>
-        <FaRegEnvelope className='h-8 w-8' />
+        <FaRegEnvelope className={cn(`h-${size} w-${size}`, className)} />
       </Link>
       <Link href='https://patreon.com/thestreetartlist'>
-        <PiPatreonLogoBold className='h-8 w-8' />
+        <PiPatreonLogoBold className={cn(`h-${size} w-${size}`, className)} />
       </Link>
     </div>
   )

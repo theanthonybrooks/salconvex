@@ -65,7 +65,7 @@ NavBarProps) {
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='z-[19] fixed left-1/2 top-[34px] -translate-x-1/2 h-[90px] w-[90px] bg-background rounded-full md:hidden'
+        className='z-[19] fixed left-1/2 top-[34px] -translate-x-1/2 h-[90px] w-[90px] bg-background rounded-full lg:hidden'
       />
       <motion.div
         initial={{ boxShadow: "none" }}
@@ -73,12 +73,12 @@ NavBarProps) {
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-20 h-25  border-black  md:bg-transparent bg-background '>
+        className='fixed left-0 right-0 top-0 z-20 h-25  border-black  lg:bg-transparent bg-background '>
         {/* add bg background for mobile */}
 
-        <div className='mx-auto flex w-screen items-center justify-between h-full md:py-4 px-8 relative'>
+        <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative'>
           {/* Mobile Logo and Navigation */}
-          <div className='md:hidden items-center gap-2 flex'>
+          <div className='lg:hidden items-center gap-2 flex'>
             <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] origin-center z-10'>
               {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
@@ -102,7 +102,7 @@ NavBarProps) {
           {/* Desktop Logo */}
 
           <motion.div
-            className='hidden lg:flex h-full items-center gap-2 bg-white rounded-full border-2 border-black p-1 overflow-hidden'
+            className='hidden lg:flex h-15 items-center gap-2 bg-white rounded-full border-2 border-black p-1 overflow-hidden'
             animate={{
               width: isScrolled ? "60px" : "250px",
             }}
@@ -154,7 +154,7 @@ NavBarProps) {
                   <NavigationMenuItem>
                     <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+                      <ul className='grid w-[400px] gap-3 p-4 lg:w-[500px] lg:grid-cols-2 '>
                         {filteredNavbarMenu.map((component) => (
                           <ListItem
                             key={component.title}
@@ -182,7 +182,7 @@ NavBarProps) {
               ))}
             </div>
           )}
-          <div className='hidden md:block h-full w-fit bg-white rounded-full p-1 pr-5 border-2 border-black'>
+          <div className='hidden lg:flex items-center h-15 w-fit bg-white rounded-full p-1 pr-5 border-2 border-black'>
             {/* Right Side */}
             <div className='flex items-center gap-4'>
               {/* <h1>{user?.image}</h1> */}
@@ -196,7 +196,7 @@ NavBarProps) {
                 <Link href='/auth/sign-in' prefetch={true}>
                   <Button
                     variant='salWithShadowHidden'
-                    className='font-bold hidden md:block ml-2 my-1 rounded-full '>
+                    className='font-bold hidden lg:block ml-2 my-1 rounded-full '>
                     Sign in
                   </Button>
                 </Link>
@@ -209,7 +209,7 @@ NavBarProps) {
               />
             </div>
           </div>
-          <div className='flex items-center justify-end w-full  md:hidden'>
+          <div className='flex items-center justify-end w-full  lg:hidden'>
             {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
             {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>

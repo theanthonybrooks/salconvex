@@ -10,6 +10,7 @@ const SalHeader = () => {
         alt='The Street Art List'
         width={250}
         height={100}
+        priority={true}
       />
       <p className='text-center text-sm mb-4'>
         List of street art, graffiti, & mural projects.
@@ -21,7 +22,7 @@ const SalHeader = () => {
           @anthonybrooksart
         </Link>
       </p>
-      <SocialsRow />
+      <SocialsRow className='mb-4' />
     </div>
   )
 }

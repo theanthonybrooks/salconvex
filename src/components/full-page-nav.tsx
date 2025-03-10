@@ -1,8 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import MenuToggle from "@/components/ui/hamburger-icon"
 import { Separator } from "@/components/ui/separator"
+import SocialsRow from "@/components/ui/socials"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import { mainMenuItems } from "@/constants/menu"
 import { footerCRText } from "@/constants/text"
@@ -16,8 +16,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { FaRegEnvelope } from "react-icons/fa"
-import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
 
 interface FullPageNavProps {
   // userId?: string | undefined
@@ -29,7 +27,7 @@ interface FullPageNavProps {
 const menuVariants = {
   open: {
     width: [0, "100vw", "100vw", "100vw"],
-    height: [50, 80, "50vw", "100vh"],
+    height: [60, 80, "50vw", "100vh"],
     top: [17, 0, 0, 0],
     right: [41, 0, 0, 0],
     borderRadius: [40, 40, 20, 0],
@@ -58,7 +56,7 @@ const menuVariants = {
   // },
   closed: {
     width: ["100vw", "100vw", "100vw", 0, 0], // Shrinks width last
-    height: ["100vh", "100vh", 50, 50, 50], // Shrinks height first
+    height: ["100vh", "100vh", 60, 60, 60], // Shrinks height first
     top: [0, 0, 17, 17, 17],
     right: [0, 0, 0, 41, 41],
     borderRadius: [0, 20, 40, 40, 40],
@@ -162,17 +160,17 @@ const mobileMenuVariants = {
 const mobileTextVariants = {
   open: {
     opacity: 1,
-    y: 0,
+
     height: "100%",
     transition: {
-      delay: 0.3,
-      duration: 0.4,
+      delay: 0.4,
+      duration: 0.6,
       ease: "easeInOut",
     },
   },
   closed: {
     opacity: 0,
-    y: 20,
+
     height: 0,
     transition: {
       duration: 0.4,
@@ -265,7 +263,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
           initial='overlayInitial'
           variants={screenOverlayVariants}
           animate={isOpen}
-          className='absolute w-screen h-dvh z-[1] backdrop-blur-md bg-black/20 right-0 top-0 origin-top-right'
+          className='absolute w-screen h-dvh z-[10] backdrop-blur-md bg-black/20 right-0 top-0 origin-top-right'
         />
       </AnimatePresence>
 
@@ -358,7 +356,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
               </motion.section>
               <motion.div
                 className='flex flex-col justify-start scrollable invis  h-full w-full '
-                initial={{ opacity: 0, y: 20, height: 0 }}
+                initial={{ opacity: 0, height: 0 }}
                 variants={mobileTextVariants}
                 animate={isOpen}
                 // exit={{
@@ -367,32 +365,6 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                 //   height: 0,
                 // }}
               >
-                {/* <Unauthenticated>
-                  <div className='flex gap-x-4 items-center justify-center w-screen p-8'>
-                    <Link
-                      href='/auth/sign-in'
-                      prefetch={true}
-                      className=' flex-1'>
-                      <Button
-                        className='font-bold text-lg w-full py-8'
-                        variant='salWithShadow'>
-                        Sign in
-                      </Button>
-                    </Link>
-                    <span className='font-bold'>OR</span>
-
-                    <Link
-                      href='/auth/register'
-                      prefetch={true}
-                      className=' flex-1'>
-                      <Button
-                        className='font-bold text-lg w-full py-8'
-                        variant='salWithShadow'>
-                        Sign up
-                      </Button>
-                    </Link>
-                  </div>
-                </Unauthenticated> */}
                 <ul
                   className={cn(
                     "font-black m-x-auto w-full text-[4rem] font-tanker tracking-wide lowercase"
@@ -506,7 +478,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                         setTimeout(() => setIsOpen("closed"), 1000)
                       }}
                       className={cn(
-                        "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                        "pl-8 py-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
                       )}>
                       log out
                     </div>
@@ -517,47 +489,18 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.1, duration: 0.4 }}
-                  className='flex space-x-5 py-6 items-center justify-center'>
-                  <Link
-                    href='https://facebook.com/thestreetartlist'
-                    target='_blank'>
-                    <Button variant='ghost' size='icon'>
-                      <FaFacebookF size={22} />
-                    </Button>
-                  </Link>
-                  <Link
-                    href='https://instagram.com/thestreetartlist'
-                    target='_blank'>
-                    <Button variant='ghost' size='icon'>
-                      <FaInstagram size={22} />
-                    </Button>
-                  </Link>
-                  <Link
-                    href='https://threads.net/thestreetartlist'
-                    target='_blank'>
-                    <Button variant='ghost' size='icon'>
-                      <FaThreads size={22} />
-                    </Button>
-                  </Link>
-
-                  <Link href='mailto:info@thestreetartlist.com' target='_blank'>
-                    <Button variant='ghost' size='icon'>
-                      <FaRegEnvelope size={22} />
-                    </Button>
-                  </Link>
-
-                  {/*    <div className='flex space-x-2 text-sm items-center'>
-                        <p>Made with ❤️ by</p>
-                        <Link
-                          href='https://theanthonybrooks.com'
-                          target='_blank'
-                          className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
-                          Anthony Brooks
-                        </Link>
-                      </div>
-                      <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
-                        {footerText.text}
-                      </div>*/}
+                  className='flex flex-col space-y-5 py-6  items-center justify-center'>
+                  <SocialsRow />
+                  <div className='flex space-x-2 text-sm items-center'>
+                    <p>Made with ❤️ by</p>
+                    <Link
+                      href='https://theanthonybrooks.com'
+                      target='_blank'
+                      className=' decoration-black focus:underline focus:decoration-black focus:decoration-2 m-0 p-0 focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                      Anthony Brooks
+                    </Link>
+                  </div>
+                  {footerText.text}
                 </motion.div>
               </motion.div>
               {/* Fixed Bottom Row */}
@@ -775,39 +718,8 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                     transition={{ delay: 0.9, duration: 0.4 }}>
                     <div className='flex space-x-2 items-center'>
                       <p className='text-sm'>Links:</p>
-                      <Link
-                        href='https://facebook.com/thestreetartlist'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaFacebookF className='h-5 w-5' />
-                        </Button>
-                      </Link>
-                      <Link
-                        href='https://instagram.com/thestreetartlist'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaInstagram className='h-5 w-5' />
-                        </Button>
-                      </Link>
-                      <Link
-                        href='https://threads.net/thestreetartlist'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaThreads className='h-5 w-5' />
-                        </Button>
-                      </Link>
-                      {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
-                    <Button variant='ghost' size='icon'>
-                      <FaPatreon className='h-5 w-5' />
-                    </Button>
-                  </Link> */}
-                      <Link
-                        href='mailto:info@thestreetartlist.com'
-                        target='_blank'>
-                        <Button variant='ghost' size='icon'>
-                          <FaRegEnvelope className='h-5 w-5' />
-                        </Button>
-                      </Link>
+
+                      <SocialsRow size={7} />
                     </div>
                     <div className='flex space-x-2 text-sm items-center'>
                       <p>Made with ❤️ by</p>

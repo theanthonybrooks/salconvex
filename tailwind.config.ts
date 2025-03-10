@@ -127,8 +127,11 @@ export default {
         "3px": "3px",
         "4px": "4px",
         "5px": "5px",
+        "15": "60px",
+        "25": "100px",
       },
       height: {
+        "15": "60px",
         "25": "100px",
       },
       fontSize: {
