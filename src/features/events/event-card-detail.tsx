@@ -157,7 +157,7 @@ const EventCardDetail = ({
               and feel free to reach out with any questions
             </p>
           </div>
-          <div className='relativeflex flex-col space-y-3 border-b-2 border-dotted border-black/20 pb-3 mb-4'>
+          <div className='relative flex flex-col space-y-3 border-b-2 border-dotted border-black/20 pb-3 mb-4'>
             <div className='absolute top-0 right-2'>
               <Minus />
             </div>
@@ -220,7 +220,10 @@ const EventCardDetail = ({
               </div>*/}
             </div>
           </div>
-          <div className='grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
+          <div className='relative grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
+            <div className='absolute top-0 right-2'>
+              <Minus />
+            </div>
             <p className='font-semibold underline underline-offset-2'>Other:</p>
             <p className='list-decimal list-inside px-4'>
               Only one application per artist; artist teams should only submit

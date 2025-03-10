@@ -1,6 +1,6 @@
 import EventCardDetail from "@/features/events/event-card-detail"
 
-const EventDetailPage = () => {
+const Event = () => {
   return (
     <div className='px-6 flex flex-col items-center '>
       <EventCardDetail accepted='accepted' bookmarked={true} hidden={false} />
@@ -10,4 +10,4 @@ const EventDetailPage = () => {
   )
 }
 
-export default EventDetailPage
+export default Event
