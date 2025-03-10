@@ -22,9 +22,17 @@ const AccordionContext = React.createContext<{
   setOpenValue: () => {},
 })
 
-const AccordionItemContext = React.createContext<{ value: string }>({
+interface AccordionItemContextProps {
+  value: string
+  triggerProps?: Partial<AccordionTriggerProps>
+}
+
+const AccordionItemContext = React.createContext<AccordionItemContextProps>({
   value: "",
 })
+const AccordionItemUpdateContext = React.createContext<{
+  setTriggerProps?: (props: Partial<AccordionTriggerProps>) => void
+}>({})
 
 const Accordion = ({ children, defaultValue, ...props }: AccordionProps) => {
   const [openValue, setOpenValue] = React.useState<string | undefined>(
@@ -53,18 +61,26 @@ interface AccordionItemProps
 }
 
 const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
+  React.ComponentRef<typeof AccordionPrimitive.Item>,
   AccordionItemProps
->(({ className, value, ...props }, ref) => (
-  <AccordionItemContext.Provider value={{ value }}>
-    <AccordionPrimitive.Item
-      ref={ref}
-      value={value}
-      className={cn("border-b-2 border-dotted border-black/20", className)}
-      {...props}
-    />
-  </AccordionItemContext.Provider>
-))
+>(({ className, value, ...props }, ref) => {
+  const [triggerProps, setTriggerProps] = React.useState<
+    Partial<AccordionTriggerProps>
+  >({})
+
+  return (
+    <AccordionItemContext.Provider value={{ value, triggerProps }}>
+      <AccordionItemUpdateContext.Provider value={{ setTriggerProps }}>
+        <AccordionPrimitive.Item
+          ref={ref}
+          value={value}
+          className={cn("border-b-2 border-dotted border-black/20", className)}
+          {...props}
+        />
+      </AccordionItemUpdateContext.Provider>
+    </AccordionItemContext.Provider>
+  )
+})
 AccordionItem.displayName = "AccordionItem"
 
 interface AccordionTriggerProps
@@ -75,7 +91,7 @@ interface AccordionTriggerProps
 }
 
 const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
+  React.ComponentRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
 >(
   (
@@ -92,6 +108,10 @@ const AccordionTrigger = React.forwardRef<
     const { openValue } = React.useContext(AccordionContext)
     const { value } = React.useContext(AccordionItemContext)
     const isOpen = openValue === value
+    const { setTriggerProps } = React.useContext(AccordionItemUpdateContext)
+    React.useEffect(() => {
+      setTriggerProps?.({ hidePreview, hasPreview, title })
+    }, [hidePreview, hasPreview, title, setTriggerProps])
 
     return (
       <AccordionPrimitive.Header className='flex'>
@@ -100,18 +120,23 @@ const AccordionTrigger = React.forwardRef<
           className={cn(
             "group flex flex-1 items-start  py-4 text-sm font-medium transition-all  text-left",
             className,
-            hasPreview && "flex-col gap-y-2"
+            hasPreview && "flex-col gap-y-2",
+            isOpen && hasPreview && !hidePreview && "pt-4 pb-0"
           )}
           {...props}>
           <div className='flex justify-between items-center w-full'>
-            <span className=' hover:underline'> {title}</span>
+            <span className={cn(" hover:underline")}> {title}</span>
             {isOpen ? (
               <Minus className='h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200' />
             ) : (
               <Plus className='h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200' />
             )}
           </div>
-          {(isOpen && !hidePreview) || (!isOpen && <>{children}</>)}
+          {(!isOpen || (isOpen && !hidePreview)) && (
+            <span className='font-normal flex flex-col gap-y-2'>
+              {children}
+            </span>
+          )}
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
     )
@@ -120,19 +145,30 @@ const AccordionTrigger = React.forwardRef<
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
 const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Content
-    ref={ref}
-    className={cn(
-      "overflow-hidden text-sm transition-all data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up",
-      className
-    )}
-    {...props}>
-    <div className='pb-4 pt-0'>{children}</div>
-  </AccordionPrimitive.Content>
-))
+>(({ className, children, ...props }, ref) => {
+  const { triggerProps } = React.useContext(AccordionItemContext)
+
+  return (
+    <AccordionPrimitive.Content
+      ref={ref}
+      className={cn(
+        "overflow-hidden text-sm transition-all data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up",
+        className
+      )}
+      {...props}>
+      <div className={cn("pb-4 pt-0", triggerProps?.hasPreview && "pt-2")}>
+        {/* {triggerProps?.hasPreview && (
+          <div className='text-muted-foreground text-sm mb-2'>
+            Preview enabled: {triggerProps.title}
+          </div>
+        )} */}
+        {children}
+      </div>
+    </AccordionPrimitive.Content>
+  )
+})
 AccordionContent.displayName = AccordionPrimitive.Content.displayName
 
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger }

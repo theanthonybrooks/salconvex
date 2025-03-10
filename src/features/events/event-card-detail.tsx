@@ -14,8 +14,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion"
-import { FaGear, FaHouse, FaInfo, FaPlane } from "react-icons/fa6"
-import { PiBowlFood, PiPencilCircle } from "react-icons/pi"
+import { FaRegCommentDots } from "react-icons/fa6"
+import { GoGear } from "react-icons/go"
+import { IoAirplaneOutline, IoFastFoodOutline } from "react-icons/io5"
+import { PiHouseLine, PiPencilLineDuotone } from "react-icons/pi"
 
 interface EventCardDetailProps {
   accepted?: "accepted" | "rejected" | "pending" | undefined
@@ -79,10 +81,10 @@ const EventCardDetail = ({
               <BookmarkFilledIcon
                 height={32}
                 width={32}
-                className='text-red-500'
+                className='text-red-500 mt-3'
               />
             ) : (
-              <BookmarkIcon height={32} width={32} />
+              <BookmarkIcon height={32} width={32} className='mt-3' />
             )}
             {hidden && <EyeOff className='h-6 w-6' />}
           </div>
@@ -94,7 +96,7 @@ const EventCardDetail = ({
               Event Name in full that wraps two rows if needed
             </p>
 
-            <p className='text-sm inline-flex items-end gap-x-1 mb-1'>
+            <p className='text-sm inline-flex items-end gap-x-1 mb-3'>
               City, (state), Country
               <MapPin />
             </p>
@@ -122,41 +124,28 @@ const EventCardDetail = ({
       <div className='col-span-full w-full flex flex-col gap-y-3 justify-start items-start'>
         <h3 className='text-left indent-2'>Open Call Details:</h3>
         <Card className='w-full p-5 bg-white/60 border-black/20 rounded-xl'>
-          {/*        <div className='flex flex-col space-y-3  pb-3 mb-4 relative'>
-            <div className='absolute top-0 right-2'>
-              <Minus />
-            </div>
-            <p>
-              <span className='font-semibold'>Deadline:</span>
-              <br /> Mar 2 2025 @ 5:00pm (CST)
-            </p>
-            <p>
-              <span className='font-semibold'>Eligible:</span>
-              <br />
-              <span className='text-red-600'>National: US Artists</span>
-            </p>
-            <p>
-              <span className='font-semibold'>More Info:</span>
-              <br /> Artists from xyz region, identity, and/or location are
-              eligible to apply.
-            </p>
-          </div>*/}
           <Accordion>
             <AccordionItem value='item-1'>
               <AccordionTrigger title='Deadline & Eligibility:' hasPreview>
                 <p>
-                  <span className='font-semibold'>Deadline:</span>
+                  <span className='font-semibold underline underline-offset-2'>
+                    Deadline:
+                  </span>
                   <br /> Mar 2 2025 @ 5:00pm (CST)
                 </p>
                 <p>
-                  <span className='font-semibold'>Eligible:</span>
+                  <span className='font-semibold underline underline-offset-2'>
+                    Eligible:
+                  </span>
                   <br />
-                  <span className='text-red-600'>National: US Artists</span>
+                  <span className='text-red-600'>National: US Artists*</span>
                 </p>
               </AccordionTrigger>
               <AccordionContent>
                 <p>
-                  <span className='font-semibold'>More Info:</span>
+                  <span className='font-semibold underline underline-offset-2'>
+                    More Info:
+                  </span>
                   <br /> Artists from xyz region, identity, and/or location are
                   eligible to apply.
                 </p>
@@ -171,30 +160,31 @@ const EventCardDetail = ({
                 <section className='flex flex-col justify-center items-center w-full'>
                   <br />
                   {/* ----------------- Preview Section ------------------/ */}
+
                   <div
                     id='budget-icons-${id}'
-                    className='col-span-2 flex gap-x-3 items-center justify-center'>
+                    className='col-span-2 flex gap-x-3 items-center justify-center max-w-full'>
                     <span className='p-1 border-1.5 border-black rounded-full'>
-                      <PiPencilCircle size={20} />
+                      <PiPencilLineDuotone size={18} />
                     </span>
                     <span className='p-1 border-1.5 border-black rounded-full'>
                       {" "}
-                      <FaHouse size={20} />
+                      <PiHouseLine size={18} />
                     </span>
                     <span className='p-1 border-1.5 border-black rounded-full'>
-                      <PiBowlFood size={20} />
+                      <IoFastFoodOutline size={18} />
+                    </span>
+                    <span className='p-1 border-1.5 border-red-600 text-red-600 rounded-full'>
+                      <PaintRoller size={18} />
                     </span>
                     <span className='p-1 border-1.5 border-black rounded-full'>
-                      <PaintRoller size={20} />
+                      <IoAirplaneOutline size={18} />
                     </span>
                     <span className='p-1 border-1.5 border-black rounded-full'>
-                      <FaPlane size={20} />
+                      <GoGear size={18} />
                     </span>
                     <span className='p-1 border-1.5 border-black rounded-full'>
-                      <FaGear size={20} />
-                    </span>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      <FaInfo size={20} />
+                      <FaRegCommentDots size={18} />
                     </span>
                   </div>
                 </section>
@@ -213,24 +203,40 @@ const EventCardDetail = ({
                   </p>
                   {/* NOTE: How to better display this? It's a bit jarring at the moment
             when viewing it. */}
-                  <div className=' grid grid-cols-2 justify-between'>
-                    <p className='font-medium'>Design Fee:</p>
-                    <p className='text-right'> $750</p>
-                    <p className='font-medium'>Accommodation:</p>
-                    <p className='text-right'>Provided</p>
-                    <p className='font-medium'>Food:</p>
-                    <p className='text-right'>$40/day</p>
-                    <p className='font-medium'>Travel Costs:</p>
-                    <p className='text-right'> Up to $500</p>
-                    <p className='font-medium'>Materials:</p>
-                    <p className='text-right text-red-500 italic'>
-                      (not provided)
-                    </p>
+                  <div className=' flex flex-col gap-y-3 justify-between'>
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      <p className='font-medium'>Design Fee:</p>
+                      <p className='text-right'> $750</p>
+                    </div>
+
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      <p className='font-medium'>Accommodation:</p>
+                      <p className='text-right'>Provided</p>
+                    </div>
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      <p className='font-medium'>Food:</p>
+                      <p className='text-right'>$40/day</p>
+                    </div>
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      <p className='font-medium'>Travel Costs:</p>
+                      <p className='text-right'> Up to $500</p>
+                    </div>
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      <p className='font-medium'>Materials:</p>
+                      <p className='text-right text-red-500 italic'>
+                        (not provided)
+                      </p>
+                    </div>
                     {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
-                    <p className='font-medium'>Equipment:</p>
-                    <p className='text-right'>(provided)</p>
-                    <p className='font-medium'>Other:</p>
-                    <p className='text-right'> ...details details</p>
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      {" "}
+                      <p className='font-medium'>Equipment:</p>
+                      <p className='text-right'>(provided)</p>
+                    </div>
+                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                      <p className='font-medium'>Other:</p>
+                      <p className='text-right'> ...details details</p>
+                    </div>
                     {/* <li>Must have liability insurance</li> */
                     /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
                   </div>
