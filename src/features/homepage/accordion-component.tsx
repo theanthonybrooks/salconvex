@@ -4,7 +4,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/mapped-accordion"
 import { AccordionSection } from "@/constants/accordions"
 import { motion } from "framer-motion"
 import { HelpCircle } from "lucide-react"

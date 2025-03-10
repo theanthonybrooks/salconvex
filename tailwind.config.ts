@@ -102,7 +102,6 @@ export default {
         smd: "-3px 3px 0 0 #000000",
         ssm: "-2px 2px 0 0 #000000",
       },
-
       padding: {
         "10": "2.5rem",
         "12": "3rem",
