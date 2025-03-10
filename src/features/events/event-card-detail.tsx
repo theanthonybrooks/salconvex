@@ -19,6 +19,8 @@ import { GoGear } from "react-icons/go"
 import { IoAirplaneOutline, IoFastFoodOutline } from "react-icons/io5"
 import { PiHouseLine, PiPencilLineDuotone } from "react-icons/pi"
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 interface EventCardDetailProps {
   accepted?: "accepted" | "rejected" | "pending" | undefined
   bookmarked?: boolean
@@ -60,7 +62,7 @@ const EventCardDetail = ({
         </span>
       )}
       <div className='w-full grid col-span-full  grid-cols-[75px_auto]  gap-x-3 mb-4'>
-        <div className='col-span-1 flex flex-col items-center justify-start space-y-6 pt-3 pb-3'>
+        <div className='col-span-1 flex flex-col items-center justify-around space-y-6 pt-3 pb-3'>
           <div
             className={cn(
               "rounded-full bg-white border-2 h-15 w-15 relative ",
@@ -90,16 +92,18 @@ const EventCardDetail = ({
           </div>
         </div>
 
-        <div className='pt-3 pb-3 pr-3 flex-col flex gap-y-3 '>
-          <div className='flex flex-col gap-y-1 mb-2'>
+        <div className='pt-3 pb-3 pr-3 gap-y-3 flex-col flex justify-between '>
+          <div className='flex flex-col gap-y-1'>
             <p className='text-base font-semibold  mb-1'>
-              Event Name in full that wraps two rows if needed
+              Event Name in full that spans two rows
             </p>
 
-            <p className='text-sm inline-flex items-end gap-x-1 mb-3'>
+            <p className='text-sm inline-flex items-end gap-x-1'>
               City, (state), Country
               <MapPin />
             </p>
+          </div>
+          <div className='flex flex-col justify-between gap-y-1'>
             <p className='text-sm'>
               <span className='font-semibold'>Event Dates:</span> June 5-18,
               2025
@@ -110,338 +114,489 @@ const EventCardDetail = ({
             <p className='text-sm'>
               <span className='font-semibold'>Type:</span> Street Art Festival
             </p>
-            {/* NOTE: Make these dynamic and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
-            {/* <div className='flex gap-x-4 mt-3 items-center justify-start'>
+          </div>
+          {/* NOTE: Make these dynamic and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
+          {/* <div className='flex gap-x-4 mt-3 items-center justify-start'>
               <MailIcon size={24} />
               <Globe size={24} />
               <FaInstagram size={24} />
               <FiFacebook size={24} />
               <FaVk size={24} />
             </div> */}
-          </div>
         </div>
       </div>
       <div className='col-span-full w-full flex flex-col gap-y-3 justify-start items-start'>
-        <h3 className='text-left indent-2'>Open Call Details:</h3>
-        <Card className='w-full p-5 bg-white/60 border-black/20 rounded-xl'>
-          <Accordion>
-            <AccordionItem value='item-1'>
-              <AccordionTrigger title='Deadline & Eligibility:' hasPreview>
-                <p>
-                  <span className='font-semibold underline underline-offset-2'>
-                    Deadline:
-                  </span>
-                  <br /> Mar 2 2025 @ 5:00pm (CST)
-                </p>
-                <p>
-                  <span className='font-semibold underline underline-offset-2'>
-                    Eligible:
-                  </span>
-                  <br />
-                  <span className='text-red-600'>National: US Artists*</span>
-                </p>
-              </AccordionTrigger>
-              <AccordionContent>
-                <p>
-                  <span className='font-semibold underline underline-offset-2'>
-                    More Info:
-                  </span>
-                  <br /> Artists from xyz region, identity, and/or location are
-                  eligible to apply.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
+        <Tabs
+          defaultValue='opencall'
+          className='w-full flex flex-col justify-center'>
+          <TabsList className='w-fit mx-auto raymond bg-white/60'>
+            <TabsTrigger value='opencall'>Open Call</TabsTrigger>
+            <TabsTrigger value='event'>Event Details</TabsTrigger>
+            <TabsTrigger value='organizer'>Organizer</TabsTrigger>
+          </TabsList>
+          <TabsContent value='opencall'>
+            <Card className='w-full p-5 bg-white/60 border-black/20 rounded-xl'>
+              <Accordion>
+                <AccordionItem value='item-1'>
+                  <AccordionTrigger title='Deadline & Eligibility:' hasPreview>
+                    <p>
+                      <span className='font-semibold underline underline-offset-2'>
+                        Deadline:
+                      </span>
+                      <br /> Mar 2 2025 @ 5:00pm (CST)
+                    </p>
+                    <p>
+                      <span className='font-semibold underline underline-offset-2'>
+                        Eligible:
+                      </span>
+                      <br />
+                      <span className='text-red-600'>
+                        National: US Artists*
+                      </span>
+                    </p>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p>
+                      <span className='font-semibold underline underline-offset-2'>
+                        More Info:
+                      </span>
+                      <br /> Artists from xyz region, identity, and/or location
+                      are eligible to apply.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
 
-            <AccordionItem value='item-2'>
-              <AccordionTrigger
-                title=' Budget & Compensation:'
-                hasPreview
-                hidePreview>
-                <section className='flex flex-col justify-center items-center w-full'>
-                  <br />
-                  {/* ----------------- Preview Section ------------------/ */}
+                <AccordionItem value='item-2'>
+                  <AccordionTrigger
+                    title=' Budget & Compensation:'
+                    hasPreview
+                    hidePreview>
+                    <section className='flex flex-col justify-center items-center w-full'>
+                      <br />
+                      {/* ----------------- Preview Section ------------------/ */}
 
-                  <div
-                    id='budget-icons-${id}'
-                    className='col-span-2 flex gap-x-3 items-center justify-center max-w-full'>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      <PiPencilLineDuotone size={18} />
-                    </span>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      {" "}
-                      <PiHouseLine size={18} />
-                    </span>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      <IoFastFoodOutline size={18} />
-                    </span>
-                    <span className='p-1 border-1.5 border-red-600 text-red-600 rounded-full'>
-                      <PaintRoller size={18} />
-                    </span>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      <IoAirplaneOutline size={18} />
-                    </span>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      <GoGear size={18} />
-                    </span>
-                    <span className='p-1 border-1.5 border-black rounded-full'>
-                      <FaRegCommentDots size={18} />
-                    </span>
-                  </div>
-                </section>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className=' flex flex-col space-y-3  pb-3 mb-4'>
-                  <p>
-                    <span className='font-semibold underline underline-offset-2'>
-                      Budget:
-                    </span>
-                    <br />
-                    up to $10,000 | $50/ft²
-                  </p>
-                  <p className='font-semibold underline underline-offset-2'>
-                    Compensation Includes:
-                  </p>
-                  {/* NOTE: How to better display this? It's a bit jarring at the moment
+                      <div
+                        id='budget-icons-${id}'
+                        className='col-span-2 flex gap-x-3 items-center justify-center max-w-full'>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <PiPencilLineDuotone size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          {" "}
+                          <PiHouseLine size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <IoFastFoodOutline size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-red-600 text-red-600 rounded-full'>
+                          <PaintRoller size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <IoAirplaneOutline size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <GoGear size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <FaRegCommentDots size={18} />
+                        </span>
+                      </div>
+                    </section>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className=' flex flex-col space-y-3  pb-3 mb-4'>
+                      <p>
+                        <span className='font-semibold underline underline-offset-2'>
+                          Budget:
+                        </span>
+                        <br />
+                        up to $10,000 | $50/ft²
+                      </p>
+                      <p className='font-semibold underline underline-offset-2'>
+                        Compensation Includes:
+                      </p>
+                      {/* NOTE: How to better display this? It's a bit jarring at the moment
             when viewing it. */}
-                  <div className=' flex flex-col gap-y-3 justify-between'>
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      <p className='font-medium'>Design Fee:</p>
-                      <p className='text-right'> $750</p>
-                    </div>
+                      <div className=' flex flex-col gap-y-3 justify-between'>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Design Fee:</p>
+                          <p className='text-right'> $750</p>
+                        </div>
 
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      <p className='font-medium'>Accommodation:</p>
-                      <p className='text-right'>Provided</p>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Accommodation:</p>
+                          <p className='text-right'>Provided</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Food:</p>
+                          <p className='text-right'>$40/day</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Travel Costs:</p>
+                          <p className='text-right'> Up to $500</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Materials:</p>
+                          <p className='text-right text-red-500 italic'>
+                            (not provided)
+                          </p>
+                        </div>
+                        {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          {" "}
+                          <p className='font-medium'>Equipment:</p>
+                          <p className='text-right'>(provided)</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Other:</p>
+                          <p className='text-right'> ...details details</p>
+                        </div>
+                        {/* <li>Must have liability insurance</li> */
+                        /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
+                      </div>
                     </div>
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      <p className='font-medium'>Food:</p>
-                      <p className='text-right'>$40/day</p>
-                    </div>
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      <p className='font-medium'>Travel Costs:</p>
-                      <p className='text-right'> Up to $500</p>
-                    </div>
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      <p className='font-medium'>Materials:</p>
-                      <p className='text-right text-red-500 italic'>
-                        (not provided)
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='item-3'>
+                  <AccordionTrigger title='Application Requirements' />
+                  <AccordionContent>
+                    <div className='flex flex-col space-y-3  pb-3 mb-4'>
+                      <ol className='list-decimal list-inside px-4'>
+                        <li>Must be a US citizen or permanent resident</li>
+                        <li>Must be at least 18 years old</li>
+                        <li>3 years of experience in public art</li>
+                        <li>Artist statement</li>
+                        <li>Up to 10 photos of recent works</li>
+                        <li>Google Form</li>
+                        {/* <li>Must have liability insurance</li> */
+                        /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
+                      </ol>
+                      <p>
+                        Send applications to{" "}
+                        <a href='mailto:info@thestreetartlist.com'>
+                          person@thestreetartlist.com
+                        </a>{" "}
+                        and feel free to reach out with any questions
                       </p>
                     </div>
-                    {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      {" "}
-                      <p className='font-medium'>Equipment:</p>
-                      <p className='text-right'>(provided)</p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='item-4'>
+                  <AccordionTrigger title='Other info:' />
+                  <AccordionContent>
+                    <div className='grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
+                      <p className='list-decimal list-inside px-4'>
+                        Only one application per artist; artist teams should
+                        only submit one application. Yada yada yada. More more
+                        more details.
+                      </p>
                     </div>
-                    <div className='flex justify-between items-center border-b border-dashed border-black/20'>
-                      <p className='font-medium'>Other:</p>
-                      <p className='text-right'> ...details details</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <div className='col-span-full mt-4 flex items-center justify-center px-4'>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-r-none border-r w-full min-w-[100px]'>
+                  Apply
+                </Button>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-none border-x w-fit sm:px-3 px-3'>
+                  {bookmarked ? (
+                    <BookmarkFilledIcon className='text-red-500 size-6' />
+                  ) : (
+                    <BookmarkIcon height={32} width={32} />
+                  )}
+                </Button>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-l-none border-l w-fit sm:px-2 px-2'>
+                  {hidden ? (
+                    <EyeOff height={24} width={24} className='text-red-500' />
+                  ) : (
+                    <Eye height={32} width={32} />
+                  )}
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+          <TabsContent value='event'>
+            <Card className='w-full p-5 bg-white/60 border-black/20 rounded-xl'>
+              <Accordion defaultValue='item-1'>
+                <AccordionItem value='item-1'>
+                  <AccordionTrigger title='Event Location:' />
+
+                  <AccordionContent>
+                    <div className='w-full h-[200px] bg-orange-500/50 rounded-xl relative'>
+                      <h1 className='text-3xl absolute top-0 right-0 -translate-x-1/2 translate-y-1/2'>
+                        Map Here
+                      </h1>
                     </div>
-                    {/* <li>Must have liability insurance</li> */
-                    /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                    <p>
+                      Get directions{" "}
+                      <span className='underline underline-offset-2'>here</span>
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
 
-            <AccordionItem value='item-3'>
-              <AccordionTrigger title='Application Requirements' />
-              <AccordionContent>
-                <div className='flex flex-col space-y-3  pb-3 mb-4'>
-                  <ol className='list-decimal list-inside px-4'>
-                    <li>Must be a US citizen or permanent resident</li>
-                    <li>Must be at least 18 years old</li>
-                    <li>3 years of experience in public art</li>
-                    <li>Artist statement</li>
-                    <li>Up to 10 photos of recent works</li>
-                    <li>Google Form</li>
-                    {/* <li>Must have liability insurance</li> */
-                    /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
-                  </ol>
-                  <p>
-                    Send applications to{" "}
-                    <a href='mailto:info@thestreetartlist.com'>
-                      person@thestreetartlist.com
-                    </a>{" "}
-                    and feel free to reach out with any questions
-                  </p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                <AccordionItem value='item-2'>
+                  <AccordionTrigger title='About the Event:' />
 
-            <AccordionItem value='item-4'>
-              <AccordionTrigger title='Other info:' />
-              <AccordionContent>
-                <div className='grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
-                  <p className='list-decimal list-inside px-4'>
-                    Only one application per artist; artist teams should only
-                    submit one application. Yada yada yada. More more more
-                    details.
-                  </p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-          <div className='col-span-full mt-4 flex items-center justify-center px-4'>
-            <Button
-              variant='salWithShadowHidden'
-              size='lg'
-              className='rounded-r-none border-r w-full min-w-[100px]'>
-              Apply
-            </Button>
-            <Button
-              variant='salWithShadowHidden'
-              size='lg'
-              className='rounded-none border-x w-fit sm:px-3 px-3'>
-              {bookmarked ? (
-                <BookmarkFilledIcon className='text-red-500 size-6' />
-              ) : (
-                <BookmarkIcon height={32} width={32} />
-              )}
-            </Button>
-            <Button
-              variant='salWithShadowHidden'
-              size='lg'
-              className='rounded-l-none border-l w-fit sm:px-2 px-2'>
-              {hidden ? (
-                <EyeOff height={24} width={24} className='text-red-500' />
-              ) : (
-                <Eye height={32} width={32} />
-              )}
-            </Button>
-          </div>
+                  <AccordionContent>
+                    <div className=' flex flex-col space-y-3  pb-3 mb-4'>
+                      <p>
+                        This is some random text about the event. When it is,
+                        where it is, how it is. Why it is. Blahblahblah blah
+                        blah blah blah blah blah blah.
+                        <br />
+                        Oh, new line. Okay, blah blah blah.
+                        <br />
+                        Again? Wow, blah blah blah.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-          {/*       <div className='relative flex flex-col space-y-3  pb-3 mb-4'>
-            <div className='absolute top-0 right-2'>
-              <Minus />
-            </div>
-            <p className='font-semibold underline underline-offset-2'>
-              Application Requirements:
-            </p>
-            <ol className='list-decimal list-inside px-4'>
-              <li>Must be a US citizen or permanent resident</li>
-              <li>Must be at least 18 years old</li>
-              <li>3 years of experience in public art</li>
-              <li>Artist statement</li>
-              <li>Up to 10 photos of recent works</li>
-              <li>Google Form</li>
-              /~ <li>Must have liability insurance</li> */
-          /* Note-to-self: this is something that coold/should be later. These sort of requirements~/
-            </ol>
-            <p>
-              Send applications to{" "}
-              <a href='mailto:info@thestreetartlist.com'>
-                person@thestreetartlist.com
-              </a>{" "}
-              and feel free to reach out with any questions
-            </p>
-          </div>
-          <div className='relative flex flex-col space-y-3  pb-3 mb-4'>
-            <div className='absolute top-0 right-2'>
-              <Minus />
-            </div>
-            <p>
-              <span className='font-semibold underline underline-offset-2'>
-                Budget:
-              </span>
-              <br />
-              up to $10,000 | $50/ft²
-            </p>
-            <p className='font-semibold underline underline-offset-2'>
-              Compensation Includes:
-            </p>
-            /~ NOTE: How to better display this? It's a bit jarring at the moment
-            when viewing it. ~/
-            <div className=' grid grid-cols-2 justify-between'>
-              <p className='font-medium'>Design Fee:</p>
-              <p className='text-right'> $750</p>
-              <p className='font-medium'>Accommodation:</p>
-              <p className='text-right'>Provided</p>
-              <p className='font-medium'>Food:</p>
-              <p className='text-right'>$40/day</p>
-              <p className='font-medium'>Travel Costs:</p>
-              <p className='text-right'> Up to $500</p>
-              <p className='font-medium'>Materials:</p>
-              <p className='text-right text-red-500 italic'>(not provided)</p>
-              /~ NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  ~/
-              <p className='font-medium'>Equipment:</p>
-              <p className='text-right'>(provided)</p>
-              <p className='font-medium'>Other:</p>
-              <p className='text-right'> ...details details</p>
-              /~ <li>Must have liability insurance</li> */
-          /* Note-to-self: this is something that coold/should be later. These sort of requirements~/
-              /~ ----------------- Preview Section ------------------/ ~/
-              /~            <div
-                id='budget-icons-${id}'
-                className='col-span-2 flex gap-x-3 items-center justify-center'>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  <PiPencilCircle size={20} />
-                </span>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  {" "}
-                  <FaHouse size={20} />
-                </span>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  <PiBowlFood size={20} />
-                </span>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  <PaintRoller size={20} />
-                </span>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  <FaPlane size={20} />
-                </span>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  <FaGear size={20} />
-                </span>
-                <span className='p-1 border-1.5 border-black rounded-full'>
-                  <FaInfo size={20} />
-                </span>
-              </div>~/
-            </div>
-          </div>
-          <div className='relative grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
-            <div className='absolute top-0 right-2'>
-              <Minus />
-            </div>
-            <p className='font-semibold underline underline-offset-2'>Other:</p>
-            <p className='list-decimal list-inside px-4'>
-              Only one application per artist; artist teams should only submit
-              one application. Yada yada yada. More more more details.
-            </p>
-            <div className='col-span-full mt-4 flex items-center justify-center px-4'>
-              <Button
-                variant='salWithShadowHidden'
-                size='lg'
-                className='rounded-r-none border-r w-full'>
-                Apply
-              </Button>
-              <Button
-                variant='salWithShadowHidden'
-                size='lg'
-                className='rounded-none border-x w-fit px-3'>
-                {bookmarked ? (
-                  <BookmarkFilledIcon
-                    height={24}
-                    width={24}
-                    className='text-red-500'
-                  />
-                ) : (
-                  <BookmarkIcon height={32} width={32} />
-                )}
-              </Button>
-              <Button
-                variant='salWithShadowHidden'
-                size='lg'
-                className='rounded-l-none border-l w-fit px-2'>
-                {hidden ? (
-                  <EyeOff height={24} width={24} className='text-red-500' />
-                ) : (
-                  <Eye height={32} width={32} />
-                )}
-              </Button>
-            </div>
-          </div>*/}
-        </Card>
+                <AccordionItem value='item-3'>
+                  <AccordionTrigger title='Other info:' />
+                  <AccordionContent>
+                    <p>
+                      Event may be postponed or canceled due to weather or other
+                      unforeseen circumstances. As organizers, we&apos;ll do our
+                      best to keep you informed of any changes.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <div className='col-span-full mt-4 flex items-center justify-center px-4'>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-r-none border-r w-full min-w-[100px]'>
+                  Apply
+                </Button>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-none border-x w-fit sm:px-3 px-3'>
+                  {bookmarked ? (
+                    <BookmarkFilledIcon className='text-red-500 size-6' />
+                  ) : (
+                    <BookmarkIcon height={32} width={32} />
+                  )}
+                </Button>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-l-none border-l w-fit sm:px-2 px-2'>
+                  {hidden ? (
+                    <EyeOff height={24} width={24} className='text-red-500' />
+                  ) : (
+                    <Eye height={32} width={32} />
+                  )}
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+          <TabsContent value='organizer'>
+            <Card className='w-full p-5 bg-white/60 border-black/20 rounded-xl'>
+              <Accordion>
+                <AccordionItem value='item-1'>
+                  <AccordionTrigger title='Deadline & Eligibility:' hasPreview>
+                    <p>
+                      <span className='font-semibold underline underline-offset-2'>
+                        Deadline:
+                      </span>
+                      <br /> Mar 2 2025 @ 5:00pm (CST)
+                    </p>
+                    <p>
+                      <span className='font-semibold underline underline-offset-2'>
+                        Eligible:
+                      </span>
+                      <br />
+                      <span className='text-red-600'>
+                        National: US Artists*
+                      </span>
+                    </p>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p>
+                      <span className='font-semibold underline underline-offset-2'>
+                        More Info:
+                      </span>
+                      <br /> Artists from xyz region, identity, and/or location
+                      are eligible to apply.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='item-2'>
+                  <AccordionTrigger
+                    title=' Budget & Compensation:'
+                    hasPreview
+                    hidePreview>
+                    <section className='flex flex-col justify-center items-center w-full'>
+                      <br />
+                      {/* ----------------- Preview Section ------------------/ */}
+
+                      <div
+                        id='budget-icons-${id}'
+                        className='col-span-2 flex gap-x-3 items-center justify-center max-w-full'>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <PiPencilLineDuotone size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          {" "}
+                          <PiHouseLine size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <IoFastFoodOutline size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-red-600 text-red-600 rounded-full'>
+                          <PaintRoller size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <IoAirplaneOutline size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <GoGear size={18} />
+                        </span>
+                        <span className='p-1 border-1.5 border-black rounded-full'>
+                          <FaRegCommentDots size={18} />
+                        </span>
+                      </div>
+                    </section>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className=' flex flex-col space-y-3  pb-3 mb-4'>
+                      <p>
+                        <span className='font-semibold underline underline-offset-2'>
+                          Budget:
+                        </span>
+                        <br />
+                        up to $10,000 | $50/ft²
+                      </p>
+                      <p className='font-semibold underline underline-offset-2'>
+                        Compensation Includes:
+                      </p>
+                      {/* NOTE: How to better display this? It's a bit jarring at the moment
+            when viewing it. */}
+                      <div className=' flex flex-col gap-y-3 justify-between'>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Design Fee:</p>
+                          <p className='text-right'> $750</p>
+                        </div>
+
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Accommodation:</p>
+                          <p className='text-right'>Provided</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Food:</p>
+                          <p className='text-right'>$40/day</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Travel Costs:</p>
+                          <p className='text-right'> Up to $500</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Materials:</p>
+                          <p className='text-right text-red-500 italic'>
+                            (not provided)
+                          </p>
+                        </div>
+                        {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          {" "}
+                          <p className='font-medium'>Equipment:</p>
+                          <p className='text-right'>(provided)</p>
+                        </div>
+                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                          <p className='font-medium'>Other:</p>
+                          <p className='text-right'> ...details details</p>
+                        </div>
+                        {/* <li>Must have liability insurance</li> */
+                        /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='item-3'>
+                  <AccordionTrigger title='Application Requirements' />
+                  <AccordionContent>
+                    <div className='flex flex-col space-y-3  pb-3 mb-4'>
+                      <ol className='list-decimal list-inside px-4'>
+                        <li>Must be a US citizen or permanent resident</li>
+                        <li>Must be at least 18 years old</li>
+                        <li>3 years of experience in public art</li>
+                        <li>Artist statement</li>
+                        <li>Up to 10 photos of recent works</li>
+                        <li>Google Form</li>
+                        {/* <li>Must have liability insurance</li> */
+                        /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
+                      </ol>
+                      <p>
+                        Send applications to{" "}
+                        <a href='mailto:info@thestreetartlist.com'>
+                          person@thestreetartlist.com
+                        </a>{" "}
+                        and feel free to reach out with any questions
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='item-4'>
+                  <AccordionTrigger title='Other info:' />
+                  <AccordionContent>
+                    <div className='grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
+                      <p className='list-decimal list-inside px-4'>
+                        Only one application per artist; artist teams should
+                        only submit one application. Yada yada yada. More more
+                        more details.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <div className='col-span-full mt-4 flex items-center justify-center px-4'>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-r-none border-r w-full min-w-[100px]'>
+                  Apply
+                </Button>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-none border-x w-fit sm:px-3 px-3'>
+                  {bookmarked ? (
+                    <BookmarkFilledIcon className='text-red-500 size-6' />
+                  ) : (
+                    <BookmarkIcon height={32} width={32} />
+                  )}
+                </Button>
+                <Button
+                  variant='salWithShadowHidden'
+                  size='lg'
+                  className='rounded-l-none border-l w-fit sm:px-2 px-2'>
+                  {hidden ? (
+                    <EyeOff height={24} width={24} className='text-red-500' />
+                  ) : (
+                    <Eye height={32} width={32} />
+                  )}
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Card>
   )
