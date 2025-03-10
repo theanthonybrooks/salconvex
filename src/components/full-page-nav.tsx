@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils"
 import { Authenticated, Unauthenticated } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle, XCircle } from "lucide-react"
-import { useTheme } from "next-themes"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -217,7 +216,7 @@ const screenOverlayVariants = {
 
 const FullPageNav = ({ user }: FullPageNavProps) => {
   const footerText = footerCRText()
-  const { theme } = useTheme()
+  // const { theme } = useTheme()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState("initial")
   const [freshOpen, setFreshOpen] = useState(false)

@@ -4,7 +4,7 @@ import {
   ElementOrSelector,
   useAnimate,
 } from "framer-motion"
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
 const TRANSITION: AnimationOptions = {
   ease: "easeInOut",
@@ -98,6 +98,30 @@ export const useMotionTimeline = (
 
   const [scope, animate] = useAnimate()
 
+  const isAnimationArray = (animation: Animation): animation is Animation[] => {
+    return Array.isArray(animation[0])
+  }
+
+  const processAnimation = useCallback(
+    async (animation: Animation) => {
+      if (isAnimationArray(animation)) {
+        await Promise.all(animation.map(processAnimation))
+      } else {
+        await animate(...animation)
+      }
+    },
+    [animate]
+  )
+
+  const handleAnimate = useCallback(async () => {
+    for (let i = 0; i < count; i++) {
+      for (const animation of keyframes) {
+        if (!mounted.current) return
+        await processAnimation(animation)
+      }
+    }
+  }, [count, keyframes, processAnimation])
+
   useEffect(() => {
     mounted.current = true
 
@@ -106,28 +130,7 @@ export const useMotionTimeline = (
     return () => {
       mounted.current = false
     }
-  }, [])
-
-  const isAnimationArray = (animation: Animation): animation is Animation[] => {
-    return Array.isArray(animation[0])
-  }
-
-  const processAnimation = async (animation: Animation) => {
-    if (isAnimationArray(animation)) {
-      await Promise.all(animation.map(processAnimation))
-    } else {
-      await animate(...animation)
-    }
-  }
-
-  const handleAnimate = async () => {
-    for (let i = 0; i < count; i++) {
-      for (const animation of keyframes) {
-        if (!mounted.current) return
-        await processAnimation(animation)
-      }
-    }
-  }
+  }, [handleAnimate])
 
   return scope
 }
