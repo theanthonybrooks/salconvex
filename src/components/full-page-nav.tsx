@@ -576,13 +576,13 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                                 className={cn(
                                   "cursor-pointer hover:translate-x-3 transition-transform ease-in-out duration-300",
                                   activeCategory === section.title &&
-                                    "stroked wshadow ",
-                                  activeCategory === section.title &&
-                                    theme === "default" &&
-                                    "text-white",
-                                  activeCategory === section.title &&
-                                    theme === "light" &&
-                                    "text-salYellow"
+                                    "stroked wshadow text-white"
+                                  // activeCategory === section.title &&
+                                  //   theme === "default" &&
+                                  //   "text-white",
+                                  // activeCategory === section.title &&
+                                  //   theme === "light" &&
+                                  //   "text-white"
                                 )}>
                                 {/* {activeCategory === section.title && (
                                       <GoDotFill className='text-black size-8 md:size-14' />
