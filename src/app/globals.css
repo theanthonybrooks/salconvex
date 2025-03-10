@@ -29,7 +29,8 @@ body,
     --sal-green: 83, 51%, 88%; /* #e4f0d1 */
     --sal-test: rgb(228, 240, 209);
     --sal-yellow-hex: #f8f16b;
-    --background: 0 0% 100%;
+    --background: 83, 51%, 88%;
+    /* --background: 0 0% 100%; */
     --user-icon: var(--sal-yellow-old);
     --foreground: 222.2 84% 4.9%;
     /* --sal-progress: rgb(255, 247, 100); */
