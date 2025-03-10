@@ -29,7 +29,7 @@ const EventCardDetail = ({
   hidden = false,
 }: EventCardDetailProps) => {
   return (
-    <Card className='bg-white/50 border-black/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
+    <Card className='bg-white/50 border-black/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[90vw] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
       <Link
         href='/thelist'
         className='col-span-full pl-3 flex gap-x-2 items-center justify-start py-2'>
@@ -121,7 +121,7 @@ const EventCardDetail = ({
       </div>
       <div className='col-span-full w-full flex flex-col gap-y-3 justify-start items-start'>
         <h3 className='text-left indent-2'>Open Call Details:</h3>
-        <Card className='w-full p-3 bg-white/60 border-black/20 rounded-xl'>
+        <Card className='w-full p-5 bg-white/60 border-black/20 rounded-xl'>
           {/*        <div className='flex flex-col space-y-3  pb-3 mb-4 relative'>
             <div className='absolute top-0 right-2'>
               <Minus />
@@ -164,7 +164,10 @@ const EventCardDetail = ({
             </AccordionItem>
 
             <AccordionItem value='item-2'>
-              <AccordionTrigger title=' Budget & Compensation:' hasPreview>
+              <AccordionTrigger
+                title=' Budget & Compensation:'
+                hasPreview
+                hidePreview>
                 <section className='flex flex-col justify-center items-center w-full'>
                   <br />
                   {/* ----------------- Preview Section ------------------/ */}
@@ -277,13 +280,13 @@ const EventCardDetail = ({
             <Button
               variant='salWithShadowHidden'
               size='lg'
-              className='rounded-r-none border-r w-full min-w-[200px]'>
+              className='rounded-r-none border-r w-full min-w-[100px]'>
               Apply
             </Button>
             <Button
               variant='salWithShadowHidden'
               size='lg'
-              className='rounded-none border-x w-fit sm:px-3'>
+              className='rounded-none border-x w-fit sm:px-3 px-3'>
               {bookmarked ? (
                 <BookmarkFilledIcon className='text-red-500 size-6' />
               ) : (
@@ -293,7 +296,7 @@ const EventCardDetail = ({
             <Button
               variant='salWithShadowHidden'
               size='lg'
-              className='rounded-l-none border-l w-fit sm:px-2'>
+              className='rounded-l-none border-l w-fit sm:px-2 px-2'>
               {hidden ? (
                 <EyeOff height={24} width={24} className='text-red-500' />
               ) : (

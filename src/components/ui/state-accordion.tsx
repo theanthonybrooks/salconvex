@@ -71,39 +71,52 @@ interface AccordionTriggerProps
   extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> {
   title: string
   hasPreview?: boolean
+  hidePreview?: boolean
 }
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
->(({ className, children, title, hasPreview = false, ...props }, ref) => {
-  const { openValue } = React.useContext(AccordionContext)
-  const { value } = React.useContext(AccordionItemContext)
-  const isOpen = openValue === value
+>(
+  (
+    {
+      hidePreview = false,
+      className,
+      children,
+      title,
+      hasPreview = false,
+      ...props
+    },
+    ref
+  ) => {
+    const { openValue } = React.useContext(AccordionContext)
+    const { value } = React.useContext(AccordionItemContext)
+    const isOpen = openValue === value
 
-  return (
-    <AccordionPrimitive.Header className='flex'>
-      <AccordionPrimitive.Trigger
-        ref={ref}
-        className={cn(
-          "group flex flex-1 items-start  py-4 text-sm font-medium transition-all  text-left",
-          className,
-          hasPreview && "flex-col gap-y-2"
-        )}
-        {...props}>
-        <div className='flex justify-between items-center w-full'>
-          <span className=' hover:underline'> {title}</span>
-          {isOpen ? (
-            <Minus className='h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200' />
-          ) : (
-            <Plus className='h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200' />
+    return (
+      <AccordionPrimitive.Header className='flex'>
+        <AccordionPrimitive.Trigger
+          ref={ref}
+          className={cn(
+            "group flex flex-1 items-start  py-4 text-sm font-medium transition-all  text-left",
+            className,
+            hasPreview && "flex-col gap-y-2"
           )}
-        </div>
-        {children}
-      </AccordionPrimitive.Trigger>
-    </AccordionPrimitive.Header>
-  )
-})
+          {...props}>
+          <div className='flex justify-between items-center w-full'>
+            <span className=' hover:underline'> {title}</span>
+            {isOpen ? (
+              <Minus className='h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200' />
+            ) : (
+              <Plus className='h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200' />
+            )}
+          </div>
+          {(isOpen && !hidePreview) || (!isOpen && <>{children}</>)}
+        </AccordionPrimitive.Trigger>
+      </AccordionPrimitive.Header>
+    )
+  }
+)
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
 const AccordionContent = React.forwardRef<
