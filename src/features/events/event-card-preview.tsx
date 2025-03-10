@@ -3,8 +3,14 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Bookmark, CircleDollarSignIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-const EventCardPreview = () => {
+interface EventCardPreviewProps {
+  path: string
+}
+
+const EventCardPreview = ({ path }: EventCardPreviewProps) => {
+  const router = useRouter()
   return (
     <Card className='bg-white/40 border-black/20  grid grid-rows-[auto_1fr] grid-cols-[75px_auto_50px] max-w-[400px] gap-x-3 rounded-3xl mb-10 first:mt-6 px-1 py-2 '>
       <div className='row-span-2 col-span-1 flex flex-col items-center justify-between pt-3 pb-3 pl-2'>
@@ -43,7 +49,11 @@ const EventCardPreview = () => {
             <span className='text-red-600'>US Artists*</span>
           </p>
         </div>
-        <Button variant='salWithShadowHidden' size='lg' className='bg-white/60'>
+        <Button
+          variant='salWithShadowHidden'
+          size='lg'
+          className='bg-white/60'
+          onClick={() => router.push(path)}>
           View More
         </Button>
       </div>
