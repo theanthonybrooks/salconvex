@@ -182,26 +182,23 @@ export default function NavBar({
               </div> */}
 
               {/* Right Side */}
-              <div className='hidden lg:flex  items-center gap-x-3'>
+              <div className='hidden lg:flex  items-center gap-x-4'>
                 <Bell />
-                <div className='flex items-center h-[50px] w-fit bg-white rounded-full p-1 pr-5 border-2 border-black'>
-                  <div className='flex items-center gap-4'>
-                    <Unauthenticated>
-                      <Link href='/auth/sign-in' prefetch={true}>
-                        <Button
-                          variant='salWithShadowHidden'
-                          className='font-bold hidden lg:block ml-2 my-1 rounded-full '>
-                          Sign in
-                        </Button>
-                      </Link>
-                    </Unauthenticated>
 
-                    {userId !== "guest" && user && (
-                      <UserProfile className='h-[40px] w-[40px]' user={user} />
-                    )}
-                    <FullPageNav user={user} />
-                  </div>
-                </div>
+                <Unauthenticated>
+                  <Link href='/auth/sign-in' prefetch={true}>
+                    <Button
+                      variant='salWithShadowHidden'
+                      className='font-bold hidden lg:block ml-2 my-1 rounded-full '>
+                      Sign in
+                    </Button>
+                  </Link>
+                </Unauthenticated>
+
+                {userId !== "guest" && user && (
+                  <UserProfile className='h-[40px] w-[40px]' user={user} />
+                )}
+                <FullPageNav user={user} />
               </div>
             </>
           )}

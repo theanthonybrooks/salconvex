@@ -61,8 +61,6 @@ export const CommandMenuCustom = <T extends CommandItem>({
       }, 0)
     }
   }, [open])
-  //NOTE: Remove this later
-  console.log("is mobile:", isMobile)
 
   // Keyboard shortcut handler (depends only on setOpen)
   useEffect(() => {
@@ -96,7 +94,11 @@ export const CommandMenuCustom = <T extends CommandItem>({
         damping: 20,
       },
     },
-    exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      transition: { duration: 0.5, ease: "easeInOut" },
+    },
   }
 
   const searchTerm = value.toLowerCase()
@@ -107,9 +109,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
   }
 
   const handleLinkClick = () => {
-    setTimeout(() => {
-      setOpen(false)
-    }, 750)
+    setOpen(false)
   }
 
   // Group items by group name
@@ -148,108 +148,106 @@ export const CommandMenuCustom = <T extends CommandItem>({
       label={title}
       className='fixed inset-0 flex items-center justify-center text-black z-[999]'
       onClick={() => setOpen(false)}>
+      {/* Background overlay */}
       <AnimatePresence>
         {open && (
-          <>
-            {/* Background overlay */}
-            <motion.div
-              className='fixed inset-0 z-100'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }} // adjust to your liking
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // subtler overlay color
-            />
-
-            {/* Dialog box */}
-            <motion.div
-              variants={dialogVariants}
-              initial='hidden'
-              animate='visible'
-              exit='exit'
-              className='relative flex max-w-[90vw] max-h-[80vh] w-full md:max-w-xl flex-col rounded-lg border border-stone-300 bg-white p-4 shadow-xl'
-              onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => setOpen(false)}
-                className='absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110'>
-                <X className='h-7 w-7 md:h-5 md:w-5 text-stone-600' />
-              </button>
-              <DialogTitle className='sr-only'>{title}</DialogTitle>
-              <div className='flex items-center gap-1 border-b border-stone-300'>
-                <IoSearch className='z-20 p-1 text-3xl text-stone-400' />
-                <Command.Input
-                  ref={inputRef}
-                  value={value}
-                  onValueChange={handleValueChange}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setOpen(false)
-                    }
-                    if (e.key === "Escape") {
-                      setValue("")
-                      setSearch("")
-                      setOpen(false)
-                    }
-                  }}
-                  placeholder={cn(
-                    placeholder,
-                    !isMobile && "  (Hint: Ctrl + /)"
-                  )}
-                  className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-none'
-                />
-              </div>
-              <div className='max-h-60dvh search scrollable mini p-3'>
-                <Command.List>
-                  {Object.keys(groupedItems).length === 0 ? (
-                    <Command.Empty>
-                      No results found for{" "}
-                      <span className='text-violet-500 italic'>
-                        &quot;{value}&quot;
-                      </span>
-                    </Command.Empty>
-                  ) : (
-                    Object.entries(groupedItems).map(
-                      ([groupKey, groupItems]) => (
-                        <Command.Group
-                          key={groupKey}
-                          heading={groupKey.toUpperCase()}
-                          className='mb-5 text-sm text-stone-400 border-t-1.5 border-stone-200 first:border-t-0 pt-2'>
-                          {groupItems.map((item) => (
-                            <Command.Item
-                              key={item.path}
-                              className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-stone-950 transition-colors hover:bg-stone-100'
-                              onMouseEnter={() => setHoveredItem(item.path)}
-                              onMouseLeave={() => setHoveredItem(null)}
-                              onSelect={() => router.push(item.path)}>
-                              {item.icon && <item.icon className='h-4 w-4' />}
-                              <Link
-                                href={item.path}
-                                prefetch={true}
-                                onClick={handleLinkClick}>
-                                <span>{item.title}</span>
-                              </Link>
-                              {item.desc && !isMobile && (
-                                <motion.span
-                                  initial={{ opacity: 0 }}
-                                  animate={{
-                                    opacity: hoveredItem === item.path ? 1 : 0,
-                                  }}
-                                  transition={{ duration: 0.1 }}
-                                  className='inline-flex items-center gap-2 text-stone-600'>
-                                  <DashIcon />
-                                  <span>{item.desc}</span>
-                                </motion.span>
-                              )}
-                            </Command.Item>
-                          ))}
-                        </Command.Group>
-                      )
-                    )
-                  )}
-                </Command.List>
-              </div>
-            </motion.div>
-          </>
+          <motion.div
+            key='overlay'
+            className='fixed inset-0 z-100'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }} // adjust to your liking
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // subtler overlay color
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {/* Dialog box */}
+        {open && (
+          <motion.div
+            key='dialogBox'
+            variants={dialogVariants}
+            initial='hidden'
+            animate='visible'
+            exit='exit'
+            className='relative flex max-w-[90vw] max-h-[80vh] w-full md:max-w-xl flex-col rounded-lg border border-stone-300 bg-white p-4 shadow-xl'
+            onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setOpen(false)}
+              className='absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110'>
+              <X className='h-7 w-7 md:h-5 md:w-5 text-stone-600' />
+            </button>
+            <DialogTitle className='sr-only'>{title}</DialogTitle>
+            <div className='flex items-center gap-1 border-b border-stone-300'>
+              <IoSearch className='z-20 p-1 text-3xl text-stone-400' />
+              <Command.Input
+                ref={inputRef}
+                value={value}
+                onValueChange={handleValueChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setOpen(false)
+                  }
+                  if (e.key === "Escape") {
+                    setValue("")
+                    setSearch("")
+                    setOpen(false)
+                  }
+                }}
+                placeholder={cn(placeholder, !isMobile && "  (Hint: Ctrl + /)")}
+                className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-none'
+              />
+            </div>
+            <div className='max-h-60dvh search scrollable mini p-3'>
+              <Command.List>
+                {Object.keys(groupedItems).length === 0 ? (
+                  <Command.Empty>
+                    No results found for{" "}
+                    <span className='text-violet-500 italic'>
+                      &quot;{value}&quot;
+                    </span>
+                  </Command.Empty>
+                ) : (
+                  Object.entries(groupedItems).map(([groupKey, groupItems]) => (
+                    <Command.Group
+                      key={groupKey}
+                      heading={groupKey.toUpperCase()}
+                      className='mb-5 text-sm text-stone-400 border-t-1.5 border-stone-200 first:border-t-0 pt-2'>
+                      {groupItems.map((item) => (
+                        <Command.Item
+                          key={item.path}
+                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-stone-950 transition-colors hover:bg-stone-100'
+                          onMouseEnter={() => setHoveredItem(item.path)}
+                          onMouseLeave={() => setHoveredItem(null)}
+                          onSelect={() => router.push(item.path)}>
+                          {item.icon && <item.icon className='h-4 w-4' />}
+                          <Link
+                            href={item.path}
+                            prefetch={true}
+                            onClick={handleLinkClick}>
+                            <span>{item.title}</span>
+                          </Link>
+                          {item.desc && !isMobile && (
+                            <motion.span
+                              initial={{ opacity: 0 }}
+                              animate={{
+                                opacity: hoveredItem === item.path ? 1 : 0,
+                              }}
+                              transition={{ duration: 0.1 }}
+                              className='inline-flex items-center gap-2 text-stone-600'>
+                              <DashIcon />
+                              <span>{item.desc}</span>
+                            </motion.span>
+                          )}
+                        </Command.Item>
+                      ))}
+                    </Command.Group>
+                  ))
+                )}
+              </Command.List>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </Command.Dialog>
