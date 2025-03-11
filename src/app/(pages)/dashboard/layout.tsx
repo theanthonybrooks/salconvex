@@ -19,11 +19,12 @@ export default async function DashboardLayout({
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token })
   const role = user?.user?.role
   return (
-    <div className='flex h-screen overflow-hidden'>
-      <DashboardSideBar subStatus={subStatus?.subStatus} role={role} />
-      <main className='flex-1 overflow-y-auto scrollable'>
-        <DashboardTopNav>{children}</DashboardTopNav>
-      </main>
-    </div>
+    <>
+      <DashboardTopNav />
+      <div className='flex h-screen overflow-hidden'>
+        <DashboardSideBar subStatus={subStatus?.subStatus} role={role} />
+        <main className='flex-1 overflow-y-auto scrollable'>{children}</main>
+      </div>
+    </>
   )
 }

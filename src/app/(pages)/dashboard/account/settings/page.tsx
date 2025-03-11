@@ -71,6 +71,7 @@ import { currencies, Currency } from "@/app/data/currencies"
 import { Timezone, timezones } from "@/app/data/timezones"
 import { SearchMappedSelect } from "@/components/ui/mapped-select"
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
+import { useTheme } from "next-themes"
 import { useCallback } from "react"
 import { FaUserNinja } from "react-icons/fa6"
 import { toast } from "react-toastify"
@@ -97,7 +98,8 @@ export default function SettingsPage() {
   const [selectedCurrency, setCurrency] = useState<string | undefined>(
     undefined
   )
-  const [selectedTheme, setTheme] = useState<string | undefined>(undefined)
+  const { setTheme, theme } = useTheme()
+  const [selectedTheme, setThemePref] = useState<string | undefined>(undefined)
   // const [selectedLanguage, setLanguage] = useState("en")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -341,9 +343,10 @@ export default function SettingsPage() {
     if (userPrefs) {
       setTimezone(userPrefs.timezone ?? "GMT")
       setCurrency(userPrefs.currency ?? "USD")
+      setThemePref(userPrefs.theme ?? "light")
       setTheme(userPrefs.theme ?? "light")
     }
-  }, [userPrefs])
+  }, [userPrefs, setTheme])
 
   useEffect(() => {
     if (user) {
@@ -747,8 +750,8 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Select
-                    defaultValue={selectedTheme ?? "light"}
-                    onValueChange={setTheme}>
+                    defaultValue={userPrefs?.theme ?? theme}
+                    onValueChange={setThemePref}>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select color' />
                     </SelectTrigger>
