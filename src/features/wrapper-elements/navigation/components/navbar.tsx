@@ -115,7 +115,7 @@ NavBarProps) {
           {/* Mobile Logo and Navigation */}
           {isMobile && (
             <div className='lg:hidden items-center gap-2 flex'>
-              <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] origin-center z-10'>
+              <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] z-10'>
                 {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
                 <Link href='/' prefetch={true}>

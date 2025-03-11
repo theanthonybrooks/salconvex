@@ -101,6 +101,8 @@ export const CommandMenuCustom = <T extends CommandItem>({
     },
   }
 
+  //TODO: FIGURE OUT WHY THE EXIT ANIMATION DOESN'T HAPPEN
+
   const searchTerm = value.toLowerCase()
 
   const handleValueChange = (newValue: string) => {
