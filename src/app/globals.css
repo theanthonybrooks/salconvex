@@ -221,7 +221,7 @@ body,
 
     --radius: 0.5rem;
   }
-  @media (min-width: 640px) {
+  @media (min-width: 1024px) {
     :root {
       --nav-shadow: none;
     }

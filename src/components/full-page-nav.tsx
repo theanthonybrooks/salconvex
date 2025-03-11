@@ -18,6 +18,7 @@ import { useEffect, useState } from "react"
 
 interface FullPageNavProps {
   // userId?: string | undefined
+  isScrolled?: boolean
   user?: User | null
   // userPref?: UserPref | null
   // subStatus?: string | undefined
@@ -80,13 +81,14 @@ const menuVariants = {
     opacity: [0],
   },
 }
-const mobileMenuVariants = {
+
+const getMobileMenuVariants = (isScrolled: boolean | undefined) => ({
   open: {
     width: ["4em", "100vw", "100vw", "100vw"],
-    // height: [40, 100, 100, 100, "100vh"],
-    height: ["40px", "100px", "100px", "100vh"],
-    // transform: ["translateX(0)"],
-    top: [17, 0, 0, 0],
+    height: isScrolled
+      ? ["40px", "80px", "80px", "100vh"]
+      : ["40px", "100px", "100px", "100vh"],
+    top: isScrolled ? [17, 0, 0, 0] : [20, 0, 0, 0],
     right: [41, 0, 0, 0],
     borderRadius: [40, 40, 20, 0],
     transition: {
@@ -96,28 +98,6 @@ const mobileMenuVariants = {
     },
     opacity: [1, 1, 1, 1],
   },
-  // closed: {
-  //   width: ["100vw", "99vw", "98vw", "4em"],
-  //   height: ["100vh", 40, 40, 39],
-  //   top: [0, 17, 17, 17],
-  //   right: [0, 0, 41, 41],
-  //   borderRadius: [0, 20, 40, 40],
-  //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
-  //   transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
-
-  //   opacity: [1, 1, 1, 1],
-  // },
-  // closed: {
-  //   width: ["100vw", "100vw", "100vw", "100vw", "4em"],
-  //   height: ["100vh", "75vh", "50vh", "25vh", "40px"], // More gradual reduction
-  //   top: [0, 0, 0, 0, 17],
-  //   right: [0, 0, 0, 0, 41],
-  //   borderRadius: [0, 0, 20, 40, 40],
-  //   opacity: [1, 1, 1, 1, 1],
-
-  //   transition: { duration: 1.25, ease: [0.6, 0.05, 0.1, 1] }, // Smoother curve
-  // },
-
   closed: {
     width: "100vw",
     height: 0,
@@ -129,23 +109,10 @@ const mobileMenuVariants = {
       duration: 0.75,
       ease: [0.6, 0.05, 0.1, 1],
       type: "spring",
-      stiffness: 120, // Adjust this for bounciness
-      damping: 20, // Smooths the stop at the final height
+      stiffness: 120,
+      damping: 20,
     },
   },
-
-  // closed: {
-  //   width: ["100vw"],
-  //   height: ["100px"],
-  //   top: [0],
-  //   right: [0],
-  //   // transform: ["translateX(-50%)"],
-  //   borderRadius: [0],
-  //   opacity: [1],
-
-  //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
-  //   transition: { duration: 1.25, ease: [0.5, 1, 0.56, 0.81] },
-  // },
   mobileInitial: {
     width: [0],
     height: [0],
@@ -155,7 +122,84 @@ const mobileMenuVariants = {
     transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
     opacity: [0],
   },
-}
+})
+
+// const mobileMenuVariants = {
+//   open: {
+//     width: ["4em", "100vw", "100vw", "100vw"],
+//     // height: [40, 100, 100, 100, "100vh"],
+//     height: ["40px", "100px", "100px", "100vh"],
+//     // transform: ["translateX(0)"],
+//     top: [17, 0, 0, 0],
+//     right: [41, 0, 0, 0],
+//     borderRadius: [40, 40, 20, 0],
+//     transition: {
+//       duration: 1,
+//       ease: [0.5, 1, 0.56, 0.81],
+//       times: [0, 0.2, 0.4, 1],
+//     },
+//     opacity: [1, 1, 1, 1],
+//   },
+//   // closed: {
+//   //   width: ["100vw", "99vw", "98vw", "4em"],
+//   //   height: ["100vh", 40, 40, 39],
+//   //   top: [0, 17, 17, 17],
+//   //   right: [0, 0, 41, 41],
+//   //   borderRadius: [0, 20, 40, 40],
+//   //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+//   //   transition: { duration: 0.75, ease: [0.68, -0.55, 0.27, 1.55] },
+
+//   //   opacity: [1, 1, 1, 1],
+//   // },
+//   // closed: {
+//   //   width: ["100vw", "100vw", "100vw", "100vw", "4em"],
+//   //   height: ["100vh", "75vh", "50vh", "25vh", "40px"], // More gradual reduction
+//   //   top: [0, 0, 0, 0, 17],
+//   //   right: [0, 0, 0, 0, 41],
+//   //   borderRadius: [0, 0, 20, 40, 40],
+//   //   opacity: [1, 1, 1, 1, 1],
+
+//   //   transition: { duration: 1.25, ease: [0.6, 0.05, 0.1, 1] }, // Smoother curve
+//   // },
+
+//   closed: {
+//     width: "100vw",
+//     height: 0,
+//     top: 0,
+//     right: 0,
+//     borderRadius: 0,
+//     opacity: 1,
+//     transition: {
+//       duration: 0.75,
+//       ease: [0.6, 0.05, 0.1, 1],
+//       type: "spring",
+//       stiffness: 120, // Adjust this for bounciness
+//       damping: 20, // Smooths the stop at the final height
+//     },
+//   },
+
+//   // closed: {
+//   //   width: ["100vw"],
+//   //   height: ["100px"],
+//   //   top: [0],
+//   //   right: [0],
+//   //   // transform: ["translateX(-50%)"],
+//   //   borderRadius: [0],
+//   //   opacity: [1],
+
+//   //   // transition: { duration: 0.75, ease: [0.83, 0, 0.1, 1] },
+//   //   transition: { duration: 1.25, ease: [0.5, 1, 0.56, 0.81] },
+//   // },
+//   mobileInitial: {
+//     width: [0],
+//     height: [0],
+//     top: [20],
+//     right: [35],
+//     borderRadius: [40],
+//     transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
+//     opacity: [0],
+//   },
+// }
 const mobileTextVariants = {
   open: {
     opacity: 1,
@@ -214,7 +258,7 @@ const screenOverlayVariants = {
   },
 }
 
-const FullPageNav = ({ user }: FullPageNavProps) => {
+const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
   const footerText = footerCRText()
   // const { theme } = useTheme()
   const pathname = usePathname()
@@ -321,7 +365,7 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
             className={cn(
               "xl:hidden top-5 right-5 w-full h-full  fixed  box-border bg-background"
             )}
-            variants={mobileMenuVariants}
+            variants={getMobileMenuVariants(isScrolled)}
             animate={isOpen}
             initial='mobileInitial'
             exit='mobileInitial'
@@ -337,7 +381,10 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                 duration: 0.75,
                 ease: [0.83, 0, 0.1, 1],
               }}
-              className='grid grid-rows-[100px_auto] grid-cols-1 h-dvh w-screen '>
+              className={cn(
+                "grid  grid-cols-1 h-dvh w-screen ",
+                isScrolled ? "grid-rows-[80px_auto]" : "grid-rows-[100px_auto]"
+              )}>
               <motion.section
                 initial={{ display: "none" }}
                 variants={mobileImageVariants}
@@ -347,8 +394,8 @@ const FullPageNav = ({ user }: FullPageNavProps) => {
                 <Image
                   src='/sitelogo.svg'
                   alt='The Street Art List'
-                  width={60}
-                  height={60}
+                  width={isScrolled ? 40 : 60}
+                  height={isScrolled ? 40 : 60}
                   className='absolute left-5 top-5'
                   priority={true}
                 />

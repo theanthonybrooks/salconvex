@@ -59,18 +59,41 @@ NavBarProps) {
 
   return (
     <>
-      <motion.div
+      {/* <motion.div
         initial={{ boxShadow: "none" }}
         animate={{
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className='z-[19] fixed left-1/2 top-[34px] -translate-x-1/2 h-[90px] w-[90px] bg-background rounded-full lg:hidden'
-      />
+      /> */}
+      <motion.div
+        initial={{ boxShadow: "none" }}
+        animate={{
+          height: isScrolled ? "80px" : "100px",
+        }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className='fixed left-0 right-0 top-0 z-[19] h-25  '>
+        <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative'>
+          <motion.div
+            initial={{ boxShadow: "none", height: 90, width: 90 }}
+            animate={{
+              boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
+              height: isScrolled ? 70 : 90,
+              width: isScrolled ? 70 : 90,
+            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={cn(
+              "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] flex items-center justify-center bg-background rounded-full "
+            )}
+          />
+        </div>
+      </motion.div>
       <motion.div
         initial={{ boxShadow: "none" }}
         animate={{
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
+          height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className='fixed left-0 right-0 top-0 z-20 h-25  border-black  lg:bg-transparent bg-background '>
@@ -85,18 +108,31 @@ NavBarProps) {
               <Link href='/' prefetch={true}>
                 {/* <span className='font-semibold'>The Street Art List</span> */}
 
-                <Image
+                <motion.img
+                  initial={{ height: 70, width: 70 }}
+                  animate={{
+                    height: isScrolled ? 50 : 70,
+                    width: isScrolled ? 50 : 70,
+                  }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                   src='/sitelogo.svg'
                   alt='The Street Art List'
-                  width={70}
-                  height={70}
-                  priority={true}
 
                   // className='z-10'
                 />
               </Link>
             </div>
-            <div className='z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full ' />
+            <motion.div
+              initial={{ height: 90, width: 90 }}
+              animate={{
+                height: isScrolled ? 70 : 90,
+                width: isScrolled ? 70 : 90,
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className={cn(
+                "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full "
+              )}
+            />
           </div>
 
           {/* Desktop Logo */}
@@ -223,6 +259,7 @@ NavBarProps) {
             </Unauthenticated> */}
             <FullPageNav
               // userId={userId}
+              isScrolled={isScrolled}
               user={user}
               // userPref={userPref}
               // subStatus={subStatus}

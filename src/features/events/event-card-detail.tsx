@@ -47,7 +47,7 @@ const EventCardDetail = ({
   hidden = false,
 }: EventCardDetailProps) => {
   return (
-    <Card className='bg-white/50 border-black/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[90vw] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
+    <Card className='bg-white/50 border-black/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
       <Link
         href='/thelist'
         className='col-span-full pl-3 flex gap-x-2 items-center justify-start py-2'>
