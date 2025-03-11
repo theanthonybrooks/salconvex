@@ -49,11 +49,11 @@ const EventCardDetail = ({
       {accepted !== undefined && (
         <span
           className={cn(
-            "col-start-2 text-xs",
+            "col-start-2 text-xs bg-white/70 px-2 py-1 rounded-full w-fit border border-black/20",
             accepted === "accepted"
-              ? "text-emerald-500"
+              ? "text-emerald-500 border-emerald-500/20"
               : accepted === "rejected"
-              ? "text-red-500"
+              ? "text-red-500 border-red-500/20"
               : accepted === "pending"
               ? "italic text-black/50"
               : ""
