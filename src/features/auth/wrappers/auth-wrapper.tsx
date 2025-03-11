@@ -1,6 +1,5 @@
 "use client"
 
-import Loader from "@/components/ui/washing-loader"
 import { useConvexAuth } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { usePathname } from "next/navigation"
@@ -47,25 +46,14 @@ export default function ClientAuthWrapper({
   return (
     <div>
       <AnimatePresence mode='wait'>
-        {isLoading ? (
-          <motion.div
-            key='loader'
-            className='flex items-center justify-center min-h-screen'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}>
-            <Loader />
-          </motion.div>
-        ) : (
-          <motion.div
-            ref={targetRef}
-            key='content'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}>
-            {/* {isPublicPage && (
+        <motion.div
+          ref={targetRef}
+          key='content'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}>
+          {/* {isPublicPage && (
               <motion.div
                 id='scroll-indicator'
                 // initial={{ opacity: 0 }}
@@ -85,9 +73,8 @@ export default function ClientAuthWrapper({
                 }}
               />
             )} */}
-            {children}
-          </motion.div>
-        )}
+          {children}
+        </motion.div>
       </AnimatePresence>
     </div>
   )
