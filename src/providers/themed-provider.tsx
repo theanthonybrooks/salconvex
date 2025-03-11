@@ -12,16 +12,8 @@ interface ThemedProviderProps {
 
 export function ThemedProvider({ children, userPref }: ThemedProviderProps) {
   const userTheme = userPref?.theme
-  // const { setTheme, theme } = useTheme()
   const pathname = usePathname()
-  // If the pathname starts with /auth, force the 'sal' theme.
-  const forcedTheme = pathname.startsWith("/auth")
-    ? "default"
-    : // : pathname.startsWith("/dashboard")
-      // // ? "light"
-      // userTheme
-      // ? userTheme
-      undefined
+  const forcedTheme = pathname.startsWith("/auth") ? "default" : undefined
 
   // useEffect(() => {
   //   if (userTheme && theme !== userTheme) {

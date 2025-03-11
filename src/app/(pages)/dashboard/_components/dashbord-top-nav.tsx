@@ -70,7 +70,7 @@ export default function NavBar({
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <div className='fixed left-0 right-0 top-0 z-20 h-20  border-black  lg:bg-transparent bg-background border-b'>
+      <div className='fixed left-0 right-0 top-0 z-20 h-20  border-black  bg-background border-b'>
         <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 pl-6 pr-8 relative'>
           {/* Mobile Logo and Navigation */}
           {isMobile && (

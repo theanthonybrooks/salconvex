@@ -343,9 +343,9 @@ export default function SettingsPage() {
       setTimezone(userPrefs.timezone ?? "GMT")
       setCurrency(userPrefs.currency ?? "USD")
       setThemePref(userPrefs.theme ?? "light")
-      setTheme(userPrefs.theme ?? "light")
+      // setTheme(userPrefs.theme ?? "light")
     }
-  }, [userPrefs, setTheme])
+  }, [userPrefs])
 
   useEffect(() => {
     if (user) {
@@ -759,7 +759,10 @@ export default function SettingsPage() {
                   </div>
                   <Select
                     defaultValue={userPrefs?.theme ?? theme}
-                    onValueChange={setThemePref}>
+                    onValueChange={(value) => {
+                      setThemePref(value)
+                      setTheme(value)
+                    }}>
                     <SelectTrigger className='w-full sm:w-[180px]'>
                       <SelectValue placeholder='Select color' />
                     </SelectTrigger>
