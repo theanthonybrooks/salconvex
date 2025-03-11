@@ -9,23 +9,13 @@ import { useRef } from "react"
 export default function Home() {
   const targetRef = useRef(null)
   const { scrollY } = useScroll()
-
-  // useMotionValueEvent(scrollY, "change", (latest) => {
-  //   console.log("Page scroll: ", latest)
-  // })
-
   const smoothScrollY = useSpring(scrollY, {
     stiffness: 100,
     damping: 20,
     mass: 0.4,
   })
   const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
-  // const left = useTransform(smoothScrollY, [0, 150, 450], ["0%", "0%", "50%"])
-  // const transX = useTransform(
-  //   smoothScrollY,
-  //   [0, 150, 450],
-  //   ["0%", "0%", "-50%"]
-  // )
+
   return (
     <motion.div ref={targetRef}>
       <motion.div

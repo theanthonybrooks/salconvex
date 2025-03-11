@@ -3,17 +3,34 @@
 import Loader from "@/components/ui/washing-loader"
 import { useConvexAuth } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useRef } from "react"
+import { usePathname } from "next/navigation"
+import { useEffect, useRef } from "react"
 
 export default function ClientAuthWrapper({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // const pathname = usePathname()
+  const pathname = usePathname()
   // const { theme } = useTheme()
   const { isLoading } = useConvexAuth()
   const targetRef = useRef(null)
+
+  const invisScrollPages = ["/", "/auth"]
+
+  const isInvisScrollPage =
+    pathname === "/" ||
+    invisScrollPages.some((path) => path !== "/" && pathname.startsWith(path))
+
+  useEffect(() => {
+    if (isInvisScrollPage) {
+      document.body.classList.add("invis")
+    } else {
+      document.body.classList.remove("invis")
+    }
+
+    // No need for a cleanup function because it's handled by the else condition
+  }, [pathname, isInvisScrollPage])
   // const { scrollYProgress } = useScroll({ target: targetRef })
   // useMotionValueEvent(scrollYProgress, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
