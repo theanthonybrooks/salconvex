@@ -13,8 +13,6 @@ import {
   PaintRoller,
   Phone,
 } from "lucide-react"
-import Link from "next/link"
-import { IoIosArrowRoundBack } from "react-icons/io"
 
 import {
   Accordion,
@@ -48,11 +46,6 @@ const EventCardDetail = ({
 }: EventCardDetailProps) => {
   return (
     <Card className='bg-white/50 border-black/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
-      <Link
-        href='/thelist'
-        className='col-span-full pl-3 flex gap-x-2 items-center justify-start py-2'>
-        <IoIosArrowRoundBack className='h-6 w-6' /> back to open calls
-      </Link>
       {accepted !== undefined && (
         <span
           className={cn(
@@ -131,19 +124,19 @@ const EventCardDetail = ({
           </div>
           {/* NOTE: Make these dynamic and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
           {/* <div className='flex gap-x-4 mt-3 items-center justify-start'>
-              <MailIcon size={24} />
-              <Globe size={24} />
-              <FaInstagram size={24} />
-              <FiFacebook size={24} />
-              <FaVk size={24} />
-            </div> */}
+                <MailIcon size={24} />
+                <Globe size={24} />
+                <FaInstagram size={24} />
+                <FiFacebook size={24} />
+                <FaVk size={24} />
+              </div> */}
         </div>
       </div>
       <div className='col-span-full overflow-hidden w-full flex flex-col gap-y-3 justify-start items-start'>
         <Tabs
           defaultValue='opencall'
           className='w-full flex flex-col justify-center'>
-          <TabsList className='w-full  raymond bg-white/60 justify-between h-12'>
+          <TabsList className='w-full  raymond bg-white/60 justify-around h-12'>
             <TabsTrigger className='h-10' value='opencall'>
               Open Call
             </TabsTrigger>
@@ -242,7 +235,7 @@ const EventCardDetail = ({
                         Compensation Includes:
                       </p>
                       {/* NOTE: How to better display this? It's a bit jarring at the moment
-            when viewing it. */}
+              when viewing it. */}
                       <div className=' flex flex-col gap-y-3 justify-between'>
                         <div className='flex justify-between items-center border-b border-dashed border-black/20'>
                           <p className='font-medium'>Design Fee:</p>
@@ -450,7 +443,7 @@ const EventCardDetail = ({
           <TabsContent value='organizer'>
             <Card
               className='max-w-full overflow-hidden w-full
- p-5 bg-white/60 border-black/20 rounded-xl space-y-6'>
+   p-5 bg-white/60 border-black/20 rounded-xl space-y-6'>
               <div className='w-full grid grid-cols-[75px_minmax(0,1fr)] '>
                 <div
                   className={cn(
@@ -507,16 +500,16 @@ const EventCardDetail = ({
               </div>
 
               {/* <div className='col-span-full'>
-                <h3>Other Events/Projects by this organizer:</h3>
-                <ul>
-                  <li>
-                    Event Name <Link href='#'>(link)</Link>
-                  </li>
-                  <li>
-                    Event Name <Link href='#'>(link)</Link>
-                  </li>
-                </ul>
-              </div> */}
+                  <h3>Other Events/Projects by this organizer:</h3>
+                  <ul>
+                    <li>
+                      Event Name <Link href='#'>(link)</Link>
+                    </li>
+                    <li>
+                      Event Name <Link href='#'>(link)</Link>
+                    </li>
+                  </ul>
+                </div> */}
             </Card>
           </TabsContent>
         </Tabs>

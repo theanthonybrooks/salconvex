@@ -1,3 +1,4 @@
+import DashboardContent from "@/features/dashboard/dashboard-content"
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server"
 import { fetchQuery } from "convex/nextjs"
 import { ReactNode } from "react"
@@ -5,11 +6,13 @@ import { api } from "~/convex/_generated/api"
 import DashboardSideBar from "./_components/dashboard-sidebar"
 import DashboardTopNav from "./_components/dashbord-top-nav"
 
+interface DashboardLayoutProps {
+  children: ReactNode
+}
+
 export default async function DashboardLayout({
   children,
-}: {
-  children: ReactNode
-}) {
+}: DashboardLayoutProps) {
   const token = await convexAuthNextjsToken()
   const subStatus = await fetchQuery(
     api.subscriptions.getUserSubscriptionStatus,
@@ -18,12 +21,17 @@ export default async function DashboardLayout({
   )
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token })
   const role = user?.user?.role
+
   return (
     <>
-      <DashboardTopNav />
-      <div className='flex h-screen overflow-hidden'>
+      <DashboardTopNav
+        user={user?.user}
+        subStatus={subStatus?.subStatus}
+        userId={user?.userId}
+      />
+      <div className='flex max-h-screen max-w-screen overflow-hidden pt-20'>
         <DashboardSideBar subStatus={subStatus?.subStatus} role={role} />
-        <main className='flex-1 overflow-y-auto scrollable'>{children}</main>
+        <DashboardContent>{children}</DashboardContent>
       </div>
     </>
   )

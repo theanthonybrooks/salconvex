@@ -22,9 +22,10 @@ import { api } from "~/convex/_generated/api"
 
 interface UserProfileProps {
   user: User | null
+  className?: string
 }
 
-export function UserProfile({ user }: UserProfileProps) {
+export function UserProfile({ user, className }: UserProfileProps) {
   const subscription = useQuery(api.subscriptions.getUserSubscription)?.status
   // const subscription = user?.subscription
   return (
@@ -32,8 +33,9 @@ export function UserProfile({ user }: UserProfileProps) {
       <DropdownMenuTrigger asChild>
         <Button
           variant='ghost'
-          className='relative h-[50px] w-[50px] rounded-full'>
-          <Avatar className='h-[50px] w-[50px] border border-border'>
+          className={cn("relative h-[50px] w-[50px] rounded-full", className)}>
+          <Avatar
+            className={cn("h-[50px] w-[50px] border border-border", className)}>
             <AvatarImage src={user?.image} alt={user?.name || "User Profile"} />
 
             <AvatarFallback

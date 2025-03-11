@@ -58,7 +58,6 @@ import {
   Globe,
   LoaderPinwheel,
   Mail,
-  Moon,
   Palette,
   Shield,
   Upload,
@@ -398,13 +397,21 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue='account' className='space-y-6'>
-        <TabsList className='max-w-full scrollable invis justify-start'>
-          <TabsTrigger value='account'>Account</TabsTrigger>
-          <TabsTrigger value='notifications'>Notifications</TabsTrigger>
+        <TabsList className='max-w-full scrollable invis  bg-white/80 w-full  justify-around md:w-auto md:justify-start h-12'>
+          <TabsTrigger value='account' className='h-9 px-4'>
+            Account
+          </TabsTrigger>
+          {/* <TabsTrigger value='notifications'>
+            Notifications
+          </TabsTrigger> */}
           {/*          //NOTE: in order to disabled, just add "disabled" to the tabs trigger
            */}
-          <TabsTrigger value='appearance'>Appearance</TabsTrigger>
-          <TabsTrigger value='security'>Security</TabsTrigger>
+          <TabsTrigger value='appearance' className='h-10 px-4'>
+            Appearance
+          </TabsTrigger>
+          <TabsTrigger value='security' className='h-10 px-4'>
+            Security
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value='account'>
@@ -524,7 +531,7 @@ export default function SettingsPage() {
                     disabled={isSaving}
                     type='submit'
                     variant='salWithShadow'
-                    className='mt-4'>
+                    className='mt-4  w-full sm:w-auto'>
                     {isSaving ? (
                       <span className='flex items-center gap-2'>
                         <LoaderPinwheel className='h-4 w-4 animate-spin' />
@@ -572,7 +579,7 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <Separator />*/}
-                <div className='flex items-center justify-between'>
+                <div className='flex  flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between '>
                   <div className='space-y-0.5'>
                     <Label>Timezone</Label>
                     <p className='text-sm text-muted-foreground'>
@@ -595,6 +602,7 @@ export default function SettingsPage() {
                   <SearchMappedSelect<Timezone>
                     value={selectedTimezone ?? "GMT"}
                     onChange={setTimezone}
+                    // className='w-full sm:w-[280px]'
                     data={timezones[0]}
                     getItemLabel={(timezone) =>
                       `${timezone.gmtAbbreviation}  - ${timezone.name} (${
@@ -623,7 +631,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <Separator />
-                <div className='flex items-center justify-between'>
+                <div className='flex  flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between '>
                   <div className='space-y-0.5'>
                     <Label>Currency</Label>
                     <p className='text-sm text-muted-foreground'>
@@ -644,7 +652,7 @@ export default function SettingsPage() {
                   </Select> */}
 
                   <SearchMappedSelect<Currency>
-                    width={"w-[120px]"}
+                    className='sm:w-[120px]'
                     value={selectedCurrency ?? "USD"}
                     onChange={setCurrency}
                     data={currencies[0]}
@@ -724,7 +732,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className='space-y-6'>
               <div className='space-y-4'>
-                <div className='flex items-center justify-between'>
+                {/* <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-4'>
                     <Moon className='h-5 w-5 text-muted-foreground' />
                     <div>
@@ -735,9 +743,9 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Switch defaultChecked disabled />
-                </div>
+                </div> */}
                 <Separator />
-                <div className='flex items-center justify-between'>
+                <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between '>
                   <div className='flex items-center gap-4'>
                     <Palette className='h-5 w-5 text-muted-foreground' />
                     <div>
@@ -745,14 +753,14 @@ export default function SettingsPage() {
                       TODO: Add theme (just use useTheme() hook and set the theme to whatever they choose + add it to their preferences to load on startup on any new devices) */}
                       <Label>Theme Color</Label>
                       <p className='text-sm text-muted-foreground'>
-                        Choose your theme color <i>(coming soon)</i>
+                        Choose your theme color
                       </p>
                     </div>
                   </div>
                   <Select
                     defaultValue={userPrefs?.theme ?? theme}
                     onValueChange={setThemePref}>
-                    <SelectTrigger className='w-[180px]'>
+                    <SelectTrigger className='w-full sm:w-[180px]'>
                       <SelectValue placeholder='Select color' />
                     </SelectTrigger>
                     <SelectContent>
@@ -796,8 +804,8 @@ export default function SettingsPage() {
                     </Button>
                   </div>
                   <Separator />*/}
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
+                  <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between px-4'>
+                    <div className='flex items-center gap-4 '>
                       <Shield className='h-5 w-5 text-muted-foreground' />
                       <div>
                         <Label>Password</Label>
@@ -808,7 +816,9 @@ export default function SettingsPage() {
                     </div>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant='outline' className='min-w-[150px]'>
+                        <Button
+                          variant='outline'
+                          className='min-w-[150px] w-full sm:w-auto'>
                           Update
                         </Button>
                       </DialogTrigger>
@@ -920,7 +930,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 <div className='space-y-4'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between px-4'>
                     <p className='font-medium'>Current Session</p>
                     <div>
                       {/* <p className='text-sm text-muted-foreground'>
@@ -930,13 +940,13 @@ export default function SettingsPage() {
                     <Button
                       type='button'
                       variant='outline'
-                      className='text-destructive min-w-[150px]'
+                      className='text-destructive min-w-[150px]  w-full sm:w-auto'
                       onClick={signOut}>
                       Sign Out
                     </Button>
                   </div>
                   <Separator />
-                  <div className='flex items-center justify-between'>
+                  <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between px-4'>
                     <div>
                       <p className='font-medium'>Other Sessions</p>
                       <p className='text-sm text-muted-foreground'>
@@ -950,7 +960,7 @@ export default function SettingsPage() {
                         <Button
                           type='button'
                           variant='outline'
-                          className='text-destructive min-w-[150px]'>
+                          className='text-destructive min-w-[150px]  w-full sm:w-auto'>
                           Sign Out All
                         </Button>
                       </AlertDialogTrigger>
@@ -975,7 +985,7 @@ export default function SettingsPage() {
                     </AlertDialog>
                   </div>
                   <Separator />
-                  <div className='flex items-center justify-between bg-destructive/10 p-4 rounded-lg'>
+                  <div className=' flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between  bg-destructive/10 p-4 rounded-lg'>
                     <div>
                       <p className='font-medium'>Delete Account</p>
                       <p className='text-sm text-muted-foreground'>
@@ -990,8 +1000,7 @@ export default function SettingsPage() {
                         <Button
                           type='button'
                           variant='destructive'
-                          // className='text-destructive min-w-[150px] hover:bg-destructive/20 bg-destructive/10'
-                        >
+                          className=' min-w-[150px]  w-full sm:w-auto'>
                           Delete Account
                         </Button>
                       </AlertDialogTrigger>

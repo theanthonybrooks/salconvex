@@ -319,9 +319,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
           lookalike with two divs/spans inside that move up and down and have an
           overflow of hidden */}
 
-          {isOpen === "open" && !pathname.includes("/dashboard") && (
-            <ThemeToggle />
-          )}
+          {isOpen === "open" && <ThemeToggle />}
           <MenuToggle
             menuState={isOpen === "initial" ? "closed" : isOpen}
             setState={setIsOpen}

@@ -6,6 +6,7 @@ import {
   dashboardNavItems as navItems,
 } from "@/constants/links"
 import { Search } from "@/features/Sidebar/Search"
+import { cn } from "@/lib/utils"
 import clsx from "clsx"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, ChevronRight } from "lucide-react"
@@ -117,7 +118,7 @@ export default function DashboardSideBar({
   }
 
   return (
-    <div className='hidden w-64 border-r bg-background min-[1024px]:block'>
+    <div className='hidden w-64 border-r  h-screen bg-background min-[1024px]:block max-h-[calc(100vh-80px)] overflow-hidden'>
       {/* <div className='flex h-full flex-col justify-between'> */}
       {/* <div className='flex min-h-[72px] flex-shrink-0 items-center border-b px-4'>
           <Link
@@ -131,15 +132,15 @@ export default function DashboardSideBar({
 
       <nav
         className='grid max-h-[calc(100vh-55px)]
- h-full overflow-hidden grid-rows-[60px_1fr_80px] space-y-1 px-4 pt-4'>
+ h-full overflow-hidden grid-rows-[60px_1fr_80px] space-y-1 pt-4'>
         <Search
           title={"Search"}
           source={dashboardNavItems}
           // groupName={"Heading"}
-          className='mb-5'
+          className='mb-5 mx-4'
           placeholder="Find what you're looking for!"
         />
-        <div className='overflow-y-auto scrollable mini '>
+        <div className='overflow-y-auto scrollable mini px-4'>
           {/* Render main navigation items (excluding sections) */}
           {filteredNavItems
             .filter((item) => !item.sectionCat)
@@ -166,16 +167,20 @@ export default function DashboardSideBar({
           {/* Render sections */}
           {filteredNavItems
             .filter((item) => item.sectionHead)
-            .map((section) => (
-              <div key={section.sectionCat}>
+            .map((section, index, arr) => (
+              <div key={section.sectionCat} className='space-y-2'>
                 {/* Section header */}
-                <section className='py-2'>
+                <section
+                  className={cn(
+                    pathname.includes("dashboard/" + section.sectionCat) &&
+                      "hover:bg-primary/10"
+                  )}>
                   <div
-                    className={clsx(
-                      "flex flex-col gap-2 rounded-lg px-3 py-2 pl-5 text-sm transition-colors",
+                    className={cn(
+                      "flex flex-col gap-2  pr-3 py-4 pl-5 text-sm transition-colors",
                       pathname.includes("dashboard/" + section.sectionCat)
                         ? "font-bold"
-                        : "text-muted-foreground hover:bg-primary/10 hover:text-foreground",
+                        : "text-muted-foreground  hover:text-foreground hover:bg-primary/10",
                       openSection === section.sectionCat &&
                         pathname.includes("dashboard/" + section.sectionCat)
                         ? "cursor-default"
@@ -203,7 +208,9 @@ export default function DashboardSideBar({
                       )}
                     </div>
                   </div>
-                  <Separator thickness={2} className='w-full' />
+                  {index !== arr.length - 1 && (
+                    <Separator thickness={2} className='w-full' />
+                  )}
                 </section>
 
                 <AnimatePresence>

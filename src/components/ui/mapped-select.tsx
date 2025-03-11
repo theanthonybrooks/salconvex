@@ -73,7 +73,8 @@ interface SearchMappedSelectProps<T> {
   searchFields: (keyof T)[] // Specify which fields should be used for searching
   disabled?: boolean
   placeholder?: string
-  width?: string
+  // width?: string
+  className?: string
 }
 
 export function SearchMappedSelect<T>({
@@ -81,14 +82,15 @@ export function SearchMappedSelect<T>({
   data,
   getItemLabel,
   getItemValue,
+  className,
   // getItemKey,
   getItemDisplay,
   onChange,
   searchFields,
   disabled = false,
   placeholder = "Select an option",
-  width = "w-[280px]",
-}: SearchMappedSelectProps<T>) {
+}: // width = "w-[280px]",
+SearchMappedSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -127,8 +129,8 @@ export function SearchMappedSelect<T>({
         <Button
           variant='outline'
           className={cn(
-            " font-normal relative h-10 border-foreground/20 truncate pr-8 flex items-center justify-center",
-            width
+            " font-normal relative h-10 border-foreground/20 truncate pr-8 flex items-center justify-center w-full sm:w-[280px]",
+            className
           )}
           disabled={disabled}>
           <span className='truncate'>

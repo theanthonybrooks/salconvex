@@ -135,14 +135,14 @@ export const CommandMenuCustom = <T extends CommandItem>({
       onOpenChange={setOpen}
       shouldFilter={false}
       label={title}
-      className='fixed inset-0 flex items-center justify-center text-black'
+      className='fixed inset-0 flex items-center justify-center text-black z-[999]'
       onClick={() => setOpen(false)}>
       <AnimatePresence>
         {open && (
           <>
             {/* Background overlay */}
             <motion.div
-              className='fixed inset-0'
+              className='fixed inset-0 z-100'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }} // adjust to your liking
               exit={{ opacity: 0 }}
@@ -184,7 +184,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                   className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-none'
                 />
               </div>
-              <div className='max-h-60dvh search scrollbar overflow-y-auto p-3'>
+              <div className='max-h-60dvh search scrollable mini p-3'>
                 <Command.List>
                   {Object.keys(groupedItems).length === 0 ? (
                     <Command.Empty>
