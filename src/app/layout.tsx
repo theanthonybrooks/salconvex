@@ -68,7 +68,8 @@ export default async function RootLayout({
         <body
           className={cn(
             GeistSans.className,
-            " scrollable invis darkbar antialiased",
+            " scrollable  darkbar antialiased",
+            // " scrollable invis darkbar antialiased",
             tankerReg.variable,
             spaceMono.variable,
             libreFranklin.variable,

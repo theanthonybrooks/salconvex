@@ -84,7 +84,7 @@ NavBarProps) {
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={cn(
-              "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] flex items-center justify-center bg-background rounded-full "
+              "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] flex items-center justify-center bg-background rounded-full lg:hidden "
             )}
           />
         </div>

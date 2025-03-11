@@ -30,7 +30,7 @@ export default async function HomeLayout({
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className='scrollable mini boundless darkbar'>
+      <div className='scrollable mini darkbar'>
         <main className='flex min-w-screen min-h-screen flex-col pt-[4rem]'>
           {children}
         </main>

@@ -31,7 +31,7 @@ export default async function HomeLayout({
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className='scrollable mini boundless darkbar pt-32'>
+      <div className='scrollable mini darkbar pt-32'>
         <SalHeader />
         <main className='min-w-screen min-h-screen'>{children}</main>
 
