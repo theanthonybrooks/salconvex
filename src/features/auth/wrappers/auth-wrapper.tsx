@@ -1,6 +1,5 @@
 "use client"
 
-import { useConvexAuth } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
@@ -12,7 +11,7 @@ export default function ClientAuthWrapper({
 }) {
   const pathname = usePathname()
   // const { theme } = useTheme()
-  const { isLoading } = useConvexAuth()
+  // const { isLoading } = useConvexAuth()
   const targetRef = useRef(null)
 
   const invisScrollPages = ["/", "/auth"]
