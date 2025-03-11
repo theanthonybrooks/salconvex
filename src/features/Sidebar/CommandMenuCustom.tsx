@@ -6,6 +6,7 @@ import { X } from "lucide-react"
 import Link from "next/link"
 import { IoSearch } from "react-icons/io5"
 
+import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 
@@ -23,6 +24,7 @@ export interface CommandItem {
 interface CommandMenuProps<T extends CommandItem> {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
+  isMobile?: boolean
   title: string
   source: T[] // Ensure all items in `source` match `CommandItem`
   shortcut?: string
@@ -36,6 +38,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
   title,
   source,
   shortcut = "/",
+  isMobile = false,
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
@@ -58,6 +61,8 @@ export const CommandMenuCustom = <T extends CommandItem>({
       }, 0)
     }
   }, [open])
+  //NOTE: Remove this later
+  console.log("is mobile:", isMobile)
 
   // Keyboard shortcut handler (depends only on setOpen)
   useEffect(() => {
@@ -156,12 +161,12 @@ export const CommandMenuCustom = <T extends CommandItem>({
               initial='hidden'
               animate='visible'
               exit='exit'
-              className='relative flex max-h-[80vh] w-full max-w-xl flex-col rounded-lg border border-stone-300 bg-white p-4 shadow-xl'
+              className='relative flex max-w-[90vw] max-h-[80vh] w-full md:max-w-xl flex-col rounded-lg border border-stone-300 bg-white p-4 shadow-xl'
               onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setOpen(false)}
                 className='absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110'>
-                <X className='h-5 w-5 text-stone-600' />
+                <X className='h-7 w-7 md:h-5 md:w-5 text-stone-600' />
               </button>
               <DialogTitle className='sr-only'>{title}</DialogTitle>
               <div className='flex items-center gap-1 border-b border-stone-300'>
@@ -180,7 +185,10 @@ export const CommandMenuCustom = <T extends CommandItem>({
                       setOpen(false)
                     }
                   }}
-                  placeholder={`${placeholder}   (Hint: Ctrl + /)`}
+                  placeholder={cn(
+                    placeholder,
+                    !isMobile && "  (Hint: Ctrl + /)"
+                  )}
                   className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-none'
                 />
               </div>
@@ -211,7 +219,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                               <Link href={item.path} prefetch={true}>
                                 <span>{item.title}</span>
                               </Link>
-                              {item.desc && (
+                              {item.desc && !isMobile && (
                                 <motion.span
                                   initial={{ opacity: 0 }}
                                   animate={{

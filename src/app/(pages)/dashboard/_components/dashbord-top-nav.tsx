@@ -4,6 +4,8 @@ import FullPageNav from "@/components/full-page-nav"
 import { Button } from "@/components/ui/button"
 import { NavigationMenuLink } from "@/components/ui/navigation-menu"
 import { UserProfile } from "@/components/ui/user-profile"
+import { dashboardNavItems } from "@/constants/links"
+import { Search } from "@/features/Sidebar/Search"
 import { cn } from "@/lib/utils"
 import { Unauthenticated } from "convex/react"
 // import { useQuery } from "convex-helpers/react/cache"
@@ -72,39 +74,48 @@ export default function NavBar({
         <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 pl-6 pr-8 relative'>
           {/* Mobile Logo and Navigation */}
           {isMobile && (
-            <div className='lg:hidden items-center gap-2 flex'>
-              <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] origin-center z-10'>
-                {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
+            // <div className='lg:hidden items-center gap-2 flex'>
+            //   <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] origin-center z-10'>
+            //     {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
-                <Link href='/' prefetch={true}>
-                  {/* <span className='font-semibold'>The Street Art List</span> */}
+            //     <Link href='/' prefetch={true}>
+            //       {/* <span className='font-semibold'>The Street Art List</span> */}
 
-                  <motion.img
-                    initial={{ height: 70, width: 70 }}
-                    animate={{
-                      height: isScrolled ? 50 : 70,
-                      width: isScrolled ? 50 : 70,
-                    }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    src='/sitelogo.svg'
-                    alt='The Street Art List'
+            //       <motion.img
+            //         initial={{ height: 70, width: 70 }}
+            //         animate={{
+            //           height: isScrolled ? 50 : 70,
+            //           width: isScrolled ? 50 : 70,
+            //         }}
+            //         transition={{ duration: 0.3, ease: "easeOut" }}
+            //         src='/sitelogo.svg'
+            //         alt='The Street Art List'
 
-                    // className='z-10'
-                  />
-                </Link>
-              </div>
-              <motion.div
-                initial={{ height: 90, width: 90 }}
-                animate={{
-                  height: isScrolled ? 70 : 90,
-                  width: isScrolled ? 70 : 90,
-                }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className={cn(
-                  "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full "
-                )}
-              />
-            </div>
+            //         // className='z-10'
+            //       />
+            //     </Link>
+            //   </div>
+            //   <motion.div
+            //     initial={{ height: 90, width: 90 }}
+            //     animate={{
+            //       height: isScrolled ? 70 : 90,
+            //       width: isScrolled ? 70 : 90,
+            //     }}
+            //     transition={{ duration: 0.3, ease: "easeOut" }}
+            //     className={cn(
+            //       "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full "
+            //     )}
+            //   />
+            // </div>
+            <Search
+              iconOnly
+              isMobile={isMobile}
+              title={"Search"}
+              source={dashboardNavItems}
+              // groupName={"Heading"}
+              className='mb-5 mx-4'
+              placeholder="Find what you're looking for!"
+            />
           )}
 
           {!isMobile && (
@@ -197,7 +208,7 @@ export default function NavBar({
 
           {/* ------ Mobile Right side ------ */}
           {isMobile && (
-            <div className='flex items-center justify-end w-full  lg:hidden'>
+            <div className='flex items-center justify-end w-full gap-x-6  lg:hidden'>
               {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
               {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>
@@ -209,6 +220,7 @@ export default function NavBar({
                 </Button>
               </Link>
             </Unauthenticated> */}
+              <Bell size={32} />
               <FullPageNav
                 // userId={userId}
                 isScrolled={isScrolled}
