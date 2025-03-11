@@ -29,7 +29,7 @@ export default async function DashboardLayout({
         subStatus={subStatus?.subStatus}
         userId={user?.userId}
       />
-      <div className='flex max-h-screen max-w-screen overflow-hidden pt-20'>
+      <div className='flex max-h-dvh max-w-screen overflow-hidden pt-20'>
         <DashboardSideBar subStatus={subStatus?.subStatus} role={role} />
         <DashboardContent>{children}</DashboardContent>
       </div>
