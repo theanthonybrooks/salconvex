@@ -71,7 +71,7 @@ export default function AccountPage() {
       </div>
 
       {/* Account Information Grid */}
-      <div className='grid gap-6 md:grid-cols-2'>
+      <div className='flex flex-col md:grid gap-6 md:grid-cols-2'>
         {/* User Information Card */}
         <Card>
           <CardHeader>
@@ -168,15 +168,6 @@ export default function AccountPage() {
                   </span>
                 </div>
 
-                <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>
-                    Account Interval:
-                  </span>
-                  <span className='font-medium capitalize'>
-                    {subscription?.interval + "ly"}
-                  </span>
-                </div>
-
                 <div className='mt-0 flex items-start justify-between'>
                   <span className='whitespace-nowrap text-muted-foreground'>
                     Plan Amount:
@@ -184,7 +175,10 @@ export default function AccountPage() {
                   {/* TODO: ensure that this is correct. similar line in the billing page  */}
 
                   <span className='flex flex-col items-end justify-start font-medium'>
-                    ${(subscription?.amount ?? 0 / 100).toFixed(0)}
+                    ${" "}
+                    {subscription?.amount
+                      ? (subscription.amount / 100).toFixed(0)
+                      : 0}
                     {nextAmount !== undefined && (
                       <>
                         <span className='text-sm font-light italic text-gray-400'>
@@ -206,6 +200,14 @@ export default function AccountPage() {
                       </>
                     )}
                   </span>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-muted-foreground'>
+                      Account Interval:
+                    </span>
+                    <span className='font-medium capitalize'>
+                      {subscription?.interval + "ly"}
+                    </span>
+                  </div>
                 </div>
                 <div className='flex items-center justify-between'>
                   <span className='text-muted-foreground'>Auto Renew:</span>

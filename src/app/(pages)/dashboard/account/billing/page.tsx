@@ -136,21 +136,15 @@ export default function AccountPage() {
                   </span>
                 </div>
 
-                <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>
-                    Account Interval:
-                  </span>
-                  <span className='font-medium capitalize'>
-                    {subscription?.interval + "ly"}
-                  </span>
-                </div>
-
                 <div className='mt-0 flex items-start justify-between'>
                   <span className='whitespace-nowrap text-muted-foreground'>
                     Plan Amount:
                   </span>
                   <span className='flex flex-col items-end justify-start font-medium'>
-                    ${(subscription?.amount ?? 0 / 100).toFixed(0)}
+                    $
+                    {subscription?.amount
+                      ? (subscription.amount / 100).toFixed(0)
+                      : 0}
                     {nextAmount !== undefined && (
                       <>
                         <span className='text-sm font-light italic text-gray-400'>
@@ -171,6 +165,15 @@ export default function AccountPage() {
                         </span>
                       </>
                     )}
+                  </span>
+                </div>
+
+                <div className='flex items-center justify-between'>
+                  <span className='text-muted-foreground'>
+                    Account Interval:
+                  </span>
+                  <span className='font-medium capitalize'>
+                    {subscription?.interval + "ly"}
                   </span>
                 </div>
                 <div className='flex items-center justify-between'>

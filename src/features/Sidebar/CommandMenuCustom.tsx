@@ -106,6 +106,12 @@ export const CommandMenuCustom = <T extends CommandItem>({
     setValue(newValue)
   }
 
+  const handleLinkClick = () => {
+    setTimeout(() => {
+      setOpen(false)
+    }, 750)
+  }
+
   // Group items by group name
   const groups = extractedItems.reduce<Record<string, typeof extractedItems>>(
     (acc, item) => {
@@ -216,7 +222,10 @@ export const CommandMenuCustom = <T extends CommandItem>({
                               onMouseLeave={() => setHoveredItem(null)}
                               onSelect={() => router.push(item.path)}>
                               {item.icon && <item.icon className='h-4 w-4' />}
-                              <Link href={item.path} prefetch={true}>
+                              <Link
+                                href={item.path}
+                                prefetch={true}
+                                onClick={handleLinkClick}>
                                 <span>{item.title}</span>
                               </Link>
                               {item.desc && !isMobile && (
