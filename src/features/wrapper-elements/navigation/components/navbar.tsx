@@ -118,7 +118,7 @@ NavBarProps) {
               <motion.div
                 initial={{ translateX: "-50%" }}
                 animate={{
-                  translateX: isScrolled ? "50%" : "-50%",
+                  translateX: isScrolled ? "-50%" : "-50%",
                 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className='absolute bottom-0 left-1/2 translate-y-[13px] z-10'
