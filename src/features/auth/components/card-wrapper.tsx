@@ -1,6 +1,6 @@
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Header } from "@/features/auth/components/header"
 import { Social } from "@/features/auth/components/social"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import React from "react"
@@ -41,14 +41,14 @@ export default function CardWrapper({
         {showSocial && (
           <>
             <Social />
-            <p className='flex w-full items-center gap-x-3 text-sm text-black before:h-[1px] before:flex-1 before:bg-black after:h-[1px] after:flex-1 after:bg-black'>
+            <p className='flex w-full items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground'>
               or
             </p>
           </>
         )}
       </CardContent>
       <CardContent> {children}</CardContent>
-      <CardFooter className='flex justify-center items-center gap-2 text-sm text-black'>
+      <CardFooter className='flex justify-center items-center gap-2 text-sm text-foreground'>
         {backButtonHref && (
           <>
             <p>{backButtonQuestion}</p>

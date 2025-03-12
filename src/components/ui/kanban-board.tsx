@@ -90,7 +90,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
   return (
-    <div className='h-screen w-full bg-background text-black'>
+    <div className='h-screen w-full bg-background text-foreground'>
       <Board userRole={userRole} />
     </div>
   )
@@ -253,7 +253,7 @@ const Column: React.FC<
         <h3 className={`font-medium ${headingColor} p-4 rounded-lg`}>
           {title}
         </h3>
-        <span className='rounded text-sm text-black'>{cards.length}</span>
+        <span className='rounded text-sm text-foreground'>{cards.length}</span>
       </div>
       <div
         className={`h-full w-full transition-colors ${
@@ -301,10 +301,10 @@ const Card: React.FC<CardProps> = ({ title, id, column, handleDragStart }) => {
             column,
           })
         }
-        className={`cursor-grab rounded border border-black/20  ${getColumnColor(
+        className={`cursor-grab rounded border border-foreground/20  ${getColumnColor(
           column
         )} p-3 active:cursor-grabbing`}>
-        <p className='text-sm text-black'>{title}</p>
+        <p className='text-sm text-foreground'>{title}</p>
       </motion.div>
     </>
   )

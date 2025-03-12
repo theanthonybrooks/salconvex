@@ -33,17 +33,17 @@ const buttonVariants = cva(
         linkHover2:
           "relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:ease-in-out after:duration-300",
         salWithShadow:
-          "bg-white text-black border-2 border-black font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
+          "bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
         salWithShadowHidden:
-          "bg-white text-black border-2 border-black font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
         salWithoutShadow:
-          "bg-white text-black  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-black focus:bg-salyellow/70",
+          "bg-white text-foreground  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-foreground focus:bg-salyellow/70",
         salWithShadowYlw:
-          "bg-salyellow text-black border-2 border-black font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
+          "bg-salyellow text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
         salWithShadowHiddenYlw:
-          "bg-salYellow text-black border-2 border-black font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+          "bg-salYellow text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
         salWithShadowPink:
-          "bg-salPink text-black border-2 border-black font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
+          "bg-salPink text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -863,9 +863,9 @@ export default function SettingsPage() {
                                 }
                                 className='absolute inset-y-0 right-0 flex items-center pr-3'>
                                 {showCurrentPassword ? (
-                                  <Eye className='size-4 text-black' />
+                                  <Eye className='size-4 text-foreground' />
                                 ) : (
-                                  <EyeOff className='size-4 text-black' />
+                                  <EyeOff className='size-4 text-foreground' />
                                 )}
                               </button>
                             </div>
@@ -897,9 +897,9 @@ export default function SettingsPage() {
                                 }
                                 className='absolute inset-y-0 right-0 flex items-center pr-3'>
                                 {showNewPassword ? (
-                                  <Eye className='size-4 text-black' />
+                                  <Eye className='size-4 text-foreground' />
                                 ) : (
-                                  <EyeOff className='size-4 text-black' />
+                                  <EyeOff className='size-4 text-foreground' />
                                 )}
                               </button>
                             </div>
@@ -967,13 +967,13 @@ export default function SettingsPage() {
                           Sign Out All
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
+                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-foreground'>
                         <AlertDialogHeader>
-                          <AlertDialogTitle className='text-black'>
+                          <AlertDialogTitle className='text-foreground'>
                             Sign out all sessions?
                           </AlertDialogTitle>
                         </AlertDialogHeader>
-                        <AlertDialogDescription className='text-black'>
+                        <AlertDialogDescription className='text-foreground'>
                           Are you sure you want to sign out of all your
                           sessions? You&apos;ll need to re-login on all devices.
                         </AlertDialogDescription>
@@ -1007,13 +1007,13 @@ export default function SettingsPage() {
                           Delete Account
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
+                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-foreground'>
                         <AlertDialogHeader>
-                          <AlertDialogTitle className='text-black'>
+                          <AlertDialogTitle className='text-foreground'>
                             Sign out all sessions?
                           </AlertDialogTitle>
                         </AlertDialogHeader>
-                        <AlertDialogDescription className='text-black'>
+                        <AlertDialogDescription className='text-foreground'>
                           Are you sure you want to delete your account? Any
                           active subscriptions need to be canceled before this
                           is possible and all data will be permanently deleted.

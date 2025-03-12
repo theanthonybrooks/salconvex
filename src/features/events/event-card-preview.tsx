@@ -12,7 +12,7 @@ interface EventCardPreviewProps {
 const EventCardPreview = ({ path }: EventCardPreviewProps) => {
   const router = useRouter()
   return (
-    <Card className='bg-white/40 border-black/20  grid  grid-cols-[75px_minmax(0,auto)_50px] min-w-[340px] max-w-[400px] gap-x-3 rounded-3xl mb-10 first:mt-6 px-1 py-2 '>
+    <Card className='bg-white/40 border-foreground/20  grid  grid-cols-[75px_minmax(0,auto)_50px] min-w-[340px] max-w-[400px] gap-x-3 rounded-3xl mb-10 first:mt-6 px-1 py-2 '>
       <div className='row-span-2 col-span-1 flex flex-col items-center justify-between pt-3 pb-3 pl-2'>
         <div className='rounded-full bg-white border-2 h-12 w-12 relative'>
           <p className='text-xs absolute left-0 top-0 translate-x-1/3 translate-y-[80%]'>
@@ -21,7 +21,7 @@ const EventCardPreview = ({ path }: EventCardPreviewProps) => {
         </div>
         <div className='border-dotted border-1.5 h-11 w-14 rounded-lg flex flex-col justify-center items-center py-[5px]'>
           <span className='text-2xs leading-[0.85rem]'>Call Type</span>
-          <span className='text-lg font-black leading-[0.85rem]'>E</span>
+          <span className='text-lg font-foreground leading-[0.85rem]'>E</span>
           <span className='text-2xs leading-[0.85rem]'>Event</span>
         </div>
       </div>

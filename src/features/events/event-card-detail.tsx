@@ -45,17 +45,17 @@ const EventCardDetail = ({
   hidden = false,
 }: EventCardDetailProps) => {
   return (
-    <Card className='bg-white/50 border-black/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
+    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
       {accepted !== undefined && (
         <span
           className={cn(
-            "col-start-2 text-xs bg-white/70 px-2 py-1 rounded-full w-fit border-2 border-black/30",
+            "col-start-2 text-xs bg-white/70 px-2 py-1 rounded-full w-fit border-2 border-foreground/30",
             accepted === "accepted"
               ? "text-emerald-600 border-emerald-500/50"
               : accepted === "rejected"
               ? "text-red-500 border-red-500/30"
               : accepted === "pending"
-              ? "italic text-black/50"
+              ? "italic text-foreground/50"
               : ""
           )}>
           Application status:{" "}
@@ -78,7 +78,7 @@ const EventCardDetail = ({
                 : accepted === "rejected"
                 ? "ring-4  ring-offset-1 ring-red-500"
                 : accepted === "pending"
-                ? "ring-4 ring-offset-1 ring-black/20"
+                ? "ring-4 ring-offset-1 ring-foreground/20"
                 : ""
             )}>
             <p className='text-sm absolute left-0 top-0 translate-x-1/3 translate-y-[80%]'>
@@ -149,7 +149,7 @@ const EventCardDetail = ({
             </TabsTrigger>
           </TabsList>
           <TabsContent value='opencall'>
-            <Card className=' w-full p-5 bg-white/60 border-black/20 rounded-xl'>
+            <Card className=' w-full p-5 bg-white/60 border-foreground/20 rounded-xl'>
               <Accordion defaultValue='item-1'>
                 <AccordionItem value='item-1'>
                   <AccordionTrigger title='Deadline & Eligibility:' />
@@ -207,7 +207,7 @@ const EventCardDetail = ({
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
                           <IoFastFoodOutline size={18} />
                         </span>
-                        <span className='p-1 border-1.5 border-black/20 text-black/20  rounded-full'>
+                        <span className='p-1 border-1.5 border-foreground/20 text-foreground/20  rounded-full'>
                           <PaintRoller size={18} />
                         </span>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
@@ -237,36 +237,36 @@ const EventCardDetail = ({
                       {/* NOTE: How to better display this? It's a bit jarring at the moment
               when viewing it. */}
                       <div className=' flex flex-col gap-y-3 justify-between'>
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Design Fee:</p>
                           <p className='text-right'> $750</p>
                         </div>
 
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Accommodation:</p>
                           <p className='text-right'>Provided</p>
                         </div>
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Food:</p>
                           <p className='text-right'>$40/day</p>
                         </div>
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Travel Costs:</p>
                           <p className='text-right'> Up to $500</p>
                         </div>
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Materials:</p>
                           <p className='text-right text-red-500 italic'>
                             (not provided)
                           </p>
                         </div>
                         {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           {" "}
                           <p className='font-medium'>Equipment:</p>
                           <p className='text-right'>(provided)</p>
                         </div>
-                        <div className='flex justify-between items-center border-b border-dashed border-black/20'>
+                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Other:</p>
                           <p className='text-right'> ...details details</p>
                         </div>
@@ -305,7 +305,7 @@ const EventCardDetail = ({
                 <AccordionItem value='item-4'>
                   <AccordionTrigger title='Other info:' />
                   <AccordionContent>
-                    <div className='grid grid-cols-[1fr_auto]  border-black/20 pb-3 mb-4'>
+                    <div className='grid grid-cols-[1fr_auto]  border-foreground/20 pb-3 mb-4'>
                       <p className='list-decimal list-inside px-4'>
                         Only one application per artist; artist teams should
                         only submit one application. Yada yada yada. More more
@@ -346,7 +346,7 @@ const EventCardDetail = ({
             </Card>
           </TabsContent>
           <TabsContent value='event'>
-            <Card className='w-full max-w-[90vw] p-5 bg-white/60 border-black/20 rounded-xl'>
+            <Card className='w-full max-w-[90vw] p-5 bg-white/60 border-foreground/20 rounded-xl'>
               <Accordion defaultValue='item-1'>
                 <AccordionItem value='item-1'>
                   <AccordionTrigger title='Event Location:' />
@@ -443,7 +443,7 @@ const EventCardDetail = ({
           <TabsContent value='organizer'>
             <Card
               className='max-w-full overflow-hidden w-full
-   p-5 bg-white/60 border-black/20 rounded-xl space-y-6'>
+   p-5 bg-white/60 border-foreground/20 rounded-xl space-y-6'>
               <div className='w-full grid grid-cols-[75px_minmax(0,1fr)] '>
                 <div
                   className={cn(

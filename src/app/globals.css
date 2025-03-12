@@ -22,7 +22,7 @@ body,
 
 @layer base {
   :root {
-    --sal-yellow: hsl(50 100% 72%); /* #ffe770 */
+    --sal-yellow: 50 100% 72%; /* #ffe770 */
     /* --sal-yellow-old: hsl(50 100% 72%); /* #ffe770 */
     --sal-pink: 303 100% 82%; /* #ff7bff #f4a9f6 */
     --sal-pink-hex: #f4a9f6;
@@ -92,7 +92,7 @@ body,
 
     --sidebar-primary: 240 5.9% 10%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 80%;
 
     --sidebar-accent: 240 4.8% 95.9%;
 
@@ -103,41 +103,44 @@ body,
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 222.2 84% 4.9%;
+    --color-picker-preview: hsl(47, 1%, 10%);
+    --background: 51, 0%, 13%;
 
-    --foreground: 210 40% 98%;
+    --foreground: 40 0% 88%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 40, 1%, 11%;
 
-    --card-foreground: 210 40% 98%;
+    --card-foreground: 38 0% 80%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 45.2 4% 18.9%;
 
-    --popover-foreground: 210 40% 98%;
+    --popover-foreground: 38 0% 80%;
 
-    --primary: 210 40% 98%;
+    --primary: 38 0% 80%;
 
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 45.2 0% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 40 0% 17.5%;
 
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 38 0% 80%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 40 0% 37.5%;
 
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 40 0% 65.1%;
+    /* --muted-foreground: 35, 0%, 37%; */
+    --txt-muted-foreground: 40, 0%, 37%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 40 2.6% 17.5%;
 
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 38 0% 80%;
 
     --destructive: 0 62.8% 30.6%;
 
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 38 0% 80%;
 
-    --border: 217.2 32.6% 17.5%;
+    --border: 40 0% 17.5%;
 
-    --input: 217.2 32.6% 17.5%;
+    --input: 40 0% 17.5%;
 
     --ring: 212.7 26.8% 83.9%;
 
@@ -165,7 +168,7 @@ body,
 
     --sidebar-border: 240 3.7% 15.9%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 40 91.2% 59.8%;
   }
   .default {
     --background-prev: 60 90% 75%; /* #f8f16b */

@@ -96,7 +96,7 @@ export const LoginForm = () => {
           <Button
             disabled={isPending}
             type='submit'
-            className='w-full py-4 border-2 border-black bg-white text-md text-black shadow-[-5px_5px_black] hover:shadow-[-3px_3px_black] hover:bg-stone-100 rounded-md active:shadow-[-1px_1px_black]'>
+            className='w-full py-4 border-2 border-foreground bg-white text-md text-foreground shadow-[-5px_5px_black] hover:shadow-[-3px_3px_black] hover:bg-stone-100 rounded-md active:shadow-[-1px_1px_black]'>
             Sign In
           </Button>
         </form>

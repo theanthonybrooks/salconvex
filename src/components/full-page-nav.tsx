@@ -306,7 +306,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
           initial='overlayInitial'
           variants={screenOverlayVariants}
           animate={isOpen}
-          className='absolute w-screen h-dvh z-[10] backdrop-blur-md bg-black/20 right-0 top-0 origin-top-right'
+          className='absolute w-screen h-dvh z-[10] backdrop-blur-md bg-foreground/20 right-0 top-0 origin-top-right'
         />
       </AnimatePresence>
 
@@ -388,7 +388,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                 variants={mobileImageVariants}
                 animate={isOpen}
                 transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                className='w-full border-b-2 border-black'>
+                className='w-full border-b-2 border-foreground'>
                 <Image
                   src='/sitelogo.svg'
                   alt='The Street Art List'
@@ -411,7 +411,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
               >
                 <ul
                   className={cn(
-                    "font-black m-x-auto w-full text-[4rem] font-tanker tracking-wide lowercase"
+                    "font-foreground m-x-auto w-full text-[4rem] font-tanker tracking-wide lowercase"
                   )}>
                   {mainMenuItems.map((section) => {
                     const isExpanded =
@@ -434,7 +434,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                     return (
                       <li
                         key={`${section.title}-mobileCat`}
-                        className='border-b-2 border-black  w-full'>
+                        className='border-b-2 border-foreground  w-full'>
                         <div
                           onClick={() => {
                             return (
@@ -447,7 +447,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                           className={cn(
                             "cursor-pointer flex justify-start px-9 py-4",
                             activeCategory === section.title &&
-                              "bg-black text-background unstroked"
+                              "bg-foreground text-background unstroked"
                             // activeCategory === section.title &&
                             //   theme === "default" &&
                             //   "text-white",
@@ -481,7 +481,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                                       className={cn(
                                         "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
                                         pathname === item.path &&
-                                          "underline underline-offset-4 decoration-6 text-black"
+                                          "underline underline-offset-4 decoration-6 text-foreground"
                                         // item.path.includes("dashboard") &&
                                         //   "text-salPink"
                                       )}>
@@ -500,7 +500,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                 <Unauthenticated>
                   <div
                     className={cn(
-                      "pl-8 py-5 font-black m-x-auto w-full text-[4rem] border-b-2 border-black font-tanker tracking-wide lowercase"
+                      "pl-8 py-5 font-foreground m-x-auto w-full text-[4rem] border-b-2 border-foreground font-tanker tracking-wide lowercase"
                     )}>
                     <Link onClick={onHandleLinkClick} href={"/pricing"}>
                       Pricing
@@ -508,7 +508,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                   </div>
                   <div
                     className={cn(
-                      "pl-8 pt-6 font-black m-x-auto w-full text-[3rem] border-b-2 border-black font-tanker tracking-wide lowercase"
+                      "pl-8 pt-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker tracking-wide lowercase"
                     )}>
                     <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
                       Login | Register
@@ -522,14 +522,14 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                         setTimeout(() => setIsOpen("closed"), 1000)
                       }}
                       className={cn(
-                        "pl-8 py-6 font-black m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                        "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
                       )}>
                       log out
                     </div>
                   </SignOutBtn>
                 </Authenticated>
                 <motion.div
-                  // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-black text-foreground w-full'
+                  // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-foreground text-foreground w-full'
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.1, duration: 0.4 }}
@@ -540,7 +540,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                     <Link
                       href='https://theanthonybrooks.com'
                       target='_blank'
-                      className=' decoration-black focus:underline focus:decoration-black focus:decoration-2 m-0 p-0 focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                      className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2 m-0 p-0 focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
                       Anthony Brooks
                     </Link>
                   </div>
@@ -583,7 +583,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
               className='w-full h-full hidden md:grid grid-row-1 md:grid-rows-[auto_70px] '>
               {isOpen === "open" && (
                 <>
-                  <div className='grid grid-cols-1 md:grid-cols-3 divide-x-1.5 divide-solid row-span-1 w-screen px-5 divide-black overflow-hidden'>
+                  <div className='grid grid-cols-1 md:grid-cols-3 divide-x-1.5 divide-solid row-span-1 w-screen px-5 divide-foreground overflow-hidden'>
                     {/* Column 1 - Main Titles */}
                     <motion.div
                       className='p-4 py-8 flex items-start justify-center scrollable mini darkbar'
@@ -592,7 +592,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                       transition={{ delay: 0.7, duration: 0.4 }}>
                       <ul
                         className={cn(
-                          "font-black m-auto text-[3rem] lg:text-[4.5rem] space-y-3 ",
+                          "font-foreground m-auto text-[3rem] lg:text-[4.5rem] space-y-3 ",
                           "font-tanker tracking-wide  lowercase select-none"
                         )}>
                         {mainMenuItems.map((section) => {
@@ -629,7 +629,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                                   //   "text-white"
                                 )}>
                                 {/* {activeCategory === section.title && (
-                                      <GoDotFill className='text-black size-8 md:size-14' />
+                                      <GoDotFill className='text-foreground size-8 md:size-14' />
                                     )} */}
                                 {section.title}
                               </div>
@@ -650,7 +650,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.9, duration: 0.4 }}>
-                      <ul className='font-black m-auto text-[1.2rem] lg:text-[3rem] space-y-3 select-none font-tanker tracking-wide  lowercase'>
+                      <ul className='font-foreground m-auto text-[1.2rem] lg:text-[3rem] space-y-3 select-none font-tanker tracking-wide  lowercase'>
                         {activeMenuItems?.items
                           .filter((item) => {
                             const itemUserType = item?.userType
@@ -680,7 +680,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                                   className={cn(
                                     "cursor-pointer  ",
                                     pathname === item.path &&
-                                      "underline underline-offset-4 decoration-6 text-black translate-x-2"
+                                      "underline underline-offset-4 decoration-6 text-foreground translate-x-2"
                                     // item.path.includes("dashboard") &&
                                     //   "text-salPink"
                                   )}>
@@ -698,14 +698,14 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1.1, duration: 0.4 }}>
-                      <div className='h-[30%] w-[80%] flex flex-col  border-black border-1.5 border-dotted rounded-lg p-8 scrollable mini'>
+                      <div className='h-[30%] w-[80%] flex flex-col  border-foreground border-1.5 border-dotted rounded-lg p-8 scrollable mini'>
                         <p>User Notifications</p>
                         <Separator />
                         <p className='italic text-sm'>
                           Nothing to see here yet
                         </p>
                       </div>
-                      <div className='h-[50%] w-[80%] flex flex-col  border-black border-1.5 border-dotted rounded-lg p-8'>
+                      <div className='h-[50%] w-[80%] flex flex-col  border-foreground border-1.5 border-dotted rounded-lg p-8'>
                         <p>Applications</p>
                         <Separator className='mb-2' />
                         <ol className='flex flex-col gap-y-3'>
@@ -756,7 +756,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
 
                   {/* Fixed Bottom Row */}
                   <motion.div
-                    className=' col-span-3 row-span-1 border-t-1.5 border-black text-foreground flex items-center justify-between px-8'
+                    className=' col-span-3 row-span-1 border-t-1.5 border-foreground text-foreground flex items-center justify-between px-8'
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9, duration: 0.4 }}>
@@ -770,7 +770,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                       <Link
                         href='https://theanthonybrooks.com'
                         target='_blank'
-                        className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                        className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
                         Anthony Brooks
                       </Link>
                     </div>

@@ -35,7 +35,7 @@ export const Search = <T extends CommandItem>({
       {!iconOnly && (
         <div
           className={cn(
-            "relative flex items-center rounded-lg border-stone-300 bg-primary/10 px-2 py-1.5 text-sm text-black hover:bg-primary/20",
+            "relative flex items-center rounded-lg border-stone-300 bg-primary/10 px-2 py-1.5 text-sm text-foreground hover:bg-primary/20",
             className
           )}>
           <FiSearch

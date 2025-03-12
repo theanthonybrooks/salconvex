@@ -129,7 +129,7 @@ SearchMappedSelectProps<T>) {
         <Button
           variant='outline'
           className={cn(
-            " font-normal relative h-10 border-foreground/20 truncate pr-8 flex items-center justify-center w-full sm:w-[280px]",
+            " font-normal relative h-10 border-foreground/20 truncate pr-8 flex items-center justify-center w-full sm:w-[280px] bg-card hover:bg-background/20",
             className
           )}
           disabled={disabled}>
@@ -137,9 +137,9 @@ SearchMappedSelectProps<T>) {
             {selectedLabel ? getItemDisplay(selectedLabel) : placeholder}
           </span>
           {isOpen ? (
-            <ChevronUp className='absolute right-3 top-3 origin-center text-foreground/50' />
+            <ChevronUp className='absolute right-3 top-2 origin-center text-foreground/50' />
           ) : (
-            <ChevronDown className='absolute right-3 top-3 origin-center text-foreground/50' />
+            <ChevronDown className='absolute right-3 top-2 origin-center text-foreground/50' />
           )}
         </Button>
       </PopoverTrigger>
@@ -167,7 +167,7 @@ SearchMappedSelectProps<T>) {
                         setIsOpen(false)
                       }}
                       className={cn(
-                        "flex justify-between",
+                        "flex justify-between hover:bg-background/40",
                         isSelected && "bg-salYellow"
                       )}>
                       {getItemLabel(item)}

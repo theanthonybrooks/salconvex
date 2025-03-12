@@ -35,7 +35,7 @@ export default function Home() {
             borderBottomRightRadius: borderRadius,
           }}
         />
-        <motion.span className='absolute bottom-0  flex flex-row gap-1 left-1/2 -translate-x-1/2  px-10 py-2 rounded-t-2xl border-t-1.5 border-x-1.5 border-r-black border-b-black text-foreground bg-background'>
+        <motion.span className='absolute bottom-0  flex flex-row gap-1 left-1/2 -translate-x-1/2  px-10 py-2 rounded-t-2xl border-t-1.5 border-x-1.5 border-r-foreground border-b-foreground text-foreground bg-background'>
           <i className='text-base'>Silent Rhythm</i>
           <span>
             by{" "}

@@ -81,9 +81,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
   }
 
   return (
-    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-black bg-salYellow md:bg-white shadow-none  p-6'>
+    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-foreground bg-salYellow md:bg-white shadow-none  p-6'>
       <button
-        className='absolute right-5 top-4 z-10 text-lg font-bold text-black hover:rounded-full hover:text-salPink focus-visible:bg-salPink'
+        className='absolute right-5 top-4 z-10 text-lg font-bold text-foreground hover:rounded-full hover:text-salPink focus-visible:bg-salPink'
         aria-label='Back to homepage'
         tabIndex={8}
         onClick={() => router.push("/")}>
@@ -110,7 +110,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             priority={true}
           />
         </Link>
-        <CardDescription className='mt-2 text-base text-black'>
+        <CardDescription className='mt-2 text-base text-foreground'>
           Please sign in to continue
         </CardDescription>
       </CardHeader>
@@ -163,12 +163,12 @@ const SignInCard: React.FC<SignInCardProps> = ({
             )}
           </Button>
         </div>
-        <p className='flex items-center gap-x-3 text-sm text-black before:h-[1px] before:flex-1 before:bg-black after:h-[1px] after:flex-1 after:bg-black'>
+        <p className='flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground'>
           or
         </p>
         <form className=' flex flex-col' onSubmit={(e) => onPasswordSignIn(e)}>
           <div className='space-y-4 sm:space-y-2.5'>
-            <Label htmlFor='email' className='text-black'>
+            <Label htmlFor='email' className='text-foreground'>
               Email address
             </Label>
             <Input
@@ -180,18 +180,18 @@ const SignInCard: React.FC<SignInCardProps> = ({
               placeholder=' '
               type='email'
               // inputHeight='sm'
-              className='border-[1.5px] border-black bg-white text-black focus:bg-white'
+              className='border-[1.5px] border-foreground bg-white text-foreground focus:bg-white'
               required
               tabIndex={3}
             />
             <div className='flex flex-col space-y-2.5'>
               <div className='flex justify-between items-center'>
-                <Label htmlFor='password' className='text-black'>
+                <Label htmlFor='password' className='text-foreground'>
                   Password
                 </Label>
                 <span
                   onClick={forgotPasswordHandler}
-                  className='text-black text-sm hover:underline cursor-pointer'>
+                  className='text-foreground text-sm hover:underline cursor-pointer'>
                   Forgot password?
                 </span>
               </div>
@@ -205,7 +205,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
                   placeholder=' '
                   type={showPassword ? "text" : "password"}
                   // inputHeight='sm'
-                  className='border-[1.5px] border-black bg-white text-black focus:bg-white'
+                  className='border-[1.5px] border-foreground bg-white text-foreground focus:bg-white'
                   required
                   tabIndex={4}
                 />
@@ -215,9 +215,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
                   className='absolute inset-y-0 right-0 flex items-center pr-3'
                   tabIndex={5}>
                   {showPassword ? (
-                    <Eye className='size-4 text-black' />
+                    <Eye className='size-4 text-foreground' />
                   ) : (
-                    <EyeOff className='size-4 text-black' />
+                    <EyeOff className='size-4 text-foreground' />
                   )}
                 </button>
               </div>
@@ -239,11 +239,11 @@ const SignInCard: React.FC<SignInCardProps> = ({
         </form>
       </CardContent>
       <CardFooter className='justify-center pb-0'>
-        <p className='mt-3 text-center text-sm text-black'>
+        <p className='mt-3 text-center text-sm text-foreground'>
           Don&apos;t have an account?{" "}
           <span
             onClick={switchFlow}
-            className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+            className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
             tabIndex={7}>
             Sign up
           </span>

@@ -148,7 +148,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
       onOpenChange={setOpen}
       shouldFilter={false}
       label={title}
-      className='fixed inset-0 flex items-center justify-center text-black z-[999]'
+      className='fixed inset-0 flex items-center justify-center text-foreground z-[999]'
       onClick={() => setOpen(false)}>
       {/* Background overlay */}
       <AnimatePresence>
@@ -173,7 +173,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
             initial='hidden'
             animate='visible'
             exit='exit'
-            className='relative flex max-w-[90vw] max-h-[80vh] w-full md:max-w-xl flex-col rounded-lg border border-stone-300 bg-white p-4 shadow-xl'
+            className='relative flex max-w-[90vw] max-h-[80vh] w-full md:max-w-xl flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl'
             onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setOpen(false)}
@@ -198,7 +198,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                   }
                 }}
                 placeholder={cn(placeholder, !isMobile && "  (Hint: Ctrl + /)")}
-                className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-none'
+                className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-none bg-card'
               />
             </div>
             <div className='max-h-60dvh search scrollable mini p-3'>
@@ -219,7 +219,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                       {groupItems.map((item) => (
                         <Command.Item
                           key={item.path}
-                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-stone-950 transition-colors hover:bg-stone-100'
+                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900'
                           onMouseEnter={() => setHoveredItem(item.path)}
                           onMouseLeave={() => setHoveredItem(null)}
                           onSelect={() => router.push(item.path)}>

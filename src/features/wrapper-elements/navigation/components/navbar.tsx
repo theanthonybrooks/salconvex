@@ -110,7 +110,7 @@ NavBarProps) {
           height: isScrolled && isMobile ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-20 h-25  border-black  lg:bg-transparent bg-background '>
+        className='fixed left-0 right-0 top-0 z-20 h-25  border-foreground  lg:bg-transparent bg-background '>
         <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative'>
           {/* Mobile Logo and Navigation */}
           {isMobile && (
@@ -157,7 +157,7 @@ NavBarProps) {
             <>
               {/* Desktop Logo & Navigation */}
               <motion.div
-                className='hidden lg:flex h-15 items-center gap-2 bg-white rounded-full border-2 border-black p-1 overflow-hidden'
+                className='hidden lg:flex h-15 items-center gap-2 bg-white rounded-full border-2 border-foreground p-1 overflow-hidden'
                 animate={{
                   width: isScrolled ? "60px" : "250px",
                 }}
@@ -238,7 +238,7 @@ NavBarProps) {
               </div>
 
               {/* Right Side */}
-              <div className='hidden lg:flex items-center h-15 w-fit bg-white rounded-full p-1 pr-5 border-2 border-black'>
+              <div className='hidden lg:flex items-center h-15 w-fit bg-white rounded-full p-1 pr-5 border-2 border-foreground'>
                 <div className='flex items-center gap-4'>
                   <Unauthenticated>
                     <Link href='/auth/sign-in' prefetch={true}>

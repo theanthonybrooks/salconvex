@@ -70,7 +70,7 @@ export default function NavBar({
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <div className='fixed left-0 right-0 top-0 z-20 h-20  border-black  bg-background border-b'>
+      <div className='fixed left-0 right-0 top-0 z-20 h-20  border-foreground  bg-background border-b'>
         <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 pl-6 pr-8 relative'>
           {/* Mobile Logo and Navigation */}
           {isMobile && (
@@ -123,7 +123,7 @@ export default function NavBar({
               {/* Desktop Logo & Navigation */}
               <div className='flex gap-x-2 items-center justify-center'>
                 <motion.div
-                  className='hidden lg:flex h-[50px] w-[50px] items-center gap-2 bg-white rounded-full border-2 border-black p-1 overflow-hidden'
+                  className='hidden lg:flex h-[50px] w-[50px] items-center gap-2 bg-white rounded-full border-2 border-foreground p-1 overflow-hidden'
                   transition={{ duration: 0.4, ease: "easeInOut" }}>
                   <Link
                     href='/'

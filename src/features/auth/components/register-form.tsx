@@ -266,7 +266,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   }, [step])
 
   return (
-    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-black bg-salYellow md:bg-white shadow-none  p-6'>
+    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-foreground bg-salYellow md:bg-white shadow-none  p-6'>
       <CloseBtn
         title='Are you sure?'
         description='You can always start again at any time though an account is required to apply to open calls.'
@@ -302,15 +302,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               Read more about account types{" "}
               <Link
                 href='/pricing'
-                className='underline font-medium text-zinc-950 decoration-black underline-offset-4 outline-none focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline-offset-2 hover:underline-offset-1 cursor-pointer'>
+                className='underline font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline-offset-2 hover:underline-offset-1 cursor-pointer'>
                 here
               </Link>
             </p> */}
-            <p className='mt-2 mb-5 text-center text-base text-black'>
+            <p className='mt-2 mb-5 text-center text-base text-foreground'>
               Already have an account?{" "}
               <span
                 onClick={switchFlow}
-                className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+                className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
                 tabIndex={
                   step === "signUp" && selectedOption.includes("organizer")
                     ? 13
@@ -333,7 +333,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             {/* Adjust top offset to match the speech bubble’s center */}
             <div className='absolute max-w-[300px] left-[50%] top-[37%] z-10 w-full -translate-x-1/2 -translate-y-1/2 transform text-center'>
               <CardTitle className='mb-2 text-4xl'>Verify your email</CardTitle>
-              <CardDescription className='text-base text-black max-w-[300px] text-center text-balance'>
+              <CardDescription className='text-base text-foreground max-w-[300px] text-center text-balance'>
                 {email
                   ? "We sent a code to " + obsEmail + "!"
                   : "We sent you a verification code!"}
@@ -438,9 +438,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             className='absolute inset-y-0 right-0 flex items-center pr-3'
                             tabIndex={step === "signUp" ? 5 : -1}>
                             {showPassword ? (
-                              <Eye className='size-4 text-black' />
+                              <Eye className='size-4 text-foreground' />
                             ) : (
-                              <EyeOff className='size-4 text-black' />
+                              <EyeOff className='size-4 text-foreground' />
                             )}
                           </button>
                         </div>
@@ -582,12 +582,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               </Button>
             </form>
             <CardFooter className='justify-center pt-4 px-0 pb-0 flex flex-col'>
-              <p className='mt-3 text-center text-sm text-black'>
+              <p className='mt-3 text-center text-sm text-foreground'>
                 By creating an account, you agree to our
                 <br />
                 <Link
                   href='/terms'
-                  className='font-bold cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'
+                  className='font-bold cursor-pointer  decoration-foreground underline-offset-2 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline'
                   tabIndex={
                     step === "signUp" && selectedOption.includes("organizer")
                       ? 11
@@ -598,7 +598,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 and{" "}
                 <Link
                   href='/privacy'
-                  className='font-bold inline-flex  items-center cursor-pointer  decoration-black underline-offset-2 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline'
+                  className='font-bold inline-flex  items-center cursor-pointer  decoration-foreground underline-offset-2 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline'
                   tabIndex={
                     step === "signUp" && selectedOption.includes("organizer")
                       ? 12
@@ -631,7 +631,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     disabled={isPending}
                     // tabIndex={step !== 'forgot' && 1}
                     tabIndex={1}
-                    className='border-black '
+                    className='border-foreground '
                     ref={otpInputRef}>
                     <InputOTPGroup>
                       <InputOTPSlot index={0} className='bg-white' border='2' />

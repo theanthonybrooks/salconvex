@@ -39,7 +39,7 @@ import { useCallback, useEffect } from "react"
 const multiSelectVariants = cva("mx-[2px] ", {
   variants: {
     variant: {
-      basic: " border-[1.5px] text-black bg-white  hover:bg-white",
+      basic: " border-[1.5px] text-foreground bg-white  hover:bg-white",
       default: "border-foreground/10 text-foreground bg-card  hover:bg-card",
       secondary:
         "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -227,7 +227,7 @@ export const MultiSelect = React.forwardRef<
             className={cn(
               "flex w-full p-1 rounded-md border items-center justify-between bg-stone-100 hover:bg-stone-100 [&_svg]:pointer-events-auto h-[40px] sm:h-[32px]",
               className,
-              variant === "basic" ? "border-black" : "",
+              variant === "basic" ? "border-foreground" : "",
               multiSelectVariants({ variant })
             )}>
             {selectedValues.length > 0 ? (
@@ -320,7 +320,7 @@ export const MultiSelect = React.forwardRef<
           className={cn(
             "p-0 max-w-max",
             hasSearch ? "w-auto" : "w-full min-w-[200px]",
-            variant === "basic" ? "border-black" : ""
+            variant === "basic" ? "border-foreground" : ""
           )}
           align='start'
           onEscapeKeyDown={() => setIsPopoverOpen(false)}>

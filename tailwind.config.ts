@@ -35,6 +35,7 @@ export default {
         salProgress: "var(--sal-progress)",
         salPink: "hsl(var(--sal-pink))",
         userIcon: "hsl(var(--user-icon))",
+        txtMutedForeground: "hsl(var(--txt-muted-foreground))",
         customPurple: "#5C3B58",
         card: {
           DEFAULT: "hsl(var(--card))",

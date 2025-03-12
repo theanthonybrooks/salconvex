@@ -96,7 +96,7 @@ export default function Footer() {
                     {...register("email", { required: true })}
                     type='email'
                     placeholder='Enter your email'
-                    className='w-full min-w-0 rounded-lg bg-background border-black'
+                    className='w-full min-w-0 rounded-lg bg-background border-foreground'
                   />
                 </div>
                 <div className='mt-3 sm:ml-3 sm:mt-0'>
@@ -160,7 +160,7 @@ export default function Footer() {
               <Link
                 href='https://theanthonybrooks.com'
                 target='_blank'
-                className=' decoration-black focus:underline focus:decoration-black focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
                 Anthony Brooks
               </Link>
             </div>

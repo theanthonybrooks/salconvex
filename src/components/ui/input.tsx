@@ -8,10 +8,10 @@ const inputVariants = cva(
     variants: {
       variant: {
         basic:
-          "border-black bg-white text-black border-[1.5px] focus:outline focus:ring-1 focus:bg-white",
+          "border-foreground bg-white text-foreground border-[1.5px] focus:outline focus:ring-1 focus:bg-white",
 
-        default: "border-gray-300 bg-white text-black",
-        outline: "border-black bg-transparent",
+        default: "border-gray-300 bg-white text-foreground",
+        outline: "border-foreground bg-transparent",
         ghost: "bg-transparent border-none",
         destructive: "border-red-500 text-red-600 bg-red-100",
       },

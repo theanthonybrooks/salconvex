@@ -44,7 +44,7 @@ const ResendTimer: React.FC<{ initialTime?: number; onResend: () => void }> = ({
       ) : (
         <span
           onClick={handleResend}
-          className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'>
+          className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'>
           Resend code
         </span>
       )}

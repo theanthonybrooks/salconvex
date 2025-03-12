@@ -132,7 +132,7 @@ export default function DashboardSideBar({
 
       <nav
         className='grid max-h-[calc(100vh-55px)]
- h-full overflow-hidden grid-rows-[60px_1fr_80px] space-y-1 pt-4'>
+ h-full overflow-hidden grid-rows-[60px_1fr_65px] space-y-1 pt-4'>
         <Search
           title={"Search"}
           source={dashboardNavItems}
@@ -153,13 +153,13 @@ export default function DashboardSideBar({
                     "flex items-center gap-2 rounded-lg px-3 py-5 pl-5 text-sm transition-colors",
                     pathname === item.href
                       ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
-                      : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+                      : "text-primary hover:bg-primary/10 hover:text-foreground"
                   )}>
                   <item.icon className='h-4 w-4' />
                   {item.label}
                 </Link>
                 {pathname !== item.href && (
-                  <Separator thickness={2} className='border-black/20' />
+                  <Separator thickness={2} className='border-foreground/20' />
                 )}
               </React.Fragment>
             ))}
@@ -180,7 +180,7 @@ export default function DashboardSideBar({
                       "flex flex-col gap-2  pr-3 py-4 pl-5 text-sm transition-colors",
                       pathname.includes("dashboard/" + section.sectionCat)
                         ? "font-bold"
-                        : "text-muted-foreground  hover:text-foreground hover:bg-primary/10",
+                        : "text-primary  hover:text-foreground hover:bg-primary/10",
                       openSection === section.sectionCat &&
                         pathname.includes("dashboard/" + section.sectionCat)
                         ? "cursor-default"
@@ -233,7 +233,7 @@ export default function DashboardSideBar({
                                 "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                                 pathname === sectionItem.href
                                   ? "bg-primary/10 pl-3 text-primary hover:bg-primary/20"
-                                  : "pl-3 text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+                                  : "pl-3 text-primary hover:bg-primary/10 hover:text-foreground"
                               )}>
                               <sectionItem.icon className='h-4 w-4' />
                               {sectionItem.label}
@@ -259,10 +259,10 @@ export default function DashboardSideBar({
                 prefetch={true}
                 href={item.href}
                 className={clsx(
-                  "flex items-center gap-2 rounded-lg px-3 py-5 text-center text-sm transition-colors",
+                  "flex items-center gap-2 pl-8 pr-3 py-5 text-center text-sm transition-colors",
                   pathname === item.href
                     ? "bg-primary/10 text-primary hover:bg-primary/20"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    : "text-primary hover:bg-primary/10 hover:text-foreground"
                 )}>
                 <item.icon className='h-4 w-4' />
                 {item.label}

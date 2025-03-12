@@ -39,7 +39,7 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
       <AlertDialogTrigger asChild>
         <button
           className={cn(
-            "absolute right-5 top-4 z-10 rounded text-lg font-bold text-black hover:rounded-full hover:text-salPink focus:bg-salPink",
+            "absolute right-5 top-4 z-10 rounded text-lg font-bold text-foreground hover:rounded-full hover:text-salPink focus:bg-salPink",
             className
           )}
           aria-label='Close modal'
@@ -48,10 +48,10 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
           <X size={25} />
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
+      <AlertDialogContent className='w-[80dvw] bg-salYellow text-foreground'>
         <AlertDialogHeader>
           <AlertDialogTitle className='text-2xl'>{title}</AlertDialogTitle>
-          <AlertDialogDescription className='text-black'>
+          <AlertDialogDescription className='text-foreground'>
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>

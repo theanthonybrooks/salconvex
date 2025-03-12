@@ -74,7 +74,10 @@ const AccordionItem = React.forwardRef<
         <AccordionPrimitive.Item
           ref={ref}
           value={value}
-          className={cn("border-b-2 border-dotted border-black/20", className)}
+          className={cn(
+            "border-b-2 border-dotted border-foreground/20",
+            className
+          )}
           {...props}
         />
       </AccordionItemUpdateContext.Provider>

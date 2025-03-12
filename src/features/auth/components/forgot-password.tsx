@@ -55,19 +55,19 @@ const CloseMsg: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <button
-          className='absolute right-5 top-4 z-10 rounded text-lg font-bold text-black hover:rounded-full hover:text-salPink focus:bg-salPink'
+          className='absolute right-5 top-4 z-10 rounded text-lg font-bold text-foreground hover:rounded-full hover:text-salPink focus:bg-salPink'
           aria-label='Close modal'
           // tabIndex={successfulCreation ? 6 : 4}
         >
           <X size={25} />
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className='w-[80dvw] bg-salYellow text-black'>
+      <AlertDialogContent className='w-[80dvw] bg-salYellow text-foreground'>
         <AlertDialogHeader>
           <AlertDialogTitle className='text-2xl'>
             Where would you like to go?
           </AlertDialogTitle>
-          <AlertDialogDescription className='text-black'>
+          <AlertDialogDescription className='text-foreground'>
             If you&apos;ve remembered your password, you can login. Otherwise,
             you can stay here to reset your password, or go to the homepage.
           </AlertDialogDescription>
@@ -194,7 +194,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
   }
 
   return step === "forgot" ? (
-    <Card className='md:relative w-full  border-none md:border-solid md:border-2 border-black bg-salYellow md:bg-white shadow-none  p-8'>
+    <Card className='md:relative w-full  border-none md:border-solid md:border-2 border-foreground bg-salYellow md:bg-white shadow-none  p-8'>
       <CloseBtn
         description=" If you've remembered your password, you can login. Otherwise, you
             can stay here to reset your password, or go to the homepage."
@@ -230,7 +230,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
             />
           </section>
           {/* <CardTitle>Forget your password?</CardTitle> */}
-          <CardDescription className='text-base text-black  text-center'>
+          <CardDescription className='text-base text-foreground  text-center'>
             {error ? (
               <FormError message={error} />
             ) : (
@@ -239,17 +239,17 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
           </CardDescription>
         </CardHeader>
         <CardContent className='px-10 pb-0'>
-          <Separator thickness={2} className='border-black mb-4' />
+          <Separator thickness={2} className='border-foreground mb-4' />
           <form
             onSubmit={forgotForm.handleSubmit(handleForgotSubmit)}
             className='space-y-6 flex flex-col'>
             <div className='space-y-2.5'>
-              <Label htmlFor='email' className='text-black'>
+              <Label htmlFor='email' className='text-foreground'>
                 Email address
               </Label>
               <Input
                 {...forgotForm.register("email")}
-                className='border-[1.5px] border-black bg-white text-black focus:bg-white'
+                className='border-[1.5px] border-foreground bg-white text-foreground focus:bg-white'
                 placeholder='youremail@mail.com'
                 type='text'
                 name='email'
@@ -276,11 +276,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
         </CardContent>
       </Form>
       <CardFooter className='justify-center p-4 pb-0'>
-        <p className='mt-3 text-center text-sm text-black'>
+        <p className='mt-3 text-center text-sm text-foreground'>
           Remember your password?{" "}
           <span
             onClick={switchFlow}
-            className='font-medium text-zinc-950 decoration-black underline-offset-4 outline-none hover:underline focus:underline focus:decoration-black focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+            className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
             tabIndex={7}>
             Sign in
           </span>
@@ -288,7 +288,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
       </CardFooter>
     </Card>
   ) : (
-    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-black bg-salYellow md:bg-white shadow-none  p-8'>
+    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-foreground bg-salYellow md:bg-white shadow-none  p-8'>
       <CloseMsg switchFlow={switchFlow} />
       <Form {...resetForm}>
         <CardHeader className='flex-col items-center justify-center'>
@@ -302,7 +302,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
               className='ml-2'
             />
           </div>
-          {email && <h1 className='text-black'> to: {email}</h1>}
+          {email && <h1 className='text-foreground'> to: {email}</h1>}
         </CardHeader>
 
         <CardContent className='p-0'>
@@ -328,7 +328,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
             className='space-y-6 px-8 flex flex-col justify-center'>
             <Label
               htmlFor='code'
-              className='mt-5  text-center text-base text-black'>
+              className='mt-5  text-center text-base text-foreground'>
               Please enter the code sent to your email
             </Label>
             <InputOTP
@@ -342,7 +342,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
               disabled={pending}
               // tabIndex={step !== 'forgot' && 1}
               tabIndex={1}
-              className='border-black '>
+              className='border-foreground '>
               <InputOTPGroup>
                 <InputOTPSlot index={0} className='bg-white' />
                 <InputOTPSlot index={1} className='bg-white' />
@@ -376,7 +376,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
             />
             <div className='flex flex-col space-y-2.5  mb-6'>
               <div className='flex justify-between items-center'>
-                <Label htmlFor='newPassword' className='  text-base text-black'>
+                <Label
+                  htmlFor='newPassword'
+                  className='  text-base text-foreground'>
                   Enter your new password
                 </Label>
               </div>
@@ -391,7 +393,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
                   placeholder=' '
                   type={showPassword ? "text" : "password"}
                   // inputHeight='sm'
-                  className='border-[1.5px] border-black bg-white text-black focus:bg-white'
+                  className='border-[1.5px] border-foreground bg-white text-foreground focus:bg-white'
                   required
                   tabIndex={4}
                 />
@@ -401,9 +403,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
                   className='absolute inset-y-0 right-0 flex items-center pr-3'
                   tabIndex={5}>
                   {showPassword ? (
-                    <Eye className='size-4 text-black' />
+                    <Eye className='size-4 text-foreground' />
                   ) : (
-                    <EyeOff className='size-4 text-black' />
+                    <EyeOff className='size-4 text-foreground' />
                   )}
                 </button>
               </div>
