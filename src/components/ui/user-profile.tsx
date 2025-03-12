@@ -14,6 +14,7 @@ import {
 import SignOutBtn from "@/features/auth/components/sign-out-btn"
 import { useQuery } from "@/helpers/convexHelpers"
 import { cn } from "@/lib/utils"
+import { User as UserType } from "@/types/user"
 // import { SignOutButton, useUser } from "@clerk/nextjs";
 import { LogOut, Settings, Sparkles, User } from "lucide-react"
 import Link from "next/link"
@@ -21,7 +22,7 @@ import { FaUserNinja } from "react-icons/fa6"
 import { api } from "~/convex/_generated/api"
 
 interface UserProfileProps {
-  user: User | null
+  user: UserType | null
   className?: string
 }
 
