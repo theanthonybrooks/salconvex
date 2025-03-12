@@ -69,7 +69,7 @@ const PricingHeader = ({
       </div>
     </div>
 
-    <h2 className='bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text pb-2 text-3xl font-bold text-transparent dark:from-white dark:via-blue-300 dark:to-white md:text-4xl'>
+    <h2 className='bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text pb-2 text-3xl font-bold text-transparent dark:from-white dark:via-blue-300 dark:to-white md:text-4xl'>
       {title}
     </h2>
     <p className='mx-auto mt-4 max-w-2xl text-gray-600 dark:text-gray-300'>
@@ -147,7 +147,7 @@ const PricingCard = ({
         "flex w-full min-w-[20vw] max-w-sm flex-col justify-between px-2 py-1",
         {
           "relative border-2 border-blue-500 dark:border-blue-400": popular,
-          "bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-2xl":
+          "bg-linear-to-b from-gray-900 to-gray-800 text-white shadow-2xl":
             exclusive,
         }
       )}>

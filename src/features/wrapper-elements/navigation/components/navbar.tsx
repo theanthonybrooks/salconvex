@@ -86,7 +86,7 @@ NavBarProps) {
             height: isScrolled ? "80px" : "100px",
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className='fixed left-0 right-0 top-0 z-[19] h-25  '>
+          className='fixed left-0 right-0 top-0 z-19 h-25  '>
           <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative lg:hidden'>
             <motion.div
               initial={{ boxShadow: "none", height: 90, width: 90 }}
@@ -297,7 +297,7 @@ const ListItem = React.forwardRef<
           href={href}
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             className
           )}
           {...props}>

@@ -307,11 +307,11 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
           initial='overlayInitial'
           variants={screenOverlayVariants}
           animate={isOpen}
-          className='absolute w-screen h-dvh z-[10] backdrop-blur-md bg-foreground/20 right-0 top-0 origin-top-right'
+          className='absolute w-screen h-dvh z-10 backdrop-blur-md bg-foreground/20 right-0 top-0 origin-top-right'
         />
       </AnimatePresence>
 
-      <div className='z-[100]'>
+      <div className='z-100'>
         {/* Menu Button + Theme Toggle*/}
         <div className='flex flex-row gap-x-2  items-center justify-between relative w-full z-20'>
           {/* <ThemeToggle userPref={themePref} /> */}

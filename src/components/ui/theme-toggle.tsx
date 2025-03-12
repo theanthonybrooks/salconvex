@@ -91,7 +91,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
           viewBox='0 0 100 100'
           fill='none'
           xmlns='http://www.w3.org/2000/svg'
-          className='relative  !w-6 !h-6 md:w-4 md:h-4 overflow-visible'>
+          className='relative  w-6! h-6! md:w-4 md:h-4 overflow-visible'>
           {/* <m.path
             variants={shineVariant}
             d={moonPath}

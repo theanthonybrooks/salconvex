@@ -39,7 +39,7 @@ export function AccordionComponent({ src }: AccordionComponentProps) {
           )}
 
           {src.title && (
-            <h2 className='bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text pb-2 text-3xl font-bold text-transparent dark:from-white dark:via-blue-300 dark:to-white md:text-4xl'>
+            <h2 className='bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text pb-2 text-3xl font-bold text-transparent dark:from-white dark:via-blue-300 dark:to-white md:text-4xl'>
               {src.title}
             </h2>
           )}

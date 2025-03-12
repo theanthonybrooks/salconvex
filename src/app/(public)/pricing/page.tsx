@@ -45,7 +45,7 @@ export default function PricingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className='text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white animate-gradient-x pb-2'>
+              className='text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white animate-gradient-x pb-2'>
               Choose Your Perfect Plan
             </motion.h1>
 
@@ -68,7 +68,7 @@ export default function PricingPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className='space-y-4'>
-              <h2 className='text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white'>
+              <h2 className='text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white'>
                 Everything You Need
               </h2>
               <p className='text-gray-600 dark:text-gray-400'>
@@ -86,7 +86,7 @@ export default function PricingPage() {
                 <div
                   key={feature}
                   className='flex items-center gap-2 text-gray-600 dark:text-gray-400'>
-                  <Check className='h-5 w-5 flex-shrink-0 text-blue-500' />
+                  <Check className='h-5 w-5 shrink-0 text-blue-500' />
                   <span>{feature}</span>
                 </div>
               ))}

@@ -44,7 +44,7 @@ export default function SideBySide() {
                 </div>
               </div>
 
-              <h2 className='text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white pb-2'>
+              <h2 className='text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white pb-2'>
                 A Faster Path to Production
               </h2>
               <p className='mt-6 text-lg text-gray-600 dark:text-gray-300'>
@@ -83,7 +83,7 @@ export default function SideBySide() {
             viewport={{ once: true }}
             className='relative'>
             <div className='relative rounded-xl overflow-hidden'>
-              <div className='absolute inset-0 bg-gradient-to-t from-background/20 via-background/5 to-background/0 z-10'></div>
+              <div className='absolute inset-0 bg-linear-to-t from-background/20 via-background/5 to-background/0 z-10'></div>
               <p>Right Side</p>
             </div>
           </motion.div>

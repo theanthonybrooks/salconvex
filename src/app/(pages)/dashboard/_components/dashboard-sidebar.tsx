@@ -120,7 +120,7 @@ export default function DashboardSideBar({
   return (
     <div className='hidden w-64 border-r  h-screen bg-background min-[1024px]:block max-h-[calc(100vh-80px)] overflow-hidden'>
       {/* <div className='flex h-full flex-col justify-between'> */}
-      {/* <div className='flex min-h-[72px] flex-shrink-0 items-center border-b px-4'>
+      {/* <div className='flex min-h-[72px] shrink-0 items-center border-b px-4'>
           <Link
             prefetch={true}
             className='flex items-center gap-2 font-semibold hover:cursor-pointer'

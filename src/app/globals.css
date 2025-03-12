@@ -1,7 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/* @font-face {
+@import 'tailwindcss';
+
+@config '../../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer utilities {
+  /* @font-face {
   font-family: "Tanker-Regular";
   src: url("/fonts/tanker/Tanker-Regular.ttf") format("truetype");
   font-weight: 400;
@@ -9,16 +29,17 @@
   font-style: normal;
 } */
 
-html,
-body,
-:root {
-  height: 100vh;
-  height: 100dvh;
-}
+  html,
+  body,
+  :root {
+    height: 100vh;
+    height: 100dvh;
+  }
 
-/* body {
+  /* body {
   scrollbar-gutter: auto;
 } */
+}
 
 @layer base {
   :root {
@@ -242,203 +263,206 @@ body,
   }
 }
 
-/* ----------- Components ------------ */
+@layer utilities {
+  /* ----------- Components ------------ */
 
-.search {
-  & .scrollbar::-webkit-scrollbar {
-    width: 2px;
+  .search {
+    & .scrollbar::-webkit-scrollbar {
+      width: 2px;
+    }
+    &.scrollbar::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: #f7f4ed;
+    }
+
+    &.scrollbar::-webkit-scrollbar-thumb {
+      background: #e6dcd5;
+      border-radius: 100vh;
+      /*  border: 3px solid #f6f7ed;  */
+    }
+
+    &.scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #e0cbcb;
+    }
   }
-  &.scrollbar::-webkit-scrollbar-track {
-    border-radius: 100vh;
-    background: #f7f4ed;
+
+  .no-scroll {
+    overflow: hidden !important;
   }
 
-  &.scrollbar::-webkit-scrollbar-thumb {
-    background: #e6dcd5;
-    border-radius: 100vh;
-    /*  border: 3px solid #f6f7ed;  */
-  }
-
-  &.scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #e0cbcb;
-  }
-}
-
-.no-scroll {
-  overflow: hidden !important;
-}
-
-.scrollable {
-  overflow: auto;
-  scrollbar-gutter: auto;
-  /* &.boundless {
+  .scrollable {
+    overflow: auto;
+    scrollbar-gutter: auto;
+    /* &.boundless {
     height: 100vh;
   } */
-}
-
-/* For WebKit-based browsers (Chrome, Safari, Edge) */
-.scrollable::-webkit-scrollbar {
-  width: 1em;
-  height: 2px; /* if you also want horizontal scrollbars */
-}
-
-.scrollable::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-.scrollable::-webkit-scrollbar-thumb {
-  background-color: var(--background);
-  border-radius: 9999px; /* fully rounded */
-  border: 1px solid black;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.scrollable::-webkit-scrollbar-thumb:hover {
-  transform: scaleX(2); /* doubles the width from 2px to ~4px */
-}
-.scrollable.mini::-webkit-scrollbar {
-  width: 4px;
-}
-.scrollable.mini.darkbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.65);
-}
-
-.scrollable.mini::-webkit-scrollbar-thumb {
-  /* background: rgb(224, 220, 217); */
-  background: hsl(var(--primary) / 0.15);
-  border: none;
-}
-.scrollable.invis {
-  scrollbar-gutter: unset;
-  overflow: auto;
-}
-
-.scrollable.invis::-webkit-scrollbar {
-  display: none;
-  width: 0;
-}
-
-.scrollable.invis {
-  -ms-overflow-style: none;
-}
-
-@-moz-document url-prefix() {
-  .scrollable {
-    scrollbar-width: thin;
-    scrollbar-color: var(--background) rgb(255, 252, 199);
   }
-}
 
-.accordion-cont {
-  &:not(:last-of-type) {
-    padding-bottom: 10px;
+  /* For WebKit-based browsers (Chrome, Safari, Edge) */
+  .scrollable::-webkit-scrollbar {
+    width: 1em;
+    height: 2px; /* if you also want horizontal scrollbars */
   }
-  &:not(:first-of-type) {
-    padding-top: 10px;
+
+  .scrollable::-webkit-scrollbar-track {
+    background: var(--background);
   }
-}
 
-.price-card-cont {
-  &:not(:last-of-type) {
-    margin-bottom: 5em;
+  .scrollable::-webkit-scrollbar-thumb {
+    background-color: var(--background);
+    border-radius: 9999px; /* fully rounded */
+    border: 1px solid black;
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease;
   }
-}
 
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-
-:focus-visible {
-  outline: 2px solid var(--sal-pink-hex);
-  outline-offset: 2px;
-}
-
-:focus,
-:focus-within,
-:active {
-  &:not(button) {
-    box-shadow: none;
+  .scrollable::-webkit-scrollbar-thumb:hover {
+    transform: scaleX(2); /* doubles the width from 2px to ~4px */
   }
-  outline: none;
-  /* border: 2px solid black ; */
-}
-form {
-  input:focus,
-  textarea:focus {
-    outline: 1px solid black;
-    outline-offset: 0;
+  .scrollable.mini::-webkit-scrollbar {
+    width: 4px;
   }
-  input:not(:placeholder-shown):valid {
-    background-color: rgb(255, 255, 255);
+  .scrollable.mini.darkbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.65);
   }
-}
-text-area::placeholder,
-input::placeholder {
-  color: foreground;
-}
 
-input::-webkit-autofill,
-input::-webkit-autofill:hover,
-input::-webkit-autofill:focus,
-input::-webkit-autofill:active {
-  background-color: white;
-  color: black;
-  box-shadow: 0 0 0px 1000px white inset;
-}
-
-input:-webkit-autofill,
-textarea:-webkit-autofill,
-select:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 30px white inset;
-  -webkit-text-fill-color: black;
-  caret-color: black; /* note-to-self: cursor styling*/
-
-  &.sal {
-    -webkit-box-shadow: 0 0 0 30px var(--sal-yellow-hex) inset;
+  .scrollable.mini::-webkit-scrollbar-thumb {
+    /* background: rgb(224, 220, 217); */
+    background: hsl(var(--primary) / 0.15);
+    border: none;
   }
-  font-weight: 400;
-  font-style: italic;
-}
+  .scrollable.invis {
+    scrollbar-gutter: unset;
+    overflow: auto;
+  }
 
-input::-moz-focus-inner {
-  border: 0;
-}
+  .scrollable.invis::-webkit-scrollbar {
+    display: none;
+    width: 0;
+  }
 
-input {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
+  .scrollable.invis {
+    -ms-overflow-style: none;
+  }
 
-input:not(:placeholder-shown):not(:valid):not(:read-only) {
-  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2); /* outer offset outline */
-}
+  @-moz-document url-prefix() {
+    .scrollable {
+      scrollbar-width: thin;
+      scrollbar-color: var(--background) rgb(255, 252, 199);
+    }
+  }
 
-::selection {
-  background: var(--sal-pink-hex); /* Yellow highlight */
-  color: black;
-}
+  .accordion-cont {
+    &:not(:last-of-type) {
+      padding-bottom: 10px;
+    }
+    &:not(:first-of-type) {
+      padding-top: 10px;
+    }
+  }
 
-button,
-img,
-svg,
-a {
-  user-select: none;
-}
-/* *:not(p, h1, h2, h3) {
+  .price-card-cont {
+    &:not(:last-of-type) {
+      margin-bottom: 5em;
+    }
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--sal-pink-hex);
+    outline-offset: 2px;
+  }
+
+  :focus,
+  :focus-within,
+  :active {
+    &:not(button) {
+      box-shadow: none;
+    }
+    outline: none;
+    /* border: 2px solid black ; */
+  }
+  form {
+    input:focus,
+    textarea:focus {
+      outline: 1px solid black;
+      outline-offset: 0;
+    }
+    input:not(:placeholder-shown):valid {
+      background-color: rgb(255, 255, 255);
+    }
+  }
+  text-area::placeholder,
+  input::placeholder {
+    color: foreground;
+  }
+
+  input::-webkit-autofill,
+  input::-webkit-autofill:hover,
+  input::-webkit-autofill:focus,
+  input::-webkit-autofill:active {
+    background-color: white;
+    color: black;
+    box-shadow: 0 0 0px 1000px white inset;
+  }
+
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+    -webkit-text-fill-color: black;
+    caret-color: black; /* note-to-self: cursor styling*/
+
+    &.sal {
+      -webkit-box-shadow: 0 0 0 30px var(--sal-yellow-hex) inset;
+    }
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  input::-moz-focus-inner {
+    border: 0;
+  }
+
+  input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  input:not(:placeholder-shown):not(:valid):not(:read-only) {
+    box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2); /* outer offset outline */
+  }
+
+  ::selection {
+    background: var(--sal-pink-hex); /* Yellow highlight */
+    color: black;
+  }
+
+  button,
+  img,
+  svg,
+  a {
+    user-select: none;
+  }
+  /* *:not(p, h1, h2, h3) {
   user-select: none;
 } */
 
-button:focus-visible,
-button:focus-within,
-button:active {
-  outline: var(--sal-pink) solid 2px;
-}
-/* 
+  button:focus-visible,
+  button:focus-within,
+  button:active {
+    outline: var(--sal-pink) solid 2px;
+  }
+  /* 
 :focus-visible {
   &:not(button) {
     outline: rgba(0, 0, 0, 0.2) solid 2px;
@@ -446,6 +470,7 @@ button:active {
 
   border-radius: 5px;
 } */
+}
 
 @layer base {
   * {

@@ -302,7 +302,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               Read more about account types{" "}
               <Link
                 href='/pricing'
-                className='underline font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline-offset-2 hover:underline-offset-1 cursor-pointer'>
+                className='underline font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-hidden focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-hidden focus-visible:underline-offset-2 hover:underline-offset-1 cursor-pointer'>
                 here
               </Link>
             </p> */}
@@ -310,7 +310,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               Already have an account?{" "}
               <span
                 onClick={switchFlow}
-                className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+                className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-hidden hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-hidden focus-visible:underline cursor-pointer'
                 tabIndex={
                   step === "signUp" && selectedOption.includes("organizer")
                     ? 13
@@ -587,7 +587,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 <br />
                 <Link
                   href='/terms'
-                  className='font-bold cursor-pointer  decoration-foreground underline-offset-2 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline'
+                  className='font-bold cursor-pointer  decoration-foreground underline-offset-2 outline-hidden hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-hidden focus-visible:underline'
                   tabIndex={
                     step === "signUp" && selectedOption.includes("organizer")
                       ? 11
@@ -598,7 +598,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 and{" "}
                 <Link
                   href='/privacy'
-                  className='font-bold inline-flex  items-center cursor-pointer  decoration-foreground underline-offset-2 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline'
+                  className='font-bold inline-flex  items-center cursor-pointer  decoration-foreground underline-offset-2 outline-hidden hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-hidden focus-visible:underline'
                   tabIndex={
                     step === "signUp" && selectedOption.includes("organizer")
                       ? 12

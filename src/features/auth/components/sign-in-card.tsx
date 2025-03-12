@@ -243,7 +243,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
           Don&apos;t have an account?{" "}
           <span
             onClick={switchFlow}
-            className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-none hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-none focus-visible:underline cursor-pointer'
+            className='font-medium text-zinc-950 decoration-foreground underline-offset-4 outline-hidden hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus:outline-hidden focus-visible:underline cursor-pointer'
             tabIndex={7}>
             Sign up
           </span>
