@@ -77,7 +77,11 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
         variant='ghost2'
         className={className}
         onClick={() =>
-          theme === "default" ? setTheme("light") : setTheme("default")
+          theme === "default"
+            ? setTheme("light")
+            : theme === "light"
+            ? setTheme("dark")
+            : setTheme("default")
         }>
         <m.svg
           strokeWidth='4'
@@ -133,18 +137,30 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
                     d: moonPath,
                     rotate: -360,
                     strokeWidth: 3,
-                    stroke: "black",
+                    stroke: "var(--foreground-hex)",
                     fill: "transparent",
                     fillOpacity: 0.35,
                     strokeOpacity: 1,
 
                     scale: 2.25,
                   }
+                : theme === "dark"
+                ? {
+                    d: sunPath,
+                    rotate: 0,
+                    strokeWidth: 4,
+                    stroke: "var(--foreground-hex)",
+                    fill: "transparent",
+                    fillOpacity: 0.35,
+                    strokeOpacity: 1,
+
+                    scale: 2.5,
+                  }
                 : {
                     d: sunPath,
                     rotate: 0,
                     strokeWidth: 6,
-                    stroke: "black",
+                    stroke: "var(--foreground-hex)",
                     fill: "transparent",
                     fillOpacity: 0.35,
                     strokeOpacity: 1,

@@ -32,6 +32,7 @@ body,
     --background: 83, 51%, 88%;
     /* --background: 0 0% 100%; */
     --user-icon: var(--sal-yellow-old);
+    --foreground-hex: #020817;
     --foreground: 222.2 84% 4.9%;
     /* --sal-progress: rgb(255, 247, 100); */
     --sal-progress: hsl(50 100% 72%);
@@ -107,6 +108,7 @@ body,
     --background: 51, 0%, 13%;
 
     --foreground: 40 0% 88%;
+    --foreground-hex: #e0e0e0;
 
     --card: 40, 1%, 11%;
 
@@ -177,7 +179,7 @@ body,
     --user-icon: 0, 0%, 100%;
 
     --foreground: 222.2 84% 4.9%;
-
+    --foreground-hex: #020817;
     --card: 0 0% 100%;
 
     --card-foreground: 222.2 84% 4.9%;

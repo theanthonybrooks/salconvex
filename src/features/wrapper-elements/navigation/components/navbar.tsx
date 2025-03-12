@@ -16,6 +16,7 @@ import {
   landingPageNavbarLinks,
 } from "@/constants/navbars"
 import { cn } from "@/lib/utils"
+import { User } from "@/types/user"
 import { Unauthenticated } from "convex/react"
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion"

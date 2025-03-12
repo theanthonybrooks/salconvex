@@ -22,23 +22,51 @@ export const addCard = mutation({
       v.literal("doing"),
       v.literal("done")
     ),
+    order: v.optional(v.string()),
+    priority: v.optional(v.string()),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    // Get the highest order value in this column
-    const cardsInColumn = await ctx.db
+    const { column, order, title, userId, priority } = args
+
+    if (order === "start") {
+      // Get all cards in this column sorted by order ascending (smallest first)
+      const cardsInColumn = await ctx.db
+        .query("todoKanban")
+        .withIndex("by_column_order", (q) => q.eq("column", column))
+        .order("asc") // Get lowest order first
+        .collect()
+
+      // Shift all existing cards down
+      for (const card of cardsInColumn) {
+        await ctx.db.patch(card._id, { order: card.order + 1 })
+      }
+
+      // Insert new card at order = 0
+      return await ctx.db.insert("todoKanban", {
+        title,
+        column,
+        createdAt: Date.now(),
+        lastUpdatedBy: userId,
+        order: 0,
+        priority,
+      })
+    }
+
+    // Default behavior (add at the end)
+    const lastCard = await ctx.db
       .query("todoKanban")
-      .withIndex("by_column_order", (q) => q.eq("column", args.column))
+      .withIndex("by_column_order", (q) => q.eq("column", column))
       .order("desc") // Get highest order first
       .first()
 
-    const newOrder = cardsInColumn ? cardsInColumn.order + 1 : 0
+    const newOrder = lastCard ? lastCard.order + 1 : 0
 
     return await ctx.db.insert("todoKanban", {
-      title: args.title,
-      column: args.column as ColumnType,
+      title,
+      column: column as ColumnType,
       createdAt: Date.now(),
-      lastUpdatedBy: args.userId,
+      lastUpdatedBy: userId,
       order: newOrder,
     })
   },
@@ -119,12 +147,14 @@ export const editCard = mutation({
     id: v.id("todoKanban"),
     title: v.string(),
     userId: v.string(),
+    priority: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.patch(args.id, {
       title: args.title,
       updatedAt: Date.now(),
       lastUpdatedBy: args.userId,
+      priority: args.priority,
     })
   },
 })

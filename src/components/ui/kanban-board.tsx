@@ -1,14 +1,36 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client"
 
 import { Id } from "convex/_generated/dataModel"
 import { useMutation, useQuery } from "convex/react"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { Dot, X } from "lucide-react"
+import { useRef, useState } from "react"
 import { FaFire } from "react-icons/fa"
 import { FiPlus, FiTrash } from "react-icons/fi"
-import { api } from "../../../convex/_generated/api"
+import { api } from "~/convex/_generated/api"
+
+import { cn } from "@/lib/utils"
+import { Pencil } from "lucide-react" // Using Pencil icon for edit
+
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done"
 
@@ -16,6 +38,7 @@ interface Card {
   title: string
   id: string
   column: ColumnType
+  priority?: string
 }
 
 interface MoveCardArgs {
@@ -29,6 +52,8 @@ interface AddCardArgs {
   title: string
   column: ColumnType
   userId: string
+  order?: "start" | "end"
+  priority?: string
 }
 
 interface DeleteCardArgs {
@@ -53,8 +78,10 @@ interface CardProps {
   title: string
   id: string
   column: ColumnType
+  priority?: string
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
+  deleteCard: (args: DeleteCardArgs) => void
 }
 
 interface DropIndicatorProps {
@@ -90,17 +117,35 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
   return (
-    <div className='h-screen w-full bg-background text-foreground'>
+    <div className='h-screen w-full bg-background text-foreground dark:text-primary-foreground'>
       <Board userRole={userRole} />
     </div>
   )
 }
 
 const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
-  const rawCards = useQuery(api.kanban.cards.getCards) || []
+  const rawCards =
+    useQuery(api.kanban.cards.getCards) ||
+    ([] as {
+      _id: Id<"todoKanban">
+      title: string
+      column: ColumnType
+      order: number
+      priority?: string
+    }[])
+  const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 }
+
   const cards = rawCards
-    .map(({ _id, ...rest }) => ({ id: _id, ...rest }))
-    .sort((a, b) => a.order - b.order)
+    .map(({ _id, ...rest }) => ({ id: _id, ...rest })) // Convert `_id` to `id`
+    .sort((a, b) => {
+      // Get priority levels, default to "medium" if undefined
+      const priorityA = priorityLevels[a.priority || "medium"]
+      const priorityB = priorityLevels[b.priority || "medium"]
+
+      // Sort by priority first, then by order
+      return priorityA - priorityB || a.order - b.order
+    })
+
   const addCard = useMutation(api.kanban.cards.addCard)
   const moveCard = useMutation(api.kanban.cards.moveCard)
   const deleteCard = useMutation(api.kanban.cards.deleteCard)
@@ -116,35 +161,39 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   }
 
   return (
-    <div className='flex h-full w-full gap-3 overflow-auto scrollable invis p-12'>
-      {(["proposed", "backlog", "todo", "doing", "done"] as ColumnType[]).map(
-        (column) => (
-          <Column
-            key={column}
-            title={columnDisplayNames[column]}
-            column={column}
-            headingColor={getColumnColor(column)}
-            cards={cards.filter((card) => card.column === column)}
-            userRole={userRole}
-            moveCard={moveCard}
-            addCard={addCard}
-            deleteCard={deleteCard}
-            activeColumn={activeColumn} // Pass activeColumn state
-            setActiveColumn={setActiveColumn} // Function to update activeColumn
-          />
-        )
-      )}
+    <div className='flex flex-col items-center gap-6'>
+      {/* Submission Form */}
+      {userRole === "admin" && <TaskSubmissionForm addCard={addCard} />}
+      <div className='flex h-full w-full gap-3 overflow-auto scrollable invis p-12'>
+        {(["proposed", "backlog", "todo", "doing", "done"] as ColumnType[]).map(
+          (column) => (
+            <Column
+              key={column}
+              title={columnDisplayNames[column]}
+              column={column}
+              headingColor={getColumnColor(column)}
+              cards={cards.filter((card) => card.column === column)}
+              userRole={userRole}
+              moveCard={moveCard}
+              addCard={addCard}
+              deleteCard={deleteCard}
+              activeColumn={activeColumn} // Pass activeColumn state
+              setActiveColumn={setActiveColumn} // Function to update activeColumn
+            />
+          )
+        )}
 
-      <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
+        <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
+      </div>
     </div>
   )
 }
 
 const Column: React.FC<
   ColumnProps & {
-    moveCard: any
-    addCard: any
-    deleteCard: any
+    moveCard: (args: MoveCardArgs) => void
+    addCard: (args: AddCardArgs) => void
+    deleteCard: (args: DeleteCardArgs) => void
     activeColumn: string | null
     setActiveColumn: (col: string | null) => void
   }
@@ -154,6 +203,7 @@ const Column: React.FC<
   column,
   cards,
   userRole,
+  deleteCard,
   moveCard,
   addCard,
   activeColumn,
@@ -179,13 +229,20 @@ const Column: React.FC<
     const indicators = getIndicators()
     const { element } = getNearestIndicator(e, indicators)
     let beforeId =
-      element.dataset.before !== "-1" ? element.dataset.before : undefined
+      element.dataset.before !== "-1"
+        ? (element.dataset.before as Id<"todoKanban">)
+        : undefined
 
     if (cards.length === 0) {
       beforeId = undefined
     }
 
-    moveCard({ id: cardId, column, beforeId, userId: "admin" })
+    moveCard({
+      id: cardId as Id<"todoKanban">,
+      column,
+      beforeId,
+      userId: "admin",
+    })
   }
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -236,7 +293,6 @@ const Column: React.FC<
     )
   }
 
-  // 🛠️ Restore getIndicators function
   const getIndicators = () => {
     return Array.from(
       document.querySelectorAll(`[data-column="${column}"]`)
@@ -253,7 +309,9 @@ const Column: React.FC<
         <h3 className={`font-medium ${headingColor} p-4 rounded-lg`}>
           {title}
         </h3>
-        <span className='rounded text-sm text-foreground'>{cards.length}</span>
+        <span className='rounded text-sm text-foreground dark:text-primary-foreground'>
+          {cards.length}
+        </span>
       </div>
       <div
         className={`h-full w-full transition-colors ${
@@ -265,6 +323,7 @@ const Column: React.FC<
           <Card
             key={c.id}
             {...c}
+            deleteCard={deleteCard}
             handleDragStart={handleDragStart}
             handleDragEnd={handleDragEnd}
           />
@@ -286,7 +345,109 @@ const Column: React.FC<
   )
 }
 
-const Card: React.FC<CardProps> = ({ title, id, column, handleDragStart }) => {
+// const Card: React.FC<CardProps> = ({
+//   title,
+//   id,
+//   column,
+//   handleDragStart,
+//   deleteCard,
+// }) => {
+//   const handleDelete = async (e: React.DragEvent<HTMLDivElement>) => {
+//     const cardId = e.dataTransfer.getData("cardId")
+//     if (!cardId) return
+
+//     await deleteCard({ id: cardId as Id<"todoKanban">, userId: "admin" })
+//   }
+//   return (
+//     <>
+//       <DropIndicator beforeId={id} column={column} />
+//       <motion.div
+//         layout
+//         layoutId={id}
+//         draggable='true'
+//         onDragStart={(e) =>
+//           handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
+//             title,
+//             id,
+//             column,
+//           })
+//         }
+//         className={`cursor-grab rounded border border-foreground/20 relative  ${getColumnColor(
+//           column
+//         )} p-3 active:cursor-grabbing`}>
+//         <X
+//           onClick={handleDelete}
+//           className='absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+//         />
+//         <p className='text-sm text-foreground dark:text-primary-foreground'>
+//           {title}
+//         </p>
+//       </motion.div>
+//     </>
+//   )
+// }
+
+const Card: React.FC<CardProps> = ({
+  title,
+  id,
+  column,
+  handleDragStart,
+  deleteCard,
+  priority,
+}) => {
+  const [newTitle, setNewTitle] = useState(title)
+  const [newPriority, setNewPriority] = useState(priority || "medium")
+  const [isHovered, setIsHovered] = useState(false)
+
+  const editCard = useMutation(api.kanban.cards.editCard)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  // Delete function
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    await deleteCard({ id: id as Id<"todoKanban">, userId: "admin" })
+  }
+
+  // Save edited title
+  const handleSave = async () => {
+    if (!newTitle.trim() || (newTitle === title && newPriority === priority)) {
+      return
+    }
+
+    await editCard({
+      id: id as Id<"todoKanban">,
+      title: newTitle,
+      priority: newPriority,
+      userId: "admin",
+    })
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSave()
+  }
+
+  const handleTogglePriority = async () => {
+    setNewPriority((prevPriority) => {
+      let updatedPriority
+      if (prevPriority === "high") {
+        updatedPriority = "low"
+      } else if (prevPriority === "low") {
+        updatedPriority = "medium"
+      } else {
+        updatedPriority = "high"
+      }
+
+      editCard({
+        id: id as Id<"todoKanban">,
+        title: newTitle,
+        priority: updatedPriority,
+        userId: "admin",
+      })
+
+      return updatedPriority
+    })
+  }
+
   return (
     <>
       <DropIndicator beforeId={id} column={column} />
@@ -299,12 +460,112 @@ const Card: React.FC<CardProps> = ({ title, id, column, handleDragStart }) => {
             title,
             id,
             column,
+            priority,
           })
         }
-        className={`cursor-grab rounded border border-foreground/20  ${getColumnColor(
+        className={`cursor-grab text-primary-foreground rounded-lg border border-foreground/20  relative p-3 active:cursor-grabbing grid grid-cols-[30px_minmax(0,1fr)] ${getColumnColor(
           column
-        )} p-3 active:cursor-grabbing`}>
-        <p className='text-sm text-foreground'>{title}</p>
+        )}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}>
+        {isHovered && (
+          <div className='absolute top-0 right-0 bg-card/90 dark:bg-foreground border border-primary p-3 rounded-lg flex gap-x-2 items-center justify-center'>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Pencil
+                  size={16}
+                  className=' text-gray-500 hover:text-gray-700 cursor-pointer'
+                />
+              </DialogTrigger>
+              <DialogContent
+                className='sm:max-w-[425px] bg-card'
+                onOpenAutoFocus={(event) => {
+                  event.preventDefault()
+                  inputRef.current?.focus()
+                }}>
+                <DialogHeader>
+                  <DialogTitle>Edit Task</DialogTitle>
+                  <DialogDescription>
+                    Edit task description and priority
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className='flex gap-x-4 items-start'>
+                  <div className='flex flex-col items-start gap-2 flex-1'>
+                    <Label htmlFor='name'>Task:</Label>
+                    <textarea
+                      ref={inputRef}
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      autoFocus
+                      className='text-sm w-full border rounded p-1 h-full bg-card scrollable mini'
+                    />
+                  </div>
+                  <div className='flex flex-col items-start gap-2'>
+                    <Label htmlFor='username'>Priority:</Label>
+                    <Select
+                      value={newPriority}
+                      onValueChange={(val) => setNewPriority(val)}>
+                      <SelectTrigger className='min-w-[100px]'>
+                        <SelectValue placeholder='Theme' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='high'>
+                          <span className='flex items-center gap-x-1'>
+                            <Dot className='text-green-500' size={24} />
+                            High
+                          </span>
+                        </SelectItem>
+                        <SelectItem value='medium'>
+                          <span className='flex items-center gap-x-1'>
+                            <Dot className='text-yellow-500' size={24} />
+                            Medium
+                          </span>
+                        </SelectItem>
+                        <SelectItem value='low'>
+                          <span className='flex items-center gap-x-1'>
+                            <Dot className='text-red-500' size={24} />
+                            Low
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <DialogClose>
+                    <Button type='submit' onClick={handleSave}>
+                      Save changes
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <X
+              size={16}
+              onClick={handleDelete}
+              className=' text-red-500 hover:text-red-700 cursor-pointer'
+            />
+          </div>
+        )}
+        <span
+          onClick={handleTogglePriority}
+          className={cn(
+            "rounded-full h-2 w-2 p-[5px] mt-1 hover:cursor-pointer",
+            newPriority === "high"
+              ? "bg-green-500"
+              : newPriority === "low"
+              ? "bg-red-500"
+              : "bg-yellow-500"
+          )}
+        />
+
+        <p className='text-sm text-foreground dark:text-primary-foreground'>
+          {title}
+        </p>
       </motion.div>
     </>
   )
@@ -320,20 +581,20 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
   )
 }
 
-const BurnBarrel: React.FC<{ deleteCard: any; userRole: string }> = ({
-  deleteCard,
-  userRole,
-}) => {
+const BurnBarrel: React.FC<{
+  deleteCard: (args: DeleteCardArgs) => void
+  userRole: string
+}> = ({ deleteCard, userRole }) => {
   const [active, setActive] = useState(false)
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     if (userRole !== "admin") return
     e.preventDefault()
-    setActive(true) // ✅ Icon changes when hovering
+    setActive(true)
   }
 
   const handleDragLeave = () => {
-    setActive(false) // ✅ Restore normal state
+    setActive(false)
   }
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
@@ -342,7 +603,7 @@ const BurnBarrel: React.FC<{ deleteCard: any; userRole: string }> = ({
     const cardId = e.dataTransfer.getData("cardId")
     if (!cardId) return
 
-    await deleteCard({ id: cardId, userId: "admin" }) // ✅ Delete from Convex
+    await deleteCard({ id: cardId as Id<"todoKanban">, userId: "admin" })
     setActive(false)
   }
 
@@ -363,7 +624,7 @@ const BurnBarrel: React.FC<{ deleteCard: any; userRole: string }> = ({
 
 const AddCard: React.FC<
   AddCardProps & {
-    addCard: any
+    addCard: (args: AddCardArgs) => void
     activeColumn: string | null
     setActiveColumn: (col: string | null) => void
   }
@@ -403,7 +664,7 @@ const AddCard: React.FC<
           <div className='mt-1.5 flex items-center justify-end gap-1.5'>
             <button
               type='button'
-              onClick={() => setActiveColumn(null)} // Close only this form
+              onClick={() => setActiveColumn(null)}
               className='px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-600'>
               Close
             </button>
@@ -425,5 +686,78 @@ const AddCard: React.FC<
         </motion.button>
       )}
     </>
+  )
+}
+
+const TaskSubmissionForm: React.FC<{
+  addCard: (args: AddCardArgs) => void
+}> = ({ addCard }) => {
+  const [title, setTitle] = useState("")
+  const [column, setColumn] = useState<ColumnType>("todo") // Default to "To Do"
+  const [order, setOrder] = useState<"start" | "end">("end") // Default to adding at the end
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!title.trim()) return
+
+    addCard({ title, column, userId: "admin", order, priority })
+    setTitle("")
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className='flex flex-col gap-3 p-4 border rounded-lg bg-white shadow-md w-1/3'>
+      <h3 className='text-lg font-semibold'>Add New Task</h3>
+
+      {/* Task Name Input */}
+      <textarea
+        placeholder='Task name...'
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className='border p-2 rounded-lg w-full bg-card'
+      />
+
+      {/* Column Selection */}
+      <select
+        value={column}
+        onChange={(e) => setColumn(e.target.value as ColumnType)}
+        className='border p-2 rounded-lg bg-card'>
+        <option value='proposed'>Proposed</option>
+        <option value='backlog'>Backlog</option>
+        <option value='todo'>To Do</option>
+        <option value='doing'>In Progress</option>
+        <option value='done'>Complete</option>
+      </select>
+
+      {/* Order Selection */}
+      <select
+        value={order}
+        onChange={(e) => setOrder(e.target.value as "start" | "end")}
+        className='border p-2 rounded-lg bg-card'>
+        <option value='start'>Add to the Beginning</option>
+        <option value='end'>Add to the End</option>
+      </select>
+
+      {/* Priority Selection */}
+      <select
+        value={priority}
+        onChange={(e) =>
+          setPriority(e.target.value as "low" | "medium" | "high")
+        }
+        className='border p-2 rounded-lg bg-card'>
+        <option value='high'>High</option>
+        <option value='medium'>Medium</option>
+        <option value='low'>Low</option>
+      </select>
+
+      {/* Submit Button */}
+      <button
+        type='submit'
+        className='bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition'>
+        Add Task
+      </button>
+    </form>
   )
 }

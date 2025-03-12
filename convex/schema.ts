@@ -79,6 +79,7 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
     lastUpdatedBy: v.string(),
+    priority: v.optional(v.string()),
   }).index("by_column_order", ["column", "order"]),
 
   userPlans: defineTable({

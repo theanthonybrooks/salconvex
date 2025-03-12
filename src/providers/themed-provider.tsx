@@ -1,6 +1,7 @@
 // app/components/ThemedProvider.tsx
 "use client"
 
+import { UserPref } from "@/types/user"
 import { ThemeProvider } from "next-themes"
 import { usePathname } from "next/navigation"
 import React from "react"

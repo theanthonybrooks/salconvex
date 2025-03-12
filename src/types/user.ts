@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-interface User {
+export interface User {
   createdAt: number
   email: string
   emailVerificationTime?: number
@@ -19,7 +17,7 @@ interface User {
   tokenIdentifier: string
 }
 
-interface UserPref {
+export interface UserPref {
   timezone?: string
   currency?: string
   theme?: string
