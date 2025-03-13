@@ -62,6 +62,8 @@ export default async function RootLayout({
   const userPref = userData?.userPref ?? undefined
   // }
 
+  console.log("userPref in layout", userPref)
+
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang='en' suppressHydrationWarning>

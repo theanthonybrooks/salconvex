@@ -457,7 +457,7 @@ button:active {
 }
 
 .stroked {
-  -webkit-text-stroke: 0.5px black;
+  -webkit-text-stroke: 3px black;
   &.wshadow {
     text-shadow: black -5px 5px;
   }

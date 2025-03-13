@@ -15,12 +15,13 @@ export function ThemedProvider({ children, userPref }: ThemedProviderProps) {
   const userTheme = userPref?.theme
   const pathname = usePathname()
   const forcedTheme = pathname.startsWith("/auth") ? "default" : undefined
+  // const { theme, setTheme } = useTheme()
 
   // useEffect(() => {
   //   if (userTheme && theme !== userTheme) {
   //     setTheme(userTheme)
   //   }
-  // }, [theme, userTheme])
+  // }, [theme, userTheme, setTheme])
 
   // console.log("userTheme", userTheme)
   // console.log("theme", theme)
