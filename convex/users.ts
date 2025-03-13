@@ -364,12 +364,12 @@ export const deleteUnconfirmedUsers = internalMutation({
       .filter((q) => q.eq(q.field("emailVerified"), false))
       .collect()
 
-    const batchSize = 10 // Tune this based on performance tests.
+    const batchSize = 10
     for (let i = 0; i < unconfirmedUsers.length; i += batchSize) {
       const batch = unconfirmedUsers.slice(i, i + batchSize)
       await Promise.all(
         batch.map((user) =>
-          deleteAccount(ctx, {
+          performDeleteAccount(ctx, {
             method: "signupTimeout",
             email: user.email,
           }).catch((error) =>
@@ -385,6 +385,16 @@ export const deleteUnconfirmedUsers = internalMutation({
 })
 
 export const deleteAccount = mutation({
+  args: {
+    method: v.string(),
+    email: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await performDeleteAccount(ctx, args)
+  },
+})
+
+/*export const deleteAccount = mutation({
   args: {
     method: v.string(),
     email: v.optional(v.string()),
@@ -488,7 +498,113 @@ export const deleteAccount = mutation({
       accountCreatedAt: user.createdAt,
     })
   },
-})
+})*/
+
+async function performDeleteAccount(
+  ctx: MutationCtx,
+  args: { method: string; email?: string }
+): Promise<void> {
+  // Define the allowed methods and their configuration.
+  type MethodType =
+    | "deleteAccount"
+    | "ban"
+    | "cancelSignup"
+    | "resentOtp"
+    | "signupTimeout"
+
+  if (
+    ![
+      "deleteAccount",
+      "ban",
+      "cancelSignup",
+      "resentOtp",
+      "signupTimeout",
+    ].includes(args.method)
+  ) {
+    throw new ConvexError("Invalid method")
+  }
+  const method = args.method as MethodType
+
+  const methodConfigs: Record<
+    MethodType,
+    { deleteType: string; userAgent: string; requiresEmail: boolean }
+  > = {
+    deleteAccount: {
+      deleteType: "deleteAccount",
+      userAgent: "user-self",
+      requiresEmail: false,
+    },
+    ban: { deleteType: "ban", userAgent: "admin", requiresEmail: false },
+    cancelSignup: {
+      deleteType: "cancelSignup",
+      userAgent: "user-self",
+      requiresEmail: true,
+    },
+    resentOtp: {
+      deleteType: "resentOtp",
+      userAgent: "user-self",
+      requiresEmail: true,
+    },
+    signupTimeout: {
+      deleteType: "signupTimeout",
+      userAgent: "system",
+      requiresEmail: true,
+    },
+  }
+
+  const config = methodConfigs[method]
+
+  let queryKey: "email" | "userId"
+  let queryValue: string
+
+  if (config.requiresEmail) {
+    if (!args.email) {
+      throw new ConvexError(`Email is required for ${method}`)
+    }
+    queryKey = "email"
+    queryValue = args.email
+  } else {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) {
+      throw new ConvexError("Unauthenticated call to mutation")
+    }
+    queryKey = "userId"
+    queryValue = userId
+  }
+
+  // Query the user based on the provided key.
+  const user = await ctx.db
+    .query("users")
+    .withIndex(queryKey === "email" ? "email" : "by_userId", (q) =>
+      q.eq(queryKey, queryValue)
+    )
+    .unique()
+
+  if (!user) {
+    throw new ConvexError("User not found")
+  }
+
+  const userId = user._id
+
+  // Delete related documents.
+  await deleteRelatedDocuments(ctx, userId)
+
+  // Delete the user document if it exists.
+  const userDoc = await ctx.db.get(userId)
+  if (userDoc) {
+    await ctx.db.delete(userId)
+  }
+
+  // Log the deletion.
+  await ctx.db.insert("deleteAccountLog", {
+    email: user.email ?? "unknown",
+    userId,
+    timestamp: Date.now(),
+    userAgent: config.userAgent,
+    actionType: config.deleteType,
+    accountCreatedAt: user.createdAt,
+  })
+}
 
 async function deleteRelatedDocuments(
   ctx: { db: { query: Function; delete: Function; get: Function } },
