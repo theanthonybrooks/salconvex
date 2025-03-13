@@ -44,7 +44,7 @@
     "i": "^0.3.7",
     "input-otp": "^1.4.2",
     "lucia": "^3.2.2",
-    "lucide-react": "^0.479.0",
+    "lucide-react": "^0.475.0",
     "next": "15.1.7",
     "next-themes": "^0.4.4",
     "oslo": "^1.2.1",
@@ -66,7 +66,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@next/eslint-plugin-next": "^15.2.1",
-    "@tailwindcss/postcss": "^4.0.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -75,7 +74,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "postcss": "^8",
-    "tailwindcss": "^4.0.13",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
 }

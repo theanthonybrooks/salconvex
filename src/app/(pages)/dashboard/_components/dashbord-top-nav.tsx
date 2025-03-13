@@ -135,7 +135,7 @@ export default function NavBar({
                       width={40}
                       height={40}
                       priority={true}
-                      className='z-10 shrink-0'
+                      className=' shrink-0'
                     />
                   </Link>
                 </motion.div>

@@ -172,7 +172,7 @@ NavBarProps) {
                     width={50}
                     height={50}
                     priority={true}
-                    className='z-10 shrink-0'
+                    className=' shrink-0'
                   />
 
                   <motion.div
@@ -204,7 +204,7 @@ NavBarProps) {
               </motion.div>
 
               {/* Desktop Navigation */}
-              <div className='hidden items-center gap-6 lg:flex'>
+              <div className='hidden items-center gap-6 lg:flex z-0'>
                 <NavigationMenu>
                   <NavigationMenuList>
                     <NavigationMenuItem>
@@ -259,7 +259,7 @@ NavBarProps) {
 
           {/* ------ Mobile Right side ------ */}
           {isMobile && (
-            <div className='flex items-center justify-end w-full  lg:hidden'>
+            <div className='flex items-center justify-end w-full  lg:hidden z-20'>
               {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
               {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { motion as m } from "framer-motion"
 import { useTheme } from "next-themes"
 
@@ -73,9 +73,8 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
 
   return (
     <div className='flex items-center justify-center'>
-      <Button
-        variant='ghost2'
-        className={className}
+      <div
+        className={cn(className)}
         onClick={() =>
           theme === "default"
             ? setTheme("light")
@@ -86,12 +85,12 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
         <m.svg
           strokeWidth='4'
           strokeLinecap='round'
-          width={100}
-          height={100}
+          width={30}
+          height={30}
           viewBox='0 0 100 100'
           fill='none'
           xmlns='http://www.w3.org/2000/svg'
-          className='relative  w-6! h-6! md:w-4 md:h-4 overflow-visible'>
+          className='relative size-[30px] md:size-7 overflow-visible'>
           {/* <m.path
             variants={shineVariant}
             d={moonPath}
@@ -154,7 +153,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
                     fillOpacity: 0.35,
                     strokeOpacity: 1,
 
-                    scale: 2.5,
+                    scale: 2.3,
                   }
                 : {
                     d: sunPath,
@@ -170,7 +169,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
             }
           />
         </m.svg>
-      </Button>
+      </div>
     </div>
   )
 }
