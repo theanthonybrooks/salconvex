@@ -39,7 +39,7 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
       <AlertDialogTrigger asChild>
         <button
           className={cn(
-            "absolute right-5 top-4 z-10 rounded text-lg font-bold text-foreground hover:rounded-full hover:text-salPink focus:bg-salPink",
+            "absolute right-5 top-4 z-10 rounded text-lg font-bold text-foreground hover:rounded-full hover:text-red-600 focus:bg-salPink",
             className
           )}
           aria-label='Close modal'

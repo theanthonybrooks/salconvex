@@ -21,7 +21,10 @@ const EventCardPreview = ({ path }: EventCardPreviewProps) => {
         </div>
         <div className='border-dotted border-1.5 h-11 w-14 rounded-lg flex flex-col justify-center items-center py-[5px]'>
           <span className='text-2xs leading-[0.85rem]'>Call Type</span>
-          <span className='text-lg font-foreground leading-[0.85rem]'>E</span>
+          <span className='text-md font-bold font-foreground leading-[0.85rem]'>
+            RFQ
+          </span>
+          {/* // todo: make this dynamic to show project, event, etc for the type */}
           <span className='text-2xs leading-[0.85rem]'>Event</span>
         </div>
       </div>
@@ -36,6 +39,7 @@ const EventCardPreview = ({ path }: EventCardPreviewProps) => {
             <p className='text-sm'>City, (state), Country</p>
           </div>
           <p className='text-sm'>
+            {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
             <span className='font-semibold'>Event:</span> June 5-18, 2025
           </p>
           <p className='text-sm'>
@@ -54,7 +58,8 @@ const EventCardPreview = ({ path }: EventCardPreviewProps) => {
           size='lg'
           className='bg-white/60'
           onClick={() => router.push(path)}>
-          View More
+          Apply
+          {/* //note: this should also have "View more" for events/projects without active open call */}
         </Button>
       </div>
       <div className='flex flex-col items-center justify-between pt-5 pb-5 pr-2'>

@@ -67,6 +67,9 @@ export default async function RootLayout({
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang='en' suppressHydrationWarning>
+        {/* <head>
+          <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' />
+        </head> */}
         <body
           className={cn(
             GeistSans.className,

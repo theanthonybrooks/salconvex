@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/navigation-menu"
 import { UserProfile } from "@/components/ui/user-profile"
 import {
-  landingPageNavbarMenuLinks as components,
   landingPageNavbarLinks,
+  landingPageNavbarMenuLinksResources as resources,
+  landingPageNavbarMenuLinksTheList as thelistitems,
 } from "@/constants/navbars"
 import { cn } from "@/lib/utils"
 import { User } from "@/types/user"
-import { Unauthenticated } from "convex/react"
+import { Authenticated, Unauthenticated } from "convex/react"
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion"
 import Image from "next/image"
@@ -55,7 +56,10 @@ NavBarProps) {
   const filteredNavbarLinks = landingPageNavbarLinks.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all")
   )
-  const filteredNavbarMenu = components.filter(
+  const filteredNavbarMenuResources = resources.filter(
+    (link) => link.sub.includes(statusKey) || link.sub.includes("all")
+  )
+  const filteredNavbarMenuTheList = thelistitems.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all")
   )
 
@@ -107,12 +111,13 @@ NavBarProps) {
       <motion.div
         initial={{ boxShadow: "none" }}
         animate={{
-          boxShadow: isScrolled && isMobile ? "var(--nav-shadow)" : "none",
-          height: isScrolled && isMobile ? "80px" : "100px",
+          boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
+          height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-20 h-25  border-foreground  lg:bg-transparent bg-background '>
-        <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative'>
+        className='fixed left-0 right-0 top-0 z-20 h-25  border-foreground   bg-background '>
+        {/* <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative'> */}
+        <div className='mx-auto grid w-screen h-full grid-cols-[300px_auto_200px] items-center px-8'>
           {/* Mobile Logo and Navigation */}
           {isMobile && (
             <div className='lg:hidden items-center gap-2 flex'>
@@ -158,7 +163,7 @@ NavBarProps) {
             <>
               {/* Desktop Logo & Navigation */}
               <motion.div
-                className='hidden lg:flex h-15 items-center gap-2 bg-white rounded-full border-2 border-foreground p-1 overflow-hidden'
+                className='hidden lg:flex h-15 items-center gap-2 bg-white rounded-full border-2 border-foreground p-[5px] box-border overflow-hidden'
                 animate={{
                   width: isScrolled ? "60px" : "250px",
                 }}
@@ -169,8 +174,8 @@ NavBarProps) {
                   <Image
                     src='/sitelogo.svg'
                     alt='The Street Art List'
-                    width={50}
-                    height={50}
+                    width={48}
+                    height={48}
                     priority={true}
                     className=' shrink-0'
                   />
@@ -198,20 +203,53 @@ NavBarProps) {
                       alt='The Street Art List'
                       width={175}
                       height={80}
+                      className='mt-1'
                     />
                   </motion.div>
                 </Link>
               </motion.div>
 
               {/* Desktop Navigation */}
-              <div className='hidden items-center gap-6 lg:flex z-0'>
-                <NavigationMenu>
+              <motion.div
+                // animate={{ opacity: isScrolled ? 0 : 1 }}
+                // transition={{ duration: 0.3, ease: "easeOut" }}
+                className='hidden justify-center gap-6 lg:flex z-0'>
+                <NavigationMenu delayDuration={Infinity}>
                   <NavigationMenuList>
                     <NavigationMenuItem>
-                      <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
-                      <NavigationMenuContent>
+                      <NavigationMenuTrigger
+                        className='border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground'
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}>
+                        Resources
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}>
                         <ul className='grid w-[400px] gap-3 p-4 lg:w-[500px] lg:grid-cols-2 '>
-                          {filteredNavbarMenu.map((component) => (
+                          {filteredNavbarMenuResources.map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}>
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        className='border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground'
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}>
+                        The List
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}>
+                        <ul className='grid w-[400px] gap-3 p-4 lg:w-[500px] lg:grid-cols-2 '>
+                          {filteredNavbarMenuTheList.map((component) => (
                             <ListItem
                               key={component.title}
                               title={component.title}
@@ -236,24 +274,37 @@ NavBarProps) {
                     )}
                   </Link>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Right Side */}
-              <div className='hidden lg:flex items-center h-15 w-fit bg-white rounded-full p-1 pr-5 border-2 border-foreground'>
-                <div className='flex items-center gap-4'>
-                  <Unauthenticated>
+              <Unauthenticated>
+                <div className='hidden lg:flex items-center justify-self-end h-15 w-fit'>
+                  <div className='flex items-center gap-4'>
                     <Link href='/auth/sign-in' prefetch={true}>
                       <Button
-                        variant='salWithShadowHidden'
-                        className='font-bold hidden lg:block ml-2 my-1 rounded-full '>
+                        variant='link'
+                        className='font-bold hidden lg:block rounded-full '>
                         Sign in
                       </Button>
                     </Link>
-                  </Unauthenticated>
-                  {userId !== "guest" && user && <UserProfile user={user} />}
-                  <FullPageNav user={user} />
+                    <Link href='/auth/register' prefetch={true}>
+                      <Button
+                        variant='salWithShadowHiddenYlw'
+                        className='font-bold hidden lg:block rounded-full '>
+                        Sign up
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </Unauthenticated>
+              <Authenticated>
+                <div className='hidden lg:flex items-center justify-self-end h-15 w-fit pr-5 '>
+                  <div className='flex items-center gap-4'>
+                    {userId !== "guest" && user && <UserProfile user={user} />}
+                    <FullPageNav user={user} />
+                  </div>
+                </div>
+              </Authenticated>
             </>
           )}
 

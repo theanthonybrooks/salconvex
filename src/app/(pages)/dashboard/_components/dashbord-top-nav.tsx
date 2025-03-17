@@ -123,12 +123,12 @@ export default function NavBar({
             <>
               {/* Desktop Logo & Navigation */}
               <div className='flex gap-x-2 items-center justify-center'>
-                <motion.div
-                  className='hidden lg:flex h-[50px] w-[50px] items-center gap-2 bg-white rounded-full border-2 border-foreground p-1 overflow-hidden'
-                  transition={{ duration: 0.4, ease: "easeInOut" }}>
-                  <Link
-                    href='/'
-                    className='flex items-center gap-2 overflow-hidden'>
+                <Link
+                  href='/'
+                  className='flex items-center gap-2 overflow-hidden'>
+                  <motion.div
+                    className='hidden lg:flex h-[50px] w-[50px] items-center gap-2 bg-white rounded-full border-2 border-foreground p-1 overflow-hidden'
+                    transition={{ duration: 0.4, ease: "easeInOut" }}>
                     <Image
                       src='/sitelogo.svg'
                       alt='The Street Art List'
@@ -137,14 +137,15 @@ export default function NavBar({
                       priority={true}
                       className=' shrink-0'
                     />
-                  </Link>
-                </motion.div>
-                <Image
-                  src='/saltext.png'
-                  alt='The Street Art List'
-                  width={175}
-                  height={80}
-                />
+                  </motion.div>
+                  <Image
+                    src='/saltext.png'
+                    alt='The Street Art List'
+                    width={175}
+                    height={80}
+                    className='mt-1'
+                  />
+                </Link>
               </div>
 
               {/* Desktop Navigation */}

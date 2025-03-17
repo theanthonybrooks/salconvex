@@ -412,7 +412,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
               >
                 <ul
                   className={cn(
-                    "font-foreground m-x-auto w-full text-[4rem] font-tanker tracking-wide lowercase"
+                    "font-foreground m-x-auto w-full text-[4rem] font-tanker  lowercase"
                   )}>
                   {mainMenuItems.map((section) => {
                     const isExpanded =
@@ -501,7 +501,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                 <Unauthenticated>
                   <div
                     className={cn(
-                      "pl-8 py-5 font-foreground m-x-auto w-full text-[4rem] border-b-2 border-foreground font-tanker tracking-wide lowercase"
+                      "pl-8 py-5 font-foreground m-x-auto w-full text-[4rem] border-b-2 border-foreground font-tanker  lowercase"
                     )}>
                     <Link onClick={onHandleLinkClick} href={"/pricing"}>
                       Pricing
@@ -509,7 +509,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                   </div>
                   <div
                     className={cn(
-                      "pl-8 pt-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker tracking-wide lowercase"
+                      "pl-8 pt-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker  lowercase"
                     )}>
                     <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
                       Login | Register
@@ -523,7 +523,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                         setTimeout(() => setIsOpen("closed"), 1000)
                       }}
                       className={cn(
-                        "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] font-tanker tracking-wide lowercase"
+                        "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] font-tanker  lowercase"
                       )}>
                       log out
                     </div>
@@ -593,8 +593,8 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                       transition={{ delay: 0.7, duration: 0.4 }}>
                       <ul
                         className={cn(
-                          "font-foreground m-auto text-[3rem] lg:text-[4.5rem] space-y-3 ",
-                          "font-tanker tracking-wide  lowercase select-none"
+                          "font-foreground m-auto text-[3rem] lg:text-[4.5rem] 3xl:text-[6rem] space-y-3 ",
+                          "font-tanker   lowercase select-none"
                         )}>
                         {mainMenuItems.map((section) => {
                           const filteredItems = section.items.filter((item) => {
@@ -651,7 +651,7 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.9, duration: 0.4 }}>
-                      <ul className='font-foreground m-auto text-[1.2rem] lg:text-[3rem] space-y-3 select-none font-tanker tracking-wide  lowercase'>
+                      <ul className='font-foreground m-auto text-[1.2rem] lg:text-[3rem] 3xl:text-[5rem] space-y-3 select-none font-tanker   lowercase'>
                         {activeMenuItems?.items
                           .filter((item) => {
                             const itemUserType = item?.userType
@@ -762,8 +762,6 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9, duration: 0.4 }}>
                     <div className='flex space-x-2 items-center'>
-                      <p className='text-sm'>Links:</p>
-
                       <SocialsRow size={7} />
                     </div>
                     <div className='flex space-x-2 text-sm items-center'>

@@ -29,9 +29,10 @@ export default function AuthScreen() {
   return (
     <div
       className={cn(
-        "h-dvh   flex overflow-y-auto justify-center items-start mt-4 sm:items-center sm:mt-0  bg-salYellow auth-cont scrollable invis"
+        "h-dvh   grid place-items-center overflow-y-auto bg-salYellow auth-cont scrollable invis"
       )}>
-      <div className='md:h-auto md:w-[500px] md:py-10'>
+      {/* //note-to-self: this md:py value is a hack to center the auth card vertically. The 900px portion is the ~height of the card element (for the register card). The 40px is the min height.  */}
+      <div className='md:h-auto md:w-[500px] grid place-items-center md:py-10'>
         {isRegister ? (
           <RegisterForm switchFlow={() => switchFlow("signIn")} />
         ) : isForgotPassword ? (

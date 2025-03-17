@@ -22,7 +22,7 @@ const SalHeader = () => {
           @anthonybrooksart
         </Link>
       </p>
-      <SocialsRow className='mb-4' />
+      <SocialsRow className='mb-4 size-8 md:size-7' />
     </div>
   )
 }

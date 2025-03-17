@@ -174,7 +174,8 @@ body,
   }
   .default {
     --background-prev: 60 90% 75%; /* #f8f16b */
-    --background: 50 100% 72%; /* #ffe770 */
+    /* --background: 0 0% 100%; */
+    --background: 50 100% 72%;
     --sal-progress: var(rgb(240, 121, 244));
     --user-icon: 0, 0%, 100%;
 
@@ -226,11 +227,11 @@ body,
 
     --radius: 0.5rem;
   }
-  @media (min-width: 1024px) {
+  /* @media (min-width: 1024px) {
     :root {
       --nav-shadow: none;
     }
-  }
+  } */
 }
 
 @layer base {

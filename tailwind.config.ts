@@ -19,6 +19,9 @@ export default {
         spaceMono: ["var(--font-space-mono)", ...fontFamily.mono],
         libreFranklin: ["var(--font-libre-franklin)", ...fontFamily.sans],
         bebasNeue: ["var(--font-bebas-neue)", ...fontFamily.sans],
+        ramaE: ["rama-gothic-e", ...fontFamily.sans],
+        ramaM: ["rama-gothic-m", ...fontFamily.sans],
+        ramaC: ["rama-gothic-c", ...fontFamily.sans],
       },
       screens: {
         "2xl": "1536px",
@@ -85,6 +88,9 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      spacing: {
+        dynamic: "min(10vh, 40px)",
       },
       borderColor: {
         bg: "rgba(0, 0, 0, 0.5)",

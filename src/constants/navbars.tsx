@@ -1,7 +1,7 @@
 import { JSX } from "react"
 import { FaInstagram } from "react-icons/fa"
 
-export const landingPageNavbarMenuLinks: {
+export const landingPageNavbarMenuLinksResources: {
   title: string
   href: string
   description: string
@@ -21,17 +21,73 @@ export const landingPageNavbarMenuLinks: {
     sub: ["active", "trialing"],
   },
   {
-    title: "Changelog",
-    href: "/changelog",
-    description: "Read my interesting changelog posts.",
+    title: "For Artists",
+    href: "/resources/artists",
+    description: "Resources compiled for artists.",
     sub: ["all"],
   },
   {
-    title: "Pricing",
-    href: "/pricing",
-    description: "The price of job security.",
+    title: "For Organizers",
+    href: "/resources/organizers",
+    description: "Resources compiled for organizers.",
     sub: ["all"],
   },
+  // {
+  //   title: "Pricing",
+  //   href: "/pricing",
+  //   description: "The price of job security.",
+  //   sub: ["all"],
+  // },
+  {
+    title: "Smog",
+    href: "/smog",
+    description: "The dragon that ate my family.",
+    sub: ["admin"],
+  },
+]
+export const landingPageNavbarMenuLinksTheList: {
+  title: string
+  href: string
+  description: string
+  isIcon?: boolean
+  sub: string[]
+}[] = [
+  {
+    title: "The List",
+    href: "/thelist",
+    description: "View all current open calls & events.",
+    sub: ["all"],
+  },
+  {
+    title: "This Week",
+    href: "/thisweek",
+    description: "Open calls ending this week.",
+    sub: ["all"],
+  },
+  {
+    title: "World Map",
+    href: "/map",
+    description: "Map of all street art fests, mural projects, etc.",
+    sub: ["all"],
+  },
+  {
+    title: "Calendar",
+    href: "/calendar",
+    description: "View upcoming events.",
+    sub: ["all"],
+  },
+  {
+    title: "The Archive",
+    href: "/archive",
+    description: "View all current open calls & events.",
+    sub: ["all"],
+  },
+  // {
+  //   title: "Pricing",
+  //   href: "/pricing",
+  //   description: "The price of job security.",
+  //   sub: ["all"],
+  // },
   {
     title: "Smog",
     href: "/smog",
