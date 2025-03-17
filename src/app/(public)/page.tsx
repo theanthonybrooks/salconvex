@@ -5,6 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+
 import { motion } from "framer-motion"
 import { useRef } from "react"
 import { FaEnvelope, FaGlobe, FaInstagram } from "react-icons/fa6"
@@ -44,57 +45,57 @@ export default function Home() {
           //   borderBottomRightRadius: borderRadius,
           // }}
         />
-        <motion.span className='absolute bottom-5 left-5 flex flex-row gap-1 px-10 py-2 rounded-3xl  text-foreground bg-white'>
-          <Popover>
-            <PopoverTrigger asChild>
+        <Popover>
+          <PopoverTrigger asChild>
+            <motion.span className='absolute bottom-5 left-5 flex flex-row gap-1 px-10 py-2 rounded-3xl  text-foreground bg-white hover:cursor-pointer'>
               <span>
                 <i className='text-base'>Silent Rhythm </i> by{" "}
                 <span className='font-bold'>Anthony Brooks</span>
               </span>
-            </PopoverTrigger>
-            <PopoverContent className='w-80'>
-              <div className='grid gap-4'>
-                <div className='space-y-2'>
-                  <h3 className='font-bold italic'>Artwork Name</h3>
-                  <p className='text-sm text-muted-foreground'>
-                    Painted in 2024 for event/project name.
-                    Description/size/materials/etc.
-                  </p>
-                  <h4 className='font-medium leading-none'>More info:</h4>
-                  <p className='text-sm text-muted-foreground'>
-                    Artist located in Copenhagen, Denmark
-                  </p>
-                </div>
-                <ul>
-                  <li className='flex gap-x-4 items-center'>
-                    <FaInstagram />{" "}
-                    <a
-                      href='https://instagram.com/anthonybrooksart'
-                      className='text-sm text-muted-foreground'>
-                      @anthonybrooksart
-                    </a>
-                  </li>
-                  <li className='flex gap-x-4 items-center'>
-                    <FaGlobe />
-                    <a
-                      href='https://anthonybrooksart.com'
-                      className='text-sm text-muted-foreground'>
-                      anthonybrooksart.com
-                    </a>
-                  </li>
-                  <li className='flex gap-x-4 items-center'>
-                    <FaEnvelope />
-                    <a
-                      href='mailto:info@thestreetartlist.com'
-                      className='text-sm text-muted-foreground'>
-                      info@thestreetartlist.com
-                    </a>
-                  </li>
-                </ul>
+            </motion.span>
+          </PopoverTrigger>
+          <PopoverContent className='w-80'>
+            <div className='grid gap-4'>
+              <div className='space-y-2'>
+                <h3 className='font-bold italic'>Artwork Name</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Painted in 2024 for event/project name.
+                  Description/size/materials/etc.
+                </p>
+                <h4 className='font-medium leading-none'>More info:</h4>
+                <p className='text-sm text-muted-foreground'>
+                  Artist located in Copenhagen, Denmark
+                </p>
               </div>
-            </PopoverContent>
-          </Popover>
-        </motion.span>
+              <ul>
+                <li className='flex gap-x-4 items-center'>
+                  <FaInstagram />{" "}
+                  <a
+                    href='https://instagram.com/anthonybrooksart'
+                    className='text-sm text-muted-foreground hover:underline underline-offset-2'>
+                    @anthonybrooksart
+                  </a>
+                </li>
+                <li className='flex gap-x-4 items-center'>
+                  <FaGlobe />
+                  <a
+                    href='https://anthonybrooksart.com'
+                    className='text-sm text-muted-foreground hover:underline underline-offset-2'>
+                    anthonybrooksart.com
+                  </a>
+                </li>
+                <li className='flex gap-x-4 items-center'>
+                  <FaEnvelope />
+                  <a
+                    href='mailto:info@thestreetartlist.com'
+                    className='text-sm text-muted-foreground hover:underline underline-offset-2'>
+                    info@thestreetartlist.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </PopoverContent>
+        </Popover>
       </motion.div>
       <div className='h-[300vh] w-full '></div>
     </motion.div>
