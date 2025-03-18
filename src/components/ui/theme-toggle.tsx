@@ -104,7 +104,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
           <m.g
             variants={raysVariants}
             initial='hidden'
-            animate={theme === "light" ? "visible" : "hidden"}
+            animate={theme === "default" ? "visible" : "hidden"}
             className='stroke-6 stroke-foreground'
             style={{ strokeLinecap: "round", strokeWidth: 8 }}>
             <m.path
@@ -133,7 +133,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
               strokeWidth: 6,
             }}
             animate={
-              theme === "default"
+              theme === "dark"
                 ? {
                     d: moonPath,
                     rotate: -360,
@@ -145,19 +145,8 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
 
                     scale: 2.25,
                   }
-                : theme === "dark"
+                : theme === "default"
                 ? {
-                    d: sunPath,
-                    rotate: 0,
-                    strokeWidth: 4,
-                    stroke: "var(--foreground-hex)",
-                    fill: "transparent",
-                    fillOpacity: 0.35,
-                    strokeOpacity: 1,
-
-                    scale: 2.3,
-                  }
-                : {
                     d: sunPath,
                     rotate: 0,
                     strokeWidth: 6,
@@ -167,6 +156,17 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
                     strokeOpacity: 1,
 
                     scale: 1,
+                  }
+                : {
+                    d: sunPath,
+                    rotate: 0,
+                    strokeWidth: 4,
+                    stroke: "var(--foreground-hex)",
+                    fill: "transparent",
+                    fillOpacity: 0.35,
+                    strokeOpacity: 1,
+
+                    scale: 2.3,
                   }
             }
           />
