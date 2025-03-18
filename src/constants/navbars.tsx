@@ -9,18 +9,6 @@ export const landingPageNavbarMenuLinksResources: {
   sub: string[]
 }[] = [
   {
-    title: "The List",
-    href: "/thelist",
-    description: "View all current open calls & events.",
-    sub: ["active", "trialing"],
-  },
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    description: "Access your personal dashboard.",
-    sub: ["active", "trialing"],
-  },
-  {
     title: "For Artists",
     href: "/resources/artists",
     description: "Resources compiled for artists.",
@@ -111,18 +99,18 @@ export const landingPageNavbarLinks: {
     description: "Access your personal dashboard.",
     sub: ["active", "trialing"],
   },
-  {
-    title: "The List",
-    href: "/thelist",
-    description: "View all current open calls & events.",
-    sub: ["active", "trialing"],
-  },
-  {
-    title: "The Archive",
-    href: "/archive",
-    description: "View all current open calls & events.",
-    sub: ["all"],
-  },
+  // {
+  //   title: "The List",
+  //   href: "/thelist",
+  //   description: "View all current open calls & events.",
+  //   sub: ["active", "trialing"],
+  // },
+  // {
+  //   title: "The Archive",
+  //   href: "/archive",
+  //   description: "View all current open calls & events.",
+  //   sub: ["all"],
+  // },
   // {
   //   title: "Map",
   //   href: "/map",
@@ -133,7 +121,7 @@ export const landingPageNavbarLinks: {
     title: "Pricing",
     href: "/pricing",
     description: "View them prices.",
-    sub: ["all"],
+    sub: ["public"],
   },
   {
     title: "Billing",

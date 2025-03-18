@@ -23,6 +23,7 @@ import { Authenticated, Unauthenticated } from "convex/react"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import React, { useEffect, useState } from "react"
 
 interface NavBarProps {
@@ -38,11 +39,14 @@ export default function NavBar({
   subStatus,
 }: // userPref,
 NavBarProps) {
+  const pathname = usePathname()
   const { scrollY } = useScroll()
   const [isMobile, setIsMobile] = useState(false)
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
+
+  const currentPage = pathname
 
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -54,13 +58,23 @@ NavBarProps) {
 
   const statusKey = subStatus ? subStatus : "none"
   const filteredNavbarLinks = landingPageNavbarLinks.filter(
-    (link) => link.sub.includes(statusKey) || link.sub.includes("all")
+    (link) =>
+      link.sub.includes(statusKey) ||
+      link.sub.includes("all") ||
+      (link.sub.includes("public") && !user)
   )
   const filteredNavbarMenuResources = resources.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all")
   )
   const filteredNavbarMenuTheList = thelistitems.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all")
+  )
+
+  const isActiveTheList = filteredNavbarMenuTheList.some(
+    (component) => component.href === currentPage
+  )
+  const isActiveResources = filteredNavbarMenuResources.some(
+    (component) => component.href === currentPage
   )
 
   useEffect(() => {
@@ -218,7 +232,10 @@ NavBarProps) {
                   <NavigationMenuList>
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
-                        className='border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground'
+                        className={cn(
+                          "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
+                          isActiveResources && "border-foreground"
+                        )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
                         Resources
@@ -240,7 +257,10 @@ NavBarProps) {
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
-                        className='border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground'
+                        className={cn(
+                          "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
+                          isActiveTheList && "border-foreground"
+                        )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
                         The List
@@ -253,7 +273,12 @@ NavBarProps) {
                             <ListItem
                               key={component.title}
                               title={component.title}
-                              href={component.href}>
+                              href={component.href}
+                              className={cn(
+                                "cursor-pointer  transition-colors duration-200 ease-in-out ",
+                                currentPage === component.href &&
+                                  "bg-background"
+                              )}>
                               {component.description}
                             </ListItem>
                           ))}
@@ -266,9 +291,13 @@ NavBarProps) {
                 {filteredNavbarLinks.map((link) => (
                   <Link key={link.title} href={link.href} prefetch={true}>
                     {!link.isIcon ? (
-                      <Button variant='ghost'>{link.title}</Button>
+                      <Button className='bg-background text-foreground border-2 border-transparent hover:bg-background hover:border-foreground'>
+                        {link.title}
+                      </Button>
                     ) : (
-                      <Button variant='ghost' size='icon'>
+                      <Button
+                        className='bg-background text-foreground  hover:bg-background hover:scale-110'
+                        size='icon'>
                         {link.icon}
                       </Button>
                     )}
@@ -348,7 +377,7 @@ const ListItem = React.forwardRef<
           href={href}
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-salPink/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             className
           )}
           {...props}>

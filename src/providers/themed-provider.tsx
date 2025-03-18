@@ -28,7 +28,7 @@ export function ThemedProvider({ children, userPref }: ThemedProviderProps) {
 
   return (
     <ThemeProvider
-      themes={["light", "dark", "default", "system"]}
+      themes={["light", "dark", "default", "white", "system"]}
       attribute='class'
       defaultTheme={userTheme ? userTheme : "default"}
       enableSystem

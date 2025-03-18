@@ -772,8 +772,8 @@ export default function SettingsPage() {
                       </SelectItem>
                       <SelectItem value='light'>Light</SelectItem>
                       <SelectItem value='dark'>Dark</SelectItem>
-                      {/* <SelectItem value='green'>Green</SelectItem>
-                      <SelectItem value='orange'>Orange</SelectItem> */}
+                      <SelectItem value='white'>White</SelectItem>
+                      {/* <SelectItem value='orange'>Orange</SelectItem> */}
                     </SelectContent>
                   </Select>
                 </div>

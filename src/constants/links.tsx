@@ -20,7 +20,6 @@ import {
   Shield,
   Twitter,
   Upload,
-  User,
   XCircle,
 } from "lucide-react"
 
@@ -161,18 +160,18 @@ export const dashboardNavItems: DashNavItem[] = [
     desc: "Dashboard home",
     sub: ["active", "trialing", "admin"],
   },
-  {
-    label: "User Account",
-    href: "/dashboard/account",
-    icon: User,
-    section: true,
-    sectionCat: "account",
-    sectionIcon: User,
-    sectionHead: true,
-    heading: "Account",
-    desc: "Manage your profile",
-    sub: ["active", "trialing", "admin"],
-  },
+  // {
+  //   label: "User Account",
+  //   href: "/dashboard/account",
+  //   icon: User,
+  //   section: true,
+  //   sectionCat: "account",
+  //   sectionIcon: User,
+  //   sectionHead: true,
+  //   heading: "Account",
+  //   desc: "Manage your profile",
+  //   sub: ["active", "trialing", "admin"],
+  // },
   {
     label: "Settings",
     href: "/dashboard/account/settings",

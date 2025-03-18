@@ -31,7 +31,9 @@ const PopoverContent = React.forwardRef<
         )}
         {...props}>
         <PopoverPrimitive.Arrow className='fill-white' />
-        <PopoverPrimitive.Close className='absolute top-3 right-3 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75'>
+        <PopoverPrimitive.Close
+          aria-label='Close popover'
+          className='absolute top-3 right-3 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75'>
           <X className='size-6 text-black/80 hover:text-red-600' />
         </PopoverPrimitive.Close>
         {children}
