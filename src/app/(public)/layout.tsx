@@ -31,7 +31,7 @@ export default async function HomeLayout({
         // userPref={userPref ?? null}
       />
       <div className='scrollable mini darkbar'>
-        <main className='flex min-w-screen min-h-screen flex-col pt-[100px] px-8'>
+        <main className='flex min-w-screen min-h-screen flex-col pt-[100px] px-4'>
           {children}
         </main>
 
