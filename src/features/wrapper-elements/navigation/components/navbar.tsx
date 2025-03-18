@@ -46,7 +46,8 @@ NavBarProps) {
   //   console.log("Page scroll: ", latest)
   // })
 
-  const currentPage = pathname
+  const currentPage = pathname.split("/")[1]
+  console.log("currentPage", currentPage)
 
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -71,10 +72,10 @@ NavBarProps) {
   )
 
   const isActiveTheList = filteredNavbarMenuTheList.some(
-    (component) => component.href === currentPage
+    (component) => component.href.includes(currentPage) && currentPage !== ""
   )
   const isActiveResources = filteredNavbarMenuResources.some(
-    (component) => component.href === currentPage
+    (component) => component.href.includes(currentPage) && currentPage !== ""
   )
 
   useEffect(() => {
@@ -227,14 +228,16 @@ NavBarProps) {
               <motion.div
                 // animate={{ opacity: isScrolled ? 0 : 1 }}
                 // transition={{ duration: 0.3, ease: "easeOut" }}
-                className='hidden justify-center gap-6 lg:flex z-0'>
+                className='hidden justify-center gap-2 lg:flex z-0 items-center'>
                 <NavigationMenu delayDuration={Infinity}>
-                  <NavigationMenuList>
+                  <NavigationMenuList className='gap-2'>
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
+                        isCurrent={isActiveResources}
                         className={cn(
                           "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
-                          isActiveResources && "border-foreground"
+                          isActiveResources &&
+                            "border-foreground/30 bg-salPink/50 hover:bg-salPink/60"
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
@@ -250,7 +253,7 @@ NavBarProps) {
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer  transition-colors duration-200 ease-in-out text-balance",
+                                "cursor-pointer  transition-colors duration-200 ease-in-out text-balance ",
                                 currentPage === component.href &&
                                   "bg-background"
                               )}>
@@ -262,9 +265,11 @@ NavBarProps) {
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
+                        isCurrent={isActiveTheList}
                         className={cn(
                           "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
-                          isActiveTheList && "border-foreground"
+                          isActiveTheList &&
+                            "border-foreground/30 bg-salPink/50 hover:bg-salPink/60"
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
@@ -296,7 +301,7 @@ NavBarProps) {
                 {filteredNavbarLinks.map((link) => (
                   <Link key={link.title} href={link.href} prefetch={true}>
                     {!link.isIcon ? (
-                      <Button className='bg-background text-foreground border-2 border-transparent hover:bg-background hover:border-foreground'>
+                      <Button className='bg-background text-foreground border-2 border-transparent hover:bg-background hover:border-foreground h-9'>
                         {link.title}
                       </Button>
                     ) : (
@@ -334,7 +339,9 @@ NavBarProps) {
               <Authenticated>
                 <div className='hidden lg:flex items-center justify-self-end h-15 w-fit pr-5 '>
                   <div className='flex items-center gap-4'>
-                    {userId !== "guest" && user && <UserProfile user={user} />}
+                    {userId !== "guest" && user && (
+                      <UserProfile user={user} className='size-10' />
+                    )}
                     <FullPageNav user={user} />
                   </div>
                 </div>

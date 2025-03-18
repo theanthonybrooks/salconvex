@@ -10,7 +10,6 @@ import {
   EyeOff,
   Globe,
   MapPin,
-  PaintRoller,
   Phone,
 } from "lucide-react"
 
@@ -24,14 +23,19 @@ import {
   FaEnvelope,
   FaFacebook,
   FaInstagram,
+  FaPaintRoller,
   FaRegCommentDots,
   FaThreads,
 } from "react-icons/fa6"
-import { GoGear } from "react-icons/go"
-import { IoAirplaneOutline, IoFastFoodOutline } from "react-icons/io5"
-import { PiHouseLine, PiPencilLineDuotone } from "react-icons/pi"
+import { IoAirplane } from "react-icons/io5"
+import {
+  PiForkKnifeFill,
+  PiHouseLineFill,
+  PiPencilLineFill,
+} from "react-icons/pi"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TbStairs } from "react-icons/tb"
 
 interface EventCardDetailProps {
   accepted?: "accepted" | "rejected" | "pending" | undefined
@@ -198,23 +202,23 @@ const EventCardDetail = ({
                         id='budget-icons-${id}'
                         className='col-span-2 flex gap-x-3 items-center justify-center max-w-full'>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
-                          <PiPencilLineDuotone size={18} />
+                          <PiPencilLineFill size={18} />
                         </span>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
                           {" "}
-                          <PiHouseLine size={18} />
+                          <PiHouseLineFill size={18} />
                         </span>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
-                          <IoFastFoodOutline size={18} />
+                          <PiForkKnifeFill size={18} />
                         </span>
                         <span className='p-1 border-1.5 border-foreground/20 text-foreground/20  rounded-full'>
-                          <PaintRoller size={18} />
+                          <FaPaintRoller size={18} />
                         </span>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
-                          <IoAirplaneOutline size={18} />
+                          <IoAirplane size={18} />
                         </span>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
-                          <GoGear size={18} />
+                          <TbStairs size={18} />
                         </span>
                         <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
                           <FaRegCommentDots size={18} />

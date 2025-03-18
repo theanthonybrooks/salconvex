@@ -1,9 +1,10 @@
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
-import { ChevronDown } from "lucide-react"
 import * as React from "react"
+import { TiArrowSortedDown } from "react-icons/ti"
 
 import { cn } from "@/lib/utils"
+import { FaChevronDown } from "react-icons/fa"
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -43,19 +44,32 @@ const navigationMenuTriggerStyle = cva(
   "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:border-black/10 focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-accent/50 data-[state=open]:bg-accent/50 "
 )
 
+type NavigationMenuTriggerProps = React.ComponentPropsWithoutRef<
+  typeof NavigationMenuPrimitive.Trigger
+> & {
+  isCurrent?: boolean
+}
+
 const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+  NavigationMenuTriggerProps
+>(({ isCurrent, className, children, ...props }, ref) => (
   <NavigationMenuPrimitive.Trigger
     ref={ref}
     className={cn(navigationMenuTriggerStyle(), "group", className)}
     {...props}>
-    {children}{" "}
-    <ChevronDown
-      className='relative top-[1px] ml-1 h-3 w-3 transition duration-300 group-data-[state=open]:rotate-180'
-      aria-hidden='true'
-    />
+    {children}
+    {isCurrent ? (
+      <TiArrowSortedDown
+        className='relative  ml-1 size-4 transition duration-300 group-data-[state=open]:rotate-180 text-foreground/40'
+        aria-hidden='true'
+      />
+    ) : (
+      <FaChevronDown
+        className='relative  ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180 text-foreground'
+        aria-hidden='true'
+      />
+    )}
   </NavigationMenuPrimitive.Trigger>
 ))
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
