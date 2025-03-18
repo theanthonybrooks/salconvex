@@ -243,12 +243,17 @@ NavBarProps) {
                       <NavigationMenuContent
                         onPointerEnter={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
-                        <ul className='grid w-[400px] gap-3 p-4 lg:w-[500px] lg:grid-cols-2 '>
+                        <ul className='grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2 '>
                           {filteredNavbarMenuResources.map((component) => (
                             <ListItem
                               key={component.title}
                               title={component.title}
-                              href={component.href}>
+                              href={component.href}
+                              className={cn(
+                                "cursor-pointer  transition-colors duration-200 ease-in-out text-balance",
+                                currentPage === component.href &&
+                                  "bg-background"
+                              )}>
                               {component.description}
                             </ListItem>
                           ))}
@@ -268,14 +273,14 @@ NavBarProps) {
                       <NavigationMenuContent
                         onPointerEnter={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
-                        <ul className='grid w-[400px] gap-3 p-4 lg:w-[500px] lg:grid-cols-2 '>
+                        <ul className='grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2 '>
                           {filteredNavbarMenuTheList.map((component) => (
                             <ListItem
                               key={component.title}
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer  transition-colors duration-200 ease-in-out ",
+                                "cursor-pointer  transition-colors duration-200 ease-in-out text-balance",
                                 currentPage === component.href &&
                                   "bg-background"
                               )}>

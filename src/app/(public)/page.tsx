@@ -47,7 +47,11 @@ export default function Home() {
         />
         <Popover>
           <PopoverTrigger asChild>
-            <motion.span className='absolute bottom-5 left-5 flex flex-row gap-1 px-10 py-2 rounded-3xl  text-foreground bg-white hover:cursor-pointer'>
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className='absolute bottom-5 left-5 flex flex-row gap-1 px-10 py-2 rounded-3xl  text-foreground bg-white hover:cursor-pointer'>
               <span>
                 <i className='text-base'>Silent Rhythm </i> by{" "}
                 <span className='font-bold'>Anthony Brooks</span>

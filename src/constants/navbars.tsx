@@ -64,12 +64,12 @@ export const landingPageNavbarMenuLinksTheList: {
     description: "View upcoming events.",
     sub: ["all"],
   },
-  {
-    title: "The Archive",
-    href: "/archive",
-    description: "View all current open calls & events.",
-    sub: ["all"],
-  },
+  // {
+  //   title: "The Archive",
+  //   href: "/archive",
+  //   description: "View all current open calls & events.",
+  //   sub: ["all"],
+  // },
   // {
   //   title: "Pricing",
   //   href: "/pricing",
