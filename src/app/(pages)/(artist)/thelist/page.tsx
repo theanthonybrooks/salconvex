@@ -7,6 +7,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { mockEventData } from "@/data/mockEventData"
 import EventCardPreview from "@/features/events/event-card-preview"
 
 const TheList = () => {
@@ -29,15 +30,10 @@ const TheList = () => {
         </PaginationContent>
       </Pagination>
 
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
-      <EventCardPreview path={"/thelist/event"} />
+      {/* Map through mockEventData to render EventCardPreview components */}
+      {mockEventData.map((event, index) => (
+        <EventCardPreview key={index} {...event} />
+      ))}
     </div>
   )
 }

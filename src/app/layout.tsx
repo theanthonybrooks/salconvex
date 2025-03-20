@@ -62,7 +62,7 @@ export default async function RootLayout({
   const userPref = userData?.userPref ?? undefined
   // }
 
-  console.log("userPref in layout", userPref)
+  // console.log("userPref in layout", userPref)
 
   return (
     <ConvexAuthNextjsServerProvider>
@@ -73,7 +73,7 @@ export default async function RootLayout({
         <body
           className={cn(
             GeistSans.className,
-            " scrollable  darkbar antialiased",
+            " scrollable  darkbar antialiased  default:font-spaceGrotesk ",
             // " scrollable invis darkbar antialiased",
             tankerReg.variable,
             spaceMono.variable,

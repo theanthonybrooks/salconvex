@@ -20,10 +20,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion"
 import {
+  FaBookmark,
   FaEnvelope,
   FaFacebook,
   FaInstagram,
   FaPaintRoller,
+  FaRegBookmark,
   FaRegCommentDots,
   FaThreads,
 } from "react-icons/fa6"
@@ -35,38 +37,95 @@ import {
 } from "react-icons/pi"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { EventData } from "@/types/event"
 import { TbStairs } from "react-icons/tb"
 
-interface EventCardDetailProps {
-  accepted?: "accepted" | "rejected" | "pending" | undefined
-  bookmarked?: boolean
-  hidden?: boolean
-}
+import { generateICSFile } from "@/lib/addToCalendar"
+import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
+import {
+  formatCurrency,
+  formatRate,
+  getEventCategoryLabel,
+} from "@/lib/eventFns"
+import Image from "next/image"
 
-const EventCardDetail = ({
-  accepted = undefined,
-  bookmarked = false,
-  hidden = false,
-}: EventCardDetailProps) => {
+const EventCardDetail = (props: EventData) => {
+  const {
+    // id,
+    logo,
+
+    callType,
+    // eventType,
+    eventCategory,
+    location,
+    dates,
+    eligibility,
+    eligibilityType,
+    eligibilityDetails,
+    budgetMin,
+    budgetMax,
+    currency,
+    budgetRate,
+    budgetRateUnit,
+    allInclusive,
+    openCall,
+    appFee,
+    status,
+    bookmarked,
+    hidden,
+    event,
+    tabs,
+    // organizer,
+  } = props
+
+  const { locale, city, stateAbbr, countryAbbr } = location
+  const {
+    designFee,
+    accommodation,
+    food,
+    travelCosts,
+    materials,
+    equipment,
+    other,
+  } = tabs.opencall.compensation
+
+  const locationString = `${
+    locale ? `${locale}, ` : ""
+  }${city}, ${stateAbbr}, ${countryAbbr}`
+
+  const icsLink =
+    dates.eventStart && dates.eventEnd
+      ? generateICSFile(
+          event.name,
+          dates.eventStart,
+          dates.eventEnd,
+          locationString,
+          tabs.event.about
+        )
+      : null
+
+  const hasBudget = budgetMin > 0 || (budgetMax && budgetMax > 0)
+  const hasRate = budgetRate && budgetRate > 0
+
   return (
-    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] min-w-[300px] grid grid-cols-[75px_auto] gap-x-3 '>
-      {accepted !== undefined && (
+    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] w-[90vw] min-w-[340px] grid grid-cols-[75px_auto] gap-x-3 '>
+      {status !== undefined && (
         <span
           className={cn(
             "col-start-2 text-xs bg-white/70 px-2 py-1 rounded-full w-fit border-2 border-foreground/30",
-            accepted === "accepted"
+            status === "accepted"
               ? "text-emerald-600 border-emerald-500/50"
-              : accepted === "rejected"
+              : status === "rejected"
               ? "text-red-500 border-red-500/30"
-              : accepted === "pending"
+              : status === "pending"
               ? "italic text-foreground/50"
               : ""
           )}>
           Application status:{" "}
           <span className='font-bold'>
-            {accepted === "accepted"
-              ? "Accepted"
-              : accepted === "rejected"
+            {status === "accepted"
+              ? "status"
+              : status === "rejected"
               ? "Rejected"
               : "Pending"}
           </span>
@@ -74,30 +133,28 @@ const EventCardDetail = ({
       )}
       <div className='w-full grid col-span-full  grid-cols-[75px_auto]  gap-x-3 mb-4'>
         <div className='col-span-1 flex flex-col items-center justify-around space-y-6 pt-3 pb-3'>
-          <div
+          <Image
+            src={logo}
+            alt='Event Logo'
+            width={60}
+            height={60}
             className={cn(
-              "rounded-full bg-white border-2 h-15 w-15 relative ",
-              accepted === "accepted"
+              "rounded-full  border-2 size-[60px] ",
+              status === "accepted"
                 ? "ring-4  ring-offset-1 ring-emerald-500"
-                : accepted === "rejected"
+                : status === "rejected"
                 ? "ring-4  ring-offset-1 ring-red-500"
-                : accepted === "pending"
+                : status === "pending"
                 ? "ring-4 ring-offset-1 ring-foreground/20"
                 : ""
-            )}>
-            <p className='text-sm absolute left-0 top-0 translate-x-1/3 translate-y-[80%]'>
-              Logo
-            </p>
-          </div>
+            )}
+          />
+
           <div className='flex flex-col space-y-4 items-center'>
             {bookmarked ? (
-              <BookmarkFilledIcon
-                height={32}
-                width={32}
-                className='text-red-500 mt-3'
-              />
+              <FaBookmark className='size-8 text-emerald-600 mt-3' />
             ) : (
-              <BookmarkIcon height={32} width={32} className='mt-3' />
+              <FaRegBookmark className='size-8 mt-3' />
             )}
             {hidden && <EyeOff className='h-6 w-6' />}
           </div>
@@ -105,26 +162,33 @@ const EventCardDetail = ({
 
         <div className='pt-3 pb-3 pr-3 gap-y-3 flex-col flex justify-between '>
           <div className='flex flex-col gap-y-1'>
-            <p className='text-base font-semibold  mb-1'>
-              Event Name in full that spans two rows
-            </p>
+            <p className='text-base font-semibold  mb-1'>{event?.name}</p>
 
             <p className='text-sm inline-flex items-end gap-x-1'>
-              City, (state), Country
+              {locationString}
               <MapPin />
             </p>
           </div>
           <div className='flex flex-col justify-between gap-y-1'>
-            <p className='text-sm'>
-              <span className='font-semibold'>Event Dates:</span> June 5-18,
-              2025
+            <p className='text-sm flex items-center gap-x-1'>
+              <span className='font-semibold'>Dates:</span>
+              {formatEventDates(dates?.eventStart || "", dates.eventEnd)}
             </p>
-            <p className='text-sm'>
-              <span className='font-semibold'>Category:</span> Event
+            <p className='text-sm flex items-center gap-x-1'>
+              <span className='font-semibold'>Category:</span>
+              {getEventCategoryLabel(eventCategory)}
             </p>
-            <p className='text-sm'>
-              <span className='font-semibold'>Type:</span> Street Art Festival
-            </p>
+            {eventCategory === "event" && (
+              <p className='text-sm flex items-center gap-x-1'>
+                <span className='font-semibold'>Type:</span> Street Art Festival
+              </p>
+            )}
+            {appFee !== 0 && (
+              <p className='text-sm flex items-center gap-x-1 text-red-600'>
+                <span className='font-semibold'>Application Fee:</span>
+                {`$${appFee}`}
+              </p>
+            )}
           </div>
           {/* NOTE: Make these dynamic and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
           {/* <div className='flex gap-x-4 mt-3 items-center justify-start'>
@@ -138,15 +202,17 @@ const EventCardDetail = ({
       </div>
       <div className='col-span-full overflow-hidden w-full flex flex-col gap-y-3 justify-start items-start'>
         <Tabs
-          defaultValue='opencall'
+          defaultValue={openCall ? "opencall" : "event"}
           className='w-full flex flex-col justify-center'>
           <TabsList className='w-full  raymond bg-white/60 justify-around h-12'>
-            <TabsTrigger className='h-10' value='opencall'>
-              Open Call
-            </TabsTrigger>
+            {openCall && (
+              <TabsTrigger className='h-10' value='opencall'>
+                Open Call
+              </TabsTrigger>
+            )}
             <TabsTrigger className='h-10' value='event'>
               {/* Project Details note-to-self: this should change automatically depending on the oc type */}
-              Event Details
+              {getEventCategoryLabel(eventCategory)} Details
             </TabsTrigger>
             <TabsTrigger className='h-10' value='organizer'>
               Organizer
@@ -165,8 +231,21 @@ const EventCardDetail = ({
                         </span>
                         <br />{" "}
                         <span className=' flex items-center gap-x-2'>
-                          Mar 2 2025 @ 5:00pm (CST){" "}
-                          <CalendarClockIcon className='h-4 w-4' />
+                          {formatOpenCallDeadline(
+                            dates?.ocEnd || "",
+                            dates?.timezone,
+                            callType
+                          )}
+                          {icsLink && (
+                            <a
+                              href={icsLink}
+                              download={`${event.name.replace(
+                                /\s+/g,
+                                "_"
+                              )}.ics`}>
+                              <CalendarClockIcon className='h-4 w-4' />
+                            </a>
+                          )}
                         </span>
                       </p>
                       <p>
@@ -174,17 +253,24 @@ const EventCardDetail = ({
                           Eligible:
                         </span>
                         <br />
-                        <span className='text-red-600'>
-                          National: US Artists*
+                        <span
+                          className={cn(
+                            eligibilityType !== "International" &&
+                              "text-red-600"
+                          )}>
+                          {eligibilityType !== "International"
+                            ? `${eligibilityType}: ${eligibility}*`
+                            : eligibility}
                         </span>
                       </p>
-                      <p>
-                        <span className='font-semibold underline underline-offset-2'>
-                          More Info:
-                        </span>
-                        <br /> Artists from xyz region, identity, and/or
-                        location are eligible to apply.
-                      </p>
+                      {eligibilityDetails && (
+                        <p>
+                          <span className='font-semibold underline underline-offset-2'>
+                            More Info:
+                          </span>
+                          <br /> {eligibilityDetails}
+                        </p>
+                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -201,78 +287,190 @@ const EventCardDetail = ({
                       <div
                         id='budget-icons-${id}'
                         className='col-span-2 flex gap-x-3 items-center justify-center max-w-full'>
-                        <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full",
+                            designFee !== null
+                              ? "  border-emerald-500 text-emerald-500"
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <PiPencilLineFill size={18} />
                         </span>
-                        <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
-                          {" "}
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full ",
+                            accommodation !== null
+                              ? " border-emerald-500 text-emerald-500"
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <PiHouseLineFill size={18} />
                         </span>
-                        <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full",
+                            food !== null
+                              ? "  border-emerald-500 text-emerald-500"
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <PiForkKnifeFill size={18} />
                         </span>
-                        <span className='p-1 border-1.5 border-foreground/20 text-foreground/20  rounded-full'>
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full",
+                            materials !== null
+                              ? " border-emerald-500 text-emerald-500 "
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <FaPaintRoller size={18} />
                         </span>
-                        <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full",
+                            travelCosts !== null
+                              ? "  border-emerald-500 text-emerald-500"
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <IoAirplane size={18} />
                         </span>
-                        <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full",
+                            equipment !== null
+                              ? "  border-emerald-500 text-emerald-500"
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <TbStairs size={18} />
                         </span>
-                        <span className='p-1 border-1.5  border-emerald-500 text-emerald-500 rounded-full'>
+                        <span
+                          className={cn(
+                            "p-1 border-1.5  rounded-full",
+                            other !== null
+                              ? "  border-emerald-500 text-emerald-500"
+                              : "border-foreground/20 text-foreground/20"
+                          )}>
                           <FaRegCommentDots size={18} />
                         </span>
                       </div>
                     </section>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className=' flex flex-col space-y-3  pb-3 mb-4'>
+                    <div className=' flex flex-col space-y-3  pb-3 mb-4 '>
                       <p>
                         <span className='font-semibold underline underline-offset-2'>
                           Budget:
                         </span>
                         <br />
-                        up to $10,000 | $50/ft²
+                        {hasBudget &&
+                          formatCurrency(
+                            budgetMin,
+                            budgetMax,
+                            currency,
+                            false,
+                            allInclusive
+                          )}
+
+                        {hasBudget && hasRate && (
+                          <span className='text-sm'> | </span>
+                        )}
+
+                        {hasRate
+                          ? formatRate(
+                              budgetRate,
+                              budgetRateUnit,
+                              currency,
+                              allInclusive
+                            )
+                          : "No Info"}
                       </p>
                       <p className='font-semibold underline underline-offset-2'>
                         Compensation Includes:
                       </p>
                       {/* NOTE: How to better display this? It's a bit jarring at the moment
               when viewing it. */}
-                      <div className=' flex flex-col gap-y-3 justify-between'>
+                      <div className=' flex flex-col gap-y-3 pr-[1px] justify-between'>
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Design Fee:</p>
-                          <p className='text-right'> $750</p>
+                          <p className='text-right'>
+                            {designFee !== null ? (
+                              formatCurrency(designFee, null, currency)
+                            ) : (
+                              <span className='text-red-500 italic'>
+                                (not provided)
+                              </span>
+                            )}
+                          </p>
                         </div>
 
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Accommodation:</p>
-                          <p className='text-right'>Provided</p>
+                          <p className='text-right'>
+                            {accommodation !== null ? (
+                              accommodation
+                            ) : (
+                              <span className='text-red-500 italic'>
+                                (not provided)
+                              </span>
+                            )}
+                          </p>
                         </div>
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Food:</p>
-                          <p className='text-right'>$40/day</p>
+                          <p className='text-right'>
+                            {food !== null ? (
+                              food
+                            ) : (
+                              <span className='text-red-500 italic'>
+                                (not provided)
+                              </span>
+                            )}
+                          </p>
                         </div>
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Travel Costs:</p>
-                          <p className='text-right'> Up to $500</p>
+                          <p className='text-right'>
+                            {travelCosts !== null ? (
+                              travelCosts
+                            ) : (
+                              <span className='text-red-500 italic'>
+                                (not provided)
+                              </span>
+                            )}
+                          </p>
                         </div>
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Materials:</p>
-                          <p className='text-right text-red-500 italic'>
-                            (not provided)
-                          </p>
+                          {materials !== null ? (
+                            materials
+                          ) : (
+                            <span className='text-red-500 italic'>
+                              (not provided)
+                            </span>
+                          )}
                         </div>
                         {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
-                          {" "}
                           <p className='font-medium'>Equipment:</p>
-                          <p className='text-right'>(provided)</p>
+                          <p className='text-right'>
+                            {equipment !== null ? (
+                              equipment
+                            ) : (
+                              <span className='text-red-500 italic'>
+                                (not provided)
+                              </span>
+                            )}
+                          </p>
                         </div>
                         <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
                           <p className='font-medium'>Other:</p>
-                          <p className='text-right'> ...details details</p>
+                          <p className='text-right'>
+                            {other !== null ? (
+                              other
+                            ) : (
+                              <span className='text-red-500 italic'>
+                                (not provided)
+                              </span>
+                            )}
+                          </p>
                         </div>
                         {/* <li>Must have liability insurance</li> */
                         /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
@@ -331,9 +529,9 @@ const EventCardDetail = ({
                   size='lg'
                   className='rounded-none border-x w-fit sm:px-3 px-3'>
                   {bookmarked ? (
-                    <BookmarkFilledIcon className='text-red-500 size-6' />
+                    <FaBookmark className='size-6 text-emerald-600 ' />
                   ) : (
-                    <BookmarkIcon height={32} width={32} />
+                    <FaRegBookmark className='size-6 ' />
                   )}
                 </Button>
                 <Button

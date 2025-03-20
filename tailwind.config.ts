@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss"
 
 import tailwindcssAnimate from "tailwindcss-animate"
 import { fontFamily } from "tailwindcss/defaultTheme"
+import { PluginAPI } from "tailwindcss/types/config"
 
 export default {
   darkMode: ["class"],
@@ -264,6 +265,28 @@ export default {
         // ".hover\\:wshadow:hover": {
         //   "text-shadow": "black -7px 7px", // Optional: Increase shadow on hover
         // },
+      })
+    },
+    function ({ addVariant, e }: PluginAPI) {
+      ;["default", "light", "white"].forEach((mode) => {
+        addVariant(
+          mode,
+          (() => {
+            return ({
+              modifySelectors,
+              separator,
+            }: {
+              modifySelectors: (
+                cb: (args: { className: string }) => string
+              ) => void
+              separator: string
+            }) => {
+              modifySelectors(({ className }) => {
+                return `.${mode} .${e(`${mode}${separator}${className}`)}`
+              })
+            }
+          })() as () => string
+        )
       })
     },
   ],
