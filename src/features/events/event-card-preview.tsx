@@ -130,7 +130,7 @@ const EventCardPreview = (props: EventData) => {
                 eligibilityType !== "International" && "text-red-600"
               )}>
               {eligibility}
-              {eligibilityType !== "International" && "*"}
+              {eligibilityType !== "International" && " Artists*"}
             </span>
           </p>
         </div>

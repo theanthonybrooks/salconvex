@@ -27,7 +27,7 @@ export interface EventData {
   logo: string
   openCall: boolean
   appFee: number
-  callFormat: string
+  callFormat: "RFP" | "RFQ"
   callType: CallType
   eventType: EventType | [EventType, EventType]
   eventCategory: EventCategory

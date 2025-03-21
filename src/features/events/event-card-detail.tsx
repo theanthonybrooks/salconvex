@@ -46,6 +46,7 @@ import {
   formatCurrency,
   formatRate,
   getEventCategoryLabel,
+  getEventTypeLabel,
 } from "@/lib/eventFns"
 import Image from "next/image"
 import { useState } from "react"
@@ -56,7 +57,7 @@ const EventCardDetail = (props: EventData) => {
     logo,
 
     callType,
-    // eventType,
+    eventType,
     eventCategory,
     location,
     dates,
@@ -129,7 +130,7 @@ const EventCardDetail = (props: EventData) => {
           Application status:{" "}
           <span className='font-bold'>
             {status === "accepted"
-              ? "status"
+              ? "Accepted"
               : status === "rejected"
               ? "Rejected"
               : "Pending"}
@@ -196,7 +197,8 @@ const EventCardDetail = (props: EventData) => {
             </p>
             {eventCategory === "event" && (
               <p className='text-sm flex items-center gap-x-1'>
-                <span className='font-semibold'>Type:</span> Street Art Festival
+                <span className='font-semibold'>Type:</span>{" "}
+                {getEventTypeLabel(eventType)}
               </p>
             )}
             {appFee !== 0 && (
@@ -275,7 +277,7 @@ const EventCardDetail = (props: EventData) => {
                               "text-red-600"
                           )}>
                           {eligibilityType !== "International"
-                            ? `${eligibilityType}: ${eligibility}*`
+                            ? `${eligibilityType}: ${eligibility} Artists*`
                             : eligibility}
                         </span>
                       </p>

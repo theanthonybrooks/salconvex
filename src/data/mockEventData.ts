@@ -125,4 +125,100 @@ export const mockEventData: EventData[] = [
       },
     },
   },
+  {
+    status: "pending",
+    bookmarked: false,
+    hidden: false,
+    id: 2,
+    logo: "/1.jpg",
+    openCall: true,
+    appFee: 25,
+    callFormat: "RFP",
+    callType: "Rolling",
+    eventType: ["mur", "pup"],
+    eventCategory: "residency",
+    location: {
+      locale: "Arts Center",
+      city: "Berlin",
+      state: "Berlin",
+      stateAbbr: "BE",
+      country: "Germany",
+      countryAbbr: "DE",
+      continent: "Europe",
+    },
+    dates: {
+      eventStart: "2025-09-01T09:00:00Z",
+      eventEnd: "2025-10-15T18:00:00Z",
+      ocStart: "2025-06-01T00:00:00Z",
+      ocEnd: "2025-09-01T23:59:59Z",
+      timezone: "Europe/Berlin",
+    },
+    eligibilityType: "National",
+    eligibility: "German",
+    eligibilityDetails:
+      "Must reside in Germany for the duration of the project",
+    budgetMin: 10000,
+    budgetMax: null,
+    currency: "EUR",
+    budgetRate: 60,
+    budgetRateUnit: "m²",
+    allInclusive: true,
+    event: {
+      name: "Urban Walls Residency",
+      location: "Berlin, BE, DE",
+      dates: "Sep 1 - Oct 15, 2025",
+      category: "Residency",
+      type: "Community Public Art",
+    },
+    tabs: {
+      opencall: {
+        compensation: {
+          designFee: 1500,
+          accommodation: "Studio housing provided",
+          food: null,
+          travelCosts: "Reimbursed up to €300",
+          materials: "Provided",
+          equipment: null,
+          other: null,
+        },
+        requirements: [
+          "Resume",
+          "Portfolio with at least 8 works",
+          "Project proposal",
+          "Reference letter",
+        ],
+        requirementsMore: [
+          "Interviews may be conducted for shortlisted applicants",
+        ],
+        requirementDestination: "residency@urbanwalls.de",
+        documents: [
+          {
+            title: "Residency Info Pack",
+            href: "https://example.com/residency-info.pdf",
+          },
+        ],
+        otherInfo: ["Residency includes optional workshops and artist talks"],
+      },
+      event: {
+        location: {
+          map: "https://example.com/map-berlin.png",
+          directions: "Google Maps Link",
+        },
+        about:
+          "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
+        links: ["Event Page", "Apply Here"],
+      },
+      organizer: {
+        name: "Berlin Mural Initiative",
+        location: "Berlin, Germany",
+        about:
+          "Supporting street art throughout Germany through residencies and public art funding.",
+        contact: {
+          organizer: "Max Müller",
+          email: "max.mueller@bmi.de",
+        },
+        links: ["Website", "Instagram", "Contact"],
+      },
+    },
+  },
 ]
