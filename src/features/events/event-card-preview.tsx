@@ -148,7 +148,8 @@ const EventCardPreview = (props: EventData) => {
           variant='salWithShadowHidden'
           size='lg'
           className='bg-white/60'
-          onClick={() => router.push(`/thelist/event/${id}`)}>
+          onClick={() => router.push(`/thelist/event/${id}`)}
+          disabled={status !== null}>
           {status === null && openCall
             ? "Apply"
             : status !== null

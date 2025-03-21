@@ -254,6 +254,7 @@ NavBarProps) {
                               className={cn(
                                 "cursor-pointer  transition-colors duration-200 ease-in-out text-balance ",
                                 component.href.includes(currentPage) &&
+                                  currentPage !== "" &&
                                   "bg-background"
                               )}>
                               {component.description}
@@ -286,6 +287,7 @@ NavBarProps) {
                               className={cn(
                                 "cursor-pointer  transition-colors duration-200 ease-in-out text-balance",
                                 component.href.includes(currentPage) &&
+                                  currentPage !== "" &&
                                   "bg-background"
                               )}>
                               {component.description}
