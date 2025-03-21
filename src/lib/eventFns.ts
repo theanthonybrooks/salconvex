@@ -11,14 +11,18 @@ export const getCallTypeLabel = (callType: CallType): string => {
 }
 
 export const getEventTypeLabel = (
-  eventType: EventType | [EventType, EventType]
+  eventType: EventType | [EventType, EventType] | null
 ): string => {
+  if (!eventType) return ""
+
   if (Array.isArray(eventType)) {
     return eventType
+      .filter((type): type is Exclude<EventType, null> => !!type)
       .map((type) => EVENT_TYPE_LABELS[type] ?? "Other")
       .join(" & ")
   }
-  return EVENT_TYPE_LABELS[eventType] ?? "Other"
+
+  return EVENT_TYPE_LABELS[eventType] ?? ""
 }
 
 export const getEventCategoryLabel = (eventCategory: EventCategory): string =>

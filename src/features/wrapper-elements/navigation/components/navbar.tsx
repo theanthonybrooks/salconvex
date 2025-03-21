@@ -47,7 +47,6 @@ NavBarProps) {
   // })
 
   const currentPage = pathname.split("/")[1]
-  console.log("currentPage", currentPage)
 
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -237,7 +236,7 @@ NavBarProps) {
                         className={cn(
                           "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
                           isActiveResources &&
-                            "border-foreground/30 bg-salPink/50 hover:bg-salPink/60"
+                            "border-foreground/20 bg-salYellowDark/30 hover:bg-salYellowDark/50 hover:border-foreground/40"
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
@@ -254,7 +253,7 @@ NavBarProps) {
                               href={component.href}
                               className={cn(
                                 "cursor-pointer  transition-colors duration-200 ease-in-out text-balance ",
-                                currentPage === component.href &&
+                                component.href.includes(currentPage) &&
                                   "bg-background"
                               )}>
                               {component.description}
@@ -269,7 +268,7 @@ NavBarProps) {
                         className={cn(
                           "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
                           isActiveTheList &&
-                            "border-foreground/30 bg-salPink/50 hover:bg-salPink/60"
+                            "border-foreground/20 bg-salYellowDark/30 hover:bg-salYellowDark/50 hover:border-foreground/40"
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
@@ -286,7 +285,7 @@ NavBarProps) {
                               href={component.href}
                               className={cn(
                                 "cursor-pointer  transition-colors duration-200 ease-in-out text-balance",
-                                currentPage === component.href &&
+                                component.href.includes(currentPage) &&
                                   "bg-background"
                               )}>
                               {component.description}

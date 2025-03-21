@@ -6,7 +6,7 @@ export type CallType =
   | "Unknown"
   | null
 
-export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth"
+export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth" | null
 export type EventCategory =
   | "event"
   | "project"
@@ -34,9 +34,10 @@ export interface EventData {
 
   location: {
     locale: string | null
-    city: string
-    state: string
-    stateAbbr: string
+    city: string | null
+    state: string | null
+    stateAbbr: string | null
+    region: string | null
     country: string
     countryAbbr: string
     continent: string
@@ -59,15 +60,11 @@ export interface EventData {
   budgetRateUnit: RateUnit
   allInclusive: boolean
 
-  status: "accepted" | "rejected" | "pending"
+  status: "accepted" | "rejected" | "pending" | null
   bookmarked: boolean
   hidden: boolean
   event: {
     name: string
-    location: string
-    dates: string
-    category: string
-    type: string
   }
   tabs: {
     opencall: {

@@ -8,7 +8,7 @@ export const CALL_TYPE_LABELS: Record<Exclude<CallType, null>, string> = {
   Unknown: "Unknown Deadline",
 }
 
-export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+export const EVENT_TYPE_LABELS: Record<Exclude<EventType, null>, string> = {
   gjm: "Graffiti Jam",
   mur: "Mural Festival",
   pup: "Paste Up/Sticker",

@@ -36,6 +36,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         salYellow: "hsl(var(--sal-yellow))",
         salYellowHex: "var(--sal-yellow-hex)",
+        salYellowDark: "hsl(var(--sal-yellow-dark))",
         salProgress: "var(--sal-progress)",
         salPink: "hsl(var(--sal-pink))",
         userIcon: "hsl(var(--user-icon))",

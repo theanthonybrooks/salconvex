@@ -10,15 +10,12 @@ import {
   Ellipsis,
   FileText,
   Folder,
-  Github,
   HelpCircle,
   Home,
   HomeIcon,
-  Instagram,
   LucideIcon,
   Settings,
   Shield,
-  Twitter,
   Upload,
   User,
   XCircle,
@@ -27,6 +24,7 @@ import {
 import { TbBrandPatreon } from "react-icons/tb"
 
 import { JSX } from "react"
+import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
 
 export type MenuProps = {
   id: number
@@ -74,28 +72,30 @@ export const LANDING_PAGE_MENU: MenuProps[] = [
 ]
 
 export const FOOTER_LINKS: Links = {
-  product: [
-    { name: "Features", href: "/features" },
-    { name: "Documentation", href: "/docs" },
-    { name: "Examples", href: "/examples" },
-    { name: "Pricing", href: "/pricing" },
-  ],
-  company: [
+  about: [
     { name: "About", href: "/about" },
     { name: "Changelog", href: "/changelog" },
-    { name: "Careers", href: "/careers" },
+    { name: "Collaborations", href: "/collaborators" },
+    // { name: "Careers", href: "/careers" },
     { name: "Contact", href: "/contact" },
+  ],
+  subscription: [
+    { name: "Features", href: "/features" },
+    // { name: "Documentation", href: "/docs" },
+    // { name: "Examples", href: "/examples" },
+    { name: "Pricing", href: "/pricing" },
   ],
   legal: [
     { name: "Privacy", href: "/privacy" },
     { name: "Terms", href: "/terms" },
-    { name: "License", href: "/license" },
+    // { name: "License", href: "/license" },
   ],
   social: [
-    { name: "Twitter", href: "https://twitter.com/theanthonybrooks" },
-    { name: "Instagram", href: "https://www.instagram.com/theanthonybrooks" },
-    { name: "LinkedIn", href: "https://www.linkedin.com/in/theanthonybrooks" },
-    { name: "GitHub", href: "https://github.com/theanthonybrooks" },
+    { name: "Instagram", href: "https://www.instagram.com/thestreetartlist" },
+    { name: "Threads", href: "https://threads.net/thestreetartlist" },
+    { name: "Facebook", href: "https://facebook.com/thestreetartlist" },
+    // { name: "LinkedIn", href: "https://www.linkedin.com/in/thestreetartlist" },
+    // { name: "GitHub", href: "https://github.com/thestreetartlist" },
   ],
 }
 
@@ -119,19 +119,19 @@ export const getGridColsClass = (numColumns: number): string => {
 
 export const SOCIAL_MEDIA_LINKS: SocialProps[] = [
   {
-    label: "Twitter",
-    icon: <Twitter className='h-5 w-5' />,
-    path: "https://twitter.com/theanthonybrooks",
+    label: "Threads",
+    icon: <FaThreads className='h-5 w-5' />,
+    path: "https://threads.net/thestreetartlist",
   },
   {
     label: "Instagram",
-    icon: <Instagram className='h-5 w-5' />,
-    path: "https://www.instagram.com/theanthonybrooks",
+    icon: <FaInstagram className='h-5 w-5' />,
+    path: "https://www.instagram.com/thestreetartlist",
   },
   {
-    label: "GitHub",
-    icon: <Github className='h-5 w-5' />,
-    path: "https://github.com/theanthonybrooks",
+    label: "Facebook",
+    icon: <FaFacebookF className='h-5 w-5' />,
+    path: "https://facebook.com/thestreetartlist",
   },
   {
     label: "Patreon",

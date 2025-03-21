@@ -11,7 +11,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { EventData } from "@/types/event"
-import { CircleDollarSignIcon } from "lucide-react"
+import { CheckCircleIcon, CircleDollarSignIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6"
@@ -22,6 +22,7 @@ const EventCardPreview = (props: EventData) => {
   const {
     id,
     logo,
+    status,
     callFormat,
     callType,
     eventCategory,
@@ -41,11 +42,11 @@ const EventCardPreview = (props: EventData) => {
     bookmarked,
   } = props
 
-  const { locale, city, stateAbbr, countryAbbr } = location
+  const { locale, city, stateAbbr, country, countryAbbr } = location
 
-  const locationString = `${
-    locale ? `${locale}, ` : ""
-  }${city}, ${stateAbbr}, ${countryAbbr}`
+  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
+    stateAbbr ? stateAbbr + ", " : ""
+  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`
 
   return (
     <Card className='bg-white/40 border-foreground/20 grid grid-cols-[75px_minmax(0,auto)_50px] min-w-[340px]  w-[90vw] max-w-[400px] gap-x-3 rounded-3xl mb-10 first:mt-6 px-1 py-2'>
@@ -53,7 +54,16 @@ const EventCardPreview = (props: EventData) => {
         <Image
           src={logo}
           alt='Event Logo'
-          className='rounded-full border size-12 border-black'
+          className={cn(
+            "rounded-full  border border-black size-12 ",
+            status === "accepted"
+              ? "ring-4  ring-offset-1 ring-emerald-500"
+              : status === "rejected"
+              ? "ring-4  ring-offset-1 ring-red-500"
+              : status === "pending"
+              ? "ring-4 ring-offset-1 ring-foreground/30"
+              : ""
+          )}
           height={48}
           width={48}
         />
@@ -85,7 +95,7 @@ const EventCardPreview = (props: EventData) => {
           </div>
           <p className='text-sm flex items-center gap-x-1'>
             {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
-            <span className='font-semibold'>Event:</span>
+            <span className='font-semibold'>Dates:</span>
             {formatEventDates(dates?.eventStart || "", dates.eventEnd, true)}
           </p>
           <p
@@ -139,14 +149,28 @@ const EventCardPreview = (props: EventData) => {
           size='lg'
           className='bg-white/60'
           onClick={() => router.push(`/thelist/event/${id}`)}>
-          {openCall ? "Apply" : "View more"}
+          {status === null && openCall
+            ? "Apply"
+            : status !== null
+            ? `Applied: ${
+                status === "accepted"
+                  ? "Accepted"
+                  : status === "rejected"
+                  ? "Rejected"
+                  : "Pending"
+              }`
+            : "View more"}
           {/* //note: this should also have "View more" for events/projects without active open call */}
         </Button>
       </div>
       <div className='flex flex-col items-center justify-between pt-5 pb-5 pr-2'>
-        <CircleDollarSignIcon
-          className={cn("h-6 w-6 text-red-600", !appFee && "opacity-0")}
-        />
+        {status === null ? (
+          <CircleDollarSignIcon
+            className={cn("h-6 w-6 text-red-600", !appFee && "opacity-0")}
+          />
+        ) : (
+          <CheckCircleIcon className={cn("h-6 w-6 text-emerald-600")} />
+        )}
         <div className='flex gap-x-2 items-center justify-center'>
           {/* <EyeOff className='h-6 w-6' /> //NOTE: Move this to the detailed card view */}
           {bookmarked ? (

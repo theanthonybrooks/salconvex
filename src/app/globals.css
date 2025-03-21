@@ -23,6 +23,7 @@ body,
 @layer base {
   :root {
     --sal-yellow: 50 100% 72%; /* #ffe770 */
+    --sal-yellow-dark: 50 70% 52%; /* #ffe770 */
     /* --sal-yellow-old: hsl(50 100% 72%); /* #ffe770 */
     --sal-pink: 303 100% 82%; /* #ff7bff #f4a9f6 */
     --sal-pink-hex: #f4a9f6;

@@ -79,7 +79,6 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           ? profile.name
           : profile.firstName + " " + profile.lastName,
         email: profile.email,
-        emailVerificationTime: null,
         createdAt: Date.now(),
         password: hashedPassword,
         firstName: profile.firstName,

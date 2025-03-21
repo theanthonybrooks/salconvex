@@ -30,7 +30,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { Label } from "@/components/ui/label"
 import CloseBtn from "@/features/auth/components/close-btn"
 import SmileySvg from "@/features/auth/components/smiley-svg"
 import SpeechBubble from "@/features/auth/components/speech-bubble"
@@ -89,7 +88,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       organizationName: "",
       name: "",
       source: "",
-      accountType: [],
+      accountType: ["artist"],
     },
     mode: "onBlur",
   })
@@ -450,23 +449,34 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   )}
                 />
 
-                <div className='w-full flex flex-col gap-y-3'>
-                  <Label className='font-bold'>Account Type</Label>
+                <FormField
+                  control={form.control}
+                  name='accountType'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='font-bold'>Account Type</FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          options={options}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                            setSelectedOption(value)
+                          }}
+                          defaultValue={field.value}
+                          placeholder='Select account type (select all that apply)'
+                          variant='basic'
+                          maxCount={3}
+                          height={8}
+                          hasSearch={false}
+                          selectAll={false}
+                          tabIndex={step === "signUp" ? 6 : -1}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <MultiSelect
-                    options={options}
-                    onValueChange={(value) => setSelectedOption(value)}
-                    defaultValue={["artist"]}
-                    // lockedValue={["artist"]}
-                    placeholder='Select account type (select all that apply)'
-                    variant='basic'
-                    maxCount={3}
-                    height={8}
-                    hasSearch={false}
-                    selectAll={false}
-                    tabIndex={step === "signUp" ? 6 : -1}
-                  />
-                </div>
                 {selectedOption.includes("artist") && (
                   <FormField
                     control={form.control}

@@ -48,6 +48,7 @@ import {
   getEventCategoryLabel,
   getEventTypeLabel,
 } from "@/lib/eventFns"
+import { motion } from "framer-motion"
 import Image from "next/image"
 import { useState } from "react"
 
@@ -81,7 +82,7 @@ const EventCardDetail = (props: EventData) => {
     // organizer,
   } = props
 
-  const { locale, city, stateAbbr, countryAbbr } = location
+  const { locale, city, stateAbbr, country, countryAbbr } = location
   const {
     designFee,
     accommodation,
@@ -94,10 +95,11 @@ const EventCardDetail = (props: EventData) => {
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
+  const [activeTab, setActiveTab] = useState(openCall ? "opencall" : "event")
 
-  const locationString = `${
-    locale ? `${locale}, ` : ""
-  }${city}, ${stateAbbr}, ${countryAbbr}`
+  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
+    stateAbbr ? stateAbbr + ", " : ""
+  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`
 
   const icsLink =
     dates.eventStart && dates.eventEnd
@@ -115,7 +117,7 @@ const EventCardDetail = (props: EventData) => {
 
   return (
     <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] w-[90vw] min-w-[340px] grid grid-cols-[75px_auto] gap-x-3 '>
-      {status !== undefined && (
+      {status !== null && (
         <span
           className={cn(
             "col-start-2 text-xs bg-white/70 px-2 py-1 rounded-full w-fit border-2 border-foreground/30",
@@ -159,7 +161,7 @@ const EventCardDetail = (props: EventData) => {
           <div className='flex flex-col space-y-4 items-center'>
             {isBookmarked ? (
               <FaBookmark
-                className='size-8 text-emerald-600 mt-3'
+                className='size-8 text-red-500 mt-3'
                 onClick={() => setIsBookmarked(false)}
               />
             ) : (
@@ -183,7 +185,10 @@ const EventCardDetail = (props: EventData) => {
 
             <p className='text-sm inline-flex items-end gap-x-1'>
               {locationString}
-              <MapPin />
+              <MapPin
+                onClick={() => setActiveTab("event")}
+                className='cursor-pointer hover:scale-105 transition-transform duration-150'
+              />
             </p>
           </div>
           <div className='flex flex-col justify-between gap-y-1'>
@@ -220,22 +225,36 @@ const EventCardDetail = (props: EventData) => {
       </div>
       <div className='col-span-full overflow-hidden w-full flex flex-col gap-y-3 justify-start items-start'>
         <Tabs
-          defaultValue={openCall ? "opencall" : "event"}
+          onValueChange={(value) => setActiveTab(value)}
+          value={activeTab}
+          defaultValue={activeTab}
           className='w-full flex flex-col justify-center'>
-          <TabsList className='w-full  raymond bg-white/60 justify-around h-12'>
-            {openCall && (
-              <TabsTrigger className='h-10' value='opencall'>
-                Open Call
+          <TabsList className='relative w-full bg-white/60 justify-around h-12 flex rounded-xl overflow-hidden'>
+            {["opencall", "event", "organizer"].map((tab) => (
+              <TabsTrigger
+                key={tab}
+                value={tab}
+                className={cn(
+                  "relative z-10 h-10 px-4 flex items-center justify-center w-full text-sm font-medium",
+                  activeTab === tab ? "text-black" : "text-muted-foreground"
+                )}>
+                {activeTab === tab && (
+                  <motion.div
+                    layoutId='tab-bg'
+                    className='absolute inset-0 bg-background shadow-sm rounded-md z-0'
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className='relative z-10'>
+                  {tab === "opencall" && "Open Call"}
+                  {tab === "event" &&
+                    `${getEventCategoryLabel(eventCategory)} Details`}
+                  {tab === "organizer" && "Organizer"}
+                </span>
               </TabsTrigger>
-            )}
-            <TabsTrigger className='h-10' value='event'>
-              {/* Project Details note-to-self: this should change automatically depending on the oc type */}
-              {getEventCategoryLabel(eventCategory)} Details
-            </TabsTrigger>
-            <TabsTrigger className='h-10' value='organizer'>
-              Organizer
-            </TabsTrigger>
+            ))}
           </TabsList>
+
           <TabsContent value='opencall'>
             <Card className=' w-full p-5 bg-white/60 border-foreground/20 rounded-xl'>
               <Accordion defaultValue='item-1'>
@@ -541,7 +560,6 @@ const EventCardDetail = (props: EventData) => {
                         <li key={index} className='py-2'>
                           <a
                             href={document.href}
-                            target='_blank'
                             className='flex items-center gap-x-2'>
                             {document.title}
                             <Download className='size-5 hover:scale-110' />
@@ -570,8 +588,17 @@ const EventCardDetail = (props: EventData) => {
                 <Button
                   variant='salWithShadowHidden'
                   size='lg'
-                  className='rounded-r-none border-r w-full min-w-[100px]'>
-                  Apply
+                  className='rounded-r-none border-r w-full min-w-[100px]'
+                  disabled={status !== null}>
+                  {status === null
+                    ? "Apply"
+                    : `Application: ${
+                        status === "accepted"
+                          ? "Accepted"
+                          : status === "rejected"
+                          ? "Rejected"
+                          : "Pending"
+                      }`}
                 </Button>
                 <Button
                   variant='salWithShadowHidden'
@@ -579,7 +606,7 @@ const EventCardDetail = (props: EventData) => {
                   className='rounded-none border-x w-fit sm:px-3 px-3'
                   onClick={() => setIsBookmarked(!isBookmarked)}>
                   {isBookmarked ? (
-                    <FaBookmark className='size-6 text-emerald-600 ' />
+                    <FaBookmark className='size-6 text-red-500 ' />
                   ) : (
                     <FaRegBookmark className='size-6 ' />
                   )}
