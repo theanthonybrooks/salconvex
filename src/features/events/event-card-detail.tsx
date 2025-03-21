@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { BookmarkFilledIcon, BookmarkIcon } from "@radix-ui/react-icons"
 import {
   CalendarClockIcon,
+  Download,
   Eye,
   EyeOff,
   Globe,
@@ -48,6 +48,7 @@ import {
   getEventCategoryLabel,
 } from "@/lib/eventFns"
 import Image from "next/image"
+import { useState } from "react"
 
 const EventCardDetail = (props: EventData) => {
   const {
@@ -72,6 +73,7 @@ const EventCardDetail = (props: EventData) => {
     appFee,
     status,
     bookmarked,
+
     hidden,
     event,
     tabs,
@@ -88,6 +90,9 @@ const EventCardDetail = (props: EventData) => {
     equipment,
     other,
   } = tabs.opencall.compensation
+
+  const [isBookmarked, setIsBookmarked] = useState(bookmarked)
+  const [isHidden, setIsHidden] = useState(hidden)
 
   const locationString = `${
     locale ? `${locale}, ` : ""
@@ -151,12 +156,23 @@ const EventCardDetail = (props: EventData) => {
           />
 
           <div className='flex flex-col space-y-4 items-center'>
-            {bookmarked ? (
-              <FaBookmark className='size-8 text-emerald-600 mt-3' />
+            {isBookmarked ? (
+              <FaBookmark
+                className='size-8 text-emerald-600 mt-3'
+                onClick={() => setIsBookmarked(false)}
+              />
             ) : (
-              <FaRegBookmark className='size-8 mt-3' />
+              <FaRegBookmark
+                className='size-8 mt-3'
+                onClick={() => setIsBookmarked(true)}
+              />
             )}
-            {hidden && <EyeOff className='h-6 w-6' />}
+            {isHidden && (
+              <EyeOff
+                className='h-6 w-6'
+                onClick={() => setIsHidden(!isHidden)}
+              />
+            )}
           </div>
         </div>
 
@@ -378,7 +394,7 @@ const EventCardDetail = (props: EventData) => {
                               budgetRate,
                               budgetRateUnit,
                               currency,
-                              allInclusive
+                              true
                             )
                           : "No Info"}
                       </p>
@@ -460,9 +476,9 @@ const EventCardDetail = (props: EventData) => {
                             )}
                           </p>
                         </div>
-                        <div className='flex justify-between items-center border-b border-dashed border-foreground/20'>
+                        <div className='flex flex-col justify-between items-start gap-y-2 '>
                           <p className='font-medium'>Other:</p>
-                          <p className='text-right'>
+                          <p>
                             {other !== null ? (
                               other
                             ) : (
@@ -484,20 +500,31 @@ const EventCardDetail = (props: EventData) => {
                   <AccordionContent>
                     <div className='flex flex-col space-y-3  pb-3 mb-4'>
                       <ol className='list-decimal list-inside px-4'>
-                        <li>Must be a US citizen or permanent resident</li>
-                        <li>Must be at least 18 years old</li>
-                        <li>3 years of experience in public art</li>
-                        <li>Artist statement</li>
-                        <li>Up to 10 photos of recent works</li>
-                        <li>Google Form</li>
+                        {tabs.opencall.requirements.map(
+                          (requirement, index) => (
+                            <li key={index}>{requirement}</li>
+                          )
+                        )}
+
                         {/* <li>Must have liability insurance</li> */
-                        /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
+                        /* TODO: this is something that could/should be later. These sort of requirements*/}
                       </ol>
-                      <p>
-                        Send applications to{" "}
-                        <a href='mailto:info@thestreetartlist.com'>
-                          person@thestreetartlist.com
-                        </a>{" "}
+                      <p className='text-sm'>
+                        {tabs.opencall.requirementsMore.map(
+                          (requirement, index) => (
+                            <span key={index} className='py-1 mr-1'>
+                              {requirement}
+                            </span>
+                          )
+                        )}
+                      </p>
+                      <p className=''>
+                        Send applications to
+                        <a
+                          href={`mailto:${tabs.opencall.requirementDestination}?subject=${event.name} Open Call`}
+                          className='mx-1 underline'>
+                          {tabs.opencall.requirementDestination}
+                        </a>
                         and feel free to reach out with any questions
                       </p>
                     </div>
@@ -505,14 +532,34 @@ const EventCardDetail = (props: EventData) => {
                 </AccordionItem>
 
                 <AccordionItem value='item-4'>
+                  <AccordionTrigger title='Documents:' />
+                  <AccordionContent>
+                    <ol className='list-decimal list-outside px-4 pl-6'>
+                      {tabs.opencall.documents.map((document, index) => (
+                        <li key={index} className='py-2'>
+                          <a
+                            href={document.href}
+                            target='_blank'
+                            className='flex items-center gap-x-2'>
+                            {document.title}
+                            <Download className='size-5 hover:scale-110' />
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value='item-5'>
                   <AccordionTrigger title='Other info:' />
                   <AccordionContent>
                     <div className='grid grid-cols-[1fr_auto]  border-foreground/20 pb-3 mb-4'>
-                      <p className='list-decimal list-inside px-4'>
-                        Only one application per artist; artist teams should
-                        only submit one application. Yada yada yada. More more
-                        more details.
-                      </p>
+                      <ol className='list-decimal list-inside px-4'>
+                        {tabs.opencall.otherInfo.map((info, index) => (
+                          <li key={index} className='py-1'>
+                            {info}
+                          </li>
+                        ))}
+                      </ol>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -527,8 +574,9 @@ const EventCardDetail = (props: EventData) => {
                 <Button
                   variant='salWithShadowHidden'
                   size='lg'
-                  className='rounded-none border-x w-fit sm:px-3 px-3'>
-                  {bookmarked ? (
+                  className='rounded-none border-x w-fit sm:px-3 px-3'
+                  onClick={() => setIsBookmarked(!isBookmarked)}>
+                  {isBookmarked ? (
                     <FaBookmark className='size-6 text-emerald-600 ' />
                   ) : (
                     <FaRegBookmark className='size-6 ' />
@@ -537,11 +585,12 @@ const EventCardDetail = (props: EventData) => {
                 <Button
                   variant='salWithShadowHidden'
                   size='lg'
-                  className='rounded-l-none border-l w-fit sm:px-2 px-2'>
-                  {hidden ? (
-                    <EyeOff height={24} width={24} className='text-red-500' />
+                  className='rounded-l-none border-l w-fit sm:px-2 px-2'
+                  onClick={() => setIsHidden(!isHidden)}>
+                  {isHidden ? (
+                    <EyeOff className='size-8 text-red-500' />
                   ) : (
-                    <Eye height={32} width={32} />
+                    <Eye className='size-8' />
                   )}
                 </Button>
               </div>
@@ -612,34 +661,6 @@ const EventCardDetail = (props: EventData) => {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              <div className='col-span-full mt-4 flex items-center justify-center px-4'>
-                <Button
-                  variant='salWithShadowHidden'
-                  size='lg'
-                  className='rounded-r-none border-r w-full min-w-[100px]'>
-                  Apply
-                </Button>
-                <Button
-                  variant='salWithShadowHidden'
-                  size='lg'
-                  className='rounded-none border-x w-fit sm:px-3 px-3'>
-                  {bookmarked ? (
-                    <BookmarkFilledIcon className='text-red-500 size-6' />
-                  ) : (
-                    <BookmarkIcon height={32} width={32} />
-                  )}
-                </Button>
-                <Button
-                  variant='salWithShadowHidden'
-                  size='lg'
-                  className='rounded-l-none border-l w-fit sm:px-2 px-2'>
-                  {hidden ? (
-                    <EyeOff height={24} width={24} className='text-red-500' />
-                  ) : (
-                    <Eye height={32} width={32} />
-                  )}
-                </Button>
-              </div>
             </Card>
           </TabsContent>
           <TabsContent value='organizer'>

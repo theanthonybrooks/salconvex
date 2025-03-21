@@ -8,7 +8,7 @@ export const mockEventData: EventData[] = [
     //User values ^
 
     id: 1,
-    logo: "https://example.com/logo1.png",
+    logo: "/1.jpg",
     openCall: true,
     appFee: 0,
     callFormat: "RFQ",
@@ -61,7 +61,8 @@ export const mockEventData: EventData[] = [
           travelCosts: "Up to $800",
           materials: null,
           equipment: "Lift/scaffolding included",
-          other: "Artist networking events and panel discussions",
+          other:
+            "Artist networking events and panel discussions. Yada yada. Things that will be offered and things that will be desired.",
         },
         requirements: [
           "Must submit portfolio with 5-10 works",
@@ -69,6 +70,30 @@ export const mockEventData: EventData[] = [
           "Artist statement",
           "Proposal for the mural concept",
           "Signed liability waiver",
+          "Minimum 3 years of mural experience",
+          "Artist statement",
+          "Proposal for the mural concept",
+          "Signed liability waiver",
+        ],
+        requirementsMore: [
+          "Applications must be submitted by March 31st at 11:59pm CET.",
+          "Any late applications will not be considered.",
+        ],
+        requirementDestination: "info@thestreetartlist.com",
+        documents: [
+          {
+            title: "Mural Project RFQ PDF",
+            href: "https://thestreetartlist.com/assets/images/mural-application-form.pdf",
+          },
+          {
+            title: "Mural Application Form",
+            href: "https://thestreetartlist.com/assets/images/mural-application-form.pdf",
+          },
+        ],
+        otherInfo: [
+          "Only one application per artist",
+          "Artist teams should only submit one application",
+          "Painting may be moved to a later date if the artist is unable to paint on the day of the event or if the weather is not suitable for painting",
         ],
       },
       event: {

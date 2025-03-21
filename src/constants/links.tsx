@@ -20,6 +20,7 @@ import {
   Shield,
   Twitter,
   Upload,
+  User,
   XCircle,
 } from "lucide-react"
 
@@ -176,11 +177,15 @@ export const dashboardNavItems: DashNavItem[] = [
     label: "Settings",
     href: "/dashboard/account/settings",
     icon: Settings,
-    subsection: true,
+    section: true,
     sectionCat: "account",
-    desc: "Customize preferences",
+    sectionIcon: User,
+    sectionHead: true,
+    heading: "Account",
+    desc: "Manage your profile",
     sub: ["active", "trialing", "admin"],
   },
+
   {
     label: "Billing",
     href: "/dashboard/account/billing",

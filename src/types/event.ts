@@ -81,6 +81,13 @@ export interface EventData {
         other: string | null
       }
       requirements: string[]
+      requirementsMore: string[]
+      requirementDestination: string
+      documents: {
+        title: string
+        href: string
+      }[]
+      otherInfo: string[]
     }
     event: {
       location: {
