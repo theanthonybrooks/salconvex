@@ -148,112 +148,85 @@ export const CommandMenuCustom = <T extends CommandItem>({
     return acc
   }, {})
 
-  useEffect(() => {
-    const input = inputRef.current
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-
-    if (!input || !isIOS) return
-
-    const handleFocus = () => {
-      window.scrollTo(0, 0)
-      document.body.scrollTop = 0
-    }
-
-    const handleBlur = () => {
-      window.requestAnimationFrame(() => {
-        document.body.style.transform = "translateY(1px)"
-        setTimeout(() => {
-          document.body.style.transform = ""
-        }, 0)
-      })
-    }
-
-    input.addEventListener("focus", handleFocus)
-    input.addEventListener("blur", handleBlur)
-
-    return () => {
-      input.removeEventListener("focus", handleFocus)
-      input.removeEventListener("blur", handleBlur)
-    }
-  }, [])
-
   return isMobile ? (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className='relative pt-4 pb-6 z-[9999] min-h-[750px] h-[750px] max-h-[90dvh] overflow-hidden '>
-        <X
-          className='size-7 absolute right-4 top-4 text-stone-600 hover:text-red-600'
-          onClick={() => setOpen(false)}
-        />
-        <DrawerHeader>
-          <DrawerTitle className='sr-only'>{title}</DrawerTitle>
-        </DrawerHeader>
+      <DrawerContent
+        setOpen={setOpen}
+        className='fixed  z-top  h-[90vh] max-h-[90%] '>
+        <div className='relative h-full w-full'>
+          <div className=' pt-4 pb-6  w-full h-full flex flex-col  overflow-hidden rounded-t-2xl'>
+            <DrawerHeader>
+              <DrawerTitle className='sr-only'>{title}</DrawerTitle>
+            </DrawerHeader>
 
-        <Command shouldFilter={false} className='flex flex-col h-full'>
-          <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6'>
-            <Command.Input
-              ref={inputRef}
-              value={value}
-              onValueChange={handleValueChange}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }
-              }}
-              placeholder={placeholder}
-              className='relative z-10 w-full p-3 pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden bg-background focus:bg-card'
-            />
-            {value.length > 0 && (
-              <button
-                onClick={() => {
-                  setValue("")
-                  setSearch("")
-                  inputRef.current?.focus()
-                }}
-                className='absolute right-8 text-stone-400 hover:text-stone-600 transition-opacity z-20'>
-                <CircleX className='size-7' />
-              </button>
-            )}
+            <Command shouldFilter={false} className='flex flex-col h-full'>
+              <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6'>
+                <Command.Input
+                  ref={inputRef}
+                  value={value}
+                  onValueChange={handleValueChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }
+                  }}
+                  placeholder={placeholder}
+                  className='relative z-10 w-full p-3 mb-3 pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden bg-background focus:bg-card'
+                />
+                {value.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setValue("")
+                      setSearch("")
+                      inputRef.current?.focus()
+                    }}
+                    className='absolute right-8 text-stone-400 hover:text-stone-600 transition-opacity z-20'>
+                    <CircleX className='size-7' />
+                  </button>
+                )}
+              </div>
+
+              <Command.List className='overflow-y-auto flex-1 px-6 py-2'>
+                {Object.keys(groupedItems).length === 0 ? (
+                  <Command.Empty className='py-8 text-base text-center'>
+                    No results found for{" "}
+                    <span className='text-violet-500 italic'>
+                      &quot;{value}&quot;
+                    </span>
+                  </Command.Empty>
+                ) : (
+                  Object.entries(groupedItems).map(([groupKey, groupItems]) => (
+                    <Command.Group
+                      key={groupKey}
+                      heading={groupKey.toUpperCase()}
+                      className='mb-5 text-base text-stone-400 border-t-1.5 border-black/20 first:border-t-0 last:mb-10 pt-2'>
+                      {groupItems.map((item) => (
+                        <Command.Item
+                          key={item.path}
+                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900'
+                          onMouseEnter={() => setHoveredItem(item.path)}
+                          onMouseLeave={() => setHoveredItem(null)}
+                          onSelect={() => {
+                            setOpen(false)
+                            router.push(item.path)
+                          }}>
+                          {item.icon && <item.icon className='h-4 w-4' />}
+                          <Link
+                            href={item.path}
+                            prefetch={true}
+                            onClick={handleLinkClick}>
+                            <span>{item.title}</span>
+                          </Link>
+                        </Command.Item>
+                      ))}
+                    </Command.Group>
+                  ))
+                )}
+              </Command.List>
+            </Command>
           </div>
-
-          <Command.List className='overflow-y-auto flex-1 px-6 py-2'>
-            {Object.keys(groupedItems).length === 0 ? (
-              <Command.Empty className='py-8 text-base text-center'>
-                No results found for{" "}
-                <span className='text-violet-500 italic'>
-                  &quot;{value}&quot;
-                </span>
-              </Command.Empty>
-            ) : (
-              Object.entries(groupedItems).map(([groupKey, groupItems]) => (
-                <Command.Group
-                  key={groupKey}
-                  heading={groupKey.toUpperCase()}
-                  className='mb-5 text-base text-stone-400 border-t-1.5 border-black/20 first:border-t-0 last:mb-10 pt-2'>
-                  {groupItems.map((item) => (
-                    <Command.Item
-                      key={item.path}
-                      className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900'
-                      onMouseEnter={() => setHoveredItem(item.path)}
-                      onMouseLeave={() => setHoveredItem(null)}
-                      onSelect={() => {
-                        setOpen(false)
-                        router.push(item.path)
-                      }}>
-                      {item.icon && <item.icon className='h-4 w-4' />}
-                      <Link
-                        href={item.path}
-                        prefetch={true}
-                        onClick={handleLinkClick}>
-                        <span>{item.title}</span>
-                      </Link>
-                    </Command.Item>
-                  ))}
-                </Command.Group>
-              ))
-            )}
-          </Command.List>
-        </Command>
+        </div>
       </DrawerContent>
     </Drawer>
   ) : (

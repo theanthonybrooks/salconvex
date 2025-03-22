@@ -4,6 +4,12 @@ import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
+
+interface DrawerContentProps
+  extends React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> {
+  setOpen: (open: boolean) => void
+}
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -36,18 +42,24 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DrawerContentProps
+>(({ setOpen, className, children, ...props }, ref) => (
   <DrawerPortal>
     <DrawerOverlay />
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-3xl border bg-background",
         className
       )}
       {...props}>
-      <div className='mx-auto mt-4 h-1 w-25 rounded-full bg-foreground' />
+      <div className='relative flex items-center justify-center py-2'>
+        <div className='mx-auto mt-4 h-1 w-25 rounded-full bg-foreground' />
+        <X
+          className='size-7 absolute right-4 top-4 text-stone-600 hover:text-red-600'
+          onClick={() => setOpen(false)}
+        />
+      </div>
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
