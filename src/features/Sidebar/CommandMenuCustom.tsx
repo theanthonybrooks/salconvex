@@ -150,7 +150,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
 
   return isMobile ? (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className='relative pt-4 pb-6 z-[9999] h-[90dvh] max-h-[90dvh] overflow-hidden '>
+      <DrawerContent className='relative pt-4 pb-6 z-[9999] h-[90vh] max-h-[90vh] overflow-hidden '>
         <X
           className='size-7 absolute right-4 top-4 text-stone-600 hover:text-red-600'
           onClick={() => setOpen(false)}

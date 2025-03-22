@@ -349,15 +349,12 @@ const FullPageNav = ({
                 variants={mobileImageVariants}
                 animate={isOpen}
                 transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                className={cn(
-                  "md:hidden absolute left-5 top-5",
-                  isDashboard && "top-2.5 "
-                )}>
+                className={cn("md:hidden absolute left-5 top-5")}>
                 <Image
                   src='/sitelogo.svg'
                   alt='The Street Art List'
-                  width={isScrolled ? 40 : 60}
-                  height={isScrolled ? 40 : 60}
+                  width={isScrolled || isDashboard ? 40 : 60}
+                  height={isScrolled || isDashboard ? 40 : 60}
                   priority={true}
                 />
               </motion.section>

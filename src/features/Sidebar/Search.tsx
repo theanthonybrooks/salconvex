@@ -61,19 +61,18 @@ export const Search = <T extends CommandItem>({
         </div>
       )}
       {iconOnly && (
-        <div className='flex items-center gap-x-2 '>
-          <FiSearch
-            className='h-8 w-8 cursor-pointer'
-            onClick={() => setOpen(true)}
-          />
+        <div
+          className='flex items-center gap-x-2  '
+          onClick={() => setOpen(true)}>
+          <FiSearch className='h-8 w-8 cursor-pointer' />
           {value && (
-            <p className='flex items-center'>
+            <span className='flex items-center'>
               &quot;
               <p className='whitespace-nowrap overflow-hidden truncate max-w-[15ch]'>
                 {value}
               </p>
               &quot;
-            </p>
+            </span>
           )}
         </div>
       )}
