@@ -99,30 +99,30 @@ NavBarProps) {
   return (
     <>
       {/* ------ Mobile Only circle underlay ----- */}
-      {isMobile && (
-        <motion.div
-          initial={{ boxShadow: "none" }}
-          animate={{
-            height: isScrolled ? "80px" : "100px",
-          }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className='fixed left-0 right-0 top-0 z-19 h-25  '>
-          <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative lg:hidden'>
-            <motion.div
-              initial={{ boxShadow: "none", height: 90, width: 90 }}
-              animate={{
-                boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
-                height: isScrolled ? 70 : 90,
-                width: isScrolled ? 70 : 90,
-              }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className={cn(
-                "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] flex items-center justify-center bg-background rounded-full lg:hidden "
-              )}
-            />
-          </div>
-        </motion.div>
-      )}
+
+      <motion.div
+        initial={{ boxShadow: "none" }}
+        animate={{
+          height: isScrolled ? "80px" : "100px",
+        }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className='fixed left-0 right-0 top-0 z-19 h-25  '>
+        <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative lg:hidden'>
+          <motion.div
+            initial={{ boxShadow: "none", height: 90, width: 90 }}
+            animate={{
+              boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
+              height: isScrolled ? 70 : 90,
+              width: isScrolled ? 70 : 90,
+            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={cn(
+              "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] flex items-center justify-center bg-background rounded-full lg:hidden "
+            )}
+          />
+        </div>
+      </motion.div>
+
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
       <motion.div
         initial={{ boxShadow: "none" }}
@@ -134,45 +134,44 @@ NavBarProps) {
         className='fixed left-0 right-0 top-0 z-20 h-25  border-foreground   bg-background '>
         <div className='mx-auto flex w-screen h-full  items-center px-8 md:grid md:grid-cols-[300px_auto_200px]'>
           {/* Mobile Logo and Navigation */}
-          {isMobile && (
-            <div className='lg:hidden items-center gap-2 flex'>
-              <motion.div
-                initial={{ translateX: -35, translateY: 13 }}
-                animate={{ translateX: isScrolled ? -25 : -35, translateY: 13 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className='absolute bottom-0 left-1/2  z-10'>
-                {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
-                <Link href='/' prefetch={true}>
-                  {/* <span className='font-semibold'>The Street Art List</span> */}
+          <div className='lg:hidden items-center gap-2 flex'>
+            <motion.div
+              initial={{ translateX: -35, translateY: 13 }}
+              animate={{ translateX: isScrolled ? -25 : -35, translateY: 13 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className='absolute bottom-0 left-1/2  z-10'>
+              {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
-                  <motion.img
-                    initial={{ height: 70, width: 70 }}
-                    animate={{
-                      height: isScrolled ? 50 : 70,
-                      width: isScrolled ? 50 : 70,
-                    }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    src='/sitelogo.svg'
-                    alt='The Street Art List'
+              <Link href='/' prefetch={true}>
+                {/* <span className='font-semibold'>The Street Art List</span> */}
 
-                    // className='z-10'
-                  />
-                </Link>
-              </motion.div>
-              <motion.div
-                initial={{ height: 90, width: 90 }}
-                animate={{
-                  height: isScrolled ? 70 : 90,
-                  width: isScrolled ? 70 : 90,
-                }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className={cn(
-                  "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full "
-                )}
-              />
-            </div>
-          )}
+                <motion.img
+                  initial={{ height: 70, width: 70 }}
+                  animate={{
+                    height: isScrolled ? 50 : 70,
+                    width: isScrolled ? 50 : 70,
+                  }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  src='/sitelogo.svg'
+                  alt='The Street Art List'
+
+                  // className='z-10'
+                />
+              </Link>
+            </motion.div>
+            <motion.div
+              initial={{ height: 90, width: 90 }}
+              animate={{
+                height: isScrolled ? 70 : 90,
+                width: isScrolled ? 70 : 90,
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className={cn(
+                "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full "
+              )}
+            />
+          </div>
 
           {!isMobile && (
             <>
@@ -352,10 +351,10 @@ NavBarProps) {
           )}
 
           {/* ------ Mobile Right side ------ */}
-          {isMobile && (
-            <div className='flex items-center justify-end w-full  lg:hidden z-20'>
-              {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
-              {/* <Unauthenticated>
+
+          <div className='flex items-center justify-end w-full  lg:hidden z-20'>
+            {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
+            {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>
                 <Button
                   variant='salWithShadowHidden'
@@ -365,16 +364,15 @@ NavBarProps) {
                 </Button>
               </Link>
             </Unauthenticated> */}
-              <FullPageNav
-                // userId={userId}
-                isMobile={isMobile}
-                isScrolled={isScrolled}
-                user={user}
-                // userPref={userPref}
-                // subStatus={subStatus}
-              />
-            </div>
-          )}
+            <FullPageNav
+              // userId={userId}
+              isMobile={isMobile}
+              isScrolled={isScrolled}
+              user={user}
+              // userPref={userPref}
+              // subStatus={subStatus}
+            />
+          </div>
         </div>
       </motion.div>
     </>

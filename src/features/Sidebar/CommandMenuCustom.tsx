@@ -152,7 +152,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent
         setOpen={setOpen}
-        className='fixed  z-top  h-[90vh] max-h-[90%] '>
+        className='fixed  z-top  h-[90vh] max-h-[90%] bg-card'>
         <div className='relative h-full w-full'>
           <div className=' pt-4 pb-6  w-full h-full flex flex-col  overflow-hidden rounded-t-2xl'>
             <DrawerHeader>
@@ -160,7 +160,8 @@ export const CommandMenuCustom = <T extends CommandItem>({
             </DrawerHeader>
 
             <Command shouldFilter={false} className='flex flex-col h-full'>
-              <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6'>
+              <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6 pb-3'>
+                <IoSearch className='p-1 text-3xl text-stone-400' />
                 <Command.Input
                   ref={inputRef}
                   value={value}
@@ -172,7 +173,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                     }
                   }}
                   placeholder={placeholder}
-                  className='relative z-10 w-full p-3 mb-3 pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden bg-background focus:bg-card'
+                  className='relative z-10 w-full p-3  pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden'
                 />
                 {value.length > 0 && (
                   <button

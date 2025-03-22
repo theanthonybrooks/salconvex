@@ -74,14 +74,12 @@ export default function NavBar({
       <div className='fixed left-0 right-0 top-0 z-20 h-20  border-foreground  bg-background border-b'>
         <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 pl-6 pr-8 relative'>
           {/* Mobile Logo and Navigation */}
-          {isMobile && (
+          {
             // <div className='lg:hidden items-center gap-2 flex'>
             //   <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[13px] origin-center z-10'>
             //     {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
-
             //     <Link href='/' prefetch={true}>
             //       {/* <span className='font-semibold'>The Street Art List</span> */}
-
             //       <motion.img
             //         initial={{ height: 70, width: 70 }}
             //         animate={{
@@ -91,7 +89,6 @@ export default function NavBar({
             //         transition={{ duration: 0.3, ease: "easeOut" }}
             //         src='/sitelogo.svg'
             //         alt='The Street Art List'
-
             //         // className='z-10'
             //       />
             //     </Link>
@@ -108,21 +105,21 @@ export default function NavBar({
             //     )}
             //   />
             // </div>
-            <Search
-              iconOnly
-              isMobile={isMobile}
-              title={"Search"}
-              source={dashboardNavItems}
-              // groupName={"Heading"}
-              className='mb-5 mx-4'
-              placeholder='Search...'
-            />
-          )}
+          }
+          <Search
+            iconOnly
+            isMobile={isMobile}
+            title={"Search"}
+            source={dashboardNavItems}
+            // groupName={"Heading"}
+            className='mb-5 mx-4 md:hidden'
+            placeholder='Search...'
+          />
 
           {!isMobile && (
             <>
               {/* Desktop Logo & Navigation */}
-              <div className='flex gap-x-2 items-center justify-center'>
+              <div className='hidden md:flex gap-x-2 items-center justify-center'>
                 <Link
                   href='/'
                   className='flex items-center gap-2 overflow-hidden'>

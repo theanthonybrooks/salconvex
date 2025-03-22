@@ -238,18 +238,18 @@ const mobileImageVariants = {
   },
 }
 
-const mobileHeaderVariants = {
-  open: {
-    display: "block",
+// const mobileHeaderVariants = {
+//   open: {
+//     display: "block",
 
-    transition: { duration: 0.75, ease: "easeInOut" },
-  },
-  closed: {
-    display: "none",
+//     transition: { duration: 0.75, ease: "easeInOut" },
+//   },
+//   closed: {
+//     display: "none",
 
-    transition: { duration: 0.3, ease: "easeInOut" },
-  },
-}
+//     transition: { duration: 0.3, ease: "easeInOut" },
+//   },
+// }
 
 const screenOverlayVariants = {
   overlayInitial: {
@@ -350,13 +350,15 @@ const FullPageNav = ({
                 animate={isOpen}
                 transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
                 className={cn("md:hidden absolute left-5 top-5")}>
-                <Image
-                  src='/sitelogo.svg'
-                  alt='The Street Art List'
-                  width={isScrolled || isDashboard ? 40 : 60}
-                  height={isScrolled || isDashboard ? 40 : 60}
-                  priority={true}
-                />
+                <Link href='/'>
+                  <Image
+                    src='/sitelogo.svg'
+                    alt='The Street Art List'
+                    width={isScrolled || isDashboard ? 40 : 60}
+                    height={isScrolled || isDashboard ? 40 : 60}
+                    priority={true}
+                  />
+                </Link>
               </motion.section>
               <ThemeToggle />
             </>
@@ -430,13 +432,32 @@ const FullPageNav = ({
                 ? "grid-rows-[80px_auto]"
                 : "grid-rows-[100px_auto]"
             )}>
-            <motion.section
+            {/* <motion.section
               initial={{ display: "none" }}
               variants={mobileHeaderVariants}
               animate={isOpen}
               transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
               className='w-full border-b-2 border-foreground '
-            />
+            /> */}
+            <AnimatePresence mode='wait'>
+              {isOpen === "open" && (
+                <motion.section
+                  key='border'
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
+                  className='relative w-full'>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    exit={{ width: 0 }}
+                    transition={{ duration: 0.4, ease: [0.83, 0, 0.1, 1] }}
+                    className='absolute bottom-0 right-0 h-[1.5px] bg-foreground'
+                  />
+                </motion.section>
+              )}
+            </AnimatePresence>
 
             <motion.div
               className='flex flex-col justify-start scrollable invis  h-full w-full '
