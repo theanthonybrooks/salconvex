@@ -713,30 +713,26 @@ const EventCardDetail = (props: EventData) => {
             <Card className='w-full max-w-[95vw] p-5 bg-white/60 border-foreground/20 rounded-xl'>
               <Accordion defaultValue='item-1'>
                 <AccordionItem value='item-1'>
-                  <AccordionTrigger
-                    title={`${getEventCategoryLabel(eventCategory)} Location:`}
-                  />
+                  <AccordionTrigger title='Location:' />
 
                   <AccordionContent>
                     <LazyMap
                       latitude={latitude}
                       longitude={longitude}
                       label={event.name}
-                      className='w-full h-[200px] overflow-hidden rounded-xl z-0 mb-2'
+                      className='w-full h-[200px] overflow-hidden rounded-xl z-0 mb-4'
                     />
                     <a
                       href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
-                      className='text-sm font-medium flex items-center gap-x-1 hover:underline underline-offset-2'>
-                      Get directions to {event.name}
-                      <MapIcon className='size-4' />
+                      className='text-sm font-medium flex items-center justify-center gap-x-1 hover:underline underline-offset-2'>
+                      Get directions
+                      <MapIcon className='size-5 md:size-4' />
                     </a>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value='item-2'>
-                  <AccordionTrigger
-                    title={`About the ${getEventCategoryLabel(eventCategory)}:`}
-                  />
+                  <AccordionTrigger title='About:' />
 
                   <AccordionContent>
                     <div className=' flex flex-col space-y-3  pb-3 mb-4'>
@@ -746,9 +742,7 @@ const EventCardDetail = (props: EventData) => {
                 </AccordionItem>
                 {eventTab.links && (
                   <AccordionItem value='item-3'>
-                    <AccordionTrigger
-                      title={`${getEventCategoryLabel(eventCategory)} Links:`}
-                    />
+                    <AccordionTrigger title='Links:' />
 
                     <AccordionContent>
                       <ul className='flex flex-col gap-y-2'>
