@@ -12,6 +12,7 @@ import {
   ConvexAuthNextjsServerProvider,
   convexAuthNextjsToken,
 } from "@convex-dev/auth/nextjs/server"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider"
 import { fetchQuery } from "convex/nextjs"
 import { GeistSans } from "geist/font/sans"
@@ -86,6 +87,7 @@ export default async function RootLayout({
             <ConvexQueryCacheProvider>
               <ThemedProvider userPref={userPref}>
                 {children}
+                <SpeedInsights />
                 <ToastContainer
                   position='top-right'
                   autoClose={5000}
