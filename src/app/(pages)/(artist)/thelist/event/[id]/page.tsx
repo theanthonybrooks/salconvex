@@ -11,7 +11,7 @@ const Event = () => {
   const event = mockEventData.find((e) => e.id === Number(id))
 
   return (
-    <div className='px-6 flex flex-col items-center'>
+    <div className='px-4 flex flex-col items-center'>
       <Link
         href='/thelist'
         className='flex gap-x-2 items-center justify-start py-6 hover:underline underline-offset-2 '>

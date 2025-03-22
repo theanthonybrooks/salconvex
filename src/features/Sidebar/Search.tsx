@@ -61,10 +61,21 @@ export const Search = <T extends CommandItem>({
         </div>
       )}
       {iconOnly && (
-        <FiSearch
-          className='h-8 w-8 cursor-pointer'
-          onClick={() => setOpen(true)}
-        />
+        <div className='flex items-center gap-x-2 '>
+          <FiSearch
+            className='h-8 w-8 cursor-pointer'
+            onClick={() => setOpen(true)}
+          />
+          {value && (
+            <p className='flex items-center'>
+              &quot;
+              <p className='whitespace-nowrap overflow-hidden truncate max-w-[15ch]'>
+                {value}
+              </p>
+              &quot;
+            </p>
+          )}
+        </div>
       )}
 
       {/* Pass props dynamically */}

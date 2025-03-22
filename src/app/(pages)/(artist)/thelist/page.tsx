@@ -3,12 +3,7 @@ import ClientEventList from "@/features/events/event-list-client"
 
 const TheList = () => {
   return (
-    <div className='px-6 flex flex-col items-center '>
-      {/* Map through mockEventData to render EventCardPreview components */}
-      {/* {mockEventData.map((event, index) => (
-        <EventCardPreview key={index} {...event} />
-      ))} */}
-
+    <div className='px-4 flex flex-col items-center max-w-screen'>
       <ClientEventList initialEvents={mockEventData} />
     </div>
   )

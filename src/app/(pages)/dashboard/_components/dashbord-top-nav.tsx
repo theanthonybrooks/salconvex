@@ -115,7 +115,7 @@ export default function NavBar({
               source={dashboardNavItems}
               // groupName={"Heading"}
               className='mb-5 mx-4'
-              placeholder="Find what you're looking for!"
+              placeholder='Search...'
             />
           )}
 
@@ -185,7 +185,7 @@ export default function NavBar({
 
               {/* Right Side */}
               <div className='hidden lg:flex  items-center gap-x-4'>
-                <Bell />
+                <Bell className='size-6 w-full' />
 
                 <Unauthenticated>
                   <Link href='/auth/sign-in' prefetch={true}>
@@ -219,14 +219,18 @@ export default function NavBar({
                 </Button>
               </Link>
             </Unauthenticated> */}
-              <Bell size={32} />
-              <FullPageNav
-                // userId={userId}
-                isScrolled={isScrolled}
-                user={user}
-                // userPref={userPref}
-                // subStatus={subStatus}
-              />
+              <>
+                <Bell className='size-7 w-fit' />
+
+                <FullPageNav
+                  // userId={userId}
+                  isScrolled={isScrolled}
+                  user={user}
+                  isDashboard={true}
+                  // userPref={userPref}
+                  // subStatus={subStatus}
+                />
+              </>
             </div>
           )}
         </div>

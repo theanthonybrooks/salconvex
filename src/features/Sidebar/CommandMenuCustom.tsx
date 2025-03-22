@@ -2,10 +2,16 @@ import { DialogTitle } from "@/components/ui/dialog"
 import { DashIcon } from "@radix-ui/react-icons"
 import { Command } from "cmdk"
 import { AnimatePresence, motion } from "framer-motion"
-import { X } from "lucide-react"
+import { CircleX, X } from "lucide-react"
 import Link from "next/link"
 import { IoSearch } from "react-icons/io5"
 
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
@@ -142,7 +148,82 @@ export const CommandMenuCustom = <T extends CommandItem>({
     return acc
   }, {})
 
-  return (
+  return isMobile ? (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerContent className='relative pt-4 pb-6 z-[9999] h-[90vh] max-h-[90vh] overflow-hidden'>
+        <X
+          className='size-7 absolute right-4 top-4 text-stone-600 hover:text-red-600'
+          onClick={() => setOpen(false)}
+        />
+        <DrawerHeader>
+          <DrawerTitle className='sr-only'>{title}</DrawerTitle>
+        </DrawerHeader>
+
+        <Command shouldFilter={false} className='flex flex-col h-full'>
+          <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6'>
+            <IoSearch className='z-20 p-1 text-3xl text-stone-400' />
+            <Command.Input
+              ref={inputRef}
+              value={value}
+              onValueChange={handleValueChange}
+              placeholder={placeholder}
+              className='relative z-10 w-full p-3 pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden bg-background focus:bg-card'
+            />
+            {value.length > 0 && (
+              <button
+                onClick={() => {
+                  setValue("")
+                  setSearch("")
+                  inputRef.current?.focus()
+                }}
+                className='absolute right-8 text-stone-400 hover:text-stone-600 transition-opacity z-20'>
+                <CircleX className='size-7' />
+              </button>
+            )}
+          </div>
+
+          {/* Scrollable list */}
+          <Command.List className='overflow-y-auto flex-1 px-6 py-2'>
+            {Object.keys(groupedItems).length === 0 ? (
+              <Command.Empty className='py-8 text-base text-center'>
+                No results found for{" "}
+                <span className='text-violet-500 italic'>
+                  &quot;{value}&quot;
+                </span>
+              </Command.Empty>
+            ) : (
+              Object.entries(groupedItems).map(([groupKey, groupItems]) => (
+                <Command.Group
+                  key={groupKey}
+                  heading={groupKey.toUpperCase()}
+                  className='mb-5 text-base text-stone-400 border-t-1.5 border-black/20 first:border-t-0 last:mb-10 pt-2'>
+                  {groupItems.map((item) => (
+                    <Command.Item
+                      key={item.path}
+                      className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900'
+                      onMouseEnter={() => setHoveredItem(item.path)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      onSelect={() => {
+                        setOpen(false)
+                        router.push(item.path)
+                      }}>
+                      {item.icon && <item.icon className='h-4 w-4' />}
+                      <Link
+                        href={item.path}
+                        prefetch={true}
+                        onClick={handleLinkClick}>
+                        <span>{item.title}</span>
+                      </Link>
+                    </Command.Item>
+                  ))}
+                </Command.Group>
+              ))
+            )}
+          </Command.List>
+        </Command>
+      </DrawerContent>
+    </Drawer>
+  ) : (
     <Command.Dialog
       open={open}
       onOpenChange={setOpen}

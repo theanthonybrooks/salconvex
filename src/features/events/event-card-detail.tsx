@@ -147,7 +147,7 @@ const EventCardDetail = (props: EventData) => {
   const hasRate = budgetRate && budgetRate > 0
 
   return (
-    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] w-[95vw] min-w-[340px] grid grid-cols-[75px_auto] gap-x-3 '>
+    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] w-full min-w-[340px] grid grid-cols-[75px_auto] gap-x-3 '>
       {status !== null && (
         <span
           className={cn(

@@ -22,6 +22,8 @@ interface FullPageNavProps {
   isScrolled?: boolean
   user?: User | null
   isMobile?: boolean
+  // className?: string
+  isDashboard?: boolean
   // userPref?: UserPref | null
   // subStatus?: string | undefined
 }
@@ -276,6 +278,7 @@ const FullPageNav = ({
   user,
   isScrolled,
   isMobile = false,
+  isDashboard = false,
 }: FullPageNavProps) => {
   const footerText = footerCRText()
   // const { theme } = useTheme()
@@ -331,29 +334,38 @@ const FullPageNav = ({
       {/* Menu Button + Theme Toggle*/}
       <div
         className={cn(
-          "flex flex-row gap-x-4  items-center  w-full z-20 justify-between"
+          "flex flex-row gap-x-4  items-center  z-20 justify-between"
         )}>
         {/* <ThemeToggle userPref={themePref} /> */}
 
         {/* //NOTE: Add sliding up animation later; will require making a button
           lookalike with two divs/spans inside that move up and down and have an
           overflow of hidden */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          variants={mobileImageVariants}
-          animate={isOpen}
-          transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-          className='md:hidden '>
-          <Image
-            src='/sitelogo.svg'
-            alt='The Street Art List'
-            width={isScrolled ? 40 : 60}
-            height={isScrolled ? 40 : 60}
-            priority={true}
-          />
-        </motion.section>
+        <AnimatePresence>
+          {isOpen === "open" && (
+            <>
+              <motion.section
+                initial={{ opacity: 0 }}
+                variants={mobileImageVariants}
+                animate={isOpen}
+                transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
+                className={cn(
+                  "md:hidden absolute left-5 top-5",
+                  isDashboard && "top-2.5 "
+                )}>
+                <Image
+                  src='/sitelogo.svg'
+                  alt='The Street Art List'
+                  width={isScrolled ? 40 : 60}
+                  height={isScrolled ? 40 : 60}
+                  priority={true}
+                />
+              </motion.section>
+              <ThemeToggle />
+            </>
+          )}
+        </AnimatePresence>
         <div className='flex items-center gap-x-4 '>
-          {isOpen === "open" && <ThemeToggle />}
           <MenuToggle
             menuState={isOpen === "initial" ? "closed" : isOpen}
             setState={setIsOpen}
@@ -392,200 +404,199 @@ const FullPageNav = ({
          *
          *
          * */}
-        {isMobile && isMobile === true && (
+
+        <motion.div
+          id='mobile-menu'
+          key='mobile-menu'
+          className={cn(
+            "xl:hidden top-5 right-5 w-full h-full  fixed  box-border bg-background"
+          )}
+          variants={getMobileMenuVariants(isScrolled)}
+          animate={isOpen}
+          initial='mobileInitial'
+          exit='mobileInitial'
+          // initial={{ width: "4em", height: 30 }}
+        >
           <motion.div
-            id='mobile-menu'
-            key='mobile-menu'
+            initial={{ display: "none" }}
+            animate={
+              isOpen === "open" ? { display: "grid" } : { display: "none" }
+            }
+            transition={{
+              delay: 0.2,
+              duration: 0.75,
+              ease: [0.83, 0, 0.1, 1],
+            }}
             className={cn(
-              "xl:hidden top-5 right-5 w-full h-full  fixed  box-border bg-background"
-            )}
-            variants={getMobileMenuVariants(isScrolled)}
-            animate={isOpen}
-            initial='mobileInitial'
-            exit='mobileInitial'
-            // initial={{ width: "4em", height: 30 }}
-          >
-            <motion.div
+              "grid  grid-cols-1 h-dvh w-screen ",
+              isScrolled || isDashboard
+                ? "grid-rows-[80px_auto]"
+                : "grid-rows-[100px_auto]"
+            )}>
+            <motion.section
               initial={{ display: "none" }}
-              animate={
-                isOpen === "open" ? { display: "grid" } : { display: "none" }
-              }
-              transition={{
-                delay: 0.2,
-                duration: 0.75,
-                ease: [0.83, 0, 0.1, 1],
-              }}
-              className={cn(
-                "grid  grid-cols-1 h-dvh w-screen ",
-                isScrolled ? "grid-rows-[80px_auto]" : "grid-rows-[100px_auto]"
-              )}>
-              <motion.section
-                initial={{ display: "none" }}
-                variants={mobileHeaderVariants}
-                animate={isOpen}
-                transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                className='w-full border-b-2 border-foreground '
-              />
+              variants={mobileHeaderVariants}
+              animate={isOpen}
+              transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
+              className='w-full border-b-2 border-foreground '
+            />
 
-              <motion.div
-                className='flex flex-col justify-start scrollable invis  h-full w-full '
-                initial={{ opacity: 0, height: 0 }}
-                variants={mobileTextVariants}
-                animate={isOpen}
-                // exit={{
-                //   opacity: 0,
-                //   y: 20,
-                //   height: 0,
-                // }}
-              >
-                <ul
-                  className={cn(
-                    "font-foreground m-x-auto w-full text-[4rem] font-tanker  lowercase"
-                  )}>
-                  {mainMenuItems.map((section) => {
-                    const isExpanded =
-                      activeCategory === section.title && !freshOpen
-                    const filteredItems = section.items.filter((item) => {
-                      const itemUserType = item?.userType
-                      const isPublic = itemUserType?.includes("public")
-                      const typeMatch = user?.accountType?.some((type) =>
-                        itemUserType?.some(
-                          (userType) =>
-                            userType.toLowerCase() === type.toLowerCase()
-                        )
+            <motion.div
+              className='flex flex-col justify-start scrollable invis  h-full w-full '
+              initial={{ opacity: 0, height: 0 }}
+              variants={mobileTextVariants}
+              animate={isOpen}
+              // exit={{
+              //   opacity: 0,
+              //   y: 20,
+              //   height: 0,
+              // }}
+            >
+              <ul
+                className={cn(
+                  "font-foreground m-x-auto w-full text-[4rem] font-tanker  lowercase"
+                )}>
+                {mainMenuItems.map((section) => {
+                  const isExpanded =
+                    activeCategory === section.title && !freshOpen
+                  const filteredItems = section.items.filter((item) => {
+                    const itemUserType = item?.userType
+                    const isPublic = itemUserType?.includes("public")
+                    const typeMatch = user?.accountType?.some((type) =>
+                      itemUserType?.some(
+                        (userType) =>
+                          userType.toLowerCase() === type.toLowerCase()
                       )
-
-                      return isPublic || typeMatch
-                    })
-
-                    if (filteredItems.length === 0) return null
-
-                    return (
-                      <li
-                        key={`${section.title}-mobileCat`}
-                        className='border-b-2 border-foreground  w-full'>
-                        <div
-                          onClick={() => {
-                            return (
-                              setFreshOpen(false),
-                              setActiveCategory(
-                                isExpanded ? null : section.title
-                              )
-                            )
-                          }}
-                          className={cn(
-                            "cursor-pointer flex justify-start px-9 py-4",
-                            activeCategory === section.title &&
-                              "bg-foreground text-background unstroked"
-                            // activeCategory === section.title &&
-                            //   theme === "default" &&
-                            //   "text-white",
-                            // activeCategory === section.title &&
-                            //   theme === "light" &&
-                            //   "text-salYellow"
-                          )}>
-                          {section.title}
-                        </div>
-
-                        {/* Animate the dropdown items */}
-                        <AnimatePresence>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{
-                                duration: 0.4,
-                                ease: "easeInOut",
-                              }}
-                              className='overflow-hidden pl-6 text-[2.5rem]'>
-                              <ul>
-                                {filteredItems
-                                  .filter(
-                                    (item) =>
-                                      !(pathname === "/" && item.path === "/")
-                                  )
-
-                                  .map((item) => (
-                                    <li
-                                      key={`${item.title}-${item.category}-mobileItem`}
-                                      className=' pl-4 '>
-                                      <Link
-                                        href={item.path}
-                                        onClick={onHandleLinkClick}
-                                        className={cn(
-                                          "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
-                                          pathname === item.path &&
-                                            "underline underline-offset-4 decoration-6 text-foreground"
-                                          // item.path.includes("dashboard") &&
-                                          //   "text-salPink"
-                                        )}>
-                                        {item.title}
-                                      </Link>
-                                    </li>
-                                  ))}
-                              </ul>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </li>
                     )
-                  })}
-                </ul>
-                <Unauthenticated>
+
+                    return isPublic || typeMatch
+                  })
+
+                  if (filteredItems.length === 0) return null
+
+                  return (
+                    <li
+                      key={`${section.title}-mobileCat`}
+                      className='border-b-2 border-foreground  w-full'>
+                      <div
+                        onClick={() => {
+                          return (
+                            setFreshOpen(false),
+                            setActiveCategory(isExpanded ? null : section.title)
+                          )
+                        }}
+                        className={cn(
+                          "cursor-pointer flex justify-start px-9 py-4",
+                          activeCategory === section.title &&
+                            "bg-foreground text-background unstroked"
+                          // activeCategory === section.title &&
+                          //   theme === "default" &&
+                          //   "text-white",
+                          // activeCategory === section.title &&
+                          //   theme === "light" &&
+                          //   "text-salYellow"
+                        )}>
+                        {section.title}
+                      </div>
+
+                      {/* Animate the dropdown items */}
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{
+                              duration: 0.4,
+                              ease: "easeInOut",
+                            }}
+                            className='overflow-hidden pl-6 text-[2.5rem]'>
+                            <ul>
+                              {filteredItems
+                                .filter(
+                                  (item) =>
+                                    !(pathname === "/" && item.path === "/")
+                                )
+
+                                .map((item) => (
+                                  <li
+                                    key={`${item.title}-${item.category}-mobileItem`}
+                                    className=' pl-4 '>
+                                    <Link
+                                      href={item.path}
+                                      onClick={onHandleLinkClick}
+                                      className={cn(
+                                        "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
+                                        pathname === item.path &&
+                                          "underline underline-offset-4 decoration-6 text-foreground"
+                                        // item.path.includes("dashboard") &&
+                                        //   "text-salPink"
+                                      )}>
+                                      {item.title}
+                                    </Link>
+                                  </li>
+                                ))}
+                            </ul>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </li>
+                  )
+                })}
+              </ul>
+              <Unauthenticated>
+                <div
+                  className={cn(
+                    "pl-8 py-5 font-foreground m-x-auto w-full text-[4rem] border-b-2 border-foreground font-tanker  lowercase"
+                  )}>
+                  <Link onClick={onHandleLinkClick} href={"/pricing"}>
+                    Pricing
+                  </Link>
+                </div>
+                <div
+                  className={cn(
+                    "pl-8 pt-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker  lowercase"
+                  )}>
+                  <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
+                    Login | Register
+                  </Link>
+                </div>
+              </Unauthenticated>
+              <Authenticated>
+                <SignOutBtn>
                   <div
+                    onClick={() => {
+                      setTimeout(() => setIsOpen("closed"), 1000)
+                    }}
                     className={cn(
-                      "pl-8 py-5 font-foreground m-x-auto w-full text-[4rem] border-b-2 border-foreground font-tanker  lowercase"
+                      "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] font-tanker  lowercase"
                     )}>
-                    <Link onClick={onHandleLinkClick} href={"/pricing"}>
-                      Pricing
-                    </Link>
+                    log out
                   </div>
-                  <div
-                    className={cn(
-                      "pl-8 pt-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker  lowercase"
-                    )}>
-                    <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
-                      Login | Register
-                    </Link>
-                  </div>
-                </Unauthenticated>
-                <Authenticated>
-                  <SignOutBtn>
-                    <div
-                      onClick={() => {
-                        setTimeout(() => setIsOpen("closed"), 1000)
-                      }}
-                      className={cn(
-                        "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] font-tanker  lowercase"
-                      )}>
-                      log out
-                    </div>
-                  </SignOutBtn>
-                </Authenticated>
-                <motion.div
-                  // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-foreground text-foreground w-full'
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.1, duration: 0.4 }}
-                  className='flex flex-col space-y-5 py-6  items-center justify-center'>
-                  <SocialsRow />
-                  <div className='flex space-x-2 text-sm items-center'>
-                    <p>Made with ❤️ by</p>
-                    <Link
-                      href='https://theanthonybrooks.com'
-                      target='_blank'
-                      className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2 m-0 p-0 focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
-                      Anthony Brooks
-                    </Link>
-                  </div>
-                  {footerText.text}
-                </motion.div>
+                </SignOutBtn>
+              </Authenticated>
+              <motion.div
+                // className=' h-[55px] flex flex-col col-span-3 border-t-1.5 border-foreground text-foreground w-full'
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.1, duration: 0.4 }}
+                className='flex flex-col space-y-5 py-6  items-center justify-center'>
+                <SocialsRow />
+                <div className='flex space-x-2 text-sm items-center'>
+                  <p>Made with ❤️ by</p>
+                  <Link
+                    href='https://theanthonybrooks.com'
+                    target='_blank'
+                    className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2 m-0 p-0 focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                    Anthony Brooks
+                  </Link>
+                </div>
+                {footerText.text}
               </motion.div>
-              {/* Fixed Bottom Row */}
             </motion.div>
+            {/* Fixed Bottom Row */}
           </motion.div>
-        )}
+        </motion.div>
 
         {/* *
          *
