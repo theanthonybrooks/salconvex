@@ -1,61 +1,47 @@
-// export const generateCalendarLinks = (
-//   title: string,
-//   startDate: string,
-//   endDate: string,
-//   location: string,
-//   description: string
-// ) => {
-//   const formattedStart = new Date(startDate)
-//     .toISOString()
-//     .replace(/-|:|\.\d+/g, "") // Convert to UTC format
-//   const formattedEnd = new Date(endDate).toISOString().replace(/-|:|\.\d+/g, "")
-
-//   return {
-//     google: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-//       title
-//     )}&dates=${formattedStart}/${formattedEnd}&details=${encodeURIComponent(
-//       description
-//     )}&location=${encodeURIComponent(location)}&sf=true&output=xml`,
-
-//     outlook: `https://outlook.live.com/calendar/0/deeplink/compose?path=/calendar/action/compose&rru=addevent&startdt=${formattedStart}&enddt=${formattedEnd}&subject=${encodeURIComponent(
-//       title
-//     )}&location=${encodeURIComponent(location)}&body=${encodeURIComponent(
-//       description
-//     )}&allday=false`,
-
-//     yahoo: `https://calendar.yahoo.com/?v=60&TITLE=${encodeURIComponent(
-//       title
-//     )}&ST=${formattedStart}&ET=${formattedEnd}&DESC=${encodeURIComponent(
-//       description
-//     )}&in_loc=${encodeURIComponent(location)}&DUR=0100`,
-
-//     apple: `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0D%0AVERSION:2.0%0D%0ABEGIN:VEVENT%0D%0ASUMMARY:${encodeURIComponent(
-//       title
-//     )}%0D%0ADTSTART:${formattedStart}%0D%0ADTEND:${formattedEnd}%0D%0ADESCRIPTION:${encodeURIComponent(
-//       description
-//     )}%0D%0ALOCATION:${encodeURIComponent(
-//       location
-//     )}%0D%0AEND:VEVENT%0D%0AEND:VCALENDAR`,
-//   }
-// }
-
 export const generateICSFile = (
   title: string,
-  startDate: string,
-  endDate: string,
+  ocStartDate: string,
+  ocEndDate: string,
   location: string,
-  description: string
+  description: string,
+  startDate?: string,
+  endDate?: string,
+  url?: string
 ) => {
-  const formattedStart = new Date(startDate)
-    .toISOString()
-    .replace(/-|:|\.\d+/g, "")
-  const formattedEnd = new Date(endDate).toISOString().replace(/-|:|\.\d+/g, "")
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toISOString().replace(/-|:|\.\d+/g, "")
 
-  return `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0D%0AVERSION:2.0%0D%0APRODID:-//YourApp//EN%0D%0ABEGIN:VEVENT%0D%0ASUMMARY:${encodeURIComponent(
-    title
-  )}%0D%0ADTSTART:${formattedStart}%0D%0ADTEND:${formattedEnd}%0D%0ADESCRIPTION:${encodeURIComponent(
-    description
-  )}%0D%0ALOCATION:${encodeURIComponent(
-    location
-  )}%0D%0AEND:VEVENT%0D%0AEND:VCALENDAR`
+  const formattedOcStart = formatDate(ocStartDate)
+  const formattedOcEnd = formatDate(ocEndDate)
+  const formattedStart = startDate ? formatDate(startDate) : ""
+  const formattedEnd = endDate ? formatDate(endDate) : ""
+
+  const descriptionWithEventDates = startDate
+    ? `Event/project dates:${formattedStart}-${formattedEnd}\n\n ${description}`
+    : description
+
+  const urlFormatted = url
+    ? `https://www.thestreetartlist.com/thelist/${url}`
+    : ""
+
+  const icsContent = `
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//YourApp//EN
+BEGIN:VEVENT
+SUMMARY:${title}
+DTSTART:${formattedOcStart}
+DTEND:${formattedOcEnd}
+DESCRIPTION:${descriptionWithEventDates}
+LOCATION:${location}
+URL:${url ? urlFormatted : ""}
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+END:VCALENDAR`.trim()
+
+  return `data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`
 }

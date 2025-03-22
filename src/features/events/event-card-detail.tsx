@@ -70,7 +70,7 @@ import { useState } from "react"
 
 const EventCardDetail = (props: EventData) => {
   const {
-    // id,
+    id,
     logo,
 
     callType,
@@ -133,13 +133,16 @@ const EventCardDetail = (props: EventData) => {
   }`
 
   const icsLink =
-    dates.eventStart && dates.eventEnd
+    callType === "Fixed" && dates.ocStart && dates.ocEnd
       ? generateICSFile(
           event.name,
           dates.ocStart,
           dates.ocEnd,
           locationString,
-          eventTab.about
+          eventTab.about,
+          dates.eventStart ? dates.eventStart : "",
+          dates.eventEnd,
+          `${id}`
         )
       : null
 
@@ -304,14 +307,14 @@ const EventCardDetail = (props: EventData) => {
                             dates?.timezone,
                             callType
                           )}
-                          {icsLink && (
+                          {icsLink && callType === "Fixed" && (
                             <a
                               href={icsLink}
                               download={`${event.name.replace(
                                 /\s+/g,
                                 "_"
                               )}.ics`}>
-                              <CalendarClockIcon className='h-4 w-4' />
+                              <CalendarClockIcon className='size-7 md:size-4' />
                             </a>
                           )}
                         </span>

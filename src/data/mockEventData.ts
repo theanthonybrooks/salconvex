@@ -320,7 +320,7 @@ export const mockEventData: EventData[] = [
     dates: {
       eventStart: "2025-09-01T09:00:00Z",
       eventEnd: "2026-09-15T18:00:00Z",
-      ocStart: "202-06-01T00:00:00Z",
+      ocStart: "2025-06-01T00:00:00Z",
       ocEnd: "2025-09-01T23:59:59Z",
       timezone: "Europe/Berlin",
     },
