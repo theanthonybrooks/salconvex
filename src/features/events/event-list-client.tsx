@@ -37,7 +37,7 @@ const ClientEventList = ({ initialEvents }: Props) => {
   const filteredEvents = useFilteredEvents(initialEvents, filters, sortOptions)
 
   return (
-    <div className='px-6 flex flex-col items-center'>
+    <div className='px-6 flex flex-col items-center max-w-screen'>
       <Pagination>
         <PaginationContent>
           <PaginationItem>

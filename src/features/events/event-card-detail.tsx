@@ -260,7 +260,7 @@ const EventCardDetail = (props: EventData) => {
           value={activeTab}
           defaultValue={activeTab}
           className='w-full flex flex-col justify-center'>
-          <TabsList className='relative w-full bg-white/60 justify-around h-12 flex rounded-xl overflow-hidden'>
+          <TabsList className='relative w-full bg-white/60 justify-around h-12 flex rounded-xl overflow-hidden overflow-x-auto invis'>
             {["opencall", "event", "organizer"].map((tab) => (
               <TabsTrigger
                 key={tab}
@@ -623,7 +623,7 @@ const EventCardDetail = (props: EventData) => {
                     ? "Applied"
                     : status === null
                     ? "Apply"
-                    : `Application: ${
+                    : `Applied: ${
                         status === "accepted"
                           ? "Accepted"
                           : status === "rejected"
