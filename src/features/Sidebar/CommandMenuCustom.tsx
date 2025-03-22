@@ -149,22 +149,32 @@ export const CommandMenuCustom = <T extends CommandItem>({
   }, {})
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden"
-      document.body.style.position = "fixed"
-      document.body.style.width = "100%"
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+    const isSmallScreen = window.innerWidth < 1024
+
+    if (!isIOS || !isSmallScreen) return
+
+    const input = inputRef.current
+    if (!input) return
+
+    const handleBlur = () => {
+      window.requestAnimationFrame(() => {
+        document.body.style.transform = "translateY(1px)"
+        setTimeout(() => {
+          document.body.style.transform = ""
+        }, 0)
+      })
     }
 
+    input.addEventListener("blur", handleBlur)
     return () => {
-      document.body.style.overflow = ""
-      document.body.style.position = ""
-      document.body.style.width = ""
+      input.removeEventListener("blur", handleBlur)
     }
-  }, [open])
+  }, [])
 
   return isMobile ? (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className='relative pt-4 pb-6 z-[9999] min-h-[750px] h-[750px] max-h-[90vh] overflow-hidden '>
+      <DrawerContent className='relative pt-4 pb-6 z-[9999] min-h-[750px] h-[750px] max-h-[90dvh] overflow-hidden '>
         <X
           className='size-7 absolute right-4 top-4 text-stone-600 hover:text-red-600'
           onClick={() => setOpen(false)}
