@@ -33,6 +33,7 @@ export interface EventData {
   eventCategory: EventCategory
 
   location: {
+    sameAsOrganizer?: boolean
     locale: string | null
     city: string | null
     state: string | null
@@ -84,25 +85,57 @@ export interface EventData {
         title: string
         href: string
       }[]
-      otherInfo: string[]
+      otherInfo?: string[]
     }
     event: {
       location: {
-        map: string
+        latitude: number
+        longitude: number
+
         directions: string
       }
       about: string
-      links: string[]
+      links: {
+        type: string
+        title: string
+        href: string
+        handle?: string
+      }[]
+      otherInfo?: string[]
     }
     organizer: {
+      id: number
       name: string
-      location: string
+      logo: string
+      location: {
+        locale: string | null
+        city: string | null
+        state: string | null
+        stateAbbr: string | null
+        region: string | null
+        country: string
+        countryAbbr: string
+        continent: string
+      }
       about: string
       contact: {
         organizer: string
-        email: string
+        primaryContact: {
+          email?: string
+          phone?: string
+          href?: string
+        }
       }
-      links: string[]
+      links: {
+        website?: string
+        instagram?: string
+        facebook?: string
+        threads?: string
+        email?: string
+        vk?: string
+        phone?: string
+        address?: string
+      }
     }
   }
 }

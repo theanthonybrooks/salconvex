@@ -125,21 +125,19 @@ export const EventFilters = ({
       </Select>
 
       {hasActiveFilters && (
-        <div className='w-full flex justify-end'>
-          <span
-            className='text-sm text-muted-foreground underline-offset-4 hover:underline cursor-pointer'
-            onClick={() =>
-              onChange({
-                showHidden: false,
-                bookmarkedOnly: false,
-                eventTypes: [],
-                eventCategories: [],
-                continent: undefined,
-              })
-            }>
-            Clear filters
-          </span>
-        </div>
+        <span
+          className='text-sm text-muted-foreground underline-offset-4 hover:underline cursor-pointer'
+          onClick={() =>
+            onChange({
+              showHidden: false,
+              bookmarkedOnly: false,
+              eventTypes: [],
+              eventCategories: [],
+              continent: undefined,
+            })
+          }>
+          Clear filters
+        </span>
       )}
     </div>
   )

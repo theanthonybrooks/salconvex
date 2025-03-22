@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -98,6 +98,7 @@ interface MultiSelectProps
    * Animation duration in seconds for the visual effects (e.g., bouncing badges).
    * Optional, defaults to 0 (no animation).
    */
+
   animation?: number
 
   /**
@@ -126,6 +127,7 @@ interface MultiSelectProps
   className?: string
   height?: number
   shortResults?: boolean
+  value?: string[]
 }
 
 export const MultiSelect = React.forwardRef<
@@ -134,6 +136,7 @@ export const MultiSelect = React.forwardRef<
 >(
   (
     {
+      value,
       options,
       onValueChange,
       variant,
@@ -206,6 +209,12 @@ export const MultiSelect = React.forwardRef<
         onValueChange(allValues)
       }
     }
+
+    useEffect(() => {
+      if (value !== undefined) {
+        setSelectedValues([...value])
+      }
+    }, [value])
 
     // useEffect(() => {
     //   if (defaultValue.length === 0) {

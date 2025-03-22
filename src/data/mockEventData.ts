@@ -95,30 +95,58 @@ export const mockEventData: EventData[] = [
       },
       event: {
         location: {
-          map: "https://example.com/map1.png",
+          latitude: 80.7127837,
+          longitude: -24.0059413,
+
           directions: "See directions on Google Maps",
         },
         about:
           "The Mural Arts Festival is a large-scale public mural event featuring renowned international street artists. The festival spans multiple locations and includes live painting, workshops, and panel discussions.",
-        links: ["Official Website", "Instagram Page", "Contact Organizer"],
+        links: [
+          {
+            type: "website",
+            title: "Official Website",
+            href: "www.muralartsfestival.com",
+          },
+          {
+            type: "instagram",
+            title: "Instagram Page",
+            handle: "@muralartsfestival",
+            href: "https://www.instagram.com/muralartsfestival",
+          },
+          {
+            type: "email",
+            title: "Event Email",
+            href: "info@muralartsfestival.com",
+          },
+        ],
       },
       organizer: {
+        id: 3,
         name: "Urban Arts Collective",
-        location: "New York, NY, USA",
+        logo: "/sitelogo.svg",
+        location: {
+          locale: null,
+          city: "New York",
+          state: "New York",
+          stateAbbr: "NY",
+          region: null,
+          country: "United States",
+          countryAbbr: "USA",
+          continent: "North America",
+        },
         about:
           "Urban Arts Collective is a nonprofit organization dedicated to supporting street artists and fostering public art initiatives around the world.",
         contact: {
-          organizer: "Jane Doe",
-          email: "jane.doe@urbanartscollective.org",
+          organizer: "Lillith Lathardly",
+          primaryContact: {
+            email: "lilly.the.lizard@urbanartscollective.org",
+          },
         },
-        links: [
-          "Website",
-          "Email",
-          "Phone",
-          "Instagram",
-          "Facebook",
-          "Threads",
-        ],
+        links: {
+          website: "https://www.urbanartscollective.org",
+          email: "info@urbanartscollective.org",
+        },
       },
     },
   },
@@ -208,38 +236,62 @@ export const mockEventData: EventData[] = [
             href: "https://thestreetartlist.com/assets/images/mural-application-form.pdf",
           },
         ],
-        otherInfo: [
-          "Only one application per artist",
-          "Artist teams should only submit one application",
-          "Painting may be moved to a later date if the artist is unable to paint on the day of the event or if the weather is not suitable for painting",
-        ],
       },
       event: {
         location: {
-          map: "https://example.com/map1.png",
+          latitude: 40.7127837,
+          longitude: -74.0059413,
           directions: "See directions on Google Maps",
         },
         about:
           "The Mural Arts Festival is a large-scale public mural event featuring renowned international street artists. The festival spans multiple locations and includes live painting, workshops, and panel discussions.",
-        links: ["Official Website", "Instagram Page", "Contact Organizer"],
+        links: [
+          {
+            type: "website",
+            title: "Official Website",
+            href: "https://www.muralartsfestival.com",
+          },
+          {
+            type: "instagram",
+            title: "Instagram Page",
+            handle: "@muralartsfestival",
+            href: "https://www.instagram.com/muralartsfestival",
+          },
+          {
+            type: "email",
+            title: "Contact Organizer",
+            href: "info@muralartsfestival.com",
+          },
+        ],
       },
       organizer: {
+        id: 2,
         name: "Urban Arts Collective",
-        location: "New York, NY, USA",
+        logo: "/sitelogo.svg",
+        location: {
+          locale: null,
+          city: "New York",
+          state: "New York",
+          stateAbbr: "NY",
+          region: null,
+          country: "United States",
+          countryAbbr: "USA",
+          continent: "North America",
+        },
         about:
           "Urban Arts Collective is a nonprofit organization dedicated to supporting street artists and fostering public art initiatives around the world.",
         contact: {
-          organizer: "Jane Doe",
-          email: "jane.doe@urbanartscollective.org",
+          organizer: "Lillith Lathardly",
+          primaryContact: {
+            email: "lilly.the.lizard@urbanartscollective.org",
+          },
         },
-        links: [
-          "Website",
-          "Email",
-          "Phone",
-          "Instagram",
-          "Facebook",
-          "Threads",
-        ],
+        links: {
+          website: "https://www.urbanartscollective.org",
+          email: "info@urbanartscollective.org",
+          phone: "+1 (202) 555-0100",
+          instagram: "https://www.instagram.com/urbanartscollective",
+        },
       },
     },
   },
@@ -316,23 +368,60 @@ export const mockEventData: EventData[] = [
       },
       event: {
         location: {
-          map: "https://example.com/map-berlin.png",
+          latitude: 48.7127837,
+          longitude: -7.0059413,
           directions: "Google Maps Link",
         },
         about:
           "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
-        links: ["Event Page", "Apply Here"],
+        links: [
+          {
+            type: "website",
+            title: "Event Page",
+            href: "www.urbanwalls.de/en/residency",
+          },
+
+          {
+            type: "facebook",
+            title: "Facebook",
+            handle: "@urbanwalls",
+            href: "https://www.facebook.com/urbanwalls",
+          },
+        ],
+        otherInfo: ["Residency includes optional workshops and artist talks"],
       },
       organizer: {
+        id: 1,
         name: "Berlin Mural Initiative",
-        location: "Berlin, Germany",
+        logo: "/sitelogo.svg",
+        location: {
+          locale: "Neukolln",
+          city: "Berlin",
+          state: null,
+          stateAbbr: null,
+          region: null,
+          country: "Germany",
+          countryAbbr: "DE",
+          continent: "Europe",
+        },
         about:
           "Supporting street art throughout Germany through residencies and public art funding.",
         contact: {
           organizer: "Max Müller",
-          email: "max.mueller@bmi.de",
+          primaryContact: {
+            email: "max.mueller@bmi.de",
+          },
         },
-        links: ["Website", "Instagram", "Contact"],
+        links: {
+          website: "https://www.bmi.de",
+          instagram: "https://www.instagram.com/bmi.de",
+          facebook: "https://www.facebook.com/bmi.de",
+          threads: "https://www.threads.net/group/bmi.de",
+          email: "info@bmi.de",
+          vk: "https://vk.com/bmi.de",
+          phone: "+49 30 200 50 00",
+          address: "Neukollnstraße 1, 10117 Berlin",
+        },
       },
     },
   },

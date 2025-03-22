@@ -5,29 +5,44 @@ import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import {
   CalendarClockIcon,
+  CheckCircle,
+  CircleX,
   Download,
+  Ellipsis,
   Eye,
   EyeOff,
   Globe,
+  MapIcon,
   MapPin,
   Phone,
 } from "lucide-react"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion"
+
 import {
   FaBookmark,
   FaEnvelope,
   FaFacebook,
+  FaGlobe,
   FaInstagram,
   FaPaintRoller,
   FaRegBookmark,
   FaRegCommentDots,
   FaThreads,
+  FaVk,
 } from "react-icons/fa6"
 import { IoAirplane } from "react-icons/io5"
 import {
@@ -40,6 +55,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EventData } from "@/types/event"
 import { TbStairs } from "react-icons/tb"
 
+import { LazyMap } from "@/features/wrapper-elements/map/lazy-map"
 import { generateICSFile } from "@/lib/addToCalendar"
 import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
 import {
@@ -81,6 +97,7 @@ const EventCardDetail = (props: EventData) => {
     tabs,
     // organizer,
   } = props
+  const { opencall, event: eventTab, organizer } = tabs
 
   const { locale, city, stateAbbr, country, countryAbbr } = location
   const {
@@ -91,15 +108,29 @@ const EventCardDetail = (props: EventData) => {
     materials,
     equipment,
     other,
-  } = tabs.opencall.compensation
+  } = opencall.compensation
+
+  const { latitude, longitude } = eventTab.location
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
   const [activeTab, setActiveTab] = useState(openCall ? "opencall" : "event")
+  const [manualApplied, setManualApplied] = useState(false)
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`
+
+  const orgLocationString = `${
+    organizer.location.locale ? `${organizer.location.locale}, ` : ""
+  }${organizer.location.city}, ${
+    organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
+  }${
+    organizer.location.countryAbbr === "UK" ||
+    organizer.location.countryAbbr === "USA"
+      ? organizer.location.countryAbbr
+      : organizer.location.country
+  }`
 
   const icsLink =
     dates.eventStart && dates.eventEnd
@@ -108,7 +139,7 @@ const EventCardDetail = (props: EventData) => {
           dates.eventStart,
           dates.eventEnd,
           locationString,
-          tabs.event.about
+          eventTab.about
         )
       : null
 
@@ -521,30 +552,26 @@ const EventCardDetail = (props: EventData) => {
                   <AccordionContent>
                     <div className='flex flex-col space-y-3  pb-3 mb-4'>
                       <ol className='list-decimal list-inside px-4'>
-                        {tabs.opencall.requirements.map(
-                          (requirement, index) => (
-                            <li key={index}>{requirement}</li>
-                          )
-                        )}
+                        {opencall.requirements.map((requirement, index) => (
+                          <li key={index}>{requirement}</li>
+                        ))}
 
                         {/* <li>Must have liability insurance</li> */
                         /* TODO: this is something that could/should be later. These sort of requirements*/}
                       </ol>
                       <p className='text-sm'>
-                        {tabs.opencall.requirementsMore.map(
-                          (requirement, index) => (
-                            <span key={index} className='py-1 mr-1'>
-                              {requirement}
-                            </span>
-                          )
-                        )}
+                        {opencall.requirementsMore.map((requirement, index) => (
+                          <span key={index} className='py-1 mr-1'>
+                            {requirement}
+                          </span>
+                        ))}
                       </p>
                       <p className=''>
                         Send applications to
                         <a
-                          href={`mailto:${tabs.opencall.requirementDestination}?subject=${event.name} Open Call`}
+                          href={`mailto:${opencall.requirementDestination}?subject=${event.name} Open Call`}
                           className='mx-1 underline'>
-                          {tabs.opencall.requirementDestination}
+                          {opencall.requirementDestination}
                         </a>
                         and feel free to reach out with any questions
                       </p>
@@ -556,41 +583,45 @@ const EventCardDetail = (props: EventData) => {
                   <AccordionTrigger title='Documents:' />
                   <AccordionContent>
                     <ol className='list-decimal list-outside px-4 pl-6'>
-                      {tabs.opencall.documents.map((document, index) => (
+                      {opencall.documents.map((document, index) => (
                         <li key={index} className='py-2'>
-                          <a
-                            href={document.href}
-                            className='flex items-center gap-x-2'>
+                          <div className='flex items-center gap-x-2'>
                             {document.title}
-                            <Download className='size-5 hover:scale-110' />
-                          </a>
+                            <a href={document.href} download={document.title}>
+                              <Download className='size-5 hover:scale-110' />
+                            </a>
+                          </div>
                         </li>
                       ))}
                     </ol>
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value='item-5'>
-                  <AccordionTrigger title='Other info:' />
-                  <AccordionContent>
-                    <div className='grid grid-cols-[1fr_auto]  border-foreground/20 pb-3 mb-4'>
-                      <ol className='list-decimal list-inside px-4'>
-                        {tabs.opencall.otherInfo.map((info, index) => (
-                          <li key={index} className='py-1'>
-                            {info}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                {opencall.otherInfo && (
+                  <AccordionItem value='item-5'>
+                    <AccordionTrigger title='Other info:' />
+                    <AccordionContent>
+                      <div className='grid grid-cols-[1fr_auto]  border-foreground/20 pb-3 mb-4'>
+                        <ol className='list-decimal list-inside px-4'>
+                          {opencall.otherInfo.map((info, index) => (
+                            <li key={index} className='py-1'>
+                              {info}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
               </Accordion>
               <div className='col-span-full mt-4 flex items-center justify-center px-4'>
                 <Button
                   variant='salWithShadowHidden'
                   size='lg'
                   className='rounded-r-none border-r w-full min-w-[100px]'
-                  disabled={status !== null}>
-                  {status === null
+                  disabled={status !== null || manualApplied}>
+                  {manualApplied
+                    ? "Applied"
+                    : status === null
                     ? "Apply"
                     : `Application: ${
                         status === "accepted"
@@ -611,7 +642,7 @@ const EventCardDetail = (props: EventData) => {
                     <FaRegBookmark className='size-6 ' />
                   )}
                 </Button>
-                <Button
+                {/* <Button
                   variant='salWithShadowHidden'
                   size='lg'
                   className='rounded-l-none border-l w-fit sm:px-2 px-2'
@@ -621,7 +652,60 @@ const EventCardDetail = (props: EventData) => {
                   ) : (
                     <Eye className='size-8' />
                   )}
-                </Button>
+                </Button> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant='salWithShadowHidden'
+                      size='lg'
+                      className='rounded-l-none border-l w-fit sm:px-2 px-2'>
+                      <Ellipsis className='size-8' />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>More options</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => setIsHidden(!isHidden)}
+                      className={cn(
+                        "cursor-pointer text-black/80  hover:text-red-500"
+                      )}>
+                      {isHidden ? (
+                        <span className='flex items-center gap-x-1 '>
+                          <EyeOff className='size-4' />
+                          Unhide{" "}
+                          {eventCategory === "event" ? "Event" : "Open Call"}
+                        </span>
+                      ) : (
+                        <span className='flex items-center gap-x-1 '>
+                          <Eye className='size-4' />
+                          Hide{" "}
+                          {eventCategory === "event" ? "Event" : "Open Call"}
+                        </span>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setManualApplied(!manualApplied)}
+                      className={cn(
+                        "cursor-pointer",
+                        manualApplied
+                          ? " text-emerald-700 hover:text-black/80"
+                          : "hover:text-emerald-700 text-black/80"
+                      )}>
+                      {manualApplied ? (
+                        <span className='flex items-center gap-x-1'>
+                          <CircleX className='size-4' />
+                          Mark as Not Applied
+                        </span>
+                      ) : (
+                        <span className='flex items-center gap-x-1'>
+                          <CheckCircle className='size-4' />
+                          Mark as Applied
+                        </span>
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </Card>
           </TabsContent>
@@ -629,66 +713,91 @@ const EventCardDetail = (props: EventData) => {
             <Card className='w-full max-w-[90vw] p-5 bg-white/60 border-foreground/20 rounded-xl'>
               <Accordion defaultValue='item-1'>
                 <AccordionItem value='item-1'>
-                  <AccordionTrigger title='Event Location:' />
+                  <AccordionTrigger
+                    title={`${getEventCategoryLabel(eventCategory)} Location:`}
+                  />
 
                   <AccordionContent>
-                    <div className='w-full h-[200px] bg-orange-500/50 rounded-xl relative'>
-                      <h1 className='text-3xl absolute top-0 right-0 -translate-x-1/2 translate-y-1/2'>
-                        Map Here
-                      </h1>
-                    </div>
-                    <p>
-                      Get directions{" "}
-                      <span className='underline underline-offset-2'>here</span>
-                    </p>
+                    <LazyMap
+                      latitude={latitude}
+                      longitude={longitude}
+                      label={event.name}
+                      className='w-full h-[200px] overflow-hidden rounded-xl z-0 mb-2'
+                    />
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+                      className='text-sm font-medium flex items-center gap-x-1 hover:underline underline-offset-2'>
+                      Get directions to {event.name}
+                      <MapIcon className='size-4' />
+                    </a>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value='item-2'>
-                  <AccordionTrigger title='About the Event:' />
+                  <AccordionTrigger
+                    title={`About the ${getEventCategoryLabel(eventCategory)}:`}
+                  />
 
                   <AccordionContent>
                     <div className=' flex flex-col space-y-3  pb-3 mb-4'>
-                      <p>
-                        This is some random text about the event. When it is,
-                        where it is, how it is. Why it is. Blahblahblah blah
-                        blah blah blah blah blah blah.
-                        <br />
-                        Oh, new line. Okay, blah blah blah.
-                        <br />
-                        Again? Wow, blah blah blah.
-                      </p>
+                      <p>{eventTab.about}</p>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value='item-3'>
-                  <AccordionTrigger title='Event Links:' />
+                {eventTab.links && (
+                  <AccordionItem value='item-3'>
+                    <AccordionTrigger
+                      title={`${getEventCategoryLabel(eventCategory)} Links:`}
+                    />
 
-                  <AccordionContent>
-                    <ul>
-                      <li>
-                        <a href='#'>Website</a>
-                      </li>
-                      <li>
-                        <a href='#'>Instagram</a>
-                      </li>
-                      <li>
-                        <a href='#'>Email</a>
-                      </li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
+                    <AccordionContent>
+                      <ul className='flex flex-col gap-y-2'>
+                        {eventTab.links.map((link, index) => (
+                          <li key={index}>
+                            <a
+                              href={
+                                link.type === "email"
+                                  ? `mailto:${link.href}?subject=${event.name}`
+                                  : link.href
+                              }
+                              target='_blank'
+                              className='flex items-center gap-x-2 hover:underline underline-offset-2'>
+                              {link.type === "website" && (
+                                <FaGlobe className='h-4 w-4' />
+                              )}
+                              {link.type === "instagram" && (
+                                <FaInstagram className='h-4 w-4' />
+                              )}
+                              {link.type === "facebook" && (
+                                <FaFacebook className='h-4 w-4' />
+                              )}
+                              {link.type === "threads" && (
+                                <FaThreads className='h-4 w-4' />
+                              )}
+                              {link.type === "email" && (
+                                <FaEnvelope className='h-4 w-4' />
+                              )}
+                              {link.type === "email" || link.type === "website"
+                                ? link.href
+                                : link.handle}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
 
-                <AccordionItem value='item-4'>
-                  <AccordionTrigger title='Other info:' />
-                  <AccordionContent>
-                    <p>
-                      Event may be postponed or canceled due to weather or other
-                      unforeseen circumstances. As organizers, we&apos;ll do our
-                      best to keep you informed of any changes.
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
+                {eventTab.otherInfo && (
+                  <AccordionItem value='item-4'>
+                    <AccordionTrigger title='Other info:' />
+                    <AccordionContent>
+                      {eventTab.otherInfo.map((info, index) => (
+                        <p key={index}>{info}</p>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
               </Accordion>
             </Card>
           </TabsContent>
@@ -696,22 +805,19 @@ const EventCardDetail = (props: EventData) => {
             <Card
               className='max-w-full overflow-hidden w-full
    p-5 bg-white/60 border-foreground/20 rounded-xl space-y-6'>
-              <div className='w-full grid grid-cols-[75px_minmax(0,1fr)] '>
-                <div
-                  className={cn(
-                    "rounded-full bg-white border-2 h-15 w-15 relative col-span-1"
-                  )}>
-                  <p className='text-sm absolute left-0 top-0 translate-x-1/3 translate-y-[80%]'>
-                    Logo
-                  </p>
-                </div>
+              <div className='w-full grid grid-cols-[75px_minmax(0,1fr)] items-center '>
+                <Image
+                  src={organizer.logo}
+                  alt='Event Logo'
+                  width={60}
+                  height={60}
+                  className={cn("rounded-full  border-2 size-[60px] ")}
+                />
                 <div className='col-span-1'>
                   <p className='text-sm font-bold line-clamp-2'>
-                    Organization/Individual Name (Organization)
-                    Organization/Individual Name (Organization)
-                    Organization/Individual Name (Organization)
+                    {organizer.name}
                   </p>
-                  <p className='text-sm font-medium'>Organization Location</p>
+                  <p className='text-sm font-medium'>{orgLocationString}</p>
                 </div>
               </div>
               <div className='w-full space-y-5'>
@@ -719,35 +825,102 @@ const EventCardDetail = (props: EventData) => {
                   <p className='font-semibold text-sm'>
                     About the Organization:
                   </p>
-                  <p className='text-sm line-clamp-4'>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.{" "}
-                  </p>
+                  <p className='text-sm line-clamp-4'>{organizer.about}</p>
                 </section>
                 <section className='flex flex-col gap-y-2'>
                   <span>
                     <p className='font-semibold text-sm'>Organizer:</p>
-                    <p className='text-sm line-clamp-4'>Name Namington XIII</p>
+                    <p className='text-sm line-clamp-4'>
+                      {organizer.contact.organizer}
+                    </p>
                   </span>
                   <span>
                     <p className='font-semibold text-sm'>Main Contact:</p>
-                    <p className='text-sm line-clamp-4'>
-                      Namester@namethisthing.com
-                    </p>
+                    <div className='flex items-center gap-x-2'>
+                      {organizer.contact.primaryContact.email ? (
+                        <FaEnvelope />
+                      ) : organizer.contact.primaryContact.phone ? (
+                        <Phone />
+                      ) : (
+                        <Globe />
+                      )}
+
+                      <a
+                        href={
+                          organizer.contact.primaryContact.email
+                            ? `mailto:${organizer.contact.primaryContact.email}`
+                            : organizer.contact.primaryContact.href
+                            ? organizer.contact.primaryContact.href
+                            : `tel:${organizer.contact.primaryContact.phone}`
+                        }
+                        className='text-sm line-clamp-4 hover:underline underline-offset-2'>
+                        {organizer.contact.primaryContact.phone
+                          ? organizer.contact.primaryContact.phone
+                          : organizer.contact.primaryContact.href
+                          ? organizer.contact.primaryContact.href
+                          : organizer.contact.primaryContact.email}
+                      </a>
+                    </div>
                   </span>
                 </section>
                 <section>
                   <p className='font-semibold text-sm'>Links:</p>
-                  <div className='flex gap-x-6 items-center justify-center pt-3'>
-                    <Globe className='h-6 w-6' />
-                    <FaEnvelope className='h-6 w-6' />
-                    <Phone className='h-6 w-6' />
-                    <FaInstagram className='h-6 w-6' />
-                    <FaFacebook className='h-6 w-6' />
-                    <FaThreads className='h-6 w-6' />
+                  <div className='flex gap-x-6 items-center justify-start pt-3'>
+                    {organizer.links.website && (
+                      <a
+                        href={organizer.links.website}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <Globe className='h-6 w-6' />
+                      </a>
+                    )}
+                    {organizer.links.email && (
+                      <a
+                        href={`mailto:${organizer.links.email}`}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <FaEnvelope className='h-6 w-6' />
+                      </a>
+                    )}
+                    {organizer.links.phone && (
+                      <a
+                        href={`tel:${organizer.links.phone}`}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <Phone className='h-6 w-6' />
+                      </a>
+                    )}
+                    {organizer.links.instagram && (
+                      <a
+                        href={organizer.links.instagram}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <FaInstagram className='h-6 w-6' />
+                      </a>
+                    )}
+                    {organizer.links.facebook && (
+                      <a
+                        href={organizer.links.facebook}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <FaFacebook className='h-6 w-6' />
+                      </a>
+                    )}
+                    {organizer.links.threads && (
+                      <a
+                        href={organizer.links.threads}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <FaThreads className='h-6 w-6' />
+                      </a>
+                    )}
+                    {organizer.links.vk && (
+                      <a
+                        href={organizer.links.vk}
+                        className='h-6 w-6 hover:scale-110 '>
+                        <FaVk className='h-6 w-6' />
+                      </a>
+                    )}
                   </div>
+                  <a
+                    className='text-sm line-clamp-4 text-center mt-6 hover:underline underline-offset-2'
+                    href={`/organizer/${organizer.id}`}>
+                    Check out {organizer.name}&apos;s other events
+                  </a>
                 </section>
               </div>
 

@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import ApplyButton from "@/features/events/event-apply-btn"
 import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
 import {
   formatCurrency,
@@ -13,12 +13,9 @@ import { cn } from "@/lib/utils"
 import { EventData } from "@/types/event"
 import { CheckCircleIcon, CircleDollarSignIcon } from "lucide-react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6"
 
 const EventCardPreview = (props: EventData) => {
-  const router = useRouter()
-
   const {
     id,
     logo,
@@ -144,25 +141,8 @@ const EventCardPreview = (props: EventData) => {
             </span>
           </p>
         </div>
-        <Button
-          variant='salWithShadowHidden'
-          size='lg'
-          className='bg-white/60'
-          onClick={() => router.push(`/thelist/event/${id}`)}
-          disabled={status !== null}>
-          {status === null && openCall
-            ? "Apply"
-            : status !== null
-            ? `Applied: ${
-                status === "accepted"
-                  ? "Accepted"
-                  : status === "rejected"
-                  ? "Rejected"
-                  : "Pending"
-              }`
-            : "View more"}
-          {/* //note: this should also have "View more" for events/projects without active open call */}
-        </Button>
+
+        <ApplyButton id={id} status={status} openCall={openCall} />
       </div>
       <div className='flex flex-col items-center justify-between pt-5 pb-5 pr-2'>
         {status === null ? (
@@ -175,7 +155,7 @@ const EventCardPreview = (props: EventData) => {
         <div className='flex gap-x-2 items-center justify-center'>
           {/* <EyeOff className='h-6 w-6' /> //NOTE: Move this to the detailed card view */}
           {bookmarked ? (
-            <FaBookmark className='size-8 text-emerald-600' />
+            <FaBookmark className='size-8 text-red-600' />
           ) : (
             <FaRegBookmark className='size-8' />
           )}

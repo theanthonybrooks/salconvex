@@ -15,6 +15,7 @@ import {
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider"
 import { fetchQuery } from "convex/nextjs"
 import { GeistSans } from "geist/font/sans"
+import "leaflet/dist/leaflet.css"
 import type { Metadata } from "next"
 import { ToastContainer } from "react-toastify"
 import { api } from "~/convex/_generated/api"
@@ -67,9 +68,9 @@ export default async function RootLayout({
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang='en' suppressHydrationWarning>
-        {/* <head>
-          <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' />
-        </head> */}
+        <head>
+          {/* <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' /> */}
+        </head>
         <body
           className={cn(
             GeistSans.className,
