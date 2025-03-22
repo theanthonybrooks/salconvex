@@ -1,16 +1,6 @@
 "use client"
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import EventCardPreview from "@/features/events/event-card-preview"
-import { EventFilters } from "@/features/events/event-list-filters"
 import { useFilteredEvents } from "@/hooks/use-filtered-events"
 import { EventData } from "@/types/event"
 import { Filters, SortOptions } from "@/types/thelist"
@@ -21,7 +11,7 @@ interface Props {
 }
 
 const ClientEventList = ({ initialEvents }: Props) => {
-  const [filters, setFilters] = useState<Filters>({
+  const [filters] = useState<Filters>({
     showHidden: false,
     bookmarkedOnly: false,
     limit: 10,
@@ -29,7 +19,7 @@ const ClientEventList = ({ initialEvents }: Props) => {
     eventCategories: [],
   })
 
-  const [sortOptions, setSortOptions] = useState<SortOptions>({
+  const [sortOptions] = useState<SortOptions>({
     sortBy: "date",
     sortDirection: "asc",
   })
@@ -38,7 +28,7 @@ const ClientEventList = ({ initialEvents }: Props) => {
 
   return (
     <div className='px-6 flex flex-col items-center max-w-screen'>
-      <Pagination>
+      {/* <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious href='#' />
@@ -61,7 +51,7 @@ const ClientEventList = ({ initialEvents }: Props) => {
         onSortChange={(partial) =>
           setSortOptions((prev) => ({ ...prev, ...partial }))
         }
-      />
+      /> */}
 
       {filteredEvents.length === 0 ? (
         <p className='mt-8 text-center text-muted-foreground text-sm'>
