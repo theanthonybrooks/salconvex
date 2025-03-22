@@ -149,13 +149,15 @@ export const CommandMenuCustom = <T extends CommandItem>({
   }, {})
 
   useEffect(() => {
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-    const isSmallScreen = window.innerWidth < 1024
-
-    if (!isIOS || !isSmallScreen) return
-
     const input = inputRef.current
-    if (!input) return
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+    if (!input || !isIOS) return
+
+    const handleFocus = () => {
+      window.scrollTo(0, 0)
+      document.body.scrollTop = 0
+    }
 
     const handleBlur = () => {
       window.requestAnimationFrame(() => {
@@ -166,8 +168,11 @@ export const CommandMenuCustom = <T extends CommandItem>({
       })
     }
 
+    input.addEventListener("focus", handleFocus)
     input.addEventListener("blur", handleBlur)
+
     return () => {
+      input.removeEventListener("focus", handleFocus)
       input.removeEventListener("blur", handleBlur)
     }
   }, [])
