@@ -21,6 +21,7 @@ interface FullPageNavProps {
   // userId?: string | undefined
   isScrolled?: boolean
   user?: User | null
+  isMobile?: boolean
   // userPref?: UserPref | null
   // subStatus?: string | undefined
 }
@@ -225,6 +226,18 @@ const mobileTextVariants = {
 
 const mobileImageVariants = {
   open: {
+    opacity: 1,
+    transition: { duration: 0.75, ease: "easeInOut" },
+  },
+  closed: {
+    opacity: 0,
+
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
+}
+
+const mobileHeaderVariants = {
+  open: {
     display: "block",
 
     transition: { duration: 0.75, ease: "easeInOut" },
@@ -259,7 +272,11 @@ const screenOverlayVariants = {
   },
 }
 
-const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
+const FullPageNav = ({
+  user,
+  isScrolled,
+  isMobile = false,
+}: FullPageNavProps) => {
   const footerText = footerCRText()
   // const { theme } = useTheme()
   const pathname = usePathname()
@@ -311,21 +328,38 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
         />
       </AnimatePresence>
 
-      <div className='z-100'>
-        {/* Menu Button + Theme Toggle*/}
-        <div className='flex flex-row gap-x-4  items-center justify-between relative w-full z-20'>
-          {/* <ThemeToggle userPref={themePref} /> */}
+      {/* Menu Button + Theme Toggle*/}
+      <div
+        className={cn(
+          "flex flex-row gap-x-4  items-center  w-full z-20 justify-between"
+        )}>
+        {/* <ThemeToggle userPref={themePref} /> */}
 
-          {/* //NOTE: Add sliding up animation later; will require making a button
+        {/* //NOTE: Add sliding up animation later; will require making a button
           lookalike with two divs/spans inside that move up and down and have an
           overflow of hidden */}
-
+        <motion.section
+          initial={{ opacity: 0 }}
+          variants={mobileImageVariants}
+          animate={isOpen}
+          transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
+          className='md:hidden '>
+          <Image
+            src='/sitelogo.svg'
+            alt='The Street Art List'
+            width={isScrolled ? 40 : 60}
+            height={isScrolled ? 40 : 60}
+            priority={true}
+          />
+        </motion.section>
+        <div className='flex items-center gap-x-4 '>
           {isOpen === "open" && <ThemeToggle />}
           <MenuToggle
             menuState={isOpen === "initial" ? "closed" : isOpen}
             setState={setIsOpen}
           />
-          {/* <Button
+        </div>
+        {/* <Button
             variant='salWithShadowHidden'
             onClick={() =>
               setIsOpen(
@@ -342,22 +376,23 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
             )}>
             {isOpen === "open" ? "CLOSE" : "MENU"}
           </Button> */}
-        </div>
+      </div>
 
-        {/* /~ Fullscreen Menu Overlay ~/ */}
-        <AnimatePresence>
-          {/* Expanding content */}
-          {/* *
-           *
-           *
-           *
-           * */}
-          {/* //---------------------- Block/Flex? (Mobile) Layout ---------------------- */}
-          {/* *
-           *
-           *
-           *
-           * */}
+      {/* /~ Fullscreen Menu Overlay ~/ */}
+      <AnimatePresence>
+        {/* Expanding content */}
+        {/* *
+         *
+         *
+         *
+         * */}
+        {/* //---------------------- Block/Flex? (Mobile) Layout ---------------------- */}
+        {/* *
+         *
+         *
+         *
+         * */}
+        {isMobile && isMobile === true && (
           <motion.div
             id='mobile-menu'
             key='mobile-menu'
@@ -386,19 +421,12 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
               )}>
               <motion.section
                 initial={{ display: "none" }}
-                variants={mobileImageVariants}
+                variants={mobileHeaderVariants}
                 animate={isOpen}
                 transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                className='w-full border-b-2 border-foreground'>
-                <Image
-                  src='/sitelogo.svg'
-                  alt='The Street Art List'
-                  width={isScrolled ? 40 : 60}
-                  height={isScrolled ? 40 : 60}
-                  className='absolute left-5 top-5'
-                  priority={true}
-                />
-              </motion.section>
+                className='w-full border-b-2 border-foreground '
+              />
+
               <motion.div
                 className='flex flex-col justify-start scrollable invis  h-full w-full '
                 initial={{ opacity: 0, height: 0 }}
@@ -472,24 +500,30 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
                               }}
                               className='overflow-hidden pl-6 text-[2.5rem]'>
                               <ul>
-                                {filteredItems.map((item) => (
-                                  <li
-                                    key={`${item.title}-${item.category}-mobileItem`}
-                                    className=' pl-4 '>
-                                    <Link
-                                      href={item.path}
-                                      onClick={onHandleLinkClick}
-                                      className={cn(
-                                        "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
-                                        pathname === item.path &&
-                                          "underline underline-offset-4 decoration-6 text-foreground"
-                                        // item.path.includes("dashboard") &&
-                                        //   "text-salPink"
-                                      )}>
-                                      {item.title}
-                                    </Link>
-                                  </li>
-                                ))}
+                                {filteredItems
+                                  .filter(
+                                    (item) =>
+                                      !(pathname === "/" && item.path === "/")
+                                  )
+
+                                  .map((item) => (
+                                    <li
+                                      key={`${item.title}-${item.category}-mobileItem`}
+                                      className=' pl-4 '>
+                                      <Link
+                                        href={item.path}
+                                        onClick={onHandleLinkClick}
+                                        className={cn(
+                                          "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
+                                          pathname === item.path &&
+                                            "underline underline-offset-4 decoration-6 text-foreground"
+                                          // item.path.includes("dashboard") &&
+                                          //   "text-salPink"
+                                        )}>
+                                        {item.title}
+                                      </Link>
+                                    </li>
+                                  ))}
                               </ul>
                             </motion.div>
                           )}
@@ -551,18 +585,20 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
               {/* Fixed Bottom Row */}
             </motion.div>
           </motion.div>
+        )}
 
-          {/* *
-           *
-           *
-           *
-           * */}
-          {/* //---------------------- Grid (Desktop) Layout ---------------------- */}
-          {/* *
-           *
-           *
-           *
-           * */}
+        {/* *
+         *
+         *
+         *
+         * */}
+        {/* //---------------------- Grid (Desktop) Layout ---------------------- */}
+        {/* *
+         *
+         *
+         *
+         * */}
+        {!isMobile && (
           <motion.div
             key='desktop-menu'
             className={cn(
@@ -789,8 +825,8 @@ const FullPageNav = ({ user, isScrolled }: FullPageNavProps) => {
               )}
             </motion.div>
           </motion.div>
-        </AnimatePresence>
-      </div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

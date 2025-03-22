@@ -130,8 +130,7 @@ NavBarProps) {
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className='fixed left-0 right-0 top-0 z-20 h-25  border-foreground   bg-background '>
-        {/* <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative'> */}
-        <div className='mx-auto grid w-screen h-full grid-cols-[300px_auto_200px] items-center px-8'>
+        <div className='mx-auto flex w-screen h-full  items-center px-8 md:grid md:grid-cols-[300px_auto_200px]'>
           {/* Mobile Logo and Navigation */}
           {isMobile && (
             <div className='lg:hidden items-center gap-2 flex'>
@@ -366,6 +365,7 @@ NavBarProps) {
             </Unauthenticated> */}
               <FullPageNav
                 // userId={userId}
+                isMobile={isMobile}
                 isScrolled={isScrolled}
                 user={user}
                 // userPref={userPref}

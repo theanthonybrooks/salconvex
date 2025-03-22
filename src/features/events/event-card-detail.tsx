@@ -147,7 +147,7 @@ const EventCardDetail = (props: EventData) => {
   const hasRate = budgetRate && budgetRate > 0
 
   return (
-    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] w-[90vw] min-w-[340px] grid grid-cols-[75px_auto] gap-x-3 '>
+    <Card className='bg-white/50 border-foreground/20 p-3   rounded-3xl mb-10 first:mt-6 max-w-[400px] w-[95vw] min-w-[340px] grid grid-cols-[75px_auto] gap-x-3 '>
       {status !== null && (
         <span
           className={cn(
@@ -710,7 +710,7 @@ const EventCardDetail = (props: EventData) => {
             </Card>
           </TabsContent>
           <TabsContent value='event'>
-            <Card className='w-full max-w-[90vw] p-5 bg-white/60 border-foreground/20 rounded-xl'>
+            <Card className='w-full max-w-[95vw] p-5 bg-white/60 border-foreground/20 rounded-xl'>
               <Accordion defaultValue='item-1'>
                 <AccordionItem value='item-1'>
                   <AccordionTrigger

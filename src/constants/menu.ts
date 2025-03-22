@@ -101,8 +101,8 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["artist"],
       },
       {
-        title: "Billing",
-        path: "/dashboard/account/billing",
+        title: "Account",
+        path: "/dashboard/account",
         category: "dashboard",
         public: false,
         view: "dashboard",
