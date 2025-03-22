@@ -136,8 +136,8 @@ const EventCardDetail = (props: EventData) => {
     dates.eventStart && dates.eventEnd
       ? generateICSFile(
           event.name,
-          dates.eventStart,
-          dates.eventEnd,
+          dates.ocStart,
+          dates.ocEnd,
           locationString,
           eventTab.about
         )

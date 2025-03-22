@@ -51,8 +51,10 @@ NavBarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 150)
+    const scrollThreshold = isMobile ? 50 : 150
+    setIsScrolled(latest > scrollThreshold)
   })
+
   // const { subStatus } =
   //   useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
 
