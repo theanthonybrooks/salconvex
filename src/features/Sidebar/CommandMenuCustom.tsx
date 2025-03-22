@@ -150,7 +150,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
 
   return isMobile ? (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className='relative pt-4 pb-6 z-[9999] h-[90vh] max-h-[90vh] overflow-hidden'>
+      <DrawerContent className='relative pt-4 pb-6 z-[9999] h-[90dvh] max-h-[90dvh] overflow-hidden '>
         <X
           className='size-7 absolute right-4 top-4 text-stone-600 hover:text-red-600'
           onClick={() => setOpen(false)}
@@ -161,11 +161,16 @@ export const CommandMenuCustom = <T extends CommandItem>({
 
         <Command shouldFilter={false} className='flex flex-col h-full'>
           <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6'>
-            <IoSearch className='z-20 p-1 text-3xl text-stone-400' />
             <Command.Input
               ref={inputRef}
               value={value}
               onValueChange={handleValueChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }
+              }}
               placeholder={placeholder}
               className='relative z-10 w-full p-3 pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden bg-background focus:bg-card'
             />
@@ -182,7 +187,6 @@ export const CommandMenuCustom = <T extends CommandItem>({
             )}
           </div>
 
-          {/* Scrollable list */}
           <Command.List className='overflow-y-auto flex-1 px-6 py-2'>
             {Object.keys(groupedItems).length === 0 ? (
               <Command.Empty className='py-8 text-base text-center'>

@@ -78,7 +78,6 @@ export const Search = <T extends CommandItem>({
         </div>
       )}
 
-      {/* Pass props dynamically */}
       <CommandMenuCustom
         open={open}
         setOpen={setOpen}
