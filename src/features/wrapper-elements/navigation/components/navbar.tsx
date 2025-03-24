@@ -63,7 +63,8 @@ NavBarProps) {
     (link) =>
       link.sub.includes(statusKey) ||
       link.sub.includes("all") ||
-      (link.sub.includes("public") && !user)
+      (link.sub.includes("public") &&
+        (subStatus === "none" || subStatus === "cancelled"))
   )
   const filteredNavbarMenuResources = resources.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all")
@@ -101,12 +102,11 @@ NavBarProps) {
       {/* ------ Mobile Only circle underlay ----- */}
 
       <motion.div
-        initial={{ boxShadow: "none" }}
         animate={{
           height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-19 h-25  '>
+        className='fixed left-0 right-0 top-0 z-[19] h-25  '>
         <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative lg:hidden'>
           <motion.div
             initial={{ boxShadow: "none", height: 90, width: 90 }}
@@ -137,8 +137,8 @@ NavBarProps) {
 
           <div className='lg:hidden items-center gap-2 flex'>
             <motion.div
-              initial={{ translateX: -35, translateY: 13 }}
-              animate={{ translateX: isScrolled ? -25 : -35, translateY: 13 }}
+              initial={{ translateX: "-50%", translateY: 14 }}
+              animate={{ translateX: "-50%", translateY: 14 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className='absolute bottom-0 left-1/2  z-10'>
               {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}

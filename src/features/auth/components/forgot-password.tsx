@@ -128,7 +128,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
   ) => {
     setError(undefined)
     try {
-      console.log("data", data)
       const isNewUser = await convex.query(api.users.isNewUser, {
         email: data.email,
       })
@@ -288,7 +287,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
       </CardFooter>
     </Card>
   ) : (
-    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-foreground bg-salYellow md:bg-white shadow-none  p-8'>
+    <Card className='md:relative w-full border-none md:border-solid md:border-2 border-foreground bg-salYellow md:bg-white shadow-none  md:p-8'>
       <CloseMsg switchFlow={switchFlow} />
       <Form {...resetForm}>
         <CardHeader className='flex-col items-center justify-center'>

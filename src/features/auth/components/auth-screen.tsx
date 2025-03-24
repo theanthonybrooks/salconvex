@@ -5,11 +5,12 @@ import RegisterForm from "@/features/auth/components/register-form"
 import SignInCard from "@/features/auth/components/sign-in-card"
 import { cn } from "@/lib/utils"
 
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export default function AuthScreen() {
   const router = useRouter()
   const pathname = usePathname()
+  const callbackUrl = useSearchParams().get("src")
 
   // Create booleans based on the URL.
   const isRegister = pathname.endsWith("/register")
@@ -23,7 +24,12 @@ export default function AuthScreen() {
     } else if (target === "forgotPassword") {
       targetPath = "/auth/forgot-password"
     }
-    router.push(targetPath)
+
+    if (callbackUrl) {
+      router.push(`${targetPath}?src=${encodeURIComponent(callbackUrl)}`)
+    } else {
+      router.push(targetPath)
+    }
   }
 
   return (

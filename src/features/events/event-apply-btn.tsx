@@ -7,9 +7,15 @@ interface ApplyButtonProps {
   id: number
   status: "accepted" | "rejected" | "pending" | null
   openCall: boolean
+  publicView?: boolean
 }
 
-const ApplyButton: React.FC<ApplyButtonProps> = ({ id, status, openCall }) => {
+const ApplyButton: React.FC<ApplyButtonProps> = ({
+  id,
+  status,
+  openCall,
+  publicView,
+}) => {
   const router = useRouter()
   const [isHovered, setIsHovered] = useState(false)
 
@@ -31,7 +37,11 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({ id, status, openCall }) => {
       variant='salWithShadowHidden'
       size='lg'
       className='bg-white/60 relative overflow-hidden'
-      onClick={() => router.push(`/thelist/event/${id}`)}
+      onClick={
+        publicView
+          ? () => router.push("/pricing")
+          : () => router.push(`/thelist/event/${id}`)
+      }
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       <AnimatePresence mode='wait' initial={false}>

@@ -32,9 +32,7 @@ export const Search = <T extends CommandItem>({
 }: SearchProps<T>) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("Search")
-  console.log("User: ", user)
   const userType = user?.accountType
-  console.log("userType", userType)
 
   return (
     <>

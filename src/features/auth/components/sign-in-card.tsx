@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import React, { useState } from "react"
 import { FaApple, FaGoogle } from "react-icons/fa"
 
@@ -47,6 +47,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
 
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("src")
+
   const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setPending(true)
@@ -58,7 +61,11 @@ const SignInCard: React.FC<SignInCardProps> = ({
     signIn("password", formData)
       .then(() => {
         setSuccess("Successfully signed in!")
-        // router.push("/verify")
+        if (callbackUrl && callbackUrl === "newUser") {
+          router.replace("/pricing#plans")
+        } else {
+          router.replace("/")
+        }
       })
       .catch((err) => {
         const errorMessage =

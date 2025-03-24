@@ -41,7 +41,7 @@ import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { ExternalLink, Eye, EyeOff, LoaderCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { v4 as uuidv4 } from "uuid"
@@ -77,6 +77,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [email, setEmail] = useState<string>("")
   const [obsEmail, setObsEmail] = useState("")
   const [otp, setOtp] = useState<string>("")
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("src")
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -220,6 +222,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         setIsLoading(false)
         setSuccess("Successfully signed up and verified!")
         form.reset()
+        if (callbackUrl && callbackUrl === "newUser") {
+          router.replace("/pricing#plans")
+        } else {
+          router.replace("/")
+        }
       }
     } catch (error) {
       setIsLoading(false)
@@ -435,7 +442,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             type='button'
                             onClick={() => setShowPassword((prev) => !prev)}
                             className='absolute inset-y-0 right-0 flex items-center pr-3'
-                            tabIndex={step === "signUp" ? 5 : -1}>
+                            tabIndex={-1}>
                             {showPassword ? (
                               <Eye className='size-4 text-foreground' />
                             ) : (
@@ -469,7 +476,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                           height={8}
                           hasSearch={false}
                           selectAll={false}
-                          tabIndex={step === "signUp" ? 6 : -1}
+                          tabIndex={step === "signUp" ? 5 : -1}
                         />
                       </FormControl>
                       <FormMessage />

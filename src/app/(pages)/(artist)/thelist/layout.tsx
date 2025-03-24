@@ -1,7 +1,7 @@
+import TheListNavBar from "@/app/(pages)/(artist)/thelist/components/artist-navbar"
 import SalHeader from "@/components/ui/sal-header"
 import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper"
 import Footer from "@/features/wrapper-elements/navigation/components/footer"
-import NavBar from "@/features/wrapper-elements/navigation/components/navbar"
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server"
 import { fetchQuery } from "convex/nextjs"
 import { api } from "~/convex/_generated/api"
@@ -23,9 +23,11 @@ export default async function HomeLayout({
     { token }
   )
 
+  // if (!token) redirect("auth/sign-in")
+
   return (
     <ClientAuthWrapper>
-      <NavBar
+      <TheListNavBar
         userId={userId ?? "guest"}
         user={user ?? null}
         subStatus={subStatus?.subStatus ?? "none"}

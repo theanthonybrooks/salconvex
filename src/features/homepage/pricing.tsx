@@ -211,9 +211,10 @@ const PricingCard = ({
         <Button
           onClick={() => {
             if (!userExists) {
-              router.push("/auth/sign-in")
+              router.push("/auth/register?src=newUser")
               return
             }
+
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false)
           }}
           className={cn("w-full", {
@@ -253,7 +254,7 @@ export default function Pricing() {
   }
 
   return (
-    <section className='price-card-cont px-4'>
+    <section id='plans' className='price-card-cont px-4'>
       <div className='mx-auto max-w-7xl'>
         <PricingHeader
           title='Choose Your Plan'

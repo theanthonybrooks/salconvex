@@ -11,11 +11,17 @@ import {
 
 import { cn } from "@/lib/utils"
 import { EventData } from "@/types/event"
+import { UserPref } from "@/types/user"
 import { CheckCircleIcon, CircleDollarSignIcon } from "lucide-react"
 import Image from "next/image"
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6"
 
-const EventCardPreview = (props: EventData) => {
+type EventCardPreviewProps = EventData & {
+  publicView?: boolean
+  userPref?: UserPref | null
+}
+
+const EventCardPreview = (props: EventCardPreviewProps) => {
   const {
     id,
     logo,
@@ -37,6 +43,8 @@ const EventCardPreview = (props: EventData) => {
     openCall,
     appFee,
     bookmarked,
+    publicView,
+    userPref,
   } = props
 
   const { locale, city, stateAbbr, country, countryAbbr } = location
@@ -44,6 +52,8 @@ const EventCardPreview = (props: EventData) => {
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`
+
+  const userCurrency = userPref?.currency ?? ""
 
   return (
     <Card className='bg-white/40 border-foreground/20 grid grid-cols-[75px_minmax(0,auto)_50px] min-w-[340px]  w-[90vw] max-w-[400px] gap-x-3 rounded-3xl mb-10 first:mt-6 px-1 py-2'>
@@ -101,11 +111,15 @@ const EventCardPreview = (props: EventData) => {
               !openCall && "hidden"
             )}>
             <span className={"font-semibold"}>Deadline:</span>
-            {formatOpenCallDeadline(
-              dates?.ocEnd || "",
-              dates?.timezone,
-              callType,
-              true
+            {publicView ? (
+              <span className='blur-[5px]'>This Year</span>
+            ) : (
+              formatOpenCallDeadline(
+                dates?.ocEnd || "",
+                dates?.timezone,
+                callType,
+                true
+              )
             )}
           </p>
           <p
@@ -114,17 +128,26 @@ const EventCardPreview = (props: EventData) => {
               !openCall && "hidden"
             )}>
             <span className='font-semibold'>Budget:</span>
-            {budgetMin > 0 || (budgetMax && budgetMax > 0)
-              ? formatCurrency(
-                  budgetMin,
-                  budgetMax,
-                  currency,
-                  true,
-                  allInclusive
-                )
-              : budgetRate && budgetRate > 0
-              ? formatRate(budgetRate, budgetRateUnit, currency, allInclusive)
-              : "No Info"}
+            {publicView ? (
+              <span className='blur-[5px]'>Sign in to view</span>
+            ) : budgetMin > 0 || (budgetMax && budgetMax > 0) ? (
+              formatCurrency(
+                budgetMin,
+                budgetMax,
+                userCurrency ? userCurrency : currency,
+                true,
+                allInclusive
+              )
+            ) : budgetRate && budgetRate > 0 ? (
+              formatRate(
+                budgetRate,
+                budgetRateUnit,
+                userCurrency ? userCurrency : currency,
+                allInclusive
+              )
+            ) : (
+              "No Info"
+            )}
           </p>
           <p
             className={cn(
@@ -132,17 +155,26 @@ const EventCardPreview = (props: EventData) => {
               !openCall && "hidden"
             )}>
             <span className='font-semibold'>Eligible:</span>
-            <span
-              className={cn(
-                eligibilityType !== "International" && "text-red-600"
-              )}>
-              {eligibility}
-              {eligibilityType !== "International" && " Artists*"}
-            </span>
+            {publicView ? (
+              <span className='blur-[5px]'>$3 per month</span>
+            ) : (
+              <span
+                className={cn(
+                  eligibilityType !== "International" && "text-red-600"
+                )}>
+                {eligibility}
+                {eligibilityType !== "International" && " Artists*"}
+              </span>
+            )}
           </p>
         </div>
 
-        <ApplyButton id={id} status={status} openCall={openCall} />
+        <ApplyButton
+          id={id}
+          status={status}
+          openCall={openCall}
+          publicView={publicView}
+        />
       </div>
       <div className='flex flex-col items-center justify-between pt-5 pb-5 pr-2'>
         {status === null ? (
@@ -154,6 +186,7 @@ const EventCardPreview = (props: EventData) => {
         )}
         <div className='flex gap-x-2 items-center justify-center'>
           {/* <EyeOff className='h-6 w-6' /> //NOTE: Move this to the detailed card view */}
+          {/* TODO: Add publicView check to this as well (when the state is set up) */}
           {bookmarked ? (
             <FaBookmark className='size-8 text-red-600' />
           ) : (

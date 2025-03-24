@@ -28,7 +28,7 @@ export default function Home() {
         initial={{ y: 0, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className='hidden  sm:flex flex-col h-full items-center justify-center relative rounded-3xl overflow-hidden'
+        className='flex flex-col h-full items-center justify-center relative rounded-3xl overflow-hidden'
         style={{
           maxHeight: "calc(100dvh - 8.5rem)",
         }}>

@@ -58,8 +58,6 @@ export const CommandMenuCustom = <T extends CommandItem>({
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const router = useRouter()
 
-  console.log("Usertype: ", userType)
-
   // Update the ref if shortcut changes
   useEffect(() => {
     shortcutRef.current = shortcut

@@ -5,8 +5,35 @@ import { AccordionComponent } from "@/features/homepage/accordion-component"
 import Pricing from "@/features/homepage/pricing"
 import { motion } from "framer-motion"
 import { Check, DollarSign } from "lucide-react"
+import { useEffect } from "react"
 
 export default function PricingPage() {
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const hash = window.location.hash
+    console.log("hash", hash)
+    if (hash !== "#plans") return
+
+    let attempts = 0
+    const maxAttempts = 10
+    console.log("attempts", attempts)
+
+    const scrollToSection = () => {
+      const section = document.getElementById("plans")
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" })
+        // Optional: Clear hash after scrolling
+        window.history.replaceState(null, "", window.location.pathname)
+      } else if (attempts < maxAttempts) {
+        attempts++
+        requestAnimationFrame(scrollToSection)
+      }
+    }
+
+    scrollToSection()
+  }, [])
+
   const features = [
     "Authentication & Authorization",
     "Payment Processing",
