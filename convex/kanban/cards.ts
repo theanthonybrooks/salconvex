@@ -148,6 +148,15 @@ export const editCard = mutation({
     title: v.string(),
     userId: v.string(),
     priority: v.optional(v.string()),
+    column: v.optional(
+      v.union(
+        v.literal("proposed"),
+        v.literal("backlog"),
+        v.literal("todo"),
+        v.literal("doing"),
+        v.literal("done")
+      )
+    ),
   },
   handler: async (ctx, args) => {
     return await ctx.db.patch(args.id, {
@@ -155,6 +164,7 @@ export const editCard = mutation({
       updatedAt: Date.now(),
       lastUpdatedBy: args.userId,
       priority: args.priority,
+      ...(args.column !== undefined && { column: args.column }),
     })
   },
 })

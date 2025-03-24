@@ -3,10 +3,9 @@
 import { Id } from "convex/_generated/dataModel"
 import { useMutation, useQuery } from "convex/react"
 import { motion } from "framer-motion"
-import { Dot, X } from "lucide-react"
-import { useRef, useState } from "react"
-import { FaFire } from "react-icons/fa"
-import { FiPlus, FiTrash } from "react-icons/fi"
+import { X } from "lucide-react"
+import { useState } from "react"
+import { FiPlus } from "react-icons/fi"
 import { api } from "~/convex/_generated/api"
 
 import { cn } from "@/lib/utils"
@@ -24,13 +23,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done"
 
@@ -92,11 +84,6 @@ interface DropIndicatorProps {
 // interface BurnBarrelProps {
 //   userRole: string
 // }
-
-interface AddCardProps {
-  column: ColumnType
-  userRole: string
-}
 
 interface KanbanBoardProps {
   userRole?: string
@@ -163,8 +150,13 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   return (
     <div className='flex flex-col items-center gap-6'>
       {/* Submission Form */}
-      {userRole === "admin" && <TaskSubmissionForm addCard={addCard} />}
-      <div className='flex h-full w-full gap-3 overflow-auto scrollable invis p-12'>
+      {/* {userRole === "admin" && (
+        <div className='flex items-center justify-center w-full gap-3'>
+        
+          <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
+        </div>
+      )} */}
+      <div className='flex h-full w-full max-h-screen gap-3  invis p-12'>
         {(["proposed", "backlog", "todo", "doing", "done"] as ColumnType[]).map(
           (column) => (
             <Column
@@ -182,8 +174,6 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
             />
           )
         )}
-
-        <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
       </div>
     </div>
   )
@@ -206,7 +196,7 @@ const Column: React.FC<
   deleteCard,
   moveCard,
   addCard,
-  activeColumn,
+
   setActiveColumn,
 }) => {
   const [active, setActive] = useState(false)
@@ -305,16 +295,24 @@ const Column: React.FC<
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDragEnd}>
-      <div className='mb-3 flex items-center justify-between'>
+      <div className='mb-3 flex items-center justify-between sticky top-0 bg-background z-10'>
         <h3 className={`font-medium ${headingColor} p-4 rounded-lg`}>
           {title}
         </h3>
-        <span className='rounded text-sm text-foreground dark:text-primary-foreground'>
+        {userRole === "admin" && (
+          <AddCard
+            column={column}
+            addCard={addCard}
+            userRole={userRole}
+            setActiveColumn={setActiveColumn}
+          />
+        )}
+        <span className='rounded text-sm text-foreground dark:text-primary-foreground '>
           {cards.length}
         </span>
       </div>
       <div
-        className={`h-full w-full transition-colors ${
+        className={`flex flex-col gap-[2px] overflow-y-auto scrollable mini max-h-[calc(100vh-150px)] transition-colors ${
           active
             ? "bg-[hsl(45,100%,71%)]/30"
             : "bg-[hsl(60, 100%, 99.6078431372549%)]/0"
@@ -330,16 +328,6 @@ const Column: React.FC<
         ))}
 
         <DropIndicator beforeId={undefined} column={column} />
-
-        {userRole === "admin" && (
-          <AddCard
-            column={column}
-            addCard={addCard}
-            userRole={userRole}
-            activeColumn={activeColumn}
-            setActiveColumn={setActiveColumn}
-          />
-        )}
       </div>
     </div>
   )
@@ -395,35 +383,15 @@ const Card: React.FC<CardProps> = ({
   deleteCard,
   priority,
 }) => {
-  const [newTitle, setNewTitle] = useState(title)
   const [newPriority, setNewPriority] = useState(priority || "medium")
   const [isHovered, setIsHovered] = useState(false)
 
   const editCard = useMutation(api.kanban.cards.editCard)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   // Delete function
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation()
     await deleteCard({ id: id as Id<"todoKanban">, userId: "admin" })
-  }
-
-  // Save edited title
-  const handleSave = async () => {
-    if (!newTitle.trim() || (newTitle === title && newPriority === priority)) {
-      return
-    }
-
-    await editCard({
-      id: id as Id<"todoKanban">,
-      title: newTitle,
-      priority: newPriority,
-      userId: "admin",
-    })
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSave()
   }
 
   const handleTogglePriority = async () => {
@@ -439,7 +407,7 @@ const Card: React.FC<CardProps> = ({
 
       editCard({
         id: id as Id<"todoKanban">,
-        title: newTitle,
+        title,
         priority: updatedPriority,
         userId: "admin",
       })
@@ -470,79 +438,30 @@ const Card: React.FC<CardProps> = ({
         onMouseLeave={() => setIsHovered(false)}>
         {isHovered && (
           <div className='absolute top-0 right-0 bg-card/90 dark:bg-foreground border border-primary p-3 rounded-lg flex gap-x-2 items-center justify-center'>
-            <Dialog>
-              <DialogTrigger asChild>
+            <TaskDialog
+              mode='edit'
+              trigger={
                 <Pencil
                   size={16}
-                  className=' text-gray-500 hover:text-gray-700 cursor-pointer'
+                  className='text-gray-500 hover:text-gray-700 cursor-pointer'
                 />
-              </DialogTrigger>
-              <DialogContent
-                className='sm:max-w-[425px] bg-card'
-                onOpenAutoFocus={(event) => {
-                  event.preventDefault()
-                  inputRef.current?.focus()
-                }}>
-                <DialogHeader>
-                  <DialogTitle>Edit Task</DialogTitle>
-                  <DialogDescription>
-                    Edit task description and priority
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className='flex gap-x-4 items-start'>
-                  <div className='flex flex-col items-start gap-2 flex-1'>
-                    <Label htmlFor='name'>Task:</Label>
-                    <textarea
-                      ref={inputRef}
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      autoFocus
-                      className='text-sm w-full border rounded p-1 h-full bg-card scrollable mini'
-                    />
-                  </div>
-                  <div className='flex flex-col items-start gap-2'>
-                    <Label htmlFor='username'>Priority:</Label>
-                    <Select
-                      value={newPriority}
-                      onValueChange={(val) => setNewPriority(val)}>
-                      <SelectTrigger className='min-w-[100px]'>
-                        <SelectValue placeholder='Theme' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='high'>
-                          <span className='flex items-center gap-x-1'>
-                            <Dot className='text-green-500' size={24} />
-                            High
-                          </span>
-                        </SelectItem>
-                        <SelectItem value='medium'>
-                          <span className='flex items-center gap-x-1'>
-                            <Dot className='text-yellow-500' size={24} />
-                            Medium
-                          </span>
-                        </SelectItem>
-                        <SelectItem value='low'>
-                          <span className='flex items-center gap-x-1'>
-                            <Dot className='text-red-500' size={24} />
-                            Low
-                          </span>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <DialogClose>
-                    <Button type='submit' onClick={handleSave}>
-                      Save changes
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+              }
+              initialValues={{
+                title,
+                column,
+                priority: (["low", "medium", "high"].includes(priority ?? "")
+                  ? priority
+                  : "medium") as "low" | "medium" | "high",
+              }}
+              onSubmit={(data) => {
+                editCard({
+                  id: id as Id<"todoKanban">,
+                  ...data,
+                  userId: "admin",
+                })
+                setNewPriority(data.priority)
+              }}
+            />
 
             <X
               size={16}
@@ -581,7 +500,8 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
   )
 }
 
-const BurnBarrel: React.FC<{
+{
+  /*const BurnBarrel: React.FC<{
   deleteCard: (args: DeleteCardArgs) => void
   userRole: string
 }> = ({ deleteCard, userRole }) => {
@@ -620,144 +540,261 @@ const BurnBarrel: React.FC<{
       {active ? <FaFire className='animate-bounce' /> : <FiTrash />}
     </div>
   )
+}*/
 }
 
-const AddCard: React.FC<
-  AddCardProps & {
-    addCard: (args: AddCardArgs) => void
-    activeColumn: string | null
-    setActiveColumn: (col: string | null) => void
-  }
-> = ({ column, addCard, userRole, activeColumn, setActiveColumn }) => {
-  const [text, setText] = useState("")
-  const isOpen = activeColumn === column // Check if this column is the active one
+const AddCard: React.FC<{
+  column: ColumnType
+  addCard: (args: AddCardArgs) => void
+
+  setActiveColumn: (col: string | null) => void
+  userRole: string
+}> = ({ column, addCard, userRole }) => {
+  // const [title, setTitle] = useState("")
+  // const [priority, setPriority] = useState<"low" | "medium" | "high">("medium")
+  // const [order, setOrder] = useState<"start" | "end">("end")
+  // const [selectedColumn, setSelectedColumn] = useState<ColumnType>(column)
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault()
+  //   if (!title.trim()) return
+
+  //   await addCard({
+  //     title: title.trim(),
+  //     column: selectedColumn,
+  //     userId: "admin",
+  //     order,
+  //     priority,
+  //   })
+
+  //   setTitle("")
+  //   setSelectedColumn(column)
+  //   setOrder("start")
+  //   setPriority("medium")
+  //   setActiveColumn(null)
+  // }
 
   if (userRole !== "admin") return null
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!text.trim().length) return
-
-    await addCard({ title: text.trim(), column, userId: "admin" })
-    setText("")
-    setActiveColumn(null) // Close the form after submission
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault() // Prevent new lines in textarea
-      handleSubmit(e)
-    }
-  }
-
   return (
-    <>
-      {isOpen ? (
-        <motion.form layout onSubmit={handleSubmit}>
-          <textarea
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={handleKeyDown} // Capture Enter key
-            autoFocus
-            placeholder='Add new task...'
-            className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-violet-800/60 placeholder-violet-300 focus:outline-0'
-          />
-          <div className='mt-1.5 flex items-center justify-end gap-1.5'>
-            <button
-              type='button'
-              onClick={() => setActiveColumn(null)}
-              className='px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-600'>
-              Close
-            </button>
-            <button
-              type='submit'
-              className='flex items-center gap-1.5 rounded bg-neutral-50 px-3 py-1.5 text-xs text-neutral-950 transition-colors hover:bg-neutral-300'>
-              <span>Add</span>
-              <FiPlus />
-            </button>
-          </div>
-        </motion.form>
-      ) : (
+    // <Dialog>
+    //   <DialogTrigger asChild>
+    //     <motion.button
+    //       layout
+    //       onClick={() => setActiveColumn(column)}
+    //       className='text-xs text-neutral-500 transition-colors hover:text-neutral-600'>
+    //       <FiPlus />
+    //     </motion.button>
+    //   </DialogTrigger>
+    //   <DialogContent className='bg-card'>
+    //     <DialogHeader>
+    //       <DialogTitle>Add New Task</DialogTitle>
+    //       <DialogDescription>
+    //         Add a new task to any column with optional priority and order.
+    //       </DialogDescription>
+    //     </DialogHeader>
+
+    //     <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+    //       <textarea
+    //         value={title}
+    //         onChange={(e) => setTitle(e.target.value)}
+    //         placeholder='Task title...'
+    //         className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+    //       />
+
+    //       <Label>Column</Label>
+    //       <select
+    //         value={selectedColumn}
+    //         onChange={(e) => setSelectedColumn(e.target.value as ColumnType)}
+    //         className='border p-2 rounded bg-background text-foreground'>
+    //         <option value='proposed'>Proposed</option>
+    //         <option value='backlog'>Backlog</option>
+    //         <option value='todo'>To Do</option>
+    //         <option value='doing'>In Progress</option>
+    //         <option value='done'>Complete</option>
+    //       </select>
+
+    //       <Label>Priority</Label>
+    //       <select
+    //         value={priority}
+    //         onChange={(e) =>
+    //           setPriority(e.target.value as "low" | "medium" | "high")
+    //         }
+    //         className='border p-2 rounded bg-background text-foreground'>
+    //         <option value='high'>High</option>
+    //         <option value='medium'>Medium</option>
+    //         <option value='low'>Low</option>
+    //       </select>
+
+    //       <Label>Order</Label>
+    //       <select
+    //         value={order}
+    //         onChange={(e) => setOrder(e.target.value as "start" | "end")}
+    //         className='border p-2 rounded bg-background text-foreground'>
+    //         <option value='start'>Add to Beginning</option>
+    //         <option value='end'>Add to End</option>
+    //       </select>
+
+    //       <DialogFooter className='flex justify-end gap-2'>
+    //         <DialogClose asChild>
+    //           <Button type='button' variant='salWithShadowHiddenYlw'>
+    //             Cancel
+    //           </Button>
+    //         </DialogClose>
+    //         <DialogClose asChild>
+    //           <Button variant='salWithShadowHidden' type='submit'>
+    //             Add Task
+    //           </Button>
+    //         </DialogClose>
+    //       </DialogFooter>
+    //     </form>
+    //   </DialogContent>
+    // </Dialog>
+    <TaskDialog
+      mode='add'
+      trigger={
         <motion.button
           layout
-          onClick={() => setActiveColumn(column)} // Set this column as active
-          className='flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 transition-colors hover:text-neutral-600'>
-          <span>Add card</span>
+          className='text-xs text-neutral-500 hover:text-neutral-600'>
           <FiPlus />
         </motion.button>
-      )}
-    </>
+      }
+      initialValues={{ column, priority: "medium", order: "end", title: "" }}
+      onSubmit={(data) => {
+        addCard({
+          ...data,
+          userId: "admin",
+        })
+      }}
+    />
   )
 }
 
-const TaskSubmissionForm: React.FC<{
-  addCard: (args: AddCardArgs) => void
-}> = ({ addCard }) => {
-  const [title, setTitle] = useState("")
-  const [column, setColumn] = useState<ColumnType>("todo") // Default to "To Do"
-  const [order, setOrder] = useState<"start" | "end">("end") // Default to adding at the end
-  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium")
+type BaseTaskValues = {
+  title: string
+  column: ColumnType
+  priority: "low" | "medium" | "high"
+}
+
+type AddTaskDialogProps = {
+  mode: "add"
+  trigger: React.ReactNode
+  initialValues?: BaseTaskValues & { order: "start" | "end" }
+  onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void
+}
+
+type EditTaskDialogProps = {
+  mode: "edit"
+  trigger: React.ReactNode
+  initialValues?: BaseTaskValues
+  onSubmit: (values: BaseTaskValues) => void
+}
+
+type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps
+
+export const TaskDialog: React.FC<TaskDialogProps> = ({
+  mode,
+  trigger,
+  initialValues,
+  onSubmit,
+}) => {
+  const [title, setTitle] = useState(initialValues?.title || "")
+  const [column, setColumn] = useState<ColumnType>(
+    initialValues?.column || "todo"
+  )
+  const [priority, setPriority] = useState<"low" | "medium" | "high">(
+    initialValues?.priority || "medium"
+  )
+  const [order, setOrder] = useState<"start" | "end">(
+    mode === "add" && initialValues?.order ? initialValues.order : "end"
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) return
 
-    addCard({ title, column, userId: "admin", order, priority })
-    setTitle("")
+    if (mode === "add") {
+      onSubmit({ title: title.trim(), column, priority, order })
+    } else {
+      onSubmit({ title: title.trim(), column, priority })
+    }
   }
 
+  const isEdit = mode === "edit"
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className='flex flex-col gap-3 p-4 border rounded-lg bg-white shadow-md w-1/3'>
-      <h3 className='text-lg font-semibold'>Add New Task</h3>
+    <Dialog>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className='bg-card'>
+        <DialogHeader>
+          <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? "Update task details."
+              : "Create a new task with priority and location."}
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Task Name Input */}
-      <textarea
-        placeholder='Task name...'
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className='border p-2 rounded-lg w-full bg-card'
-      />
+        <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+          <Label>Task</Label>
+          <textarea
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder='Task title...'
+            className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+          />
 
-      {/* Column Selection */}
-      <select
-        value={column}
-        onChange={(e) => setColumn(e.target.value as ColumnType)}
-        className='border p-2 rounded-lg bg-card'>
-        <option value='proposed'>Proposed</option>
-        <option value='backlog'>Backlog</option>
-        <option value='todo'>To Do</option>
-        <option value='doing'>In Progress</option>
-        <option value='done'>Complete</option>
-      </select>
+          <Label>Column</Label>
+          <select
+            value={column}
+            onChange={(e) => setColumn(e.target.value as ColumnType)}
+            className='border p-2 rounded bg-background text-foreground'>
+            <option value='proposed'>Proposed</option>
+            <option value='backlog'>Backlog</option>
+            <option value='todo'>To Do</option>
+            <option value='doing'>In Progress</option>
+            <option value='done'>Complete</option>
+          </select>
 
-      {/* Order Selection */}
-      <select
-        value={order}
-        onChange={(e) => setOrder(e.target.value as "start" | "end")}
-        className='border p-2 rounded-lg bg-card'>
-        <option value='start'>Add to the Beginning</option>
-        <option value='end'>Add to the End</option>
-      </select>
+          <Label>Priority</Label>
+          <select
+            value={priority}
+            onChange={(e) =>
+              setPriority(e.target.value as "low" | "medium" | "high")
+            }
+            className='border p-2 rounded bg-background text-foreground'>
+            <option value='high'>High</option>
+            <option value='medium'>Medium</option>
+            <option value='low'>Low</option>
+          </select>
 
-      {/* Priority Selection */}
-      <select
-        value={priority}
-        onChange={(e) =>
-          setPriority(e.target.value as "low" | "medium" | "high")
-        }
-        className='border p-2 rounded-lg bg-card'>
-        <option value='high'>High</option>
-        <option value='medium'>Medium</option>
-        <option value='low'>Low</option>
-      </select>
+          {!isEdit && (
+            <>
+              <Label>Order</Label>
+              <select
+                value={order}
+                onChange={(e) => setOrder(e.target.value as "start" | "end")}
+                className='border p-2 rounded bg-background text-foreground'>
+                <option value='start'>Add to Beginning</option>
+                <option value='end'>Add to End</option>
+              </select>
+            </>
+          )}
 
-      {/* Submit Button */}
-      <button
-        type='submit'
-        className='bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition'>
-        Add Task
-      </button>
-    </form>
+          <DialogFooter className='flex justify-end gap-2'>
+            <DialogClose asChild>
+              <Button type='button' variant='salWithShadowHiddenYlw'>
+                Cancel
+              </Button>
+            </DialogClose>
+            <DialogClose asChild>
+              <Button type='submit' variant='salWithShadowHidden'>
+                {isEdit ? "Save Changes" : "Add Task"}
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
