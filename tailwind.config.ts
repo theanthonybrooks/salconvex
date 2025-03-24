@@ -25,6 +25,7 @@ export default {
         ramaC: ["rama-gothic-c", ...fontFamily.sans],
       },
       screens: {
+        lg: "1025px",
         "2xl": "1536px",
         "3xl": "1920px",
         "4xl": "2560px",

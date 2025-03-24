@@ -192,10 +192,10 @@ export default function NavBar({
           )}
 
           {/* ------ Mobile Right side ------ */}
-          {isMobile && (
-            <div className='flex items-center justify-end w-full gap-x-6  lg:hidden'>
-              {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
-              {/* <Unauthenticated>
+
+          <div className='flex items-center justify-end w-full gap-x-6  lg:hidden'>
+            {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
+            {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>
                 <Button
                   variant='salWithShadowHidden'
@@ -205,20 +205,19 @@ export default function NavBar({
                 </Button>
               </Link>
             </Unauthenticated> */}
-              <>
-                <Bell className='size-7 w-fit' />
+            <>
+              <Bell className='size-7 w-fit' />
 
-                <FullPageNav
-                  // userId={userId}
-                  isScrolled={isScrolled}
-                  user={user}
-                  isDashboard={true}
-                  // userPref={userPref}
-                  // subStatus={subStatus}
-                />
-              </>
-            </div>
-          )}
+              <FullPageNav
+                // userId={userId}
+                isScrolled={isScrolled}
+                user={user}
+                isDashboard={true}
+                // userPref={userPref}
+                // subStatus={subStatus}
+              />
+            </>
+          </div>
         </div>
       </div>
     </>
