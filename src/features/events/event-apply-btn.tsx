@@ -26,9 +26,10 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
       ? "Applied: Rejected"
       : "Applied: Pending"
 
-  const initialText = status === null && openCall ? "Apply" : statusText
+  const initialText =
+    (status === null && openCall) || publicView ? "Apply" : statusText
 
-  const shouldHoverSwap = status !== null
+  const shouldHoverSwap = status !== null && !publicView
 
   const textToShow = shouldHoverSwap && isHovered ? "View more" : initialText
 

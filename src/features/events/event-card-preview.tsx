@@ -44,7 +44,7 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
     appFee,
     bookmarked,
     publicView,
-    userPref,
+    // userPref,
   } = props
 
   const { locale, city, stateAbbr, country, countryAbbr } = location
@@ -53,7 +53,7 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`
 
-  const userCurrency = userPref?.currency ?? ""
+  // const userCurrency = userPref?.currency ?? ""
 
   return (
     <Card className='bg-white/40 border-foreground/20 grid grid-cols-[75px_minmax(0,auto)_50px] min-w-[340px]  w-[90vw] max-w-[400px] gap-x-3 rounded-3xl mb-10 first:mt-6 px-1 py-2'>
@@ -134,16 +134,18 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
               formatCurrency(
                 budgetMin,
                 budgetMax,
-                userCurrency ? userCurrency : currency,
+                currency,
                 true,
                 allInclusive
+                // userCurrency !== currency ? userCurrency : undefined
               )
             ) : budgetRate && budgetRate > 0 ? (
               formatRate(
                 budgetRate,
                 budgetRateUnit,
-                userCurrency ? userCurrency : currency,
+                currency,
                 allInclusive
+                // userCurrency !== currency ? userCurrency : undefined
               )
             ) : (
               "No Info"

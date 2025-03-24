@@ -1,7 +1,6 @@
 import {
   convexAuthNextjsMiddleware,
   createRouteMatcher,
-  isAuthenticatedNextjs,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server"
 
@@ -12,8 +11,8 @@ const isAuthPage = createRouteMatcher(["/auth/:path*"])
 
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
-    const isAuthenticated = await isAuthenticatedNextjs()
-    console.log("isAuthenticatedNextjs:", isAuthenticated)
+    // const isAuthenticated = await isAuthenticatedNextjs()
+    // console.log("isAuthenticatedNextjs:", isAuthenticated)
 
     if (isAuthPage(request) && (await convexAuth.isAuthenticated())) {
       return nextjsMiddlewareRedirect(request, "/")

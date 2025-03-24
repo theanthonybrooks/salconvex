@@ -18,6 +18,7 @@ interface Props {
   sortOptions: SortOptions
   onChange: (newFilters: Partial<Filters>) => void
   onSortChange: (newSort: Partial<SortOptions>) => void
+  onResetFilters: () => void
 }
 
 export const EventFilters = ({
@@ -25,6 +26,7 @@ export const EventFilters = ({
   sortOptions,
   onChange,
   onSortChange,
+  onResetFilters,
 }: Props) => {
   const hasActiveFilters =
     filters.bookmarkedOnly ||
@@ -34,7 +36,7 @@ export const EventFilters = ({
     filters.continent !== undefined
 
   return (
-    <div className='flex flex-wrap gap-4 items-center justify-start mb-6'>
+    <div className='flex flex-wrap gap-4 items-center justify-start my-6'>
       <label className='flex items-center gap-2 cursor-pointer'>
         <Checkbox
           id='bookmarkedOnly'
@@ -127,15 +129,7 @@ export const EventFilters = ({
       {hasActiveFilters && (
         <span
           className='text-sm text-muted-foreground underline-offset-4 hover:underline cursor-pointer'
-          onClick={() =>
-            onChange({
-              showHidden: false,
-              bookmarkedOnly: false,
-              eventTypes: [],
-              eventCategories: [],
-              continent: undefined,
-            })
-          }>
+          onClick={onResetFilters}>
           Clear filters
         </span>
       )}
