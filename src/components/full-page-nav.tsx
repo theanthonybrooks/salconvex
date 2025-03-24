@@ -352,7 +352,7 @@ const FullPageNav = ({
                 className={cn("md:hidden absolute left-5 top-5")}>
                 <Link href='/'>
                   <Image
-                    src='/sitelogo.svg'
+                    src='/logotransparency.png'
                     alt='The Street Art List'
                     width={isScrolled || isDashboard ? 40 : 60}
                     height={isScrolled || isDashboard ? 40 : 60}
@@ -841,7 +841,7 @@ const FullPageNav = ({
                     <div className='flex gap-x-2 items-center text-center text-sm text-gray-600 dark:text-gray-400'>
                       {footerText.text}
                       <Image
-                        src='/sitelogo.svg'
+                        src='/logotransparency.png'
                         alt='The Street Art List'
                         width={40}
                         height={40}

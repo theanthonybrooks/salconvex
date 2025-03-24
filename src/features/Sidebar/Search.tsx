@@ -3,6 +3,7 @@ import {
   CommandMenuCustom,
 } from "@/features/Sidebar/CommandMenuCustom"
 import { cn } from "@/lib/utils"
+import { User } from "@/types/user"
 import { useState } from "react"
 import { FiCommand, FiSearch } from "react-icons/fi"
 
@@ -15,12 +16,14 @@ interface SearchProps<T extends CommandItem> {
   placeholder?: string
   iconOnly?: boolean
   isMobile?: boolean
+  user?: User | null
 }
 
 export const Search = <T extends CommandItem>({
   title,
   source,
   shortcut = "/",
+  user,
   // groupName,
   iconOnly = false,
   isMobile = false,
@@ -29,6 +32,9 @@ export const Search = <T extends CommandItem>({
 }: SearchProps<T>) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("Search")
+  console.log("User: ", user)
+  const userType = user?.accountType
+  console.log("userType", userType)
 
   return (
     <>
@@ -62,7 +68,7 @@ export const Search = <T extends CommandItem>({
       )}
       {iconOnly && (
         <div
-          className='flex items-center gap-x-2  '
+          className={cn("flex items-center gap-x-2  ", className)}
           onClick={() => setOpen(true)}>
           <FiSearch className='h-8 w-8 cursor-pointer' />
           {value && (
@@ -87,6 +93,7 @@ export const Search = <T extends CommandItem>({
         placeholder={placeholder}
         setSearch={setValue}
         isMobile={isMobile}
+        userType={userType}
       />
     </>
   )

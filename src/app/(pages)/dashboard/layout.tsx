@@ -1,6 +1,7 @@
 import DashboardContent from "@/features/dashboard/dashboard-content"
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server"
 import { fetchQuery } from "convex/nextjs"
+import { redirect } from "next/navigation"
 import { ReactNode } from "react"
 import { api } from "~/convex/_generated/api"
 import DashboardSideBar from "./_components/dashboard-sidebar"
@@ -22,6 +23,8 @@ export default async function DashboardLayout({
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token })
   const role = user?.user?.role
 
+  if (!user || !subStatus) redirect("/auth/sign-in")
+
   return (
     <>
       <DashboardTopNav
@@ -30,7 +33,11 @@ export default async function DashboardLayout({
         userId={user?.userId}
       />
       <div className='flex max-h-dvh max-w-screen overflow-hidden pt-20'>
-        <DashboardSideBar subStatus={subStatus?.subStatus} role={role} />
+        <DashboardSideBar
+          user={user?.user}
+          subStatus={subStatus?.subStatus}
+          role={role}
+        />
         <DashboardContent>{children}</DashboardContent>
       </div>
     </>

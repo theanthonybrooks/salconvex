@@ -153,7 +153,7 @@ NavBarProps) {
                     width: isScrolled ? 50 : 70,
                   }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  src='/sitelogo.svg'
+                  src='/logotransparency.png'
                   alt='The Street Art List'
 
                   // className='z-10'
@@ -177,16 +177,17 @@ NavBarProps) {
             <>
               {/* Desktop Logo & Navigation */}
               <motion.div
-                className='hidden lg:flex h-15 items-center gap-2 bg-white rounded-full border-2 border-foreground p-[5px] box-border overflow-hidden'
+                className='hidden lg:flex h-15 items-center gap-2 rounded-full border-2 border-foreground p-[5px] box-border overflow-hidden'
                 animate={{
                   width: isScrolled ? "60px" : "250px",
+                  backgroundColor: isScrolled ? "var(--background)" : "white",
                 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}>
                 <Link
                   href='/'
                   className='flex items-center gap-2 overflow-hidden'>
                   <Image
-                    src='/sitelogo.svg'
+                    src='/logotransparency.png'
                     alt='The Street Art List'
                     width={48}
                     height={48}

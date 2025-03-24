@@ -101,7 +101,6 @@ export default function Home() {
           </PopoverContent>
         </Popover>
       </motion.div>
-      <div className='h-[300vh] w-full '></div>
     </motion.div>
   )
 }

@@ -144,7 +144,8 @@ interface DashNavItem {
   href: string
   icon: LucideIcon
   sectionIcon?: LucideIcon
-  sub: string[] // Change sub to an array of strings
+  sub: string[]
+  userType: string[]
   section?: boolean
   sectionCat?: string
   sectionHead?: boolean
@@ -160,6 +161,7 @@ export const dashboardNavItems: DashNavItem[] = [
     icon: Home,
     desc: "Dashboard home",
     sub: ["active", "trialing", "admin"],
+    userType: ["public"],
   },
   // {
   //   label: "User Account",
@@ -184,6 +186,7 @@ export const dashboardNavItems: DashNavItem[] = [
     heading: "Account",
     desc: "Manage your profile",
     sub: ["active", "trialing", "admin"],
+    userType: ["public"],
   },
 
   {
@@ -194,6 +197,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "account",
     desc: "Manage your payments",
     sub: ["active", "trialing", "cancelled", "admin"],
+    userType: ["public"],
   },
   {
     label: "Pending Applications",
@@ -203,6 +207,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "admin",
     desc: "Submitted Applications",
     sub: ["admin"],
+    userType: ["admin"],
   },
   {
     label: "Website To-Dos",
@@ -215,6 +220,7 @@ export const dashboardNavItems: DashNavItem[] = [
     heading: "Admin",
     desc: "Admin Panel",
     sub: ["admin"],
+    userType: ["admin"],
   },
   {
     label: "My Applications",
@@ -227,6 +233,7 @@ export const dashboardNavItems: DashNavItem[] = [
     heading: "Applications",
     desc: "Track your submissions",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Bookmarks",
@@ -236,6 +243,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "apps",
     desc: "Saved opportunities",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Submitted",
@@ -245,6 +253,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "apps",
     desc: "Your sent applications",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Pending",
@@ -254,6 +263,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "apps",
     desc: "Awaiting response",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Accepted",
@@ -263,6 +273,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "apps",
     desc: "Approved applications",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Rejected",
@@ -272,6 +283,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "apps",
     desc: "Declined applications",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "CV & Resume",
@@ -284,6 +296,7 @@ export const dashboardNavItems: DashNavItem[] = [
     heading: "CV & Portfolio",
     desc: "Manage professional documents",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Portfolio",
@@ -293,6 +306,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "portfolio",
     desc: "Your uploaded works",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Artist Statement",
@@ -302,6 +316,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "portfolio",
     desc: "Define your artistic vision",
     sub: ["active", "trialing", "admin"],
+    userType: ["artist", "admin"],
   },
   {
     label: "Other Stuff",
@@ -314,6 +329,7 @@ export const dashboardNavItems: DashNavItem[] = [
     heading: "Miscellaneous",
     desc: "Extras & other tools",
     sub: ["active", "trialing", "admin"],
+    userType: ["public"],
   },
   {
     label: "Changelog",
@@ -324,6 +340,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "misc",
     desc: "View the latest updates",
     sub: ["all"],
+    userType: ["public"],
   },
   {
     label: "Help & Support",
@@ -331,5 +348,6 @@ export const dashboardNavItems: DashNavItem[] = [
     icon: HelpCircle,
     desc: "Get assistance",
     sub: ["all"],
+    userType: ["public"],
   },
 ]

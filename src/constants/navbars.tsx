@@ -123,12 +123,12 @@ export const landingPageNavbarLinks: {
     description: "View them prices.",
     sub: ["public"],
   },
-  {
-    title: "Billing",
-    href: "/dashboard/billing",
-    description: "View your subscription details.",
-    sub: ["cancelled"],
-  },
+  // {
+  //   title: "Billing",
+  //   href: "/dashboard/billing",
+  //   description: "View your subscription details.",
+  //   sub: ["cancelled"],
+  // },
 
   {
     title: "Instagram",

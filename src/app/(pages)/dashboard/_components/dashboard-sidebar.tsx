@@ -7,6 +7,7 @@ import {
 } from "@/constants/links"
 import { Search } from "@/features/Sidebar/Search"
 import { cn } from "@/lib/utils"
+import { User } from "@/types/user"
 import clsx from "clsx"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, ChevronRight } from "lucide-react"
@@ -47,14 +48,17 @@ const sectionVariants = {
 interface DashboardSideBarProps {
   subStatus: string | undefined
   role: string[] | undefined
+  user: User | undefined
 }
 
 export default function DashboardSideBar({
   subStatus,
   role,
+  user,
 }: DashboardSideBarProps) {
   const pathname = usePathname()
   const [openSection, setOpenSection] = useState<string | null>(null)
+
   // const { image, alt, width, height } = landingPageLogo[0]
   // const {
   //   image: image2,
@@ -136,6 +140,7 @@ export default function DashboardSideBar({
         <Search
           title={"Search"}
           source={dashboardNavItems}
+          user={user}
           // groupName={"Heading"}
           className='mb-5 mx-4'
           placeholder="Find what you're looking for!"

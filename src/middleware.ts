@@ -6,7 +6,8 @@ import {
 } from "@convex-dev/auth/nextjs/server"
 
 // const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
-const isSubOnlyPage = createRouteMatcher(["/dashboard/:path*"])
+//note-to-self: Moved dashboard logic to the dashboard layout where it checks user and subscription status
+// const isSubOnlyPage = createRouteMatcher(["/dashboard/:path*"])
 const isAuthPage = createRouteMatcher(["/auth/:path*"])
 
 export default convexAuthNextjsMiddleware(
@@ -18,9 +19,6 @@ export default convexAuthNextjsMiddleware(
       return nextjsMiddlewareRedirect(request, "/")
     }
 
-    if (isSubOnlyPage(request) && !isAuthenticated) {
-      return nextjsMiddlewareRedirect(request, "/auth/sign-in")
-    }
     // if (isAuthPage(request) && isAuthenticated) {
     //   return nextjsMiddlewareRedirect(request, "/")
     // }

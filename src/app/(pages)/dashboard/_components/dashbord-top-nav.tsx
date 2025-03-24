@@ -31,25 +31,13 @@ export default function NavBar({
 }: NavBarProps) {
   const { scrollY } = useScroll()
   const [isMobile, setIsMobile] = useState(false)
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    console.log("Page scroll: ", latest)
-  })
 
   const [isScrolled, setIsScrolled] = useState(false)
 
   useMotionValueEvent(scrollY, "change", (latest) => {
+    //   console.log("Page scroll: ", latest)
     setIsScrolled(latest > 150)
   })
-  // const { subStatus } =
-  //   useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
-
-  // const statusKey = subStatus ? subStatus : "none"
-  // const filteredNavbarLinks = landingPageNavbarLinks.filter(
-  //   (link) => link.sub.includes(statusKey) || link.sub.includes("all")
-  // )
-  // const filteredNavbarMenu = components.filter(
-  //   (link) => link.sub.includes(statusKey) || link.sub.includes("all")
-  // )
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)")
@@ -112,14 +100,15 @@ export default function NavBar({
             title={"Search"}
             source={dashboardNavItems}
             // groupName={"Heading"}
-            className='mb-5 mx-4 md:hidden'
+            className=' lg:hidden'
             placeholder='Search...'
+            user={user}
           />
 
           {!isMobile && (
             <>
               {/* Desktop Logo & Navigation */}
-              <div className='hidden md:flex gap-x-2 items-center justify-center'>
+              <div className='hidden lg:flex gap-x-2 items-center justify-center'>
                 <Link
                   href='/'
                   className='flex items-center gap-2 overflow-hidden'>

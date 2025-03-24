@@ -22,6 +22,7 @@ export interface CommandItem {
   icon?: React.ComponentType<{ className?: string }>
   path?: string
   href?: string
+  userType: string[]
   sectionCat?: string
   group?: string
   desc?: string
@@ -32,10 +33,11 @@ interface CommandMenuProps<T extends CommandItem> {
   setOpen: Dispatch<SetStateAction<boolean>>
   isMobile?: boolean
   title: string
-  source: T[] // Ensure all items in `source` match `CommandItem`
+  source: T[]
   shortcut?: string
   placeholder?: string
   setSearch: React.Dispatch<React.SetStateAction<string>>
+  userType?: string[]
 }
 
 export const CommandMenuCustom = <T extends CommandItem>({
@@ -45,6 +47,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
   source,
   shortcut = "/",
   isMobile = false,
+  userType,
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
@@ -54,6 +57,9 @@ export const CommandMenuCustom = <T extends CommandItem>({
   const shortcutRef = useRef(shortcut)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const router = useRouter()
+
+  console.log("Usertype: ", userType)
+
   // Update the ref if shortcut changes
   useEffect(() => {
     shortcutRef.current = shortcut
@@ -80,8 +86,20 @@ export const CommandMenuCustom = <T extends CommandItem>({
     return () => document.removeEventListener("keydown", down)
   }, [setOpen])
 
+  const filteredItems = source.filter((item) => {
+    const itemUserType = item?.userType
+    const isPublic = itemUserType?.includes("public")
+    const typeMatch = userType?.some((type) =>
+      itemUserType?.some(
+        (userType) => userType.toLowerCase() === type.toLowerCase()
+      )
+    )
+
+    return isPublic || typeMatch
+  })
+
   // Extract fields from source dynamically
-  const extractedItems = source.map((item) => ({
+  const extractedItems = filteredItems.map((item) => ({
     title: item.label || item.name,
     icon: item.icon || null,
     path: item.path || item.href || "#",
