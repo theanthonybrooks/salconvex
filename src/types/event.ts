@@ -20,17 +20,22 @@ export type EligibilityType =
   | "Regional/Local"
   | "Other"
 
+export type EventStatus = "applied" | "accepted" | "rejected" | "pending" | null
+
+export type OpenCallStatus = "active" | "ended" | "coming-soon" | null
+
 export type RateUnit = "ft²" | "m²"
 
 export interface EventData {
   id: number
   logo: string
-  openCall: boolean
+  openCall: OpenCallStatus
   appFee: number
   callFormat: "RFP" | "RFQ"
   callType: CallType
   eventType: EventType | [EventType, EventType]
   eventCategory: EventCategory
+  adminNote?: string
 
   location: {
     sameAsOrganizer?: boolean
@@ -61,7 +66,8 @@ export interface EventData {
   budgetRateUnit: RateUnit
   allInclusive: boolean
 
-  status: "accepted" | "rejected" | "pending" | null
+  status: EventStatus
+  // manualApplied?: boolean
   bookmarked: boolean
   hidden: boolean
   event: {

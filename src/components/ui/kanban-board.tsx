@@ -103,11 +103,7 @@ const getColumnColor = (column: ColumnType) => {
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
-  return (
-    <div className='h-full w-full bg-background text-foreground dark:text-primary-foreground'>
-      <Board userRole={userRole} />
-    </div>
-  )
+  return <Board userRole={userRole} />
 }
 
 const Board: React.FC<{ userRole: string }> = ({ userRole }) => {

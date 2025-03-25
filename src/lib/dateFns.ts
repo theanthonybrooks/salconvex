@@ -71,9 +71,9 @@ export const formatEventDates = (
       return `${startMonthShort} ${startDay}, ${startYear} - ${endMonthShort} ${endDay}, ${endYear}`
     }
   } else if (startMonthFull !== endMonthFull) {
-    return `${startMonthShort} ${startDay} - ${endMonthShort} ${endDay}, ${startYear}`
+    return `${startMonthShort} ${startDay} - ${endMonthShort} ${endDay} (${startYear})`
   } else {
-    return `${startMonthFull} ${startDay}-${endDay}, ${startYear}`
+    return `${startMonthFull} ${startDay}-${endDay} (${startYear})`
   }
 }
 

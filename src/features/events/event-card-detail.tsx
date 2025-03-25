@@ -1,15 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import {
   CalendarClockIcon,
-  CheckCircle,
-  CircleX,
   Download,
-  Ellipsis,
-  Eye,
   EyeOff,
   Globe,
   MapIcon,
@@ -17,14 +12,6 @@ import {
   Phone,
 } from "lucide-react"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   Accordion,
   AccordionContent,
@@ -55,6 +42,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EventData } from "@/types/event"
 import { TbStairs } from "react-icons/tb"
 
+import ApplyButton from "@/features/events/event-apply-btn"
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map"
 import { generateICSFile } from "@/lib/addToCalendar"
 import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
@@ -115,7 +103,7 @@ const EventCardDetail = (props: EventData) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
   const [activeTab, setActiveTab] = useState(openCall ? "opencall" : "event")
-  const [manualApplied, setManualApplied] = useState(false)
+  const [isManualApplied, setManualApplied] = useState(status)
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
@@ -616,100 +604,19 @@ const EventCardDetail = (props: EventData) => {
                   </AccordionItem>
                 )}
               </Accordion>
-              <div className='col-span-full mt-4 flex items-center justify-center px-4'>
-                <Button
-                  variant='salWithShadowHidden'
-                  size='lg'
-                  className='rounded-r-none border-r w-full min-w-[100px]'
-                  disabled={status !== null || manualApplied}>
-                  {manualApplied
-                    ? "Applied"
-                    : status === null
-                    ? "Apply"
-                    : `Applied: ${
-                        status === "accepted"
-                          ? "Accepted"
-                          : status === "rejected"
-                          ? "Rejected"
-                          : "Pending"
-                      }`}
-                </Button>
-                <Button
-                  variant='salWithShadowHidden'
-                  size='lg'
-                  className='rounded-none border-x w-fit sm:px-3 px-3'
-                  onClick={() => setIsBookmarked(!isBookmarked)}>
-                  {isBookmarked ? (
-                    <FaBookmark className='size-6 text-red-500 ' />
-                  ) : (
-                    <FaRegBookmark className='size-6 ' />
-                  )}
-                </Button>
-                {/* <Button
-                  variant='salWithShadowHidden'
-                  size='lg'
-                  className='rounded-l-none border-l w-fit sm:px-2 px-2'
-                  onClick={() => setIsHidden(!isHidden)}>
-                  {isHidden ? (
-                    <EyeOff className='size-8 text-red-500' />
-                  ) : (
-                    <Eye className='size-8' />
-                  )}
-                </Button> */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant='salWithShadowHidden'
-                      size='lg'
-                      className='rounded-l-none border-l w-fit sm:px-2 px-2'>
-                      <Ellipsis className='size-8' />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>More options</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => setIsHidden(!isHidden)}
-                      className={cn(
-                        "cursor-pointer text-black/80  hover:text-red-500"
-                      )}>
-                      {isHidden ? (
-                        <span className='flex items-center gap-x-1 '>
-                          <EyeOff className='size-4' />
-                          Unhide{" "}
-                          {eventCategory === "event" ? "Event" : "Open Call"}
-                        </span>
-                      ) : (
-                        <span className='flex items-center gap-x-1 '>
-                          <Eye className='size-4' />
-                          Hide{" "}
-                          {eventCategory === "event" ? "Event" : "Open Call"}
-                        </span>
-                      )}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setManualApplied(!manualApplied)}
-                      className={cn(
-                        "cursor-pointer",
-                        manualApplied
-                          ? " text-emerald-700 hover:text-black/80"
-                          : "hover:text-emerald-700 text-black/80"
-                      )}>
-                      {manualApplied ? (
-                        <span className='flex items-center gap-x-1'>
-                          <CircleX className='size-4' />
-                          Mark as Not Applied
-                        </span>
-                      ) : (
-                        <span className='flex items-center gap-x-1'>
-                          <CheckCircle className='size-4' />
-                          Mark as Applied
-                        </span>
-                      )}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              <ApplyButton
+                id={id}
+                // status={status}
+                openCall={openCall}
+                manualApplied={isManualApplied}
+                setManualApplied={setManualApplied}
+                isBookmarked={isBookmarked}
+                setIsBookmarked={setIsBookmarked}
+                isHidden={isHidden}
+                setIsHidden={setIsHidden}
+                eventCategory={eventCategory}
+                appFee={appFee}
+              />
             </Card>
           </TabsContent>
           <TabsContent value='event'>

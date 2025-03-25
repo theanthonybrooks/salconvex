@@ -9,7 +9,7 @@ export const mockEventData: EventData[] = [
 
     id: 1,
     logo: "/1.jpg",
-    openCall: true,
+    openCall: "active",
     appFee: 0,
     callFormat: "RFQ",
     callType: "Fixed",
@@ -158,7 +158,7 @@ export const mockEventData: EventData[] = [
 
     id: 1,
     logo: "/1.jpg",
-    openCall: true,
+    openCall: "coming-soon",
     appFee: 0,
     callFormat: "RFQ",
     callType: "Fixed",
@@ -301,12 +301,13 @@ export const mockEventData: EventData[] = [
     hidden: false,
     id: 2,
     logo: "/1.jpg",
-    openCall: true,
+    openCall: "active",
     appFee: 25,
     callFormat: "RFP",
     callType: "Rolling",
     eventType: null,
     eventCategory: "residency",
+    adminNote: "Watch out for the banana throwing sharks",
     location: {
       locale: "Neukolln",
       city: "Berlin",
