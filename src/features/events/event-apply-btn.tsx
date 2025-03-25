@@ -100,6 +100,7 @@ interface ApplyButtonProps {
   isPreview?: boolean
   publicView?: boolean
   openCall: OpenCallStatus
+  className?: string
 }
 
 const ApplyButton: React.FC<ApplyButtonProps> = ({
@@ -115,6 +116,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
   openCall,
   publicView,
   isPreview = false,
+  className,
 }) => {
   const href = publicView
     ? "/pricing"
@@ -138,7 +140,11 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
         }`
 
   return (
-    <div className='col-span-full md:w-[250px] mt-4 md:mt-0 flex items-center justify-center px-4'>
+    <div
+      className={cn(
+        "col-span-full lg:w-[250px] mt-4 lg:mt-0 flex items-center justify-center lg:px-4 ",
+        className
+      )}>
       <Link href={href} passHref>
         <Button
           asChild
@@ -151,7 +157,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
           variant='salWithShadowHidden'
           size='lg'
           className={cn(
-            "rounded-r-none border-r w-full min-w-[100px]",
+            "rounded-r-none border-r w-full min-w-[150px]",
             status !== null &&
               "text-foreground/50 border-foreground/50 bg-background"
           )}>

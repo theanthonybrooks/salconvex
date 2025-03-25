@@ -628,6 +628,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
                 setIsHidden={setIsHidden}
                 eventCategory={eventCategory}
                 appFee={appFee}
+                className='w-full'
               />
             </Card>
           </TabsContent>
