@@ -319,7 +319,7 @@ const Column: React.FC<
               setActiveColumn={setActiveColumn}
             />
           )}
-          <span className='rounded text-sm text-foreground dark:text-primary-foreground'>
+          <span className='rounded text-sm text-foreground dark:text-primary-foreground pr-4'>
             {cards.length}
           </span>
 
@@ -534,8 +534,8 @@ const AddCard: React.FC<{
       trigger={
         <motion.button
           layout
-          className='text-xs text-neutral-500 hover:text-neutral-600'>
-          <FiPlus />
+          className='text-xs text-neutral-500 hover:text-neutral-600 flex gap-x-1 items-center'>
+          Add <FiPlus />
         </motion.button>
       }
       initialValues={{ column, priority: "medium", order: "end", title: "" }}
