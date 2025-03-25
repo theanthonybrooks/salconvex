@@ -122,7 +122,7 @@ export const mockEventData: EventData[] = [
         ],
       },
       organizer: {
-        id: 3,
+        id: 11,
         name: "Urban Arts Collective",
         logo: "/sitelogo.svg",
         location: {
@@ -156,7 +156,7 @@ export const mockEventData: EventData[] = [
     hidden: true,
     //User values ^
 
-    id: 1,
+    id: 2,
     logo: "/1.jpg",
     openCall: "coming-soon",
     appFee: 0,
@@ -265,7 +265,7 @@ export const mockEventData: EventData[] = [
         ],
       },
       organizer: {
-        id: 2,
+        id: 11,
         name: "Urban Arts Collective",
         logo: "/sitelogo.svg",
         location: {
@@ -299,7 +299,7 @@ export const mockEventData: EventData[] = [
     status: "pending",
     bookmarked: false,
     hidden: false,
-    id: 2,
+    id: 3,
     logo: "/1.jpg",
     openCall: "active",
     appFee: 25,
@@ -392,7 +392,7 @@ export const mockEventData: EventData[] = [
         otherInfo: ["Residency includes optional workshops and artist talks"],
       },
       organizer: {
-        id: 1,
+        id: 10,
         name: "Berlin Mural Initiative",
         logo: "/sitelogo.svg",
         location: {

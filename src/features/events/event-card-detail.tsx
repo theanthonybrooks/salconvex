@@ -56,7 +56,11 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { useState } from "react"
 
-const EventCardDetail = (props: EventData) => {
+interface EventCardDetailProps extends EventData {
+  eventOnly?: boolean
+}
+
+const EventCardDetail = (props: EventCardDetailProps) => {
   const {
     id,
     logo,
@@ -83,6 +87,7 @@ const EventCardDetail = (props: EventData) => {
     hidden,
     event,
     tabs,
+    eventOnly,
     // organizer,
   } = props
   const { opencall, event: eventTab, organizer } = tabs
@@ -102,7 +107,9 @@ const EventCardDetail = (props: EventData) => {
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
-  const [activeTab, setActiveTab] = useState(openCall ? "opencall" : "event")
+  const [activeTab, setActiveTab] = useState(
+    openCall === "active" ? "opencall" : "event"
+  )
   const [isManualApplied, setManualApplied] = useState(status)
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
@@ -251,30 +258,35 @@ const EventCardDetail = (props: EventData) => {
           value={activeTab}
           defaultValue={activeTab}
           className='w-full flex flex-col justify-center'>
-          <TabsList className='relative w-full bg-white/60 justify-around h-12 flex rounded-xl overflow-hidden overflow-x-auto invis'>
-            {["opencall", "event", "organizer"].map((tab) => (
-              <TabsTrigger
-                key={tab}
-                value={tab}
-                className={cn(
-                  "relative z-10 h-10 px-4 flex items-center justify-center w-full text-sm font-medium",
-                  activeTab === tab ? "text-black" : "text-muted-foreground"
-                )}>
-                {activeTab === tab && (
-                  <motion.div
-                    layoutId='tab-bg'
-                    className='absolute inset-0 bg-background shadow-sm rounded-md z-0'
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className='relative z-10'>
-                  {tab === "opencall" && "Open Call"}
-                  {tab === "event" &&
-                    `${getEventCategoryLabel(eventCategory)} Details`}
-                  {tab === "organizer" && "Organizer"}
-                </span>
-              </TabsTrigger>
-            ))}
+          <TabsList className='relative w-full bg-white/60 justify-around h-12 flex rounded-xl '>
+            {["opencall", "event", "organizer"]
+              .filter((tab) => !eventOnly || tab !== "opencall")
+              .map((tab) => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  className={cn(
+                    "relative z-10 h-10 px-4 flex items-center justify-center w-full text-sm font-medium",
+                    activeTab === tab ? "text-black" : "text-muted-foreground"
+                  )}>
+                  {activeTab === tab && (
+                    <motion.div
+                      layoutId='tab-bg'
+                      className='absolute inset-0 bg-background shadow-sm rounded-md z-0'
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                  <span className='relative z-10'>
+                    {tab === "opencall" && "Open Call"}
+                    {tab === "event" && getEventCategoryLabel(eventCategory)}
+                    {tab === "organizer" && "Organizer"}
+                  </span>
+                </TabsTrigger>
+              ))}
           </TabsList>
 
           <TabsContent value='opencall'>

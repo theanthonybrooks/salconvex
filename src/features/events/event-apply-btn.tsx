@@ -36,7 +36,11 @@ export const ApplyButtonShort: React.FC<ApplyButtonShortProps> = ({
   publicView,
   appFee,
 }) => {
-  const href = publicView ? "/pricing" : `/thelist/call/${id}`
+  const href = publicView
+    ? "/pricing"
+    : openCall === "active"
+    ? `/thelist/call/${id}`
+    : `/thelist/event/${id}`
 
   const buttonText =
     openCall === "coming-soon"
@@ -112,7 +116,11 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
   publicView,
   isPreview = false,
 }) => {
-  const href = publicView ? "/pricing" : `/thelist/call/${id}`
+  const href = publicView
+    ? "/pricing"
+    : openCall === "active"
+    ? `/thelist/call/${id}`
+    : `/thelist/event/${id}`
 
   const buttonText =
     openCall === "coming-soon" || openCall === "ended"
