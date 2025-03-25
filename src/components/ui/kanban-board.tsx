@@ -9,7 +9,7 @@ import { FiPlus } from "react-icons/fi"
 import { api } from "~/convex/_generated/api"
 
 import { cn } from "@/lib/utils"
-import { Pencil } from "lucide-react" // Using Pencil icon for edit
+import { Pencil } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -133,7 +133,7 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   const moveCard = useMutation(api.kanban.cards.moveCard)
   const deleteCard = useMutation(api.kanban.cards.deleteCard)
 
-  const [activeColumn, setActiveColumn] = useState<string | null>(null) // Track active add form
+  const [activeColumn, setActiveColumn] = useState<string | null>(null)
 
   const columnDisplayNames: Record<ColumnType, string> = {
     proposed: "Proposed",
@@ -143,27 +143,30 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
     done: "Complete",
   }
 
+  const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"]
+  const hasProposed = cards.some((card) => card.column === "proposed")
+
+  const orderedColumns: ColumnType[] = hasProposed
+    ? ["proposed", ...baseColumns]
+    : baseColumns
+
   return (
     <div className='flex  w-full h-full max-h-[80vh] overflow-hidden gap-3 p-6'>
-      {(["backlog", "todo", "doing", "done"] as ColumnType[])
-        .concat(
-          cards.some((card) => card.column === "proposed") ? ["proposed"] : []
-        )
-        .map((column) => (
-          <Column
-            key={column}
-            title={columnDisplayNames[column]}
-            column={column}
-            headingColor={getColumnColor(column)}
-            cards={cards.filter((card) => card.column === column)}
-            userRole={userRole}
-            moveCard={moveCard}
-            addCard={addCard}
-            deleteCard={deleteCard}
-            activeColumn={activeColumn}
-            setActiveColumn={setActiveColumn}
-          />
-        ))}
+      {orderedColumns.map((column) => (
+        <Column
+          key={column}
+          title={columnDisplayNames[column]}
+          column={column}
+          headingColor={getColumnColor(column)}
+          cards={cards.filter((card) => card.column === column)}
+          userRole={userRole}
+          moveCard={moveCard}
+          addCard={addCard}
+          deleteCard={deleteCard}
+          activeColumn={activeColumn}
+          setActiveColumn={setActiveColumn}
+        />
+      ))}
     </div>
   )
 }
@@ -258,6 +261,7 @@ const Column: React.FC<
       (closest, child) => {
         const box = child.getBoundingClientRect()
         const offset = e.clientY - (box.top + DISTANCE_OFFSET)
+        // const offset = Math.round(e.clientY - (box.top + DISTANCE_OFFSET))
 
         if (offset < 0 && offset > closest.offset) {
           return { offset: offset, element: child }
@@ -284,24 +288,6 @@ const Column: React.FC<
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDragEnd}>
-      {/*  <div className='mb-3 flex items-center justify-between sticky top-0 bg-background z-10 '>
-        <h3 className={`font-medium ${headingColor} p-4 rounded-lg`}>
-          {title}
-        </h3>
-        {userRole === "admin" && (
-          <AddCard
-            column={column}
-            addCard={addCard}
-            userRole={userRole}
-            setActiveColumn={setActiveColumn}
-          />
-        )}
-        /~ Gradient overlay at the top for fade ~/
-        <div className='pointer-events-none absolute bottom-0 left-0 w-full h-6 bg-gradient-to-b from-background to-transparent z-10' />
-        <span className='rounded text-sm text-foreground dark:text-primary-foreground '>
-          {cards.length}
-        </span>
-      </div>*/}
       <div className='mb-3 sticky top-0 z-10 bg-background'>
         <div className='flex items-center justify-between relative'>
           <h3 className={cn("font-medium  p-4 rounded-lg z-10", headingColor)}>
@@ -326,10 +312,10 @@ const Column: React.FC<
 
       <div
         className={cn(
-          "flex flex-col gap-[2px] overflow-y-auto scrollable mini  transition-colors pr-2 flex-1",
+          "flex flex-col gap-[2px] overflow-y-auto scrollable mini  transition-colors px-2 flex-1",
           "h-[calc(100vh-160px)] ",
           active
-            ? "bg-[hsl(45,100%,71%)]/30"
+            ? "bg-[hsl(295,100%,71%)]/30"
             : "bg-[hsl(60, 100%, 99.6078431372549%)]/0"
         )}>
         {cards.map((c) => (
@@ -347,48 +333,6 @@ const Column: React.FC<
     </div>
   )
 }
-
-// const Card: React.FC<CardProps> = ({
-//   title,
-//   id,
-//   column,
-//   handleDragStart,
-//   deleteCard,
-// }) => {
-//   const handleDelete = async (e: React.DragEvent<HTMLDivElement>) => {
-//     const cardId = e.dataTransfer.getData("cardId")
-//     if (!cardId) return
-
-//     await deleteCard({ id: cardId as Id<"todoKanban">, userId: "admin" })
-//   }
-//   return (
-//     <>
-//       <DropIndicator beforeId={id} column={column} />
-//       <motion.div
-//         layout
-//         layoutId={id}
-//         draggable='true'
-//         onDragStart={(e) =>
-//           handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
-//             title,
-//             id,
-//             column,
-//           })
-//         }
-//         className={`cursor-grab rounded border border-foreground/20 relative  ${getColumnColor(
-//           column
-//         )} p-3 active:cursor-grabbing`}>
-//         <X
-//           onClick={handleDelete}
-//           className='absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
-//         />
-//         <p className='text-sm text-foreground dark:text-primary-foreground'>
-//           {title}
-//         </p>
-//       </motion.div>
-//     </>
-//   )
-// }
 
 const Card: React.FC<CardProps> = ({
   title,
@@ -432,7 +376,7 @@ const Card: React.FC<CardProps> = ({
   }
 
   return (
-    <>
+    <motion.div layout className='relative flex flex-col'>
       <DropIndicator beforeId={id} column={column} />
       <motion.div
         layout
@@ -501,7 +445,7 @@ const Card: React.FC<CardProps> = ({
           {title}
         </p>
       </motion.div>
-    </>
+    </motion.div>
   )
 }
 
@@ -534,7 +478,7 @@ const AddCard: React.FC<{
           Add <FiPlus />
         </motion.button>
       }
-      initialValues={{ column, priority: "medium", order: "end", title: "" }}
+      initialValues={{ column, priority: "medium", order: "start", title: "" }}
       onSubmit={(data) => {
         addCard({
           ...data,
@@ -581,7 +525,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
     initialValues?.priority || "medium"
   )
   const [order, setOrder] = useState<"start" | "end">(
-    mode === "add" && initialValues?.order ? initialValues.order : "end"
+    mode === "add" && initialValues?.order ? initialValues.order : "start"
   )
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -593,6 +537,12 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
     } else {
       onSubmit({ title: title.trim(), column, priority })
     }
+    setTitle("")
+    setColumn(initialValues?.column || "todo")
+    setPriority(initialValues?.priority || "medium")
+    setOrder(
+      mode === "add" && initialValues?.order ? initialValues.order : "end"
+    )
   }
 
   const isEdit = mode === "edit"
@@ -625,7 +575,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
             onChange={(e) => setColumn(e.target.value as ColumnType)}
             className='border p-2 rounded bg-background text-foreground'>
             <option value='proposed'>Proposed</option>
-            <option value='backlog'>Backlog</option>
+            <option value='backlog'>Considering</option>
             <option value='todo'>To Do</option>
             <option value='doing'>In Progress</option>
             <option value='done'>Complete</option>

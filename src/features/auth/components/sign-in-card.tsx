@@ -152,13 +152,16 @@ const SignInCard: React.FC<SignInCardProps> = ({
               </>
             )}
           </Button>
+
           <Button
             variant='salWithShadowHidden'
             size='lg'
             type='button'
             className='min-w-[8.5rem] w-full     gap-2 focus:bg-salYellow/70 bg-salYellow md:bg-white'
             onClick={() => onProviderSignIn("apple")}
-            disabled={pending}
+            // disabled={pending}
+            //TODO: Add Apple OAuth
+            disabled={true}
             tabIndex={2}>
             {isLoading === "apple" ? (
               <LoaderCircle className='size-4 animate-spin' />
