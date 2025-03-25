@@ -104,7 +104,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
   return (
-    <div className='h-screen w-full bg-background text-foreground dark:text-primary-foreground'>
+    <div className='h-full w-full bg-background text-foreground dark:text-primary-foreground'>
       <Board userRole={userRole} />
     </div>
   )
@@ -148,33 +148,26 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   }
 
   return (
-    <div className='flex flex-col items-center gap-6'>
-      {/* Submission Form */}
-      {/* {userRole === "admin" && (
-        <div className='flex items-center justify-center w-full gap-3'>
-        
-          <BurnBarrel deleteCard={deleteCard} userRole={userRole} />
-        </div>
-      )} */}
-      <div className='flex h-full w-full max-h-screen gap-3  invis p-12'>
-        {(["proposed", "backlog", "todo", "doing", "done"] as ColumnType[]).map(
-          (column) => (
-            <Column
-              key={column}
-              title={columnDisplayNames[column]}
-              column={column}
-              headingColor={getColumnColor(column)}
-              cards={cards.filter((card) => card.column === column)}
-              userRole={userRole}
-              moveCard={moveCard}
-              addCard={addCard}
-              deleteCard={deleteCard}
-              activeColumn={activeColumn} // Pass activeColumn state
-              setActiveColumn={setActiveColumn} // Function to update activeColumn
-            />
-          )
-        )}
-      </div>
+    <div className='flex h-full w-full max-h-[calc(100vh-80px)] gap-3  invis p-2'>
+      {(["backlog", "todo", "doing", "done"] as ColumnType[])
+        .concat(
+          cards.some((card) => card.column === "proposed") ? ["proposed"] : []
+        )
+        .map((column) => (
+          <Column
+            key={column}
+            title={columnDisplayNames[column]}
+            column={column}
+            headingColor={getColumnColor(column)}
+            cards={cards.filter((card) => card.column === column)}
+            userRole={userRole}
+            moveCard={moveCard}
+            addCard={addCard}
+            deleteCard={deleteCard}
+            activeColumn={activeColumn}
+            setActiveColumn={setActiveColumn}
+          />
+        ))}
     </div>
   )
 }
@@ -312,11 +305,13 @@ const Column: React.FC<
         </span>
       </div>
       <div
-        className={`flex flex-col gap-[2px] overflow-y-auto scrollable mini max-h-[calc(100vh-150px)] transition-colors ${
+        className={cn(
+          "flex flex-col gap-[2px] overflow-y-auto scrollable mini max-h-[calc(100dvh-80px)] transition-colors pr-2",
+          "h-[calc(100vh-160px)] ",
           active
             ? "bg-[hsl(45,100%,71%)]/30"
             : "bg-[hsl(60, 100%, 99.6078431372549%)]/0"
-        }`}>
+        )}>
         {cards.map((c) => (
           <Card
             key={c.id}
@@ -500,49 +495,6 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
   )
 }
 
-{
-  /*const BurnBarrel: React.FC<{
-  deleteCard: (args: DeleteCardArgs) => void
-  userRole: string
-}> = ({ deleteCard, userRole }) => {
-  const [active, setActive] = useState(false)
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return
-    e.preventDefault()
-    setActive(true)
-  }
-
-  const handleDragLeave = () => {
-    setActive(false)
-  }
-
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return
-
-    const cardId = e.dataTransfer.getData("cardId")
-    if (!cardId) return
-
-    await deleteCard({ id: cardId as Id<"todoKanban">, userId: "admin" })
-    setActive(false)
-  }
-
-  return (
-    <div
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      className={`mt-10 grid h-56 w-56 shrink-0 place-content-center rounded border text-3xl transition-colors ${
-        active
-          ? "border-red-800 bg-red-800/20 text-red-500"
-          : "border-neutral-500 bg-neutral-500/20 text-neutral-500"
-      }`}>
-      {active ? <FaFire className='animate-bounce' /> : <FiTrash />}
-    </div>
-  )
-}*/
-}
-
 const AddCard: React.FC<{
   column: ColumnType
   addCard: (args: AddCardArgs) => void
@@ -550,106 +502,9 @@ const AddCard: React.FC<{
   setActiveColumn: (col: string | null) => void
   userRole: string
 }> = ({ column, addCard, userRole }) => {
-  // const [title, setTitle] = useState("")
-  // const [priority, setPriority] = useState<"low" | "medium" | "high">("medium")
-  // const [order, setOrder] = useState<"start" | "end">("end")
-  // const [selectedColumn, setSelectedColumn] = useState<ColumnType>(column)
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   if (!title.trim()) return
-
-  //   await addCard({
-  //     title: title.trim(),
-  //     column: selectedColumn,
-  //     userId: "admin",
-  //     order,
-  //     priority,
-  //   })
-
-  //   setTitle("")
-  //   setSelectedColumn(column)
-  //   setOrder("start")
-  //   setPriority("medium")
-  //   setActiveColumn(null)
-  // }
-
   if (userRole !== "admin") return null
 
   return (
-    // <Dialog>
-    //   <DialogTrigger asChild>
-    //     <motion.button
-    //       layout
-    //       onClick={() => setActiveColumn(column)}
-    //       className='text-xs text-neutral-500 transition-colors hover:text-neutral-600'>
-    //       <FiPlus />
-    //     </motion.button>
-    //   </DialogTrigger>
-    //   <DialogContent className='bg-card'>
-    //     <DialogHeader>
-    //       <DialogTitle>Add New Task</DialogTitle>
-    //       <DialogDescription>
-    //         Add a new task to any column with optional priority and order.
-    //       </DialogDescription>
-    //     </DialogHeader>
-
-    //     <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-    //       <textarea
-    //         value={title}
-    //         onChange={(e) => setTitle(e.target.value)}
-    //         placeholder='Task title...'
-    //         className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
-    //       />
-
-    //       <Label>Column</Label>
-    //       <select
-    //         value={selectedColumn}
-    //         onChange={(e) => setSelectedColumn(e.target.value as ColumnType)}
-    //         className='border p-2 rounded bg-background text-foreground'>
-    //         <option value='proposed'>Proposed</option>
-    //         <option value='backlog'>Backlog</option>
-    //         <option value='todo'>To Do</option>
-    //         <option value='doing'>In Progress</option>
-    //         <option value='done'>Complete</option>
-    //       </select>
-
-    //       <Label>Priority</Label>
-    //       <select
-    //         value={priority}
-    //         onChange={(e) =>
-    //           setPriority(e.target.value as "low" | "medium" | "high")
-    //         }
-    //         className='border p-2 rounded bg-background text-foreground'>
-    //         <option value='high'>High</option>
-    //         <option value='medium'>Medium</option>
-    //         <option value='low'>Low</option>
-    //       </select>
-
-    //       <Label>Order</Label>
-    //       <select
-    //         value={order}
-    //         onChange={(e) => setOrder(e.target.value as "start" | "end")}
-    //         className='border p-2 rounded bg-background text-foreground'>
-    //         <option value='start'>Add to Beginning</option>
-    //         <option value='end'>Add to End</option>
-    //       </select>
-
-    //       <DialogFooter className='flex justify-end gap-2'>
-    //         <DialogClose asChild>
-    //           <Button type='button' variant='salWithShadowHiddenYlw'>
-    //             Cancel
-    //           </Button>
-    //         </DialogClose>
-    //         <DialogClose asChild>
-    //           <Button variant='salWithShadowHidden' type='submit'>
-    //             Add Task
-    //           </Button>
-    //         </DialogClose>
-    //       </DialogFooter>
-    //     </form>
-    //   </DialogContent>
-    // </Dialog>
     <TaskDialog
       mode='add'
       trigger={
