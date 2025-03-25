@@ -148,7 +148,7 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   }
 
   return (
-    <div className='flex h-full w-full max-h-[calc(100vh-80px)] gap-3  invis p-2'>
+    <div className='flex  w-full h-full max-h-[80vh] overflow-hidden gap-3 p-6'>
       {(["backlog", "todo", "doing", "done"] as ColumnType[])
         .concat(
           cards.some((card) => card.column === "proposed") ? ["proposed"] : []
@@ -284,11 +284,11 @@ const Column: React.FC<
 
   return (
     <div
-      className='w-56 shrink-0'
+      className='w-56 shrink-0 flex flex-col h-full relative'
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDragEnd}>
-      <div className='mb-3 flex items-center justify-between sticky top-0 bg-background z-10'>
+      {/*  <div className='mb-3 flex items-center justify-between sticky top-0 bg-background z-10 '>
         <h3 className={`font-medium ${headingColor} p-4 rounded-lg`}>
           {title}
         </h3>
@@ -300,13 +300,37 @@ const Column: React.FC<
             setActiveColumn={setActiveColumn}
           />
         )}
+        /~ Gradient overlay at the top for fade ~/
+        <div className='pointer-events-none absolute bottom-0 left-0 w-full h-6 bg-gradient-to-b from-background to-transparent z-10' />
         <span className='rounded text-sm text-foreground dark:text-primary-foreground '>
           {cards.length}
         </span>
+      </div>*/}
+      <div className='mb-3 sticky top-0 z-10 bg-background'>
+        <div className='flex items-center justify-between relative'>
+          <h3 className={cn("font-medium  p-4 rounded-lg z-10", headingColor)}>
+            {title}
+          </h3>
+          {userRole === "admin" && (
+            <AddCard
+              column={column}
+              addCard={addCard}
+              userRole={userRole}
+              setActiveColumn={setActiveColumn}
+            />
+          )}
+          <span className='rounded text-sm text-foreground dark:text-primary-foreground'>
+            {cards.length}
+          </span>
+
+          {/* Fade at bottom of header */}
+          <div className='pointer-events-none absolute -bottom-6 left-0 w-full h-4 bg-gradient-to-b from-background to-transparent z-[9]' />
+        </div>
       </div>
+
       <div
         className={cn(
-          "flex flex-col gap-[2px] overflow-y-auto scrollable mini max-h-[calc(100dvh-80px)] transition-colors pr-2",
+          "flex flex-col gap-[2px] overflow-y-auto scrollable mini  transition-colors pr-2 flex-1",
           "h-[calc(100vh-160px)] ",
           active
             ? "bg-[hsl(45,100%,71%)]/30"

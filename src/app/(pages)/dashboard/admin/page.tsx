@@ -10,16 +10,6 @@ export default function AccountPage() {
   const user = userData?.user
 
   return (
-    // <div className='flex flex-col gap-6 p-6'>
-    //   {/* <div>
-    //     <h1 className='text-3xl font-semibold tracking-tight'>
-    //       Admin Overview
-    //     </h1>
-    //     <p className='mt-2 text-muted-foreground'>
-    //       Current pending applications, planned posts, tasks/todos, and more.
-    //     </p>
-    //   </div>
-    //  </div> */}
     <>
       <KanbanBoard userRole={user?.role?.[0]} />
     </>

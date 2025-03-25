@@ -988,7 +988,7 @@ export default function SettingsPage() {
                     </AlertDialog>
                   </div>
                   <Separator />
-                  <div className=' flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between  bg-destructive/10 p-4 rounded-lg'>
+                  <div className=' flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:gap-x-4 md:justify-between  bg-destructive/10 p-4 rounded-lg'>
                     <div>
                       <p className='font-medium'>Delete Account</p>
                       <p className='text-sm text-muted-foreground'>
