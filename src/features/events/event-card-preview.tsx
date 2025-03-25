@@ -20,6 +20,7 @@ import {
   CircleDollarSignIcon,
   Ellipsis,
   EyeOff,
+  Info,
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -432,91 +433,100 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
             </p>
             <p className='flex gap-x-2 items-center'>
               <span className='font-semibold '>Budget:</span>
+              {publicView ? (
+                <span className='blur-[5px]'>Get paid for your work</span>
+              ) : (
+                <>
+                  {hasBudget &&
+                    formatCurrency(
+                      budgetMin,
+                      budgetMax,
+                      currency,
+                      false,
+                      allInclusive
+                    )}
+                  <span className='hidden xl:block'>
+                    {hasBudget && hasRate && (
+                      <span className='text-sm'> | </span>
+                    )}
 
-              {hasBudget &&
-                formatCurrency(
-                  budgetMin,
-                  budgetMax,
-                  currency,
-                  false,
-                  allInclusive
-                )}
-              <span className='hidden xl:block'>
-                {hasBudget && hasRate && <span className='text-sm'> | </span>}
-
-                {hasRate
-                  ? formatRate(budgetRate, budgetRateUnit, currency, true)
-                  : "No Info"}
-              </span>
-              {!allInclusive && <span className='text-sm'>*</span>}
+                    {hasRate
+                      ? formatRate(budgetRate, budgetRateUnit, currency, true)
+                      : "No Info"}
+                  </span>
+                  {!allInclusive && <span className='text-sm'>*</span>}
+                </>
+              )}
             </p>
-            <div
-              id='budget-icons-${id}'
-              className='col-span-2 mt-1 xl:flex gap-x-3 items-center justify-start max-w-full hidden'>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full",
-                  designFee !== null && !allInclusive
-                    ? "  border-emerald-500 text-emerald-500"
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <PiPencilLineFill size={18} />
-              </span>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full ",
-                  accommodation !== null && !allInclusive
-                    ? " border-emerald-500 text-emerald-500"
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <PiHouseLineFill size={18} />
-              </span>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full",
-                  food !== null && !allInclusive
-                    ? "  border-emerald-500 text-emerald-500"
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <PiForkKnifeFill size={18} />
-              </span>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full",
-                  materials !== null && !allInclusive
-                    ? " border-emerald-500 text-emerald-500 "
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <FaPaintRoller size={18} />
-              </span>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full",
-                  travelCosts !== null && !allInclusive
-                    ? "  border-emerald-500 text-emerald-500"
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <IoAirplane size={18} />
-              </span>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full",
-                  equipment !== null && !allInclusive
-                    ? "  border-emerald-500 text-emerald-500"
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <TbStairs size={18} />
-              </span>
-              <span
-                className={cn(
-                  "p-1 border-1.5  rounded-full",
-                  other !== null && !allInclusive
-                    ? "  border-emerald-500 text-emerald-500"
-                    : "border-foreground/20 text-foreground/20"
-                )}>
-                <FaRegCommentDots size={18} />
-              </span>
-            </div>
+            {!publicView && (
+              <div
+                id='budget-icons-${id}'
+                className='col-span-2 mt-1 xl:flex gap-x-3 items-center justify-start max-w-full hidden'>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full",
+                    designFee !== null && !allInclusive
+                      ? "  border-emerald-500 text-emerald-500"
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <PiPencilLineFill size={18} />
+                </span>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full ",
+                    accommodation !== null && !allInclusive
+                      ? " border-emerald-500 text-emerald-500"
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <PiHouseLineFill size={18} />
+                </span>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full",
+                    food !== null && !allInclusive
+                      ? "  border-emerald-500 text-emerald-500"
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <PiForkKnifeFill size={18} />
+                </span>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full",
+                    materials !== null && !allInclusive
+                      ? " border-emerald-500 text-emerald-500 "
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <FaPaintRoller size={18} />
+                </span>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full",
+                    travelCosts !== null && !allInclusive
+                      ? "  border-emerald-500 text-emerald-500"
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <IoAirplane size={18} />
+                </span>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full",
+                    equipment !== null && !allInclusive
+                      ? "  border-emerald-500 text-emerald-500"
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <TbStairs size={18} />
+                </span>
+                <span
+                  className={cn(
+                    "p-1 border-1.5  rounded-full",
+                    other !== null && !allInclusive
+                      ? "  border-emerald-500 text-emerald-500"
+                      : "border-foreground/20 text-foreground/20"
+                  )}>
+                  <FaRegCommentDots size={18} />
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className='py-6 flex-col flex gap-y-6 text-sm items-center justify-center'>
@@ -546,6 +556,14 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
                 ""
               )}
             </>
+          )}
+          {appFee !== 0 && (
+            <p className='text-sm flex items-center gap-x-1 text-red-600'>
+              <span className='font-semibold flex items-center gap-x-1'>
+                <Info /> Application Fee:
+              </span>
+              {`$${appFee}`}
+            </p>
           )}
 
           {callType !== "Invite" && (
