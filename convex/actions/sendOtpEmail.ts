@@ -13,7 +13,7 @@ export const sendOtpEmail = action({
 
     try {
       await resend.emails.send({
-        from: "My App <onboarding@resend.dev>",
+        from: "My App <hello@support.streetartlist.com>",
         to: email,
         subject: "Your OTP Code",
         text: `Your one-time password (OTP) is: ${otp}. It expires in 5 minutes.`,
