@@ -17,7 +17,19 @@ export const scryptCrypto = {
 }
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Github, Google, CustomPassword, ResendOTP],
+  providers: [
+    Github,
+    Google({
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+        },
+      },
+    }),
+    CustomPassword,
+    ResendOTP,
+  ],
   callbacks: {
     async createOrUpdateUser(ctx, { existingUserId, profile, type, provider }) {
       console.log("profile data:", profile)
