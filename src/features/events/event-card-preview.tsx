@@ -287,7 +287,7 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
       {/* //---------------------- (Desktop) Layout ---------------------- */}
       <Card
         className={cn(
-          "hidden bg-white/40 border-foreground/20 lg:grid grid-cols-[60px_minmax(0,auto)_15%_25%_25%] min-w-[640px] min-h-[15em] w-[90vw] max-w-[90vw] gap-x-3 rounded-3xl mb-10 first:mt-6 "
+          "hidden bg-white/40 border-foreground/20 lg:grid grid-cols-[60px_minmax(0,auto)_15%_25%_25%] min-w-[640px] min-h-[15em] w-[90vw] max-w-7xl gap-x-3 rounded-3xl mb-10 first:mt-6 "
         )}>
         <div className='flex flex-col items-center justify-between  border-r border-foreground pb-3 pt-5'>
           <div className='flex flex-col gap-y-3 items-center'>
