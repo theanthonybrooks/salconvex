@@ -170,7 +170,7 @@ export const createStripeCheckoutSession = action({
         mode: args.accountType === "organizer" ? "payment" : "subscription",
         subscription_data:
           args.accountType === "organizer" ? {} : subscriptionData,
-        success_url: `${process.env.FRONTEND_URL}/success`,
+        success_url: `${process.env.FRONTEND_URL}/thelist`,
         cancel_url: `${process.env.FRONTEND_URL}/pricing`,
         //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
         customer_email: user.email,
