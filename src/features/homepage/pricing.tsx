@@ -263,7 +263,7 @@ const PricingCard = ({
               {isArtist && (isYearly ? "/year" : "/month")}
             </span>
           </div>
-          {(!user || isEligibleForFree) && (
+          {(!user || isEligibleForFree) && isOrganizer && (
             <p className='text-lg text-foreground text-green-600 mt-4'>
               First Open Call is free
             </p>
