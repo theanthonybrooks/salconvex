@@ -67,7 +67,6 @@ export default function Footer() {
                       <li key={item.name}>
                         <Link
                           href={item.href}
-                          target='_blank'
                           className='text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:underline underline-offset-2'>
                           {item.name}
                         </Link>
