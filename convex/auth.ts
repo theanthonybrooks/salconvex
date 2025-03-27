@@ -3,6 +3,7 @@ import Google from "@auth/core/providers/google"
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError } from "convex/values"
 import { Scrypt } from "lucia"
+import { maybeAssignOrganizationId } from "~/convex/organizations"
 import { CustomPassword } from "./functions/customPassword"
 import { ResendOTP } from "./otp/resendOtp"
 import { findUserByEmail } from "./users"
@@ -86,6 +87,14 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
       const hashedPassword = await scryptCrypto.hashSecret(profile.password)
 
+      const orgId = await maybeAssignOrganizationId({
+        db: ctx.db,
+        currentOrgName: profile.organizationName as string | undefined,
+        accountType: profile.accountType as string[],
+      })
+
+      console.log("orgId: ", orgId)
+
       const newUserId = await ctx.db.insert("users", {
         name: profile.name
           ? profile.name
@@ -96,7 +105,6 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         firstName: profile.firstName,
         lastName: profile.lastName,
         accountType: profile.accountType,
-        organizationName: profile.organizationName,
         source: profile.source,
         userId: currentId ? currentId : `temp${Date.now()}`,
         role: profile.role ?? ["user"],
@@ -104,10 +112,27 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         emailVerified: false,
       })
 
+      console.log("newUserId: ", newUserId)
+
+      const userAccountType = profile.accountType as string[]
+
+      console.log("userAccountType: ", userAccountType)
+
+      if (userAccountType.includes("organizer")) {
+        await ctx.db.insert("organizations", {
+          ownerId: newUserId,
+          organizationName: profile.organizationName,
+          organizationId: orgId,
+          logo: "/1.jpg",
+          hadFreeCall: false,
+        })
+      }
+
       await ctx.db.insert("userPreferences", {
         userId: newUserId,
         timezone: "GMT",
         language: "EN",
+        currency: "USD",
         theme: "default",
       })
 

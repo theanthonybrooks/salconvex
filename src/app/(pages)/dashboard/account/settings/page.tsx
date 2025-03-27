@@ -78,7 +78,6 @@ import { api } from "~/convex/_generated/api"
 
 export default function SettingsPage() {
   const { signOut } = useAuthActions()
-  // const router = useRouter()
   const userData = useQuery(api.users.getCurrentUser, {})
   const user = userData?.user
   const userPrefs = userData?.userPref
@@ -123,10 +122,11 @@ export default function SettingsPage() {
   const onDeleteAccount = async () => {
     setPending(true)
     setError("")
+    localStorage.clear()
 
     try {
-      await DeleteAccount({ method: "deleteAccount" })
-      signOut()
+      await DeleteAccount({ method: "deleteAccount", userId: user?.userId })
+      await signOut()
     } catch (err) {
       setError("Failed to delete account. Please try again.")
       console.error(err)

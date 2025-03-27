@@ -20,6 +20,7 @@ import type * as functions_customGoogle from "../functions/customGoogle.js";
 import type * as functions_customPassword from "../functions/customPassword.js";
 import type * as http from "../http.js";
 import type * as kanban_cards from "../kanban/cards.js";
+import type * as organizations from "../organizations.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   "functions/customPassword": typeof functions_customPassword;
   http: typeof http;
   "kanban/cards": typeof kanban_cards;
+  organizations: typeof organizations;
   "otp/resendOtp": typeof otp_resendOtp;
   "otp/resetOtp": typeof otp_resetOtp;
   "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;

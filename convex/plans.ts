@@ -7,3 +7,11 @@ export const getUserPlans = query({
     return plans
   },
 })
+
+export const getOrgPlans = query({
+  handler: async (ctx) => {
+    const plans = await ctx.db.query("orgPlans").collect()
+
+    return plans
+  },
+})

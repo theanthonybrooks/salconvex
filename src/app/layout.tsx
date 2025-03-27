@@ -58,13 +58,13 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const token = await convexAuthNextjsToken()
+  let userData = null
 
-  // if (token !== null) {
-  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+  if (token) {
+    userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+  }
+
   const userPref = userData?.userPref ?? undefined
-  // }
-
-  // console.log("userPref in layout", userPref)
 
   return (
     <ConvexAuthNextjsServerProvider>

@@ -118,6 +118,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         setError("A user with that email already exists.")
         return
       }
+      if (values.organizationName?.trim()) {
+        const isNewOrg = await convex.query(api.organizations.isNewOrg, {
+          organizationName: values.organizationName.trim(),
+        })
+
+        if (!isNewOrg) {
+          setError(
+            "An organization with that name already exists. Please contact us if you feel this is an error."
+          )
+          return
+        }
+      }
     } catch (queryError) {
       console.error("Error checking for existing user:", queryError)
     }

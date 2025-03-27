@@ -23,6 +23,7 @@ interface TheListNavBarProps {
 export default function TheListNavBar({
   userId,
   user,
+  subStatus,
 }: //   subStatus,
 // userPref,
 TheListNavBarProps) {
@@ -169,7 +170,11 @@ TheListNavBarProps) {
                 <div className='hidden lg:flex items-center justify-self-end h-15 w-fit pr-5 '>
                   <div className='flex items-center gap-4'>
                     {userId !== "guest" && user && (
-                      <UserProfile user={user} className='size-10' />
+                      <UserProfile
+                        user={user}
+                        className='size-10'
+                        subscription={subStatus}
+                      />
                     )}
                     <FullPageNav user={user} />
                   </div>

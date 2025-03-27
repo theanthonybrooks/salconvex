@@ -25,7 +25,7 @@ interface NavBarProps {
 
 export default function NavBar({
   userId,
-  // subStatus,
+  subStatus,
   // userPref,
   user,
 }: NavBarProps) {
@@ -184,7 +184,11 @@ export default function NavBar({
                 </Unauthenticated>
 
                 {userId !== "guest" && user && (
-                  <UserProfile className='h-[40px] w-[40px]' user={user} />
+                  <UserProfile
+                    className='h-[40px] w-[40px]'
+                    user={user}
+                    subscription={subStatus}
+                  />
                 )}
                 <FullPageNav user={user} />
               </div>

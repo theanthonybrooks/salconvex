@@ -27,7 +27,6 @@ const customUserSchema = {
   firstName: v.string(),
   lastName: v.string(),
   accountType: v.array(v.string()),
-  organizationName: v.optional(v.string()),
   source: v.optional(v.string()),
   userId: v.string(),
   role: v.array(v.string()),
@@ -35,6 +34,54 @@ const customUserSchema = {
   tokenIdentifier: v.string(),
   image: v.optional(v.string()),
   emailVerified: v.optional(v.boolean()),
+}
+
+const organizationSchema = {
+  ownerId: v.id("users"),
+  organizationName: v.string(),
+  organizationId: v.number(),
+  logo: v.string(),
+  location: v.optional(
+    v.object({
+      locale: v.optional(v.string()),
+      city: v.optional(v.string()),
+      state: v.optional(v.string()),
+      stateAbbr: v.optional(v.string()),
+      region: v.optional(v.string()),
+      country: v.string(),
+      countryAbbr: v.string(),
+      continent: v.string(),
+    })
+  ),
+  about: v.optional(v.string()),
+  contact: v.optional(
+    v.object({
+      organizer: v.string(),
+      primaryContact: v.object({
+        email: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        href: v.optional(v.string()),
+      }),
+    })
+  ),
+  links: v.optional(
+    v.object({
+      website: v.optional(v.string()),
+      instagram: v.optional(v.string()),
+      facebook: v.optional(v.string()),
+      threads: v.optional(v.string()),
+      email: v.optional(v.string()),
+      vk: v.optional(v.string()),
+      phone: v.optional(v.string()),
+      address: v.optional(v.string()),
+    })
+  ),
+  hadFreeCall: v.boolean(),
+  updatedAt: v.optional(v.number()),
+
+  lastUpdatedBy: v.optional(v.string()),
+  // events: v.array(v.id("events")),
+  // TODO: Link organization to events and from events to open calls
 }
 
 export default defineSchema({
@@ -66,6 +113,30 @@ export default defineSchema({
     .index("email", ["email"])
     .index("userId", ["userId"]),
 
+  // Organization Tables
+  organizations: defineTable(organizationSchema)
+    .index("by_organizationName", ["organizationName"])
+    .index("by_organizationId", ["organizationId"])
+    .index("by_ownerId", ["ownerId"]),
+
+  organizationSubscriptions: defineTable({
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    stripeId: v.string(),
+    currency: v.string(),
+    status: v.string(),
+    amountSubtotal: v.number(),
+    amountTotal: v.number(),
+    amountDiscount: v.number(),
+    metadata: v.any(),
+    customerId: v.string(),
+    paidStatus: v.string(),
+  })
+    .index("organizationId", ["organizationId"])
+    .index("userId", ["userId"])
+    .index("stripeId", ["stripeId"])
+    .index("customerId", ["customerId"]),
+
   todoKanban: defineTable({
     title: v.string(),
     column: v.union(
@@ -93,6 +164,22 @@ export default defineSchema({
     }),
     features: v.optional(v.array(v.string())), // added features column
     popular: v.optional(v.boolean()), // added popular column
+  })
+    .index("key", ["key"])
+    .index("stripeProductId", ["stripeProductId"]),
+
+  orgPlans: defineTable({
+    key: v.string(),
+    title: v.string(),
+    description: v.string(),
+    stripeProductId: v.optional(v.string()),
+    prices: v.optional(
+      v.object({
+        rate: v.number(),
+      })
+    ),
+    features: v.optional(v.array(v.string())),
+    popular: v.optional(v.boolean()),
   })
     .index("key", ["key"])
     .index("stripeProductId", ["stripeProductId"]),

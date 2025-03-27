@@ -6,15 +6,19 @@ import { api } from "~/convex/_generated/api"
 
 const TheList = async () => {
   const token = await convexAuthNextjsToken()
-  const subStatus = await fetchQuery(
-    api.subscriptions.getUserSubscriptionStatus,
-    {},
-    { token }
-  )
-  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
 
+  let userData = null
+  let subStatus = null
+
+  if (token) {
+    userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+    subStatus = await fetchQuery(
+      api.subscriptions.getUserSubscriptionStatus,
+      {},
+      { token }
+    )
+  }
   const userPref = userData?.userPref ?? null
-
   const publicView = !token || !subStatus?.hasActiveSubscription
 
   return (

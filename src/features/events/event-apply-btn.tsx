@@ -55,7 +55,7 @@ export const ApplyButtonShort: React.FC<ApplyButtonShortProps> = ({
 
   return (
     <>
-      <Link href={href} passHref>
+      <Link href={href} passHref target={publicView ? "_blank" : "_self"}>
         <Button
           asChild
           // onClick={() => {
@@ -145,7 +145,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
         "col-span-full lg:w-[250px] mt-4 lg:mt-0 flex items-center justify-center lg:px-4 ",
         className
       )}>
-      <Link href={href} passHref>
+      <Link href={href} passHref target={!publicView ? "_blank" : "_self"}>
         <Button
           asChild
           // onClick={() => {

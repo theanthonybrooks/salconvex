@@ -40,6 +40,19 @@ export const getUserHadTrial = query({
     return sub?.hadTrial === true
   },
 })
+
+export const getOrgHadFreeCall = query({
+  handler: async (ctx) => {
+    const identity = await getAuthUserId(ctx)
+    if (!identity) return false
+    const org = await ctx.db
+      .query("organizations")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", identity))
+      .first()
+    return org?.hadFreeCall === true
+  },
+})
+
 export const getUserHasSubscription = query({
   handler: async (ctx) => {
     const identity = await getAuthUserId(ctx)
@@ -58,53 +71,77 @@ export const createStripeCheckoutSession = action({
     planKey: schema.tables.userPlans.validator.fields.key,
     interval: v.optional(v.string()),
     hadTrial: v.optional(v.boolean()),
+    accountType: v.optional(v.string()),
+    slidingPrice: v.optional(v.number()),
+    isEligibleForFree: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
-    args: { planKey: string; interval?: string; hadTrial?: boolean }
+    args: {
+      planKey: string
+      interval?: string
+      hadTrial?: boolean
+      accountType?: string
+      slidingPrice?: number
+      isEligibleForFree?: boolean
+    }
   ): Promise<{ url: string }> => {
     const identity = await getAuthUserId(ctx)
     if (!identity) throw new Error("Not authenticated")
-
     const result = await ctx.runQuery(api.users.getCurrentUser, {})
     if (!result) throw new Error("User not found")
     const { user } = result
     if (!user || !user.email) throw new Error("User not found or missing email")
+    if (args.accountType === "organizer") {
+      if (!args.slidingPrice) throw new Error("Sliding price not provided")
+    }
 
-    // Use an internal query to fetch the plan details by key.
+    console.log("Arguments: ", args)
+    console.log("isEligibleForFree: ", args.isEligibleForFree)
+
     const plan: any = await ctx.runQuery(
       internal.stripeSubscriptions.getPlanByKey,
       {
         key: args.planKey,
       }
     )
-
-    if (!plan || !plan.prices || !plan.prices.month) {
-      throw new Error("Plan not found or missing pricing info")
+    if (args.accountType === "artist") {
+      if (!plan || !plan.prices || !plan.prices.month) {
+        throw new Error("Plan not found or missing pricing info")
+      }
     }
 
-    // Choose the price ID based on the provided interval, defaulting to "month"
-    console.log("interval which: ", args.interval)
-    console.log("plan which: ", plan)
-
     const priceId =
-      (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
-      plan.prices.month.usd.stripeId
+      args.slidingPrice && args.accountType === "organizer"
+        ? args.slidingPrice
+        : (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
+          plan.prices.month.usd.stripeId
+
+    console.log("priceId which: ", priceId)
+
     if (!priceId) throw new Error("Stripe price ID not found in plan pricing")
+
     const metadata: Record<string, string> = {
       userId: user.tokenIdentifier,
       userEmail: user.email,
       plan: args.planKey,
-      interval: args.interval || "month",
+      interval:
+        args.accountType === "organizer"
+          ? "One-time"
+          : args.interval || "month",
     }
 
     console.log("hadTrial: ", args.hadTrial)
+    console.log("Meta Data: ", metadata)
 
     // Determine subscription data options
     const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData =
       {
-        ...(args.hadTrial ? {} : { trial_period_days: 14 }),
+        ...(args.hadTrial || args.slidingPrice
+          ? {}
+          : { trial_period_days: 14 }),
       }
+    //TODO: Make some sort of trial/one-off for organizers of events. Could just check if they already have an open call? Would prefer to add a flag, though.
 
     console.log("metadata: ", metadata)
     // Create a Stripe Checkout Session.
@@ -112,18 +149,40 @@ export const createStripeCheckoutSession = action({
       await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
+          args.accountType === "artist"
+            ? {
+                price: priceId,
+                quantity: 1,
+              }
+            : {
+                price_data: {
+                  currency: "usd",
+                  unit_amount: args.slidingPrice
+                    ? args.slidingPrice * 100
+                    : 5000,
+                  product_data: {
+                    name: "Open Call Listing - – One-Time",
+                  },
+                },
+                quantity: 1,
+              },
         ],
-        mode: "subscription", // or "payment" for one-time payments
-        subscription_data: subscriptionData,
+        mode: args.accountType === "organizer" ? "payment" : "subscription",
+        subscription_data:
+          args.accountType === "organizer" ? {} : subscriptionData,
         success_url: `${process.env.FRONTEND_URL}/success`,
-        cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+        cancel_url: `${process.env.FRONTEND_URL}/pricing`,
+        //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
         customer_email: user.email,
+        ...(args.accountType === "organizer"
+          ? { customer_creation: "always" }
+          : {}),
         metadata: metadata,
         client_reference_id: metadata.userId,
+        discounts: args.isEligibleForFree
+          ? [{ coupon: "KT7bnfqn" }]
+          : undefined,
+        //TODO: Add coupon and products to production version of Stripe
       })
 
     // console.log("checkout session created: ", session)
@@ -187,7 +246,6 @@ export const subscriptionStoreWebhook = mutation({
     //   eventType = "customer.subscription.created"
     // }
     console.log("eventType once more: ", eventType)
-    //NOTE: Check this part to ensure that the userId is being extracted correctly
     const userId = args.body.data.object.customer ?? null
     console.log("customer id: ", userId)
 
@@ -303,6 +361,11 @@ export const subscriptionStoreWebhook = mutation({
 
       case "checkout.session.completed":
         const metadata = args.body.data.object.metadata
+        const metaInterval = metadata?.interval
+        const oneTime = metaInterval === "One-time"
+        const freeCall =
+          args.body.data.object.discounts[0]?.coupon === "KT7bnfqn"
+
         const checkoutUser = await ctx.db
           .query("userSubscriptions")
           .withIndex("userId", (q) =>
@@ -310,7 +373,16 @@ export const subscriptionStoreWebhook = mutation({
           )
           .first()
 
-        if (checkoutUser) {
+        const checkoutOrg = await ctx.db
+          .query("organizations")
+          .withIndex("by_ownerId", (q) =>
+            q.eq("ownerId", args.body.data.object.metadata.userId)
+          )
+          .first()
+
+        console.log("checkoutOrg: ", checkoutOrg)
+
+        if (checkoutUser && !oneTime) {
           console.log("user subscription already exists")
           console.log("checkout session: ", checkoutUser)
 
@@ -319,7 +391,9 @@ export const subscriptionStoreWebhook = mutation({
             metadata: args.body.data.object.metadata ?? {},
             customerId: args.body.data.object.customer,
           })
-        } else {
+        } else if (!checkoutUser && oneTime) {
+          console.log("checkoutUser didn't exist: ", checkoutUser)
+
           await ctx.db.insert("userSubscriptions", {
             userId: args.body.data.object.metadata?.userId,
             metadata: args.body.data.object.metadata ?? {},
@@ -327,6 +401,44 @@ export const subscriptionStoreWebhook = mutation({
             paidStatus: args.body.data.object.paid,
           })
         }
+
+        if (oneTime && checkoutOrg) {
+          const checkoutOrgSub = await ctx.db
+            .query("organizationSubscriptions")
+            .withIndex("organizationId", (q) =>
+              q.eq("organizationId", checkoutOrg._id)
+            )
+            .first()
+
+          console.log("checkoutOrgSub: ", checkoutOrgSub)
+
+          console.log("one-time: ", oneTime)
+          await ctx.db.patch(checkoutOrg._id, {
+            updatedAt: Date.now(),
+            lastUpdatedBy: metadata?.userId,
+          })
+
+          if (freeCall) {
+            await ctx.db.patch(checkoutOrg._id, {
+              hadFreeCall: true,
+            })
+          }
+          await ctx.db.insert("organizationSubscriptions", {
+            organizationId: checkoutOrg._id,
+            userId: metadata?.userId,
+            stripeId: args.body.data.object.id,
+            currency: args.body.data.object.currency,
+            status: args.body.data.object.status,
+            amountSubtotal: args.body.data.object.amount_subtotal,
+            amountTotal: args.body.data.object.amount_total,
+            amountDiscount: args.body.data.object.total_details.amount_discount,
+            metadata: metadata,
+            customerId: args.body.data.object.customer,
+            paidStatus: args.body.data.object.payment_status,
+          })
+        }
+
+        console.log("should be able to do logic for one-time here")
 
         const existingUser = await ctx.db
           .query("users")

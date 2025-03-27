@@ -12,17 +12,21 @@ export default async function HomeLayout({
   children: React.ReactNode
 }) {
   const token = await convexAuthNextjsToken()
-  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
-  // const userPref = userData?.userPref ?? null
-  const userId = userData?.userId ?? null
-  const user = userData?.user ?? undefined
 
-  const subStatus = await fetchQuery(
-    api.subscriptions.getUserSubscriptionStatus,
-    {},
-    { token }
-  )
+  let userData = null
+  let subStatus = null
 
+  if (token) {
+    userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+    subStatus = await fetchQuery(
+      api.subscriptions.getUserSubscriptionStatus,
+      {},
+      { token }
+    )
+  }
+
+  const userId = userData?.userId ?? "guest"
+  const user = userData?.user ?? null
   // if (!token) redirect("auth/sign-in")
 
   return (
