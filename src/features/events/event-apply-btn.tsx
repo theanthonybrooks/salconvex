@@ -157,7 +157,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
           variant='salWithShadowHidden'
           size='lg'
           className={cn(
-            "rounded-r-none border-r w-full min-w-[150px]",
+            "rounded-r-none border-r w-full xl:min-w-[150px]",
             status !== null &&
               "text-foreground/50 border-foreground/50 bg-background"
           )}>
