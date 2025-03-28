@@ -12,12 +12,39 @@ const PopoverTrigger = PopoverPrimitive.Trigger
 
 const PopoverAnchor = PopoverPrimitive.Anchor
 
+const CustomArrow = React.forwardRef<
+  SVGSVGElement,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Arrow>
+>(({ className, ...props }, ref) => (
+  <PopoverPrimitive.Arrow asChild ref={ref} {...props}>
+    <svg
+      className={cn("block", className)}
+      width='15'
+      height='10'
+      viewBox='0 0 30 10'
+      preserveAspectRatio='none'>
+      <polygon points='0,0 30,0 15,10' fill='black' />
+      <polygon points='2,0 28,0 15,8' fill='white' />
+    </svg>
+  </PopoverPrimitive.Arrow>
+))
+CustomArrow.displayName = "CustomArrow"
+
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
+    showCloseButton?: boolean
+  }
 >(
   (
-    { className, align = "center", sideOffset = 4, children, ...props },
+    {
+      className,
+      align = "center",
+      sideOffset = 4,
+      children,
+      showCloseButton = true,
+      ...props
+    },
     ref
   ) => (
     <PopoverPrimitive.Portal>
@@ -30,11 +57,14 @@ const PopoverContent = React.forwardRef<
           className
         )}
         {...props}>
-        <PopoverPrimitive.Arrow className='fill-white' />
+        {/* <PopoverPrimitive.Arrow className='fill-white' /> */}
+        <CustomArrow />
         <PopoverPrimitive.Close
           aria-label='Close popover'
           className='absolute top-3 right-3 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75'>
-          <X className='size-6 text-black/80 hover:text-red-600' />
+          {showCloseButton && (
+            <X className='size-6 text-black/80 hover:text-red-600' />
+          )}
         </PopoverPrimitive.Close>
         {children}
       </PopoverPrimitive.Content>

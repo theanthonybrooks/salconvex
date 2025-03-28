@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
+import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as functions_customGoogle from "../functions/customGoogle.js";
@@ -40,6 +41,7 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
+  "artists/artistActions": typeof artists_artistActions;
   auth: typeof auth;
   crons: typeof crons;
   "functions/customGoogle": typeof functions_customGoogle;

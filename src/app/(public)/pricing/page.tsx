@@ -3,8 +3,6 @@
 import { faqs2 } from "@/constants/accordions"
 import { AccordionComponent } from "@/features/homepage/accordion-component"
 import Pricing from "@/features/homepage/pricing"
-import { motion } from "framer-motion"
-import { Check, DollarSign } from "lucide-react"
 import { useEffect } from "react"
 
 export default function PricingPage() {
@@ -34,28 +32,28 @@ export default function PricingPage() {
     scrollToSection()
   }, [])
 
-  const features = [
-    "Authentication & Authorization",
-    "Payment Processing",
-    "SEO Optimization",
-    "TypeScript Support",
-    "Database Integration",
-    "Dark Mode Support",
-    "Responsive Design",
-    "API Integration",
-  ]
+  // const features = [
+  //   "Authentication & Authorization",
+  //   "Payment Processing",
+  //   "SEO Optimization",
+  //   "TypeScript Support",
+  //   "Database Integration",
+  //   "Dark Mode Support",
+  //   "Responsive Design",
+  //   "API Integration",
+  // ]
 
   return (
     <>
-      <div className='container mx-auto px-4'>
-        <section className='relative flex flex-col items-center justify-center py-20'>
-          {/* Background gradient */}
+      <div className='container mx-auto'>
+        {/*    <section className='relative flex flex-col items-center justify-center py-20'>
+          /~ Background gradient ~/
           <div className='absolute inset-0 -z-10 h-full w-full bg-white dark:bg-foreground bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]'>
             <div className='absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-blue-400 dark:bg-blue-500 opacity-20 blur-[100px]'></div>
           </div>
 
           <div className='space-y-6 text-center'>
-            {/* Pill badge */}
+            /~ Pill badge ~/
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -67,7 +65,7 @@ export default function PricingPage() {
               </div>
             </motion.div>
 
-            {/* Main heading */}
+            /~ Main heading ~/
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -76,7 +74,7 @@ export default function PricingPage() {
               Choose Your Perfect Plan
             </motion.h1>
 
-            {/* Subtitle */}
+            /~ Subtitle ~/
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -86,10 +84,10 @@ export default function PricingPage() {
               next big idea faster than ever
             </motion.p>
           </div>
-        </section>
+        </section>*/}
 
         <section className='py-12'>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16'>
+          {/*       <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16'>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -118,7 +116,7 @@ export default function PricingPage() {
                 </div>
               ))}
             </motion.div>
-          </div>
+          </div>*/}
 
           <div className='py-8'>
             <Pricing />

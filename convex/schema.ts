@@ -36,6 +36,49 @@ const customUserSchema = {
   emailVerified: v.optional(v.boolean()),
 }
 
+const artistSchema = {
+  artistId: v.id("users"),
+  artistName: v.optional(v.string()),
+  artistNationality: v.optional(v.array(v.string())),
+  artistResidency: v.optional(
+    v.object({
+      full: v.optional(v.string()),
+      city: v.optional(v.string()),
+      state: v.optional(v.string()),
+      country: v.optional(v.string()),
+      location: v.optional(v.array(v.string())),
+    })
+  ),
+  documents: v.optional(
+    v.object({
+      cv: v.optional(v.string()),
+      resume: v.optional(v.string()),
+      artistStatement: v.optional(v.string()),
+      images: v.optional(v.array(v.string())),
+    })
+  ),
+  applications: v.optional(
+    v.array(
+      v.object({
+        applicationId: v.optional(v.string()),
+        applicationStatus: v.optional(v.string()),
+      })
+    )
+  ),
+  listActions: v.optional(
+    v.array(
+      v.object({
+        eventId: v.id("events"),
+        hidden: v.boolean(),
+        bookmarked: v.boolean(),
+      })
+    )
+  ),
+  updatedAt: v.optional(v.number()),
+  lastUpdatedBy: v.optional(v.string()),
+  completedProfile: v.boolean(),
+}
+
 const organizationSchema = {
   ownerId: v.id("users"),
   organizationName: v.string(),
@@ -112,6 +155,11 @@ export default defineSchema({
   })
     .index("email", ["email"])
     .index("userId", ["userId"]),
+
+  // Artist Tables
+  artists: defineTable(artistSchema)
+    .index("by_artistId", ["artistId"])
+    .index("by_artistNationality", ["artistNationality"]),
 
   // Organization Tables
   organizations: defineTable(organizationSchema)

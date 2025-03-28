@@ -24,9 +24,9 @@ export default async function DashboardLayout({
   const role = user?.user?.role
 
   if (!user || !subStatus) redirect("/auth/sign-in")
-  if (subStatus?.subStatus === "cancelled") {
-    redirect("/pricing#plans")
-  }
+  // if (subStatus?.subStatus === "cancelled") {
+  //   redirect("/pricing#plans")
+  // }
 
   return (
     <>

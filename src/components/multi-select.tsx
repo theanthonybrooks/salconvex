@@ -68,6 +68,8 @@ interface MultiSelectProps
     label: string
     /** The unique value associated with the option. */
     value: string
+    /** The group label associated with the option. */
+    group?: string
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>
   }[]
@@ -226,6 +228,8 @@ export const MultiSelect = React.forwardRef<
     //   setSelectedValues([...new Set([...defaultValue, ...lockedValue])]) /
     // }, [defaultValue, lockedValue])
 
+    // Group options if any have a group property
+
     return (
       <Popover
         open={isPopoverOpen}
@@ -266,7 +270,7 @@ export const MultiSelect = React.forwardRef<
                             <IconComponent className='h-4 w-4 mr-2' />
                           )}
                           <p className='text-sm font-normal'>{option?.label}</p>
-                          {!lockedValue.includes(value) && ( // ✅ Hide remove icon for locked values
+                          {!lockedValue.includes(value) && (
                             <X
                               className='ml-2 h-3 w-3 cursor-pointer'
                               onClick={(event) => {
@@ -380,7 +384,7 @@ export const MultiSelect = React.forwardRef<
                     <span>(Select All)</span>
                   </CommandItem>
                 )}
-                {options.map((option) => {
+                {/* {options.map((option) => {
                   const isSelected = selectedValues.includes(option.value)
                   return (
                     <CommandItem
@@ -402,7 +406,101 @@ export const MultiSelect = React.forwardRef<
                       <span>{option.label}</span>
                     </CommandItem>
                   )
-                })}
+                })} */}
+                {/* {Object.entries(groupedOptions).map(([groupLabel, items]) => (
+                  <CommandGroup key={groupLabel} heading={groupLabel}>
+                    {items.map((option) => {
+                      const isSelected = selectedValues.includes(option.value)
+                      return (
+                        <CommandItem
+                          key={option.value}
+                          onSelect={() => toggleOption(option.value)}
+                          className='cursor-pointer'>
+                          <div
+                            className={cn(
+                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              isSelected
+                                ? "bg-primary text-primary-foreground"
+                                : "opacity-50 [&_svg]:invisible"
+                            )}>
+                            <CheckIcon className='h-4 w-4' />
+                          </div>
+                          {option.icon && (
+                            <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
+                          )}
+                          <span>{option.label}</span>
+                        </CommandItem>
+                      )
+                    })}
+                  </CommandGroup>
+                ))} */}
+                {options.some((o) => o.group) ? (
+                  Object.entries(
+                    options.reduce<Record<string, typeof options>>(
+                      (acc, curr) => {
+                        const group = curr.group ?? "Ungrouped"
+                        if (!acc[group]) acc[group] = []
+                        acc[group].push(curr)
+                        return acc
+                      },
+                      {}
+                    )
+                  ).map(([group, groupOptions]) => (
+                    <CommandGroup
+                      key={group}
+                      heading={group === "Ungrouped" ? undefined : group}>
+                      {groupOptions.map((option) => {
+                        const isSelected = selectedValues.includes(option.value)
+                        return (
+                          <CommandItem
+                            key={option.value}
+                            onSelect={() => toggleOption(option.value)}
+                            className='cursor-pointer'>
+                            <div
+                              className={cn(
+                                "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                isSelected
+                                  ? "bg-primary text-primary-foreground"
+                                  : "opacity-50 [&_svg]:invisible"
+                              )}>
+                              <CheckIcon className='h-4 w-4' />
+                            </div>
+                            {option.icon && (
+                              <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
+                            )}
+                            <span>{option.label}</span>
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                  ))
+                ) : (
+                  <CommandGroup>
+                    {options.map((option) => {
+                      const isSelected = selectedValues.includes(option.value)
+                      return (
+                        <CommandItem
+                          key={option.value}
+                          onSelect={() => toggleOption(option.value)}
+                          className='cursor-pointer'>
+                          <div
+                            className={cn(
+                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              isSelected
+                                ? "bg-primary text-primary-foreground"
+                                : "opacity-50 [&_svg]:invisible"
+                            )}>
+                            <CheckIcon className='h-4 w-4' />
+                          </div>
+                          {option.icon && (
+                            <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
+                          )}
+                          <span>{option.label}</span>
+                        </CommandItem>
+                      )
+                    })}
+                  </CommandGroup>
+                )}
               </CommandGroup>
               <CommandSeparator />
               <CommandGroup>

@@ -70,7 +70,7 @@ interface SearchMappedSelectProps<T> {
   getItemValue: (item: T) => string
   // getItemKey?: (item: T) => string
   onChange: (value: string) => void
-  searchFields: (keyof T)[] // Specify which fields should be used for searching
+  searchFields: string[] // Specify which fields should be used for searching
   disabled?: boolean
   placeholder?: string
   // width?: string
@@ -94,6 +94,16 @@ SearchMappedSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
+  function getNestedValue<T>(obj: T, path: string): unknown {
+    return path.split(".").reduce((acc, key) => {
+      if (acc && typeof acc === "object") {
+        const current = acc as Record<string, unknown>
+        return current[key]
+      }
+      return undefined
+    }, obj as unknown)
+  }
+
   // Find the label for the selected item
   const selectedLabel = Object.values(data)
     .flat()
@@ -102,13 +112,26 @@ SearchMappedSelectProps<T>) {
   // Function to check if an item matches the search query
   const matchesSearch = (item: T) => {
     const lowerSearch = searchQuery.toLowerCase()
-    return searchFields.some((field) => {
-      const fieldValue = item[field]
-      if (typeof fieldValue === "string") {
-        return fieldValue.toLowerCase().includes(lowerSearch)
-      } else if (typeof fieldValue === "number") {
-        return fieldValue.toString().includes(lowerSearch)
+
+    return searchFields.some((path) => {
+      const value = getNestedValue(item, path)
+
+      if (Array.isArray(value)) {
+        return value.some((entry) =>
+          typeof entry === "string"
+            ? entry.toLowerCase().includes(lowerSearch)
+            : false
+        )
       }
+
+      if (typeof value === "string") {
+        return value.toLowerCase().includes(lowerSearch)
+      }
+
+      if (typeof value === "number") {
+        return value.toString().includes(lowerSearch)
+      }
+
       return false
     })
   }
@@ -122,6 +145,8 @@ SearchMappedSelectProps<T>) {
     },
     {}
   )
+
+  console.log("filteredData: ", filteredData)
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -144,7 +169,7 @@ SearchMappedSelectProps<T>) {
         </Button>
       </PopoverTrigger>
       <PopoverContent align='end' className='min-w-[280px] w-full p-0'>
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder='Search...'
             autoFocus
@@ -156,7 +181,7 @@ SearchMappedSelectProps<T>) {
               <CommandGroup key={group} heading={group}>
                 {items.map((item) => {
                   const itemValue = getItemValue(item)
-                  // const itemKey = getItemKey?.(item) ?? itemValue
+
                   const isSelected = value === itemValue
 
                   return (

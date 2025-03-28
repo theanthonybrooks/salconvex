@@ -379,7 +379,7 @@ export const subscriptionStoreWebhook = mutation({
             q.eq("ownerId", args.body.data.object.metadata.userId)
           )
           .first()
-
+        console.log("checkoutUser: ", checkoutUser)
         console.log("checkoutOrg: ", checkoutOrg)
 
         if (checkoutUser && !oneTime) {
@@ -391,12 +391,12 @@ export const subscriptionStoreWebhook = mutation({
             metadata: args.body.data.object.metadata ?? {},
             customerId: args.body.data.object.customer,
           })
-        } else if (!checkoutUser && oneTime) {
+        } else if (!checkoutUser && !oneTime) {
           console.log("checkoutUser didn't exist: ", checkoutUser)
 
           await ctx.db.insert("userSubscriptions", {
-            userId: args.body.data.object.metadata?.userId,
-            metadata: args.body.data.object.metadata ?? {},
+            userId: metadata.userId,
+            metadata: metadata ?? {},
             customerId: args.body.data.object.customer,
             paidStatus: args.body.data.object.paid,
           })
@@ -449,6 +449,7 @@ export const subscriptionStoreWebhook = mutation({
         console.log("existingUser checkout: ", existingUser)
         if (existingUser) {
           console.log("metadata: ", metadata)
+          //TODO: Add logic for organizations. Currently, it's adding the metadata in the style of artists plans, which isn't useful or accurate.
           await ctx.db.patch(existingUser._id, {
             subscription: `${metadata.interval}ly-${metadata.plan}`,
           })

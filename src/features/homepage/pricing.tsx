@@ -14,6 +14,10 @@ import { cn } from "@/lib/utils"
 import { useAction, useConvexAuth } from "convex/react"
 
 import DiscreteSlider from "@/components/ui/slider"
+import {
+  AccountSubscribeForm,
+  ModeType,
+} from "@/features/account/account-profile-form"
 import { User } from "@/types/user"
 import { useQuery } from "convex-helpers/react/cache"
 import { motion } from "framer-motion"
@@ -263,7 +267,7 @@ const PricingCard = ({
               {isArtist && (isYearly ? "/year" : "/month")}
             </span>
           </div>
-          {(!user || isEligibleForFree) && isOrganizer && (
+          {(!user || isEligibleForFree) && !isFree && isOrganizer && (
             <p className='text-lg text-foreground text-green-600 mt-4'>
               First Open Call is free
             </p>
@@ -297,15 +301,14 @@ const PricingCard = ({
       </div>
 
       <CardFooter>
-        <Button
-          variant={
-            popular || isFree ? "salWithShadowPink" : "salWithShadowHiddenYlw"
-          }
+        <AccountSubscribeForm
+          user={user}
+          mode={accountType as ModeType}
           onClick={() => {
-            if (!user) {
-              router.push("/auth/register?src=newUser")
-              return
-            }
+            // if (!user) {
+            //   router.push("/auth/register?src=newUser")
+            //   return
+            // }
 
             if (isFree) {
               router.push("/submit?src=freecall")
@@ -313,12 +316,17 @@ const PricingCard = ({
               return
             }
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false)
-          }}
-          className={cn("w-full hover:brightness-105", {
-            "bg-salPink brightness-[1.15] hover:brightness-125": popular,
-          })}>
-          {isArtist ? "Get" : "List"} {title}
-        </Button>
+          }}>
+          <Button
+            variant={
+              popular || isFree ? "salWithShadowPink" : "salWithShadowHiddenYlw"
+            }
+            className={cn("w-full hover:brightness-105", {
+              "bg-salPink brightness-[1.15] hover:brightness-125": popular,
+            })}>
+            {isArtist ? "Get" : "List"} {title}
+          </Button>
+        </AccountSubscribeForm>
       </CardFooter>
     </Card>
   )
@@ -383,41 +391,40 @@ export default function Pricing() {
   return (
     <section id='plans' className='price-card-cont px-4'>
       <div className='mx-auto max-w-7xl'>
-        {isPublic && (
-          <div className='flex flex-col gap-2 px-4 w-full items-center'>
-            <p className='text-2xl font-bold'>Are you an</p>
-            <div className='flex items-center gap-4 text-center'>
+        <div className='flex flex-col gap-2 px-4 w-full items-center'>
+          <p className='text-2xl font-bold'>Are you an</p>
+          <div className='flex items-center md:gap-4 text-center flex-col md:flex-row'>
+            <p
+              onClick={() => {
+                setSelectedAccountType("artist")
+                setIsYearly(false)
+              }}
+              className={cn(
+                "font-tanker stroked lowercase text-salYellow text-[4em] cursor-pointer tracking-wide",
+                isArtist && "wshadow text-white"
+              )}>
+              Artist
+            </p>
+            <span className='font-bold'>OR</span>
+            <span className='flex items-center'>
               <p
-                onClick={() => {
-                  setSelectedAccountType("artist")
-                  setIsYearly(false)
-                }}
+                onClick={() => setSelectedAccountType("organizer")}
                 className={cn(
-                  "font-tanker stroked lowercase text-white text-[4em] cursor-pointer tracking-wide",
-                  isArtist && "wshadow text-salYellow"
+                  "font-tanker stroked lowercase text-salYellow text-[4em] cursor-pointer tracking-wide",
+                  isOrganizer && "wshadow text-white"
                 )}>
-                Artist
+                Organizer
               </p>
-              <span className='font-bold'>OR</span>
-              <span className='flex items-center'>
-                <p
-                  onClick={() => setSelectedAccountType("organizer")}
-                  className={cn(
-                    "font-tanker stroked lowercase text-white text-[4em] cursor-pointer tracking-wide",
-                    isOrganizer && "wshadow text-salYellow"
-                  )}>
-                  Organizer
-                </p>
-                <p
-                  className={cn(
-                    "font-tanker stroked lowercase text-white text-[4em] cursor-pointer tracking-wide"
-                  )}>
-                  ?
-                </p>
-              </span>
-            </div>
+              <p
+                className={cn(
+                  "font-tanker stroked lowercase text-salYellow text-[4em] cursor-pointer tracking-wide"
+                )}>
+                ?
+              </p>
+            </span>
           </div>
-        )}
+        </div>
+
         {isArtist && !hasSub ? (
           <PricingHeader
             title='Choose Your Plan'
@@ -439,7 +446,7 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className='mt-10 flex justify-center gap-3'>
+            className='mt-10 flex justify-center gap-y-6 lg:gap-5 flex-col lg:flex-row'>
             {[...plans]
               .sort((a, b) => {
                 const priceA = isYearly
@@ -470,7 +477,7 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className='mt-10 flex justify-center gap-3'>
+            className='mt-10 flex justify-center gap-y-6 md:gap-8 flex-col md:flex-row'>
             {orgPlans &&
               orgPlans.map((plan) => {
                 const { key, prices, ...rest } = plan
