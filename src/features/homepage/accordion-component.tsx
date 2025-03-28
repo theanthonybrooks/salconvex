@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/mapped-accordion"
 import { AccordionSection } from "@/constants/accordions"
 import { motion } from "framer-motion"
-import { HelpCircle } from "lucide-react"
 
 interface AccordionComponentProps {
   src: AccordionSection
@@ -28,23 +27,13 @@ export function AccordionComponent({ src }: AccordionComponentProps) {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           className={`text-center ${src.title ? "mb-16" : "mb-4"}`}>
-          {/* Pill badge */}
-          {src.name && (
-            <div className='mx-auto mb-6 w-fit rounded-full border border-blue-200 bg-blue-50 px-4 py-1 dark:border-blue-900 dark:bg-blue-900/30'>
-              <div className='flex items-center gap-2 text-sm font-medium text-blue-900 dark:text-blue-200'>
-                <HelpCircle className='h-4 w-4' />
-                <span>{src.name}</span>
-              </div>
-            </div>
-          )}
-
           {src.title && (
-            <h2 className='bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text pb-2 text-3xl font-bold text-transparent dark:from-white dark:via-blue-300 dark:to-white md:text-4xl'>
+            <h2 className='font-tanker lowercase text-[4em]  tracking-wide text-foreground'>
               {src.title}
             </h2>
           )}
           {src.description && (
-            <p className='mx-auto mt-4 max-w-2xl text-gray-600 dark:text-gray-300'>
+            <p className='mx-auto mt-4 max-w-2xl text-foreground text-sm'>
               {src.description}
             </p>
           )}
@@ -66,13 +55,13 @@ export function AccordionComponent({ src }: AccordionComponentProps) {
               <AccordionItem
                 key={index}
                 value={`item-${index + 1}`}
-                className='mb-4 rounded-lg border border-gray-200 px-2 dark:border-gray-800'>
+                className='mb-4 rounded-lg border border-foreground/50 px-2 hover:bg-card/20 data-[state=open]:bg-card/50 '>
                 <AccordionTrigger
                   className='px-2 py-4 hover:no-underline'
                   iconOpen={src.iconOpen}
                   iconClosed={src.iconClosed}
                   icon={src.icon}>
-                  <span className='pr-3 text-left font-medium text-gray-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400'>
+                  <span className='pr-3 text-left font-medium text-foreground transition-colors'>
                     {item.subtitle}
                   </span>
                 </AccordionTrigger>
@@ -80,17 +69,13 @@ export function AccordionComponent({ src }: AccordionComponentProps) {
                   {Array.isArray(item.text) && src.isList ? (
                     <ul className={`${src.listStyle} list-inside`}>
                       {item.text.map((entry, i) => (
-                        <li
-                          key={i}
-                          className='mb-3 text-gray-600 dark:text-gray-300'>
+                        <li key={i} className='mb-3 text-foreground'>
                           {entry}
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className='text-gray-600 dark:text-gray-300'>
-                      {item.text}
-                    </p>
+                    <p className='text-foreground'>{item.text}</p>
                   )}
                 </AccordionContent>
               </AccordionItem>

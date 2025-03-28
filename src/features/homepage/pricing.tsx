@@ -20,11 +20,12 @@ import {
 } from "@/features/account/account-profile-form"
 import { User } from "@/types/user"
 import { useQuery } from "convex-helpers/react/cache"
+import { ConvexError } from "convex/values"
 import { motion } from "framer-motion"
-import { CheckCircle2 } from "lucide-react"
-import Link from "next/link"
+import { CheckCircle2, LoaderPinwheel } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
+import { toast } from "react-toastify"
 import { api } from "~/convex/_generated/api"
 
 type PricingSwitchProps = {
@@ -63,15 +64,22 @@ const pricingIntervals = [
 
 //--------------------- Existing Subscription  ----------------------//
 
-const ExistingSubscription = () => {
+const ExistingSubscription = ({ onClick }: { onClick: () => void }) => {
   return (
-    <Card className='flex w-full max-w-sm flex-col justify-between px-2 py-1'>
-      <Link href='/dashboard/account'>
-        <Button className={"w-full bg-white text-gray-900 hover:bg-gray-100"}>
-          Manage Subscription
-        </Button>
-      </Link>
-    </Card>
+    <div className='mt-[1rem] flex w-full flex-col gap-y-6 items-center justify-center p-3'>
+      <div className='flex flex-col items-center'>
+        <p className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
+          Your Subscription
+        </p>
+        <p className='text-center text-balance'>
+          Want to upgrade or cancel your subscription?
+        </p>
+      </div>
+
+      <Button variant='salWithShadow' onClick={onClick}>
+        Manage Subscription
+      </Button>
+    </div>
   )
 }
 
@@ -84,11 +92,11 @@ const PricingHeader = ({
   title: string
   subtitle: string
 }) => (
-  <div className='my-6 text-center flex flex-col items-center gap-4 '>
-    <h2 className=' text-3xl font-bold text-foreground md:text-4xl'>{title}</h2>
-    <p className='max-w-2xl text-gray-600 dark:text-gray-300 text-balance'>
-      {subtitle}
-    </p>
+  <div className=' my-6 md:my-8 text-center flex flex-col items-center gap-4 md:gap-8 '>
+    <h2 className=' text-3xl text-foreground  font-tanker lowercase md:text-[4em] cursor-pointer tracking-wide '>
+      {title}
+    </h2>
+    <p className='max-w-2xl text-foreground text-balance'>{subtitle}</p>
   </div>
 )
 
@@ -131,6 +139,62 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
           ))}
         </TabsList>
       </Tabs>
+    </div>
+  )
+}
+
+// -------------------- Type Switch -----------------------//
+
+export const AccountTypeSwitch = ({
+  isArtist,
+  setSelectedAccountType,
+  selectedAccountType,
+  setIsYearly,
+  hasSub,
+}: {
+  isArtist: boolean
+  setSelectedAccountType: (value: string) => void
+  selectedAccountType: string
+  setIsYearly: (value: boolean) => void
+  hasSub: boolean
+}) => {
+  return (
+    <div className='flex flex-col  items-center justify-center  text-center'>
+      <div
+        className={cn(
+          "flex flex-col gap-4 items-center",
+          !hasSub && "mt-8 3xl:mt-14"
+        )}>
+        {isArtist ? (
+          <p>
+            Want to <span className='font-bold'>add</span> an open call?
+          </p>
+        ) : !hasSub ? (
+          <p>
+            Want to <span className='font-bold'>apply</span> to open calls?
+          </p>
+        ) : (
+          <p>
+            Want to <span className='font-bold'>manage</span> your plan?
+          </p>
+        )}
+        <Button
+          variant='salWithShadowHidden'
+          size='lg'
+          onClick={() => {
+            setSelectedAccountType(
+              selectedAccountType === "artist" ? "organizer" : "artist"
+            )
+            setIsYearly(false)
+          }}
+          className='w-fit '>
+          {selectedAccountType === "artist"
+            ? "Switch to Organizer Options"
+            : hasSub
+            ? "View your current plan"
+            : "Switch to Artist Options"}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -216,12 +280,12 @@ const PricingCard = ({
         }
       )}>
       {popular && (
-        <div className='absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-salPink border-2 px-3 py-1 brightness-[1.15]'>
+        <div className='absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-salPinkLt border-2 px-3 py-1 '>
           <p className='text-sm font-medium text-foreground'>Recommended</p>
         </div>
       )}
       {isFree && (
-        <div className='absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-salPink border-2 px-3 py-1 brightness-[1.15]'>
+        <div className='absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-salPinkLt border-2 px-3 py-1 '>
           <p className='text-sm font-medium text-foreground'>Free Listing</p>
         </div>
       )}
@@ -321,9 +385,7 @@ const PricingCard = ({
             variant={
               popular || isFree ? "salWithShadowPink" : "salWithShadowHiddenYlw"
             }
-            className={cn("w-full hover:brightness-105", {
-              "bg-salPink brightness-[1.15] hover:brightness-125": popular,
-            })}>
+            className={cn("w-full")}>
             {isArtist ? "Get" : "List"} {title}
           </Button>
         </AccountSubscribeForm>
@@ -347,16 +409,26 @@ export default function Pricing() {
     isAuthenticated ? {} : "skip"
   )
 
-  const hasSub = subStatus?.hasActiveSubscription
+  const hasSub = subStatus?.hasActiveSubscription ?? false
+  const subscription = useQuery(
+    api.subscriptions.getUserSubscription,
+    hasSub ? {} : "skip"
+  )
+  const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl)
 
-  const isPublic = !isAuthenticated
+  console.log(subscription)
+
+  console.log("subStatus", subStatus)
+  console.log("hasSub", hasSub)
+
+  // const isPublic = !isAuthenticated
   const user = userData?.user
-  const userAccountTypes = user?.accountType ?? []
-  const multiType = userAccountTypes.length > 1
-  let accountType = user?.accountType[0] ?? "artist"
-  if (hasSub) {
-    accountType = "organizer"
-  }
+  // const userAccountTypes = user?.accountType ?? []
+  // const multiType = userAccountTypes.length > 1
+  const accountType = user?.accountType[0] ?? "artist"
+  // if (hasSub) {
+  //   accountType = "organizer"
+  // }
 
   console.log("accountType: ", accountType)
   const [selectedAccountType, setSelectedAccountType] = useState(accountType)
@@ -364,6 +436,43 @@ export default function Pricing() {
   // const userIsArtist = userAccountTypes.includes("artist")
   const isArtist = selectedAccountType === "artist"
   const isOrganizer = selectedAccountType === "organizer"
+
+  const handleManageSubscription = async () => {
+    if (!subscription?.customerId) {
+      toast.error(
+        "No subscription found. Please contact support if this is incorrect."
+      )
+      return
+    }
+
+    try {
+      const result = await getDashboardUrl({
+        customerId: subscription.customerId,
+      })
+      if (result?.url) {
+        window.location.href = result.url
+      }
+    } catch (err: unknown) {
+      if (err instanceof ConvexError) {
+        toast.error(
+          typeof err.data === "string" &&
+            err.data.toLowerCase().includes("no such customer")
+            ? "Your account was cancelled. Contact support for assistance."
+            : err.data || "An unexpected error occurred."
+        )
+      } else if (err instanceof Error) {
+        toast.error(
+          typeof err.message === "string" &&
+            err.message.toLowerCase().includes("no such customer")
+            ? "Your account was cancelled. Contact support for assistance."
+            : err.message || "An unexpected error occurred."
+        )
+      } else {
+        toast.error("An unknown error occurred.")
+      }
+      return
+    }
+  }
 
   useEffect(() => {
     setSelectedAccountType(accountType)
@@ -374,79 +483,79 @@ export default function Pricing() {
 
   const plans = useQuery(api.plans.getUserPlans)
   const orgPlans = useQuery(api.plans.getOrgPlans)
-  if (!plans || (!orgPlans && isOrganizer)) return <div>Loading plans...</div>
-
-  if (hasSub && !userAccountTypes.includes("organizer")) {
-    return (
-      <div className='mt-[1rem] flex w-full flex-col items-center justify-center p-3'>
-        <PricingHeader
-          title='Your Subscription'
-          subtitle='Want to upgrade or cancel your subscription?'
-        />
-        <ExistingSubscription />
-      </div>
-    )
-  }
 
   return (
-    <section id='plans' className='price-card-cont px-4'>
+    <section id='plans' className='price-card-cont px-4 pt-6'>
       <div className='mx-auto max-w-7xl'>
-        <div className='flex flex-col gap-2 px-4 w-full items-center'>
-          <p className='text-2xl font-bold'>Are you an</p>
-          <div className='flex items-center md:gap-4 text-center flex-col md:flex-row'>
-            <p
-              onClick={() => {
-                setSelectedAccountType("artist")
-                setIsYearly(false)
-              }}
-              className={cn(
-                "font-tanker stroked lowercase text-salYellow text-[4em] cursor-pointer tracking-wide",
-                isArtist && "wshadow text-white"
-              )}>
-              Artist
-            </p>
-            <span className='font-bold'>OR</span>
-            <span className='flex items-center'>
+        {/* {!hasSub && (
+          <div className='flex flex-col gap-2 px-4 w-full items-center'>
+            <p className='text-2xl font-bold'>Are you an</p>
+            <div className='flex items-center md:gap-4 text-center flex-col md:flex-row'>
               <p
-                onClick={() => setSelectedAccountType("organizer")}
+                onClick={() => {
+                  setSelectedAccountType("artist")
+                  setIsYearly(false)
+                }}
                 className={cn(
-                  "font-tanker stroked lowercase text-salYellow text-[4em] cursor-pointer tracking-wide",
-                  isOrganizer && "wshadow text-white"
+                  "font-tanker  lowercase  text-[4em] cursor-pointer tracking-wide",
+                  isArtist && "wshadow text-white stroked"
                 )}>
-                Organizer
+                Artist
               </p>
-              <p
-                className={cn(
-                  "font-tanker stroked lowercase text-salYellow text-[4em] cursor-pointer tracking-wide"
-                )}>
-                ?
-              </p>
-            </span>
+              <span className='font-bold'>OR</span>
+              <span className='flex items-center'>
+                <p
+                  onClick={() => setSelectedAccountType("organizer")}
+                  className={cn(
+                    "font-tanker  lowercase  text-[4em] cursor-pointer tracking-wide",
+                    isOrganizer && "wshadow text-white stroked"
+                  )}>
+                  Organizer
+                </p>
+                <p
+                  className={cn(
+                    "font-tanker stroked lowercase text-background text-[4em] cursor-pointer tracking-wide"
+                  )}>
+                  ?
+                </p>
+              </span>
+            </div>
           </div>
-        </div>
+        )} */}
+        {isArtist && !hasSub && (
+          <>
+            <PricingHeader
+              title='Choose Your Plan'
+              subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
+            />
+            <PricingSwitch onSwitch={togglePricingPeriod} />
+          </>
+        )}
 
-        {isArtist && !hasSub ? (
-          <PricingHeader
-            title='Choose Your Plan'
-            subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
-          />
-        ) : (
+        {isOrganizer && (
           <PricingHeader
             title='Select your call type'
             subtitle='Graffiti jams are always free to list and mural projects are priced on a sliding scale. All event-only listings (without open call) are free.'
           />
         )}
 
-        {isArtist && !hasSub && (
-          <PricingSwitch onSwitch={togglePricingPeriod} />
-        )}
-        {isArtist && !hasSub ? (
+        {!plans ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className='mt-10 flex justify-center gap-y-6 lg:gap-5 flex-col lg:flex-row'>
+            className='mt-10  flex items-center justify-center gap-y-6 md:gap-2 flex-col md:flex-row'>
+            <LoaderPinwheel className='animate-spin' />
+            <p className='text-lg font-bold'>Loading plans...</p>
+          </motion.div>
+        ) : isArtist && !hasSub ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className='mt-10 3xl:mt-16 flex justify-center gap-y-6 lg:gap-5 flex-col lg:flex-row'>
             {[...plans]
               .sort((a, b) => {
                 const priceA = isYearly
@@ -471,13 +580,15 @@ export default function Pricing() {
                 )
               })}
           </motion.div>
+        ) : isArtist && hasSub ? (
+          <ExistingSubscription onClick={handleManageSubscription} />
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className='mt-10 flex justify-center gap-y-6 md:gap-8 flex-col md:flex-row'>
+            className='mt-10 3xl:mt-16 flex justify-center gap-y-6 md:gap-8 flex-col md:flex-row'>
             {orgPlans &&
               orgPlans.map((plan) => {
                 const { key, prices, ...rest } = plan
@@ -500,6 +611,13 @@ export default function Pricing() {
               })}
           </motion.div>
         )}
+        <AccountTypeSwitch
+          isArtist={isArtist}
+          setSelectedAccountType={setSelectedAccountType}
+          selectedAccountType={selectedAccountType}
+          setIsYearly={setIsYearly}
+          hasSub={hasSub}
+        />
         {/* {isOrganizer && (
           <div className='flex flex-col gap-2 text-sm max-w-[60%] mx-auto text-pretty mt-6'>
             <p className='font-bold'>NOTE:</p>
@@ -514,33 +632,6 @@ export default function Pricing() {
           </div>
         )} */}
         {/* //TODO:Add functionality that will allow artists/organizers to add other account type (prompt them) */}
-        {(isPublic || multiType) && !hasSub && (
-          <div className='flex flex-col gap-4 items-center justify-center mt-14 text-center'>
-            {isArtist ? (
-              <p>
-                Want to <span className='font-bold'>add</span> an open call?
-              </p>
-            ) : (
-              <p>
-                Want to <span className='font-bold'>apply</span> to open calls?
-              </p>
-            )}
-            <Button
-              variant='salWithShadowHidden'
-              size='lg'
-              onClick={() => {
-                setSelectedAccountType(
-                  selectedAccountType === "artist" ? "organizer" : "artist"
-                )
-                setIsYearly(false)
-              }}
-              className='w-fit '>
-              {selectedAccountType === "artist"
-                ? "Switch to Organizer Options"
-                : "Switch to Artist Options"}
-            </Button>
-          </div>
-        )}
       </div>
     </section>
   )

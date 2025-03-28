@@ -25,14 +25,22 @@ body,
 @layer base {
   :root {
     --sal-yellow: 50 100% 72%; /* #ffe770 */
-    --sal-yellow-dark: 83, 51%, 78%; /* #ffe770 */
+    --sal-yellow-light: 50 100% 80%; /* #ffe770 */
+    --sal-yellow-lt-hover: 50 100% 85%; /* #ffe770 */
+    --sal-yellow-dark: 50 70% 62%; /* #ffe770 */
+
     /* --sal-yellow-old: hsl(50 100% 72%); /* #ffe770 */
+    --sal-pink-dark: 303 70% 62%; /* #ff7bff #f4a9f6 */
     --sal-pink: 303 100% 82%; /* #ff7bff #f4a9f6 */
+    --sal-pink-light: 303 100% 90%; /* #ff7bff #f4a9f6 */
+    --sal-pink-lt-hover: 303 100% 95%; /* #ff7bff #f4a9f6 */
+
     --sal-pink-hex: #f4a9f6;
     --sal-green: 83, 51%, 88%; /* #e4f0d1 */
     --sal-test: rgb(228, 240, 209);
     --sal-yellow-hex: #f8f16b;
     --background: 83, 51%, 88%;
+    --background-dark: 83, 51%, 78%;
     /* --background: 0 0% 100%; */
     --user-icon: var(--sal-yellow-old);
     --foreground-hex: #020817;
@@ -179,7 +187,8 @@ body,
     --background-prev: 60 90% 75%; /* #f8f16b */
     /* --background: 0 0% 100%; */
     --background: 50 100% 72%;
-    --sal-yellow-dark: 50 70% 52%; /* #ffe770 */
+    --background-dark: 50 70% 52%;
+
     --sal-progress: var(rgb(240, 121, 244));
     --user-icon: 0, 0%, 100%;
 
@@ -329,6 +338,10 @@ body,
 }
 
 .scrollable {
+  &.justy {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   overflow: auto;
   scrollbar-gutter: auto;
   /* &.boundless {

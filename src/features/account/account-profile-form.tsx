@@ -9,8 +9,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { Label } from "@/components/ui/label"
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi"
+import HorizontalLinearStepper from "@/components/ui/stepper"
 import {
   fetchMapboxSuggestions,
   MapboxSuggestion,
@@ -56,6 +66,13 @@ type ArtistFormValues = {
   locationCountry?: string
   locationCoordinates?: string[]
 }
+
+// type EventFormValues = {
+//   eventName: string
+//   eventDescription: string
+//   eventDate: string
+//   //etc etc
+// }
 
 export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
   className,
@@ -107,11 +124,12 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
   )
 
   const router = useRouter()
-  const [column, setColumn] = useState("todo")
-  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium")
-  const [order, setOrder] = useState("start")
+  const [activeStep, setActiveStep] = useState(0)
+  const [skipped, setSkipped] = useState(new Set<number>())
+
   const [title, setTitle] = useState("")
   const [name, setName] = useState("")
+  const [hasPrevEvent] = useState(false)
 
   useEffect(() => {
     setName(user?.name ?? `${user?.firstName} ${user?.lastName}`)
@@ -164,12 +182,17 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
     }
   }
 
+  const onCancel = () => {
+    setActiveStep(0)
+    reset()
+  }
+
   const isArtist = mode === "artist"
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div
+        <DialogHeader
           className='w-full'
           onClick={(e) => {
             if (!user) {
@@ -180,11 +203,16 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
             // If user exists, do nothing and allow modal to open
           }}>
           {children}
-        </div>
+        </DialogHeader>
       </DialogTrigger>
 
-      <DialogContent className={cn("bg-card ", className)}>
-        <DialogHeader>
+      <DialogContent
+        className={cn(
+          "bg-card max-w-full max-h-full w-full h-full md:h-auto md:max-w-lg ",
+          className,
+          !isArtist && "xl:max-w-[95vw]  xl:max-h-[90vh] xl:h-full"
+        )}>
+        <div>
           <DialogTitle>
             {isArtist ? "Create Artist Profile" : "Add New Call"}
           </DialogTitle>
@@ -193,7 +221,7 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
               ? "Add information needed to apply for open calls"
               : "Add open call for your project or event"}
           </DialogDescription>
-        </DialogHeader>
+        </div>
         {isArtist ? (
           <>
             {/* NOTE: Artist Profile Creation */}
@@ -236,7 +264,7 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
                           "altSpellings",
                         ]}
                         tabIndex={2}
-                        required
+                        className='bg-card'
                       />
                     )}
                   />
@@ -262,7 +290,7 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
                             setSuggestions(results)
                           }}
                           placeholder='Place of residence (city, state, country, etc)...'
-                          className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-sm placeholder-foreground/50 focus:outline-none placeholder-shown:bg-salYellow/50 '
+                          className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-sm placeholder-foreground/50 focus:outline-none placeholder-shown:bg-card '
                         />
                         {suggestions.length > 0 && (
                           <ul className='absolute z-50 mt-1 w-full rounded-md bg-white shadow'>
@@ -317,69 +345,98 @@ export const AccountSubscribeForm: React.FC<AccountSubscribeFormProps> = ({
         ) : (
           <>
             {/*NOTE: Open Call Profile Creation */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col gap-4'>
-              <Label>Event</Label>
-              <textarea
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
-              />
-
-              <Label>Column</Label>
-              <select
-                value={column}
-                onChange={(e) => setColumn(e.target.value)}
-                className='border p-2 rounded bg-background text-foreground'>
-                <option value='proposed'>Proposed</option>
-                <option value='backlog'>Considering</option>
-                <option value='todo'>To Do</option>
-                <option value='doing'>In Progress</option>
-                <option value='done'>Complete</option>
-              </select>
-
-              <Label>Priority</Label>
-              <select
-                value={priority}
-                onChange={(e) =>
-                  setPriority(e.target.value as "low" | "medium" | "high")
-                }
-                className='border p-2 rounded bg-background text-foreground'>
-                <option value='high'>High</option>
-                <option value='medium'>Medium</option>
-                <option value='low'>Low</option>
-              </select>
-
-              {!isArtist && (
-                <>
-                  <Label>Order</Label>
-                  <select
-                    value={order}
-                    onChange={(e) =>
-                      setOrder(e.target.value as "start" | "end")
-                    }
-                    className='border p-2 rounded bg-background text-foreground'>
-                    <option value='start'>Add to Beginning</option>
-                    <option value='end'>Add to End</option>
-                  </select>
-                </>
-              )}
-
-              <DialogFooter className='flex justify-end gap-2'>
+            <HorizontalLinearStepper
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              skipped={skipped}
+              setSkipped={setSkipped}
+              steps={4}
+              className='px-2 xl:px-8'
+              finalLabel='Submit'
+              onFinalSubmit={handleSubmit(onSubmit)}
+              isDirty={true}
+              onSave={() => {}}
+              cancelButton={
                 <DialogClose asChild>
-                  <Button type='button' variant='salWithShadowHiddenYlw'>
+                  <Button
+                    type='button'
+                    variant='salWithShadowHiddenYlw'
+                    onClick={onCancel}>
                     Cancel
                   </Button>
                 </DialogClose>
-                <DialogClose asChild>
-                  <Button type='submit' variant='salWithShadowHidden'>
-                    {isArtist ? "Save Changes" : "Add Task"}
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </form>
+              }>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col  p-4  min-h-96 h-full
+'>
+                {activeStep === 0 && (
+                  <div className='gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
+                    <section className='flex flex-col gap-2'>
+                      <div className='flex flex-col gap-y-3 items-center justify-center'>
+                        <p className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
+                          {hasPrevEvent ? "Welcome Back!" : "Welcome!"}
+                        </p>
+                        <p className='text-center text-balance'>
+                          {hasPrevEvent
+                            ? "To start, select from your existing events or create a new open call"
+                            : "To start, create a new open call!"}
+                        </p>
+
+                        {hasPrevEvent && (
+                          <Select onValueChange={() => {}} defaultValue={"1"}>
+                            <SelectTrigger className='max-w-sm p-8 text-base text-center mt-6'>
+                              <SelectValue placeholder='Select from your events ' />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                              <SelectItem value='1'>Event 1</SelectItem>
+                              <SelectItem value='2'>Event 2</SelectItem>
+                              <SelectItem value='3'>Event 3</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                    </section>
+                    <section>
+                      <Label>Event Name</Label>
+                      <input
+                        value={title}
+                        // {...register("eventName")}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder='Task title...'
+                        className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                      />
+                      <p>
+                        Check here if the organizer (a) already exists, (b) has
+                        any current events (that they may want to add a new open
+                        call for) , (c) has any current open calls (so they
+                        don&apos;t accidentally create a duplicate) and (d) to
+                        give a brief intro and ask the MOST basic event info if
+                        this is their first. If no existing events, use this as
+                        a starting point and a sort of welcome/intro page to
+                        posting an open call here.
+                      </p>
+                    </section>
+                  </div>
+                )}
+                {activeStep === 1 && (
+                  <p className='gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
+                    Second Step
+                  </p>
+                )}
+                {activeStep === 2 && (
+                  <p className='gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
+                    Third Step{" "}
+                  </p>
+                )}
+                {activeStep === 3 && (
+                  <p className='gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
+                    Final Step
+                  </p>
+                )}
+              </form>
+            </HorizontalLinearStepper>
           </>
         )}
       </DialogContent>

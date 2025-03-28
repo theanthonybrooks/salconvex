@@ -28,15 +28,14 @@ export interface AccordionSection {
 }
 
 // Annotate the constant with the type
-export const faqs2: AccordionSection = {
+export const faqs: AccordionSection = {
   name: null,
-  title: "Frequently Asked Questions",
+  title: "FAQ",
   description:
-    "Everything you need to know about the Next.js Starter Kit. Can't find the answer you're looking for? Reach out to our team.",
+    "Curious why I do all of this? Hopefully, these answers will help to clarify some things",
   // icon: <HelpCircle className='h-4 w-4' />,
   iconClosed: <Plus className={cn("h-4 w-4 mr-1", iconClosedClass)} />,
   iconOpen: <Minus className={cn("h-4 w-4 mr-1 ", iconOpenClass)} />,
-  firstOpen: true,
 
   items: [
     {

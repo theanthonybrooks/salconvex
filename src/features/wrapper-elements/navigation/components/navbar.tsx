@@ -234,7 +234,7 @@ NavBarProps) {
                         className={cn(
                           "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
                           isActiveResources &&
-                            "border-foreground/20 bg-salYellowDark/30 hover:bg-salYellowDark/50 hover:border-foreground/40"
+                            "border-foreground/20 bg-backgroundDark/30 hover:bg-backgroundDark/50 hover:border-foreground/40"
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
@@ -267,7 +267,7 @@ NavBarProps) {
                         className={cn(
                           "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
                           isActiveTheList &&
-                            "border-foreground/20 bg-salYellowDark/30 hover:bg-salYellowDark/50 hover:border-foreground/40"
+                            "border-foreground/20 bg-backgroundDark/30 hover:bg-backgroundDark/50 hover:border-foreground/40"
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}>
