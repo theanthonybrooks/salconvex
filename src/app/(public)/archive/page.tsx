@@ -1,6 +1,6 @@
 "use client"
 
-import { faqs2 } from "@/constants/accordions"
+import { faqs } from "@/constants/accordions"
 import { AccordionComponent } from "@/features/homepage/accordion-component"
 import Pricing from "@/features/homepage/pricing"
 
@@ -89,7 +89,7 @@ export default function Archive() {
           </section>
 
           <section className='pb-20'>
-            <AccordionComponent src={faqs2} />
+            <AccordionComponent src={faqs} />
           </section>
         </div>
       </>
