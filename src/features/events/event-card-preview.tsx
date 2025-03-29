@@ -529,36 +529,38 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             </div>
           </div>
         ) : (
-          <div className='pt-8 pb-3 flex-col flex gap-y-3 text-sm'>
-            <span className='font-semibold '>Organizer/Event Links:</span>
-            {event.links.map((link, index) => {
-              return (
-                <Link key={index} href={link.href} target='_blank'>
-                  <div className='flex gap-x-2 items-center justify-start '>
-                    {link.type === "website" && (
-                      <FaGlobe className='size-5 hover:scale-110 ' />
-                    )}
-                    {link.type === "instagram" && (
-                      <FaInstagram className='size-5 hover:scale-110 ' />
-                    )}
-                    {link.type === "facebook" && (
-                      <FaFacebook className='size-5 hover:scale-110 ' />
-                    )}
-                    {link.type === "threads" && (
-                      <FaThreads className='size-5 hover:scale-110 ' />
-                    )}
-                    {link.type === "email" && (
-                      <FaEnvelope className='size-5 hover:scale-110 ' />
-                    )}
-                    <span className='hover:underline underline-offset-2'>
-                      {link.type === "email" || link.type === "website"
-                        ? link.href.split("www.").slice(-1)[0]
-                        : link.handle}
-                    </span>
-                  </div>
-                </Link>
-              )
-            })}
+          <div className='pt-8 pb-3 flex-col flex gap-y-6 text-sm'>
+            <span className='font-semibold '>Event Links:</span>
+            <div className='flex flex-col gap-y-2 '>
+              {event.links.map((link, index) => {
+                return (
+                  <Link key={index} href={link.href} target='_blank'>
+                    <div className='flex gap-x-2 items-center justify-start '>
+                      {link.type === "website" && (
+                        <FaGlobe className='size-5 hover:scale-110 ' />
+                      )}
+                      {link.type === "instagram" && (
+                        <FaInstagram className='size-5 hover:scale-110 ' />
+                      )}
+                      {link.type === "facebook" && (
+                        <FaFacebook className='size-5 hover:scale-110 ' />
+                      )}
+                      {link.type === "threads" && (
+                        <FaThreads className='size-5 hover:scale-110 ' />
+                      )}
+                      {link.type === "email" && (
+                        <FaEnvelope className='size-5 hover:scale-110 ' />
+                      )}
+                      <span className='hover:underline underline-offset-2'>
+                        {link.type === "email" || link.type === "website"
+                          ? link.href.split("www.").slice(-1)[0]
+                          : link.handle}
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         )}
         <div className='py-6 flex-col flex gap-y-6 text-sm items-center justify-center'>
