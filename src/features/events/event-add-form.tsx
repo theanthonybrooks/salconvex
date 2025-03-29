@@ -42,7 +42,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   })
 
   const [activeStep, setActiveStep] = useState(0)
-  const [hasPrevEvent] = useState(false)
+  const [hasPrevEvent] = useState(true)
   const [title, setTitle] = useState("")
   //   const [name, setName] = useState("")
 
@@ -110,11 +110,11 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       }>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className='flex flex-col  p-4  min-h-96 h-full
+        className='flex flex-col grow  p-4  min-h-96 h-full
    '>
         {activeStep === 0 && (
-          <div className='gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
-            <section className='flex flex-col gap-2'>
+          <div className='h-full gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
+            <section className='flex flex-col gap-2 justify-center'>
               <div className='flex flex-col gap-y-3 items-center justify-center'>
                 <p className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
                   {hasPrevEvent ? "Welcome Back!" : "Welcome!"}

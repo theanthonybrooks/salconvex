@@ -60,18 +60,20 @@ export const AccountSubscribeForm = ({
         className={cn(
           "bg-card max-w-full max-h-full w-full  md:h-auto md:max-w-lg ",
           className,
-          !isArtist && "xl:max-w-[95vw]  xl:max-h-[90vh] xl:h-full"
+          !isArtist && "h-full xl:max-w-[95vw]  xl:max-h-[90vh] xl:h-full"
         )}>
-        <div>
-          <DialogTitle>
+        <>
+          <DialogTitle className={cn(!isArtist && "sr-only")}>
             {isArtist ? "Create Artist Profile" : "Add New Call"}
           </DialogTitle>
-          <DialogDescription>
-            {isArtist
-              ? "Add information needed to apply for open calls"
-              : "Add open call for your project or event"}
-          </DialogDescription>
-        </div>
+          {isArtist && (
+            <DialogDescription>
+              {isArtist
+                ? "Add information needed to apply for open calls"
+                : "Add open call for your project or event"}
+            </DialogDescription>
+          )}
+        </>
         {isArtist ? (
           <ArtistProfileForm user={user} onClick={onClick} />
         ) : (

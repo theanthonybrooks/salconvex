@@ -68,7 +68,7 @@ export default function HorizontalLinearStepper({
   const lastStep = stepArray.length - 1
 
   return (
-    <div className={cn("flex flex-col h-full w-full max-h-[75dvh]", className)}>
+    <div className={cn("flex flex-col h-full w-full py-4 ", className)}>
       {/* Custom Stepper Header with Animated Connectors */}
       <div className='flex items-center justify-center gap-4 w-full max-w-3xl mx-auto px-4'>
         {stepArray.map((step, index) => (
@@ -131,7 +131,7 @@ export default function HorizontalLinearStepper({
           <Button
             variant='salWithShadowHidden'
             className={cn(
-              "opacity-0 bg-salPinkLtHover hover:bg-salPinkLt",
+              "opacity-0 bg-salPinkLtHover hover:bg-salPinkLt hidden lg:block",
               isDirty && onSave !== undefined && "opacity-100"
             )}
             disabled={!isDirty}
@@ -139,7 +139,7 @@ export default function HorizontalLinearStepper({
             Save Progress
           </Button>
           {onSave !== undefined && (
-            <p className=' text-balance text-sm italic'>
+            <p className=' text-balance text-sm italic hidden lg:block'>
               You can save at any time and come back to it later.
             </p>
           )}
