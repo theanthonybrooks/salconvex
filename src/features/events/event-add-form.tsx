@@ -93,7 +93,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     <HorizontalLinearStepper
       activeStep={activeStep}
       setActiveStep={setActiveStep}
-      steps={4}
+      steps={6}
       className='px-2 xl:px-8'
       finalLabel='Submit'
       onFinalSubmit={handleSubmit(onSubmit)}

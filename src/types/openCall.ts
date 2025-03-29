@@ -16,8 +16,8 @@ export interface OpenCall {
     callFormat: "RFP" | "RFQ"
     callType: CallType
     dates: {
-      ocStart: string
-      ocEnd: string
+      ocStart: string | null //null for rolling, email, etc or just open calls without dates
+      ocEnd: string | null
       timezone: string
     }
   }

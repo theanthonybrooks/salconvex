@@ -1,6 +1,12 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import {
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import ApplyButton, {
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn"
@@ -14,10 +20,14 @@ import {
 } from "@/lib/eventFns"
 
 import { cn } from "@/lib/utils"
+import { DropdownMenu, DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
 import {
+  CheckCircle,
   CheckCircleIcon,
   CircleDollarSignIcon,
+  CircleX,
   Ellipsis,
+  Eye,
   EyeOff,
   Info,
 } from "lucide-react"
@@ -59,9 +69,10 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     logo,
     tabs,
     bookmarked,
+    // hasActiveOpenCall,
     hidden,
+    openCallStatus,
   } = event
-  console.log("event status", event.status)
   const { opencall, organizer } = tabs
 
   // const { compensation, basicInfo, eligibility } = opencall
@@ -79,6 +90,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   const { locale, city, stateAbbr, country, countryAbbr } = location
 
   const locationParts: string[] = []
+  const hasOpenCall = openCallStatus === "active"
 
   if (locale) locationParts.push(locale)
 
@@ -140,6 +152,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               className={cn(
                 "rounded-full  border border-black size-12 ",
                 !publicView &&
+                  hasOpenCall &&
                   (event.status === "accepted"
                     ? "ring-4  ring-offset-1 ring-emerald-500"
                     : event.status === "rejected"
@@ -266,7 +279,10 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             />
           ) : (
             <CheckCircleIcon
-              className={cn("size-6 text-emerald-600", publicView && "hidden")}
+              className={cn(
+                "size-6 text-emerald-600",
+                (publicView || !hasOpenCall) && "hidden"
+              )}
             />
           )}
           <div className='flex gap-x-2 items-center justify-center'>
@@ -327,7 +343,73 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             )}
             {/* TODO: Add publicView check to this as well (when the state is set up) */}
           </div>
-          <Ellipsis className='size-7' />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Ellipsis className='size-7 cursor-pointer' />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className='text-sm '>
+              <DropdownMenuLabel>More options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className='p-1 flex flex-col gap-y-1'>
+                <DropdownMenuItem
+                  onClick={() => setIsHidden(!isHidden)}
+                  className={cn(
+                    "cursor-pointer text-black/80  hover:text-red-500",
+                    publicView && "hidden"
+                  )}>
+                  {isHidden ? (
+                    <span className='flex items-center gap-x-1 '>
+                      <EyeOff className='size-4' />
+                      Unhide{" "}
+                      {event.category === "event" ? "Event" : "Open Call"}
+                    </span>
+                  ) : (
+                    <span className='flex items-center gap-x-1 '>
+                      <Eye className='size-4' />
+                      Hide {event.category === "event" ? "Event" : "Open Call"}
+                    </span>
+                  )}
+                </DropdownMenuItem>
+                {openCallStatus === "active" && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setManualApplied(status !== null ? null : "applied")
+                    }
+                    className={cn(
+                      "cursor-pointer text-sm",
+                      publicView && "hidden",
+                      event.status
+                        ? " text-emerald-700 hover:text-black/80"
+                        : "hover:text-emerald-700 text-black/80"
+                    )}>
+                    {event.status ? (
+                      <span className='flex items-center gap-x-1 text-sm'>
+                        <CircleX className='size-4' />
+                        Mark as Not Applied
+                      </span>
+                    ) : (
+                      <span className='flex items-center gap-x-1 text-sm'>
+                        <CheckCircle className='size-4' />
+                        Mark as Applied
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                )}
+                {publicView && (
+                  <DropdownMenuItem
+                    className={cn(
+                      "cursor-pointer text-sm",
+
+                      event.status
+                        ? " text-emerald-700 hover:text-black/80"
+                        : "hover:text-emerald-700 text-black/80"
+                    )}>
+                    Subscribe to bookmark, hide, or apply
+                  </DropdownMenuItem>
+                )}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className='pt-5 pb-3 pl-3 flex-col flex gap-y-3'>
@@ -340,6 +422,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   className={cn(
                     "rounded-full  border border-black size-12 ",
                     !publicView &&
+                      hasOpenCall &&
                       (event.status === "accepted"
                         ? "ring-4  ring-offset-1 ring-emerald-500"
                         : event.status === "rejected"
@@ -395,7 +478,14 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             <div className='flex flex-col gap-y-2'>
               <p className={cn("text-sm  flex items-center gap-x-1")}>
                 <span className={"font-semibold"}>
-                  {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}:
+                  {/* {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}: */}
+                  {hasOpenCall &&
+                    (basicInfo.callType === "Fixed"
+                      ? "Deadline"
+                      : basicInfo?.callType === "Email"
+                      ? "Email by"
+                      : "Status")}
+                  :
                 </span>
                 {publicView ? (
                   <span className='blur-[5px]'>This Year</span>

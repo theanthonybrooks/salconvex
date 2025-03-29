@@ -36,14 +36,19 @@ export const ApplyButtonShort = ({
   publicView,
   appFee,
 }: ApplyButtonShortProps) => {
-  const href = publicView
-    ? "/pricing"
-    : openCall === "active"
-    ? `/thelist/call/${id}`
-    : `/thelist/event/${id}`
+  const href =
+    publicView && !openCall
+      ? `/thelist/event/${id}`
+      : publicView && openCall
+      ? "/pricing"
+      : openCall === "active"
+      ? `/thelist/call/${id}`
+      : `/thelist/event/${id}`
 
   const buttonText =
-    openCall === "coming-soon"
+    publicView && openCall === "active"
+      ? "Apply"
+      : openCall === "coming-soon"
       ? "Coming Soon!"
       : openCall === "ended"
       ? "View More"
@@ -55,7 +60,7 @@ export const ApplyButtonShort = ({
 
   return (
     <>
-      <Link href={href} passHref target={publicView ? "_blank" : "_self"}>
+      <Link href={href} passHref target={!publicView ? "_blank" : "_self"}>
         <Button
           asChild
           // onClick={() => {

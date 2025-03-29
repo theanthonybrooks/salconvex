@@ -110,7 +110,7 @@ export const testEventData: EventData[] = [
     id: "8",
     name: "Dastardly Dallas",
     logo: "/1.jpg",
-    hasActiveOpenCall: true,
+    hasActiveOpenCall: false,
     openCallId: ["14"],
 
     eventType: ["gjm", "mur"],
@@ -291,7 +291,7 @@ export const testOpenCallData: OpenCall[] = [
     basicInfo: {
       appFee: 10,
       callFormat: "RFP",
-      callType: "Rolling",
+      callType: "Email",
       dates: {
         ocStart: "2025-03-01T00:00:00Z",
         ocEnd: "2025-09-01T23:59:59Z",
@@ -346,8 +346,8 @@ export const testOpenCallData: OpenCall[] = [
     organizerId: ["11"],
     basicInfo: {
       appFee: 0,
-      callFormat: "RFP",
-      callType: "Rolling",
+      callFormat: "RFQ",
+      callType: "Fixed",
       dates: {
         ocStart: "2025-03-01T00:00:00Z",
         ocEnd: "2025-04-01T23:59:59Z",

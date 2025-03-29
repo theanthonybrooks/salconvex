@@ -139,7 +139,7 @@ Props) => {
           No events found matching the selected filters.
         </p>
       ) : (
-        (publicView ? paginatedEvents.slice(0, 2) : paginatedEvents).map(
+        (publicView ? paginatedEvents.slice(0, 10) : paginatedEvents).map(
           (event) => (
             <EventCardPreview
               key={event.id}

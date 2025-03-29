@@ -54,6 +54,9 @@ export const useMockEventCards = (): CombinedEventCardData[] => {
             if (now < start) openCallStatus = "coming-soon"
             else if (now > end) openCallStatus = "ended"
             else openCallStatus = "active"
+          } else if (!start && end) {
+            if (now > end) openCallStatus = "ended"
+            else if (now <= end) openCallStatus = "active"
           }
           //   console.log(
           //     "Event ID:",
