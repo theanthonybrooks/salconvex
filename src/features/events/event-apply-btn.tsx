@@ -102,6 +102,7 @@ interface ApplyButtonProps {
   publicView?: boolean
   openCall: OpenCallStatus
   className?: string
+  detailCard?: boolean
 }
 
 const ApplyButton = ({
@@ -118,6 +119,7 @@ const ApplyButton = ({
   publicView,
   isPreview = false,
   className,
+  detailCard,
 }: ApplyButtonProps) => {
   console.log("openCall", openCall)
   const href = publicView
@@ -148,7 +150,9 @@ const ApplyButton = ({
   return (
     <div
       className={cn(
-        "col-span-full lg:w-[250px] mt-4 lg:mt-0 flex items-center justify-center lg:px-4 ",
+        "col-span-full  mt-4 lg:mt-0 flex items-center justify-center lg:px-4 ",
+        !detailCard && "lg:w-[250px]",
+        detailCard && "lg:w-full lg:mt-4",
         className
       )}>
       <Link href={href} passHref target={!publicView ? "_blank" : "_self"}>

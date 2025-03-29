@@ -122,7 +122,7 @@ const AccordionTrigger = React.forwardRef<
           ref={ref}
           className={cn(
             "group flex flex-1 items-start  py-4 text-sm font-medium transition-all  text-left",
-            className,
+            !hasPreview && className,
             hasPreview && "flex-col gap-y-2",
             isOpen && hasPreview && !hidePreview && "pt-4 pb-0"
           )}
@@ -136,9 +136,7 @@ const AccordionTrigger = React.forwardRef<
             )}
           </div>
           {(!isOpen || (isOpen && !hidePreview)) && (
-            <span className='font-normal flex flex-col gap-y-2'>
-              {children}
-            </span>
+            <span className={cn(hasPreview && className)}>{children}</span>
           )}
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>

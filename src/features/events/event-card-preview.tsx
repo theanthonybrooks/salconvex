@@ -251,7 +251,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           <ApplyButtonShort
             id={id}
             status={event.status}
-            openCall={event.openCall}
+            openCall={event.openCallStatus}
             publicView={publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
           />
@@ -589,11 +589,11 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               </span>
             </div>
           )}*/}
-          {event.openCall !== null && (
+          {event.openCallStatus !== null && (
             <>
-              {event.openCall === "coming-soon" ? (
+              {event.openCallStatus === "coming-soon" ? (
                 <p className='text-sm'>Open Call Coming Soon!</p>
-              ) : event.openCall === "ended" ? (
+              ) : event.openCallStatus === "ended" ? (
                 <p className='text-sm'>Open Call Ended</p>
               ) : (
                 ""
@@ -612,7 +612,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           <ApplyButton
             id={id}
             // status={status}
-            openCall={event.openCall}
+            openCall={event.openCallStatus}
             publicView={publicView}
             manualApplied={isManualApplied}
             setManualApplied={setManualApplied}

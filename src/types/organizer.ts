@@ -6,6 +6,7 @@ export type Organizer = {
     locale?: string
     city?: string
     state?: string
+    stateAbbr?: string
     region?: string
     country?: string
     countryAbbr?: string

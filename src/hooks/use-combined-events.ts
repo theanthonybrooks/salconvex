@@ -17,7 +17,7 @@ export type CombinedEventCardData = EventData & {
   hidden: boolean
   status: ApplicationStatus | null
   appFee?: number
-  openCall: OpenCallStatus | null
+  openCallStatus: OpenCallStatus | null
   adminNoteOC?: string | null
 }
 
@@ -71,7 +71,7 @@ export const useMockEventCards = (): CombinedEventCardData[] => {
             status: application?.applicationStatus ?? null,
             adminNoteOC: openCall?.adminNoteOC ?? null,
             appFee: openCall?.basicInfo.appFee ?? 0,
-            openCall: openCallStatus,
+            openCallStatus,
           }
         })
     )

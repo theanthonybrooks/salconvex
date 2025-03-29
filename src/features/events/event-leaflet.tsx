@@ -17,6 +17,8 @@ export default function MapComponent({
   label,
   className,
 }: MapComponentProps) {
+  console.log("latitude", latitude)
+  console.log("longitude", longitude)
   return (
     <MapContainer
       center={[latitude, longitude]}

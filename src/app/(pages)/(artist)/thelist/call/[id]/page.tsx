@@ -1,5 +1,6 @@
 "use client"
 
+import EventCardDetail from "@/features/events/event-card-detail"
 import { useMockEventCards } from "@/hooks/use-combined-events"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -18,8 +19,7 @@ const Call = () => {
         <IoIosArrowRoundBack className='h-6 w-6' /> back to The List
       </Link>
       {event ? (
-        // <EventCardDetail {...event} />
-        <p>Open Call Page</p>
+        <EventCardDetail event={event} />
       ) : (
         <p className='text-red-600 text-lg font-semibold'>
           Open Call not found.

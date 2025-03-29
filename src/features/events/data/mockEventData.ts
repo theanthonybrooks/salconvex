@@ -78,6 +78,7 @@ export const testEventData: EventData[] = [
       state: "Illinois",
       stateAbbr: "IL",
       country: "United States",
+      countryAbbr: "USA",
       continent: "North America",
       coordinates: {
         latitude: 48.7127837,
