@@ -25,7 +25,7 @@ export const testEventData: EventData[] = [
       continent: "North America",
       coordinates: {
         latitude: 48.7127837,
-        longitude: -7.0059413,
+        longitude: 17.0059413,
       },
       directions: "Google Maps Link",
     },
@@ -82,7 +82,7 @@ export const testEventData: EventData[] = [
       continent: "North America",
       coordinates: {
         latitude: 48.7127837,
-        longitude: -7.0059413,
+        longitude: 17.0059413,
       },
       directions: "Google Maps Link",
     },
@@ -127,7 +127,7 @@ export const testEventData: EventData[] = [
       continent: "Europe",
       coordinates: {
         latitude: 48.7127837,
-        longitude: -7.0059413,
+        longitude: 17.0059413,
       },
       directions: "Google Maps Link",
     },
@@ -170,7 +170,7 @@ export const testEventData: EventData[] = [
       continent: "Europe",
       coordinates: {
         latitude: 48.7127837,
-        longitude: -7.0059413,
+        longitude: 17.0059413,
       },
       directions: "Google Maps Link",
     },
@@ -213,7 +213,7 @@ export const testEventData: EventData[] = [
       continent: "North America",
       coordinates: {
         latitude: 48.7127837,
-        longitude: -7.0059413,
+        longitude: 17.0059413,
       },
       directions: "Google Maps Link",
     },
@@ -256,7 +256,7 @@ export const testEventData: EventData[] = [
       continent: "North America",
       coordinates: {
         latitude: 48.7127837,
-        longitude: -7.0059413,
+        longitude: 17.0059413,
       },
       directions: "Google Maps Link",
     },
