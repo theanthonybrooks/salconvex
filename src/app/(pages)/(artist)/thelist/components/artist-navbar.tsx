@@ -2,6 +2,7 @@
 
 import FullPageNav from "@/components/full-page-nav"
 import { Button } from "@/components/ui/button"
+import { Link } from "@/components/ui/custom-link"
 import { UserProfile } from "@/components/ui/user-profile"
 import { dashboardNavItems } from "@/constants/links"
 import { Search } from "@/features/Sidebar/Search"
@@ -10,7 +11,7 @@ import { User } from "@/types/user"
 import { Authenticated, Unauthenticated } from "convex/react"
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion"
-import Link from "next/link"
+
 import { useEffect, useState } from "react"
 
 interface TheListNavBarProps {
@@ -122,26 +123,46 @@ TheListNavBarProps) {
               />
             </Link>
           </motion.div>
+          {!user && (
+            <>
+              <Link
+                href='/pricing#plans'
+                prefetch={true}
+                className='hidden lg:flex font-bold px-8'>
+                View Pricing
+              </Link>
+              <Link
+                href='/pricing#plans'
+                prefetch={true}
+                className='lg:hidden font-bold'>
+                Pricing
+              </Link>
+            </>
+          )}
           {/* NOTE: Limit/hide search for users who don't have a subscription or those who aren't signed in */}
-          <Search
-            title={"Search"}
-            source={dashboardNavItems}
-            className='hidden lg:flex'
-            // groupName={"Heading"}
+          {user && (
+            <>
+              <Search
+                title={"Search"}
+                source={dashboardNavItems}
+                className='hidden lg:flex'
+                // groupName={"Heading"}
 
-            placeholder='Search...'
-            user={user}
-          />
-          <Search
-            iconOnly
-            isMobile={isMobile}
-            title={"Search"}
-            source={dashboardNavItems}
-            // groupName={"Heading"}
-            className=' lg:hidden'
-            placeholder='Search...'
-            user={user}
-          />
+                placeholder='Search...'
+                user={user}
+              />
+              <Search
+                iconOnly
+                isMobile={isMobile}
+                title={"Search"}
+                source={dashboardNavItems}
+                // groupName={"Heading"}
+                className=' lg:hidden'
+                placeholder='Search...'
+                user={user}
+              />
+            </>
+          )}
 
           {!isMobile && (
             <>
@@ -149,12 +170,11 @@ TheListNavBarProps) {
               <Unauthenticated>
                 <div className='hidden lg:flex items-center justify-self-end h-15 w-fit'>
                   <div className='flex items-center gap-4'>
-                    <Link href='/auth/sign-in' prefetch={true}>
-                      <Button
-                        variant='link'
-                        className='font-bold hidden lg:block rounded-full '>
-                        Sign in
-                      </Button>
+                    <Link
+                      href='/auth/sign-in'
+                      prefetch={true}
+                      className='font-bold'>
+                      Sign in
                     </Link>
                     <Link href='/auth/register' prefetch={true}>
                       <Button

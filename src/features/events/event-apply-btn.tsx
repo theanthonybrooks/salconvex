@@ -25,18 +25,16 @@ export const ApplyButtonShort = ({
   const href =
     publicView && !openCall
       ? `/thelist/event/${id}`
-      : publicView && openCall
-      ? "/pricing"
+      : publicView && openCall === "active"
+      ? "/pricing#plans"
       : openCall === "active"
       ? `/thelist/call/${id}`
       : `/thelist/event/${id}`
 
   const buttonText =
-    publicView && openCall === "active"
-      ? "Apply"
-      : openCall === "coming-soon"
+    openCall === "coming-soon"
       ? "Coming Soon!"
-      : status
+      : status && !publicView
       ? "Applied"
       : openCall === "active"
       ? "Apply"
@@ -113,19 +111,20 @@ const ApplyButton = ({
   const href =
     publicView && !openCall
       ? `/thelist/event/${id}`
-      : publicView && openCall
+      : publicView && openCall === "active"
       ? "/pricing#plans"
       : openCall === "active"
       ? `/thelist/call/${id}`
       : `/thelist/event/${id}`
 
-  const buttonText = openCall
-    ? status !== null && !publicView && !isPreview
-      ? `Applied: ${
-          status.slice(0, 1).toUpperCase() + status.slice(1).toLowerCase()
-        }`
-      : "Apply"
-    : "View More"
+  const buttonText =
+    openCall === "active"
+      ? status !== null && !publicView && !isPreview
+        ? `Applied: ${
+            status.slice(0, 1).toUpperCase() + status.slice(1).toLowerCase()
+          }`
+        : "Apply"
+      : "View More"
 
   return (
     <div
