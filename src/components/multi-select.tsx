@@ -350,9 +350,10 @@ export const MultiSelect = React.forwardRef<
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          showCloseButton={false}
           className={cn(
-            "p-0 max-w-max",
-            hasSearch ? "w-auto" : "w-full min-w-[200px]",
+            "p-0 max-w-max border-foreground border",
+            hasSearch ? "w-auto" : "w-full min-w-[200px] ",
             variant === "basic" ? "border-foreground" : ""
           )}
           align='start'

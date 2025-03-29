@@ -6,7 +6,7 @@ export type CallType =
   | "Unknown"
   | null
 
-export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth" | null
+export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth"
 export type EventCategory =
   | "event"
   | "project"
@@ -19,129 +19,61 @@ export type EligibilityType =
   | "National"
   | "Regional/Local"
   | "Other"
+  | null
 
-export type EventStatus = "applied" | "accepted" | "rejected" | "pending" | null
+export type ApplicationStatus =
+  | "applied"
+  | "considering"
+  | "to next step"
+  | "accepted"
+  | "rejected"
+  | "pending"
+  | "roster"
+  | "shortlisted"
+  | null
 
 export type OpenCallStatus = "active" | "ended" | "coming-soon" | null
 
 export type RateUnit = "ft²" | "m²"
 
 export interface EventData {
-  id: number
-  logo: string
-  openCall: OpenCallStatus
-  appFee: number
-  callFormat: "RFP" | "RFQ"
-  callType: CallType
-  eventType: EventType | [EventType, EventType]
-  eventCategory: EventCategory
   adminNote?: string
+  organizerId: string[]
 
-  location: {
-    sameAsOrganizer?: boolean
-    locale: string | null
-    city: string | null
-    state: string | null
-    stateAbbr: string | null
-    region: string | null
-    country: string
-    countryAbbr: string
-    continent: string
-  }
+  id: string
+  name: string
+  logo: string
+  hasActiveOpenCall: boolean
+  openCallId?: string[] //list the open call id's that are associated with this event
+  eventType?: [EventType] | [EventType, EventType]
+  category: EventCategory
   dates: {
     eventStart: string | null
     eventEnd: string
-    ocStart: string
-    ocEnd: string
-    timezone: string
   }
 
-  eligibilityType: EligibilityType
-  eligibility: string
-  eligibilityDetails: string | null
-  budgetMin: number
-  budgetMax: number | null
-  currency: string
-  budgetRate: number
-  budgetRateUnit: RateUnit
-  allInclusive: boolean
-
-  status: EventStatus
-  // manualApplied?: boolean
-  bookmarked: boolean
-  hidden: boolean
-  event: {
-    name: string
+  location: {
+    sameAsOrganizer?: boolean
+    locale?: string
+    city?: string
+    state?: string
+    stateAbbr?: string //needs this for the preview (so I don't need to map it later)
+    region?: string
+    country: string
+    countryAbbr?: string // get this as well while searching anyways.
+    continent?: string
+    coordinates?: {
+      latitude: number
+      longitude: number
+    }
+    directions: string
   }
-  tabs: {
-    opencall: {
-      compensation: {
-        designFee: number | null
-        accommodation: string | null
-        food: string | null
-        travelCosts: string | null
-        materials: string | null
-        equipment: string | null
-        other: string | null
-      }
-      requirements: string[]
-      requirementsMore: string[]
-      requirementDestination: string
-      documents: {
-        title: string
-        href: string
-      }[]
-      otherInfo?: string[]
-    }
-    event: {
-      location: {
-        latitude: number
-        longitude: number
-
-        directions: string
-      }
-      about: string
-      links: {
-        type: string
-        title: string
-        href: string
-        handle?: string
-      }[]
-      otherInfo?: string[]
-    }
-    organizer: {
-      id: number
-      name: string
-      logo: string
-      location: {
-        locale: string | null
-        city: string | null
-        state: string | null
-        stateAbbr: string | null
-        region: string | null
-        country: string
-        countryAbbr: string
-        continent: string
-      }
-      about: string
-      contact: {
-        organizer: string
-        primaryContact: {
-          email?: string
-          phone?: string
-          href?: string
-        }
-      }
-      links: {
-        website?: string
-        instagram?: string
-        facebook?: string
-        threads?: string
-        email?: string
-        vk?: string
-        phone?: string
-        address?: string
-      }
-    }
-  }
+  about: string
+  links: {
+    type: string
+    title: string
+    href: string
+    handle?: string
+  }[]
+  otherInfo?: string[]
 }

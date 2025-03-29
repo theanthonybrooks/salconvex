@@ -1,4 +1,3 @@
-import { mockEventData } from "@/data/mockEventData"
 import ClientEventList from "@/features/events/event-list-client"
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server"
 import { fetchQuery } from "convex/nextjs"
@@ -18,13 +17,14 @@ const TheList = async () => {
       { token }
     )
   }
+
   const userPref = userData?.userPref ?? null
   const publicView = !token || !subStatus?.hasActiveSubscription
 
   return (
     <div className='px-4 flex flex-col items-center max-w-screen'>
       <ClientEventList
-        initialEvents={mockEventData}
+        // initialEvents={testEventData}
         publicView={publicView}
         userPref={userPref}
       />

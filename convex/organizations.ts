@@ -1,6 +1,8 @@
 import { v } from "convex/values"
 import { DatabaseReader, query } from "./_generated/server"
 
+import { v4 as uuidv4 } from "uuid"
+
 export async function maybeAssignOrganizationId({
   db,
   currentOrgName,
@@ -9,7 +11,7 @@ export async function maybeAssignOrganizationId({
   db: DatabaseReader
   currentOrgName?: string
   accountType: string[]
-}): Promise<number | undefined> {
+}): Promise<string | undefined> {
   const isOrganizer = accountType.includes("organizer")
   const hasOrgName = !!currentOrgName
 
@@ -42,13 +44,7 @@ export async function maybeAssignOrganizationId({
     .collect()
 
   console.log("usersWithOrgId: ", usersWithOrgId)
-  const maxOrgId =
-    usersWithOrgId.length > 0
-      ? Math.max(...usersWithOrgId.map((u) => u.organizationId ?? 0))
-      : 0
-
-  console.log("maxOrgId: ", maxOrgId)
-  return maxOrgId + 1
+  return uuidv4()
 }
 
 export const isNewOrg = query({

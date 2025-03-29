@@ -8,8 +8,8 @@ import * as React from "react"
 interface StepperProps {
   activeStep: number
   setActiveStep: React.Dispatch<React.SetStateAction<number>>
-  skipped: Set<number>
-  setSkipped: React.Dispatch<React.SetStateAction<Set<number>>>
+  skipped?: Set<number>
+  setSkipped?: React.Dispatch<React.SetStateAction<Set<number>>>
   steps: { label: string; optional?: boolean }[] | number
   children?: React.ReactNode
   className?: string
@@ -43,30 +43,30 @@ export default function HorizontalLinearStepper({
       : steps
 
   const handleNext = () => {
-    if (skipped.has(activeStep)) {
-      const newSkipped = new Set(skipped)
-      newSkipped.delete(activeStep)
-      setSkipped(newSkipped)
+    if (skipped && setSkipped) {
+      if (skipped.has(activeStep)) {
+        const newSkipped = new Set(skipped)
+        newSkipped.delete(activeStep)
+        setSkipped(newSkipped)
+      }
     }
     setActiveStep((prev) => prev + 1)
   }
 
   const handleBack = () => setActiveStep((prev) => prev - 1)
-
   const handleSkip = () => {
     if (!stepArray[activeStep].optional) {
       throw new Error("You can't skip a step that isn't optional.")
     }
-    setSkipped((prev) => new Set(prev).add(activeStep))
+    if (setSkipped) {
+      setSkipped((prev) => new Set(prev).add(activeStep))
+    }
     setActiveStep((prev) => prev + 1)
   }
-
-  console.log("activeStep", activeStep)
 
   const handleReset = () => setActiveStep(0)
   const lastStep = stepArray.length - 1
 
-  console.log("lastStep", lastStep)
   return (
     <div className={cn("flex flex-col h-full w-full max-h-[75dvh]", className)}>
       {/* Custom Stepper Header with Animated Connectors */}

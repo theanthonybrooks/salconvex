@@ -17,6 +17,7 @@ export interface Filters {
   eventTypes?: EventType[]
   eventCategories?: EventCategory[]
   continent?: Continents
+  page?: number
 }
 
 export interface SortOptions {

@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { useAction, useConvexAuth } from "convex/react"
 
+import { Separator } from "@/components/ui/separator"
 import DiscreteSlider from "@/components/ui/slider"
 import {
   AccountSubscribeForm,
@@ -22,8 +23,8 @@ import { User } from "@/types/user"
 import { useQuery } from "convex-helpers/react/cache"
 import { ConvexError } from "convex/values"
 import { motion } from "framer-motion"
-import { CheckCircle2, LoaderPinwheel } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { CheckCircle2 } from "lucide-react"
+import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "react-toastify"
 import { api } from "~/convex/_generated/api"
@@ -48,6 +49,7 @@ type PricingCardProps = {
   description: string
   features?: string[]
   popular?: boolean
+  image?: string
 }
 
 const pricingRange = [
@@ -211,8 +213,8 @@ const PricingCard = ({
   features,
   popular,
   accountType,
+  image,
 }: PricingCardProps) => {
-  const router = useRouter()
   const isArtist = accountType === "artist"
   const isOrganizer = accountType === "organizer"
   const isFree = prices.rate === 0
@@ -292,11 +294,25 @@ const PricingCard = ({
 
       <div>
         <CardHeader className='space-y-2 pb-4'>
-          <CardTitle className='text-xl'>{title}</CardTitle>
-          <CardDescription className={cn("text-foreground")}>
-            {description}
-          </CardDescription>
+          {image && (
+            <Image
+              src={image}
+              alt={title}
+              width={200}
+              height={200}
+              className='w-full h-auto'
+            />
+          )}
+          {!image && (
+            <>
+              <CardTitle className='text-xl'>{title}</CardTitle>
+              <CardDescription className={cn("text-foreground")}>
+                {description}
+              </CardDescription>
+            </>
+          )}
         </CardHeader>
+        <Separator className='mb-4' thickness={2} />
 
         <CardContent className='pb-4'>
           <div className='flex items-baseline gap-1'>
@@ -369,16 +385,11 @@ const PricingCard = ({
           user={user}
           mode={accountType as ModeType}
           onClick={() => {
-            // if (!user) {
-            //   router.push("/auth/register?src=newUser")
+            // if (isFree) {
+            //   router.push("/submit?src=freecall")
+            //   //TODO: utilize this src param when submitting a free call
             //   return
             // }
-
-            if (isFree) {
-              router.push("/submit?src=freecall")
-              //TODO: utilize this src param when submitting a free call
-              return
-            }
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false)
           }}>
           <Button
@@ -484,6 +495,9 @@ export default function Pricing() {
   const plans = useQuery(api.plans.getUserPlans)
   const orgPlans = useQuery(api.plans.getOrgPlans)
 
+  if (!plans || !orgPlans)
+    return <div className='h-screen w-screen bg-background' />
+
   return (
     <section id='plans' className='price-card-cont px-4 pt-6'>
       <div className='mx-auto max-w-7xl'>
@@ -539,17 +553,7 @@ export default function Pricing() {
           />
         )}
 
-        {!plans ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className='mt-10  flex items-center justify-center gap-y-6 md:gap-2 flex-col md:flex-row'>
-            <LoaderPinwheel className='animate-spin' />
-            <p className='text-lg font-bold'>Loading plans...</p>
-          </motion.div>
-        ) : isArtist && !hasSub ? (
+        {isArtist && !hasSub ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -570,6 +574,7 @@ export default function Pricing() {
                 const { key, ...rest } = plan
                 return (
                   <PricingCard
+                    image={plan.img}
                     key={plan.title}
                     user={user}
                     planKey={key}

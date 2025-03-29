@@ -33,7 +33,7 @@ import currencies from "currency-codes"
 
 export const formatCurrency = (
   min: number,
-  max: number | null,
+  max: number | undefined,
   currency: string,
   preview: boolean = false,
   total: boolean = true

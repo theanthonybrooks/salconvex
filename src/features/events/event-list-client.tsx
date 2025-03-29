@@ -11,28 +11,38 @@ import {
 } from "@/components/ui/pagination"
 import EventCardPreview from "@/features/events/event-card-preview"
 import { EventFilters } from "@/features/events/event-list-filters"
+import { useMockEventCards } from "@/hooks/use-combined-events"
 import { useFilteredEvents } from "@/hooks/use-filtered-events"
 import { setParamIfNotDefault } from "@/lib/utils"
-import { EventCategory, EventData, EventType } from "@/types/event"
+import { EventCategory, EventType } from "@/types/event"
 import { Filters, SortOptions } from "@/types/thelist"
 import { UserPref } from "@/types/user"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface Props {
-  initialEvents: EventData[]
+  // initialEvents: EventData[]
   publicView: boolean
   userPref: UserPref | null
 }
 
-const ClientEventList = ({ initialEvents, publicView, userPref }: Props) => {
+const ClientEventList = ({
+  // initialEvents,
+  publicView,
+}: // userPref,
+
+Props) => {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const allEvents = useMockEventCards()
+
+  // console.log("allEvents", allEvents)
 
   const defaultFilters: Filters = {
     showHidden: false,
     bookmarkedOnly: false,
     limit: 10,
+
     eventTypes: [],
     eventCategories: [],
   }
@@ -46,6 +56,7 @@ const ClientEventList = ({ initialEvents, publicView, userPref }: Props) => {
     showHidden: searchParams.get("h") === "true",
     bookmarkedOnly: searchParams.get("b") === "true",
     limit: Number(searchParams.get("l")) || defaultFilters.limit,
+    page: Number(searchParams.get("page")) || 1,
     eventTypes:
       (searchParams.get("type")?.split(",") as EventType[]) ??
       defaultFilters.eventTypes,
@@ -83,6 +94,12 @@ const ClientEventList = ({ initialEvents, publicView, userPref }: Props) => {
       params.set("cat", filters.eventCategories.join(","))
     else params.delete("cat")
 
+    if (filters.page && filters.page !== 1) {
+      params.set("page", filters.page.toString())
+    } else {
+      params.delete("page")
+    }
+
     setParamIfNotDefault(params, "sb", sortOptions.sortBy, "date")
     setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc")
 
@@ -95,7 +112,12 @@ const ClientEventList = ({ initialEvents, publicView, userPref }: Props) => {
     )
   }, [filters, sortOptions, router])
 
-  const filteredEvents = useFilteredEvents(initialEvents, filters, sortOptions)
+  const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions)
+  const currentPage = filters.page ?? 1
+  const paginatedEvents = filteredEvents.slice(
+    (currentPage - 1) * filters.limit,
+    currentPage * filters.limit
+  )
 
   return (
     <>
@@ -112,6 +134,7 @@ const ClientEventList = ({ initialEvents, publicView, userPref }: Props) => {
             }
             onResetFilters={handleResetFilters}
           />
+          {/* Add in pagination logic here later. Should use convex as well as params*/}
           <Pagination className='mb-6'>
             <PaginationContent>
               <PaginationItem>
@@ -136,14 +159,17 @@ const ClientEventList = ({ initialEvents, publicView, userPref }: Props) => {
           No events found matching the selected filters.
         </p>
       ) : (
-        (publicView ? filteredEvents.slice(0, 2) : filteredEvents).map(
-          (event, index) => (
+        (publicView ? paginatedEvents.slice(0, 2) : paginatedEvents).map(
+          (event) => (
             <EventCardPreview
-              key={index}
-              {...event}
+              key={event.id}
+              event={event}
               publicView={publicView}
-              userPref={userPref}
             />
+            // <div key={event.id}>
+            //   {event.id}
+            //   {event.name}
+            // </div>
           )
         )
       )}

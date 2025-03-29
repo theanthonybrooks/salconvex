@@ -1,38 +1,41 @@
-import { EventData } from "@/types/event"
+import { CombinedEventCardData } from "@/hooks/use-combined-events"
 import { Filters, SortOptions } from "@/types/thelist"
 import { useMemo } from "react"
 
 export const useFilteredEvents = (
-  events: EventData[],
+  events: CombinedEventCardData[],
   filters: Filters,
   sortOptions: SortOptions
-): EventData[] => {
+): CombinedEventCardData[] => {
   return useMemo(() => {
     return events
       .filter((event) => {
         if (!filters.showHidden && event.hidden) return false
         if (filters.bookmarkedOnly && !event.bookmarked) return false
+
         if (
           filters.eventTypes &&
           filters.eventTypes.length > 0 &&
-          (event.eventType === null ||
-            (Array.isArray(event.eventType)
-              ? !event.eventType.some((type) =>
-                  filters.eventTypes!.includes(type)
-                )
-              : !filters.eventTypes.includes(event.eventType)))
-        )
+          (!event.eventType ||
+            !event.eventType.some((type) => filters.eventTypes!.includes(type)))
+        ) {
           return false
+        }
 
         if (
           filters.eventCategories &&
           filters.eventCategories.length > 0 &&
-          !filters.eventCategories.includes(event.eventCategory)
-        )
+          !filters.eventCategories.includes(event.category)
+        ) {
           return false
+        }
 
-        if (filters.continent && event.location.continent !== filters.continent)
+        if (
+          filters.continent &&
+          event.location.continent !== filters.continent
+        ) {
           return false
+        }
 
         return true
       })
@@ -48,8 +51,8 @@ export const useFilteredEvents = (
         }
 
         if (sortBy === "name") {
-          const aName = a.event.name.toLowerCase()
-          const bName = b.event.name.toLowerCase()
+          const aName = a.name.toLowerCase()
+          const bName = b.name.toLowerCase()
           return sortDirection === "asc"
             ? aName.localeCompare(bName)
             : bName.localeCompare(aName)

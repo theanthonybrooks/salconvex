@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-import { EventCategory, EventStatus, OpenCallStatus } from "@/types/event"
+import { ApplicationStatus, EventCategory, OpenCallStatus } from "@/types/event"
 import {
   CheckCircle,
   CircleDollarSignIcon,
@@ -22,20 +22,20 @@ import React from "react"
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6"
 
 interface ApplyButtonShortProps {
-  id: number
-  status: EventStatus
+  id: string
+  status: ApplicationStatus
   openCall: OpenCallStatus
   publicView?: boolean
   appFee: number
 }
 
-export const ApplyButtonShort: React.FC<ApplyButtonShortProps> = ({
+export const ApplyButtonShort = ({
   id,
   status,
   openCall,
   publicView,
   appFee,
-}) => {
+}: ApplyButtonShortProps) => {
   const href = publicView
     ? "/pricing"
     : openCall === "active"
@@ -88,9 +88,9 @@ export const ApplyButtonShort: React.FC<ApplyButtonShortProps> = ({
 }
 
 interface ApplyButtonProps {
-  id: number
-  manualApplied: EventStatus
-  setManualApplied: React.Dispatch<React.SetStateAction<EventStatus>>
+  id: string
+  manualApplied: ApplicationStatus
+  setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>
   isBookmarked: boolean
   setIsBookmarked: React.Dispatch<React.SetStateAction<boolean>>
   isHidden: boolean
@@ -103,7 +103,7 @@ interface ApplyButtonProps {
   className?: string
 }
 
-const ApplyButton: React.FC<ApplyButtonProps> = ({
+const ApplyButton = ({
   id,
   manualApplied: status,
   setManualApplied,
@@ -117,7 +117,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
   publicView,
   isPreview = false,
   className,
-}) => {
+}: ApplyButtonProps) => {
   const href = publicView
     ? "/pricing"
     : openCall === "active"

@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import ApplyButton, {
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn"
+import { CombinedEventCardData } from "@/hooks/use-combined-events"
 import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
 import {
   formatCurrency,
@@ -13,8 +14,6 @@ import {
 } from "@/lib/eventFns"
 
 import { cn } from "@/lib/utils"
-import { EventData } from "@/types/event"
-import { UserPref } from "@/types/user"
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -39,52 +38,40 @@ import {
 } from "react-icons/pi"
 import { TbStairs } from "react-icons/tb"
 
-type EventCardPreviewProps = EventData & {
+export interface EventCardPreviewProps {
+  event: CombinedEventCardData
   publicView?: boolean
-  userPref?: UserPref | null
 }
 
-const EventCardPreview = (props: EventCardPreviewProps) => {
+const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   const {
-    id,
-    logo,
-    status,
-    callFormat,
-    callType,
-    eventType,
-    eventCategory,
-    adminNote,
-    event,
-    location,
     dates,
-    budgetMin,
-    budgetMax,
-    currency,
-    budgetRate,
-    budgetRateUnit,
-    allInclusive,
-    eligibility,
-    eligibilityType,
-    openCall,
-    appFee,
+    location,
+    category,
+    id,
+    eventType,
+    name,
+    logo,
+    tabs,
     bookmarked,
     hidden,
-    publicView,
-    tabs,
+  } = event
 
-    // userPref,
-  } = props
   const { opencall, organizer } = tabs
+
+  // const { compensation, basicInfo, eligibility } = opencall
+  // const { budget, categories } = compensation
+  const compensation = event.hasActiveOpenCall
+    ? opencall?.compensation
+    : undefined
+  const basicInfo = event.hasActiveOpenCall ? opencall?.basicInfo : undefined
+  const eligibility = event.hasActiveOpenCall
+    ? opencall?.eligibility
+    : undefined
+  const budget = compensation?.budget
+  const categories = compensation?.categories ?? {}
+
   const { locale, city, stateAbbr, country, countryAbbr } = location
-  const {
-    designFee,
-    accommodation,
-    food,
-    travelCosts,
-    materials,
-    equipment,
-    other,
-  } = opencall.compensation
 
   const locationParts: string[] = []
 
@@ -108,7 +95,7 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
-  const [isManualApplied, setManualApplied] = useState(status)
+  const [isManualApplied, setManualApplied] = useState(event.status)
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
 
   // const icsLink =
@@ -125,8 +112,14 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
   //       )
   //     : null
 
-  const hasBudget = budgetMin > 0 || (budgetMax && budgetMax > 0)
-  const hasRate = budgetRate && budgetRate > 0
+  const hasBudget = !!(
+    budget &&
+    (budget.min > 0 || (budget.max && budget.max > 0))
+  )
+  const hasRate = !!(budget && budget.rate && budget.rate > 0)
+
+  const isCurrentlyOpen =
+    basicInfo && budget && eligibility && event.hasActiveOpenCall
 
   // const userCurrency = userPref?.currency ?? ""
 
@@ -141,11 +134,11 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
               alt='Event Logo'
               className={cn(
                 "rounded-full  border border-black size-12 ",
-                status === "accepted"
+                event.status === "accepted"
                   ? "ring-4  ring-offset-1 ring-emerald-500"
-                  : status === "rejected"
+                  : event.status === "rejected"
                   ? "ring-4  ring-offset-1 ring-red-500"
-                  : status === "pending"
+                  : event.status === "pending"
                   ? "ring-4 ring-offset-1 ring-foreground/30"
                   : ""
               )}
@@ -156,15 +149,15 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
           <div
             className={cn(
               "border-dotted border-1.5 h-11 w-14 rounded-lg flex flex-col justify-center items-center py-[5px]",
-              !openCall && "opacity-0"
+              !isCurrentlyOpen && "opacity-0"
             )}>
             <span className='text-2xs leading-[0.85rem]'>Call Type</span>
             <span className='text-md font-bold font-foreground leading-[0.85rem]'>
-              {callFormat}
+              {basicInfo && basicInfo.callFormat}
             </span>
             {/* // todo: make this dynamic to show project, event, etc for the type */}
             <span className='text-2xs leading-[0.85rem]'>
-              {getEventCategoryLabel(eventCategory)}
+              {getEventCategoryLabel(category)}
             </span>
           </div>
         </div>
@@ -183,86 +176,87 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
               <span className='font-semibold'>Dates:</span>
               {formatEventDates(dates?.eventStart || "", dates.eventEnd, true)}
             </p>
-            <p
-              className={cn(
-                "text-sm  flex items-center gap-x-1",
-                !openCall && "hidden"
-              )}>
-              <span className={"font-semibold"}>
-                {callType === "Fixed" ? "Deadline" : "Status"}:
-              </span>
-              {publicView ? (
-                <span className='blur-[5px]'>This Year</span>
-              ) : (
-                formatOpenCallDeadline(
-                  dates?.ocEnd || "",
-                  dates?.timezone,
-                  callType,
-                  true
-                )
-              )}
-            </p>
-            <p
-              className={cn(
-                "text-sm flex items-center gap-x-1",
-                !openCall && "hidden"
-              )}>
-              <span className='font-semibold'>Budget:</span>
-              {publicView ? (
-                <span className='blur-[5px]'>Sign in to view</span>
-              ) : budgetMin > 0 || (budgetMax && budgetMax > 0) ? (
-                formatCurrency(
-                  budgetMin,
-                  budgetMax,
-                  currency,
-                  true,
-                  allInclusive
-                  // userCurrency !== currency ? userCurrency : undefined
-                )
-              ) : budgetRate && budgetRate > 0 ? (
-                formatRate(
-                  budgetRate,
-                  budgetRateUnit,
-                  currency,
-                  allInclusive
-                  // userCurrency !== currency ? userCurrency : undefined
-                )
-              ) : (
-                "No Info"
-              )}
-            </p>
-            <p
-              className={cn(
-                "text-sm flex items-center gap-x-1",
-                !openCall && "hidden"
-              )}>
-              <span className='font-semibold'>Eligible:</span>
-              {publicView ? (
-                <span className='blur-[5px]'>$3 per month</span>
-              ) : (
-                <span
-                  className={cn(
-                    eligibilityType !== "International" && "text-red-600"
-                  )}>
-                  {eligibility}
-                  {eligibilityType !== "International" && " Artists*"}
+            {isCurrentlyOpen && (
+              <p className={cn("text-sm  flex items-center gap-x-1")}>
+                <span className={"font-semibold"}>
+                  {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
                 </span>
-              )}
-            </p>
+                {publicView ? (
+                  <span className='blur-[5px]'>This Year</span>
+                ) : (
+                  formatOpenCallDeadline(
+                    basicInfo.dates?.ocEnd || "",
+                    basicInfo.dates?.timezone,
+                    basicInfo.callType,
+                    true
+                  )
+                )}
+              </p>
+            )}
+            {isCurrentlyOpen && (
+              <p className={cn("text-sm flex items-center gap-x-1")}>
+                <span className='font-semibold'>Budget:</span>
+                {publicView ? (
+                  <span className='blur-[5px]'>Sign in to view</span>
+                ) : budget.min > 0 || (budget.max && budget.max > 0) ? (
+                  formatCurrency(
+                    budget.min,
+                    budget.max,
+                    budget.currency,
+                    true,
+                    budget.allInclusive
+                    // userCurrency !== currency ? userCurrency : undefined
+                  )
+                ) : budget.rate && budget.rate > 0 ? (
+                  formatRate(
+                    budget.rate,
+                    budget.unit,
+                    budget.currency,
+                    budget.allInclusive
+                    // userCurrency !== currency ? userCurrency : undefined
+                  )
+                ) : (
+                  "No Info"
+                )}
+              </p>
+            )}
+            {isCurrentlyOpen && (
+              <p
+                className={cn(
+                  "text-sm flex items-center gap-x-1",
+                  !event.hasActiveOpenCall && "hidden"
+                )}>
+                <span className='font-semibold'>Eligible:</span>
+                {publicView ? (
+                  <span className='blur-[5px]'>$3 per month</span>
+                ) : (
+                  <span
+                    className={cn(
+                      eligibility.type !== "International" && "text-red-600"
+                    )}>
+                    {eligibility.whom}
+                    {eligibility.type !== "International" && " Artists*"}
+                  </span>
+                )}
+              </p>
+            )}
           </div>
 
           <ApplyButtonShort
             id={id}
-            status={status}
-            openCall={openCall}
+            status={event.status}
+            openCall={event.openCall}
             publicView={publicView}
-            appFee={appFee}
+            appFee={basicInfo ? basicInfo.appFee : 0}
           />
         </div>
         <div className='flex flex-col items-center justify-between pt-5 pb-5 pr-2'>
-          {status === null && !isManualApplied ? (
+          {event.status === null && !isManualApplied ? (
             <CircleDollarSignIcon
-              className={cn("size-6 text-red-600", !appFee && "opacity-0")}
+              className={cn(
+                "size-6 text-red-600",
+                !basicInfo?.appFee && "opacity-0"
+              )}
             />
           ) : (
             <CheckCircleIcon className={cn("size-6 text-emerald-600")} />
@@ -304,7 +298,10 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
             )}
             {isManualApplied === null ? (
               <CircleDollarSignIcon
-                className={cn("size-6 text-red-600", !appFee && "hidden")}
+                className={cn(
+                  "size-6 text-red-600",
+                  !basicInfo?.appFee && "hidden"
+                )}
               />
             ) : (
               <CheckCircleIcon className={cn("size-6 text-emerald-600")} />
@@ -329,18 +326,18 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
                   alt='Event Logo'
                   className={cn(
                     "rounded-full  border border-black size-12 ",
-                    status === "accepted"
+                    event.status === "accepted"
                       ? "ring-4  ring-offset-1 ring-emerald-500"
-                      : status === "rejected"
+                      : event.status === "rejected"
                       ? "ring-4  ring-offset-1 ring-red-500"
-                      : status === "pending"
+                      : event.status === "pending"
                       ? "ring-4 ring-offset-1 ring-foreground/30"
                       : ""
                   )}
                   height={48}
                   width={48}
                 />
-                <p className='text-base font-semibold'>{event?.name}</p>
+                <p className='text-base font-semibold'>{name}</p>
                 {/* <p className='text-sm'>{locationString}</p> */}
               </div>
             </Link>
@@ -352,19 +349,19 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
             <p className='text-sm flex items-center gap-x-1'>
               <span className='font-semibold'>Category:</span>
 
-              {getEventCategoryLabel(eventCategory)}
+              {getEventCategoryLabel(event.category)}
             </p>
-            {eventCategory === "event" && (
+            {event.category === "event" && eventType && (
               <p className='text-sm flex items-center gap-x-1'>
                 <span className='font-semibold'>Type:</span>
-
-                {getEventTypeLabel(eventType)}
+                {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </p>
             )}
-            {adminNote && (
+            {(event.adminNote || event.adminNoteOC) && (
               <p className='text-sm flex flex-col gap-y-1'>
                 <span className='font-semibold'>Note:</span>
-                {adminNote}
+                {event.adminNoteOC && event.adminNoteOC}
+                {event.adminNote && !event.adminNoteOC && event.adminNote}
               </p>
             )}
           </div>
@@ -378,163 +375,161 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
             ))}
           </div>
         </div>
-        <div className='pt-8 pb-3 flex-col flex gap-y-6 text-sm'>
-          <span className='font-semibold '>Open Call:</span>
-          <div className='flex flex-col gap-y-2'>
-            <p
-              className={cn(
-                "text-sm  flex items-center gap-x-1",
-                !openCall && "hidden"
-              )}>
-              <span className={"font-semibold"}>
-                {callType === "Fixed" ? "Deadline" : "Status"}:
-              </span>
-              {publicView ? (
-                <span className='blur-[5px]'>This Year</span>
-              ) : (
-                <>
-                  <span className='hidden xl:block'>
-                    {formatOpenCallDeadline(
-                      dates?.ocEnd || "",
-                      dates?.timezone,
-                      callType
-                    )}
-                  </span>
-                  <span className='block xl:hidden'>
-                    {formatOpenCallDeadline(
-                      dates?.ocEnd || "",
-                      dates?.timezone,
-                      callType,
-                      true
-                    )}
-                  </span>
-                </>
-              )}
-            </p>
-            <p
-              className={cn(
-                "text-sm flex items-center gap-x-1",
-                !openCall && "hidden"
-              )}>
-              <span className='font-semibold'>Eligible:</span>
-              {publicView ? (
-                <span className='blur-[5px]'>$3 per month</span>
-              ) : (
-                <span
-                  className={cn(
-                    eligibilityType !== "International" && "text-red-600"
-                  )}>
-                  {eligibilityType !== "International" &&
-                    `${eligibilityType}: `}
-                  {eligibility}
-                  {eligibilityType !== "International" && " Artists*"}
+        {isCurrentlyOpen && (
+          <div className='pt-8 pb-3 flex-col flex gap-y-6 text-sm'>
+            <span className='font-semibold '>Open Call:</span>
+            <div className='flex flex-col gap-y-2'>
+              <p className={cn("text-sm  flex items-center gap-x-1")}>
+                <span className={"font-semibold"}>
+                  {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}:
                 </span>
-              )}
-            </p>
-            <p className='flex gap-x-2 items-center'>
-              <span className='font-semibold '>Budget:</span>
-              {publicView ? (
-                <span className='blur-[5px]'>Get paid for your work</span>
-              ) : (
-                <>
-                  {hasBudget &&
-                    formatCurrency(
-                      budgetMin,
-                      budgetMax,
-                      currency,
-                      false,
-                      allInclusive
-                    )}
-                  <span className='hidden xl:block'>
-                    {hasBudget && hasRate && (
-                      <span className='text-sm'> | </span>
-                    )}
+                {publicView ? (
+                  <span className='blur-[5px]'>This Year</span>
+                ) : (
+                  <>
+                    <span className='hidden xl:block'>
+                      {formatOpenCallDeadline(
+                        basicInfo.dates?.ocEnd || "",
+                        basicInfo.dates?.timezone,
+                        basicInfo.callType
+                      )}
+                    </span>
+                    <span className='block xl:hidden'>
+                      {formatOpenCallDeadline(
+                        basicInfo.dates?.ocEnd || "",
+                        basicInfo.dates?.timezone,
+                        basicInfo.callType,
+                        true
+                      )}
+                    </span>
+                  </>
+                )}
+              </p>
+              <p className={cn("text-sm flex items-center gap-x-1")}>
+                <span className='font-semibold'>Eligible:</span>
+                {publicView ? (
+                  <span className='blur-[5px]'>$3 per month</span>
+                ) : (
+                  <span
+                    className={cn(
+                      eligibility.type !== "International" && "text-red-600"
+                    )}>
+                    {eligibility.type !== "International" &&
+                      `${eligibility.type}: `}
+                    {eligibility.whom}
+                    {eligibility.type !== "International" && " Artists*"}
+                  </span>
+                )}
+              </p>
+              <p className='flex gap-x-2 items-center'>
+                <span className='font-semibold '>Budget:</span>
+                {publicView ? (
+                  <span className='blur-[5px]'>Get paid for your work</span>
+                ) : (
+                  <>
+                    {hasBudget &&
+                      formatCurrency(
+                        budget.min,
+                        budget.max,
+                        budget.currency,
+                        false,
+                        budget.allInclusive
+                      )}
+                    <span className='hidden xl:block'>
+                      {hasBudget && hasRate && (
+                        <span className='text-sm'> | </span>
+                      )}
 
-                    {hasRate
-                      ? formatRate(budgetRate, budgetRateUnit, currency, true)
-                      : "No Info"}
+                      {hasRate &&
+                        formatRate(
+                          budget.rate,
+                          budget.unit,
+                          budget.currency,
+                          true
+                        )}
+                    </span>
+                    {!budget.allInclusive && <span className='text-sm'>*</span>}
+                  </>
+                )}
+              </p>
+              {!publicView && (
+                <div
+                  id='budget-icons-${id}'
+                  className='col-span-2 mt-1 xl:flex gap-x-3 items-center justify-start max-w-full hidden'>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full",
+                      categories.designFee && !budget.allInclusive
+                        ? "  border-emerald-500 text-emerald-500"
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <PiPencilLineFill size={18} />
                   </span>
-                  {!allInclusive && <span className='text-sm'>*</span>}
-                </>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full ",
+                      categories.accommodation && !budget.allInclusive
+                        ? " border-emerald-500 text-emerald-500"
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <PiHouseLineFill size={18} />
+                  </span>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full",
+                      categories.food && !budget.allInclusive
+                        ? "  border-emerald-500 text-emerald-500"
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <PiForkKnifeFill size={18} />
+                  </span>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full",
+                      categories.materials && !budget.allInclusive
+                        ? " border-emerald-500 text-emerald-500 "
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <FaPaintRoller size={18} />
+                  </span>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full",
+                      categories.travelCosts && !budget.allInclusive
+                        ? "  border-emerald-500 text-emerald-500"
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <IoAirplane size={18} />
+                  </span>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full",
+                      categories.equipment && !budget.allInclusive
+                        ? "  border-emerald-500 text-emerald-500"
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <TbStairs size={18} />
+                  </span>
+                  <span
+                    className={cn(
+                      "p-1 border-1.5  rounded-full",
+                      categories.other && !budget.allInclusive
+                        ? "  border-emerald-500 text-emerald-500"
+                        : "border-foreground/20 text-foreground/20"
+                    )}>
+                    <FaRegCommentDots size={18} />
+                  </span>
+                </div>
               )}
-            </p>
-            {!publicView && (
-              <div
-                id='budget-icons-${id}'
-                className='col-span-2 mt-1 xl:flex gap-x-3 items-center justify-start max-w-full hidden'>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full",
-                    designFee !== null && !allInclusive
-                      ? "  border-emerald-500 text-emerald-500"
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <PiPencilLineFill size={18} />
-                </span>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full ",
-                    accommodation !== null && !allInclusive
-                      ? " border-emerald-500 text-emerald-500"
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <PiHouseLineFill size={18} />
-                </span>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full",
-                    food !== null && !allInclusive
-                      ? "  border-emerald-500 text-emerald-500"
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <PiForkKnifeFill size={18} />
-                </span>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full",
-                    materials !== null && !allInclusive
-                      ? " border-emerald-500 text-emerald-500 "
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <FaPaintRoller size={18} />
-                </span>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full",
-                    travelCosts !== null && !allInclusive
-                      ? "  border-emerald-500 text-emerald-500"
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <IoAirplane size={18} />
-                </span>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full",
-                    equipment !== null && !allInclusive
-                      ? "  border-emerald-500 text-emerald-500"
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <TbStairs size={18} />
-                </span>
-                <span
-                  className={cn(
-                    "p-1 border-1.5  rounded-full",
-                    other !== null && !allInclusive
-                      ? "  border-emerald-500 text-emerald-500"
-                      : "border-foreground/20 text-foreground/20"
-                  )}>
-                  <FaRegCommentDots size={18} />
-                </span>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
         <div className='py-6 flex-col flex gap-y-6 text-sm items-center justify-center'>
           {/* {openCall === "active" && (
             <div
               className={cn(
                 "border-dotted border-1.5 h-11 w-14 rounded-lg flex flex-col justify-center items-center py-[5px]",
-                !openCall && "opacity-0"
+                !event.hasActiveOpenCall && "opacity-0"
               )}>
               <span className='text-2xs leading-[0.85rem]'>Call Type</span>
               <span className='text-md font-bold font-foreground leading-[0.85rem]'>
@@ -546,43 +541,41 @@ const EventCardPreview = (props: EventCardPreviewProps) => {
               </span>
             </div>
           )}*/}
-          {openCall !== null && (
+          {event.openCall !== null && (
             <>
-              {openCall === "coming-soon" ? (
+              {event.openCall === "coming-soon" ? (
                 <p className='text-sm'>Open Call Coming Soon!</p>
-              ) : openCall === "ended" ? (
+              ) : event.openCall === "ended" ? (
                 <p className='text-sm'>Open Call Ended</p>
               ) : (
                 ""
               )}
             </>
           )}
-          {appFee !== 0 && (
+          {isCurrentlyOpen && basicInfo.appFee !== 0 && (
             <p className='text-sm flex items-center gap-x-1 text-red-600'>
               <span className='font-semibold flex items-center gap-x-1'>
                 <Info /> Application Fee:
               </span>
-              {`$${appFee}`}
+              {`$${basicInfo.appFee}`}
             </p>
           )}
 
-          {callType !== "Invite" && (
-            <ApplyButton
-              id={id}
-              // status={status}
-              openCall={openCall}
-              publicView={publicView}
-              manualApplied={isManualApplied}
-              setManualApplied={setManualApplied}
-              isBookmarked={isBookmarked}
-              setIsBookmarked={setIsBookmarked}
-              isHidden={isHidden}
-              setIsHidden={setIsHidden}
-              eventCategory={eventCategory}
-              isPreview={true}
-              appFee={appFee}
-            />
-          )}
+          <ApplyButton
+            id={id}
+            // status={status}
+            openCall={event.openCall}
+            publicView={publicView}
+            manualApplied={isManualApplied}
+            setManualApplied={setManualApplied}
+            isBookmarked={isBookmarked}
+            setIsBookmarked={setIsBookmarked}
+            isHidden={isHidden}
+            setIsHidden={setIsHidden}
+            eventCategory={event.category}
+            isPreview={true}
+            appFee={basicInfo ? basicInfo.appFee : 0}
+          />
         </div>
       </Card>
     </>

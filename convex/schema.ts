@@ -82,7 +82,7 @@ const artistSchema = {
 const organizationSchema = {
   ownerId: v.id("users"),
   organizationName: v.string(),
-  organizationId: v.number(),
+  organizationId: v.string(),
   logo: v.string(),
   location: v.optional(
     v.object({
@@ -206,6 +206,7 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     stripeProductId: v.optional(v.string()),
+    img: v.optional(v.string()),
     prices: v.object({
       month: v.optional(stripeIntervalPricesValidator),
       year: v.optional(stripeIntervalPricesValidator),

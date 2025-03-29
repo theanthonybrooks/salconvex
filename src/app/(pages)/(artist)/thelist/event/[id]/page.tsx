@@ -1,6 +1,6 @@
 "use client"
 
-import { mockEventData } from "@/data/mockEventData"
+import { mockEventData } from "@/features/events/data/mockEventData"
 import EventCardDetail from "@/features/events/event-card-detail"
 import Link from "next/link"
 import { useParams } from "next/navigation"
