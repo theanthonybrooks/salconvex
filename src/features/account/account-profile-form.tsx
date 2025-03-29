@@ -60,7 +60,7 @@ export const AccountSubscribeForm = ({
         className={cn(
           "bg-card max-w-full max-h-full w-full  md:h-auto md:max-w-lg ",
           className,
-          !isArtist && "h-full xl:max-w-[95vw]  xl:max-h-[90vh] xl:h-full"
+          !isArtist && "h-dvh xl:max-w-[95vw]  xl:max-h-[90vh] xl:h-full"
         )}>
         <>
           <DialogTitle className={cn(!isArtist && "sr-only")}>
