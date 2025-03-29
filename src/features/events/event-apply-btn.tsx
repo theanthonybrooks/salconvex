@@ -126,10 +126,11 @@ const ApplyButton = ({
     : `/thelist/event/${id}`
 
   const buttonText =
-    openCall === "coming-soon" || openCall === "ended"
+    openCall === null || openCall === "coming-soon" || openCall === "ended"
       ? "View More"
       : status !== null
-      ? "Applied"
+      ? //TODO: Refactor this. The status values have changed and it's not working as expected.
+        "Applied"
       : (status === null && openCall === "active") || isPreview
       ? "Apply"
       : `Applied: ${

@@ -26,9 +26,14 @@ import Link from "next/link"
 import { useState } from "react"
 import {
   FaBookmark,
+  FaEnvelope,
+  FaFacebook,
+  FaGlobe,
+  FaInstagram,
   FaPaintRoller,
   FaRegBookmark,
   FaRegCommentDots,
+  FaThreads,
 } from "react-icons/fa6"
 import { IoAirplane } from "react-icons/io5"
 import {
@@ -56,7 +61,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     bookmarked,
     hidden,
   } = event
-
+  console.log("event status", event.status)
   const { opencall, organizer } = tabs
 
   // const { compensation, basicInfo, eligibility } = opencall
@@ -283,7 +288,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
         className={cn(
           "hidden bg-white/40 border-foreground/20 lg:grid grid-cols-[60px_minmax(0,auto)_15%_25%_25%] min-w-[640px] min-h-[15em] w-[90vw] max-w-7xl gap-x-3 rounded-3xl mb-10 first:mt-6 "
         )}>
-        <div className='flex flex-col items-center justify-between  border-r border-foreground pb-3 pt-5'>
+        <div className='flex flex-col items-center justify-between  border-r border-foreground/20 pb-3 pt-5'>
           <div className='flex flex-col gap-y-3 items-center'>
             {isBookmarked ? (
               <FaBookmark
@@ -375,7 +380,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             ))}
           </div>
         </div>
-        {isCurrentlyOpen && (
+        {isCurrentlyOpen ? (
           <div className='pt-8 pb-3 flex-col flex gap-y-6 text-sm'>
             <span className='font-semibold '>Open Call:</span>
             <div className='flex flex-col gap-y-2'>
@@ -522,6 +527,38 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 </div>
               )}
             </div>
+          </div>
+        ) : (
+          <div className='pt-8 pb-3 flex-col flex gap-y-3 text-sm'>
+            <span className='font-semibold '>Organizer/Event Links:</span>
+            {event.links.map((link, index) => {
+              return (
+                <Link key={index} href={link.href} target='_blank'>
+                  <div className='flex gap-x-2 items-center justify-start '>
+                    {link.type === "website" && (
+                      <FaGlobe className='size-5 hover:scale-110 ' />
+                    )}
+                    {link.type === "instagram" && (
+                      <FaInstagram className='size-5 hover:scale-110 ' />
+                    )}
+                    {link.type === "facebook" && (
+                      <FaFacebook className='size-5 hover:scale-110 ' />
+                    )}
+                    {link.type === "threads" && (
+                      <FaThreads className='size-5 hover:scale-110 ' />
+                    )}
+                    {link.type === "email" && (
+                      <FaEnvelope className='size-5 hover:scale-110 ' />
+                    )}
+                    <span className='hover:underline underline-offset-2'>
+                      {link.type === "email" || link.type === "website"
+                        ? link.href.split("www.").slice(-1)[0]
+                        : link.handle}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         )}
         <div className='py-6 flex-col flex gap-y-6 text-sm items-center justify-center'>

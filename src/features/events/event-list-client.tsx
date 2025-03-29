@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
+import { BasicPagination } from "@/components/ui/pagination2"
 import EventCardPreview from "@/features/events/event-card-preview"
 import { EventFilters } from "@/features/events/event-list-filters"
 import { useMockEventCards } from "@/hooks/use-combined-events"
@@ -119,6 +111,7 @@ Props) => {
     currentPage * filters.limit
   )
 
+  const totalPages = Math.ceil(filteredEvents.length / filters.limit)
   return (
     <>
       {!publicView && (
@@ -135,22 +128,8 @@ Props) => {
             onResetFilters={handleResetFilters}
           />
           {/* Add in pagination logic here later. Should use convex as well as params*/}
-          <Pagination className='mb-6'>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href='' />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#'>1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href='#' />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          ...
+          <BasicPagination currentPage={currentPage} totalPages={totalPages} />
         </>
       )}
 
