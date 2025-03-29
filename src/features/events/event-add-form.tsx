@@ -103,6 +103,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           <Button
             type='button'
             variant='salWithShadowHiddenYlw'
+            className='min-w-24'
             onClick={onCancel}>
             Cancel
           </Button>
@@ -139,6 +140,153 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   </Select>
                 )}
               </div>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
+            </section>
+            <section>
+              <Label>Event Name</Label>
+              <input
+                value={title}
+                // {...register("eventName")}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='Task title...'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+              />
+              <p>
+                Check here if the organizer (a) already exists,
+                <br /> (b) has any current events (that they may want to add a
+                new open call for) ,
+                <br /> (c)has any current open calls (so they don&apos;t
+                accidentally create a duplicate) and
+                <br /> (d) to give a brief intro and ask the MOST basic event
+                info if this is their first. If no existing events, use this as
+                a starting point and a sort of welcome/intro page to posting an
+                open call here.
+              </p>
             </section>
             <section>
               <Label>Event Name</Label>

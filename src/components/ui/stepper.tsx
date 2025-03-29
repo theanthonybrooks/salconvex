@@ -68,7 +68,11 @@ export default function HorizontalLinearStepper({
   const lastStep = stepArray.length - 1
 
   return (
-    <div className={cn("flex flex-col h-full w-full py-8 lg:py-4 ", className)}>
+    <div
+      className={cn(
+        "flex flex-col h-full w-full lg:max-h-[85dvh] max-h-[90dvh] pt-4 pb-8 lg:pb-4",
+        className
+      )}>
       {/* Custom Stepper Header with Animated Connectors */}
       <div className='flex items-center justify-center gap-4 w-full max-w-3xl mx-auto px-4'>
         {stepArray.map((step, index) => (
