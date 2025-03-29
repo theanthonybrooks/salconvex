@@ -70,7 +70,7 @@ export default function PricingPage() {
         <Pricing />
         <Separator
           thickness={3}
-          className='w-1/2 min-w-96 mx-auto my-8 max-w-[90vw] '
+          className='w-1/2 md:min-w-96 mx-auto my-8 max-w-[90vw] '
         />
 
         <AccordionComponent src={faqs} />
