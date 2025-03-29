@@ -167,7 +167,7 @@ export function SearchMappedMultiSelect<T>({
             autoFocus
             value={searchQuery}
             onValueChange={setSearchQuery}
-            className='pr-8'
+            className='pr-8 text-base lg:text-sm'
           />
           {values.length > 0 && (
             <X
