@@ -122,17 +122,17 @@ export const ArtistProfileForm = ({
     <form
       onSubmit={handleSubmit(onSubmit)}
       className={cn("flex flex-col gap-6", className)}>
-      <div className='flex flex-col gap-2 px-4 mt-4 '>
+      <div className='flex flex-col gap-2  lg:px-4 mt-4 '>
         <Label htmlFor='artistName'>Artist Name </Label>
         <input
           tabIndex={1}
           id='artistName'
           {...register("artistName")}
           placeholder='(if different from your profile name)'
-          className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-sm  focus:outline-none placeholder-shown:bg-salYellow/50 '
+          className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-base  focus:outline-none placeholder-shown:bg-salYellow/50 '
         />
       </div>
-      <div className='border border-dotted border-foreground/50 mt-3 text-foreground/75 bg-salYellow/30 rounded-md p-4  flex flex-col gap-3 relative'>
+      <div className='border border-dotted border-foreground/50 mt-3 text-foreground/75 bg-salYellow/30 rounded-md p-4 pt-8 lg:pt-4 flex flex-col gap-3 relative'>
         <span className='absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card text-sm px-3 py-1'>
           Eligibility Details:
         </span>
@@ -158,7 +158,7 @@ export const ArtistProfileForm = ({
                   "altSpellings",
                 ]}
                 tabIndex={2}
-                className='bg-card hover:bg-card'
+                className='bg-card hover:bg-card text-base h-12'
               />
             )}
           />
@@ -182,7 +182,7 @@ export const ArtistProfileForm = ({
                     setSuggestions(results)
                   }}
                   placeholder='Place of residence (city, state, country, etc)...'
-                  className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-sm placeholder-foreground/50 focus:outline-none placeholder-shown:bg-card '
+                  className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-base placeholder-foreground/50 focus:outline-none placeholder-shown:bg-card '
                 />
                 {suggestions.length > 0 && (
                   <ul className='absolute z-50 mt-1 w-full rounded-md bg-white shadow'>
@@ -217,15 +217,16 @@ export const ArtistProfileForm = ({
         </div>
       </div>
 
-      <DialogFooter className='flex justify-end gap-2'>
+      <DialogFooter className='flex justify-end gap-4 mt-4  lg:gap-2'>
         <DialogClose asChild>
-          <Button type='button' variant='salWithShadowHiddenYlw'>
+          <Button type='button' size='lg' variant='salWithShadowHiddenYlw'>
             Cancel
           </Button>
         </DialogClose>
         <DialogClose asChild>
           <Button
             type='submit'
+            size='lg'
             variant='salWithShadowHidden'
             disabled={!isValid}>
             Save Changes

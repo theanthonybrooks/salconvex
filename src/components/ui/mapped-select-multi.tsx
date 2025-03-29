@@ -162,7 +162,7 @@ export function SearchMappedMultiSelect<T>({
                 ? "Max 3 selected"
                 : values.length > 0 && selectLimit
                 ? `Select up to ${selectLimit - values.length} more`
-                : "Search (↑↓ to navigate)"
+                : "Search..."
             }
             autoFocus
             value={searchQuery}

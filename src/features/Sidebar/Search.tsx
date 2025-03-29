@@ -52,7 +52,7 @@ export const Search = <T extends CommandItem>({
               setOpen(true)
             }}
             type='text'
-            placeholder='Search'
+            placeholder={placeholder}
             defaultValue={value}
             className='w-full bg-transparent placeholder:text-stone-400 focus:outline-hidden '
           />
@@ -69,7 +69,7 @@ export const Search = <T extends CommandItem>({
           className={cn("flex items-center gap-x-2  ", className)}
           onClick={() => setOpen(true)}>
           <FiSearch className='h-8 w-8 cursor-pointer' />
-          {value && (
+          {value && value !== "Search" && (
             <span className='flex items-center'>
               &quot;
               <p className='whitespace-nowrap overflow-hidden truncate max-w-[15ch]'>

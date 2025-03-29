@@ -58,7 +58,7 @@ export const AccountSubscribeForm = ({
 
       <DialogContent
         className={cn(
-          "bg-card max-w-full max-h-full w-full h-full md:h-auto md:max-w-lg ",
+          "bg-card max-w-full max-h-full w-full  md:h-auto md:max-w-lg ",
           className,
           !isArtist && "xl:max-w-[95vw]  xl:max-h-[90vh] xl:h-full"
         )}>
