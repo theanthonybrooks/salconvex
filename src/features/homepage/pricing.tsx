@@ -162,11 +162,7 @@ export const AccountTypeSwitch = ({
 }) => {
   return (
     <div className='flex flex-col  items-center justify-center  text-center'>
-      <div
-        className={cn(
-          "flex flex-col gap-4 items-center",
-          !hasSub && "mt-8 3xl:mt-14"
-        )}>
+      <div className={cn("flex flex-col gap-4 items-center mt-8 3xl:mt-14")}>
         {isArtist ? (
           <p>
             Want to <span className='font-bold'>add</span> an open call?

@@ -139,13 +139,14 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               alt='Event Logo'
               className={cn(
                 "rounded-full  border border-black size-12 ",
-                event.status === "accepted"
-                  ? "ring-4  ring-offset-1 ring-emerald-500"
-                  : event.status === "rejected"
-                  ? "ring-4  ring-offset-1 ring-red-500"
-                  : event.status === "pending"
-                  ? "ring-4 ring-offset-1 ring-foreground/30"
-                  : ""
+                !publicView &&
+                  (event.status === "accepted"
+                    ? "ring-4  ring-offset-1 ring-emerald-500"
+                    : event.status === "rejected"
+                    ? "ring-4  ring-offset-1 ring-red-500"
+                    : event.status === "pending"
+                    ? "ring-4 ring-offset-1 ring-foreground/30"
+                    : "")
               )}
               height={48}
               width={48}
@@ -264,7 +265,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               )}
             />
           ) : (
-            <CheckCircleIcon className={cn("size-6 text-emerald-600")} />
+            <CheckCircleIcon
+              className={cn("size-6 text-emerald-600", publicView && "hidden")}
+            />
           )}
           <div className='flex gap-x-2 items-center justify-center'>
             {/* <EyeOff className='size-6' /> //NOTE: Move this to the detailed card view */}
@@ -309,7 +312,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 )}
               />
             ) : (
-              <CheckCircleIcon className={cn("size-6 text-emerald-600")} />
+              <CheckCircleIcon
+                className={cn(
+                  "size-6 text-emerald-600",
+                  publicView && "hidden"
+                )}
+              />
             )}
             {isHidden && (
               <EyeOff
@@ -331,13 +339,14 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   alt='Event Logo'
                   className={cn(
                     "rounded-full  border border-black size-12 ",
-                    event.status === "accepted"
-                      ? "ring-4  ring-offset-1 ring-emerald-500"
-                      : event.status === "rejected"
-                      ? "ring-4  ring-offset-1 ring-red-500"
-                      : event.status === "pending"
-                      ? "ring-4 ring-offset-1 ring-foreground/30"
-                      : ""
+                    !publicView &&
+                      (event.status === "accepted"
+                        ? "ring-4  ring-offset-1 ring-emerald-500"
+                        : event.status === "rejected"
+                        ? "ring-4  ring-offset-1 ring-red-500"
+                        : event.status === "pending"
+                        ? "ring-4 ring-offset-1 ring-foreground/30"
+                        : "")
                   )}
                   height={48}
                   width={48}

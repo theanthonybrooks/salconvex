@@ -68,6 +68,7 @@ export const ApplyButtonShort = ({
           className={cn(
             " w-full min-w-[100px] bg-white/60",
             status !== null &&
+              !publicView &&
               "text-foreground/50 border-foreground/50 bg-background"
           )}>
           <span className='flex items-center gap-x-1'>
@@ -126,7 +127,10 @@ const ApplyButton = ({
     : `/thelist/event/${id}`
 
   const buttonText =
-    openCall === null || openCall === "coming-soon" || openCall === "ended"
+    publicView ||
+    openCall === null ||
+    openCall === "coming-soon" ||
+    openCall === "ended"
       ? "View More"
       : status !== null
       ? //TODO: Refactor this. The status values have changed and it's not working as expected.
@@ -161,11 +165,12 @@ const ApplyButton = ({
           className={cn(
             "rounded-r-none border-r w-full xl:min-w-[150px]",
             status !== null &&
+              !publicView &&
               "text-foreground/50 border-foreground/50 bg-background"
           )}>
           <span className='flex items-center gap-x-1'>
             {buttonText}
-            {appFee > 0 && (
+            {appFee > 0 && !publicView && (
               <CircleDollarSignIcon
                 className={cn(
                   "size-6 text-red-600",
@@ -212,7 +217,10 @@ const ApplyButton = ({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setIsHidden(!isHidden)}
-            className={cn("cursor-pointer text-black/80  hover:text-red-500")}>
+            className={cn(
+              "cursor-pointer text-black/80  hover:text-red-500",
+              publicView && "hidden"
+            )}>
             {isHidden ? (
               <span className='flex items-center gap-x-1 '>
                 <EyeOff className='size-4' />
@@ -232,6 +240,7 @@ const ApplyButton = ({
               }
               className={cn(
                 "cursor-pointer",
+                publicView && "hidden",
                 status
                   ? " text-emerald-700 hover:text-black/80"
                   : "hover:text-emerald-700 text-black/80"
@@ -247,6 +256,18 @@ const ApplyButton = ({
                   Mark as Applied
                 </span>
               )}
+            </DropdownMenuItem>
+          )}
+          {publicView && (
+            <DropdownMenuItem
+              className={cn(
+                "cursor-pointer",
+
+                status
+                  ? " text-emerald-700 hover:text-black/80"
+                  : "hover:text-emerald-700 text-black/80"
+              )}>
+              Subscribe to bookmark, hide, or apply
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
