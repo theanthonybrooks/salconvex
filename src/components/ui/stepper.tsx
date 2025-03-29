@@ -70,7 +70,7 @@ export default function HorizontalLinearStepper({
   return (
     <div
       className={cn(
-        "flex flex-col h-full w-full lg:max-h-[85dvh] max-h-[90dvh] pt-4 pb-8 lg:pb-4",
+        "flex flex-col h-full w-full lg:max-h-[85dvh] max-h-[90dvh] pt-8 lg:pt-4 lg:pb-4",
         className
       )}>
       {/* Custom Stepper Header with Animated Connectors */}
@@ -135,7 +135,7 @@ export default function HorizontalLinearStepper({
           <Button
             variant='salWithShadowHidden'
             className={cn(
-              "opacity-0 bg-salPinkLtHover hover:bg-salPinkLt hidden lg:block",
+              "opacity-0 bg-salPinkLtHover hover:bg-salPinkLt hidden lg:block ",
               isDirty && onSave !== undefined && "opacity-100"
             )}
             disabled={!isDirty}
@@ -147,10 +147,11 @@ export default function HorizontalLinearStepper({
               You can save at any time and come back to it later.
             </p>
           )}
-          <div className='flex justify-end gap-2'>
+          <div className='flex justify-end gap-2 min-w-24'>
             {cancelButton}
             <Button
               variant='salWithShadowHiddenYlw'
+              className='min-w-24'
               disabled={activeStep === 0}
               onClick={handleBack}>
               Back

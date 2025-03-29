@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
+import { Input } from "@/components/ui/input"
 import { EventData } from "@/types/event"
 
 interface EventOCFormProps {
@@ -114,7 +115,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         className='flex flex-col grow  p-4  min-h-96 h-full
    '>
         {activeStep === 0 && (
-          <div className='h-full gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
+          <div className='h-full flex flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
             <section className='flex flex-col gap-2 justify-center'>
               <div className='flex flex-col gap-y-3 items-center justify-center'>
                 <p className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
@@ -143,14 +144,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -160,18 +161,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -181,18 +182,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -202,18 +203,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -223,18 +224,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -244,18 +245,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -265,18 +266,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -286,18 +287,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
             <section>
               <Label>Event Name</Label>
-              <input
+              <Input
                 value={title}
                 // {...register("eventName")}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Task title...'
-                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+                className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />
-              <p>
+              {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -307,7 +308,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 info if this is their first. If no existing events, use this as
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
-              </p>
+              </p> */}
             </section>
           </div>
         )}
