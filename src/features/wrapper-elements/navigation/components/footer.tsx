@@ -47,7 +47,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className=' max-w-screen flex justify-center border-t border-border'>
+    <footer className=' max-w-screen overflow-hidden flex justify-center border-t border-border'>
       <div className='mx-auto  px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:w-full xl:max-w-full xl:px-6'>
         <div className='xl:grid xl:grid-cols-2 xl:gap-8'>
           {/* Links */}
