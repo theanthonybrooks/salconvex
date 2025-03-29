@@ -1,22 +1,8 @@
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import EventContextMenu from "@/features/events/ui/event-context-menu"
 import { cn } from "@/lib/utils"
 import { ApplicationStatus, EventCategory, OpenCallStatus } from "@/types/event"
-import {
-  CheckCircle,
-  CircleDollarSignIcon,
-  CircleX,
-  Ellipsis,
-  Eye,
-  EyeOff,
-} from "lucide-react"
+import { CircleDollarSignIcon } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6"
@@ -128,7 +114,7 @@ const ApplyButton = ({
 }: ApplyButtonProps) => {
   console.log("openCall", openCall)
   const href = publicView
-    ? "/pricing"
+    ? "/pricing#plans"
     : openCall === "active"
     ? `/thelist/call/${id}`
     : `/thelist/event/${id}`
@@ -212,75 +198,16 @@ const ApplyButton = ({
         <Eye className='size-8' />
       )}
     </Button> */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='salWithShadowHidden'
-            size='lg'
-            className='rounded-l-none border-l w-fit sm:px-2 px-2'>
-            <Ellipsis className='size-8' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>More options</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setIsHidden(!isHidden)}
-            className={cn(
-              "cursor-pointer text-black/80  hover:text-red-500",
-              publicView && "hidden"
-            )}>
-            {isHidden ? (
-              <span className='flex items-center gap-x-1 '>
-                <EyeOff className='size-4' />
-                Unhide {eventCategory === "event" ? "Event" : "Open Call"}
-              </span>
-            ) : (
-              <span className='flex items-center gap-x-1 '>
-                <Eye className='size-4' />
-                Hide {eventCategory === "event" ? "Event" : "Open Call"}
-              </span>
-            )}
-          </DropdownMenuItem>
-          {openCall === "active" && (
-            <DropdownMenuItem
-              onClick={() =>
-                setManualApplied(status !== null ? null : "applied")
-              }
-              className={cn(
-                "cursor-pointer",
-                publicView && "hidden",
-                status
-                  ? " text-emerald-700 hover:text-black/80"
-                  : "hover:text-emerald-700 text-black/80"
-              )}>
-              {status ? (
-                <span className='flex items-center gap-x-1'>
-                  <CircleX className='size-4' />
-                  Mark as Not Applied
-                </span>
-              ) : (
-                <span className='flex items-center gap-x-1'>
-                  <CheckCircle className='size-4' />
-                  Mark as Applied
-                </span>
-              )}
-            </DropdownMenuItem>
-          )}
-          {publicView && (
-            <DropdownMenuItem
-              className={cn(
-                "cursor-pointer",
-
-                status
-                  ? " text-emerald-700 hover:text-black/80"
-                  : "hover:text-emerald-700 text-black/80"
-              )}>
-              Subscribe to bookmark, hide, or apply
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <EventContextMenu
+        isHidden={isHidden}
+        setIsHidden={setIsHidden}
+        publicView={publicView}
+        eventStatus={status}
+        eventCategory={eventCategory}
+        openCallStatus={openCall}
+        setManualApplied={setManualApplied}
+        buttonTrigger={true}
+      />
     </div>
   )
 }

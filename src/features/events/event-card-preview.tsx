@@ -1,15 +1,10 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import {
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import ApplyButton, {
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn"
+import EventContextMenu from "@/features/events/ui/event-context-menu"
 import { CombinedEventCardData } from "@/hooks/use-combined-events"
 import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
 import {
@@ -20,14 +15,9 @@ import {
 } from "@/lib/eventFns"
 
 import { cn } from "@/lib/utils"
-import { DropdownMenu, DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
 import {
-  CheckCircle,
   CheckCircleIcon,
   CircleDollarSignIcon,
-  CircleX,
-  Ellipsis,
-  Eye,
   EyeOff,
   Info,
 } from "lucide-react"
@@ -343,73 +333,15 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             )}
             {/* TODO: Add publicView check to this as well (when the state is set up) */}
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Ellipsis className='size-7 cursor-pointer' />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className='text-sm '>
-              <DropdownMenuLabel>More options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <div className='p-1 flex flex-col gap-y-1'>
-                <DropdownMenuItem
-                  onClick={() => setIsHidden(!isHidden)}
-                  className={cn(
-                    "cursor-pointer text-black/80  hover:text-red-500",
-                    publicView && "hidden"
-                  )}>
-                  {isHidden ? (
-                    <span className='flex items-center gap-x-1 '>
-                      <EyeOff className='size-4' />
-                      Unhide{" "}
-                      {event.category === "event" ? "Event" : "Open Call"}
-                    </span>
-                  ) : (
-                    <span className='flex items-center gap-x-1 '>
-                      <Eye className='size-4' />
-                      Hide {event.category === "event" ? "Event" : "Open Call"}
-                    </span>
-                  )}
-                </DropdownMenuItem>
-                {openCallStatus === "active" && (
-                  <DropdownMenuItem
-                    onClick={() =>
-                      setManualApplied(status !== null ? null : "applied")
-                    }
-                    className={cn(
-                      "cursor-pointer text-sm",
-                      publicView && "hidden",
-                      event.status
-                        ? " text-emerald-700 hover:text-black/80"
-                        : "hover:text-emerald-700 text-black/80"
-                    )}>
-                    {event.status ? (
-                      <span className='flex items-center gap-x-1 text-sm'>
-                        <CircleX className='size-4' />
-                        Mark as Not Applied
-                      </span>
-                    ) : (
-                      <span className='flex items-center gap-x-1 text-sm'>
-                        <CheckCircle className='size-4' />
-                        Mark as Applied
-                      </span>
-                    )}
-                  </DropdownMenuItem>
-                )}
-                {publicView && (
-                  <DropdownMenuItem
-                    className={cn(
-                      "cursor-pointer text-sm",
-
-                      event.status
-                        ? " text-emerald-700 hover:text-black/80"
-                        : "hover:text-emerald-700 text-black/80"
-                    )}>
-                    Subscribe to bookmark, hide, or apply
-                  </DropdownMenuItem>
-                )}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <EventContextMenu
+            isHidden={isHidden}
+            setIsHidden={setIsHidden}
+            publicView={publicView}
+            eventStatus={event.status}
+            eventCategory={event.category}
+            openCallStatus={openCallStatus}
+            setManualApplied={setManualApplied}
+          />
         </div>
 
         <div className='pt-5 pb-3 pl-3 flex-col flex gap-y-3'>
