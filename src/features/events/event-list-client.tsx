@@ -138,7 +138,7 @@ Props) => {
           <Pagination className='mb-6'>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious href='#' />
+                <PaginationPrevious href='' />
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink href='#'>1</PaginationLink>
