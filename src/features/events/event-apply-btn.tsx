@@ -36,8 +36,6 @@ export const ApplyButtonShort = ({
       ? "Apply"
       : openCall === "coming-soon"
       ? "Coming Soon!"
-      : openCall === "ended"
-      ? "View More"
       : status
       ? "Applied"
       : openCall === "active"
@@ -112,31 +110,22 @@ const ApplyButton = ({
   className,
   detailCard,
 }: ApplyButtonProps) => {
-  console.log("openCall", openCall)
-  const href = publicView
-    ? "/pricing#plans"
-    : openCall === "active"
-    ? `/thelist/call/${id}`
-    : `/thelist/event/${id}`
+  const href =
+    publicView && !openCall
+      ? `/thelist/event/${id}`
+      : publicView && openCall
+      ? "/pricing#plans"
+      : openCall === "active"
+      ? `/thelist/call/${id}`
+      : `/thelist/event/${id}`
 
-  const buttonText =
-    publicView ||
-    openCall === null ||
-    openCall === "coming-soon" ||
-    openCall === "ended"
-      ? "View More"
-      : status !== null
-      ? //TODO: Refactor this. The status values have changed and it's not working as expected.
-        "Applied"
-      : (status === null && openCall === "active") || isPreview
-      ? "Apply"
-      : `Applied: ${
-          status === "accepted"
-            ? "Accepted"
-            : status === "rejected"
-            ? "Rejected"
-            : "Pending"
+  const buttonText = openCall
+    ? status !== null && !publicView && !isPreview
+      ? `Applied: ${
+          status.slice(0, 1).toUpperCase() + status.slice(1).toLowerCase()
         }`
+      : "Apply"
+    : "View More"
 
   return (
     <div
