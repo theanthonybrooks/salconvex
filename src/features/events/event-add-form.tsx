@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
+// import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 import { EventData } from "@/types/event"
 
 interface EventOCFormProps {
@@ -37,7 +37,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     },
     reset,
   } = useForm<EventData>({
-    defaultValues: eventDefaultValues,
+    // defaultValues: eventDefaultValues,
     mode: "onChange",
   })
 

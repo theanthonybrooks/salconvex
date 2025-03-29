@@ -118,6 +118,7 @@ const ApplyButton = ({
   isPreview = false,
   className,
 }: ApplyButtonProps) => {
+  console.log("openCall", openCall)
   const href = publicView
     ? "/pricing"
     : openCall === "active"
