@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { OrgSearch } from "@/features/organizers/components/org-search"
 import { eventOCSchema } from "@/features/organizers/schemas/event-add-schema"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useQuery } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { z } from "zod"
@@ -43,70 +44,37 @@ interface EventOCFormProps {
 
 type EventOCFormValues = z.infer<typeof eventOCSchema>
 
-const stepFields: Record<number, (keyof z.infer<typeof eventOCSchema>)[]> = {
-  0: ["organization", "eventName"],
-  1: ["eventType", "budget"],
-  2: ["deadline"],
-  3: ["description"],
-  4: [], // etc.
-  5: [], // final confirm step
-}
-
 export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
-  //   const {
-  //     register,
-  //     control,
-  //     watch,
-
-  //     // setValue,
-  //     handleSubmit: handleSubmit,
-  //     formState: {
-  //       isValid,
-  //       //   dirtyFields,
-  //       isDirty,
-  //       errors,
-  //     },
-  //     reset,
-  //   } = useForm<z.infer<typeof eventOCSchema>>({
-  //     resolver: zodResolver(eventOCSchema),
-  //     defaultValues: {
-  //       organization: undefined,
-  //       eventName: "",
-  //     },
-  //     mode: "onChange",
-  //   })
-
-  //   const selectedOrg = useWatch({
-  //     control,
-  //     name: "organization",
-  //   })
-  const form = useForm<EventOCFormValues>({
-    resolver: undefined,
+  const form = useForm<z.infer<typeof eventOCSchema>>({
+    resolver: zodResolver(eventOCSchema),
     defaultValues: {
-      organization: null,
+      organization: undefined,
       eventName: "",
     },
     mode: "onChange",
   })
 
-  console.log(form.watch())
-
   const {
     register,
     control,
     watch,
+
     // setValue,
-    handleSubmit,
+    handleSubmit: handleSubmit,
     formState: {
-      //   isValid,
-      isSubmitting,
+      isValid,
       //   dirtyFields,
       isDirty,
-      errors,
+      //   errors,
     },
     reset,
   } = form
 
+  //   const selectedOrg = useWatch({
+  //     control,
+  //     name: "organization",
+  //   })
+  console.log(form.watch())
   const orgValue = watch("organization")
   const orgName =
     typeof orgValue === "string" ? orgValue : orgValue?.organizationName ?? ""
@@ -117,11 +85,11 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     orgName.trim().length >= 3 ? { organizationName: orgName } : "skip"
   )
   const [orgError, setOrgError] = useState("")
-  //   const [error, setError] = useState({ message: "" })
   const [isValidOrg, setIsValidOrg] = useState<string>("")
-  //   const formIsValid = isValid && isValidOrg === "valid"
 
-  console.log("Form errors:", errors)
+  const formIsValid = isValid && isValidOrg === "valid"
+
+  //   console.log("Form errors:", errors)
   //   console.log("isValid", isValid)
   //   console.log("isValidOrg", isValidOrg)
   //   console.log("existingOrgs", existingOrgs)
@@ -137,7 +105,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   }
 
   const [activeStep, setActiveStep] = useState(0)
-  const stepHasErrors = stepFields[activeStep].some((field) => !!errors[field])
   //   const [name, setName] = useState("")
 
   const onCancel = () => {
@@ -158,41 +125,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       console.error("Failed to submit form:", error)
       toast.error("Failed to submit form")
     }
-  }
-
-  const onStepSave = async () => {
-    const fields = stepFields[activeStep] // fields for this step
-    const values = form.getValues(fields) // only those fields
-
-    console.log("values", values)
-    console.log("fields", fields)
-
-    const schemaForStep = eventOCSchema.pick(
-      fields.reduce((acc, key) => {
-        acc[key] = true
-        return acc
-      }, {} as { [K in keyof EventOCFormValues]?: true })
-    )
-
-    const result = schemaForStep.safeParse(values)
-    console.log("result", result)
-
-    if (!result.success) {
-      // Set field-level errors for only this step
-      result.error.issues.forEach((issue) => {
-        form.setError(issue.path[0] as keyof EventOCFormValues, {
-          type: "manual",
-          message: issue.message,
-        })
-      })
-      return
-    }
-
-    // ✅ Step is valid — optionally persist step data here
-    console.log("Step valid data:", result.data)
-
-    // Advance to next step
-    setActiveStep((prev) => prev + 1)
   }
 
   useEffect(() => {
@@ -217,9 +149,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       finalLabel='Submit'
       onFinalSubmit={handleSubmit(onSubmit)}
       isDirty={isDirty}
-      onSave={onStepSave}
-      disabled={stepHasErrors || isSubmitting}
-      //   disabled={isStepValid === false}
+      onSave={handleSubmit(onSubmit)}
+      disabled={!formIsValid}
       cancelButton={
         <DialogClose asChild>
           <Button
@@ -238,8 +169,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         {activeStep === 0 && (
           <div className='h-full flex flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
             <section className='flex flex-col  gap-2 '>
-              <div className='flex flex-col gap-y-6 items-center '>
-                <div className='flex flex-col  items-center '>
+              <div className='flex flex-col gap-y-6 items-center justify-center'>
+                <div className='flex flex-col  items-center justify-center'>
                   <div className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
                     Welcome{" "}
                     <AnimatePresence>
@@ -279,7 +210,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       <OrgSearch
                         value={field.value}
                         onChange={field.onChange}
-                        // setSelectedOrgData={setSelectedOrgData}
                         isValid={isValidOrg}
                         onReset={() => {
                           setIsValidOrg("")

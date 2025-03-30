@@ -36,14 +36,13 @@ export const eventOCSchema = z.object({
           .string()
           .min(3, "At least 3 chars")
           .max(35, "Max 35 chars"),
-        logo: z.string().optional(),
       })
     )
     .nullable(),
   eventName: z.string().min(3, "Event name must be at least 3 characters"),
-  eventType: z.string().min(1),
-  budget: z.number().min(0).optional(),
-  deadline: z.date().optional(),
-  description: z.string().min(10),
+  //   eventType: z.string().min(1),
+  //   budget: z.number().min(0).optional(),
+  //   deadline: z.date().optional(),
+  //   description: z.string().min(10),
   // add all other fields across all steps
 })

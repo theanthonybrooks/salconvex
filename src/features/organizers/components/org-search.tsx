@@ -58,11 +58,7 @@ export const OrgSearch = ({
   )
   const showSuggestions = focused && results && results.length > 0
 
-  const handleSelect = (org: {
-    _id: Id<"organizations">
-    organizationName: string
-    logo?: string
-  }) => {
+  const handleSelect = (org: { organizationName: string }) => {
     onChange(org)
     setInputValue(org.organizationName)
     setFocused(false)
