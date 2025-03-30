@@ -1,40 +1,39 @@
-import { fetchMapboxSuggestions, MapboxSuggestion } from "@/lib/locations"
 import { cn } from "@/lib/utils"
 import React, { useState } from "react"
 
-interface MapboxInputProps {
+export interface SuggestionItem<T = unknown> {
+  id: string
+  label: string
+  value: T
+}
+
+interface SearchSelectInputProps<T> {
   value: string
-  onChange: (value: string) => void
-  onSelect: (location: {
-    city: string
-    state: string
-    stateAbbr: string
-    country: string
-    countryAbbr: string
-    coordinates: number[]
-    full: string
-  }) => void
+  onChange: (val: string) => void
+  onSelect: (item: SuggestionItem<T>) => void
+  searchFunction: (query: string) => Promise<SuggestionItem<T>[]>
   placeholder?: string
   className?: string
   tabIndex?: number
 }
 
-export const MapboxInput = ({
+export function SearchSelectInput<T>({
   value,
   onChange,
   onSelect,
-  placeholder = "Enter a location",
+  searchFunction,
+  placeholder = "Search...",
   className,
   tabIndex,
-}: MapboxInputProps) => {
-  const [suggestions, setSuggestions] = useState<MapboxSuggestion[]>([])
+}: SearchSelectInputProps<T>) {
+  const [suggestions, setSuggestions] = useState<SuggestionItem<T>[]>([])
   const [highlightedIndex, setHighlightedIndex] = useState(0)
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
     onChange(val)
     if (!val.trim()) return setSuggestions([])
-    const results = await fetchMapboxSuggestions(val)
+    const results = await searchFunction(val)
     setSuggestions(results)
     setHighlightedIndex(0)
   }
@@ -52,30 +51,11 @@ export const MapboxInput = ({
     } else if (e.key === "Enter") {
       e.preventDefault()
       const selected = suggestions[highlightedIndex]
-      if (selected) handleSelect(selected)
+      if (selected) {
+        onSelect(selected)
+        setSuggestions([])
+      }
     }
-  }
-
-  const handleSelect = (s: MapboxSuggestion) => {
-    const context = s.context || []
-    const findContext = (type: string) =>
-      context.find((c) => c.id.startsWith(type))
-
-    const stateContext = findContext("region")
-    const countryContext = findContext("country")
-
-    const locationData = {
-      city: s.text,
-      state: stateContext?.text || "",
-      stateAbbr: stateContext?.short_code?.split("-")[1] || "",
-      country: countryContext?.text || "",
-      countryAbbr: countryContext?.short_code?.toUpperCase() || "",
-      coordinates: s.center,
-      full: s.place_name,
-    }
-
-    onSelect(locationData)
-    setSuggestions([])
   }
 
   return (
@@ -87,7 +67,7 @@ export const MapboxInput = ({
         placeholder={placeholder}
         tabIndex={tabIndex}
         className={cn(
-          "w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-base placeholder-foreground/50 focus:outline-none placeholder-shown:bg-card ",
+          "w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-base placeholder-foreground/50 focus:outline-none placeholder-shown:bg-card",
           className
         )}
       />
@@ -101,8 +81,11 @@ export const MapboxInput = ({
                   ? "bg-salPinkLt"
                   : "hover:bg-salYellow/70"
               }`}
-              onMouseDown={() => handleSelect(s)}>
-              {s.place_name}
+              onMouseDown={() => {
+                onSelect(s)
+                setSuggestions([])
+              }}>
+              {s.label}
             </li>
           ))}
         </ul>

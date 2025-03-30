@@ -8,7 +8,6 @@ export const formatEventDates = (
 ) => {
   const seasonalTerms = ["spring", "summer", "fall", "winter"]
 
-  // Convert to lowercase for case-insensitive comparison
   const isSeasonalStart = seasonalTerms.some((term) =>
     start.toLowerCase().includes(term)
   )
@@ -16,27 +15,23 @@ export const formatEventDates = (
     end.toLowerCase().includes(term)
   )
 
-  // If the end date is seasonal and the start date is missing, return "By [end season]"
-  if (!start.trim() && isSeasonalEnd) {
+  if ((!start.trim() || start === null || !isSeasonalStart) && isSeasonalEnd) {
     return `By ${end}`
   }
 
-  // If either start or end is a seasonal term, format properly
   if (isSeasonalStart || isSeasonalEnd) {
     const startParts = start.split(" ")
     const endParts = end.split(" ")
 
-    const startSeason = startParts[0] || "" // e.g., "Spring"
-    const endSeason = endParts[0] || "" // e.g., "Summer"
-    const startYear = startParts[1] || "" // e.g., "2025"
-    const endYear = endParts[1] || "" // e.g., "2025"
+    const startSeason = startParts[0] || ""
+    const endSeason = endParts[0] || ""
+    const startYear = startParts[1] || ""
+    const endYear = endParts[1] || ""
 
-    // If the start is missing but the end is seasonal, return "By [end season]"
     if (!startSeason && endSeason) {
       return `By ${end}`
     }
 
-    // Avoid repeating the year if it's the same
     return startYear === endYear
       ? `${startSeason} - ${endSeason} ${startYear}`
       : `${start} - ${end}`
@@ -45,24 +40,40 @@ export const formatEventDates = (
   const startDate = new Date(start)
   const endDate = new Date(end)
 
+  const isStartDateValid = !isNaN(startDate.getTime())
+  const isEndDateValid = !isNaN(endDate.getTime())
+
   const fullMonth = new Intl.DateTimeFormat("en-US", { month: "long" })
   const shortMonth = new Intl.DateTimeFormat("en-US", { month: "short" })
 
-  const startMonthShort = shortMonth.format(startDate)
-  const startMonthFull = fullMonth.format(startDate)
-  const endMonthShort = shortMonth.format(endDate)
-  const endMonthFull = fullMonth.format(endDate)
+  let startMonthShort = "by"
+  let startMonthFull = "by"
+  let startDay: number | null = null
+  let endDay: number | null = null
+  let startYear: number | null = null
+  let endYear: number | null = null
+  let endMonthShort: string | null = null
+  let endMonthFull: string | null = null
 
-  const startDay = startDate.getDate() || null // Handle falsy values
-  const endDay = endDate.getDate()
+  if (isStartDateValid) {
+    startMonthShort = shortMonth.format(startDate)
+    startMonthFull = fullMonth.format(startDate)
+    startDay = startDate.getDate() || null
+    startYear = startDate.getFullYear()
+  }
 
-  const startYear = startDate.getFullYear()
-  const endYear = endDate.getFullYear()
+  if (isEndDateValid) {
+    endMonthShort = shortMonth.format(endDate)
+    endMonthFull = fullMonth.format(endDate)
+    endDay = endDate.getDate() || null
+    endYear = endDate.getFullYear()
+  }
 
-  // If startDay is missing, return "By [end date]"
   if (!startDay) {
     return `By ${endMonthFull} ${endDay}, ${endYear}`
   }
+
+  if (!endDay) return "Dates unknown"
 
   if (startYear !== endYear) {
     if (preview) {
@@ -91,14 +102,11 @@ export const formatOcDates = (start: string, end: string) => {
   const endYear = endDate.getFullYear()
 
   if (startYear !== endYear) {
-    // Different years → "Jul 10, 2025 - Aug 5, 2026"
-    return `${startMonth} ${startDay}, ${startYear} - ${endMonth} ${endDay}, ${endYear}`
+    return `${startMonth} ${startDay} (${startYear}) - ${endMonth} ${endDay} (${endYear})`
   } else if (startMonth !== endMonth) {
-    // Same year, different months → "Jul 10 - Aug 5, 2025"
-    return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${startYear}`
+    return `${startMonth} ${startDay} - ${endMonth} ${endDay} (${startYear})`
   } else {
-    // Same month → "Jul 10-20, 2025"
-    return `${startMonth} ${startDay}-${endDay}, ${startYear}`
+    return `${startMonth} ${startDay}-${endDay} (${startYear})`
   }
 }
 
@@ -108,25 +116,28 @@ export const formatOpenCallDeadline = (
   callType: CallType,
   preview?: boolean
 ) => {
-  if (!dateString) {
-    return "Unknown Deadline"
-  }
+  if (!dateString) return "Unknown Deadline"
   if (callType === "Invite") return "Invite-only"
-  else if (callType === "Rolling") return "Rolling Open Call"
+  if (callType === "Rolling") return "Rolling Open Call"
 
   const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone)
   if (!dt.isValid) return "Invalid date"
-  const ordinalSuffix = getOrdinalSuffix(dt.day)
-  const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`
-  if (preview) return dt.toFormat(`MMM d'${ordinalSuffix}', yyyy`)
 
-  return `${dt.toFormat(
-    `MMM d'${ordinalSuffix}', yyyy @ h:mm a`
-  )} (${timeZoneFormat})`
+  const dateObj = dt.toJSDate()
+  const month = getFourCharMonth(dateObj)
+  const day = dt.day
+  const year = dt.year
+  const ordinal = getOrdinalSuffix(day)
+  const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`
+
+  if (preview) return `${month} ${day}${ordinal}, ${year}`
+
+  const time = dt.toFormat("h:mm a")
+  return `${month} ${day}${ordinal}, ${year} @ ${time} (${timeZoneFormat})`
 }
 
 const getOrdinalSuffix = (day: number): string => {
-  if (day >= 11 && day <= 13) return "th" // Special case for 11-13
+  if (day >= 11 && day <= 13) return "th"
   switch (day % 10) {
     case 1:
       return "st"
@@ -137,4 +148,45 @@ const getOrdinalSuffix = (day: number): string => {
     default:
       return "th"
   }
+}
+
+export const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+
+export const isValidIsoDate = (value: string | null): value is string =>
+  typeof value === "string" &&
+  isoDateRegex.test(value) &&
+  !isNaN(Date.parse(value))
+
+export const getFourCharMonth = (date: Date): string => {
+  const monthMap: Record<number, string> = {
+    0: "Jan",
+    1: "Feb",
+    2: "Mar",
+    3: "Apr",
+    4: "May",
+    5: "June",
+    6: "July",
+    7: "Aug",
+    8: "Sept",
+    9: "Oct",
+    10: "Nov",
+    11: "Dec",
+  }
+
+  return monthMap[date.getMonth()]
+}
+
+// utils/timezone.ts
+export async function fetchTimezoneFromCoordinates(
+  lat: number,
+  lng: number
+): Promise<string | undefined> {
+  const key = process.env.TIMEZONE_API_KEY
+  const url = `https://api.timezonedb.com/v2.1/get-time-zone?key=${key}&format=json&by=position&lat=${lat}&lng=${lng}`
+
+  const response = await fetch(url)
+  const data = await response.json()
+
+  if (data.status === "OK") return data.zoneName
+  return undefined
 }

@@ -45,8 +45,12 @@ const artistSchema = {
       full: v.optional(v.string()),
       city: v.optional(v.string()),
       state: v.optional(v.string()),
+      stateAbbr: v.optional(v.string()),
       country: v.optional(v.string()),
-      location: v.optional(v.array(v.string())),
+      countryAbbr: v.optional(v.string()),
+      location: v.optional(v.array(v.number())),
+      timezone: v.optional(v.string()),
+      timezoneOffset: v.optional(v.number()),
     })
   ),
   documents: v.optional(
@@ -82,7 +86,7 @@ const artistSchema = {
 const organizationSchema = {
   ownerId: v.id("users"),
   organizationName: v.string(),
-  organizationId: v.string(),
+  organizationNameLower: v.optional(v.string()),
   logo: v.string(),
   location: v.optional(
     v.object({
@@ -164,7 +168,7 @@ export default defineSchema({
   // Organization Tables
   organizations: defineTable(organizationSchema)
     .index("by_organizationName", ["organizationName"])
-    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationNameLower", ["organizationNameLower"])
     .index("by_ownerId", ["ownerId"]),
 
   organizationSubscriptions: defineTable({

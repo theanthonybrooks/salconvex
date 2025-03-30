@@ -1,11 +1,17 @@
 import rawCountries, { Country } from "world-countries"
 
-export type MapboxSuggestion = {
+export interface MapboxContextItem {
   id: string
-  place_name: string
   text: string
+  short_code?: string
+}
+
+export interface MapboxSuggestion {
+  id: string
+  text: string
+  place_name: string
   center: [number, number]
-  context?: { id: string; text: string }[]
+  context?: MapboxContextItem[]
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
@@ -128,6 +134,8 @@ export const searchLocation = async (query: string) => {
 
   if (!res.ok) throw new Error("Mapbox request failed")
   const data = await res.json()
+  console.log(data)
+
   return data.features
 }
 
@@ -137,11 +145,12 @@ export async function fetchMapboxSuggestions(query: string) {
 
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
     query
-  )}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true`
+  )}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&types=place,region,country`
 
   const res = await fetch(url)
   if (!res.ok) throw new Error("Failed to fetch suggestions")
 
   const data = await res.json()
+  console.log("suggestion data:", data)
   return data.features as MapboxSuggestion[]
 }

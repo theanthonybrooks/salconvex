@@ -18,6 +18,7 @@ interface StepperProps {
   cancelButton?: React.ReactNode
   onSave?: () => void
   isDirty?: boolean
+  disabled?: boolean
 }
 
 export default function HorizontalLinearStepper({
@@ -33,6 +34,7 @@ export default function HorizontalLinearStepper({
   cancelButton,
   onSave,
   isDirty,
+  disabled,
 }: StepperProps) {
   const stepArray =
     typeof steps === "number"
@@ -165,6 +167,7 @@ export default function HorizontalLinearStepper({
             <Button
               variant='salWithShadowHidden'
               className='min-w-32'
+              disabled={disabled}
               onClick={activeStep === lastStep ? onFinalSubmit : handleNext}>
               {activeStep === stepArray.length - 1 ? (
                 finalLabel ? (

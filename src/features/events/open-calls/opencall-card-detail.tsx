@@ -45,7 +45,11 @@ import ApplyButton from "@/features/events/event-apply-btn"
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map"
 import { CombinedEventCardData } from "@/hooks/use-combined-events"
 import { generateICSFile } from "@/lib/addToCalendar"
-import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns"
+import {
+  formatEventDates,
+  formatOpenCallDeadline,
+  isValidIsoDate,
+} from "@/lib/dateFns"
 import {
   formatCurrency,
   formatRate,
@@ -130,10 +134,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   const longitude = location.coordinates?.longitude ?? 0
   const hasOpenCall = openCallStatus === "active"
 
-  console.log("has open call", hasOpenCall)
-
-  console.log("latitude", latitude)
-  console.log("longitude", longitude)
+  // console.log("has open call", hasOpenCall)
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
@@ -157,15 +158,21 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   }`
 
   const icsLink =
-    callType === "Fixed" && ocStart && ocEnd
+    callType === "Fixed" &&
+    isValidIsoDate(dates.eventStart) &&
+    isValidIsoDate(dates.eventEnd) &&
+    isValidIsoDate(ocStart) &&
+    isValidIsoDate(ocEnd)
       ? generateICSFile(
           event.name,
           ocStart,
           ocEnd,
           locationString,
           event.about,
-          dates.eventStart ? dates.eventStart : "",
-          dates.eventEnd,
+          event.category,
+          true,
+          isValidIsoDate(dates.eventStart) ? dates.eventStart! : "",
+          isValidIsoDate(dates.eventEnd) ? dates.eventEnd! : "",
           `${openCallId}`
         )
       : null

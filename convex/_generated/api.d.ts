@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as actions_getTimezone from "../actions/getTimezone.js";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as auth from "../auth.js";
@@ -40,6 +41,7 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "actions/getTimezone": typeof actions_getTimezone;
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
   "artists/artistActions": typeof artists_artistActions;
   auth: typeof auth;

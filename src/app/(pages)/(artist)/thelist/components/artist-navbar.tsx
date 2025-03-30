@@ -131,12 +131,6 @@ TheListNavBarProps) {
                 className='hidden lg:flex font-bold px-8'>
                 View Pricing
               </Link>
-              <Link
-                href='/pricing#plans'
-                prefetch={true}
-                className='lg:hidden font-bold'>
-                Pricing
-              </Link>
             </>
           )}
           {/* NOTE: Limit/hide search for users who don't have a subscription or those who aren't signed in */}

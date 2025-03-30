@@ -423,21 +423,23 @@ export default function Pricing() {
   )
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl)
 
-  console.log(subscription)
+  // console.log(subscription)
 
-  console.log("subStatus", subStatus)
-  console.log("hasSub", hasSub)
+  // console.log("subStatus", subStatus)
+  // console.log("hasSub", hasSub)
 
   // const isPublic = !isAuthenticated
   const user = userData?.user
   // const userAccountTypes = user?.accountType ?? []
   // const multiType = userAccountTypes.length > 1
   const accountType = user?.accountType[0] ?? "artist"
+  const isAdmin = user?.accountType?.includes("admin")
+
   // if (hasSub) {
   //   accountType = "organizer"
   // }
 
-  console.log("accountType: ", accountType)
+  // console.log("accountType: ", accountType)
   const [selectedAccountType, setSelectedAccountType] = useState(accountType)
 
   // const userIsArtist = userAccountTypes.includes("artist")
@@ -497,50 +499,17 @@ export default function Pricing() {
   return (
     <section id='plans' className='price-card-cont px-4 pt-6'>
       <div className='mx-auto max-w-7xl'>
-        {/* {!hasSub && (
-          <div className='flex flex-col gap-2 px-4 w-full items-center'>
-            <p className='text-2xl font-bold'>Are you an</p>
-            <div className='flex items-center md:gap-4 text-center flex-col md:flex-row'>
-              <p
-                onClick={() => {
-                  setSelectedAccountType("artist")
-                  setIsYearly(false)
-                }}
-                className={cn(
-                  "font-tanker  lowercase  text-[4em] cursor-pointer tracking-wide",
-                  isArtist && "wshadow text-white stroked"
-                )}>
-                Artist
-              </p>
-              <span className='font-bold'>OR</span>
-              <span className='flex items-center'>
-                <p
-                  onClick={() => setSelectedAccountType("organizer")}
-                  className={cn(
-                    "font-tanker  lowercase  text-[4em] cursor-pointer tracking-wide",
-                    isOrganizer && "wshadow text-white stroked"
-                  )}>
-                  Organizer
-                </p>
-                <p
-                  className={cn(
-                    "font-tanker stroked lowercase text-background text-[4em] cursor-pointer tracking-wide"
-                  )}>
-                  ?
-                </p>
-              </span>
-            </div>
-          </div>
-        )} */}
-        {isArtist && !hasSub && (
-          <>
-            <PricingHeader
-              title='Choose Your Plan'
-              subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
-            />
-            <PricingSwitch onSwitch={togglePricingPeriod} />
-          </>
-        )}
+        {isAdmin && <ExistingSubscription onClick={handleManageSubscription} />}
+        {(isArtist && !hasSub) ||
+          (isAdmin && !isOrganizer && (
+            <>
+              <PricingHeader
+                title='Choose Your Plan'
+                subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
+              />
+              <PricingSwitch onSwitch={togglePricingPeriod} />
+            </>
+          ))}
 
         {isOrganizer && (
           <PricingHeader
@@ -549,7 +518,7 @@ export default function Pricing() {
           />
         )}
 
-        {isArtist && !hasSub ? (
+        {(isArtist && !hasSub) || (isAdmin && !isOrganizer) ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -612,6 +581,7 @@ export default function Pricing() {
               })}
           </motion.div>
         )}
+
         <AccountTypeSwitch
           isArtist={isArtist}
           setSelectedAccountType={setSelectedAccountType}
@@ -619,6 +589,7 @@ export default function Pricing() {
           setIsYearly={setIsYearly}
           hasSub={hasSub}
         />
+
         {/* {isOrganizer && (
           <div className='flex flex-col gap-2 text-sm max-w-[60%] mx-auto text-pretty mt-6'>
             <p className='font-bold'>NOTE:</p>

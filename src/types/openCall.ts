@@ -18,7 +18,7 @@ export interface OpenCall {
     dates: {
       ocStart: string | null //null for rolling, email, etc or just open calls without dates
       ocEnd: string | null
-      timezone: string
+      timezone: string //TODO: Ensure that the accurate timezone is passed when the events are submitted. Perhaps get this from the event location? I have to see what's possible.
     }
   }
   eligibility: {

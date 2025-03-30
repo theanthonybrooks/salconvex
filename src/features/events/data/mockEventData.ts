@@ -15,8 +15,8 @@ export const testEventData: EventData[] = [
 
     category: "residency",
     dates: {
-      eventStart: "2025-09-01T09:00:00Z",
-      eventEnd: "2025-09-15T18:00:00Z",
+      eventStart: "2025-01-15T06:00:00-06:00",
+      eventEnd: "2025-01-21T12:00:00-06:00",
     },
 
     location: {
@@ -293,9 +293,9 @@ export const testOpenCallData: OpenCall[] = [
       callFormat: "RFP",
       callType: "Email",
       dates: {
-        ocStart: "2025-03-01T00:00:00Z",
-        ocEnd: "2025-09-01T23:59:59Z",
-        timezone: "Europe/Berlin",
+        ocStart: "2025-03-15T06:00:00-06:00",
+        ocEnd: "2025-06-15T06:00:00-06:00",
+        timezone: "America/Chicago",
       },
     },
     eligibility: {
@@ -349,8 +349,8 @@ export const testOpenCallData: OpenCall[] = [
       callFormat: "RFQ",
       callType: "Fixed",
       dates: {
-        ocStart: "2025-03-01T00:00:00Z",
-        ocEnd: "2025-04-01T23:59:59Z",
+        ocStart: "2025-03-15T06:00:00-03:00",
+        ocEnd: "2025-03-30T06:00:00-03:00",
         timezone: "Europe/Berlin",
       },
     },

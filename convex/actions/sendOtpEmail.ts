@@ -1,4 +1,4 @@
-"use node" // ✅ Required for actions now
+"use node"
 
 import { v } from "convex/values"
 import { Resend } from "resend"

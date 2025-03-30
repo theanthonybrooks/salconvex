@@ -2,16 +2,13 @@ import { Button } from "@/components/ui/button"
 import { DialogClose, DialogFooter } from "@/components/ui/dialog"
 
 import { Label } from "@/components/ui/label"
+import { MapboxInput } from "@/components/ui/mapbox-search"
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi"
-import {
-  fetchMapboxSuggestions,
-  MapboxSuggestion,
-  sortedGroupedCountries,
-} from "@/lib/locations"
+import { sortedGroupedCountries } from "@/lib/locations"
 import { cn } from "@/lib/utils"
 import { User } from "@/types/user"
-import { useMutation, useQuery } from "convex/react"
-import React, { useEffect, useState } from "react"
+import { useAction, useMutation, useQuery } from "convex/react"
+import React, { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "react-toastify"
 import { Country } from "world-countries"
@@ -28,21 +25,22 @@ interface ArtistProfileFormProps {
 type ArtistFormValues = {
   artistName: string
   residence: string
-  nationalities: string[] // cca2 codes
-  priority: "low" | "medium" | "high"
-  order?: "start" | "end"
+  nationalities: string[] // cca2 codes for now
+
   locationCity?: string
   locationState?: string
+  locationStateAbbr?: string
   locationCountry?: string
-  locationCoordinates?: string[]
+  locationCountryAbbr?: string
+  locationCoordinates?: number[]
 }
 
 export const ArtistProfileForm = ({
   className,
 
   user,
-  onClick,
-}: ArtistProfileFormProps) => {
+}: // onClick,
+ArtistProfileFormProps) => {
   const {
     register,
     control,
@@ -64,34 +62,40 @@ export const ArtistProfileForm = ({
   })
 
   const artistInfo = useQuery(api.artists.artistActions.getArtist, {})
+  const getTimezone = useAction(api.actions.getTimezone.getTimezone)
   const updateArtist = useMutation(
     api.artists.artistActions.updateOrCreateArtist
   )
-
-  const [name, setName] = useState("")
-
-  useEffect(() => {
-    setName(user?.name ?? `${user?.firstName} ${user?.lastName}`)
-  }, [user])
 
   useEffect(() => {
     if (!artistInfo) return
 
     reset({
-      artistName: artistInfo.artistName ?? name,
+      artistName: artistInfo.artistName ?? "",
       nationalities: artistInfo.artistNationality ?? [],
       residence: artistInfo.artistResidency?.full ?? "",
       locationCity: artistInfo.artistResidency?.city ?? "",
       locationState: artistInfo.artistResidency?.state ?? "",
+      locationStateAbbr: artistInfo.artistResidency?.stateAbbr ?? "",
       locationCountry: artistInfo.artistResidency?.country ?? "",
+      locationCountryAbbr: artistInfo.artistResidency?.countryAbbr ?? "",
       locationCoordinates: artistInfo.artistResidency?.location ?? [],
     })
-  }, [artistInfo, reset, name])
-
-  const [suggestions, setSuggestions] = useState<MapboxSuggestion[]>([])
+  }, [artistInfo, reset])
 
   const onSubmit = async (data: ArtistFormValues) => {
-    console.log("data", data)
+    let timezone: string | undefined
+    let timezoneOffset: number | undefined
+    if (data.locationCoordinates?.length === 2) {
+      const timezoneData = await getTimezone({
+        latitude: data.locationCoordinates[1],
+        longitude: data.locationCoordinates[0],
+      })
+      timezone = timezoneData?.zoneName
+      timezoneOffset = timezoneData?.gmtOffset
+      //could also get dst, abbreviation (CEST, CET, etc)
+    }
+
     try {
       await updateArtist({
         artistName: data.artistName,
@@ -100,17 +104,20 @@ export const ArtistProfileForm = ({
           full: data.residence,
           city: data.locationCity,
           state: data.locationState,
+          stateAbbr: data.locationStateAbbr,
           country: data.locationCountry,
+          countryAbbr: data.locationCountryAbbr,
           location: data.locationCoordinates,
+          timezone,
+          timezoneOffset,
         },
       })
-      console.log("artist mode)")
 
       reset()
       toast.success("Successfully updated profile! Forwarding to Stripe...")
 
       setTimeout(() => {
-        onClick()
+        // onClick()
       }, 2000)
     } catch (error) {
       console.error("Failed to submit form:", error)
@@ -170,48 +177,21 @@ export const ArtistProfileForm = ({
             name='residence'
             control={control}
             render={({ field }) => (
-              <div className='relative'>
-                <input
-                  {...field}
-                  tabIndex={3}
-                  onChange={async (e) => {
-                    const query = e.target.value
-                    field.onChange(query)
-                    if (!query.trim()) return setSuggestions([])
-                    const results = await fetchMapboxSuggestions(query)
-                    setSuggestions(results)
-                  }}
-                  placeholder='Place of residence (city, state, country, etc)...'
-                  className='w-full rounded border border-foreground/30 focus:ring-1 focus:ring-foreground p-3 text-base placeholder-foreground/50 focus:outline-none placeholder-shown:bg-card '
-                />
-                {suggestions.length > 0 && (
-                  <ul className='absolute z-50 mt-1 w-full rounded-md bg-white shadow'>
-                    {suggestions.map((s) => (
-                      <li
-                        key={s.id}
-                        className='cursor-pointer p-2 text-sm hover:bg-violet-100'
-                        onClick={() => {
-                          const context = s.context || []
-                          const get = (type: string) =>
-                            context.find((c) => c.id.startsWith(type))?.text ||
-                            ""
-
-                          setValue("residence", s.place_name)
-                          setValue("locationCity", s.text)
-                          setValue("locationState", get("region"))
-                          setValue("locationCountry", get("country"))
-                          setValue(
-                            "locationCoordinates",
-                            s.center.map((c: number) => c.toString())
-                          )
-                          setSuggestions([])
-                        }}>
-                        {s.place_name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <MapboxInput
+                value={field.value}
+                onChange={field.onChange}
+                onSelect={(location) => {
+                  setValue("residence", location.full)
+                  setValue("locationCity", location.city)
+                  setValue("locationState", location.state)
+                  setValue("locationStateAbbr", location.stateAbbr)
+                  setValue("locationCountry", location.country)
+                  setValue("locationCountryAbbr", location.countryAbbr)
+                  setValue("locationCoordinates", location.coordinates)
+                }}
+                tabIndex={3}
+                placeholder='Place of residence (city, state, country, etc)...'
+              />
             )}
           />
         </div>

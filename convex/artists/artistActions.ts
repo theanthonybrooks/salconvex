@@ -28,8 +28,12 @@ export const updateOrCreateArtist = mutation({
         full: v.optional(v.string()),
         city: v.optional(v.string()),
         state: v.optional(v.string()),
+        stateAbbr: v.optional(v.string()),
         country: v.optional(v.string()),
-        location: v.optional(v.array(v.string())),
+        countryAbbr: v.optional(v.string()),
+        location: v.optional(v.array(v.number())),
+        timezone: v.optional(v.string()),
+        timezoneOffset: v.optional(v.number()),
       })
     ),
   },

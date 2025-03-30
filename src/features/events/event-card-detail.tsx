@@ -34,7 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map"
 import { CombinedEventCardData } from "@/hooks/use-combined-events"
 import { generateICSFile } from "@/lib/addToCalendar"
-import { formatEventDates } from "@/lib/dateFns"
+import { formatEventDates, isValidIsoDate } from "@/lib/dateFns"
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -94,15 +94,17 @@ const EventCardDetail = (props: EventCardDetailProps) => {
   }`
 
   const icsLink =
-    eventStart && eventEnd
+    isValidIsoDate(eventStart) && isValidIsoDate(eventEnd)
       ? generateICSFile(
           event.name,
           eventStart,
           eventEnd,
           locationString,
           event.about,
-          dates.eventStart ? dates.eventStart : "",
-          dates.eventEnd,
+          event.category,
+          false,
+          isValidIsoDate(dates.eventStart) ? dates.eventStart! : "",
+          isValidIsoDate(dates.eventEnd) ? dates.eventEnd! : "",
           `${eventId}`
         )
       : null

@@ -573,7 +573,7 @@ const FullPageNav = ({
                 </div>
                 <div
                   className={cn(
-                    "pl-8 pt-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker  lowercase"
+                    "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker  lowercase"
                   )}>
                   <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
                     Login | Register

@@ -8,8 +8,12 @@ export interface Artist {
     full?: string
     city?: string
     state?: string
+    stateAbbr?: string
     region?: string
     country?: string
+    countryAbbr?: string
+    timezone?: string
+    timezoneOffset?: number
     location?: {
       latitude: number
       longitude: number

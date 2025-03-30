@@ -110,7 +110,7 @@ Props) => {
     (currentPage - 1) * filters.limit,
     currentPage * filters.limit
   )
-  console.log("filteredEvents", filteredEvents)
+  // console.log("filteredEvents", filteredEvents)
 
   const totalPages = Math.ceil(filteredEvents.length / filters.limit)
   return (
