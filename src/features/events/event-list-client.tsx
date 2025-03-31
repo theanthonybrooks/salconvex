@@ -3,14 +3,19 @@
 import { BasicPagination } from "@/components/ui/pagination2"
 import EventCardPreview from "@/features/events/event-card-preview"
 import { EventFilters } from "@/features/events/event-list-filters"
-import { useMockEventCards } from "@/hooks/use-combined-events"
+import {
+  CombinedEventCardData,
+  useMockEventCards,
+} from "@/hooks/use-combined-events"
 import { useFilteredEvents } from "@/hooks/use-filtered-events"
+import { getFourCharMonth } from "@/lib/dateFns"
 import { setParamIfNotDefault } from "@/lib/utils"
 import { EventCategory, EventType } from "@/types/event"
 import { Filters, SortOptions } from "@/types/thelist"
 import { UserPref } from "@/types/user"
+import { format } from "date-fns"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 interface Props {
   // initialEvents: EventData[]
@@ -40,7 +45,7 @@ Props) => {
   }
 
   const defaultSort: SortOptions = {
-    sortBy: "date",
+    sortBy: "openCall",
     sortDirection: "asc",
   }
 
@@ -92,7 +97,7 @@ Props) => {
       params.delete("page")
     }
 
-    setParamIfNotDefault(params, "sb", sortOptions.sortBy, "date")
+    setParamIfNotDefault(params, "sb", sortOptions.sortBy, "openCall")
     setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc")
 
     const queryString = params.toString()
@@ -113,6 +118,78 @@ Props) => {
   // console.log("filteredEvents", filteredEvents)
 
   const totalPages = Math.ceil(filteredEvents.length / filters.limit)
+
+  // const groupedEvents = useMemo(() => {
+  //   const groups: Record<string, CombinedEventCardData[]> = {}
+
+  //   for (const event of publicView
+  //     ? paginatedEvents.slice(0, 10)
+  //     : paginatedEvents) {
+  //     let groupKey = "Unsorted"
+
+  //     if (sortOptions.sortBy === "openCall" && event.tabs.opencall) {
+  //       const ocEnd = event.tabs.opencall.basicInfo?.dates?.ocEnd
+  //       groupKey = ocEnd
+  //         ? format(new Date(ocEnd), "MMM d")
+  //         : "No Open Call Date"
+  //     }
+
+  //     if (sortOptions.sortBy === "eventStart" && event.dates.eventStart) {
+  //       groupKey = format(new Date(event.dates.eventStart), "MMM d")
+  //     }
+
+  //     if (!groups[groupKey]) groups[groupKey] = []
+  //     groups[groupKey].push(event)
+  //   }
+
+  //   return groups
+  // }, [paginatedEvents, sortOptions, publicView])
+
+  const groupedEvents = useMemo(() => {
+    const groups: Record<string, CombinedEventCardData[]> = {}
+    const orderedGroupKeys: string[] = []
+
+    for (const event of publicView
+      ? paginatedEvents.slice(0, 10)
+      : paginatedEvents) {
+      let groupKey = "Ungrouped"
+
+      if (sortOptions.sortBy === "openCall" && event.tabs.opencall) {
+        const ocEnd = event.tabs.opencall.basicInfo?.dates?.ocEnd
+        groupKey = ocEnd
+          ? format(new Date(ocEnd), "MMM d")
+          : "No Open Call Date"
+      } else if (sortOptions.sortBy === "openCall" && !event.tabs.opencall) {
+        groupKey = "No Open Call"
+      }
+
+      if (sortOptions.sortBy === "eventStart" && event.dates.eventStart) {
+        const eventStart = event.dates?.eventStart
+        groupKey = eventStart
+          ? getFourCharMonth(new Date(event.dates.eventStart)) +
+            format(new Date(event.dates.eventStart), " d")
+          : "No Event Date"
+      } else if (
+        sortOptions.sortBy === "eventStart" &&
+        !event.dates.eventStart
+      ) {
+        groupKey = "No Event Date"
+      }
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = []
+        orderedGroupKeys.push(groupKey)
+      }
+
+      groups[groupKey].push(event)
+    }
+
+    return orderedGroupKeys.map((key) => ({
+      title: key,
+      events: groups[key],
+    }))
+  }, [paginatedEvents, sortOptions, publicView])
+
   return (
     <>
       {!publicView && (
@@ -139,19 +216,47 @@ Props) => {
           No events found matching the selected filters.
         </p>
       ) : (
-        (publicView ? paginatedEvents.slice(0, 10) : paginatedEvents).map(
-          (event) => (
-            <EventCardPreview
-              key={event.id}
-              event={event}
-              publicView={publicView}
-            />
-            // <div key={event.id}>
-            //   {event.id}
-            //   {event.name}
-            // </div>
-          )
-        )
+        // (publicView ? paginatedEvents.slice(0, 10) : paginatedEvents).map(
+        //   (event, index) => (
+        //     <EventCardPreview
+        //       key={index}
+        //       event={event}
+        //       publicView={publicView}
+        //     />
+        //     // <div key={event.id}>
+        //     //   {event.id}
+        //     //   {event.name}
+        //     // </div>
+        //   )
+        // )
+        // Object.entries(groupedEvents).map(([groupTitle, eventsInGroup]) => (
+        //   <div key={groupTitle} className='mb-6'>
+        //     <h3 className='text-lg font-semibold mb-2'>{groupTitle}</h3>
+        //     <div className='space-y-4'>
+        //       {eventsInGroup.map((event, index) => (
+        //         <EventCardPreview
+        //           key={index}
+        //           event={event}
+        //           publicView={publicView}
+        //         />
+        //       ))}
+        //     </div>
+        //   </div>
+        // ))
+        groupedEvents.map((group) => (
+          <div key={group.title} className='mb-6'>
+            <h3 className='text-lg font-semibold mb-2'>{group.title}</h3>
+            <div className='space-y-4'>
+              {group.events.map((event, index) => (
+                <EventCardPreview
+                  key={index}
+                  event={event}
+                  publicView={publicView}
+                />
+              ))}
+            </div>
+          </div>
+        ))
       )}
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (

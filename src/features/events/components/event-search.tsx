@@ -57,8 +57,6 @@ export const OrgSearch = ({
     api.organizer.organizations.getUserOrganizations,
     hasUserInteracted ? { query: trimmedQuery || "" } : "skip"
   )
-  console.log("results", results)
-
   const showSuggestions = focused && results && results.length > 0
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

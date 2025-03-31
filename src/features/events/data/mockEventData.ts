@@ -17,6 +17,7 @@ export const testEventData: EventData[] = [
     dates: {
       eventStart: "2025-01-15T06:00:00-06:00",
       eventEnd: "2025-01-21T12:00:00-06:00",
+      ongoing: false,
     },
 
     location: {
@@ -69,6 +70,7 @@ export const testEventData: EventData[] = [
     dates: {
       eventStart: "2025-06-01T09:00:00Z",
       eventEnd: "2025-06-15T18:00:00Z",
+      ongoing: false,
     },
 
     location: {
@@ -109,13 +111,59 @@ export const testEventData: EventData[] = [
     id: "8",
     name: "Dastardly Dallas",
     logo: "/1.jpg",
-    openCallId: ["14"],
+    openCallId: ["14", "21"],
 
     eventType: ["gjm", "mur"],
     category: "event",
     dates: {
-      eventStart: "2024-09-01T09:00:00Z",
-      eventEnd: "2024-09-15T18:00:00Z",
+      eventStart: "2025-09-02T09:00:00Z",
+      eventEnd: "2025-09-15T18:00:00Z",
+      ongoing: false,
+    },
+
+    location: {
+      locale: "Neukolln",
+      city: "Berlin",
+      country: "Germany",
+      continent: "Europe",
+      coordinates: {
+        latitude: 48.7127837,
+        longitude: 17.0059413,
+      },
+    },
+    about:
+      "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
+    links: [
+      {
+        type: "website",
+        title: "Event Page",
+        href: "www.urbanwalls.de/en/residency",
+      },
+
+      {
+        type: "facebook",
+        title: "Facebook",
+        handle: "@urbanwalls",
+        href: "https://www.facebook.com/urbanwalls",
+      },
+    ],
+    otherInfo: ["Residency includes optional workshops and artist talks"],
+  },
+  {
+    adminNote: "Watch out for the banana throwing sharks",
+    organizerId: ["24a"],
+    mainOrgId: "24a",
+    id: "96",
+    name: "Dastardly Dallas",
+    logo: "/1.jpg",
+    openCallId: ["423"],
+
+    eventType: ["gjm", "mur"],
+    category: "event",
+    dates: {
+      eventStart: "2024-08-01T09:00:00Z",
+      eventEnd: "2024-08-15T18:00:00Z",
+      ongoing: false,
     },
 
     location: {
@@ -157,8 +205,7 @@ export const testEventData: EventData[] = [
     eventType: ["mur"],
     category: "event",
     dates: {
-      eventStart: "2025-04-01T09:00:00Z",
-      eventEnd: "2025-03-15T18:00:00Z",
+      ongoing: true,
     },
     location: {
       locale: "Neukolln",
@@ -201,6 +248,7 @@ export const testEventData: EventData[] = [
     dates: {
       eventStart: "2025-09-01T09:00:00Z",
       eventEnd: "2026-09-15T18:00:00Z",
+      ongoing: false,
     },
 
     location: {
@@ -241,8 +289,7 @@ export const testEventData: EventData[] = [
     eventType: ["mur"],
     category: "event",
     dates: {
-      eventStart: "2025-09-01T09:00:00Z",
-      eventEnd: "2026-09-15T18:00:00Z",
+      ongoing: true,
     },
 
     location: {
@@ -295,7 +342,7 @@ export const testOpenCallData: OpenCall[] = [
     },
     eligibility: {
       type: "International",
-      whom: "International (all)",
+      whom: ["International (all)"],
       details: "Must reside in Germany for the duration of the project",
     },
     compensation: {
@@ -346,13 +393,13 @@ export const testOpenCallData: OpenCall[] = [
       callType: "Fixed",
       dates: {
         ocStart: "2025-03-15T06:00:00-03:00",
-        ocEnd: "2025-03-30T06:00:00-03:00",
+        ocEnd: "2025-05-15T06:00:00-03:00",
         timezone: "Europe/Berlin",
       },
     },
     eligibility: {
       type: "National",
-      whom: "German",
+      whom: ["German"],
       details: "Must reside in Germany for the duration of the project",
     },
     compensation: {
@@ -402,7 +449,7 @@ export const testOpenCallData: OpenCall[] = [
     },
     eligibility: {
       type: "National",
-      whom: "German",
+      whom: ["German", "French"],
       details: "Must reside in Germany for the duration of the project",
     },
     compensation: {
@@ -411,6 +458,61 @@ export const testOpenCallData: OpenCall[] = [
         max: 30000,
 
         rate: 60,
+        unit: "m²",
+        currency: "EUR",
+        allInclusive: false,
+      },
+      categories: {
+        designFee: "1500",
+        accommodation: "Studio housing provided",
+        materials: "Provided",
+      },
+    },
+    requirements: {
+      requirements: [
+        "Resume",
+        "Portfolio with at least 8 works",
+        "Project proposal",
+        "Reference letter",
+      ],
+      more: ["Interviews may be conducted for shortlisted applicants"],
+      destination: "residency@urbanwalls.de",
+      documents: [
+        {
+          title: "Residency Info Pack",
+          href: "https://example.com/residency-info.pdf",
+        },
+      ],
+    },
+  },
+  {
+    adminNoteOC: "Watch out for the banana throwing sharks id 56",
+    id: "21",
+
+    eventId: "8",
+    organizerId: ["24a", "2"],
+    mainOrgId: "24a",
+    basicInfo: {
+      appFee: 0,
+      callFormat: "RFQ",
+      callType: "Fixed",
+      dates: {
+        ocStart: "2025-03-01T00:00:00Z",
+        ocEnd: "2025-09-01T23:59:59Z",
+        timezone: "Europe/Berlin",
+      },
+    },
+    eligibility: {
+      type: "National",
+      whom: ["German", "French"],
+      details: "Must reside in Germany for the duration of the project",
+    },
+    compensation: {
+      budget: {
+        min: 10000,
+        max: 50000,
+
+        rate: 660,
         unit: "m²",
         currency: "EUR",
         allInclusive: false,

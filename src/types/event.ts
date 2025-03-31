@@ -7,19 +7,20 @@ export type EventCategory =
   | "roster"
 
 export interface EventData {
+  id: string
   adminNote?: string
   organizerId: string[]
   mainOrgId: string
+  openCallId?: string[] //list the open call id's that are associated with this event
 
-  id: string
   name: string
   logo: string
-  openCallId?: string[] //list the open call id's that are associated with this event
   eventType?: [EventType] | [EventType, EventType]
   category: EventCategory
   dates: {
-    eventStart: string | null
-    eventEnd: string
+    eventStart?: string
+    eventEnd?: string
+    ongoing: boolean
   }
 
   location: {

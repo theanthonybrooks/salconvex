@@ -4,8 +4,14 @@ import { DateTime } from "luxon"
 export const formatEventDates = (
   start: string,
   end: string,
+  ongoing: boolean,
   preview?: boolean
+  // mode?: "desktop" | "mobile" = "desktop"
 ) => {
+  console.log("ongoing", ongoing, start, end)
+
+  if (ongoing) return "Ongoing"
+
   const seasonalTerms = ["spring", "summer", "fall", "winter"]
 
   const isSeasonalStart = seasonalTerms.some((term) =>
@@ -44,7 +50,6 @@ export const formatEventDates = (
   const isEndDateValid = !isNaN(endDate.getTime())
 
   const fullMonth = new Intl.DateTimeFormat("en-US", { month: "long" })
-  const shortMonth = new Intl.DateTimeFormat("en-US", { month: "short" })
 
   let startMonthShort = "by"
   let startMonthFull = "by"
@@ -56,14 +61,14 @@ export const formatEventDates = (
   let endMonthFull: string | null = null
 
   if (isStartDateValid) {
-    startMonthShort = shortMonth.format(startDate)
+    startMonthShort = getFourCharMonth(startDate)
     startMonthFull = fullMonth.format(startDate)
     startDay = startDate.getDate() || null
     startYear = startDate.getFullYear()
   }
 
   if (isEndDateValid) {
-    endMonthShort = shortMonth.format(endDate)
+    endMonthShort = getFourCharMonth(endDate)
     endMonthFull = fullMonth.format(endDate)
     endDay = endDate.getDate() || null
     endYear = endDate.getFullYear()

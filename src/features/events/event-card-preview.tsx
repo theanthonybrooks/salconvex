@@ -183,7 +183,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             <p className='text-sm flex items-center gap-x-1'>
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className='font-semibold'>Dates:</span>
-              {formatEventDates(dates?.eventStart || "", dates.eventEnd, true)}
+              {formatEventDates(
+                dates?.eventStart || "",
+                dates?.eventEnd || "",
+                dates?.ongoing,
+                true
+              )}
             </p>
             {isCurrentlyOpen && (
               <p className={cn("text-sm  flex items-center gap-x-1")}>
@@ -243,7 +248,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                     className={cn(
                       eligibility.type !== "International" && "text-red-600"
                     )}>
-                    {eligibility.whom}
+                    {eligibility.whom.length > 1
+                      ? "See details"
+                      : eligibility.whom[0]}
                     {eligibility.type !== "International" && " Artists*"}
                   </span>
                 )}
@@ -373,7 +380,11 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             <p className='text-sm flex items-center gap-x-1'>
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className='font-semibold'>Dates:</span>
-              {formatEventDates(dates?.eventStart || "", dates.eventEnd, true)}
+              {formatEventDates(
+                dates?.eventStart || "",
+                dates?.eventEnd || "",
+                dates.ongoing
+              )}
             </p>
             <p className='text-sm flex items-center gap-x-1'>
               <span className='font-semibold'>Category:</span>
@@ -452,7 +463,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                     )}>
                     {eligibility.type !== "International" &&
                       `${eligibility.type}: `}
-                    {eligibility.whom}
+                    {eligibility.whom.map((whom) => whom).join(" & ")}
                     {eligibility.type !== "International" && " Artists*"}
                   </span>
                 )}

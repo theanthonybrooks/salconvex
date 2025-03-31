@@ -7,8 +7,8 @@ import {
   testOpenCallData,
   testOrganizerData,
 } from "@/features/events/data/mockEventData"
-import { ApplicationStatus, EventData, OpenCallStatus } from "@/types/event"
-import { OpenCall } from "@/types/openCall"
+import { EventData } from "@/types/event"
+import { ApplicationStatus, OpenCall, OpenCallStatus } from "@/types/openCall"
 import { Organizer } from "@/types/organizer"
 
 export type CombinedEventCardData = EventData & {
@@ -24,62 +24,79 @@ export type CombinedEventCardData = EventData & {
 
 export const useMockEventCards = (): CombinedEventCardData[] => {
   return useMemo(() => {
-    return (
-      testEventData
-        // Removes any open calls that don't have the boolean of "hasActiveOpenCall" set to true
-        //   .filter((e) => e.hasActiveOpenCall)
+    return testEventData.flatMap((event) => {
+      const organizer = testOrganizerData.find((o) =>
+        event.organizerId?.includes(o.id)
+      )
+      if (!organizer)
+        throw new Error(`No organizer found for event ${event.id}`)
 
-        .map((event): CombinedEventCardData => {
-          const organizer = testOrganizerData.find((o) =>
-            event.organizerId?.includes(o.id)
-          )
-          const openCall = testOpenCallData.find(
-            (oc) => oc.eventId === event.id
-          )
-          const listAction = testArtistData.listActions.find(
-            (la) => la.eventId === event.id
-          )
-          const application = testApplicationsData.find(
-            (app) =>
-              app.openCallId === openCall?.id &&
-              app.artistId === testArtistData.id
-          )
+      const openCalls = testOpenCallData.filter((oc) => oc.eventId === event.id)
 
-          const ocDates = openCall?.basicInfo?.dates
-          const now = new Date()
-          const start = ocDates?.ocStart ? new Date(ocDates.ocStart) : null
-          const end = ocDates?.ocEnd ? new Date(ocDates.ocEnd) : null
+      if (openCalls.length === 0) {
+        // Case: Event has no open call
+        const listAction = testArtistData.listActions.find(
+          (la) => la.eventId === event.id
+        )
 
-          let openCallStatus: "active" | "ended" | "coming-soon" | null = null
-          if (start && end) {
-            if (now < start) openCallStatus = "coming-soon"
-            else if (now > end) openCallStatus = "ended"
-            else openCallStatus = "active"
-          } else if (!start && end) {
-            if (now > end) openCallStatus = "ended"
-            else if (now <= end) openCallStatus = "active"
-          }
-          //   console.log(
-          //     "Event ID:",
-          //     event.id,
-          //     "Matched OpenCall:",
-          //     openCall?.id,
-          //     openCall
-          //   )
-          const hasActiveOpenCall = openCallStatus === "active"
-
-          return {
+        return [
+          {
             ...event,
-            tabs: { organizer: organizer!, opencall: openCall! },
+            tabs: {
+              organizer: organizer,
+              opencall: null as unknown as OpenCall, // or handle as optional
+            },
             bookmarked: listAction?.bookmarked ?? false,
             hidden: listAction?.hidden ?? false,
-            status: application?.applicationStatus ?? null,
-            adminNoteOC: openCall?.adminNoteOC ?? null,
-            appFee: openCall?.basicInfo.appFee ?? 0,
-            hasActiveOpenCall,
-            openCallStatus,
-          }
-        })
-    )
+            status: null,
+            adminNoteOC: null,
+            appFee: 0,
+            hasActiveOpenCall: false,
+            openCallStatus: null,
+          },
+        ]
+      }
+
+      // Case: Event has one or more open calls
+      return openCalls.map((openCall) => {
+        const listAction = testArtistData.listActions.find(
+          (la) => la.eventId === event.id
+        )
+
+        const application = testApplicationsData.find(
+          (app) =>
+            app.openCallId === openCall.id && app.artistId === testArtistData.id
+        )
+
+        const ocDates = openCall?.basicInfo?.dates
+        const now = new Date()
+        const start = ocDates?.ocStart ? new Date(ocDates.ocStart) : null
+        const end = ocDates?.ocEnd ? new Date(ocDates.ocEnd) : null
+
+        let openCallStatus: OpenCallStatus | null = null
+        if (start && end) {
+          if (now < start) openCallStatus = "coming-soon"
+          else if (now > end) openCallStatus = "ended"
+          else openCallStatus = "active"
+        } else if (!start && end) {
+          if (now > end) openCallStatus = "ended"
+          else openCallStatus = "active"
+        }
+
+        const hasActiveOpenCall = openCallStatus === "active"
+
+        return {
+          ...event,
+          tabs: { organizer: organizer, opencall: openCall },
+          bookmarked: listAction?.bookmarked ?? false,
+          hidden: listAction?.hidden ?? false,
+          status: application?.applicationStatus ?? null,
+          adminNoteOC: openCall?.adminNoteOC ?? null,
+          appFee: openCall?.basicInfo.appFee ?? 0,
+          hasActiveOpenCall,
+          openCallStatus,
+        }
+      })
+    })
   }, [])
 }

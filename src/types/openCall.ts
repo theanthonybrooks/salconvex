@@ -40,14 +40,14 @@ export interface OpenCall {
     callFormat: "RFP" | "RFQ"
     callType: CallType
     dates: {
-      ocStart: string | null //null for rolling, email, etc or just open calls without dates
+      ocStart: string | null //null for rolling, email, etc or just open calls without dates. Set to null if the call is rolling. Requires type of "Rolling" and will otherwise be invalid/ignored.
       ocEnd: string | null
       timezone: string //TODO: Ensure that the accurate timezone is passed when the events are submitted. Perhaps get this from the event location? I have to see what's possible.
     }
   }
   eligibility: {
     type: EligibilityType
-    whom: string
+    whom: string[]
     details?: string
   }
   compensation: {

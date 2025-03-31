@@ -107,21 +107,21 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const orgName = typeof orgValue === "string" ? orgValue : orgValue?.name ?? ""
 
   const orgValidation = useQuery(
-    api.organizations.isOwnerOrIsNewOrg,
+    api.organizer.organizations.isOwnerOrIsNewOrg,
     orgName.trim().length >= 3 ? { organizationName: orgName } : "skip"
   )
   const [activeStep, setActiveStep] = useState(0)
   const [createOrgError, setCreateOrgError] = useState("")
   const [isValidOrg, setIsValidOrg] = useState<string>("")
-  const [existingEvent, setExistingEvent] =
-    useState<Doc<"organizations"> | null>(null)
+  const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
+    null
+  )
   const [lastSaved, setLastSaved] = useState(
-    existingEvent ? existingEvent.updatedAt : null
+    existingOrg ? existingOrg.updatedAt : null
   )
 
   const isValidForm = true //TODO: check if form is valid
-  const existingOrgs =
-    typeof existingEvent === "object" && existingEvent !== null
+  const existingOrgs = typeof existingOrg === "object" && existingOrg !== null
   const formIsValid = isValidForm && isValidOrg === "valid"
   const lastSavedDate = lastSaved
     ? new Date(Math.floor(lastSaved)).toLocaleString()
@@ -134,7 +134,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   //
   console.log("orgValue", orgValue)
   console.log("existing orgs", existingOrgs)
-  console.log("existingEvent", existingEvent)
+  console.log("existingOrg", existingOrg)
   console.log("is valid org", isValidOrg)
   console.log("last saved", lastSavedDate)
   //
@@ -187,15 +187,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   useEffect(() => {
     if (existingOrgs && isValidOrg === "valid") {
-      if (existingEvent?.updatedAt) {
-        setLastSaved(existingEvent.updatedAt)
-      } else if (existingEvent?._creationTime) {
-        setLastSaved(existingEvent._creationTime)
+      if (existingOrg?.updatedAt) {
+        setLastSaved(existingOrg.updatedAt)
+      } else if (existingOrg?._creationTime) {
+        setLastSaved(existingOrg._creationTime)
       }
     } else {
       setLastSaved(null)
     }
-  }, [existingEvent, isValidOrg, existingOrgs])
+  }, [existingOrg, isValidOrg, existingOrgs])
 
   //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
@@ -265,24 +265,30 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   <Label htmlFor='organization' className='sr-only'>
                     Organization Name
                   </Label>
-                  <Controller
-                    name='organization.name'
-                    control={control}
-                    render={({ field }) => (
-                      <OrgSearch
-                        value={field.value}
-                        onChange={field.onChange}
-                        isValid={isValidOrg}
-                        onReset={() => {
-                          setIsValidOrg("")
-                          setCreateOrgError("")
-                        }}
-                        onLoadClick={setExistingEvent}
-                        placeholder='Search or enter new name'
-                        className=' lg:h-20 py-2 text-base lg:text-xl rounded-lg'
-                      />
-                    )}
-                  />
+                  <div className='flex flex-col lg:flex-row items-center gap-4'>
+                    <div className='flex lg:flex-col items-start gap-x-2'>
+                      <p className='font-bold lg:text-xl'>Step 1: </p>
+                      <p className='lg:text-xs'>Organization</p>
+                    </div>
+                    <Controller
+                      name='organization.name'
+                      control={control}
+                      render={({ field }) => (
+                        <OrgSearch
+                          value={field.value}
+                          onChange={field.onChange}
+                          isValid={isValidOrg}
+                          onReset={() => {
+                            setIsValidOrg("")
+                            setCreateOrgError("")
+                          }}
+                          onLoadClick={setExistingOrg}
+                          placeholder='Search or enter new name'
+                          className=' lg:h-20 py-2 text-base lg:text-xl rounded-lg'
+                        />
+                      )}
+                    />
+                  </div>
                   {createOrgError && (
                     <span className='text-red-600 text-sm w-full text-center mt-2'>
                       {createOrgError}

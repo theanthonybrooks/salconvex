@@ -1,6 +1,6 @@
 import { EventCategory, EventType } from "@/types/event"
 
-type SortBy = "date" | "name"
+type SortBy = "openCall" | "name" | "eventStart"
 type SortDirection = "asc" | "desc"
 type Continents =
   | "North America"

@@ -68,7 +68,8 @@ export const EventFilters = ({
           <SelectValue placeholder='Sort By' />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value='date'>Date</SelectItem>
+          <SelectItem value='openCall'>Open Call</SelectItem>
+          <SelectItem value='eventStart'>Event Start</SelectItem>
           <SelectItem value='name'>Name</SelectItem>
         </SelectContent>
       </Select>

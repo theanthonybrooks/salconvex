@@ -71,7 +71,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
   const latitude = location.coordinates?.latitude ?? 0
   const longitude = location.coordinates?.longitude ?? 0
 
-  const { eventStart, eventEnd } = dates
+  const { eventStart, eventEnd, ongoing } = dates
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked)
   const [isHidden, setIsHidden] = useState(hidden)
@@ -93,8 +93,11 @@ const EventCardDetail = (props: EventCardDetailProps) => {
       : organizer.location.country
   }`
 
+  const isOngoing = ongoing
+  const hasEventDates = eventStart && eventEnd
+
   const icsLink =
-    isValidIsoDate(eventStart) && isValidIsoDate(eventEnd)
+    hasEventDates && isValidIsoDate(eventStart) && isValidIsoDate(eventEnd)
       ? generateICSFile(
           event.name,
           eventStart,
@@ -103,8 +106,8 @@ const EventCardDetail = (props: EventCardDetailProps) => {
           event.about,
           event.category,
           false,
-          isValidIsoDate(dates.eventStart) ? dates.eventStart! : "",
-          isValidIsoDate(dates.eventEnd) ? dates.eventEnd! : "",
+          isValidIsoDate(eventStart) ? eventStart! : "",
+          isValidIsoDate(eventEnd) ? eventEnd! : "",
           `${eventId}`
         )
       : null
@@ -157,7 +160,11 @@ const EventCardDetail = (props: EventCardDetailProps) => {
           <div className='flex flex-col justify-between gap-y-1'>
             <p className='text-sm flex items-center gap-x-1'>
               <span className='font-semibold'>Dates:</span>
-              {formatEventDates(dates?.eventStart || "", dates.eventEnd)}{" "}
+              {formatEventDates(
+                dates?.eventStart || "",
+                dates?.eventEnd || "",
+                isOngoing
+              )}
               {icsLink && (
                 <a
                   href={icsLink}

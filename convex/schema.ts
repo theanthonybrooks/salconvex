@@ -139,11 +139,12 @@ const eventSchema = {
   openCallId: v.optional(v.array(v.id("openCalls"))),
   name: v.string(),
   logo: v.string(),
-  eventType: v.string(),
+  eventType: v.optional(v.array(v.string())),
   eventCategory: v.string(),
   dates: v.object({
     eventStart: v.optional(v.string()),
-    eventEnd: v.string(),
+    eventEnd: v.optional(v.string()),
+    ongoing: v.boolean(),
   }),
   location: v.object({
     sameAsOrganizer: v.optional(v.boolean()),
@@ -164,16 +165,24 @@ const eventSchema = {
   }),
   about: v.optional(v.string()),
   links: v.optional(
-    v.object({
-      type: v.string(),
-      title: v.string(),
-      href: v.string(),
-      handle: v.optional(v.string()),
-    })
+    v.array(
+      v.object({
+        type: v.string(),
+        title: v.string(),
+        href: v.string(),
+        handle: v.optional(v.string()),
+      })
+    )
   ),
   otherInfo: v.optional(v.array(v.string())),
 }
 
+const eventOrganizerSchema = {
+  eventId: v.id("events"),
+  organizerId: v.id("organizations"),
+  isPrimary: v.boolean(),
+}
+//NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
 const openCallSchema = {
   adminNoteOC: v.optional(v.string()),
   eventId: v.id("events"),
@@ -185,13 +194,13 @@ const openCallSchema = {
     callType: v.string(),
     dates: v.object({
       ocStart: v.optional(v.string()),
-      ocEnd: v.string(),
+      ocEnd: v.optional(v.string()),
       timezone: v.string(),
     }),
   }),
   eligibility: v.object({
     type: v.string(),
-    whom: v.string(),
+    whom: v.optional(v.array(v.string())),
     details: v.optional(v.string()),
   }),
   compensation: v.object({
@@ -228,6 +237,17 @@ const openCallSchema = {
     ),
     otherInfo: v.optional(v.array(v.string())),
   }),
+}
+
+const openCallOrganizerSchema = {
+  openCallId: v.id("openCalls"),
+  organizerId: v.id("organizations"),
+  isPrimary: v.boolean(),
+}
+
+const openCallJudgesSchema = {
+  openCallId: v.id("openCalls"),
+  judgeId: v.id("users"),
 }
 
 export default defineSchema({
@@ -279,6 +299,10 @@ export default defineSchema({
     .index("by_country", ["location.countryAbbr"]),
   // .index("by_continent", ["location.continent"]), //TODO: add this back once I have the continents mapped properly
 
+  eventOrganizers: defineTable(eventOrganizerSchema)
+    .index("by_eventId", ["eventId"])
+    .index("by_organizerId", ["organizerId"]),
+
   openCalls: defineTable(openCallSchema)
     .index("by_eventId", ["eventId"])
     .index("by_organizerId", ["organizerId"])
@@ -286,6 +310,14 @@ export default defineSchema({
     .index("by_budget", ["compensation.budget.min"])
     .index("by_endDate", ["basicInfo.dates.ocEnd"])
     .index("by_eligibility", ["eligibility.type"]),
+
+  openCallOrganizers: defineTable(openCallOrganizerSchema)
+    .index("by_openCallId", ["openCallId"])
+    .index("by_organizerId", ["organizerId"]),
+
+  openCallJudges: defineTable(openCallJudgesSchema)
+    .index("by_openCallId", ["openCallId"])
+    .index("by_judgeId", ["judgeId"]),
 
   organizationSubscriptions: defineTable({
     organizationId: v.id("organizations"),

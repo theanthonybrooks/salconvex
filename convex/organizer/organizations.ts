@@ -1,8 +1,8 @@
 import { filter } from "convex-helpers/server/filter"
 import { v } from "convex/values"
-import { query } from "./_generated/server"
 
 import { getAuthUserId } from "@convex-dev/auth/server"
+import { query } from "~/convex/_generated/server"
 
 export const isNewOrg = query({
   args: {

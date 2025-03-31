@@ -90,6 +90,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   } = event
 
   const { locale, city, stateAbbr, country, countryAbbr } = location
+
+  const { eventStart, eventEnd, ongoing } = dates
   const { opencall: openCallTab, organizer } = tabs
   const {
     compensation,
@@ -157,13 +159,14 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
       ? organizer.location.countryAbbr
       : organizer.location.country
   }`
+  const hasEventDates =
+    eventStart &&
+    isValidIsoDate(eventStart) &&
+    eventEnd &&
+    isValidIsoDate(eventEnd)
 
   const icsLink =
-    callType === "Fixed" &&
-    isValidIsoDate(dates.eventStart) &&
-    isValidIsoDate(dates.eventEnd) &&
-    isValidIsoDate(ocStart) &&
-    isValidIsoDate(ocEnd)
+    callType === "Fixed" && isValidIsoDate(ocStart) && isValidIsoDate(ocEnd)
       ? generateICSFile(
           event.name,
           ocStart,
@@ -172,8 +175,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
           event.about,
           event.category,
           true,
-          isValidIsoDate(dates.eventStart) ? dates.eventStart! : "",
-          isValidIsoDate(dates.eventEnd) ? dates.eventEnd! : "",
+          hasEventDates ? dates.eventStart! : "",
+          hasEventDates ? dates.eventEnd! : "",
           `${openCallId}`
         )
       : null
@@ -261,7 +264,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
           <div className='flex flex-col justify-between gap-y-1'>
             <p className='text-sm flex items-center gap-x-1'>
               <span className='font-semibold'>Dates:</span>
-              {formatEventDates(dates?.eventStart || "", dates.eventEnd)}
+              {formatEventDates(eventStart || "", eventEnd || "", ongoing)}
             </p>
             <p className='text-sm flex items-center gap-x-1'>
               <span className='font-semibold'>Category:</span>
@@ -368,7 +371,9 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               "text-red-600"
                           )}>
                           {eligibilityType !== "International"
-                            ? `${eligibilityType}: ${eligibilityWhom} Artists*`
+                            ? `${eligibilityType}: ${eligibilityWhom
+                                .map((whom) => whom)
+                                .join("/ ")} Artists*`
                             : eligibilityWhom}
                         </span>
                       </p>
