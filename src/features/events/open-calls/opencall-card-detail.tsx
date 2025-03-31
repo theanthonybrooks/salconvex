@@ -78,6 +78,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
     eventType,
     location,
     tabs,
+    //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
     // hasActiveOpenCall: hasOpenCall,
     status,
     // adminNote,

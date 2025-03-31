@@ -27,22 +27,48 @@ import { z } from "zod"
 //   eventName: z.string().min(3, "Event name must be at least 3 characters"),
 // })
 
-export const eventOCSchema = z.object({
-  organization: z
-    .preprocess(
-      (val) => (typeof val === "string" ? { organizationName: val } : val),
-      z.object({
-        organizationName: z
-          .string()
-          .min(3, "At least 3 chars")
-          .max(35, "Max 35 chars"),
-      })
-    )
-    .nullable(),
-  eventName: z.string().min(3, "Event name must be at least 3 characters"),
-  //   eventType: z.string().min(1),
-  //   budget: z.number().min(0).optional(),
-  //   deadline: z.date().optional(),
-  //   description: z.string().min(10),
-  // add all other fields across all steps
+// export const organizationSchema = z.object({
+//   organization: z
+//     .preprocess(
+//       (val) => (typeof val === "string" ? { organizationName: val } : val),
+//       z.object({
+//         organizationName: z
+//           .string()
+//           .min(3, "At least 3 chars")
+//           .max(35, "Max 35 chars"),
+//       })
+//     )
+//     .nullable(),
+// })
+const organizationSchema = z.object({
+  name: z.string().min(3, "At least 3 chars").max(35, "Max 35 chars"),
+})
+
+const eventSchema = z.object({
+  name: z.string().min(3, "Event name must be at least 3 characters"),
+})
+
+const openCallSchema = z.object({
+  deadline: z.date().min(new Date(), "Deadline must be after today"),
+  eligibility: z
+    .string()
+    .min(3, "Eligibility criteria must be at least 3 characters"),
+  description: z.string().min(3, "Description must be at least 3 characters"),
+  budget: z.number().min(0, "Budget must be at least 0"),
+})
+
+export const step1Schema = z.object({
+  organization: organizationSchema,
+  event: eventSchema,
+})
+
+export const eventOnlySchema = z.object({
+  organization: organizationSchema,
+  event: eventSchema,
+})
+
+export const eventWithOCSchema = z.object({
+  organization: organizationSchema,
+  event: eventSchema,
+  openCall: openCallSchema,
 })

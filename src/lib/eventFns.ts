@@ -1,10 +1,11 @@
 import {
-  CALL_TYPE_LABELS,
   EVENT_CATEGORY_LABELS,
   EVENT_TYPE_LABELS,
 } from "@/constants/eventConsts"
+import { CALL_TYPE_LABELS } from "@/constants/openCallConsts"
 import { convertCurrency } from "@/lib/currencyFns"
-import { CallType, EventCategory, EventType } from "@/types/event"
+import { EventCategory, EventType } from "@/types/event"
+import { CallType } from "@/types/openCall"
 
 export const getCallTypeLabel = (callType: CallType): string => {
   if (!callType) return ""

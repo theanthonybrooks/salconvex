@@ -86,7 +86,7 @@ const artistSchema = {
 const organizationSchema = {
   ownerId: v.id("users"),
   organizationName: v.string(),
-  organizationNameLower: v.optional(v.string()),
+  events: v.optional(v.array(v.id("events"))),
   logo: v.string(),
   location: v.optional(
     v.object({
@@ -131,6 +131,105 @@ const organizationSchema = {
   // TODO: Link organization to events and from events to open calls
 }
 
+const eventSchema = {
+  adminNote: v.optional(v.string()),
+  organizerId: v.array(v.id("organizations")),
+  mainOrgId: v.id("organizations"),
+  // eventId: v.optional(v.string()),
+  openCallId: v.optional(v.array(v.id("openCalls"))),
+  name: v.string(),
+  logo: v.string(),
+  eventType: v.string(),
+  eventCategory: v.string(),
+  dates: v.object({
+    eventStart: v.optional(v.string()),
+    eventEnd: v.string(),
+  }),
+  location: v.object({
+    sameAsOrganizer: v.optional(v.boolean()),
+    locale: v.optional(v.string()),
+    city: v.optional(v.string()),
+    state: v.optional(v.string()),
+    stateAbbr: v.optional(v.string()),
+    region: v.optional(v.string()),
+    country: v.string(),
+    countryAbbr: v.string(),
+    continent: v.optional(v.string()),
+    coordinates: v.optional(
+      v.object({
+        latitude: v.number(),
+        longitude: v.number(),
+      })
+    ),
+  }),
+  about: v.optional(v.string()),
+  links: v.optional(
+    v.object({
+      type: v.string(),
+      title: v.string(),
+      href: v.string(),
+      handle: v.optional(v.string()),
+    })
+  ),
+  otherInfo: v.optional(v.array(v.string())),
+}
+
+const openCallSchema = {
+  adminNoteOC: v.optional(v.string()),
+  eventId: v.id("events"),
+  organizerId: v.array(v.id("organizations")),
+  mainOrgId: v.id("organizations"),
+  basicInfo: v.object({
+    appFee: v.number(),
+    callFormat: v.string(),
+    callType: v.string(),
+    dates: v.object({
+      ocStart: v.optional(v.string()),
+      ocEnd: v.string(),
+      timezone: v.string(),
+    }),
+  }),
+  eligibility: v.object({
+    type: v.string(),
+    whom: v.string(),
+    details: v.optional(v.string()),
+  }),
+  compensation: v.object({
+    budget: v.object({
+      min: v.number(),
+      max: v.optional(v.number()),
+      rate: v.number(),
+      unit: v.string(),
+      currency: v.string(),
+      allInclusive: v.boolean(),
+    }),
+    categories: v.object({
+      designFee: v.optional(v.string()),
+      accommodation: v.optional(v.string()),
+      food: v.optional(v.string()),
+      travelCosts: v.optional(v.string()),
+      materials: v.optional(v.string()),
+      equipment: v.optional(v.string()),
+      other: v.optional(v.string()),
+    }),
+  }),
+
+  requirements: v.object({
+    requirements: v.array(v.string()),
+    more: v.array(v.string()),
+    destination: v.string(),
+    documents: v.optional(
+      v.array(
+        v.object({
+          title: v.string(),
+          href: v.string(),
+        })
+      )
+    ),
+    otherInfo: v.optional(v.array(v.string())),
+  }),
+}
+
 export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
@@ -168,8 +267,25 @@ export default defineSchema({
   // Organization Tables
   organizations: defineTable(organizationSchema)
     .index("by_organizationName", ["organizationName"])
-    .index("by_organizationNameLower", ["organizationNameLower"])
     .index("by_ownerId", ["ownerId"]),
+
+  events: defineTable(eventSchema)
+    .index("by_name", ["name"])
+    .index("by_organizerId", ["organizerId"])
+    .index("by_mainOrgId", ["mainOrgId"])
+    // .index("by_eventId", ["event"])
+    .index("by_eventType", ["eventType"])
+    .index("by_category", ["eventCategory"])
+    .index("by_country", ["location.countryAbbr"]),
+  // .index("by_continent", ["location.continent"]), //TODO: add this back once I have the continents mapped properly
+
+  openCalls: defineTable(openCallSchema)
+    .index("by_eventId", ["eventId"])
+    .index("by_organizerId", ["organizerId"])
+    .index("by_mainOrgId", ["mainOrgId"])
+    .index("by_budget", ["compensation.budget.min"])
+    .index("by_endDate", ["basicInfo.dates.ocEnd"])
+    .index("by_eligibility", ["eligibility.type"]),
 
   organizationSubscriptions: defineTable({
     organizationId: v.id("organizations"),

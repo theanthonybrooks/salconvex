@@ -1,15 +1,39 @@
-import {
-  ApplicationStatus,
-  CallType,
-  EligibilityType,
-  RateUnit,
-} from "@/types/event"
+export type CallType =
+  | "Fixed"
+  | "Rolling"
+  | "Email"
+  | "Invite"
+  | "Unknown"
+  | null
+
+export type EligibilityType =
+  | "International"
+  | "National"
+  | "Regional/Local"
+  | "Other"
+  | null
+
+export type ApplicationStatus =
+  | "applied"
+  | "considering"
+  | "to next step"
+  | "accepted"
+  | "rejected"
+  | "pending"
+  | "roster"
+  | "shortlisted"
+  | null
+
+export type OpenCallStatus = "active" | "ended" | "coming-soon" | null
+
+export type RateUnit = "ft²" | "m²"
 
 export interface OpenCall {
   adminNoteOC?: string
   id: string //This is what will be used in the application data for artists
   eventId: string
   organizerId: string[]
+  mainOrgId: string
 
   basicInfo: {
     appFee: number

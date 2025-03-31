@@ -1,12 +1,4 @@
-import { CallType, EventCategory, EventType } from "@/types/event"
-
-export const CALL_TYPE_LABELS: Record<Exclude<CallType, null>, string> = {
-  Fixed: "Fixed Deadline",
-  Rolling: "Rolling Open Call",
-  Email: "Application via Email",
-  Invite: "Invite-Only",
-  Unknown: "Unknown Deadline",
-}
+import { EventCategory, EventType } from "@/types/event"
 
 export const EVENT_TYPE_LABELS: Record<Exclude<EventType, null>, string> = {
   gjm: "Graffiti Jam",

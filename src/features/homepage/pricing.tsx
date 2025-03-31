@@ -116,14 +116,16 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
           onSwitch(val)
           setActiveTab(val)
         }}>
-        <TabsList className='relative w-full bg-white/60 justify-around h-12 flex rounded-xl '>
+        <TabsList className='relative w-full bg-white/70 justify-around h-12 flex rounded-xl '>
           {pricingIntervals.map((opt) => (
             <TabsTrigger
               key={opt.val}
               value={opt.val}
               className={cn(
                 "relative z-10 h-10 px-4 flex items-center justify-center w-full text-sm font-medium",
-                activeTab === opt.val ? "text-black" : "text-foreground/80"
+                activeTab === opt.val
+                  ? "text-black font-bold"
+                  : "text-foreground/80"
               )}>
               {activeTab === opt.val && (
                 <motion.div
@@ -500,16 +502,15 @@ export default function Pricing() {
     <section id='plans' className='price-card-cont px-4 pt-6'>
       <div className='mx-auto max-w-7xl'>
         {isAdmin && <ExistingSubscription onClick={handleManageSubscription} />}
-        {(isArtist && !hasSub) ||
-          (isAdmin && !isOrganizer && (
-            <>
-              <PricingHeader
-                title='Choose Your Plan'
-                subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
-              />
-              <PricingSwitch onSwitch={togglePricingPeriod} />
-            </>
-          ))}
+        {((isArtist && !hasSub) || (isAdmin && !isOrganizer)) && (
+          <>
+            <PricingHeader
+              title='Choose Your Plan'
+              subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
+            />
+            <PricingSwitch onSwitch={togglePricingPeriod} />
+          </>
+        )}
 
         {isOrganizer && (
           <PricingHeader

@@ -13,7 +13,7 @@ importers:
         version: 0.37.0
       '@convex-dev/auth':
         specifier: ^0.0.80
-        version: 0.0.80(@auth/core@0.37.0)(convex@1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 0.0.80(@auth/core@0.37.0)(convex@1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.0.10)(react@19.0.0)
@@ -105,11 +105,11 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       convex:
-        specifier: ^1.17.4
-        version: 1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^1.21.0
+        version: 1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       convex-helpers:
         specifier: ^0.1.71
-        version: 0.1.71(convex@1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(zod@3.24.2)
+        version: 0.1.71(convex@1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(zod@3.24.2)
       currency-codes:
         specifier: ^2.2.0
         version: 2.2.0
@@ -2097,8 +2097,8 @@ packages:
       zod:
         optional: true
 
-  convex@1.20.0:
-    resolution: {integrity: sha512-JwccnuJwAw0fLdp3DaNR4JM+5fKTMdTvu6PXRmGLrWXg7epQi/2X0UlxxQ6Hb/b8UuJVxUEnCVJyomF75wjZ5A==}
+  convex@1.21.0:
+    resolution: {integrity: sha512-+peYmXSWsnnyASKI302RIlsf07gv6uHAOduBwDFLBjNZciO+kOVjQcskJwhTeNbAV59glL+tf7kvDh8PEnhmCw==}
     engines: {node: '>=18.0.0', npm: '>=7.0.0'}
     hasBin: true
     peerDependencies:
@@ -3799,11 +3799,11 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@convex-dev/auth@0.0.80(@auth/core@0.37.0)(convex@1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@convex-dev/auth@0.0.80(@auth/core@0.37.0)(convex@1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@auth/core': 0.37.0
       arctic: 1.9.2
-      convex: 1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      convex: 1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       cookie: 1.0.2
       jose: 5.10.0
       jwt-decode: 4.0.0
@@ -5484,14 +5484,14 @@ snapshots:
 
   convert-source-map@1.9.0: {}
 
-  convex-helpers@0.1.71(convex@1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(zod@3.24.2):
+  convex-helpers@0.1.71(convex@1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(zod@3.24.2):
     dependencies:
-      convex: 1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      convex: 1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
     optionalDependencies:
       react: 19.0.0
       zod: 3.24.2
 
-  convex@1.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  convex@1.21.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       esbuild: 0.25.1
       jwt-decode: 3.1.2

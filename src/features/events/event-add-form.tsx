@@ -18,13 +18,51 @@ import {
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 import { Input } from "@/components/ui/input"
 import { OrgSearch } from "@/features/organizers/components/org-search"
-import { eventOCSchema } from "@/features/organizers/schemas/event-add-schema"
+import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schema"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQuery } from "convex/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { z } from "zod"
 import { api } from "~/convex/_generated/api"
+import { Doc } from "~/convex/_generated/dataModel"
+
+const steps = [
+  {
+    id: 1,
+    label: "Add/Update Open Call",
+    fields: [
+      "organization.name",
+      "organization.location",
+      "organization.contact",
+    ],
+  },
+  {
+    id: 2,
+    label: "Create New Event",
+    fields: ["event.name", "event.type", "event.category"],
+  },
+  {
+    id: 3,
+    label: "step 3",
+    fields: ["openCall.deadline", "openCall.eligibility", "openCall.budget"],
+  },
+  {
+    id: 4,
+    label: "step 4",
+    fields: ["openCall.description"],
+  },
+  {
+    id: 5,
+    label: "step 5",
+    fields: ["openCall.description"],
+  },
+  {
+    id: 6,
+    label: "step 6",
+    fields: ["openCall.description"],
+  },
+]
 
 interface EventOCFormProps {
   user: User | undefined
@@ -32,24 +70,14 @@ interface EventOCFormProps {
   children?: React.ReactNode
 }
 
-// type EventOCFormValues = {
-//   organization: {
-//     _id: Id<"organizations">
-//     organizationName: string
-//     logo?: string
-//     // include whatever else you need from the org
-//   } | null
-//   eventName: string
-// }
-
-type EventOCFormValues = z.infer<typeof eventOCSchema>
+type EventOCFormValues = z.infer<typeof eventWithOCSchema>
 
 export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
-  const form = useForm<z.infer<typeof eventOCSchema>>({
-    resolver: zodResolver(eventOCSchema),
+  const form = useForm<z.infer<typeof eventWithOCSchema>>({
+    resolver: zodResolver(eventWithOCSchema),
     defaultValues: {
       organization: undefined,
-      eventName: "",
+      // eventName: "",
     },
     mode: "onChange",
   })
@@ -62,7 +90,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     // setValue,
     handleSubmit: handleSubmit,
     formState: {
-      isValid,
+      // isValid,
       //   dirtyFields,
       isDirty,
       //   errors,
@@ -74,39 +102,53 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   //     control,
   //     name: "organization",
   //   })
-  console.log(form.watch())
+  // console.log(form.watch())
   const orgValue = watch("organization")
-  const orgName =
-    typeof orgValue === "string" ? orgValue : orgValue?.organizationName ?? ""
-  const existingOrgs = typeof orgValue === "object"
+  const orgName = typeof orgValue === "string" ? orgValue : orgValue?.name ?? ""
 
   const orgValidation = useQuery(
     api.organizations.isOwnerOrIsNewOrg,
     orgName.trim().length >= 3 ? { organizationName: orgName } : "skip"
   )
-  const [orgError, setOrgError] = useState("")
+  const [activeStep, setActiveStep] = useState(0)
+  const [createOrgError, setCreateOrgError] = useState("")
   const [isValidOrg, setIsValidOrg] = useState<string>("")
+  const [existingEvent, setExistingEvent] =
+    useState<Doc<"organizations"> | null>(null)
+  const [lastSaved, setLastSaved] = useState(
+    existingEvent ? existingEvent.updatedAt : null
+  )
 
-  const formIsValid = isValid && isValidOrg === "valid"
+  const isValidForm = true //TODO: check if form is valid
+  const existingOrgs =
+    typeof existingEvent === "object" && existingEvent !== null
+  const formIsValid = isValidForm && isValidOrg === "valid"
+  const lastSavedDate = lastSaved
+    ? new Date(Math.floor(lastSaved)).toLocaleString()
+    : null
 
-  //   console.log("Form errors:", errors)
-  //   console.log("isValid", isValid)
-  //   console.log("isValidOrg", isValidOrg)
-  //   console.log("existingOrgs", existingOrgs)
-  //   console.log("selectedOrg", selectedOrg)
-  //   console.log("formIsValid", formIsValid)
-  // const eventResults = useQuery(
-  //   api.events.searchEventsByOrg,
-  //   existingOrgId ? { orgId: existingOrgId } : "skip"
-  // )
-
+  //
+  //
+  // ------------- Console Logs --------------
+  //
+  //
+  console.log("orgValue", orgValue)
+  console.log("existing orgs", existingOrgs)
+  console.log("existingEvent", existingEvent)
+  console.log("is valid org", isValidOrg)
+  console.log("last saved", lastSavedDate)
+  //
+  //
+  //
+  // ------------- Function ToDos --------------
+  //
+  //
+  //
   if (user?.accountType?.includes("rabbit")) {
     onClick()
   }
 
-  const [activeStep, setActiveStep] = useState(0)
-  //   const [name, setName] = useState("")
-
+  // -------------Used Function --------------
   const onCancel = () => {
     setActiveStep(0)
   }
@@ -127,36 +169,54 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     }
   }
 
+  // -------------UseEffects --------------
   useEffect(() => {
     if (orgValidation === "available" || orgValidation === "ownedByUser") {
-      setOrgError("")
+      setCreateOrgError("")
       setIsValidOrg("valid")
     } else if (!orgValidation) {
-      setOrgError("")
+      setCreateOrgError("")
       setIsValidOrg("")
     } else {
-      setOrgError("Organization already exists")
+      setCreateOrgError(
+        "Organization already exists. If you should have access, check that you're logged in with the right account, or contact support for assistance."
+      )
       setIsValidOrg("invalid")
     }
   }, [orgValidation])
+
+  useEffect(() => {
+    if (existingOrgs && isValidOrg === "valid") {
+      if (existingEvent?.updatedAt) {
+        setLastSaved(existingEvent.updatedAt)
+      } else if (existingEvent?._creationTime) {
+        setLastSaved(existingEvent._creationTime)
+      }
+    } else {
+      setLastSaved(null)
+    }
+  }, [existingEvent, isValidOrg, existingOrgs])
+
+  //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
   return (
     <HorizontalLinearStepper
       activeStep={activeStep}
       setActiveStep={setActiveStep}
-      steps={6}
+      steps={steps}
       className='px-2 xl:px-8'
       finalLabel='Submit'
       onFinalSubmit={handleSubmit(onSubmit)}
       isDirty={isDirty}
       onSave={handleSubmit(onSubmit)}
+      lastSaved={lastSavedDate}
       disabled={!formIsValid}
       cancelButton={
         <DialogClose asChild>
           <Button
             type='button'
             variant='salWithShadowHiddenYlw'
-            className='min-w-24'
+            className='hidden lg:min-w-24'
             onClick={onCancel}>
             Cancel
           </Button>
@@ -170,8 +230,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           <div className='h-full flex flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6'>
             <section className='flex flex-col  gap-2 '>
               <div className='flex flex-col gap-y-6 items-center justify-center'>
-                <div className='flex flex-col  items-center justify-center'>
-                  <div className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
+                <section className='flex flex-col  items-center justify-center'>
+                  <div
+                    id='welcome-text'
+                    className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
                     Welcome{" "}
                     <AnimatePresence>
                       {existingOrgs && isValidOrg === "valid" && (
@@ -198,13 +260,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       ? "Please select from your existing events or create a new open call"
                       : "To start, select from an existing organization or create a new one!"}
                   </p>
-                </div>
-                <div className='flex flex-col gap-2'>
+                </section>
+                <section className='flex flex-col gap-2'>
                   <Label htmlFor='organization' className='sr-only'>
                     Organization Name
                   </Label>
                   <Controller
-                    name='organization'
+                    name='organization.name'
                     control={control}
                     render={({ field }) => (
                       <OrgSearch
@@ -213,19 +275,20 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         isValid={isValidOrg}
                         onReset={() => {
                           setIsValidOrg("")
-                          setOrgError("")
+                          setCreateOrgError("")
                         }}
+                        onLoadClick={setExistingEvent}
                         placeholder='Search or enter new name'
-                        className='max-w-sm lg:max-w-md lg:min-w-[400px] lg:h-20 py-2 text-base lg:text-xl rounded-lg'
+                        className=' lg:h-20 py-2 text-base lg:text-xl rounded-lg'
                       />
                     )}
                   />
-                  {orgError && (
+                  {createOrgError && (
                     <span className='text-red-600 text-sm w-full text-center mt-2'>
-                      {orgError}
+                      {createOrgError}
                     </span>
                   )}
-                </div>
+                </section>
               </div>
             </section>
             <section>
@@ -244,7 +307,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
               )}
               <Label>Event Name</Label>
               <Input
-                {...register("eventName")}
+                {...register("event.name")}
                 placeholder='Task title...'
                 className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base  lg:text-sm placeholder-violet-300 focus:outline-none'
               />

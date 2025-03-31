@@ -37,10 +37,12 @@ type ArtistFormValues = {
 
 export const ArtistProfileForm = ({
   className,
-
+  onClick,
   user,
-}: // onClick,
-ArtistProfileFormProps) => {
+}: ArtistProfileFormProps) => {
+  const userFullName = user ? user?.firstName + " " + user?.lastName : ""
+  const userName = user?.name ? user.name : userFullName
+
   const {
     register,
     control,
@@ -54,7 +56,7 @@ ArtistProfileFormProps) => {
     reset,
   } = useForm<ArtistFormValues>({
     defaultValues: {
-      artistName: user?.name ?? `${user?.firstName} ${user?.lastName}`,
+      artistName: userName,
       nationalities: [],
       residence: "",
     },
@@ -71,7 +73,7 @@ ArtistProfileFormProps) => {
     if (!artistInfo) return
 
     reset({
-      artistName: artistInfo.artistName ?? "",
+      artistName: artistInfo.artistName ?? userName,
       nationalities: artistInfo.artistNationality ?? [],
       residence: artistInfo.artistResidency?.full ?? "",
       locationCity: artistInfo.artistResidency?.city ?? "",
@@ -114,10 +116,10 @@ ArtistProfileFormProps) => {
       })
 
       reset()
-      toast.success("Successfully updated profile! Forwarding to Stripe...")
 
+      toast.success("Successfully updated profile! Forwarding to Stripe...")
       setTimeout(() => {
-        // onClick()
+        onClick()
       }, 2000)
     } catch (error) {
       console.error("Failed to submit form:", error)

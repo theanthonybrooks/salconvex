@@ -568,4 +568,13 @@ button:active {
   z-index: -1;
 }
 
-/* iOS Crap */
+/* Toastify */
+@media (max-width: 768px) {
+  .Toastify__toast-container--top-right {
+    bottom: auto !important;
+    top: 1rem !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+}

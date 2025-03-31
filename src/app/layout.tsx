@@ -99,7 +99,7 @@ export default async function RootLayout({
                   draggable
                   pauseOnHover
                   theme='light'
-                  toastClassName='top-10 right-2 md:top-2 md:right-1  max-w-[90dvw] md:max-w-fit'
+                  toastClassName='rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] md:max-w-fit border-2'
                 />
               </ThemedProvider>
             </ConvexQueryCacheProvider>

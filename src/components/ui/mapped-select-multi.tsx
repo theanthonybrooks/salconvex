@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronUp, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   MdOutlineCheckBox,
   MdOutlineCheckBoxOutlineBlank,
@@ -54,6 +54,11 @@ export function SearchMappedMultiSelect<T>({
 }: SearchMappedMultiSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const isLimit = values.length === selectLimit
+
+  console.log("input ref", inputRef.current)
 
   function getNestedValue<T>(obj: T, path: string): unknown {
     return path.split(".").reduce((acc, key) => {
@@ -106,7 +111,19 @@ export function SearchMappedMultiSelect<T>({
     setIsOpen(false)
   }
 
-  const isLimit = values.length === selectLimit
+  // useEffect(() => {
+  //   if (isOpen && inputRef.current) {
+  //     inputRef.current.focus()
+  //   }
+  // }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 10)
+    }
+  }, [isOpen])
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
@@ -157,6 +174,7 @@ export function SearchMappedMultiSelect<T>({
         showCloseButton={false}>
         <Command shouldFilter={false}>
           <CommandInput
+            ref={inputRef}
             placeholder={
               isLimit
                 ? "Max 3 selected"
@@ -164,7 +182,7 @@ export function SearchMappedMultiSelect<T>({
                 ? `Select up to ${selectLimit - values.length} more`
                 : "Search..."
             }
-            autoFocus
+            // autoFocus
             value={searchQuery}
             onValueChange={setSearchQuery}
             className='pr-8 text-base lg:text-sm'
@@ -176,7 +194,7 @@ export function SearchMappedMultiSelect<T>({
             />
           )}
 
-          <CommandList className='scrollable mini darkbar'>
+          <CommandList className='scrollable mini darkbar max-h-36'>
             {Object.entries(filteredData).map(([group, items]) => (
               <CommandGroup
                 key={group}
@@ -203,7 +221,7 @@ export function SearchMappedMultiSelect<T>({
                         onChange(newValues)
                       }}
                       className={cn(
-                        "flex justify-start gap-x-2 items-center hover:bg-salPink/30 hover:cursor-pointer",
+                        "flex justify-start gap-x-2 items-center hover:bg-salPink/30 hover:cursor-pointer data-[selected='true']:ring-2 data-[selected='true']:ring-salPink",
                         isSelected && "bg-salYellow",
                         isLimit && "hover:cursor-default",
                         isLimit && !isSelected && " text-foreground/50"

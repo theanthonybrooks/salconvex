@@ -7,11 +7,11 @@ export const testEventData: EventData[] = [
   {
     adminNote: "Watch out for the banana throwing sharks",
     organizerId: ["11"],
+    mainOrgId: "11",
 
     id: "12",
     name: "Urban Walls Residency",
     logo: "/1.jpg",
-    hasActiveOpenCall: false,
 
     category: "residency",
     dates: {
@@ -27,7 +27,6 @@ export const testEventData: EventData[] = [
         latitude: 48.7127837,
         longitude: 17.0059413,
       },
-      directions: "Google Maps Link",
     },
     about:
       "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
@@ -61,10 +60,10 @@ export const testEventData: EventData[] = [
   {
     adminNote: "Watch out for the banana throwing sharks",
     organizerId: ["11"],
+    mainOrgId: "11",
     id: "3",
     name: "Urban Walls Residency",
     logo: "/1.jpg",
-    hasActiveOpenCall: true,
     openCallId: ["3"],
     category: "residency",
     dates: {
@@ -84,7 +83,6 @@ export const testEventData: EventData[] = [
         latitude: 48.7127837,
         longitude: 17.0059413,
       },
-      directions: "Google Maps Link",
     },
     about:
       "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
@@ -107,10 +105,10 @@ export const testEventData: EventData[] = [
   {
     adminNote: "Watch out for the banana throwing sharks",
     organizerId: ["24a"],
+    mainOrgId: "24a",
     id: "8",
     name: "Dastardly Dallas",
     logo: "/1.jpg",
-    hasActiveOpenCall: false,
     openCallId: ["14"],
 
     eventType: ["gjm", "mur"],
@@ -129,7 +127,6 @@ export const testEventData: EventData[] = [
         latitude: 48.7127837,
         longitude: 17.0059413,
       },
-      directions: "Google Maps Link",
     },
     about:
       "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
@@ -152,10 +149,10 @@ export const testEventData: EventData[] = [
   {
     adminNote: "Watch out for the banana throwing sharks",
     organizerId: ["432"],
+    mainOrgId: "432",
     id: "49",
     name: "The Mural Arts Festival",
     logo: "/1.jpg",
-    hasActiveOpenCall: true,
     openCallId: ["6"],
     eventType: ["mur"],
     category: "event",
@@ -172,7 +169,6 @@ export const testEventData: EventData[] = [
         latitude: 48.7127837,
         longitude: 17.0059413,
       },
-      directions: "Google Maps Link",
     },
     about:
       "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
@@ -195,10 +191,10 @@ export const testEventData: EventData[] = [
   {
     adminNote: "Watch out for the banana throwing sharks",
     organizerId: ["24a"],
+    mainOrgId: "24a",
     id: "71",
     name: "The Mural Arts Festival",
     logo: "/1.jpg",
-    hasActiveOpenCall: false,
     openCallId: ["7"],
     eventType: ["mur"],
     category: "event",
@@ -215,7 +211,6 @@ export const testEventData: EventData[] = [
         latitude: 48.7127837,
         longitude: 17.0059413,
       },
-      directions: "Google Maps Link",
     },
     about:
       "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
@@ -238,10 +233,10 @@ export const testEventData: EventData[] = [
   {
     adminNote: "Watch out for the banana throwing sharks",
     organizerId: ["24a"],
+    mainOrgId: "24a",
     id: "7",
     name: "The Mural Arts Festival",
     logo: "/1.jpg",
-    hasActiveOpenCall: false,
     openCallId: ["5"],
     eventType: ["mur"],
     category: "event",
@@ -258,7 +253,6 @@ export const testEventData: EventData[] = [
         latitude: 48.7127837,
         longitude: 17.0059413,
       },
-      directions: "Google Maps Link",
     },
     about:
       "The Urban Walls Residency brings together artists from across Germany to engage in mural-making, cultural exchange, and community events.",
@@ -287,6 +281,7 @@ export const testOpenCallData: OpenCall[] = [
 
     eventId: "49",
     organizerId: ["432"],
+    mainOrgId: "432",
 
     basicInfo: {
       appFee: 10,
@@ -344,6 +339,7 @@ export const testOpenCallData: OpenCall[] = [
 
     eventId: "3",
     organizerId: ["11"],
+    mainOrgId: "11",
     basicInfo: {
       appFee: 0,
       callFormat: "RFQ",
@@ -393,6 +389,7 @@ export const testOpenCallData: OpenCall[] = [
 
     eventId: "8",
     organizerId: ["24a"],
+    mainOrgId: "24a",
     basicInfo: {
       appFee: 0,
       callFormat: "RFQ",

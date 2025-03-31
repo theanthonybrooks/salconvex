@@ -92,7 +92,7 @@ export const MapboxInput = ({
         )}
       />
       {suggestions.length > 0 && (
-        <ul className='absolute z-50 mt-1 w-full rounded-md bg-white shadow'>
+        <ul className='absolute z-50 mt-1 w-full rounded-md bg-white shadow border-1.5 scrollable mini'>
           {suggestions.map((s, i) => (
             <li
               key={s.id}

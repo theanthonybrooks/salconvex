@@ -1,4 +1,4 @@
-import { CallType } from "@/types/event"
+import { CallType } from "@/types/openCall"
 import { DateTime } from "luxon"
 
 export const formatEventDates = (
