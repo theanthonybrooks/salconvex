@@ -119,9 +119,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         return
       }
       if (values.organizationName?.trim()) {
-        const isNewOrg = await convex.query(api.organizations.isNewOrg, {
-          organizationName: values.organizationName.trim(),
-        })
+        const isNewOrg = await convex.query(
+          api.organizer.organizations.isNewOrg,
+          {
+            organizationName: values.organizationName.trim(),
+          }
+        )
 
         if (!isNewOrg) {
           setError(

@@ -53,7 +53,11 @@
 // lib/grouping.ts
 
 import { CombinedEventCardData } from "@/hooks/use-combined-events"
-import { getFourCharMonth, getOrdinalSuffix } from "@/lib/dateFns"
+import {
+  getFourCharMonth,
+  getOrdinalSuffix,
+  isValidIsoDate,
+} from "@/lib/dateFns"
 import { format } from "date-fns"
 
 export function getGroupKeyFromEvent(
@@ -71,33 +75,63 @@ export function getGroupKeyFromEvent(
   const basicInfo = event.tabs.opencall?.basicInfo
   const callType = basicInfo?.callType
   const ocEnd = basicInfo?.dates?.ocEnd
+  const ocEndDate = ocEnd && isValidIsoDate(ocEnd) ? new Date(ocEnd) : null
+
   const eventStart = event.dates?.eventStart
-  const hasOpenCall = event.hasActiveOpenCall
-  const isPast = ocEnd ? new Date(ocEnd) < new Date() : false
-  const day = ocEnd && new Date(ocEnd).getDate()
+  const eventStartDate =
+    eventStart && isValidIsoDate(eventStart) ? new Date(eventStart) : null
+  const isPast = !!ocEndDate && ocEndDate < new Date()
+  const isPastStart = eventStart ? new Date(eventStart) < new Date() : false
 
-  if (sortBy === "openCall" && callType === "Fixed" && day) {
-    const month = getFourCharMonth(new Date(ocEnd))
-    const suffix = getOrdinalSuffix(day)
-    const year = isPast ? format(new Date(ocEnd), "yyyy") : undefined
+  //   console.log(
+  //     `${event.name}:`,
+  //     // sortBy,
+  //     callType,
 
-    return {
-      raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
-      parts: { month, day, suffix, year },
+  //     isPast,
+  //     eventStart
+  //   )
+
+  if (sortBy === "openCall" && callType === "Fixed" && ocEnd) {
+    if (ocEndDate) {
+      const day = ocEndDate.getDate()
+      const month = getFourCharMonth(ocEndDate)
+      const suffix = getOrdinalSuffix(day)
+      const year = isPast ? format(ocEndDate, "yyyy") : undefined
+
+      return {
+        raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
+        parts: { month, day, suffix, year },
+      }
+    } else {
+      return { raw: `${ocEnd}` }
     }
   }
 
   if (sortBy === "openCall") {
     if (callType === "Rolling") return { raw: "Rolling Open Call" }
     if (callType === "Email") return { raw: "Email Open Call" }
-    if (hasOpenCall) return { raw: "Open Call – Unknown Type" }
     if (!!callType) return { raw: "Past Open Call" }
     return { raw: "No Public Open Call" }
   }
 
   if (sortBy === "eventStart" && eventStart) {
+    if (eventStartDate) {
+      const day = eventStartDate.getDate()
+      const month = getFourCharMonth(eventStartDate)
+      const suffix = getOrdinalSuffix(day)
+      const year = isPastStart ? format(eventStartDate, "yyyy") : undefined
+      return {
+        raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
+        parts: { month, day, suffix, year },
+      }
+    } else {
+      return { raw: `${eventStart}` }
+    }
+  } else if (sortBy === "eventStart" && !eventStart) {
+    const ongoing = event.dates.ongoing
     return {
-      raw: `Event Start – ${format(new Date(eventStart), "MMM d, yyyy")}`,
+      raw: ongoing ? "Ongoing" : "No Event Date",
     }
   }
 

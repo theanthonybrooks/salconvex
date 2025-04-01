@@ -8,7 +8,7 @@ export const formatEventDates = (
   preview?: boolean
   // mode?: "desktop" | "mobile" = "desktop"
 ) => {
-  console.log("ongoing", ongoing, start, end)
+  // console.log("ongoing", ongoing, start, end)
 
   if (ongoing) return "Ongoing"
 
@@ -156,7 +156,8 @@ export const getOrdinalSuffix = (day: number): string => {
   }
 }
 
-export const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+export const isoDateRegex =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
 
 export const isValidIsoDate = (value: string | null): value is string =>
   typeof value === "string" &&

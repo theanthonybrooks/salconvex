@@ -1,4 +1,5 @@
 import { CombinedEventCardData } from "@/hooks/use-combined-events"
+import { isValidIsoDate } from "@/lib/dateFns"
 import { Filters, SortOptions } from "@/types/thelist"
 import { useMemo } from "react"
 
@@ -124,6 +125,86 @@ export const useFilteredEvents = (
         //   return aOCDate.getTime() - bOCDate.getTime()
         // }
 
+        if (sortBy === "eventStart") {
+          const getPriority = (item: CombinedEventCardData) => {
+            const now = new Date()
+            now.setHours(0, 0, 0, 0)
+
+            const startDate = item.dates.eventStart
+            const isValid = startDate && isValidIsoDate(startDate)
+            const validStartDate = isValid ? new Date(startDate) : null
+            const isOngoing = item.dates.ongoing
+            const eventStartDate = new Date(startDate ?? Infinity)
+            const isPast = eventStartDate < now //is technically handled by the combiner, but I'm keeping it here for now
+
+            let priority: number
+            if (startDate) {
+              if (validStartDate) {
+                if (validStartDate >= now) {
+                  priority = 0
+                } else {
+                  priority = 3
+                }
+              } else if (!isValid) priority = 1
+              else if (isOngoing) priority = 2
+              else if (isPast) priority = 3
+              else priority = 4 // Open call with unknown type or no end date
+            } else {
+              priority = 5
+            }
+
+            console.log(
+              `${item.name}:`,
+              eventStartDate,
+              isValid,
+              isOngoing,
+
+              isPast,
+              priority
+            )
+
+            return {
+              priority,
+              eventStart: eventStartDate.getTime(),
+            }
+          }
+
+          const priorityA = getPriority(a)
+          const priorityB = getPriority(b)
+
+          // Step 1: sort by priority
+          if (priorityA.priority !== priorityB.priority) {
+            return priorityA.priority - priorityB.priority
+          }
+
+          // // Step 2: fallback to sorting by month for past events
+          // if (priorityA.priority === 3 && priorityB.priority === 3) {
+          //   const monthA = new Date(a.dates.eventStart!).getMonth()
+          //   const monthB = new Date(b.dates.eventStart!).getMonth()
+          //   return monthA - monthB
+          // }
+
+          if (priorityA.priority === 3 && priorityB.priority === 3) {
+            const aDate = new Date(a.dates.eventStart ?? 0)
+            const bDate = new Date(b.dates.eventStart ?? 0)
+
+            const aYear = aDate.getFullYear()
+            const bYear = bDate.getFullYear()
+
+            if (aYear !== bYear) return bYear - aYear // most recent year first
+
+            const aMonth = aDate.getMonth()
+            const bMonth = bDate.getMonth()
+            if (aMonth !== bMonth) return aMonth - bMonth
+
+            const aDay = aDate.getDate()
+            const bDay = bDate.getDate()
+            return aDay - bDay
+          }
+
+          // Step 2: fallback to eventStart
+          return priorityA.eventStart - priorityB.eventStart
+        }
         if (sortBy === "openCall") {
           const getPriority = (item: CombinedEventCardData) => {
             const now = new Date()
@@ -182,40 +263,43 @@ export const useFilteredEvents = (
           return priorityA.eventStart - priorityB.eventStart
         }
 
-        if (sortBy === "eventStart") {
-          const hasStartA = a.dates.eventStart !== null
-          const hasStartB = b.dates.eventStart !== null
+        // if (sortBy === "eventStart") {
+        //   const hasStartA = a.dates.eventStart !== null
+        //   const hasStartB = b.dates.eventStart !== null
 
-          if (hasStartA && !hasStartB) return -1
-          if (!hasStartA && hasStartB) return 1
+        //   if (hasStartA && !hasStartB) return -1
+        //   if (!hasStartA && hasStartB) return 1
 
-          if (a.dates.eventStart && b.dates.eventStart) {
-            const now = new Date()
-            now.setHours(0, 0, 0, 0) // strip time portion to compare dates only
+        //   if (a.dates.eventStart && b.dates.eventStart) {
+        //     const now = new Date()
+        //     now.setHours(0, 0, 0, 0) // strip time portion to compare dates only
 
-            const aDate = new Date(a.dates.eventStart)
-            const bDate = new Date(b.dates.eventStart)
+        //     const aDate = new Date(a.dates.eventStart)
+        //     const bDate = new Date(b.dates.eventStart)
 
-            const aIsToday = aDate.toDateString() === now.toDateString()
-            const bIsToday = bDate.toDateString() === now.toDateString()
+        //     const aIsToday = aDate.toDateString() === now.toDateString()
+        //     const bIsToday = bDate.toDateString() === now.toDateString()
 
-            const aInFuture = aDate > now
-            const bInFuture = bDate > now
+        //     const aInFuture = aDate > now
+        //     const bInFuture = bDate > now
 
-            // Prioritize today first
-            if (aIsToday && !bIsToday) return -1
-            if (!aIsToday && bIsToday) return 1
+        //     console.log(`${a.name}:`, aDate, aIsToday, aInFuture)
+        //     console.log(`${b.name}:`, bDate, bIsToday, bInFuture)
 
-            // Then future dates
-            if (aInFuture && !bInFuture) return -1
-            if (!aInFuture && bInFuture) return 1
+        //     // Prioritize today first
+        //     if (aIsToday && !bIsToday) return -1
+        //     if (!aIsToday && bIsToday) return 1
 
-            // If both are in the past, sort by month (Jan = 0, Dec = 11)
-            return aDate.getMonth() - bDate.getMonth()
-          }
+        //     // Then future dates
+        //     if (aInFuture && !bInFuture) return -1
+        //     if (!aInFuture && bInFuture) return 1
 
-          return 0
-        }
+        //     // If both are in the past, sort by month (Jan = 0, Dec = 11)
+        //     return aDate.getMonth() - bDate.getMonth()
+        //   }
+
+        //   return 0
+        // }
 
         if (sortBy === "name") {
           const aName = a.name.toLowerCase()
