@@ -184,14 +184,17 @@ Props) => {
       ) : (
         groupedEvents.map((group) => (
           <div key={group.title.raw} className="mb-6">
-            <h3 className="mb-2 flex items-start justify-center text-center text-3xl font-semibold">
+            <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold">
               {group.title.parts ? (
                 <>
-                  {group.title.parts.month} {group.title.parts.day}
-                  <p className="align-super text-sm">
-                    {group.title.parts.suffix}
-                  </p>
-                  {group.title.parts.year ? ` (${group.title.parts.year})` : ""}
+                  {group.title.parts.month}
+                  <span className="flex items-start">
+                    {group.title.parts.day}
+                    <p className="align-super text-sm">
+                      {group.title.parts.suffix}
+                    </p>
+                  </span>
+                  {group.title.parts.year && ` (${group.title.parts.year})`}
                 </>
               ) : (
                 group.title.raw
