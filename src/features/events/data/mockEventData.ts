@@ -242,7 +242,7 @@ export const testEventData: EventData[] = [
     id: "71",
     name: "The Mural Arts Festival",
     logo: "/1.jpg",
-    openCallId: ["7"],
+    openCallId: ["69"],
     eventType: ["mur"],
     category: "event",
     dates: {
@@ -394,6 +394,7 @@ export const testOpenCallData: OpenCall[] = [
       dates: {
         ocStart: "2025-03-15T06:00:00-03:00",
         ocEnd: "2025-05-15T06:00:00-03:00",
+
         timezone: "Europe/Berlin",
       },
     },
@@ -412,6 +413,61 @@ export const testOpenCallData: OpenCall[] = [
         allInclusive: true,
       },
       categories: {},
+    },
+    requirements: {
+      requirements: [
+        "Resume",
+        "Portfolio with at least 8 works",
+        "Project proposal",
+        "Reference letter",
+      ],
+      more: ["Interviews may be conducted for shortlisted applicants"],
+      destination: "residency@urbanwalls.de",
+      documents: [
+        {
+          title: "Residency Info Pack",
+          href: "https://example.com/residency-info.pdf",
+        },
+      ],
+    },
+  },
+  {
+    adminNoteOC: "Watch out for the banana throwing sharks id 69",
+    id: "69",
+
+    eventId: "71",
+    organizerId: ["24a"],
+    mainOrgId: "24a",
+    basicInfo: {
+      appFee: 0,
+      callFormat: "RFQ",
+      callType: "Rolling",
+      dates: {
+        ocStart: null,
+        ocEnd: null,
+        timezone: "Europe/Berlin",
+      },
+    },
+    eligibility: {
+      type: "National",
+      whom: ["German", "French"],
+      details: "Must reside in Germany for the duration of the project",
+    },
+    compensation: {
+      budget: {
+        min: 10000,
+        max: 30000,
+
+        rate: 60,
+        unit: "m²",
+        currency: "EUR",
+        allInclusive: false,
+      },
+      categories: {
+        designFee: "1500",
+        accommodation: "Studio housing provided",
+        materials: "Provided",
+      },
     },
     requirements: {
       requirements: [

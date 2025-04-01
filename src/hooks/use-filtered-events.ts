@@ -69,45 +69,117 @@ export const useFilteredEvents = (
         //   return aEventDate.getTime() - bEventDate.getTime()
         // }
 
+        // if (sortBy === "openCall") {
+        //   const hasOpenCallA = a.hasActiveOpenCall
+        //   const hasOpenCallB = b.hasActiveOpenCall
+
+        //   // Step 1: prioritize events with open calls
+        //   if (hasOpenCallA && !hasOpenCallB) return -1
+        //   if (!hasOpenCallA && hasOpenCallB) return 1
+
+        //   // If neither has open call, fall back to eventStart sort
+        //   if (!hasOpenCallA && !hasOpenCallB) {
+        //     const aEventDate = new Date(a.dates.eventStart ?? Infinity)
+        //     const bEventDate = new Date(b.dates.eventStart ?? Infinity)
+        //     return aEventDate.getMonth() - bEventDate.getMonth()
+        //   }
+
+        //   const isFixedA = a.tabs.opencall?.basicInfo?.callType === "Fixed"
+        //   const isFixedB = b.tabs.opencall?.basicInfo?.callType === "Fixed"
+        //   const isRollingA = a.tabs.opencall?.basicInfo?.callType === "Rolling"
+        //   const isRollingB = b.tabs.opencall?.basicInfo?.callType === "Rolling"
+        //   const isEmailA = a.tabs.opencall?.basicInfo?.callType === "Email"
+        //   const isEmailB = b.tabs.opencall?.basicInfo?.callType === "Email"
+
+        //   if (isFixedA && !isFixedB) return -1
+        //   if (!isFixedA && isFixedB) return 1
+        //   if (isRollingA && !isRollingB) return -1
+        //   if (!isRollingA && isRollingB) return 1
+        //   if (isEmailA && !isEmailB) return -1
+        //   if (!isEmailA && isEmailB) return 1
+
+        //   // Step 2: categorize current/future vs past open calls
+        //   const now = new Date()
+        //   now.setHours(0, 0, 0, 0)
+
+        //   const aOCDate = new Date(
+        //     a.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
+        //   )
+        //   const bOCDate = new Date(
+        //     b.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
+        //   )
+
+        //   const aIsPast = aOCDate < now
+        //   const bIsPast = bOCDate < now
+
+        //   if (!aIsPast && bIsPast) return -1
+        //   if (aIsPast && !bIsPast) return 1
+
+        //   // Step 3a: if both are current/future, sort by ocEnd
+        //   if (!aIsPast && !bIsPast) {
+        //     return aOCDate.getTime() - bOCDate.getTime()
+        //   }
+
+        //   // Step 3b: if both are in the past, sort by ocEnd month
+        //   return aOCDate.getTime() - bOCDate.getTime()
+        // }
+
         if (sortBy === "openCall") {
-          const hasOpenCallA = a.hasActiveOpenCall
-          const hasOpenCallB = b.hasActiveOpenCall
+          const getPriority = (item: CombinedEventCardData) => {
+            const now = new Date()
+            now.setHours(0, 0, 0, 0)
 
-          // Step 1: prioritize events with open calls
-          if (hasOpenCallA && !hasOpenCallB) return -1
-          if (!hasOpenCallA && hasOpenCallB) return 1
+            const hasOpenCall = item.hasActiveOpenCall
+            const callType = item.tabs.opencall?.basicInfo?.callType
+            const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd
+            const isRolling = callType === "Rolling"
+            const ocEnd = new Date(ocEndRaw ?? 0)
+            const isPast = ocEnd < now //is technically handled by the combiner, but I'm keeping it here for now
 
-          // If neither has open call, fall back to eventStart sort
-          if (!hasOpenCallA && !hasOpenCallB) {
-            const aEventDate = new Date(a.dates.eventStart ?? Infinity)
-            const bEventDate = new Date(b.dates.eventStart ?? Infinity)
-            return aEventDate.getMonth() - bEventDate.getMonth()
+            let priority: number
+            if (hasOpenCall && (!isPast || isRolling)) {
+              if (callType === "Fixed") priority = 0
+              else if (callType === "Rolling") priority = 1
+              else if (callType === "Email") priority = 2
+              else priority = 3 // Open call with unknown type or no end date
+            } else if (!hasOpenCall && !!callType) {
+              priority = 4
+            } else {
+              priority = 5
+            }
+
+            // console.log(
+            //   `${item.name}:`,
+            //   hasOpenCall,
+            //   callType,
+            //   isRolling,
+            //   ocEnd,
+            //   isPast,
+            //   priority
+            // )
+
+            return {
+              priority,
+              ocEnd: ocEnd.getTime(),
+              eventStart: new Date(item.dates.eventStart ?? Infinity).getTime(),
+            }
           }
 
-          // Step 2: categorize current/future vs past open calls
-          const now = new Date()
-          now.setHours(0, 0, 0, 0)
+          const priorityA = getPriority(a)
+          const priorityB = getPriority(b)
 
-          const aOCDate = new Date(
-            a.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
-          )
-          const bOCDate = new Date(
-            b.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
-          )
-
-          const aIsPast = aOCDate < now
-          const bIsPast = bOCDate < now
-
-          if (!aIsPast && bIsPast) return -1
-          if (aIsPast && !bIsPast) return 1
-
-          // Step 3a: if both are current/future, sort by ocEnd
-          if (!aIsPast && !bIsPast) {
-            return aOCDate.getTime() - bOCDate.getTime()
+          // Step 1: sort by priority
+          if (priorityA.priority !== priorityB.priority) {
+            return priorityA.priority - priorityB.priority
           }
 
-          // Step 3b: if both are in the past, sort by ocEnd month
-          return aOCDate.getTime() - bOCDate.getTime()
+          // Step 2: if both have same priority, and it’s for active open calls, sort by ocEnd
+          if (priorityA.priority < 3) {
+            return priorityA.ocEnd - priorityB.ocEnd
+          }
+
+          // Step 3: fallback to eventStart
+          return priorityA.eventStart - priorityB.eventStart
         }
 
         if (sortBy === "eventStart") {

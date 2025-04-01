@@ -121,9 +121,10 @@ export const formatOpenCallDeadline = (
   callType: CallType,
   preview?: boolean
 ) => {
-  if (!dateString) return "Unknown Deadline"
   if (callType === "Invite") return "Invite-only"
   if (callType === "Rolling") return "Rolling Open Call"
+
+  if (!dateString) return "Unknown Deadline"
 
   const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone)
   if (!dt.isValid) return "Invalid date"
@@ -141,7 +142,7 @@ export const formatOpenCallDeadline = (
   return `${month} ${day}${ordinal}, ${year} @ ${time} (${timeZoneFormat})`
 }
 
-const getOrdinalSuffix = (day: number): string => {
+export const getOrdinalSuffix = (day: number): string => {
   if (day >= 11 && day <= 13) return "th"
   switch (day % 10) {
     case 1:

@@ -69,18 +69,27 @@ export const useMockEventCards = (): CombinedEventCardData[] => {
         )
 
         const ocDates = openCall?.basicInfo?.dates
+        const ocType = openCall?.basicInfo?.callType
+
         const now = new Date()
         const start = ocDates?.ocStart ? new Date(ocDates.ocStart) : null
         const end = ocDates?.ocEnd ? new Date(ocDates.ocEnd) : null
 
         let openCallStatus: OpenCallStatus | null = null
-        if (start && end) {
+        if (start && end && ocType === "Fixed") {
           if (now < start) openCallStatus = "coming-soon"
           else if (now > end) openCallStatus = "ended"
           else openCallStatus = "active"
-        } else if (!start && end) {
+        } else if (!start && end && ocType === "Fixed") {
           if (now > end) openCallStatus = "ended"
           else openCallStatus = "active"
+        } else if (ocType === "Rolling") {
+          openCallStatus = "active"
+        } else if (ocType === "Email" && end) {
+          if (now > end) openCallStatus = "ended"
+          else openCallStatus = "active"
+        } else {
+          openCallStatus = null
         }
 
         const hasActiveOpenCall = openCallStatus === "active"
