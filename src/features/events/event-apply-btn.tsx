@@ -43,7 +43,8 @@ export const ApplyButtonShort = ({
 
   return (
     <>
-      <Link href={href} passHref target={!publicView ? "_blank" : "_self"}>
+      {/* //removing the target attribute for now as it's not really necessary, I think. The params are all in the url when you view something, so you should go back to that exact same page/filter combo */}
+      <Link href={href} passHref>
         <Button
           asChild
           // onClick={() => {

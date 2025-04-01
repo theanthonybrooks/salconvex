@@ -1,28 +1,29 @@
-"use client"
+"use client";
 
-import { BasicPagination } from "@/components/ui/pagination2"
-import EventCardPreview from "@/features/events/event-card-preview"
-import { EventFilters } from "@/features/events/event-list-filters"
-import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings"
+import { BasicPagination } from "@/components/ui/pagination2";
+import EventCardPreview from "@/features/events/event-card-preview";
+import { EventFilters } from "@/features/events/event-list-filters";
+import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
+import Pricing from "@/features/homepage/pricing";
 import {
   CombinedEventCardData,
   useMockEventCards,
-} from "@/hooks/use-combined-events"
-import { useFilteredEvents } from "@/hooks/use-filtered-events"
+} from "@/hooks/use-combined-events";
+import { useFilteredEvents } from "@/hooks/use-filtered-events";
 // import { getFourCharMonth } from "@/lib/dateFns"
-import { setParamIfNotDefault } from "@/lib/utils"
-import { EventCategory, EventType } from "@/types/event"
-import { Filters, SortOptions } from "@/types/thelist"
-import { UserPref } from "@/types/user"
+import { setParamIfNotDefault } from "@/lib/utils";
+import { EventCategory, EventType } from "@/types/event";
+import { Filters, SortOptions } from "@/types/thelist";
+import { UserPref } from "@/types/user";
 // import { format } from "date-fns"
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 interface Props {
   // initialEvents: EventData[]
-  publicView: boolean
-  userPref: UserPref | null
+  publicView: boolean;
+  userPref: UserPref | null;
 }
 
 const ClientEventList = ({
@@ -31,9 +32,9 @@ const ClientEventList = ({
 }: // userPref,
 
 Props) => {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const allEvents = useMockEventCards()
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const allEvents = useMockEventCards();
 
   // console.log("allEvents", allEvents)
 
@@ -44,12 +45,12 @@ Props) => {
 
     eventTypes: [],
     eventCategories: [],
-  }
+  };
 
   const defaultSort: SortOptions = {
     sortBy: "openCall",
     sortDirection: "asc",
-  }
+  };
 
   const currentFilters: Filters = {
     showHidden: searchParams.get("h") === "true",
@@ -62,7 +63,7 @@ Props) => {
     eventCategories:
       (searchParams.get("cat")?.split(",") as EventCategory[]) ??
       defaultFilters.eventCategories,
-  }
+  };
 
   const currentSort: SortOptions = {
     sortBy:
@@ -70,83 +71,91 @@ Props) => {
     sortDirection:
       (searchParams.get("sd") as SortOptions["sortDirection"]) ??
       defaultSort.sortDirection,
-  }
+  };
 
-  const [filters, setFilters] = useState<Filters>(currentFilters)
-  const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort)
+  const [filters, setFilters] = useState<Filters>(currentFilters);
+  const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
 
   const handleResetFilters = () => {
-    setFilters(defaultFilters)
-    setSortOptions(defaultSort)
-  }
+    setFilters(defaultFilters);
+    setSortOptions(defaultSort);
+  };
 
   useEffect(() => {
-    const params = new URLSearchParams()
-    setParamIfNotDefault(params, "h", filters.showHidden, false)
-    setParamIfNotDefault(params, "b", filters.bookmarkedOnly, false)
-    setParamIfNotDefault(params, "l", filters.limit, 10)
+    const params = new URLSearchParams();
+    setParamIfNotDefault(params, "h", filters.showHidden, false);
+    setParamIfNotDefault(params, "b", filters.bookmarkedOnly, false);
+    setParamIfNotDefault(params, "l", filters.limit, 10);
     if (filters.eventTypes?.length)
-      params.set("type", filters.eventTypes.join(","))
-    else params.delete("type")
+      params.set("type", filters.eventTypes.join(","));
+    else params.delete("type");
 
     if (filters.eventCategories?.length)
-      params.set("cat", filters.eventCategories.join(","))
-    else params.delete("cat")
+      params.set("cat", filters.eventCategories.join(","));
+    else params.delete("cat");
 
     if (filters.page && filters.page !== 1) {
-      params.set("page", filters.page.toString())
+      params.set("page", filters.page.toString());
     } else {
-      params.delete("page")
+      params.delete("page");
     }
 
-    setParamIfNotDefault(params, "sb", sortOptions.sortBy, "openCall")
-    setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc")
+    setParamIfNotDefault(params, "sb", sortOptions.sortBy, "openCall");
+    setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc");
 
-    const queryString = params.toString()
-    const baseUrl = window.location.origin + window.location.pathname
+    const queryString = params.toString();
+    const baseUrl = window.location.origin + window.location.pathname;
     window.history.replaceState(
       null,
       "",
-      baseUrl + (queryString ? `?${queryString}` : "")
-    )
-  }, [filters, sortOptions, router])
+      baseUrl + (queryString ? `?${queryString}` : ""),
+    );
+  }, [filters, sortOptions, router]);
 
-  const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions)
-  const currentPage = filters.page ?? 1
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page") ?? "1");
+    if (pageParam !== filters.page) {
+      setFilters((prev) => ({ ...prev, page: pageParam }));
+    }
+  }, [searchParams, filters.page]);
+
+  const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
+  const currentPage = filters.page ?? 1;
   const paginatedEvents = filteredEvents.slice(
     (currentPage - 1) * filters.limit,
-    currentPage * filters.limit
-  )
+    currentPage * filters.limit,
+  );
   // console.log("filteredEvents", filteredEvents)
 
-  const totalPages = Math.ceil(filteredEvents.length / filters.limit)
+  const totalPages = Math.ceil(filteredEvents.length / filters.limit);
+  // console.log(filteredEvents.length, filters.limit, totalPages)
 
   const groupedEvents = useMemo(() => {
     const groups: Record<
       string,
       {
-        title: ReturnType<typeof getGroupKeyFromEvent>
-        events: CombinedEventCardData[]
+        title: ReturnType<typeof getGroupKeyFromEvent>;
+        events: CombinedEventCardData[];
       }
-    > = {}
-    const orderedGroupKeys: string[] = []
+    > = {};
+    const orderedGroupKeys: string[] = [];
 
-    const list = publicView ? paginatedEvents.slice(0, 10) : paginatedEvents
+    const list = publicView ? paginatedEvents.slice(0, 10) : paginatedEvents;
 
     for (const event of list) {
-      const title = getGroupKeyFromEvent(event, sortOptions.sortBy)
-      const groupKey = title.raw
+      const title = getGroupKeyFromEvent(event, sortOptions.sortBy);
+      const groupKey = title.raw;
 
       if (!groups[groupKey]) {
-        groups[groupKey] = { title, events: [] }
-        orderedGroupKeys.push(groupKey)
+        groups[groupKey] = { title, events: [] };
+        orderedGroupKeys.push(groupKey);
       }
 
-      groups[groupKey].events.push(event)
+      groups[groupKey].events.push(event);
     }
 
-    return orderedGroupKeys.map((key) => groups[key])
-  }, [paginatedEvents, sortOptions, publicView])
+    return orderedGroupKeys.map((key) => groups[key]);
+  }, [paginatedEvents, sortOptions, publicView]);
 
   return (
     <>
@@ -163,24 +172,23 @@ Props) => {
             }
             onResetFilters={handleResetFilters}
           />
-          {/* Add in pagination logic here later. Should use convex as well as params*/}
-          ...
+
           <BasicPagination currentPage={currentPage} totalPages={totalPages} />
         </>
       )}
 
       {filteredEvents.length === 0 ? (
-        <p className='mt-8 text-center text-muted-foreground text-sm'>
+        <p className="mt-8 text-center text-sm text-muted-foreground">
           No events found matching the selected filters.
         </p>
       ) : (
         groupedEvents.map((group) => (
-          <div key={group.title.raw} className='mb-6 '>
-            <h3 className='text-3xl font-semibold mb-2 text-center flex items-start justify-center'>
+          <div key={group.title.raw} className="mb-6">
+            <h3 className="mb-2 flex items-start justify-center text-center text-3xl font-semibold">
               {group.title.parts ? (
                 <>
                   {group.title.parts.month} {group.title.parts.day}
-                  <p className='text-sm align-super'>
+                  <p className="align-super text-sm">
                     {group.title.parts.suffix}
                   </p>
                   {group.title.parts.year ? ` (${group.title.parts.year})` : ""}
@@ -189,7 +197,7 @@ Props) => {
                 group.title.raw
               )}
             </h3>
-            <div className='space-y-4'>
+            <div className="space-y-4">
               {group.events.map((event, index) => (
                 <EventCardPreview
                   key={index}
@@ -203,13 +211,16 @@ Props) => {
       )}
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
-        <div>
-          For the full list and access to all of the other work that I do, you
-          can view that here:{" "}
-        </div>
+        <>
+          <h2>
+            For the full list and access to all of the other work that I do,
+            sign up!
+          </h2>
+          <Pricing />
+        </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default ClientEventList
+export default ClientEventList;

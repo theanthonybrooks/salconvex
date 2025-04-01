@@ -3,6 +3,8 @@ import { isValidIsoDate } from "@/lib/dateFns"
 import { Filters, SortOptions } from "@/types/thelist"
 import { useMemo } from "react"
 
+//TODO: Check that all instances of the date are properly validated to accommodate strings that are non iso dates
+
 export const useFilteredEvents = (
   events: CombinedEventCardData[],
   filters: Filters,
@@ -153,15 +155,15 @@ export const useFilteredEvents = (
               priority = 5
             }
 
-            console.log(
-              `${item.name}:`,
-              eventStartDate,
-              isValid,
-              isOngoing,
+            // console.log(
+            //   `${item.name}:`,
+            //   eventStartDate,
+            //   isValid,
+            //   isOngoing,
 
-              isPast,
-              priority
-            )
+            //   isPast,
+            //   priority
+            // )
 
             return {
               priority,
@@ -311,6 +313,6 @@ export const useFilteredEvents = (
 
         return 0
       })
-      .slice(0, filters.limit)
+    // .slice(0, filters.limit)
   }, [events, filters, sortOptions])
 }

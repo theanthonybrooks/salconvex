@@ -15,7 +15,8 @@ const buttonVariants = cva(
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost:
+          "hover:bg-backgroundDark hover:border-2 border-foreground rounded",
         ghost2: "hover:bg-none hover:text-accent-foreground hover:scale-105",
         link: "text-primary underline-offset-4 hover:underline",
         expandIcon:
