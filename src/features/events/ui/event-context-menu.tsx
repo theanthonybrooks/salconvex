@@ -12,7 +12,9 @@ import { CheckCircle, CircleX, Ellipsis, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
-import { ApplicationStatus, EventCategory, OpenCallStatus } from "@/types/event"
+import { EventCategory } from "@/types/event"
+import { ApplicationStatus, OpenCallStatus } from "@/types/openCall"
+
 import React from "react"
 
 interface EventContextMenuProps {

@@ -121,110 +121,6 @@ Props) => {
 
   const totalPages = Math.ceil(filteredEvents.length / filters.limit)
 
-  // const groupedEvents = useMemo(() => {
-  //   const groups: Record<string, CombinedEventCardData[]> = {}
-
-  //   for (const event of publicView
-  //     ? paginatedEvents.slice(0, 10)
-  //     : paginatedEvents) {
-  //     let groupKey = "Unsorted"
-
-  //     if (sortOptions.sortBy === "openCall" && event.tabs.opencall) {
-  //       const ocEnd = event.tabs.opencall.basicInfo?.dates?.ocEnd
-  //       groupKey = ocEnd
-  //         ? format(new Date(ocEnd), "MMM d")
-  //         : "No Open Call Date"
-  //     }
-
-  //     if (sortOptions.sortBy === "eventStart" && event.dates.eventStart) {
-  //       groupKey = format(new Date(event.dates.eventStart), "MMM d")
-  //     }
-
-  //     if (!groups[groupKey]) groups[groupKey] = []
-  //     groups[groupKey].push(event)
-  //   }
-
-  //   return groups
-  // }, [paginatedEvents, sortOptions, publicView])
-
-  // const groupedEvents = useMemo(() => {
-  //   const groups: Record<string, CombinedEventCardData[]> = {}
-  //   const orderedGroupKeys: string[] = []
-
-  //   for (const event of publicView
-  //     ? paginatedEvents.slice(0, 10)
-  //     : paginatedEvents) {
-  //     let groupKey = "Ungrouped"
-  //     if (sortOptions.sortBy === "openCall") {
-  //       if (event.tabs.opencall) {
-  //         if (event.tabs.opencall.basicInfo) {
-  //           const basicInfo = event.tabs.opencall.basicInfo
-  //           if (basicInfo.callType === "Fixed") {
-  //             const ocEnd = basicInfo?.dates?.ocEnd
-  //             groupKey = ocEnd
-  //               ? format(new Date(ocEnd), "MMM d")
-  //               : "No Open Call Date"
-  //           } else if (basicInfo.callType === "Rolling") {
-  //             groupKey = "Rolling Open Call"
-  //           } else if (basicInfo.callType === "Email") {
-  //             groupKey = "Email Open Call"
-  //           }
-  //         }
-  //       } else {
-  //         groupKey = "No Public Open Call"
-  //       }
-  //     }
-
-  //     if (sortOptions.sortBy === "eventStart" && event.dates.eventStart) {
-  //       const eventStart = event.dates?.eventStart
-  //       groupKey = eventStart
-  //         ? getFourCharMonth(new Date(event.dates.eventStart)) +
-  //           format(new Date(event.dates.eventStart), " d")
-  //         : "No Event Date"
-  //     } else if (
-  //       sortOptions.sortBy === "eventStart" &&
-  //       !event.dates.eventStart
-  //     ) {
-  //       groupKey = "No Event Date"
-  //     }
-
-  //     if (!groups[groupKey]) {
-  //       groups[groupKey] = []
-  //       orderedGroupKeys.push(groupKey)
-  //     }
-
-  //     groups[groupKey].push(event)
-  //   }
-
-  //   return orderedGroupKeys.map((key) => ({
-  //     title: key,
-  //     events: groups[key],
-  //   }))
-  // }, [paginatedEvents, sortOptions, publicView])
-
-  // const groupedEvents = useMemo(() => {
-  //   const groups: Record<string, CombinedEventCardData[]> = {}
-  //   const orderedGroupKeys: string[] = []
-
-  //   for (const event of publicView
-  //     ? paginatedEvents.slice(0, 10)
-  //     : paginatedEvents) {
-  //     const groupKey = getGroupKeyFromEvent(event, sortOptions.sortBy)
-
-  //     if (!groups[groupKey]) {
-  //       groups[groupKey] = []
-  //       orderedGroupKeys.push(groupKey)
-  //     }
-
-  //     groups[groupKey].push(event)
-  //   }
-
-  //   return orderedGroupKeys.map((key) => ({
-  //     title: key,
-  //     events: groups[key],
-  //   }))
-  // }, [paginatedEvents, sortOptions, publicView])
-
   const groupedEvents = useMemo(() => {
     const groups: Record<
       string,
@@ -278,55 +174,15 @@ Props) => {
           No events found matching the selected filters.
         </p>
       ) : (
-        // (publicView ? paginatedEvents.slice(0, 10) : paginatedEvents).map(
-        //   (event, index) => (
-        //     <EventCardPreview
-        //       key={index}
-        //       event={event}
-        //       publicView={publicView}
-        //     />
-        //     // <div key={event.id}>
-        //     //   {event.id}
-        //     //   {event.name}
-        //     // </div>
-        //   )
-        // )
-        // Object.entries(groupedEvents).map(([groupTitle, eventsInGroup]) => (
-        //   <div key={groupTitle} className='mb-6'>
-        //     <h3 className='text-lg font-semibold mb-2'>{groupTitle}</h3>
-        //     <div className='space-y-4'>
-        //       {eventsInGroup.map((event, index) => (
-        //         <EventCardPreview
-        //           key={index}
-        //           event={event}
-        //           publicView={publicView}
-        //         />
-        //       ))}
-        //     </div>
-        //   </div>
-        // ))
-        // groupedEvents.map((group) => (
-        //   <div key={group.title} className='mb-6'>
-        //     <h3 className='text-lg font-semibold mb-2'>{group.title}</h3>
-        //     <div className='space-y-4'>
-        //       {group.events.map((event, index) => (
-        //         <EventCardPreview
-        //           key={index}
-        //           event={event}
-        //           publicView={publicView}
-        //         />
-        //       ))}
-        //     </div>
-        //   </div>
-        // ))
-
         groupedEvents.map((group) => (
-          <div key={group.title.raw} className='mb-6'>
-            <h3 className='text-lg font-semibold mb-2'>
+          <div key={group.title.raw} className='mb-6 '>
+            <h3 className='text-3xl font-semibold mb-2 text-center flex items-start justify-center'>
               {group.title.parts ? (
                 <>
                   {group.title.parts.month} {group.title.parts.day}
-                  <sup className='text-xs'>{group.title.parts.suffix}</sup>
+                  <p className='text-sm align-super'>
+                    {group.title.parts.suffix}
+                  </p>
                   {group.title.parts.year ? ` (${group.title.parts.year})` : ""}
                 </>
               ) : (

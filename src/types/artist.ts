@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "@/types/event"
+import { ApplicationStatus } from "@/types/openCall"
 
 export interface Artist {
   id: string
