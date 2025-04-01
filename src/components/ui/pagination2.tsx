@@ -48,6 +48,8 @@ export const BasicPagination = ({
     [router, pathname, searchParams, totalPages],
   );
 
+  //testing this and adding a comment
+
   // const prefetchPage = useCallback(
   //   (targetPage: number) => {
   //     console.log("prefetch page", targetPage)
