@@ -19,7 +19,7 @@ export const BasicPagination = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const firstPage = currentPage === 1;
-  const lastPage = currentPage === totalPages;
+  const lastPage = currentPage === totalPages && !firstPage;
   const [page, setPage] = useState(currentPage);
 
   const onUserInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
