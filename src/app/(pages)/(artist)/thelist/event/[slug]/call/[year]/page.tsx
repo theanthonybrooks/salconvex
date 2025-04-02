@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { api } from "~/convex/_generated/api";
 
-export const OpenCallDetail = () => {
+const OpenCallDetail = () => {
   const router = useRouter();
   const { slug, year } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;

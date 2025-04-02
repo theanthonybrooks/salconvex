@@ -53,6 +53,20 @@ export const BasicPagination = ({
     [router, pathname, searchParams, totalPages],
   );
 
+  useEffect(() => {
+    if (currentPage === 1 && currentPage !== page) {
+      setPage(1);
+      setVal(1);
+    }
+  }, [currentPage, page]);
+
+  useEffect(() => {
+    if (totalPages <= 1) {
+      setPage(1);
+      setVal(1);
+    }
+  }, [totalPages]);
+
   //Not using prefetch as it doesn't work with the dynamically loaded data
   // const prefetchPage = useCallback(
   //   (targetPage: number) => {
@@ -82,8 +96,8 @@ export const BasicPagination = ({
   return (
     <motion.div
       initial={{ opacity: 0 }}
-      animate={totalPages !== 0 && { opacity: 1 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      animate={totalPages >= 1 && { opacity: 1 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
       className="my-6 grid grid-cols-[30%_70%_30%] items-center justify-center gap-4"
     >
       <p

@@ -121,6 +121,8 @@ Props) => {
 
   const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
   const currentPage = filters.page ?? 1;
+
+  console.log("current page: ", currentPage);
   const paginatedEvents = filteredEvents.slice(
     (currentPage - 1) * filters.limit,
     currentPage * filters.limit,
