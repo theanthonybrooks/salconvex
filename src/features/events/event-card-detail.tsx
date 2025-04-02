@@ -227,6 +227,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
                     initial={false}
                     layoutId="tab-bg"
                     className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
+                    exit={{ opacity: 0 }}
                     transition={{
                       type: "spring",
                       stiffness: 400,

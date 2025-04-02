@@ -1,6 +1,6 @@
-import { getFourCharMonth } from "@/lib/dateFns"
-import { getEventCategoryLabel } from "@/lib/eventFns"
-import { EventCategory } from "@/types/event"
+import { getFourCharMonth } from "@/lib/dateFns";
+import { getEventCategoryLabel } from "@/lib/eventFns";
+import { EventCategory } from "@/types/event";
 
 export const generateICSFile = (
   title: string,
@@ -12,10 +12,10 @@ export const generateICSFile = (
   isOpenCall: boolean,
   startDate?: string,
   endDate?: string,
-  url?: string
+  url?: string,
 ) => {
   const formatIsoDate = (dateStr: string) =>
-    new Date(dateStr).toISOString().replace(/-|:|\.\d+/g, "")
+    new Date(dateStr).toISOString().replace(/-|:|\.\d+/g, "");
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleString("en-US", {
@@ -25,11 +25,11 @@ export const generateICSFile = (
       hour: "numeric",
       minute: "numeric",
       timeZoneName: "short",
-    })
+    });
 
   const formatDates = (start: string, end: string) => {
-    const startDate = new Date(start)
-    const endDate = new Date(end)
+    const startDate = new Date(start);
+    const endDate = new Date(end);
     //TODO: Add the time functionality back in when we have a time picker in the event submission flow
     // const startTime = startDate.toLocaleString("en-US", {
     //   hour: "numeric",
@@ -41,64 +41,58 @@ export const generateICSFile = (
     //   minute: "numeric",
     //   timeZoneName: "short",
     // })
-    const startMonth = getFourCharMonth(startDate)
-    const startDay = startDate.getDate() || null // Handle falsy values
-    const startYear = startDate.getFullYear()
-    const endMonth = getFourCharMonth(endDate)
-    const endDay = endDate.getDate()
-    const endYear = endDate.getFullYear()
+    const startMonth = getFourCharMonth(startDate);
+    const startDay = startDate.getDate() || null; // Handle falsy values
+    const startYear = startDate.getFullYear();
+    const endMonth = getFourCharMonth(endDate);
+    const endDay = endDate.getDate();
+    const endYear = endDate.getFullYear();
 
     if (startYear !== endYear) {
-      return `${startMonth} ${startDay}, ${startYear} - ${endMonth} ${endDay}, ${endYear}`
+      return `${startMonth} ${startDay}, ${startYear} - ${endMonth} ${endDay}, ${endYear}`;
     } else {
       if (startMonth !== endMonth) {
-        return `${startMonth} ${startDay} - ${endMonth} ${endDay} (${startYear})`
+        return `${startMonth} ${startDay} - ${endMonth} ${endDay} (${startYear})`;
       } else if (startDay !== endDay) {
-        return `${startMonth} ${startDay}-${endDay} (${startYear})`
+        return `${startMonth} ${startDay}-${endDay} (${startYear})`;
       } else {
-        return `${startMonth} ${startDay} (${startYear})`
+        return `${startMonth} ${startDay} (${startYear})`;
       }
     }
-  }
+  };
 
-  let formattedStart: string | null = null
-  let formattedEnd: string | null = null
-  let formattedDateFull: string | null = null
+  let formattedStart: string | null = null;
+  let formattedEnd: string | null = null;
+  let formattedDateFull: string | null = null;
 
-  const formattedIsoOcStart = formatIsoDate(ocStartDate)
-  const formattedIsoOcEnd = formatIsoDate(ocEndDate)
+  const formattedIsoOcStart = formatIsoDate(ocStartDate);
+  const formattedIsoOcEnd = formatIsoDate(ocEndDate);
 
-  formattedStart = startDate && !endDate ? formatDate(startDate) : ""
-  formattedEnd = endDate && !startDate ? formatDate(endDate) : ""
+  formattedStart = startDate && !endDate ? formatDate(startDate) : "";
+  formattedEnd = endDate && !startDate ? formatDate(endDate) : "";
   formattedDateFull =
-    startDate && endDate ? formatDates(startDate, endDate) : ""
-
-  console.log("formattedStart", formattedStart)
-  console.log("formattedEnd", formattedEnd)
-  console.log("formattedDateFull", formattedDateFull)
+    startDate && endDate ? formatDates(startDate, endDate) : "";
 
   const descriptionWithEventDates = startDate
     ? `${getEventCategoryLabel(eventCategory)} Dates: ${
         formattedStart
           ? formattedStart
           : formattedEnd
-          ? formattedEnd
-          : formattedDateFull
+            ? formattedEnd
+            : formattedDateFull
       }\n\n ${description}`
-    : description
+    : description;
 
   const urlFormatted = url
     ? `https://www.thestreetartlist.com/thelist/${
         isOpenCall ? "call" : "event"
       }/${url}`
-    : ""
+    : "";
 
   // console.log("formattedIsoOcStart", formattedIsoOcStart)
   // console.log("formattedIsoOcEnd", formattedIsoOcEnd)
   // console.log("formattedIsoStart", formattedIsoStart)
   // console.log("formattedIsoEnd", formattedIsoEnd)
-  console.log("descriptionWithEventDates", descriptionWithEventDates)
-  console.log("urlFormattedIso", urlFormatted)
 
   const icsContent = `
 BEGIN:VCALENDAR
@@ -117,7 +111,7 @@ ACTION:DISPLAY
 DESCRIPTION:Reminder
 END:VALARM
 END:VEVENT
-END:VCALENDAR`.trim()
+END:VCALENDAR`.trim();
 
-  return `data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`
-}
+  return `data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`;
+};

@@ -24,20 +24,26 @@ const Event = () => {
   //   edition: 2025,
   // });
 
+  console.log("Referrer:", document.referrer);
+  console.log("History length:", window.history.length);
+
   const onBackClick = () => {
-    if (window.history.length > 1) {
-      router.back();
-      router.refresh();
-    } else {
-      router.push("/thelist");
-    }
+    const prevUrl = window.location.href;
+    router.back();
+    router.refresh();
 
-    // setTimeout(() => {
-    //   window.scrollTo({ top: 0, behavior: "smooth" });
-    // }, 50); // small delay gives time for back nav
-
-    // try to ensure that the page has a sec to load
+    setTimeout(() => {
+      if (window.location.href === prevUrl) {
+        router.push("/thelist");
+      }
+    }, 100);
   };
+
+  // setTimeout(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, 50); // small delay gives time for back nav
+
+  // try to ensure that the page has a sec to load
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
