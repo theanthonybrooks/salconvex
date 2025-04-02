@@ -77,9 +77,7 @@ export const EventFilters = ({
 
       <Select
         value={String(filters.limit)}
-        onValueChange={(value) =>
-          onChange({ limit: parseInt(value, 10), page: 1 })
-        }
+        onValueChange={(value) => onChange({ limit: parseInt(value, 10) })}
       >
         <SelectTrigger className="w-[150px]">
           <SelectValue placeholder="Limit" />
