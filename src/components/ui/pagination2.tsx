@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Filters, SortOptions } from "@/types/thelist";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
 
 interface BasicPaginationProps {
@@ -35,72 +36,11 @@ export const BasicPagination = ({
   console.log("sortOptions", sortOptions);
   // console.log(firstPage, lastPage, page, currentPage, totalPages);
 
-  const onUserInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const value = Number((e.target as HTMLInputElement).value);
-      if (!isNaN(value) && value >= 1 && value <= totalPages) {
-        setPage(value);
-      }
-    }
-  };
+  const [inputVal, setInputVal] = useState(page);
 
-  // const goToPage = useCallback(
-  //   (page: number) => {
-  //     const params = new URLSearchParams(searchParams.toString());
-
-  //     if (page > totalPages) return;
-
-  //     if (page === 1) {
-  //       params.delete("page");
-  //     } else {
-  //       params.set("page", page.toString());
-  //     }
-
-  //     router.push(`${pathname}?${params.toString()}`);
-  //   },
-  //   [router, pathname, searchParams, totalPages],
-  // );
-
-  // if (prevTotal !== totalPages) {
-  //   if (val !== 1 && )
-  // }
-
-  // useEffect(() => {
-  //   console.log("im changing");
-  //   // if (totalPages <= 1) {
-  //   console.log("totalPages", totalPages);
-
-  //   setPrevTotal(totalPages);
-  //   setPage(1);
-  //   setVal(1);
-  //   console.log("prevTotal", prevTotal);
-
-  //   // }
-  // }, [totalPages, prevTotal]);
-
-  //Not using prefetch as it doesn't work with the dynamically loaded data
-  // const prefetchPage = useCallback(
-  //   (targetPage: number) => {
-  //     console.log("prefetch page", targetPage)
-  //     if (targetPage < 1 || targetPage > totalPages) return
-  //     console.log("prefetching")
-  //     const params = new URLSearchParams(searchParams.toString())
-  //     if (targetPage === 1) {
-  //       params.delete("page")
-  //     } else {
-  //       params.set("page", targetPage.toString())
-  //     }
-
-  //     router.prefetch(`${pathname}?${params.toString()}`)
-  //   },
-  //   [router, pathname, searchParams, totalPages]
-  // )
-
-  // useEffect(() => {
-  //   if (page < 1 || page > totalPages || page === currentPage) return;
-
-  //   goToPage(page);
-  // }, [page, currentPage, totalPages, goToPage]);
+  useEffect(() => {
+    setInputVal(page);
+  }, [page]);
 
   return (
     <motion.div
@@ -144,15 +84,21 @@ export const BasicPagination = ({
               const parsed = Number(e.target.value);
               if (parsed > totalPages) return;
               if (!isNaN(parsed)) {
-                setPage(parsed);
+                setInputVal(parsed);
               }
             }}
-            value={page}
-            onKeyDown={onUserInput}
+            value={inputVal}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (inputVal < 1) setPage(1);
+                else if (inputVal > totalPages) setPage(totalPages);
+                else setPage(inputVal);
+              }
+            }}
             onBlur={() => {
-              if (page < 1) setPage(1);
-              else if (page > totalPages) setPage(totalPages);
-              else setPage(page);
+              if (inputVal < 1) setPage(1);
+              else if (inputVal > totalPages) setPage(totalPages);
+              else setPage(inputVal);
             }}
             type="number"
             inputMode="numeric"
