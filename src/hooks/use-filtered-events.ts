@@ -1,20 +1,20 @@
-import { CombinedEventCardData } from "@/hooks/use-combined-events"
-import { isValidIsoDate } from "@/lib/dateFns"
-import { Filters, SortOptions } from "@/types/thelist"
-import { useMemo } from "react"
+import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
+import { isValidIsoDate } from "@/lib/dateFns";
+import { Filters, SortOptions } from "@/types/thelist";
+import { useMemo } from "react";
 
 //TODO: Check that all instances of the date are properly validated to accommodate strings that are non iso dates
 
 export const useFilteredEvents = (
-  events: CombinedEventCardData[],
+  events: CombinedEventPreviewCardData[],
   filters: Filters,
-  sortOptions: SortOptions
-): CombinedEventCardData[] => {
+  sortOptions: SortOptions,
+): CombinedEventPreviewCardData[] => {
   return useMemo(() => {
     return events
       .filter((event) => {
-        if (!filters.showHidden && event.hidden) return false
-        if (filters.bookmarkedOnly && !event.bookmarked) return false
+        if (!filters.showHidden && event.hidden) return false;
+        if (filters.bookmarkedOnly && !event.bookmarked) return false;
 
         if (
           filters.eventTypes &&
@@ -22,28 +22,28 @@ export const useFilteredEvents = (
           (!event.eventType ||
             !event.eventType.some((type) => filters.eventTypes!.includes(type)))
         ) {
-          return false
+          return false;
         }
 
         if (
           filters.eventCategories &&
           filters.eventCategories.length > 0 &&
-          !filters.eventCategories.includes(event.category)
+          !filters.eventCategories.includes(event.eventCategory)
         ) {
-          return false
+          return false;
         }
 
         if (
           filters.continent &&
           event.location.continent !== filters.continent
         ) {
-          return false
+          return false;
         }
 
-        return true
+        return true;
       })
       .sort((a, b) => {
-        const { sortBy, sortDirection } = sortOptions
+        const { sortBy, sortDirection } = sortOptions;
 
         // if (sortBy === "openCall") {
         //   const hasOpenCallA = a.hasActiveOpenCall
@@ -128,31 +128,31 @@ export const useFilteredEvents = (
         // }
 
         if (sortBy === "eventStart") {
-          const getPriority = (item: CombinedEventCardData) => {
-            const now = new Date()
-            now.setHours(0, 0, 0, 0)
+          const getPriority = (item: CombinedEventPreviewCardData) => {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
 
-            const startDate = item.dates.eventStart
-            const isValid = startDate && isValidIsoDate(startDate)
-            const validStartDate = isValid ? new Date(startDate) : null
-            const isOngoing = item.dates.ongoing
-            const eventStartDate = new Date(startDate ?? Infinity)
-            const isPast = eventStartDate < now //is technically handled by the combiner, but I'm keeping it here for now
+            const startDate = item.dates.eventStart;
+            const isValid = startDate && isValidIsoDate(startDate);
+            const validStartDate = isValid ? new Date(startDate) : null;
+            const isOngoing = item.dates.ongoing;
+            const eventStartDate = new Date(startDate ?? Infinity);
+            const isPast = eventStartDate < now; //is technically handled by the combiner, but I'm keeping it here for now
 
-            let priority: number
+            let priority: number;
             if (startDate) {
               if (validStartDate) {
                 if (validStartDate >= now) {
-                  priority = 0
+                  priority = 0;
                 } else {
-                  priority = 3
+                  priority = 3;
                 }
-              } else if (!isValid) priority = 1
-              else if (isOngoing) priority = 2
-              else if (isPast) priority = 3
-              else priority = 4 // Open call with unknown type or no end date
+              } else if (!isValid) priority = 1;
+              else if (isOngoing) priority = 2;
+              else if (isPast) priority = 3;
+              else priority = 4; // Open call with unknown type or no end date
             } else {
-              priority = 5
+              priority = 5;
             }
 
             // console.log(
@@ -168,15 +168,15 @@ export const useFilteredEvents = (
             return {
               priority,
               eventStart: eventStartDate.getTime(),
-            }
-          }
+            };
+          };
 
-          const priorityA = getPriority(a)
-          const priorityB = getPriority(b)
+          const priorityA = getPriority(a);
+          const priorityB = getPriority(b);
 
           // Step 1: sort by priority
           if (priorityA.priority !== priorityB.priority) {
-            return priorityA.priority - priorityB.priority
+            return priorityA.priority - priorityB.priority;
           }
 
           // // Step 2: fallback to sorting by month for past events
@@ -187,48 +187,48 @@ export const useFilteredEvents = (
           // }
 
           if (priorityA.priority === 3 && priorityB.priority === 3) {
-            const aDate = new Date(a.dates.eventStart ?? 0)
-            const bDate = new Date(b.dates.eventStart ?? 0)
+            const aDate = new Date(a.dates.eventStart ?? 0);
+            const bDate = new Date(b.dates.eventStart ?? 0);
 
-            const aYear = aDate.getFullYear()
-            const bYear = bDate.getFullYear()
+            const aYear = aDate.getFullYear();
+            const bYear = bDate.getFullYear();
 
-            if (aYear !== bYear) return bYear - aYear // most recent year first
+            if (aYear !== bYear) return bYear - aYear; // most recent year first
 
-            const aMonth = aDate.getMonth()
-            const bMonth = bDate.getMonth()
-            if (aMonth !== bMonth) return aMonth - bMonth
+            const aMonth = aDate.getMonth();
+            const bMonth = bDate.getMonth();
+            if (aMonth !== bMonth) return aMonth - bMonth;
 
-            const aDay = aDate.getDate()
-            const bDay = bDate.getDate()
-            return aDay - bDay
+            const aDay = aDate.getDate();
+            const bDay = bDate.getDate();
+            return aDay - bDay;
           }
 
           // Step 2: fallback to eventStart
-          return priorityA.eventStart - priorityB.eventStart
+          return priorityA.eventStart - priorityB.eventStart;
         }
         if (sortBy === "openCall") {
-          const getPriority = (item: CombinedEventCardData) => {
-            const now = new Date()
-            now.setHours(0, 0, 0, 0)
+          const getPriority = (item: CombinedEventPreviewCardData) => {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
 
-            const hasOpenCall = item.hasActiveOpenCall
-            const callType = item.tabs.opencall?.basicInfo?.callType
-            const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd
-            const isRolling = callType === "Rolling"
-            const ocEnd = new Date(ocEndRaw ?? 0)
-            const isPast = ocEnd < now //is technically handled by the combiner, but I'm keeping it here for now
+            const hasOpenCall = item.hasActiveOpenCall;
+            const callType = item.tabs.opencall?.basicInfo?.callType;
+            const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd;
+            const isRolling = callType === "Rolling";
+            const ocEnd = new Date(ocEndRaw ?? 0);
+            const isPast = ocEnd < now; //is technically handled by the combiner, but I'm keeping it here for now
 
-            let priority: number
+            let priority: number;
             if (hasOpenCall && (!isPast || isRolling)) {
-              if (callType === "Fixed") priority = 0
-              else if (callType === "Rolling") priority = 1
-              else if (callType === "Email") priority = 2
-              else priority = 3 // Open call with unknown type or no end date
+              if (callType === "Fixed") priority = 0;
+              else if (callType === "Rolling") priority = 1;
+              else if (callType === "Email") priority = 2;
+              else priority = 3; // Open call with unknown type or no end date
             } else if (!hasOpenCall && !!callType) {
-              priority = 4
+              priority = 4;
             } else {
-              priority = 5
+              priority = 5;
             }
 
             // console.log(
@@ -245,24 +245,24 @@ export const useFilteredEvents = (
               priority,
               ocEnd: ocEnd.getTime(),
               eventStart: new Date(item.dates.eventStart ?? Infinity).getTime(),
-            }
-          }
+            };
+          };
 
-          const priorityA = getPriority(a)
-          const priorityB = getPriority(b)
+          const priorityA = getPriority(a);
+          const priorityB = getPriority(b);
 
           // Step 1: sort by priority
           if (priorityA.priority !== priorityB.priority) {
-            return priorityA.priority - priorityB.priority
+            return priorityA.priority - priorityB.priority;
           }
 
           // Step 2: if both have same priority, and it’s for active open calls, sort by ocEnd
           if (priorityA.priority < 3) {
-            return priorityA.ocEnd - priorityB.ocEnd
+            return priorityA.ocEnd - priorityB.ocEnd;
           }
 
           // Step 3: fallback to eventStart
-          return priorityA.eventStart - priorityB.eventStart
+          return priorityA.eventStart - priorityB.eventStart;
         }
 
         // if (sortBy === "eventStart") {
@@ -304,15 +304,15 @@ export const useFilteredEvents = (
         // }
 
         if (sortBy === "name") {
-          const aName = a.name.toLowerCase()
-          const bName = b.name.toLowerCase()
+          const aName = a.name.toLowerCase();
+          const bName = b.name.toLowerCase();
           return sortDirection === "asc"
             ? aName.localeCompare(bName)
-            : bName.localeCompare(aName)
+            : bName.localeCompare(aName);
         }
 
-        return 0
-      })
+        return 0;
+      });
     // .slice(0, filters.limit)
-  }, [events, filters, sortOptions])
-}
+  }, [events, filters, sortOptions]);
+};

@@ -1,17 +1,20 @@
+import { SubmissionFormState } from "@/types/event";
+import { Id } from "~/convex/_generated/dataModel";
+
 export type CallType =
   | "Fixed"
   | "Rolling"
   | "Email"
   | "Invite"
   | "Unknown"
-  | null
+  | null;
 
 export type EligibilityType =
   | "International"
   | "National"
   | "Regional/Local"
   | "Other"
-  | null
+  | null;
 
 export type ApplicationStatus =
   | "applied"
@@ -22,68 +25,70 @@ export type ApplicationStatus =
   | "pending"
   | "roster"
   | "shortlisted"
-  | null
+  | null;
 
-export type OpenCallStatus = "active" | "ended" | "coming-soon" | null
+export type OpenCallStatus = "active" | "ended" | "coming-soon" | null;
 
-export type RateUnit = "ft²" | "m²"
+export type RateUnit = "ft²" | "m²";
 
 export interface OpenCall {
-  adminNoteOC?: string
-  id: string //This is what will be used in the application data for artists
-  eventId: string
-  organizerId: string[]
-  mainOrgId: string
+  _id: Id<"openCalls">;
+  adminNoteOC?: string;
+
+  eventId: string;
+  organizerId: string[];
+  mainOrgId: string;
 
   basicInfo: {
-    appFee: number
-    callFormat: "RFP" | "RFQ"
-    callType: CallType
+    appFee: number;
+    callFormat: "RFP" | "RFQ";
+    callType: CallType;
     dates: {
-      ocStart: string | null //null for rolling, email, etc or just open calls without dates. Set to null if the call is rolling. Requires type of "Rolling" and will otherwise be invalid/ignored.
-      ocEnd: string | null
-      timezone: string //TODO: Ensure that the accurate timezone is passed when the events are submitted. Get this from the event location?
-    }
-  }
+      ocStart: string | null; //null for rolling, email, etc or just open calls without dates. Set to null if the call is rolling. Requires type of "Rolling" and will otherwise be invalid/ignored.
+      ocEnd: string | null;
+      timezone: string; //TODO: Ensure that the accurate timezone is passed when the events are submitted. Get this from the event location?
+    };
+  };
   eligibility: {
-    type: EligibilityType
-    whom: string[]
-    details?: string
-  }
+    type: EligibilityType;
+    whom: string[];
+    details?: string;
+  };
   compensation: {
     budget: {
-      min: number
-      max?: number
-      rate: number
-      unit: RateUnit
-      currency: string
-      allInclusive: boolean
-    }
+      min: number;
+      max?: number;
+      rate: number;
+      unit: RateUnit;
+      currency: string;
+      allInclusive: boolean;
+    };
     categories: {
-      designFee?: string
-      accommodation?: string
-      food?: string
-      travelCosts?: string
-      materials?: string
-      equipment?: string
-      other?: string
-    }
-  }
+      designFee?: string;
+      accommodation?: string;
+      food?: string;
+      travelCosts?: string;
+      materials?: string;
+      equipment?: string;
+      other?: string;
+    };
+  };
   requirements: {
-    requirements: string[]
-    more: string[]
-    destination: string
+    requirements: string[];
+    more: string[];
+    destination: string;
     documents?: {
-      title: string
-      href: string
-    }[]
-    otherInfo?: string[]
-  }
+      title: string;
+      href: string;
+    }[];
+    otherInfo?: string[];
+  };
+  state: SubmissionFormState;
 }
 
 export interface OpenCallApplication {
-  openCallId: string
-  artistId: string
-  applicationId: string
-  applicationStatus: ApplicationStatus
+  openCallId: string;
+  artistId: string;
+  applicationId: string;
+  applicationStatus: ApplicationStatus;
 }

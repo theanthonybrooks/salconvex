@@ -1,34 +1,35 @@
-"use client"
+"use client";
 
-import { AnimatePresence, motion } from "framer-motion"
-import { usePathname } from "next/navigation"
-import { useEffect, useRef } from "react"
+import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 export default function ClientAuthWrapper({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
   // const { theme } = useTheme()
   // const { isLoading } = useConvexAuth()
-  const targetRef = useRef(null)
+  const targetRef = useRef(null);
 
-  const invisScrollPages = ["/", "/auth"]
+  const invisScrollPages = ["/", "/auth"];
 
   const isInvisScrollPage =
     pathname === "/" ||
-    invisScrollPages.some((path) => path !== "/" && pathname.startsWith(path))
+    invisScrollPages.some((path) => path !== "/" && pathname.startsWith(path));
 
   useEffect(() => {
     if (isInvisScrollPage) {
-      document.body.classList.add("invis")
+      document.body.classList.add("invis");
     } else {
-      document.body.classList.remove("invis")
+      document.body.classList.remove("invis");
     }
 
     // No need for a cleanup function because it's handled by the else condition
-  }, [pathname, isInvisScrollPage])
+  }, [pathname, isInvisScrollPage]);
+
   // const { scrollYProgress } = useScroll({ target: targetRef })
   // useMotionValueEvent(scrollYProgress, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
@@ -44,14 +45,15 @@ export default function ClientAuthWrapper({
 
   return (
     <div>
-      <AnimatePresence mode='wait'>
+      <AnimatePresence mode="wait">
         <motion.div
           ref={targetRef}
-          key='content'
+          key="content"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}>
+          transition={{ duration: 0.3 }}
+        >
           {/* {isPublicPage && (
               <motion.div
                 id='scroll-indicator'
@@ -76,5 +78,5 @@ export default function ClientAuthWrapper({
         </motion.div>
       </AnimatePresence>
     </div>
-  )
+  );
 }

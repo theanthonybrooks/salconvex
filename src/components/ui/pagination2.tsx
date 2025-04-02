@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
@@ -19,8 +20,12 @@ export const BasicPagination = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const firstPage = currentPage === 1;
-  const lastPage = currentPage === totalPages && !firstPage;
+  const lastPage = currentPage === totalPages;
+  const singlePage = totalPages === 1;
+  const [val, setVal] = useState(currentPage);
   const [page, setPage] = useState(currentPage);
+
+  // console.log(firstPage, lastPage, page, currentPage, totalPages);
 
   const onUserInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -48,8 +53,7 @@ export const BasicPagination = ({
     [router, pathname, searchParams, totalPages],
   );
 
-  //testing this and adding a comment
-
+  //Not using prefetch as it doesn't work with the dynamically loaded data
   // const prefetchPage = useCallback(
   //   (targetPage: number) => {
   //     console.log("prefetch page", targetPage)
@@ -76,11 +80,18 @@ export const BasicPagination = ({
   }, [page, currentPage, totalPages, goToPage]);
 
   return (
-    <div className="my-6 grid grid-cols-[30%_70%_30%] items-center justify-center gap-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={totalPages !== 0 && { opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="my-6 grid grid-cols-[30%_70%_30%] items-center justify-center gap-4"
+    >
       <p
         className={cn(
           "opacity-0",
-          lastPage ? "cursor-pointer opacity-100" : "pointer-events-none",
+          lastPage && !firstPage
+            ? "cursor-pointer opacity-100"
+            : "pointer-events-none",
         )}
         onClick={() => setPage(1)}
       >
@@ -89,7 +100,10 @@ export const BasicPagination = ({
 
       <div className="flex items-center gap-4">
         <span
-          onClick={() => setPage(currentPage - 1)}
+          onClick={() => {
+            setVal(currentPage - 1);
+            setPage(currentPage - 1);
+          }}
           className={cn(
             "cursor-pointer px-3 py-1",
             firstPage && "pointer-events-none opacity-0",
@@ -101,32 +115,46 @@ export const BasicPagination = ({
         <span className="flex flex-row items-center gap-2">
           Page
           <Input
+            // onChange={(e) => {
+            //   setPage(Number(e.target.value));
+            // }}
             onChange={(e) => {
-              setPage(Number(e.target.value));
+              const parsed = Number(e.target.value);
+              if (parsed > totalPages) return;
+              if (!isNaN(parsed)) {
+                setVal(parsed);
+              }
             }}
-            value={page}
+            value={val}
             onKeyDown={onUserInput}
-            onBlur={() => setPage(page)}
+            onBlur={() => {
+              if (page < 1) setPage(1);
+              else if (page > totalPages) setPage(totalPages);
+              else setPage(val);
+            }}
             type="number"
             inputMode="numeric"
             pattern="[0-9]*"
             min={1}
             max={totalPages}
-            className="no-spinner w-fit border-2 border-foreground bg-background text-center text-xl font-bold"
+            className="no-spinner w-fit border-2 border-foreground bg-background text-center text-xl font-bold sm:text-xl"
           />
           of {totalPages}
         </span>
 
         <span
-          onClick={() => setPage(currentPage + 1)}
+          onClick={() => {
+            setVal(currentPage + 1);
+            setPage(currentPage + 1);
+          }}
           className={cn(
             "cursor-pointer px-3 py-1",
-            lastPage && "pointer-events-none opacity-0",
+            (lastPage || singlePage) && "pointer-events-none opacity-0",
           )}
         >
           <TiArrowRightOutline className="size-6 text-foreground hover:scale-110" />
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };

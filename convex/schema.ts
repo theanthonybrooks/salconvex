@@ -1,17 +1,17 @@
-import { authTables } from "@convex-dev/auth/server"
-import { defineSchema, defineTable } from "convex/server"
-import { v } from "convex/values"
+import { authTables } from "@convex-dev/auth/server";
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
 
 // Define a price object structure that matches your data
 const stripePriceValidator = v.object({
   amount: v.number(),
   stripeId: v.string(),
-})
+});
 
 // Define a prices object structure for a specific interval
 const stripeIntervalPricesValidator = v.object({
   usd: stripePriceValidator,
-})
+});
 
 const customUserSchema = {
   // Include Convex Auth fields you want to use
@@ -34,60 +34,60 @@ const customUserSchema = {
   tokenIdentifier: v.string(),
   image: v.optional(v.string()),
   emailVerified: v.optional(v.boolean()),
-}
+};
 
 const artistSchema = {
   artistId: v.id("users"),
   artistName: v.optional(v.string()),
   artistNationality: v.optional(v.array(v.string())),
-  artistResidency: v.optional(
-    v.object({
-      full: v.optional(v.string()),
-      city: v.optional(v.string()),
-      state: v.optional(v.string()),
-      stateAbbr: v.optional(v.string()),
-      country: v.optional(v.string()),
-      countryAbbr: v.optional(v.string()),
-      location: v.optional(v.array(v.number())),
-      timezone: v.optional(v.string()),
-      timezoneOffset: v.optional(v.number()),
-    })
-  ),
+  artistResidency: v.object({
+    full: v.optional(v.string()),
+    city: v.optional(v.string()),
+    state: v.optional(v.string()),
+    stateAbbr: v.optional(v.string()),
+    country: v.optional(v.string()),
+    countryAbbr: v.optional(v.string()),
+    location: v.optional(v.array(v.number())),
+    timezone: v.optional(v.string()),
+    timezoneOffset: v.optional(v.number()),
+  }),
+
   documents: v.optional(
     v.object({
       cv: v.optional(v.string()),
       resume: v.optional(v.string()),
       artistStatement: v.optional(v.string()),
       images: v.optional(v.array(v.string())),
-    })
+    }),
   ),
-  applications: v.optional(
-    v.array(
-      v.object({
-        applicationId: v.optional(v.string()),
-        applicationStatus: v.optional(v.string()),
-      })
-    )
+  applications: v.array(
+    v.object({
+      openCallId: v.id("openCalls"),
+      applicationId: v.optional(v.string()),
+      applicationStatus: v.optional(v.string()),
+    }),
   ),
-  listActions: v.optional(
-    v.array(
-      v.object({
-        eventId: v.id("events"),
-        hidden: v.boolean(),
-        bookmarked: v.boolean(),
-      })
-    )
+
+  listActions: v.array(
+    v.object({
+      eventId: v.id("events"),
+      hidden: v.boolean(),
+      bookmarked: v.boolean(),
+    }),
   ),
   updatedAt: v.optional(v.number()),
   lastUpdatedBy: v.optional(v.string()),
   completedProfile: v.boolean(),
-}
+};
 
 const organizationSchema = {
   ownerId: v.id("users"),
-  organizationName: v.string(),
-  events: v.optional(v.array(v.id("events"))),
-  logo: v.string(),
+  // organizationName: v.optional(v.string()),
+  name: v.string(),
+  slug: v.optional(v.string()), //todo: use slugs
+  // events: v.optional(v.array(v.id("events"))),
+  events: v.array(v.id("events")),
+  logo: v.string(), //will default to /1.jpg as always
   location: v.optional(
     v.object({
       locale: v.optional(v.string()),
@@ -98,7 +98,7 @@ const organizationSchema = {
       country: v.string(),
       countryAbbr: v.string(),
       continent: v.string(),
-    })
+    }),
   ),
   about: v.optional(v.string()),
   contact: v.optional(
@@ -109,7 +109,7 @@ const organizationSchema = {
         phone: v.optional(v.string()),
         href: v.optional(v.string()),
       }),
-    })
+    }),
   ),
   links: v.optional(
     v.object({
@@ -121,7 +121,7 @@ const organizationSchema = {
       vk: v.optional(v.string()),
       phone: v.optional(v.string()),
       address: v.optional(v.string()),
-    })
+    }),
   ),
   hadFreeCall: v.boolean(),
   updatedAt: v.optional(v.number()),
@@ -129,19 +129,23 @@ const organizationSchema = {
   lastUpdatedBy: v.optional(v.string()),
   // events: v.array(v.id("events")),
   // TODO: Link organization to events and from events to open calls
-}
+};
 
 const eventSchema = {
   adminNote: v.optional(v.string()),
   organizerId: v.array(v.id("organizations")),
   mainOrgId: v.id("organizations"),
+  slug: v.string(),
+  // mainOrgName: v.optional(v.string()),
+  mainOrgName: v.string(),
   // eventId: v.optional(v.string()),
-  openCallId: v.optional(v.array(v.id("openCalls"))),
+  openCallId: v.array(v.id("openCalls")),
   name: v.string(),
   logo: v.string(),
-  eventType: v.optional(v.array(v.string())),
+  eventType: v.array(v.string()),
   eventCategory: v.string(),
   dates: v.object({
+    edition: v.number(), //todo: make required
     eventStart: v.optional(v.string()),
     eventEnd: v.optional(v.string()),
     ongoing: v.boolean(),
@@ -160,28 +164,28 @@ const eventSchema = {
       v.object({
         latitude: v.number(),
         longitude: v.number(),
-      })
+      }),
     ),
   }),
   about: v.optional(v.string()),
-  links: v.optional(
-    v.array(
-      v.object({
-        type: v.string(),
-        title: v.string(),
-        href: v.string(),
-        handle: v.optional(v.string()),
-      })
-    )
+  links: v.array(
+    v.object({
+      type: v.string(),
+      title: v.string(),
+      href: v.string(),
+      handle: v.optional(v.string()),
+    }),
   ),
-  otherInfo: v.optional(v.array(v.string())),
-}
+  otherInfo: v.array(v.string()),
+  // state: v.string(), //draft, submitted, published, archived
+  state: v.string(), //draft, submitted, published, archived
+};
 
 const eventOrganizerSchema = {
   eventId: v.id("events"),
   organizerId: v.id("organizations"),
   isPrimary: v.boolean(),
-}
+};
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
 const openCallSchema = {
   adminNoteOC: v.optional(v.string()),
@@ -193,14 +197,15 @@ const openCallSchema = {
     callFormat: v.string(),
     callType: v.string(),
     dates: v.object({
-      ocStart: v.optional(v.string()),
-      ocEnd: v.optional(v.string()),
+      ocStart: v.optional(v.union(v.string(), v.null())), //todo: make not optional later
+      ocEnd: v.optional(v.union(v.string(), v.null())), //todo: make not optional later
       timezone: v.string(),
+      edition: v.number(),
     }),
   }),
   eligibility: v.object({
     type: v.string(),
-    whom: v.optional(v.array(v.string())),
+    whom: v.array(v.string()),
     details: v.optional(v.string()),
   }),
   compensation: v.object({
@@ -232,23 +237,32 @@ const openCallSchema = {
         v.object({
           title: v.string(),
           href: v.string(),
-        })
-      )
+        }),
+      ),
     ),
-    otherInfo: v.optional(v.array(v.string())),
+    otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
   }),
-}
+  // state: v.string(), //draft, submitted, published, archived
+  state: v.optional(v.string()), //draft, submitted, published, archived
+};
 
 const openCallOrganizerSchema = {
   openCallId: v.id("openCalls"),
   organizerId: v.id("organizations"),
   isPrimary: v.boolean(),
-}
+};
 
 const openCallJudgesSchema = {
   openCallId: v.id("openCalls"),
   judgeId: v.id("users"),
-}
+};
+
+const applicationsSchema = {
+  openCallId: v.id("openCalls"),
+  artistId: v.id("users"),
+  applicationId: v.string(),
+  applicationStatus: v.string(),
+};
 
 export default defineSchema({
   ...authTables, // This includes other auth tables
@@ -284,18 +298,28 @@ export default defineSchema({
     .index("by_artistId", ["artistId"])
     .index("by_artistNationality", ["artistNationality"]),
 
+  // Application Tables
+  applications: defineTable(applicationsSchema)
+    .index("by_openCallId", ["openCallId"])
+    .index("by_artistId", ["artistId"]),
+
   // Organization Tables
   organizations: defineTable(organizationSchema)
-    .index("by_organizationName", ["organizationName"])
+    .index("by_name", ["name"])
+    .index("by_slug", ["slug"])
     .index("by_ownerId", ["ownerId"]),
 
   events: defineTable(eventSchema)
     .index("by_name", ["name"])
+    .index("by_slug", ["slug"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
+    .index("by_mainOrgName", ["mainOrgName"])
+    .index("by_startDate", ["dates.eventStart"])
     // .index("by_eventId", ["event"])
     .index("by_eventType", ["eventType"])
     .index("by_category", ["eventCategory"])
+    .index("by_state", ["state"])
     .index("by_country", ["location.countryAbbr"]),
   // .index("by_continent", ["location.continent"]), //TODO: add this back once I have the continents mapped properly
 
@@ -309,6 +333,7 @@ export default defineSchema({
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_budget", ["compensation.budget.min"])
     .index("by_endDate", ["basicInfo.dates.ocEnd"])
+    .index("by_state", ["state"])
     .index("by_eligibility", ["eligibility.type"]),
 
   openCallOrganizers: defineTable(openCallOrganizerSchema)
@@ -344,7 +369,7 @@ export default defineSchema({
       v.literal("backlog"),
       v.literal("todo"),
       v.literal("doing"),
-      v.literal("done")
+      v.literal("done"),
     ),
     order: v.number(),
     createdAt: v.number(),
@@ -360,11 +385,11 @@ export default defineSchema({
     stripeProductId: v.optional(v.string()),
     img: v.optional(v.string()),
     prices: v.object({
-      month: v.optional(stripeIntervalPricesValidator),
-      year: v.optional(stripeIntervalPricesValidator),
+      month: stripeIntervalPricesValidator,
+      year: stripeIntervalPricesValidator,
     }),
-    features: v.optional(v.array(v.string())), // added features column
-    popular: v.optional(v.boolean()), // added popular column
+    features: v.array(v.string()),
+    popular: v.boolean(), // added popular column
   })
     .index("key", ["key"])
     .index("stripeProductId", ["stripeProductId"]),
@@ -377,9 +402,9 @@ export default defineSchema({
     prices: v.optional(
       v.object({
         rate: v.number(),
-      })
+      }),
     ),
-    features: v.optional(v.array(v.string())),
+    features: v.array(v.string()),
     popular: v.optional(v.boolean()),
   })
     .index("key", ["key"])
@@ -432,6 +457,4 @@ export default defineSchema({
     language: v.optional(v.string()),
     theme: v.optional(v.string()),
   }).index("by_userId", ["userId"]),
-
-  // Your other custom tables...
-})
+});

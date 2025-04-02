@@ -6,8 +6,8 @@ import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
 import {
-  CombinedEventCardData,
-  useMockEventCards,
+  CombinedEventPreviewCardData,
+  useEventPreviewCards,
 } from "@/hooks/use-combined-events";
 import { useFilteredEvents } from "@/hooks/use-filtered-events";
 // import { getFourCharMonth } from "@/lib/dateFns"
@@ -34,7 +34,7 @@ const ClientEventList = ({
 Props) => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const allEvents = useMockEventCards();
+  const allEvents = useEventPreviewCards();
 
   // console.log("allEvents", allEvents)
 
@@ -135,7 +135,7 @@ Props) => {
       string,
       {
         title: ReturnType<typeof getGroupKeyFromEvent>;
-        events: CombinedEventCardData[];
+        events: CombinedEventPreviewCardData[];
       }
     > = {};
     const orderedGroupKeys: string[] = [];

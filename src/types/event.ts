@@ -1,49 +1,69 @@
-export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth"
+import { Artist } from "@/types/artist";
+import { OpenCall } from "@/types/openCall";
+import { Organizer } from "@/types/organizer";
+import { Id } from "~/convex/_generated/dataModel";
+
+export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth";
 export type EventCategory =
   | "event"
   | "project"
   | "residency"
   | "gfund"
-  | "roster"
+  | "roster";
+
+export type SubmissionFormState =
+  | "draft"
+  | "submitted"
+  | "published"
+  | "archived";
 
 export interface EventData {
-  id: string
-  adminNote?: string
-  organizerId: string[]
-  mainOrgId: string
-  openCallId?: string[] //list the open call id's that are associated with this event
+  _id: Id<"events">;
+  adminNote?: string;
+  organizerId: string[];
+  mainOrgId: string;
+  openCallId: string[]; //list the open call id's that are associated with this event
 
-  name: string
-  logo: string
-  eventType?: [EventType] | [EventType, EventType]
-  category: EventCategory
+  name: string;
+  slug: string;
+  logo: string;
+  eventType?: [EventType] | [EventType, EventType];
+  // eventType?: string[];
+  eventCategory: EventCategory;
   dates: {
-    eventStart?: string
-    eventEnd?: string
-    ongoing: boolean
-  }
+    edition: number;
+    eventStart?: string;
+    eventEnd?: string;
+    ongoing: boolean;
+  };
 
   location: {
-    sameAsOrganizer?: boolean
-    locale?: string
-    city?: string
-    state?: string
-    stateAbbr?: string
-    region?: string
-    country: string
-    countryAbbr?: string
-    continent?: string
+    sameAsOrganizer?: boolean;
+    locale?: string;
+    city?: string;
+    state?: string;
+    stateAbbr?: string;
+    region?: string;
+    country: string;
+    countryAbbr?: string;
+    continent?: string;
     coordinates?: {
-      latitude: number
-      longitude: number
-    }
-  }
-  about: string
+      latitude: number;
+      longitude: number;
+    };
+  };
+  about?: string;
   links: {
-    type: string
-    title: string
-    href: string
-    handle?: string
-  }[]
-  otherInfo?: string[]
+    type: string;
+    title: string;
+    href: string;
+    handle?: string;
+  }[];
+  otherInfo?: string[];
+  state: SubmissionFormState;
+}
+
+export interface EventCardDetailProps {
+  data: { event: EventData; openCall: OpenCall; organizer: Organizer };
+  artist: Artist;
 }

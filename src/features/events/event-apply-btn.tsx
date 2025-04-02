@@ -1,23 +1,25 @@
-import { Button } from "@/components/ui/button"
-import EventContextMenu from "@/features/events/ui/event-context-menu"
-import { cn } from "@/lib/utils"
-import { EventCategory } from "@/types/event"
-import { ApplicationStatus, OpenCallStatus } from "@/types/openCall"
-import { CircleDollarSignIcon } from "lucide-react"
-import Link from "next/link"
-import React from "react"
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6"
+import { Button } from "@/components/ui/button";
+import EventContextMenu from "@/features/events/ui/event-context-menu";
+import { cn } from "@/lib/utils";
+import { EventCategory } from "@/types/event";
+import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
+import { CircleDollarSignIcon } from "lucide-react";
+import Link from "next/link";
+import React from "react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 interface ApplyButtonShortProps {
-  id: string
-  status: ApplicationStatus
-  openCall: OpenCallStatus
-  publicView?: boolean
-  appFee: number
+  id: string;
+  edition: number;
+  status: ApplicationStatus;
+  openCall: OpenCallStatus;
+  publicView?: boolean;
+  appFee: number;
 }
 
 export const ApplyButtonShort = ({
   id,
+  edition,
   status,
   openCall,
   publicView,
@@ -25,21 +27,21 @@ export const ApplyButtonShort = ({
 }: ApplyButtonShortProps) => {
   const href =
     publicView && !openCall
-      ? `/thelist/event/${id}`
+      ? `/thelist/event/${id}/${edition}`
       : publicView && openCall === "active"
-      ? "/pricing#plans"
-      : openCall === "active"
-      ? `/thelist/call/${id}`
-      : `/thelist/event/${id}`
+        ? "/pricing#plans"
+        : openCall === "active"
+          ? `/thelist/event/${id}/call/${edition}`
+          : `/thelist/event/${id}/${edition}`;
 
   const buttonText =
     openCall === "coming-soon"
       ? "Coming Soon!"
       : status && !publicView
-      ? "Applied"
-      : openCall === "active"
-      ? "Apply"
-      : "View More"
+        ? "Applied"
+        : openCall === "active"
+          ? "Apply"
+          : "View More";
 
   return (
     <>
@@ -52,21 +54,22 @@ export const ApplyButtonShort = ({
           //     setManualApplied("applied")
           //   }
           // }}
-          variant='salWithShadowHidden'
-          size='lg'
+          variant="salWithShadowHidden"
+          size="lg"
           className={cn(
-            " w-full min-w-[100px] bg-white/60",
+            "w-full min-w-[100px] bg-white/60",
             status !== null &&
               !publicView &&
-              "text-foreground/50 border-foreground/50 bg-background"
-          )}>
-          <span className='flex items-center gap-x-1'>
+              "border-foreground/50 bg-background text-foreground/50",
+          )}
+        >
+          <span className="flex items-center gap-x-1">
             {buttonText}
             {appFee > 0 && (
               <CircleDollarSignIcon
                 className={cn(
                   "size-6 text-red-600",
-                  status !== null && "text-foreground/50"
+                  status !== null && "text-foreground/50",
                 )}
               />
             )}
@@ -74,27 +77,28 @@ export const ApplyButtonShort = ({
         </Button>
       </Link>
     </>
-  )
-}
+  );
+};
 
 interface ApplyButtonProps {
-  id: string
-  manualApplied: ApplicationStatus
-  setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>
-  isBookmarked: boolean
-  setIsBookmarked: React.Dispatch<React.SetStateAction<boolean>>
-  isHidden: boolean
-  setIsHidden: React.Dispatch<React.SetStateAction<boolean>>
-  eventCategory: EventCategory
-  appFee: number
-  isPreview?: boolean
-  publicView?: boolean
-  openCall: OpenCallStatus
-  className?: string
-  detailCard?: boolean
+  id: string;
+  edition: number;
+  manualApplied: ApplicationStatus;
+  setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>;
+  isBookmarked: boolean;
+  setIsBookmarked: React.Dispatch<React.SetStateAction<boolean>>;
+  isHidden: boolean;
+  setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
+  eventCategory: EventCategory;
+  appFee: number;
+  isPreview?: boolean;
+  publicView?: boolean;
+  openCall: OpenCallStatus;
+  className?: string;
+  detailCard?: boolean;
 }
 
-const ApplyButton = ({
+export const ApplyButton = ({
   id,
   manualApplied: status,
   setManualApplied,
@@ -109,15 +113,16 @@ const ApplyButton = ({
   isPreview = false,
   className,
   detailCard,
+  edition,
 }: ApplyButtonProps) => {
   const href =
     publicView && !openCall
-      ? `/thelist/event/${id}`
+      ? `/thelist/event/${id}/${edition}`
       : publicView && openCall === "active"
-      ? "/pricing#plans"
-      : openCall === "active"
-      ? `/thelist/call/${id}`
-      : `/thelist/event/${id}`
+        ? "/pricing#plans"
+        : openCall === "active"
+          ? `/thelist/event/${id}/call/${edition}`
+          : `/thelist/event/${id}/${edition}`;
 
   const buttonText =
     openCall === "active"
@@ -126,17 +131,18 @@ const ApplyButton = ({
             status.slice(0, 1).toUpperCase() + status.slice(1).toLowerCase()
           }`
         : "Apply"
-      : "View More"
+      : "View More";
 
   return (
     <div
       className={cn(
-        "col-span-full  mt-4 lg:mt-0 flex items-center justify-center lg:px-4 ",
+        "col-span-full mt-4 flex items-center justify-center lg:mt-0 lg:px-4",
         !detailCard && "lg:w-[250px]",
-        detailCard && "lg:w-full lg:mt-4",
-        className
-      )}>
-      <Link href={href} passHref target={!publicView ? "_blank" : "_self"}>
+        detailCard && "lg:mt-4 lg:w-full",
+        className,
+      )}
+    >
+      <Link href={href} passHref>
         <Button
           asChild
           // onClick={() => {
@@ -145,21 +151,22 @@ const ApplyButton = ({
           //   }
           // }}
           //Todo: Add this to the event detail page and it will sync the state to the main page. Easy peasy
-          variant='salWithShadowHidden'
-          size='lg'
+          variant="salWithShadowHidden"
+          size="lg"
           className={cn(
-            "rounded-r-none border-r w-full xl:min-w-[150px]",
+            "w-full rounded-r-none border-r xl:min-w-[150px]",
             status !== null &&
               !publicView &&
-              "text-foreground/50 border-foreground/50 bg-background"
-          )}>
-          <span className='flex items-center gap-x-1'>
+              "border-foreground/50 bg-background text-foreground/50",
+          )}
+        >
+          <span className="flex items-center gap-x-1">
             {buttonText}
             {appFee > 0 && !publicView && (
               <CircleDollarSignIcon
                 className={cn(
                   "size-6 text-red-600",
-                  status !== null && "text-foreground/50"
+                  status !== null && "text-foreground/50",
                 )}
               />
             )}
@@ -167,14 +174,15 @@ const ApplyButton = ({
         </Button>
       </Link>
       <Button
-        variant='salWithShadowHidden'
-        size='lg'
-        className='rounded-none border-x w-fit sm:px-3 px-3'
-        onClick={() => setIsBookmarked(!isBookmarked)}>
+        variant="salWithShadowHidden"
+        size="lg"
+        className="w-fit rounded-none border-x px-3 sm:px-3"
+        onClick={() => setIsBookmarked(!isBookmarked)}
+      >
         {isBookmarked ? (
-          <FaBookmark className='size-6 text-red-500 ' />
+          <FaBookmark className="size-6 text-red-500" />
         ) : (
-          <FaRegBookmark className='size-6 ' />
+          <FaRegBookmark className="size-6" />
         )}
       </Button>
       {/* <Button
@@ -199,7 +207,5 @@ const ApplyButton = ({
         buttonTrigger={true}
       />
     </div>
-  )
-}
-
-export default ApplyButton
+  );
+};

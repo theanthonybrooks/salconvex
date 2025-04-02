@@ -1,8 +1,8 @@
-import { filter } from "convex-helpers/server/filter"
-import { v } from "convex/values"
+import { filter } from "convex-helpers/server/filter";
+import { v } from "convex/values";
 
-import { getAuthUserId } from "@convex-dev/auth/server"
-import { query } from "~/convex/_generated/server"
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { query } from "~/convex/_generated/server";
 
 export const isNewOrg = query({
   args: {
@@ -11,13 +11,11 @@ export const isNewOrg = query({
   handler: async (ctx, args) => {
     const existingOrg = await ctx.db
       .query("organizations")
-      .withIndex("by_organizationName", (q) =>
-        q.eq("organizationName", args.organizationName)
-      )
-      .unique()
-    return existingOrg === null
+      .withIndex("by_name", (q) => q.eq("name", args.organizationName))
+      .unique();
+    return existingOrg === null;
   },
-})
+});
 
 // export const searchOrganizationsByName = query({
 //   args: {
@@ -36,31 +34,31 @@ export const getUserOrganizations = query({
     query: v.string(), // keep required
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (!userId) return null
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
 
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
-    if (!user) return null
+      .unique();
+    if (!user) return null;
 
-    const q = args.query.toLowerCase()
+    const q = args.query.toLowerCase();
     const filterFn = (org: any) =>
-      q === "" || org.organizationName?.toLowerCase().includes(q)
+      q === "" || org.organizationName?.toLowerCase().includes(q);
 
     if (user?.role.includes("admin")) {
-      const all = await ctx.db.query("organizations").collect()
-      return all.filter(filterFn)
+      const all = await ctx.db.query("organizations").collect();
+      return all.filter(filterFn);
     }
 
     const orgs = await ctx.db
       .query("organizations")
       .filter((q) => q.eq(q.field("ownerId"), user._id))
-      .collect()
-    return orgs.filter(filterFn)
+      .collect();
+    return orgs.filter(filterFn);
   },
-})
+});
 
 //
 //
@@ -72,16 +70,16 @@ export const isOwnerOrIsNewOrg = query({
     organizationName: v.string(),
   },
   handler: async (ctx, args) => {
-    const inputName = args.organizationName.trim().toLowerCase()
+    const inputName = args.organizationName.trim().toLowerCase();
 
-    const userId = await getAuthUserId(ctx)
-    if (!userId) return null
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
+      .unique();
 
-    if (!user) return null
+    if (!user) return null;
 
     // const owner = await ctx.db
     //   .query("organizations")
@@ -92,13 +90,13 @@ export const isOwnerOrIsNewOrg = query({
       ctx.db
         .query("organizations")
         .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id)),
-      (org) => org.organizationName.toLowerCase() === inputName
-    ).unique()
+      (org) => org.name.toLowerCase() === inputName,
+    ).unique();
 
-    console.log("owner", owner)
+    console.log("owner", owner);
 
-    if (owner && owner.ownerId === user._id) return "ownedByUser"
-    if (owner) return "ownedByOther"
+    if (owner && owner.ownerId === user._id) return "ownedByUser";
+    if (owner) return "ownedByOther";
 
     // const org = await ctx.db
     //   .query("organizations")
@@ -108,17 +106,24 @@ export const isOwnerOrIsNewOrg = query({
     //   .unique()
     const org = await filter(
       ctx.db.query("organizations"),
-      (org) => org.organizationName.toLowerCase() === inputName
-    ).unique()
+      (org) => org.name.toLowerCase() === inputName,
+    ).unique();
 
-    console.log("org", org)
+    console.log("org", org);
 
-    if (org) return "orgNameExists"
+    if (org) return "orgNameExists";
 
-    console.log("if org")
-    if (inputName === "") return null
+    console.log("if org");
+    if (inputName === "") return null;
 
-    console.log("else")
-    return "available"
+    console.log("else");
+    return "available";
   },
-})
+});
+
+const getAllOrganizations = query({
+  handler: async (ctx) => {
+    const allOrgs = await ctx.db.query("organizations").collect();
+    return allOrgs;
+  },
+});

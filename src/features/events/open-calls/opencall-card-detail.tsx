@@ -41,9 +41,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TbStairs } from "react-icons/tb";
 
-import ApplyButton from "@/features/events/event-apply-btn";
+import { ApplyButton } from "@/features/events/event-apply-btn";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
-import { CombinedEventCardData } from "@/hooks/use-combined-events";
+import { EventCardDetailProps as OpenCallCardDetailProps } from "@/types/event";
+
+import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { generateICSFile } from "@/lib/addToCalendar";
 import {
   formatEventDates,
@@ -56,50 +58,50 @@ import {
   getEventCategoryLabel,
   getEventTypeLabel,
 } from "@/lib/eventFns";
+import { ApplicationStatus } from "@/types/openCall";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
-
-interface OpenCallCardDetailProps {
-  event: CombinedEventCardData;
-  eventOnly?: boolean;
-}
+import slugify from "slugify";
 
 const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   const {
-    event,
-    eventOnly,
+    data,
+    artist,
     // organizer,
   } = props;
+
+  const { event, organizer, openCall } = data;
   const {
     // id: eventId,
     logo: eventLogo,
-    category: eventCategory,
+    eventCategory,
     eventType,
     location,
-    tabs,
-    //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
-    // hasActiveOpenCall: hasOpenCall,
-    status,
-    // adminNote,
-    openCallStatus,
-    bookmarked,
-    hidden,
-    appFee,
     dates,
   } = event;
+  //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
+
+  const status: ApplicationStatus | null =
+    artist.applications?.find((app) => app.openCallId === openCall._id)
+      ?.applicationStatus ?? null;
+
+  const { bookmarked, hidden } = artist.listActions?.find(
+    (la) => la.eventId === event._id,
+  ) ?? {
+    bookmarked: false,
+    hidden: false,
+  };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-
   const { eventStart, eventEnd, ongoing } = dates;
-  const { opencall: openCallTab, organizer } = tabs;
   const {
     compensation,
     basicInfo,
     eligibility,
     requirements,
-    id: openCallId,
-  } = openCallTab;
+    _id: openCallId,
+  } = openCall;
   const {
     type: eligibilityType,
     whom: eligibilityWhom,
@@ -133,18 +135,23 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   const { callType, dates: callDates } = basicInfo;
   const { ocStart, ocEnd, timezone } = callDates;
 
+  const openCallStatus = getOpenCallStatus(
+    ocStart ? new Date(ocStart) : null,
+    ocEnd ? new Date(ocEnd) : null,
+    basicInfo.callType,
+  );
+
   const latitude = location.coordinates?.latitude ?? 0;
   const longitude = location.coordinates?.longitude ?? 0;
-  const hasOpenCall = openCallStatus === "active";
+  // const hasOpenCall = openCallStatus === "active";
 
   // console.log("has open call", hasOpenCall)
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isHidden, setIsHidden] = useState(hidden);
-  const [activeTab, setActiveTab] = useState(
-    hasOpenCall ? "opencall" : "event",
-  );
+  const [activeTab, setActiveTab] = useState("opencall");
   const [isManualApplied, setManualApplied] = useState(status);
+  const orgSlug = slugify(organizer.name);
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
@@ -174,8 +181,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
           ocStart,
           ocEnd,
           locationString,
-          event.about,
-          event.category,
+          event.about ?? "",
+          eventCategory,
           true,
           hasEventDates ? dates.eventStart! : "",
           hasEventDates ? dates.eventEnd! : "",
@@ -188,7 +195,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
 
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
-      {hasOpenCall && status !== null && (
+      {status !== null && (
         <span
           className={cn(
             "col-start-2 w-fit rounded-full border-2 border-foreground/30 bg-white/70 px-2 py-1 text-xs",
@@ -220,14 +227,14 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
             height={60}
             className={cn(
               "size-[60px] rounded-full border-2",
-              hasOpenCall &&
-                (status === "accepted"
-                  ? "ring-4 ring-emerald-500 ring-offset-1"
-                  : status === "rejected"
-                    ? "ring-4 ring-red-500 ring-offset-1"
-                    : status === "pending"
-                      ? "ring-4 ring-foreground/20 ring-offset-1"
-                      : ""),
+
+              status === "accepted"
+                ? "ring-4 ring-emerald-500 ring-offset-1"
+                : status === "rejected"
+                  ? "ring-4 ring-red-500 ring-offset-1"
+                  : status === "pending"
+                    ? "ring-4 ring-foreground/20 ring-offset-1"
+                    : "",
             )}
           />
 
@@ -279,10 +286,10 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </p>
             )}
-            {appFee !== 0 && (
+            {basicInfo?.appFee !== 0 && (
               <p className="flex items-center gap-x-1 text-sm text-red-600">
                 <span className="font-semibold">Application Fee:</span>
-                {`$${appFee}`}
+                {`$${basicInfo?.appFee}`}
               </p>
             )}
           </div>
@@ -304,35 +311,33 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
           className="flex w-full flex-col justify-center"
         >
           <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/60">
-            {["opencall", "event", "organizer"]
-              .filter((tab) => !eventOnly || tab !== "opencall")
-              .map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className={cn(
-                    "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
-                    activeTab === tab ? "text-black" : "text-muted-foreground",
-                  )}
-                >
-                  {activeTab === tab && (
-                    <motion.div
-                      layoutId="tab-bg"
-                      className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  <span className="relative z-10">
-                    {tab === "opencall" && "Open Call"}
-                    {tab === "event" && getEventCategoryLabel(eventCategory)}
-                    {tab === "organizer" && "Organizer"}
-                  </span>
-                </TabsTrigger>
-              ))}
+            {["opencall", "event", "organizer"].map((tab) => (
+              <TabsTrigger
+                key={tab}
+                value={tab}
+                className={cn(
+                  "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
+                  activeTab === tab ? "text-black" : "text-muted-foreground",
+                )}
+              >
+                {activeTab === tab && (
+                  <motion.div
+                    layoutId="tab-bg"
+                    className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                    }}
+                  />
+                )}
+                <span className="relative z-10">
+                  {tab === "opencall" && "Open Call"}
+                  {tab === "event" && getEventCategoryLabel(eventCategory)}
+                  {tab === "organizer" && "Organizer"}
+                </span>
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="opencall">
@@ -662,13 +667,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                     </ol>
                   </AccordionContent>
                 </AccordionItem>
-                {openCallTab.requirements?.otherInfo && (
+                {openCall?.requirements?.otherInfo && (
                   <AccordionItem value="item-5">
                     <AccordionTrigger title="Other info:" />
                     <AccordionContent>
                       <div className="mb-4 grid grid-cols-[1fr_auto] border-foreground/20 pb-3">
                         <ol className="list-inside list-decimal px-4">
-                          {openCallTab.requirements?.otherInfo?.map(
+                          {openCall?.requirements?.otherInfo?.map(
                             (info, index) => (
                               <li key={index} className="py-1">
                                 {info}
@@ -683,8 +688,9 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
               </Accordion>
               <ApplyButton
                 id={openCallId}
+                edition={event.dates.edition}
                 // status={status}
-                openCall={event.openCallStatus}
+                openCall={openCallStatus}
                 manualApplied={isManualApplied}
                 setManualApplied={setManualApplied}
                 isBookmarked={isBookmarked}
@@ -692,7 +698,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 isHidden={isHidden}
                 setIsHidden={setIsHidden}
                 eventCategory={eventCategory}
-                appFee={appFee ?? 0}
+                appFee={basicInfo?.appFee ?? 0}
                 className="w-full"
                 detailCard
               />
@@ -911,7 +917,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                   </div>
                   <a
                     className="mt-6 line-clamp-4 text-center text-sm underline-offset-2 hover:underline"
-                    href={`/organizer/${organizer.id}`}
+                    href={`/organizer/${orgSlug}`}
                   >
                     Check out {organizer.name}&apos;s other events
                   </a>
