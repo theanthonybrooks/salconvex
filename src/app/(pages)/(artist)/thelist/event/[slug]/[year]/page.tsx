@@ -47,13 +47,13 @@ const Event = () => {
       >
         <IoIosArrowRoundBack className="h-6 w-6" /> back to The List
       </div>
-      {!data || !artistData ? (
+      {!data ? (
         // <p>Event: {data?.event.name}</p>
         <span className="flex items-center gap-4 text-lg font-semibold">
           Loading <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <EventCardDetail data={data} artist={artistData.artist} />
+        <EventCardDetail data={data} artist={artistData?.artist} />
       )}
     </div>
   );

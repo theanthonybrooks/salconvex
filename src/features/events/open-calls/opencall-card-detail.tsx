@@ -83,10 +83,10 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
 
   const status: ApplicationStatus | null =
-    artist.applications?.find((app) => app.openCallId === openCall._id)
+    artist?.applications?.find((app) => app.openCallId === openCall._id)
       ?.applicationStatus ?? null;
 
-  const { bookmarked, hidden } = artist.listActions?.find(
+  const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
   ) ?? {
     bookmarked: false,

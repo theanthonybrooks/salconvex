@@ -65,5 +65,5 @@ export interface EventData {
 
 export interface EventCardDetailProps {
   data: { event: EventData; openCall: OpenCall; organizer: Organizer };
-  artist: Artist;
+  artist?: Artist;
 }

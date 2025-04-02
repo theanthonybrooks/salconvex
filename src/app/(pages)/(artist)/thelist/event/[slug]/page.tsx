@@ -26,6 +26,8 @@ const Event = () => {
   //   edition: 2025,
   // });
 
+  console.log("event data", data);
+
   const onBackClick = () => {
     router.back();
 
@@ -47,13 +49,14 @@ const Event = () => {
       >
         <IoIosArrowRoundBack className="h-6 w-6" /> back to The List
       </div>
-      {!data || !artistData ? (
+      {!data ? (
         // <p>Event: {data?.event.name}</p>
         <span className="flex items-center gap-4 text-lg font-semibold">
-          Loading <LoaderPinwheel className="animate-spin" />
+          Loading the Event Page (as in, the overall event page){" "}
+          <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <EventCardDetail data={data} artist={artistData.artist} />
+        <EventCardDetail data={data} artist={artistData?.artist} />
       )}
     </div>
   );

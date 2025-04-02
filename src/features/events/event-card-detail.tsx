@@ -61,7 +61,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
     dates,
   } = event;
 
-  const { bookmarked, hidden } = artist.listActions?.find(
+  const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
   ) ?? {
     bookmarked: false,

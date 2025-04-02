@@ -26,6 +26,8 @@ const OpenCallDetail = () => {
     router.refresh(); // try to ensure that the page has a sec to load
   };
 
+  console.log("call data", data);
+
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
   return (
@@ -36,13 +38,13 @@ const OpenCallDetail = () => {
       >
         <IoIosArrowRoundBack className="h-6 w-6" /> back to The List
       </div>
-      {!data || !artistData ? (
+      {!data ? (
         // <p>Event: {data?.event.name}</p>
         <span className="flex items-center gap-4 text-lg font-semibold">
           Loading <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <OpenCallCardDetail data={data} artist={artistData.artist} />
+        <OpenCallCardDetail data={data} artist={artistData?.artist} />
       )}
     </div>
   );
