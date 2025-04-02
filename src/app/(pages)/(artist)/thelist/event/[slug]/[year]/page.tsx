@@ -10,6 +10,7 @@ import { api } from "~/convex/_generated/api";
 const Event = () => {
   const router = useRouter();
   const { slug, year } = useParams();
+
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
   const data = useQuery(
@@ -24,19 +25,16 @@ const Event = () => {
   //   edition: 2025,
   // });
 
-  console.log("Referrer:", document.referrer);
-  console.log("History length:", window.history.length);
-
   const onBackClick = () => {
-    const prevUrl = window.location.href;
+    // const prevUrl = window.location.href;
     router.back();
-    router.refresh();
+    // router.refresh();
 
-    setTimeout(() => {
-      if (window.location.href === prevUrl) {
-        router.push("/thelist");
-      }
-    }, 100);
+    // setTimeout(() => {
+    //   if (window.location.href === prevUrl) {
+    //     window.location.href = `/thelist/`;
+    //   }
+    // }, 100);
   };
 
   // setTimeout(() => {

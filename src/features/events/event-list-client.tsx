@@ -32,8 +32,9 @@ const ClientEventList = ({
 }: // userPref,
 
 Props) => {
-  const searchParams = useSearchParams();
   const router = useRouter();
+
+  const searchParams = useSearchParams();
   const allEvents = useEventPreviewCards();
 
   // console.log("allEvents", allEvents)

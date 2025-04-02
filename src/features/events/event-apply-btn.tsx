@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
 import { CircleDollarSignIcon } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
@@ -25,6 +25,8 @@ export const ApplyButtonShort = ({
   publicView,
   appFee,
 }: ApplyButtonShortProps) => {
+  const currentUrl = window.location.href;
+  const router = useRouter();
   const href =
     publicView && !openCall
       ? `/thelist/event/${id}/${edition}`
@@ -46,36 +48,39 @@ export const ApplyButtonShort = ({
   return (
     <>
       {/* //removing the target attribute for now as it's not really necessary, I think. The params are all in the url when you view something, so you should go back to that exact same page/filter combo */}
-      <Link href={href} passHref>
-        <Button
-          asChild
-          // onClick={() => {
-          //   if (status === null) {
-          //     setManualApplied("applied")
-          //   }
-          // }}
-          variant="salWithShadowHidden"
-          size="lg"
-          className={cn(
-            "w-full min-w-[100px] bg-white/60",
-            status !== null &&
-              !publicView &&
-              "border-foreground/50 bg-background text-foreground/50",
+
+      <Button
+        asChild
+        // onClick={() => {
+        //   if (status === null) {
+        //     setManualApplied("applied")
+        //   }
+        // }}
+        onClick={() => {
+          window.history.pushState({}, "", currentUrl);
+          router.push(href);
+        }}
+        variant="salWithShadowHidden"
+        size="lg"
+        className={cn(
+          "w-full min-w-[100px] cursor-pointer bg-white/60",
+          status !== null &&
+            !publicView &&
+            "border-foreground/50 bg-background text-foreground/50",
+        )}
+      >
+        <span className="flex items-center gap-x-1">
+          {buttonText}
+          {appFee > 0 && (
+            <CircleDollarSignIcon
+              className={cn(
+                "size-6 text-red-600",
+                status !== null && "text-foreground/50",
+              )}
+            />
           )}
-        >
-          <span className="flex items-center gap-x-1">
-            {buttonText}
-            {appFee > 0 && (
-              <CircleDollarSignIcon
-                className={cn(
-                  "size-6 text-red-600",
-                  status !== null && "text-foreground/50",
-                )}
-              />
-            )}
-          </span>
-        </Button>
-      </Link>
+        </span>
+      </Button>
     </>
   );
 };
@@ -115,6 +120,8 @@ export const ApplyButton = ({
   detailCard,
   edition,
 }: ApplyButtonProps) => {
+  const router = useRouter();
+  const currentUrl = window.location.href;
   const href =
     publicView && !openCall
       ? `/thelist/event/${id}/${edition}`
@@ -142,37 +149,42 @@ export const ApplyButton = ({
         className,
       )}
     >
-      <Link href={href} passHref>
-        <Button
-          asChild
-          // onClick={() => {
-          //   if (status === null) {
-          //     setManualApplied("applied")
-          //   }
-          // }}
-          //Todo: Add this to the event detail page and it will sync the state to the main page. Easy peasy
-          variant="salWithShadowHidden"
-          size="lg"
-          className={cn(
-            "w-full rounded-r-none border-r xl:min-w-[150px]",
-            status !== null &&
-              !publicView &&
-              "border-foreground/50 bg-background text-foreground/50",
+      <Button
+        onClick={() => {
+          // if (status === null) {
+          //   setManualApplied("applied")
+          // }
+          window.history.pushState({}, "", currentUrl);
+          router.push(href);
+        }}
+        // onClick={() => {
+        //   if (status === null) {
+        //     setManualApplied("applied")
+        //   }
+        // }}
+        //Todo: Add this to the event detail page and it will sync the state to the main page. Easy peasy
+        variant="salWithShadowHidden"
+        size="lg"
+        className={cn(
+          "w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
+          status !== null &&
+            !publicView &&
+            "border-foreground/50 bg-background text-foreground/50",
+        )}
+      >
+        <span className="flex items-center gap-x-1">
+          {buttonText}
+          {appFee > 0 && !publicView && (
+            <CircleDollarSignIcon
+              className={cn(
+                "size-6 text-red-600",
+                status !== null && "text-foreground/50",
+              )}
+            />
           )}
-        >
-          <span className="flex items-center gap-x-1">
-            {buttonText}
-            {appFee > 0 && !publicView && (
-              <CircleDollarSignIcon
-                className={cn(
-                  "size-6 text-red-600",
-                  status !== null && "text-foreground/50",
-                )}
-              />
-            )}
-          </span>
-        </Button>
-      </Link>
+        </span>
+      </Button>
+
       <Button
         variant="salWithShadowHidden"
         size="lg"
