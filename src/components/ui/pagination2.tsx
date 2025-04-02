@@ -2,29 +2,37 @@
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Filters, SortOptions } from "@/types/thelist";
 import { motion } from "framer-motion";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
 
 interface BasicPaginationProps {
-  currentPage: number;
+  page: number;
   totalPages: number;
+  filters: Filters;
+  sortOptions: SortOptions;
+  onPageChange: (page: number) => void;
 }
 
 export const BasicPagination = ({
-  currentPage,
+  page,
   totalPages,
+  filters,
+  sortOptions,
+  onPageChange: setPage,
 }: BasicPaginationProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const firstPage = currentPage === 1;
-  const lastPage = currentPage === totalPages;
+  const firstPage = page === 1;
+  const lastPage = page === totalPages;
   const singlePage = totalPages === 1;
-  const [val, setVal] = useState(currentPage);
-  const [page, setPage] = useState(currentPage);
 
+  // const [prevTotal, setPrevTotal] = useState(totalPages);
+
+  console.log("currentPage", page);
+  console.log("totalPages", totalPages);
+  console.log("firstPage", firstPage);
+  console.log("lastPage", lastPage);
+  console.log("filters", filters);
+  console.log("sortOptions", sortOptions);
   // console.log(firstPage, lastPage, page, currentPage, totalPages);
 
   const onUserInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -36,36 +44,39 @@ export const BasicPagination = ({
     }
   };
 
-  const goToPage = useCallback(
-    (page: number) => {
-      const params = new URLSearchParams(searchParams.toString());
+  // const goToPage = useCallback(
+  //   (page: number) => {
+  //     const params = new URLSearchParams(searchParams.toString());
 
-      if (page > totalPages) return;
+  //     if (page > totalPages) return;
 
-      if (page === 1) {
-        params.delete("page");
-      } else {
-        params.set("page", page.toString());
-      }
+  //     if (page === 1) {
+  //       params.delete("page");
+  //     } else {
+  //       params.set("page", page.toString());
+  //     }
 
-      router.push(`${pathname}?${params.toString()}`);
-    },
-    [router, pathname, searchParams, totalPages],
-  );
+  //     router.push(`${pathname}?${params.toString()}`);
+  //   },
+  //   [router, pathname, searchParams, totalPages],
+  // );
 
-  useEffect(() => {
-    if (currentPage === 1 && currentPage !== page) {
-      setPage(1);
-      setVal(1);
-    }
-  }, [currentPage, page]);
+  // if (prevTotal !== totalPages) {
+  //   if (val !== 1 && )
+  // }
 
-  useEffect(() => {
-    if (totalPages <= 1) {
-      setPage(1);
-      setVal(1);
-    }
-  }, [totalPages]);
+  // useEffect(() => {
+  //   console.log("im changing");
+  //   // if (totalPages <= 1) {
+  //   console.log("totalPages", totalPages);
+
+  //   setPrevTotal(totalPages);
+  //   setPage(1);
+  //   setVal(1);
+  //   console.log("prevTotal", prevTotal);
+
+  //   // }
+  // }, [totalPages, prevTotal]);
 
   //Not using prefetch as it doesn't work with the dynamically loaded data
   // const prefetchPage = useCallback(
@@ -85,13 +96,11 @@ export const BasicPagination = ({
   //   [router, pathname, searchParams, totalPages]
   // )
 
-  useEffect(() => {
-    if (page < 1 || page > totalPages || page === currentPage) return;
+  // useEffect(() => {
+  //   if (page < 1 || page > totalPages || page === currentPage) return;
 
-    goToPage(page);
-    // prefetchPage(page - 1)
-    // prefetchPage(page + 1)
-  }, [page, currentPage, totalPages, goToPage]);
+  //   goToPage(page);
+  // }, [page, currentPage, totalPages, goToPage]);
 
   return (
     <motion.div
@@ -115,8 +124,7 @@ export const BasicPagination = ({
       <div className="flex items-center gap-4">
         <span
           onClick={() => {
-            setVal(currentPage - 1);
-            setPage(currentPage - 1);
+            setPage(page - 1);
           }}
           className={cn(
             "cursor-pointer px-3 py-1",
@@ -136,15 +144,15 @@ export const BasicPagination = ({
               const parsed = Number(e.target.value);
               if (parsed > totalPages) return;
               if (!isNaN(parsed)) {
-                setVal(parsed);
+                setPage(parsed);
               }
             }}
-            value={val}
+            value={page}
             onKeyDown={onUserInput}
             onBlur={() => {
               if (page < 1) setPage(1);
               else if (page > totalPages) setPage(totalPages);
-              else setPage(val);
+              else setPage(page);
             }}
             type="number"
             inputMode="numeric"
@@ -158,8 +166,7 @@ export const BasicPagination = ({
 
         <span
           onClick={() => {
-            setVal(currentPage + 1);
-            setPage(currentPage + 1);
+            setPage(page + 1);
           }}
           className={cn(
             "cursor-pointer px-3 py-1",

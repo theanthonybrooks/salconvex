@@ -17,7 +17,7 @@ import { Filters, SortOptions } from "@/types/thelist";
 import { UserPref } from "@/types/user";
 // import { format } from "date-fns"
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 interface Props {
@@ -32,8 +32,6 @@ const ClientEventList = ({
 }: // userPref,
 
 Props) => {
-  const router = useRouter();
-
   const searchParams = useSearchParams();
   const allEvents = useEventPreviewCards();
 
@@ -57,7 +55,7 @@ Props) => {
     showHidden: searchParams.get("h") === "true",
     bookmarkedOnly: searchParams.get("b") === "true",
     limit: Number(searchParams.get("l")) || defaultFilters.limit,
-    page: Number(searchParams.get("page")) || 1,
+    // page: Number(searchParams.get("page")) || 1,
     eventTypes:
       (searchParams.get("type")?.split(",") as EventType[]) ??
       defaultFilters.eventTypes,
@@ -76,10 +74,12 @@ Props) => {
 
   const [filters, setFilters] = useState<Filters>(currentFilters);
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
   const handleResetFilters = () => {
     setFilters(defaultFilters);
     setSortOptions(defaultSort);
+    setPage(1);
   };
 
   useEffect(() => {
@@ -87,6 +87,7 @@ Props) => {
     setParamIfNotDefault(params, "h", filters.showHidden, false);
     setParamIfNotDefault(params, "b", filters.bookmarkedOnly, false);
     setParamIfNotDefault(params, "l", filters.limit, 10);
+
     if (filters.eventTypes?.length)
       params.set("type", filters.eventTypes.join(","));
     else params.delete("type");
@@ -95,8 +96,8 @@ Props) => {
       params.set("cat", filters.eventCategories.join(","));
     else params.delete("cat");
 
-    if (filters.page && filters.page !== 1) {
-      params.set("page", filters.page.toString());
+    if (page && page !== 1) {
+      params.set("page", page.toString());
     } else {
       params.delete("page");
     }
@@ -111,26 +112,14 @@ Props) => {
       "",
       baseUrl + (queryString ? `?${queryString}` : ""),
     );
-  }, [filters, sortOptions, router]);
-
-  useEffect(() => {
-    const pageParam = Number(searchParams.get("page") ?? "1");
-    if (pageParam !== filters.page) {
-      setFilters((prev) => ({ ...prev, page: pageParam }));
-    }
-  }, [searchParams, filters.page]);
+  }, [filters, sortOptions, page]);
 
   const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
-  const currentPage = filters.page ?? 1;
-
-  const paginatedEvents = filteredEvents.slice(
-    (currentPage - 1) * filters.limit,
-    currentPage * filters.limit,
-  );
-  // console.log("filteredEvents", filteredEvents)
-
   const totalPages = Math.ceil(filteredEvents.length / filters.limit);
-  // console.log(filteredEvents.length, filters.limit, totalPages)
+  const paginatedEvents = useMemo(() => {
+    const start = (page - 1) * filters.limit;
+    return filteredEvents.slice(start, start + filters.limit);
+  }, [filteredEvents, page, filters.limit]);
 
   const groupedEvents = useMemo(() => {
     const groups: Record<
@@ -158,6 +147,15 @@ Props) => {
 
     return orderedGroupKeys.map((key) => groups[key]);
   }, [paginatedEvents, sortOptions, publicView]);
+  const handleFilterChange = (partial: Partial<Filters>) => {
+    setFilters((prev) => ({ ...prev, ...partial }));
+    setPage(1);
+  };
+
+  const handleSortChange = (partial: Partial<SortOptions>) => {
+    setSortOptions((prev) => ({ ...prev, ...partial }));
+    setPage(1);
+  };
 
   return (
     <>
@@ -166,16 +164,18 @@ Props) => {
           <EventFilters
             filters={filters}
             sortOptions={sortOptions}
-            onChange={(partial) =>
-              setFilters((prev) => ({ ...prev, ...partial }))
-            }
-            onSortChange={(partial) =>
-              setSortOptions((prev) => ({ ...prev, ...partial }))
-            }
+            onChange={handleFilterChange}
+            onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
           />
 
-          <BasicPagination currentPage={currentPage} totalPages={totalPages} />
+          <BasicPagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            filters={filters}
+            sortOptions={sortOptions}
+          />
         </>
       )}
 
