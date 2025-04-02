@@ -26,16 +26,13 @@ const Event = () => {
   //   edition: 2025,
   // });
 
-  console.log("event data", data);
-
   const onBackClick = () => {
-    router.back();
-
-    // setTimeout(() => {
-    //   window.scrollTo({ top: 0, behavior: "smooth" });
-    // }, 50); // small delay gives time for back nav
-
-    router.refresh(); // try to ensure that the page has a sec to load
+    if (window.history.length > 1) {
+      router.back();
+      router.refresh();
+    } else {
+      router.push("/thelist"); // or wherever your "List" lives
+    }
   };
 
   // const allEvents = useEventDetailCards();

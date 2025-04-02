@@ -163,22 +163,27 @@ const EventCardDetail = (props: EventCardDetailProps) => {
             </p>
           </div>
           <div className="flex flex-col justify-between gap-y-1">
-            <p className="flex items-center gap-x-1 text-sm">
+            <div className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Dates:</span>
-              {formatEventDates(
-                dates?.eventStart || "",
-                dates?.eventEnd || "",
-                isOngoing,
-              )}
-              {icsLink && (
-                <a
-                  href={icsLink}
-                  download={`${event.name.replace(/\s+/g, "_")}.ics`}
-                >
-                  <CalendarClockIcon className="size-5 md:size-4" />
-                </a>
-              )}
-            </p>
+              <span className="inline-grid auto-cols-max grid-flow-col gap-x-2 align-top text-sm">
+                <span className="max-w-prose text-balance break-words">
+                  {formatEventDates(
+                    dates?.eventStart || "",
+                    dates?.eventEnd || "",
+                    isOngoing,
+                    "mobile",
+                  )}
+                </span>
+                {icsLink && (
+                  <a
+                    href={icsLink}
+                    download={`${event.name.replace(/\s+/g, "_")}.ics`}
+                  >
+                    <CalendarClockIcon className="size-5 md:size-4" />
+                  </a>
+                )}
+              </span>
+            </div>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}
@@ -219,6 +224,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
               >
                 {activeTab === tab && (
                   <motion.div
+                    initial={false}
                     layoutId="tab-bg"
                     className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
                     transition={{

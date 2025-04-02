@@ -274,7 +274,12 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
           <div className="flex flex-col justify-between gap-y-1">
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Dates:</span>
-              {formatEventDates(eventStart || "", eventEnd || "", ongoing)}
+              {formatEventDates(
+                eventStart || "",
+                eventEnd || "",
+                ongoing,
+                "mobile",
+              )}
             </p>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>
@@ -324,6 +329,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                   <motion.div
                     layoutId="tab-bg"
                     className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
+                    initial={false}
                     transition={{
                       type: "spring",
                       stiffness: 400,

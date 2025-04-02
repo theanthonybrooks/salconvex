@@ -25,13 +25,18 @@ const Event = () => {
   // });
 
   const onBackClick = () => {
-    router.back();
+    if (window.history.length > 1) {
+      router.back();
+      router.refresh();
+    } else {
+      router.push("/thelist");
+    }
 
     // setTimeout(() => {
     //   window.scrollTo({ top: 0, behavior: "smooth" });
     // }, 50); // small delay gives time for back nav
 
-    router.refresh(); // try to ensure that the page has a sec to load
+    // try to ensure that the page has a sec to load
   };
 
   // const allEvents = useEventDetailCards();

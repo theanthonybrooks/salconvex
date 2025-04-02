@@ -195,6 +195,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 dates?.eventStart || "",
                 dates?.eventEnd || "",
                 dates?.ongoing,
+                "mobile",
                 true,
               )}
             </p>
@@ -396,6 +397,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 dates?.eventStart || "",
                 dates?.eventEnd || "",
                 dates.ongoing,
+                "desktop",
               )}
             </p>
             <p className="flex items-center gap-x-1 text-sm">
