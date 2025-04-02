@@ -24,7 +24,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaApple, FaGoogle } from "react-icons/fa";
 
 interface SignInCardProps {
@@ -81,11 +81,18 @@ const SignInCard: React.FC<SignInCardProps> = ({
 
   const onProviderSignIn = (value: "github" | "google" | "apple") => {
     setIsLoading(value);
-    signIn(value, { redirectTo: "/auth/sign-up" }).finally(() => {
+    signIn(value, { redirectTo: "/auth/sign-up?err=newUser" }).finally(() => {
       setPending(false);
       setIsLoading("");
     });
   };
+
+  useEffect(() => {
+    const errorDesc = searchParams.get("err");
+    if (errorDesc) {
+      setError(decodeURIComponent(errorDesc));
+    }
+  }, [searchParams]);
 
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
