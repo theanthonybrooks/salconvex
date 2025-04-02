@@ -90,7 +90,17 @@ const SignInCard: React.FC<SignInCardProps> = ({
   useEffect(() => {
     const errorDesc = searchParams.get("err");
     if (errorDesc) {
-      setError(decodeURIComponent(errorDesc));
+      if (errorDesc === "newUser") {
+        setError("No account found. Sign up with email and password first.");
+        setTimeout(() => {
+          setError("");
+          const url = new URL(window.location.href);
+          url.searchParams.delete("err");
+          window.history.replaceState({}, "", url.toString());
+        }, 5000);
+
+        return;
+      }
     }
   }, [searchParams]);
 
@@ -131,7 +141,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
         </CardDescription>
       </CardHeader>
       {!!error && (
-        <div className="mb-6 flex items-center gap-x-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+        <div className="mx-auto mb-6 flex max-w-[90%] items-center gap-x-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
           <TriangleAlert className="size-4" />
           <p>{error}</p>
         </div>
