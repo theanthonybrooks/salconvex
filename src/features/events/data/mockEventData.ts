@@ -828,3 +828,10 @@
 //     applicationStatus: "considering",
 //   },
 // ];
+
+// app/
+// ├── event/
+// │   └── [slug]/
+// │       └── [id]/
+// │       ├── call/
+// │       │   └── [slug]/
