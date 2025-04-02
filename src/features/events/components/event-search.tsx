@@ -67,7 +67,7 @@ export const OrgSearch = ({
   };
 
   const handleSelect = (org: Doc<"organizations">) => {
-    console.log("organization: ", org);
+    // console.log("organization: ", org);
     onChange(org.name);
     setInputValue(org.name);
     setSelectedVal(org.name);

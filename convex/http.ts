@@ -1,18 +1,18 @@
-import { httpRouter } from "convex/server"
-import { auth } from "./auth"
-import { paymentWebhook } from "./stripeSubscriptions"
+import { httpRouter } from "convex/server";
+import { auth } from "./auth";
+import { paymentWebhook } from "./stripeSubscriptions";
 
-const http = httpRouter()
+const http = httpRouter();
 
-auth.addHttpRoutes(http)
+auth.addHttpRoutes(http);
 
 http.route({
   path: "/payments/webhook",
   method: "POST",
   handler: paymentWebhook,
-})
+});
 
 // Log that routes are configured
-console.log("HTTP routes configured")
+// console.log("HTTP routes configured")
 
-export default http
+export default http;

@@ -84,7 +84,7 @@ const organizationSchema = {
   ownerId: v.id("users"),
   // organizationName: v.optional(v.string()),
   name: v.string(),
-  slug: v.optional(v.string()), //todo: use slugs
+  slug: v.string(), //todo: use slugs
   // events: v.optional(v.array(v.id("events"))),
   events: v.array(v.id("events")),
   logo: v.string(), //will default to /1.jpg as always
@@ -240,6 +240,13 @@ const openCallSchema = {
         }),
       ),
     ),
+    links: v.array(
+      v.object({
+        title: v.string(),
+        href: v.string(),
+      }),
+    ),
+    applicationLink: v.string(),
     otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
   }),
   // state: v.string(), //draft, submitted, published, archived

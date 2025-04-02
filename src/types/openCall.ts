@@ -17,6 +17,7 @@ export type EligibilityType =
   | null;
 
 export type ApplicationStatus =
+  | "external apply"
   | "applied"
   | "considering"
   | "to next step"

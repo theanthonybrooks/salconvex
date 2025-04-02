@@ -38,7 +38,7 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { EventCardDetailProps } from "@/types/event";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import slugify from "slugify";
 
 const EventCardDetail = (props: EventCardDetailProps) => {
@@ -78,6 +78,8 @@ const EventCardDetail = (props: EventCardDetailProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isHidden, setIsHidden] = useState(hidden);
   const [activeTab, setActiveTab] = useState("event");
+  const [hasMounted, setHasMounted] = useState(false);
+
   const orgSlug = slugify(organizer.name);
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
@@ -116,6 +118,11 @@ const EventCardDetail = (props: EventCardDetailProps) => {
           `${eventId}`,
         )
       : null;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setHasMounted(true), 50);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
@@ -222,12 +229,11 @@ const EventCardDetail = (props: EventCardDetailProps) => {
                   activeTab === tab ? "text-black" : "text-muted-foreground",
                 )}
               >
-                {activeTab === tab && (
+                {hasMounted && activeTab === tab && (
                   <motion.div
-                    initial={false}
+                    exit={{ opacity: 0 }}
                     layoutId="tab-bg"
                     className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
-                    exit={{ opacity: 0 }}
                     transition={{
                       type: "spring",
                       stiffness: 400,
@@ -235,6 +241,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
                     }}
                   />
                 )}
+
                 <span className="relative z-10">
                   {tab === "opencall" && "Open Call"}
                   {tab === "event" && getEventCategoryLabel(eventCategory)}

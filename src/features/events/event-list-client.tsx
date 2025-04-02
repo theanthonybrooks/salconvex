@@ -173,8 +173,6 @@ Props) => {
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
-            filters={filters}
-            sortOptions={sortOptions}
           />
         </>
       )}

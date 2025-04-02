@@ -2,7 +2,6 @@
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Filters, SortOptions } from "@/types/thelist";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
@@ -10,16 +9,14 @@ import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
 interface BasicPaginationProps {
   page: number;
   totalPages: number;
-  filters: Filters;
-  sortOptions: SortOptions;
+
   onPageChange: (page: number) => void;
 }
 
 export const BasicPagination = ({
   page,
   totalPages,
-  filters,
-  sortOptions,
+
   onPageChange: setPage,
 }: BasicPaginationProps) => {
   const firstPage = page === 1;
@@ -28,12 +25,6 @@ export const BasicPagination = ({
 
   // const [prevTotal, setPrevTotal] = useState(totalPages);
 
-  console.log("currentPage", page);
-  console.log("totalPages", totalPages);
-  console.log("firstPage", firstPage);
-  console.log("lastPage", lastPage);
-  console.log("filters", filters);
-  console.log("sortOptions", sortOptions);
   // console.log(firstPage, lastPage, page, currentPage, totalPages);
 
   const [inputVal, setInputVal] = useState(page);

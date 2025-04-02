@@ -106,6 +106,12 @@ const PricingHeader = ({
 
 export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
   const [activeTab, setActiveTab] = useState("0");
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setHasMounted(true), 50);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <div className="flex items-center justify-center gap-3">
@@ -129,9 +135,8 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
                   : "text-foreground/80",
               )}
             >
-              {activeTab === opt.val && (
+              {hasMounted && activeTab === opt.val && (
                 <motion.div
-                  initial={false}
                   exit={{ opacity: 0 }}
                   layoutId="tab-bg"
                   className="absolute inset-0 z-0 flex items-center justify-center rounded-md border-2 bg-background shadow-sm"
@@ -142,6 +147,7 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
                   }}
                 />
               )}
+
               <span className="z-10"> {opt.name}</span>
             </TabsTrigger>
           ))}

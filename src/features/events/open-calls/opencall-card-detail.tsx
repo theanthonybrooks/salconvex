@@ -61,7 +61,7 @@ import {
 import { ApplicationStatus } from "@/types/openCall";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import slugify from "slugify";
 
 const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
@@ -151,6 +151,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   const [isHidden, setIsHidden] = useState(hidden);
   const [activeTab, setActiveTab] = useState("opencall");
   const [isManualApplied, setManualApplied] = useState(status);
+  const [hasMounted, setHasMounted] = useState(false);
+
   const orgSlug = slugify(organizer.name);
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
@@ -192,6 +194,11 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
 
   const hasBudget = budgetMin > 0 || (budgetMax && budgetMax > 0);
   const hasRate = budgetRate && budgetRate > 0;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setHasMounted(true), 50);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
@@ -325,7 +332,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                   activeTab === tab ? "text-black" : "text-muted-foreground",
                 )}
               >
-                {activeTab === tab && (
+                {hasMounted && activeTab === tab && (
                   <motion.div
                     layoutId="tab-bg"
                     className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
