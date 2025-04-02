@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,82 +8,82 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
-import { useAction, useConvexAuth } from "convex/react"
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { useAction, useConvexAuth } from "convex/react";
 
-import { Separator } from "@/components/ui/separator"
-import DiscreteSlider from "@/components/ui/slider"
+import { Separator } from "@/components/ui/separator";
+import DiscreteSlider from "@/components/ui/slider";
 import {
   AccountSubscribeForm,
   ModeType,
-} from "@/features/account/account-profile-form"
-import { User } from "@/types/user"
-import { useQuery } from "convex-helpers/react/cache"
-import { ConvexError } from "convex/values"
-import { motion } from "framer-motion"
-import { CheckCircle2 } from "lucide-react"
-import Image from "next/image"
-import { useEffect, useMemo, useState } from "react"
-import { toast } from "react-toastify"
-import { api } from "~/convex/_generated/api"
+} from "@/features/account/account-profile-form";
+import { User } from "@/types/user";
+import { useQuery } from "convex-helpers/react/cache";
+import { ConvexError } from "convex/values";
+import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
 
 type PricingSwitchProps = {
-  onSwitch: (value: string) => void
-}
+  onSwitch: (value: string) => void;
+};
 
 type PricingCardProps = {
-  user?: User
-  isYearly?: boolean
-  title: string
-  planKey: string
-  accountType: string
+  user?: User;
+  isYearly?: boolean;
+  title: string;
+  planKey: string;
+  accountType: string;
 
   prices: {
-    month?: { usd?: { amount: number } }
-    year?: { usd?: { amount: number } }
-    rate?: number
-  }
+    month?: { usd?: { amount: number } };
+    year?: { usd?: { amount: number } };
+    rate?: number;
+  };
 
-  description: string
-  features?: string[]
-  popular?: boolean
-  image?: string
-}
+  description: string;
+  features?: string[];
+  popular?: boolean;
+  image?: string;
+};
 
 const pricingRange = [
   { value: 1, label: "Up to $5,000" },
   { value: 33, label: "$10,000" },
   { value: 66, label: "$20,000" },
   { value: 100, label: "$25,000+" },
-]
+];
 
 const pricingIntervals = [
   { name: "Monthly", val: "0" },
   { name: "Yearly", val: "1" },
-]
+];
 
 //--------------------- Existing Subscription  ----------------------//
 
 const ExistingSubscription = ({ onClick }: { onClick: () => void }) => {
   return (
-    <div className='mt-[1rem] flex w-full flex-col gap-y-6 items-center justify-center p-3'>
-      <div className='flex flex-col items-center'>
-        <p className='font-tanker lowercase text-[2.5em]  lg:text-[4em] tracking-wide text-foreground'>
+    <div className="mt-[1rem] flex w-full flex-col items-center justify-center gap-y-6 p-3">
+      <div className="flex flex-col items-center">
+        <p className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]">
           Your Subscription
         </p>
-        <p className='text-center text-balance'>
+        <p className="text-balance text-center">
           Want to upgrade or cancel your subscription?
         </p>
       </div>
 
-      <Button variant='salWithShadow' onClick={onClick}>
+      <Button variant="salWithShadow" onClick={onClick}>
         Manage Subscription
       </Button>
     </div>
-  )
-}
+  );
+};
 
 //--------------------- Pricing Header  ----------------------//
 
@@ -91,46 +91,50 @@ const PricingHeader = ({
   title,
   subtitle,
 }: {
-  title: string
-  subtitle: string
+  title: string;
+  subtitle: string;
 }) => (
-  <div className=' my-6 md:my-8 text-center flex flex-col items-center gap-4 md:gap-8 '>
-    <h2 className=' text-4xl text-foreground  font-tanker lowercase md:text-[4em] cursor-pointer tracking-wide '>
+  <div className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8">
+    <h2 className="cursor-pointer font-tanker text-4xl lowercase tracking-wide text-foreground md:text-[4em]">
       {title}
     </h2>
-    <p className='max-w-2xl text-foreground text-balance'>{subtitle}</p>
+    <p className="max-w-2xl text-balance text-foreground">{subtitle}</p>
   </div>
-)
+);
 
 //------------------- Pricing Switch -----------------------//
 
 export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
-  const [activeTab, setActiveTab] = useState("0")
+  const [activeTab, setActiveTab] = useState("0");
 
   return (
-    <div className='flex items-center justify-center gap-3'>
+    <div className="flex items-center justify-center gap-3">
       <Tabs
-        defaultValue='0'
-        className='relative w-[400px]'
+        defaultValue="0"
+        className="relative w-[400px]"
         onValueChange={(val) => {
-          onSwitch(val)
-          setActiveTab(val)
-        }}>
-        <TabsList className='relative w-full bg-white/70 justify-around h-12 flex rounded-xl '>
+          onSwitch(val);
+          setActiveTab(val);
+        }}
+      >
+        <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
           {pricingIntervals.map((opt) => (
             <TabsTrigger
               key={opt.val}
               value={opt.val}
               className={cn(
-                "relative z-10 h-10 px-4 flex items-center justify-center w-full text-sm font-medium",
+                "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
                 activeTab === opt.val
-                  ? "text-black font-bold"
-                  : "text-foreground/80"
-              )}>
+                  ? "font-bold text-black"
+                  : "text-foreground/80",
+              )}
+            >
               {activeTab === opt.val && (
                 <motion.div
-                  layoutId='tab-bg'
-                  className='absolute inset-0 bg-background shadow-sm rounded-md z-0 flex items-center justify-center border-2'
+                  initial={false}
+                  exit={{ opacity: 0 }}
+                  layoutId="tab-bg"
+                  className="absolute inset-0 z-0 flex items-center justify-center rounded-md border-2 bg-background shadow-sm"
                   transition={{
                     type: "spring",
                     stiffness: 400,
@@ -138,14 +142,14 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
                   }}
                 />
               )}
-              <span className='z-10'> {opt.name}</span>
+              <span className="z-10"> {opt.name}</span>
             </TabsTrigger>
           ))}
         </TabsList>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
 // -------------------- Type Switch -----------------------//
 
@@ -156,48 +160,49 @@ export const AccountTypeSwitch = ({
   setIsYearly,
   hasSub,
 }: {
-  isArtist: boolean
-  setSelectedAccountType: (value: string) => void
-  selectedAccountType: string
-  setIsYearly: (value: boolean) => void
-  hasSub: boolean
+  isArtist: boolean;
+  setSelectedAccountType: (value: string) => void;
+  selectedAccountType: string;
+  setIsYearly: (value: boolean) => void;
+  hasSub: boolean;
 }) => {
   return (
-    <div className='flex flex-col  items-center justify-center  text-center'>
-      <div className={cn("flex flex-col gap-4 items-center mt-8 3xl:mt-14")}>
+    <div className="flex flex-col items-center justify-center text-center">
+      <div className={cn("mt-8 flex flex-col items-center gap-4 3xl:mt-14")}>
         {isArtist ? (
           <p>
-            Want to <span className='font-bold'>add</span> an open call?
+            Want to <span className="font-bold">add</span> an open call?
           </p>
         ) : !hasSub ? (
           <p>
-            Want to <span className='font-bold'>apply</span> to open calls?
+            Want to <span className="font-bold">apply</span> to open calls?
           </p>
         ) : (
           <p>
-            Want to <span className='font-bold'>manage</span> your plan?
+            Want to <span className="font-bold">manage</span> your plan?
           </p>
         )}
         <Button
-          variant='salWithShadowHidden'
-          size='lg'
+          variant="salWithShadowHidden"
+          size="lg"
           onClick={() => {
             setSelectedAccountType(
-              selectedAccountType === "artist" ? "organizer" : "artist"
-            )
-            setIsYearly(false)
+              selectedAccountType === "artist" ? "organizer" : "artist",
+            );
+            setIsYearly(false);
           }}
-          className='w-fit '>
+          className="w-fit"
+        >
           {selectedAccountType === "artist"
             ? "Switch to Organizer Options"
             : hasSub
-            ? "View your current plan"
-            : "Switch to Artist Options"}
+              ? "View your current plan"
+              : "Switch to Artist Options"}
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 //--------------------- Pricing Card  ----------------------//
 
@@ -213,45 +218,45 @@ const PricingCard = ({
   accountType,
   image,
 }: PricingCardProps) => {
-  const isArtist = accountType === "artist"
-  const isOrganizer = accountType === "organizer"
-  const isFree = prices.rate === 0
+  const isArtist = accountType === "artist";
+  const isOrganizer = accountType === "organizer";
+  const isFree = prices.rate === 0;
   // const [slidingPrice, setSlidingPrice] = useState(50)
-  const [sliderPrice, setSliderPrice] = useState(0)
+  const [sliderPrice, setSliderPrice] = useState(0);
   const getCheckoutUrl = useAction(
-    api.stripeSubscriptions.createStripeCheckoutSession
-  )
+    api.stripeSubscriptions.createStripeCheckoutSession,
+  );
   const hadTrial = useQuery(
     api.stripeSubscriptions.getUserHadTrial,
-    user ? {} : "skip"
-  )
+    user ? {} : "skip",
+  );
 
   const hadFreeCall = useQuery(
     api.stripeSubscriptions.getOrgHadFreeCall,
-    user ? {} : "skip"
-  )
+    user ? {} : "skip",
+  );
 
   const isEligibleForFree =
-    (!isFree && isOrganizer && hadFreeCall === false) || !user
+    (!isFree && isOrganizer && hadFreeCall === false) || !user;
 
   const slidingPrice = useMemo(() => {
     switch (sliderPrice) {
       case 1:
-        return 50
+        return 50;
       case 33:
-        return 100
+        return 100;
       case 66:
-        return 200
+        return 200;
       case 100:
-        return 250
+        return 250;
       default:
-        return 50
+        return 50;
     }
-  }, [sliderPrice])
+  }, [sliderPrice]);
 
   const handleCheckout = async (
     interval: "month" | "year",
-    hadTrial: boolean
+    hadTrial: boolean,
   ) => {
     try {
       const { url } = await getCheckoutUrl({
@@ -261,71 +266,72 @@ const PricingCard = ({
         slidingPrice: slidingPrice,
         accountType,
         isEligibleForFree,
-      })
+      });
 
       if (url) {
-        window.location.href = url
+        window.location.href = url;
       }
     } catch (error) {
-      console.error("Failed to get checkout URL:", error)
+      console.error("Failed to get checkout URL:", error);
     }
-  }
+  };
 
   return (
     <Card
       className={cn(
         "flex w-full min-w-[20vw] max-w-sm flex-col justify-between px-2 py-1",
         {
-          "relative border-2 ": popular || isFree,
-        }
-      )}>
+          "relative border-2": popular || isFree,
+        },
+      )}
+    >
       {popular && (
-        <div className='absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-salPinkLt border-2 px-3 py-1 '>
-          <p className='text-sm font-medium text-foreground'>Recommended</p>
+        <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
+          <p className="text-sm font-medium text-foreground">Recommended</p>
         </div>
       )}
       {isFree && (
-        <div className='absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-salPinkLt border-2 px-3 py-1 '>
-          <p className='text-sm font-medium text-foreground'>Free Listing</p>
+        <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
+          <p className="text-sm font-medium text-foreground">Free Listing</p>
         </div>
       )}
 
       <div>
-        <CardHeader className='space-y-2 pb-4'>
+        <CardHeader className="space-y-2 pb-4">
           {image && (
             <Image
               src={image}
               alt={title}
               width={200}
               height={200}
-              className='w-full h-auto'
+              className="h-auto w-full"
             />
           )}
           {!image && (
             <>
-              <CardTitle className='text-xl'>{title}</CardTitle>
+              <CardTitle className="text-xl">{title}</CardTitle>
               <CardDescription className={cn("text-foreground")}>
                 {description}
               </CardDescription>
             </>
           )}
         </CardHeader>
-        <Separator className='mb-4' thickness={2} />
+        <Separator className="mb-4" thickness={2} />
 
-        <CardContent className='pb-4'>
-          <div className='flex items-baseline gap-1'>
+        <CardContent className="pb-4">
+          <div className="flex items-baseline gap-1">
             <span className={cn("text-4xl font-bold")}>
               {!isFree ? (
                 isArtist ? (
                   `$${
                     isYearly
-                      ? prices.year?.usd?.amount?.toFixed(0) ?? "N/A"
-                      : prices.month?.usd?.amount?.toFixed(0) ?? "N/A"
+                      ? (prices.year?.usd?.amount?.toFixed(0) ?? "N/A")
+                      : (prices.month?.usd?.amount?.toFixed(0) ?? "N/A")
                   }`
                 ) : isEligibleForFree ? (
-                  <span className='flex items-center gap-1'>
-                    <span className='line-through mr-1'>${slidingPrice}</span>
-                    <span className='text-green-600 font-semibold'>$0</span>
+                  <span className="flex items-center gap-1">
+                    <span className="mr-1 line-through">${slidingPrice}</span>
+                    <span className="font-semibold text-green-600">$0</span>
                   </span>
                 ) : (
                   `$${slidingPrice}`
@@ -346,30 +352,30 @@ const PricingCard = ({
             </span>
           </div>
           {(!user || isEligibleForFree) && !isFree && isOrganizer && (
-            <p className='text-lg text-foreground text-green-600 mt-4'>
+            <p className="mt-4 text-lg text-foreground text-green-600">
               First Open Call is free
             </p>
           )}
           {isOrganizer && !isFree && (
-            <div className='flex flex-col gap-2 mt-3'>
+            <div className="mt-3 flex flex-col gap-2">
               <p>Select your project budget:</p>
               <DiscreteSlider
                 disabled={isEligibleForFree}
                 value={sliderPrice ?? prices?.rate}
                 onChange={(val) => setSliderPrice(val)}
                 marks={pricingRange}
-                prefix='$'
-                suffix='/mo'
+                prefix="$"
+                suffix="/mo"
                 labelFormatter={(val) => `$${val}`}
-                labelDisplay='off'
-                className='max-w-[80%] mx-auto'
+                labelDisplay="off"
+                className="mx-auto max-w-[80%]"
               />
             </div>
           )}
 
-          <div className='mt-6 space-y-2'>
+          <div className="mt-6 space-y-2">
             {features?.map((feature) => (
-              <div key={feature} className='flex gap-2'>
+              <div key={feature} className="flex gap-2">
                 <CheckCircle2 className={cn("h-5 w-5 text-foreground")} />
                 <p className={cn("text-muted-foreground")}>{feature}</p>
               </div>
@@ -388,42 +394,44 @@ const PricingCard = ({
             //   //TODO: utilize this src param when submitting a free call
             //   return
             // }
-            handleCheckout(isYearly ? "year" : "month", hadTrial ?? false)
-          }}>
+            handleCheckout(isYearly ? "year" : "month", hadTrial ?? false);
+          }}
+        >
           <Button
             variant={
               popular || isFree ? "salWithShadowPink" : "salWithShadowHiddenYlw"
             }
-            className={cn("w-full")}>
+            className={cn("w-full")}
+          >
             {isArtist ? "Get" : "List"} {title}
           </Button>
         </AccountSubscribeForm>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
 //--------------------- Pricing Section  ----------------------//
 
 export default function Pricing() {
-  const [isYearly, setIsYearly] = useState<boolean>(false)
-  const { isAuthenticated } = useConvexAuth()
+  const [isYearly, setIsYearly] = useState<boolean>(false);
+  const { isAuthenticated } = useConvexAuth();
 
   const userData = useQuery(
     api.users.getCurrentUser,
-    isAuthenticated ? {} : "skip"
-  )
+    isAuthenticated ? {} : "skip",
+  );
   const subStatus = useQuery(
     api.subscriptions.getUserSubscriptionStatus,
-    isAuthenticated ? {} : "skip"
-  )
+    isAuthenticated ? {} : "skip",
+  );
 
-  const hasSub = subStatus?.hasActiveSubscription ?? false
+  const hasSub = subStatus?.hasActiveSubscription ?? false;
   const subscription = useQuery(
     api.subscriptions.getUserSubscription,
-    hasSub ? {} : "skip"
-  )
-  const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl)
+    hasSub ? {} : "skip",
+  );
+  const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
 
   // console.log(subscription)
 
@@ -431,37 +439,37 @@ export default function Pricing() {
   // console.log("hasSub", hasSub)
 
   // const isPublic = !isAuthenticated
-  const user = userData?.user
+  const user = userData?.user;
   // const userAccountTypes = user?.accountType ?? []
   // const multiType = userAccountTypes.length > 1
-  const accountType = user?.accountType[0] ?? "artist"
-  const isAdmin = user?.accountType?.includes("admin")
+  const accountType = user?.accountType[0] ?? "artist";
+  const isAdmin = user?.accountType?.includes("admin");
 
   // if (hasSub) {
   //   accountType = "organizer"
   // }
 
   // console.log("accountType: ", accountType)
-  const [selectedAccountType, setSelectedAccountType] = useState(accountType)
+  const [selectedAccountType, setSelectedAccountType] = useState(accountType);
 
   // const userIsArtist = userAccountTypes.includes("artist")
-  const isArtist = selectedAccountType === "artist"
-  const isOrganizer = selectedAccountType === "organizer"
+  const isArtist = selectedAccountType === "artist";
+  const isOrganizer = selectedAccountType === "organizer";
 
   const handleManageSubscription = async () => {
     if (!subscription?.customerId) {
       toast.error(
-        "No subscription found. Please contact support if this is incorrect."
-      )
-      return
+        "No subscription found. Please contact support if this is incorrect.",
+      );
+      return;
     }
 
     try {
       const result = await getDashboardUrl({
         customerId: subscription.customerId,
-      })
+      });
       if (result?.url) {
-        window.location.href = result.url
+        window.location.href = result.url;
       }
     } catch (err: unknown) {
       if (err instanceof ConvexError) {
@@ -469,44 +477,44 @@ export default function Pricing() {
           typeof err.data === "string" &&
             err.data.toLowerCase().includes("no such customer")
             ? "Your account was cancelled. Contact support for assistance."
-            : err.data || "An unexpected error occurred."
-        )
+            : err.data || "An unexpected error occurred.",
+        );
       } else if (err instanceof Error) {
         toast.error(
           typeof err.message === "string" &&
             err.message.toLowerCase().includes("no such customer")
             ? "Your account was cancelled. Contact support for assistance."
-            : err.message || "An unexpected error occurred."
-        )
+            : err.message || "An unexpected error occurred.",
+        );
       } else {
-        toast.error("An unknown error occurred.")
+        toast.error("An unknown error occurred.");
       }
-      return
+      return;
     }
-  }
+  };
 
   useEffect(() => {
-    setSelectedAccountType(accountType)
-  }, [accountType])
+    setSelectedAccountType(accountType);
+  }, [accountType]);
 
   const togglePricingPeriod = (value: string) =>
-    setIsYearly(parseInt(value) === 1)
+    setIsYearly(parseInt(value) === 1);
 
-  const plans = useQuery(api.plans.getUserPlans)
-  const orgPlans = useQuery(api.plans.getOrgPlans)
+  const plans = useQuery(api.plans.getUserPlans);
+  const orgPlans = useQuery(api.plans.getOrgPlans);
 
   if (!plans || !orgPlans)
-    return <div className='h-screen w-screen bg-background' />
+    return <div className="h-screen w-screen bg-background" />;
 
   return (
-    <section id='plans' className='price-card-cont px-4 pt-6'>
-      <div className='mx-auto max-w-7xl'>
+    <section id="plans" className="price-card-cont px-4 pt-6">
+      <div className="mx-auto max-w-7xl">
         {isAdmin && <ExistingSubscription onClick={handleManageSubscription} />}
         {((isArtist && !hasSub) || (isAdmin && !isOrganizer)) && (
           <>
             <PricingHeader
-              title='Choose Your Plan'
-              subtitle='Select the perfect plan for your needs. All plans include a 14-day free trial.'
+              title="Choose Your Plan"
+              subtitle="Select the perfect plan for your needs. All plans include a 14-day free trial."
             />
             <PricingSwitch onSwitch={togglePricingPeriod} />
           </>
@@ -514,8 +522,8 @@ export default function Pricing() {
 
         {isOrganizer && (
           <PricingHeader
-            title='Select your call type'
-            subtitle='Graffiti jams are always free to list and mural projects are priced on a sliding scale. All event-only listings (without open call) are free.'
+            title="Select your call type"
+            subtitle="Graffiti jams are always free to list and mural projects are priced on a sliding scale. All event-only listings (without open call) are free."
           />
         )}
 
@@ -525,19 +533,20 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className='mt-10 3xl:mt-16 flex justify-center gap-y-6 lg:gap-5 flex-col lg:flex-row'>
+            className="mt-10 flex flex-col justify-center gap-y-6 lg:flex-row lg:gap-5 3xl:mt-16"
+          >
             {[...plans]
               .sort((a, b) => {
                 const priceA = isYearly
-                  ? a.prices.year?.usd?.amount ?? Infinity
-                  : a.prices.month?.usd?.amount ?? Infinity
+                  ? (a.prices.year?.usd?.amount ?? Infinity)
+                  : (a.prices.month?.usd?.amount ?? Infinity);
                 const priceB = isYearly
-                  ? b.prices.year?.usd?.amount ?? Infinity
-                  : b.prices.month?.usd?.amount ?? Infinity
-                return priceA - priceB
+                  ? (b.prices.year?.usd?.amount ?? Infinity)
+                  : (b.prices.month?.usd?.amount ?? Infinity);
+                return priceA - priceB;
               })
               .map((plan) => {
-                const { key, ...rest } = plan
+                const { key, ...rest } = plan;
                 return (
                   <PricingCard
                     image={plan.img}
@@ -548,7 +557,7 @@ export default function Pricing() {
                     isYearly={isYearly}
                     accountType={selectedAccountType}
                   />
-                )
+                );
               })}
           </motion.div>
         ) : isArtist && hasSub ? (
@@ -559,16 +568,17 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className='mt-10 3xl:mt-16 flex justify-center gap-y-6 md:gap-8 flex-col md:flex-row'>
+            className="mt-10 flex flex-col justify-center gap-y-6 md:flex-row md:gap-8 3xl:mt-16"
+          >
             {orgPlans &&
               orgPlans.map((plan) => {
-                const { key, prices, ...rest } = plan
+                const { key, prices, ...rest } = plan;
 
                 const normalizedPrices = {
                   month: undefined,
                   year: undefined,
                   rate: prices?.rate ?? 0,
-                }
+                };
                 return (
                   <PricingCard
                     key={plan.title}
@@ -578,7 +588,7 @@ export default function Pricing() {
                     accountType={selectedAccountType}
                     prices={normalizedPrices}
                   />
-                )
+                );
               })}
           </motion.div>
         )}
@@ -607,5 +617,5 @@ export default function Pricing() {
         {/* //TODO:Add functionality that will allow artists/organizers to add other account type (prompt them) */}
       </div>
     </section>
-  )
+  );
 }
