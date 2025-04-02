@@ -19,8 +19,6 @@ const Event = () => {
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
-  console.log("event", data);
-
   // const data = useQuery(api.events.getEventWithDetails, {
   //   slug: "mural-fest",
   //   edition: 2025,

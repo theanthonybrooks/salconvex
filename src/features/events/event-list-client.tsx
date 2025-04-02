@@ -215,13 +215,13 @@ Props) => {
       )}
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
-        <>
-          <h2>
+        <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
+          <h2 className="text-balance text-center">
             For the full list and access to all of the other work that I do,
             sign up!
           </h2>
           <Pricing />
-        </>
+        </div>
       )}
     </>
   );
