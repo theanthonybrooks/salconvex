@@ -97,7 +97,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
           const url = new URL(window.location.href);
           url.searchParams.delete("err");
           window.history.replaceState({}, "", url.toString());
-        }, 5000);
+        }, 10000);
 
         return;
       }
@@ -141,8 +141,8 @@ const SignInCard: React.FC<SignInCardProps> = ({
         </CardDescription>
       </CardHeader>
       {!!error && (
-        <div className="mx-auto mb-6 flex max-w-[90%] items-center gap-x-2 text-balance rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-          <TriangleAlert className="size-4" />
+        <div className="mx-auto mb-6 flex max-w-[90%] items-center gap-x-2 text-balance rounded-md bg-destructive/15 p-3 text-center text-sm text-destructive">
+          <TriangleAlert className="size-6" />
           <p>{error}</p>
         </div>
       )}
