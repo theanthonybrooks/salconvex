@@ -1,30 +1,30 @@
-import { cn } from "@/lib/utils"
-import { Minus, Plus } from "lucide-react"
-import { JSX } from "react"
+import { cn } from "@/lib/utils";
+import { Minus, Plus } from "lucide-react";
+import { JSX } from "react";
 
 // Define the types
 interface AccordionItem {
-  subtitle: string
-  text: string[] | string
+  subtitle: string;
+  text: string[] | string;
 }
 
-const iconOpenClass =
-  "open transition-all duration-400 absolute right-4 top-4 origin-center"
-const iconClosedClass =
-  "closed transition-all duration-400 absolute right-4 top-4 origin-center"
+export const iconOpenClass =
+  "open transition-all duration-400 absolute right-4 top-4 origin-center";
+export const iconClosedClass =
+  "closed transition-all duration-400 absolute right-4 top-4 origin-center";
 
 export interface AccordionSection {
-  name?: string | null
-  title?: string | null
-  description?: string | null
-  items: AccordionItem[]
-  icon?: JSX.Element
-  iconOpen?: JSX.Element
-  iconClosed?: JSX.Element
-  firstOpen?: boolean
-  isList?: boolean
-  listStyle?: string
-  accordionWidth?: string
+  name?: string | null;
+  title?: string | null;
+  description?: string | null;
+  items: AccordionItem[];
+  icon?: JSX.Element;
+  iconOpen?: JSX.Element;
+  iconClosed?: JSX.Element;
+  firstOpen?: boolean;
+  isList?: boolean;
+  listStyle?: string;
+  accordionWidth?: string;
 }
 
 // Annotate the constant with the type
@@ -34,8 +34,8 @@ export const faqs: AccordionSection = {
   description:
     "Curious why I do all of this? Hopefully, these answers will help to clarify some things",
   // icon: <HelpCircle className='h-4 w-4' />,
-  iconClosed: <Plus className={cn("h-4 w-4 mr-1", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("h-4 w-4 mr-1 ", iconOpenClass)} />,
+  iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
 
   items: [
     {
@@ -63,12 +63,12 @@ export const faqs: AccordionSection = {
       text: "Yes, we continuously update the starter kit with the latest features, security patches, and best practices to ensure you're always working with cutting-edge technology.",
     },
   ],
-}
+};
 
 export const changelog2025: AccordionSection = {
   description: "2025",
-  iconClosed: <Plus className={cn("h-4 w-4 mr-1 ", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("h-4 w-4 mr-1 ", iconOpenClass)} />,
+  iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
   firstOpen: true,
   isList: true,
   listStyle: "list-none",
@@ -92,11 +92,11 @@ export const changelog2025: AccordionSection = {
       ],
     },
   ],
-}
+};
 export const changelog2024: AccordionSection = {
   description: "2024",
-  iconClosed: <Plus className={cn("h-4 w-4 mr-1", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("h-4 w-4 mr-1", iconOpenClass)} />,
+  iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
   firstOpen: false,
   isList: true,
   listStyle: "list-none",
@@ -200,4 +200,4 @@ export const changelog2024: AccordionSection = {
       ],
     },
   ],
-}
+};
