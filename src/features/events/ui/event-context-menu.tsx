@@ -68,7 +68,13 @@ const EventContextMenu = ({
           <Button
             variant="salWithShadowHidden"
             size="lg"
-            className="w-fit rounded-l-none border-l px-2 sm:px-2"
+            className={cn(
+              "w-fit rounded-l-none border-l px-2 sm:px-2",
+
+              appStatus !== null &&
+                !publicView &&
+                "border-foreground/50 bg-background text-foreground/50",
+            )}
           >
             <Ellipsis className="size-8" />
           </Button>

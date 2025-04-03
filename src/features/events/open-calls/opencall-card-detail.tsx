@@ -99,8 +99,6 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
     hidden: false,
   };
 
-  console.log(manualApplied);
-
   const { locale, city, stateAbbr, country, countryAbbr } = location;
   const { eventStart, eventEnd, ongoing } = dates;
   const {
@@ -110,6 +108,9 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
     requirements,
     _id: openCallId,
   } = openCall;
+
+  const appUrl = requirements?.applicationLink ?? "/thelist"; //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
+
   const {
     type: eligibilityType,
     whom: eligibilityWhom,
@@ -715,6 +716,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 id={event._id}
                 openCallId={openCallId}
                 slug={slug}
+                appUrl={appUrl}
                 edition={event.dates.edition}
                 // status={status}
                 openCall={openCallStatus}

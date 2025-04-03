@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
-import { Slot, Slottable } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import * as React from "react"
+import { cn } from "@/lib/utils";
+import { Slot, Slottable } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 [&_svg]:h-5 [&_svg]:h-5  [&_svg]:pointer-events-none",
@@ -34,17 +34,17 @@ const buttonVariants = cva(
         linkHover2:
           "relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:ease-in-out after:duration-300",
         salWithShadow:
-          "bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  hover:bg-stone-100",
+          "bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  hover:bg-stone-100",
         salWithShadowHidden:
-          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
         salWithoutShadow:
           "bg-white text-foreground  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-foreground focus:bg-salyellow/70",
         salWithShadowYlw:
-          "bg-salyellow text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
+          "bg-salyellow text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
         salWithShadowHiddenYlw:
-          "bg-salYellow text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 ease-in-out hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+          "bg-salYellow text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
         salWithShadowPink:
-          "bg-salPink hover:bg-salPinkLt text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 ease-in-out  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
+          "bg-salPink hover:bg-salPinkLt text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -57,26 +57,26 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 interface IconProps {
-  Icon: React.ElementType
-  iconPlacement: "left" | "right"
+  Icon: React.ElementType;
+  iconPlacement: "left" | "right";
 }
 
 interface IconRefProps {
-  Icon?: never
-  iconPlacement?: undefined
+  Icon?: never;
+  iconPlacement?: undefined;
 }
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+  asChild?: boolean;
 }
 
-export type ButtonIconProps = IconProps | IconRefProps
+export type ButtonIconProps = IconProps | IconRefProps;
 
 const Button = React.forwardRef<
   HTMLButtonElement,
@@ -92,29 +92,30 @@ const Button = React.forwardRef<
       iconPlacement,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const Comp = asChild ? Slot : "button"
+    const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        {...props}>
+        {...props}
+      >
         {Icon && iconPlacement === "left" && (
-          <div className='group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:pr-2 group-hover:opacity-100'>
+          <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:pr-2 group-hover:opacity-100">
             <Icon />
           </div>
         )}
         <Slottable>{props.children}</Slottable>
         {Icon && iconPlacement === "right" && (
-          <div className='w-0 translate-x-[100%] pl-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100'>
+          <div className="w-0 translate-x-[100%] pl-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100">
             <Icon />
           </div>
         )}
       </Comp>
-    )
-  }
-)
-Button.displayName = "Button"
+    );
+  },
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

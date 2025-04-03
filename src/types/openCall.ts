@@ -82,7 +82,12 @@ export interface OpenCall {
       title: string;
       href: string;
     }[];
+    links?: {
+      title: string;
+      href: string;
+    }[];
     otherInfo?: string[];
+    applicationLink?: string;
   };
   state: SubmissionFormState;
 }

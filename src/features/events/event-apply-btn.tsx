@@ -90,6 +90,7 @@ interface ApplyButtonProps {
   id: string;
   openCallId: string;
   slug: string;
+  appUrl?: string;
   edition: number;
   manualApplied: ApplicationStatus;
   // setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>;
@@ -110,6 +111,7 @@ export const ApplyButton = ({
   id,
   openCallId,
   slug,
+  appUrl,
   manualApplied: status,
   // setManualApplied,
   isBookmarked,
@@ -134,13 +136,15 @@ export const ApplyButton = ({
   const router = useRouter();
   const currentUrl = window.location.href;
   const href =
-    publicView && !openCall
-      ? `/thelist/event/${slug}/${edition}`
-      : publicView && openCall === "active"
-        ? "/pricing#plans"
-        : openCall === "active"
-          ? `/thelist/event/${slug}/call/${edition}`
-          : `/thelist/event/${slug}/${edition}`;
+    detailCard && appUrl
+      ? appUrl
+      : publicView && !openCall
+        ? `/thelist/event/${slug}/${edition}`
+        : publicView && openCall === "active"
+          ? "/pricing#plans"
+          : openCall === "active"
+            ? `/thelist/event/${slug}/call/${edition}`
+            : `/thelist/event/${slug}/${edition}`;
 
   const buttonText =
     openCall === "active"
@@ -197,7 +201,12 @@ export const ApplyButton = ({
       <Button
         variant="salWithShadowHidden"
         size="lg"
-        className="w-fit rounded-none border-x px-3 sm:px-3"
+        className={cn(
+          "w-fit rounded-none border-x px-3 sm:px-3",
+          status !== null &&
+            !publicView &&
+            "border-foreground/50 bg-background text-foreground/50",
+        )}
         onClick={onBookmark}
       >
         {isBookmarked ? (
