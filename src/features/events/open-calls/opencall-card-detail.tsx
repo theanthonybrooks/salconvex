@@ -149,8 +149,6 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
 
   // console.log("has open call", hasOpenCall)
 
-  const [isBookmarked, setIsBookmarked] = useState(bookmarked);
-  const [isHidden, setIsHidden] = useState(hidden);
   const [activeTab, setActiveTab] = useState("opencall");
   const [isApplied] = useState(status);
   const [hasMounted, setHasMounted] = useState(false);
@@ -199,17 +197,12 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   const { toggleListAction } = useToggleListAction(event._id);
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !isBookmarked });
+    toggleListAction({ bookmarked: !bookmarked });
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !isHidden });
+    toggleListAction({ hidden: !hidden });
   };
-
-  useEffect(() => {
-    setIsHidden(hidden);
-    setIsBookmarked(bookmarked);
-  }, [hidden, bookmarked]);
 
   useEffect(() => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
@@ -261,7 +254,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
           />
 
           <div className="flex flex-col items-center space-y-4">
-            {isBookmarked ? (
+            {bookmarked ? (
               <FaBookmark
                 className="mt-3 size-8 cursor-pointer text-red-500"
                 onClick={onBookmark}
@@ -272,7 +265,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 onClick={onBookmark}
               />
             )}
-            {isHidden && (
+            {hidden && (
               <EyeOff className="h-6 w-6 cursor-pointer" onClick={onHide} />
             )}
           </div>
@@ -721,9 +714,9 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 openCall={openCallStatus}
                 manualApplied={isApplied}
                 // setManualApplied={setManualApplied}
-                isBookmarked={isBookmarked}
+                isBookmarked={bookmarked}
                 // setIsBookmarked={setIsBookmarked}
-                isHidden={isHidden}
+                isHidden={hidden}
                 // setIsHidden={setIsHidden}
                 eventCategory={eventCategory}
                 appFee={basicInfo?.appFee ?? 0}

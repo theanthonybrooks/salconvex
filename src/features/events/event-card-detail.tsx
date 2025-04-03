@@ -79,8 +79,6 @@ const EventCardDetail = (props: EventCardDetailProps) => {
 
   const { eventStart, eventEnd, ongoing } = dates;
 
-  const [isBookmarked, setIsBookmarked] = useState(bookmarked);
-  const [isHidden, setIsHidden] = useState(hidden);
   const [activeTab, setActiveTab] = useState("event");
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -129,17 +127,12 @@ const EventCardDetail = (props: EventCardDetailProps) => {
   }, []);
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !isBookmarked });
+    toggleListAction({ bookmarked: !bookmarked });
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !isHidden });
+    toggleListAction({ hidden: !hidden });
   };
-
-  useEffect(() => {
-    setIsHidden(hidden);
-    setIsBookmarked(bookmarked);
-  }, [hidden, bookmarked]);
 
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
@@ -154,7 +147,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
           />
 
           <div className="flex flex-col items-center space-y-4">
-            {isBookmarked ? (
+            {bookmarked ? (
               <FaBookmark
                 className="mt-3 size-8 cursor-pointer text-red-500"
                 onClick={onBookmark}
@@ -165,7 +158,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
                 onClick={onBookmark}
               />
             )}
-            {isHidden && (
+            {hidden && (
               <EyeOff className="h-6 w-6 cursor-pointer" onClick={onHide} />
             )}
           </div>
