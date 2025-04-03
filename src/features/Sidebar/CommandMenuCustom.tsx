@@ -1,43 +1,43 @@
-import { DialogTitle } from "@/components/ui/dialog"
-import { DashIcon } from "@radix-ui/react-icons"
-import { Command } from "cmdk"
-import { AnimatePresence, motion } from "framer-motion"
-import { CircleX, X } from "lucide-react"
-import Link from "next/link"
-import { IoSearch } from "react-icons/io5"
+import { DialogTitle } from "@/components/ui/dialog";
+import { DashIcon } from "@radix-ui/react-icons";
+import { Command } from "cmdk";
+import { AnimatePresence, motion } from "framer-motion";
+import { CircleX, X } from "lucide-react";
+import Link from "next/link";
+import { IoSearch } from "react-icons/io5";
 
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from "@/components/ui/drawer"
-import { cn } from "@/lib/utils"
-import { useRouter } from "next/navigation"
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
+} from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 export interface CommandItem {
-  label?: string
-  name?: string
-  icon?: React.ComponentType<{ className?: string }>
-  path?: string
-  href?: string
-  userType: string[]
-  sectionCat?: string
-  group?: string
-  desc?: string
+  label?: string;
+  name?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  path?: string;
+  href?: string;
+  userType: string[];
+  sectionCat?: string;
+  group?: string;
+  desc?: string;
 }
 
 interface CommandMenuProps<T extends CommandItem> {
-  open: boolean
-  setOpen: Dispatch<SetStateAction<boolean>>
-  isMobile?: boolean
-  title: string
-  source: T[]
-  shortcut?: string
-  placeholder?: string
-  setSearch: React.Dispatch<React.SetStateAction<string>>
-  userType?: string[]
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  isMobile?: boolean;
+  title: string;
+  source: T[];
+  shortcut?: string;
+  placeholder?: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  userType?: string[];
 }
 
 export const CommandMenuCustom = <T extends CommandItem>({
@@ -52,49 +52,49 @@ export const CommandMenuCustom = <T extends CommandItem>({
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
 }: CommandMenuProps<T>) => {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [value, setValue] = useState("")
-  const shortcutRef = useRef(shortcut)
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null)
-  const router = useRouter()
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState("");
+  const shortcutRef = useRef(shortcut);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const router = useRouter();
 
   // Update the ref if shortcut changes
   useEffect(() => {
-    shortcutRef.current = shortcut
-  }, [shortcut])
+    shortcutRef.current = shortcut;
+  }, [shortcut]);
 
   useEffect(() => {
     if (open) {
       setTimeout(() => {
-        inputRef.current?.focus()
-        inputRef.current?.select()
-      }, 0)
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }, 0);
     }
-  }, [open])
+  }, [open]);
 
   // Keyboard shortcut handler (depends only on setOpen)
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === shortcutRef.current && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [setOpen])
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, [setOpen]);
 
   const filteredItems = source.filter((item) => {
-    const itemUserType = item?.userType
-    const isPublic = itemUserType?.includes("public")
+    const itemUserType = item?.userType;
+    const isPublic = itemUserType?.includes("public");
     const typeMatch = userType?.some((type) =>
       itemUserType?.some(
-        (userType) => userType.toLowerCase() === type.toLowerCase()
-      )
-    )
+        (userType) => userType.toLowerCase() === type.toLowerCase(),
+      ),
+    );
 
-    return isPublic || typeMatch
-  })
+    return isPublic || typeMatch;
+  });
 
   // Extract fields from source dynamically
   const extractedItems = filteredItems.map((item) => ({
@@ -103,7 +103,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
     path: item.path || item.href || "#",
     group: item.sectionCat || item.group || "Other",
     desc: item.desc || "",
-  }))
+  }));
 
   const dialogVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -121,31 +121,31 @@ export const CommandMenuCustom = <T extends CommandItem>({
       scale: 0.8,
       transition: { duration: 0.5, ease: "easeInOut" },
     },
-  }
+  };
 
   //TODO: FIGURE OUT WHY THE EXIT ANIMATION DOESN'T HAPPEN
 
-  const searchTerm = value.toLowerCase()
+  const searchTerm = value.toLowerCase();
 
   const handleValueChange = (newValue: string) => {
-    setSearch(newValue)
-    setValue(newValue)
-  }
+    setSearch(newValue);
+    setValue(newValue);
+  };
 
   const handleLinkClick = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   // Group items by group name
   const groups = extractedItems.reduce<Record<string, typeof extractedItems>>(
     (acc, item) => {
-      const grp = item.group
-      if (!acc[grp]) acc[grp] = []
-      acc[grp].push(item)
-      return acc
+      const grp = item.group;
+      if (!acc[grp]) acc[grp] = [];
+      acc[grp].push(item);
+      return acc;
     },
-    {}
-  )
+    {},
+  );
 
   // Build groupedItems based on the search term:
   // If the group name includes the search term, include all items;
@@ -154,61 +154,63 @@ export const CommandMenuCustom = <T extends CommandItem>({
     Record<string, typeof extractedItems>
   >((acc, [grpName, items]) => {
     if (grpName.toLowerCase().includes(searchTerm)) {
-      acc[grpName] = items
+      acc[grpName] = items;
     } else {
       const filtered = items.filter((item) =>
-        item?.title?.toLowerCase().includes(searchTerm)
-      )
-      if (filtered.length > 0) acc[grpName] = filtered
+        item?.title?.toLowerCase().includes(searchTerm),
+      );
+      if (filtered.length > 0) acc[grpName] = filtered;
     }
-    return acc
-  }, {})
+    return acc;
+  }, {});
 
   return isMobile ? (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent
         setOpen={setOpen}
-        className='fixed  z-top  h-[90vh] max-h-[90%] bg-card'>
-        <div className='relative h-full w-full'>
-          <div className=' pt-4 pb-6  w-full h-full flex flex-col  overflow-hidden rounded-t-2xl'>
+        className="fixed z-top h-[90vh] max-h-[90%] bg-card"
+      >
+        <div className="relative h-full w-full">
+          <div className="flex h-full w-full flex-col overflow-hidden rounded-t-2xl pb-6 pt-4">
             <DrawerHeader>
-              <DrawerTitle className='sr-only'>{title}</DrawerTitle>
+              <DrawerTitle className="sr-only">{title}</DrawerTitle>
             </DrawerHeader>
 
-            <Command shouldFilter={false} className='flex flex-col h-full'>
-              <div className='relative flex-shrink-0 flex items-center gap-1 border-b border-black/20 px-6 pb-3'>
-                <IoSearch className='p-1 text-3xl text-stone-400' />
+            <Command shouldFilter={false} className="flex h-full flex-col">
+              <div className="relative flex flex-shrink-0 items-center gap-1 border-b border-black/20 px-6 pb-3">
+                <IoSearch className="p-1 text-3xl text-stone-400" />
                 <Command.Input
                   ref={inputRef}
                   value={value}
                   onValueChange={handleValueChange}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      e.preventDefault()
-                      e.stopPropagation()
+                      e.preventDefault();
+                      e.stopPropagation();
                     }
                   }}
                   placeholder={placeholder}
-                  className='relative z-10 w-full p-3  pr-12 text-lg truncate overflow-hidden whitespace-nowrap selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden'
+                  className="focus:outline-hidden relative z-10 w-full overflow-hidden truncate whitespace-nowrap p-3 pr-12 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
                 />
                 {value.length > 0 && (
                   <button
                     onClick={() => {
-                      setValue("")
-                      setSearch("")
-                      inputRef.current?.focus()
+                      setValue("");
+                      setSearch("");
+                      inputRef.current?.focus();
                     }}
-                    className='absolute right-8 text-stone-400 hover:text-stone-600 transition-opacity z-20'>
-                    <CircleX className='size-7' />
+                    className="absolute right-8 z-20 text-stone-400 transition-opacity hover:text-stone-600"
+                  >
+                    <CircleX className="size-7" />
                   </button>
                 )}
               </div>
 
-              <Command.List className='overflow-y-auto flex-1 px-6 py-2'>
+              <Command.List className="flex-1 overflow-y-auto px-6 py-2">
                 {Object.keys(groupedItems).length === 0 ? (
-                  <Command.Empty className='py-8 text-base text-center'>
+                  <Command.Empty className="py-8 text-center text-base">
                     No results found for{" "}
-                    <span className='text-violet-500 italic'>
+                    <span className="italic text-violet-500">
                       &quot;{value}&quot;
                     </span>
                   </Command.Empty>
@@ -217,22 +219,25 @@ export const CommandMenuCustom = <T extends CommandItem>({
                     <Command.Group
                       key={groupKey}
                       heading={groupKey.toUpperCase()}
-                      className='mb-5 text-base text-stone-400 border-t-1.5 border-black/20 first:border-t-0 last:mb-10 pt-2'>
+                      className="mb-5 border-t-1.5 border-black/20 pt-2 text-base text-stone-400 first:border-t-0 last:mb-10"
+                    >
                       {groupItems.map((item) => (
                         <Command.Item
                           key={item.path}
-                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900'
+                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected="true"]:bg-salYellow/40'
                           onMouseEnter={() => setHoveredItem(item.path)}
                           onMouseLeave={() => setHoveredItem(null)}
                           onSelect={() => {
-                            setOpen(false)
-                            router.push(item.path)
-                          }}>
-                          {item.icon && <item.icon className='h-4 w-4' />}
+                            setOpen(false);
+                            router.push(item.path);
+                          }}
+                        >
+                          {item.icon && <item.icon className="h-4 w-4" />}
                           <Link
                             href={item.path}
                             prefetch={true}
-                            onClick={handleLinkClick}>
+                            onClick={handleLinkClick}
+                          >
                             <span>{item.title}</span>
                           </Link>
                         </Command.Item>
@@ -252,14 +257,15 @@ export const CommandMenuCustom = <T extends CommandItem>({
       onOpenChange={setOpen}
       shouldFilter={false}
       label={title}
-      className='fixed inset-0 flex items-center justify-center text-foreground z-999'
-      onClick={() => setOpen(false)}>
+      className="fixed inset-0 z-999 flex items-center justify-center text-foreground"
+      onClick={() => setOpen(false)}
+    >
       {/* Background overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
-            key='overlay'
-            className='fixed inset-0 z-100'
+            key="overlay"
+            className="z-100 fixed inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }} // adjust to your liking
             exit={{ opacity: 0 }}
@@ -272,45 +278,47 @@ export const CommandMenuCustom = <T extends CommandItem>({
         {/* Dialog box */}
         {open && (
           <motion.div
-            key='dialogBox'
+            key="dialogBox"
             variants={dialogVariants}
-            initial='hidden'
-            animate='visible'
-            exit='exit'
-            className='relative flex max-w-[90vw] max-h-[80vh] w-full md:max-w-xl flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl'
-            onClick={(e) => e.stopPropagation()}>
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative flex max-h-[80vh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setOpen(false)}
-              className='absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110'>
-              <X className='h-7 w-7 md:h-5 md:w-5 text-stone-600' />
+              className="absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110"
+            >
+              <X className="h-7 w-7 text-stone-600 md:h-5 md:w-5" />
             </button>
-            <DialogTitle className='sr-only'>{title}</DialogTitle>
-            <div className='flex items-center gap-1 border-b border-stone-300'>
-              <IoSearch className='z-20 p-1 text-3xl text-stone-400' />
+            <DialogTitle className="sr-only">{title}</DialogTitle>
+            <div className="flex items-center gap-1 border-b border-stone-300">
+              <IoSearch className="z-20 p-1 text-3xl text-stone-400" />
               <Command.Input
                 ref={inputRef}
                 value={value}
                 onValueChange={handleValueChange}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    setOpen(false)
+                    setOpen(false);
                   }
                   if (e.key === "Escape") {
-                    setValue("")
-                    setSearch("")
-                    setOpen(false)
+                    setValue("");
+                    setSearch("");
+                    setOpen(false);
                   }
                 }}
                 placeholder={cn(placeholder, !isMobile && "  (Hint: Ctrl + /)")}
-                className='relative z-10 w-full p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400 focus:outline-hidden bg-card'
+                className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
               />
             </div>
-            <div className='max-h-60dvh search scrollable mini p-3'>
+            <div className="max-h-60dvh search scrollable mini p-3">
               <Command.List>
                 {Object.keys(groupedItems).length === 0 ? (
                   <Command.Empty>
                     No results found for{" "}
-                    <span className='text-violet-500 italic'>
+                    <span className="italic text-violet-500">
                       &quot;{value}&quot;
                     </span>
                   </Command.Empty>
@@ -319,19 +327,22 @@ export const CommandMenuCustom = <T extends CommandItem>({
                     <Command.Group
                       key={groupKey}
                       heading={groupKey.toUpperCase()}
-                      className='mb-5 text-sm text-stone-400 border-t-1.5 border-stone-200 first:border-t-0 pt-2'>
+                      className="mb-5 border-t-1.5 border-stone-200 pt-2 text-sm text-stone-400 first:border-t-0"
+                    >
                       {groupItems.map((item) => (
                         <Command.Item
                           key={item.path}
-                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900'
+                          className="flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
                           onMouseEnter={() => setHoveredItem(item.path)}
                           onMouseLeave={() => setHoveredItem(null)}
-                          onSelect={() => router.push(item.path)}>
-                          {item.icon && <item.icon className='h-4 w-4' />}
+                          onSelect={() => router.push(item.path)}
+                        >
+                          {item.icon && <item.icon className="h-4 w-4" />}
                           <Link
                             href={item.path}
                             prefetch={true}
-                            onClick={handleLinkClick}>
+                            onClick={handleLinkClick}
+                          >
                             <span>{item.title}</span>
                           </Link>
                           {item.desc && !isMobile && (
@@ -341,7 +352,8 @@ export const CommandMenuCustom = <T extends CommandItem>({
                                 opacity: hoveredItem === item.path ? 1 : 0,
                               }}
                               transition={{ duration: 0.1 }}
-                              className='inline-flex items-center gap-2 text-stone-600'>
+                              className="inline-flex items-center gap-2 text-stone-600"
+                            >
                               <DashIcon />
                               <span>{item.desc}</span>
                             </motion.span>
@@ -357,5 +369,5 @@ export const CommandMenuCustom = <T extends CommandItem>({
         )}
       </AnimatePresence>
     </Command.Dialog>
-  )
-}
+  );
+};
