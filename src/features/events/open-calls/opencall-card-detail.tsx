@@ -150,7 +150,6 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   // console.log("has open call", hasOpenCall)
 
   const [activeTab, setActiveTab] = useState("opencall");
-  const [isApplied] = useState(status);
   const [hasMounted, setHasMounted] = useState(false);
 
   const orgSlug = slugify(organizer.name);
@@ -712,7 +711,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 edition={event.dates.edition}
                 // status={status}
                 openCall={openCallStatus}
-                manualApplied={isApplied}
+                manualApplied={status}
                 // setManualApplied={setManualApplied}
                 isBookmarked={bookmarked}
                 // setIsBookmarked={setIsBookmarked}
