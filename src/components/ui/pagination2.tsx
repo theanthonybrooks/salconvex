@@ -15,6 +15,8 @@ import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
 interface BasicPaginationProps {
   page: number;
   totalPages: number;
+  totalResults: number;
+  bottomPag?: boolean;
 
   onPageChange: (page: number) => void;
 }
@@ -22,6 +24,8 @@ interface BasicPaginationProps {
 export const BasicPagination = ({
   page,
   totalPages,
+  totalResults,
+  bottomPag = false,
 
   onPageChange: setPage,
 }: BasicPaginationProps) => {
@@ -44,21 +48,15 @@ export const BasicPagination = ({
       initial={{ opacity: 0 }}
       animate={totalPages >= 1 && { opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="my-6 flex grid-cols-[30%_70%_30%] items-center justify-center gap-4 sm:grid"
+      className="my-6 flex w-full max-w-[70vw] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0"
     >
-      <p
-        className={cn(
-          "hidden opacity-0 sm:block",
-          lastPage && !firstPage
-            ? "cursor-pointer opacity-100"
-            : "pointer-events-none",
-        )}
-        onClick={() => setPage(1)}
-      >
-        (Back to Start)
-      </p>
+      {!bottomPag && (
+        <p className={cn("mx-auto text-center")}>
+          Total Results: {totalResults}
+        </p>
+      )}
 
-      <div className="flex items-center gap-4">
+      <div className="col-start-2 flex items-center justify-center gap-4">
         <span
           onClick={() => {
             setPage(page - 1);
@@ -150,6 +148,19 @@ export const BasicPagination = ({
           <TiArrowRightOutline className="size-6 text-foreground hover:scale-110" />
         </span>
       </div>
+      {!bottomPag && (
+        <p
+          className={cn(
+            "col-start-3 hidden opacity-0 sm:block",
+            lastPage && !firstPage && totalPages > 2
+              ? "cursor-pointer decoration-2 underline-offset-2 opacity-100 hover:underline"
+              : "pointer-events-none",
+          )}
+          onClick={() => setPage(1)}
+        >
+          (Back to Start)
+        </p>
+      )}
     </motion.div>
   );
 };

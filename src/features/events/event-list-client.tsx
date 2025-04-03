@@ -116,6 +116,7 @@ Props) => {
 
   const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
   const totalPages = Math.ceil(filteredEvents.length / filters.limit);
+  const totalResults = filteredEvents.length;
   const paginatedEvents = useMemo(() => {
     const start = (page - 1) * filters.limit;
     return filteredEvents.slice(start, start + filters.limit);
@@ -172,6 +173,7 @@ Props) => {
           <BasicPagination
             page={page}
             totalPages={totalPages}
+            totalResults={totalResults}
             onPageChange={setPage}
           />
         </>
@@ -212,6 +214,14 @@ Props) => {
           </div>
         ))
       )}
+
+      <BasicPagination
+        page={page}
+        totalPages={totalPages}
+        totalResults={totalResults}
+        onPageChange={setPage}
+        bottomPag
+      />
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
         <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
