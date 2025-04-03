@@ -176,13 +176,13 @@ export const ApplyButton = ({
         //   }
         // }}
         //Todo: Add this to the event detail page and it will sync the state to the main page. Easy peasy
-        variant="salWithShadowHidden"
+        variant="salWithShadowHiddenLeft"
         size="lg"
         className={cn(
-          "w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
+          "relative z-[1] w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
           status !== null &&
             !publicView &&
-            "border-foreground/50 bg-background text-foreground/50",
+            "hover:shadow-llga border-foreground/50 bg-background text-foreground/50",
         )}
       >
         <span className="flex items-center gap-x-1">
@@ -199,13 +199,13 @@ export const ApplyButton = ({
       </Button>
 
       <Button
-        variant="salWithShadowHidden"
+        variant="salWithShadowHiddenVert"
         size="lg"
         className={cn(
-          "w-fit rounded-none border-x px-3 sm:px-3",
+          "relative z-[2] w-fit rounded-none border-x px-3 sm:px-3",
           status !== null &&
             !publicView &&
-            "border-foreground/50 bg-background text-foreground/50",
+            "hover:shadow-vlga border-foreground/50 bg-background text-foreground/50",
         )}
         onClick={onBookmark}
       >

@@ -184,7 +184,7 @@ Props) => {
       ) : (
         groupedEvents.map((group) => (
           <div key={group.title.raw} className="mb-6">
-            <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold">
+            <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
               {group.title.parts ? (
                 <>
                   {group.title.parts.month}
@@ -200,7 +200,7 @@ Props) => {
                 group.title.raw
               )}
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-4 sm:space-y-6">
               {group.events.map((event, index) => (
                 <EventCardPreview
                   key={index}

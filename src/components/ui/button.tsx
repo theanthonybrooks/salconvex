@@ -37,6 +37,10 @@ const buttonVariants = cva(
           "bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  hover:bg-stone-100",
         salWithShadowHidden:
           "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+        salWithShadowHiddenLeft:
+          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-llg hover:-translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0",
+        salWithShadowHiddenVert:
+          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-vlg  hover:translate-y-[-3px] active:shadow-none  active:translate-y-0",
         salWithoutShadow:
           "bg-white text-foreground  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-foreground focus:bg-salyellow/70",
         salWithShadowYlw:

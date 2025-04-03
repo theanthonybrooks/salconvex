@@ -1,8 +1,8 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
-import tailwindcssAnimate from "tailwindcss-animate"
-import { fontFamily } from "tailwindcss/defaultTheme"
-import { PluginAPI } from "tailwindcss/types/config"
+import tailwindcssAnimate from "tailwindcss-animate";
+import { fontFamily } from "tailwindcss/defaultTheme";
+import { PluginAPI } from "tailwindcss/types/config";
 
 export default {
   darkMode: ["class"],
@@ -115,6 +115,11 @@ export default {
       boxShadow: {
         sxl: "-7px 7px 0 0 #000000",
         slg: "-5px 5px 0 0 #000000",
+        slga: "-5px 5px 0 0 rgba(0, 0, 0, 0.7)",
+        llg: "5px 5px 0 0 #000000",
+        llga: "5px 5px 0 0 rgba(0, 0, 0, 0.7)",
+        vlg: "0 5px 0 0 #000000",
+        vlga: "0 5px 0 0 rgba(0, 0, 0, 0.7)",
         smd: "-3px 3px 0 0 #000000",
         ssm: "-2px 2px 0 0 #000000",
       },
@@ -260,7 +265,7 @@ export default {
     function ({
       addUtilities,
     }: {
-      addUtilities: (utilities: Record<string, Record<string, string>>) => void
+      addUtilities: (utilities: Record<string, Record<string, string>>) => void;
     }) {
       addUtilities({
         ".stroked": {
@@ -278,10 +283,10 @@ export default {
         // ".hover\\:wshadow:hover": {
         //   "text-shadow": "black -7px 7px", // Optional: Increase shadow on hover
         // },
-      })
+      });
     },
     function ({ addVariant, e }: PluginAPI) {
-      ;["default", "light", "white"].forEach((mode) => {
+      ["default", "light", "white"].forEach((mode) => {
         addVariant(
           mode,
           (() => {
@@ -290,17 +295,17 @@ export default {
               separator,
             }: {
               modifySelectors: (
-                cb: (args: { className: string }) => string
-              ) => void
-              separator: string
+                cb: (args: { className: string }) => string,
+              ) => void;
+              separator: string;
             }) => {
               modifySelectors(({ className }) => {
-                return `.${mode} .${e(`${mode}${separator}${className}`)}`
-              })
-            }
-          })() as () => string
-        )
-      })
+                return `.${mode} .${e(`${mode}${separator}${className}`)}`;
+              });
+            };
+          })() as () => string,
+        );
+      });
     },
   ],
-} satisfies Config
+} satisfies Config;

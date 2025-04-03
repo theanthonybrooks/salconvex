@@ -69,11 +69,11 @@ const EventContextMenu = ({
             variant="salWithShadowHidden"
             size="lg"
             className={cn(
-              "w-fit rounded-l-none border-l px-2 sm:px-2",
+              "relative z-[1] w-fit rounded-l-none border-l px-2 sm:px-2",
 
               appStatus !== null &&
                 !publicView &&
-                "border-foreground/50 bg-background text-foreground/50",
+                "hover:shadow-slga border-foreground/50 bg-background text-foreground/50",
             )}
           >
             <Ellipsis className="size-8" />

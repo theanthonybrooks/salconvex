@@ -115,13 +115,15 @@ const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
     indicator?: boolean;
+    fit?: boolean;
   }
->(({ className, children, indicator = true, ...props }, ref) => (
+>(({ className, children, indicator = true, fit, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
       "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 text-sm focus:bg-salPinkLt focus:text-accent-foreground data-[state=checked]:bg-salPinkLt/50 data-[state=checked]:font-bold",
-      indicator ? "pr-8" : "justify-center pr-2",
+      indicator && !fit ? "pr-8" : fit ? "pr-2" : "justify-center pr-2",
+
       className,
     )}
     {...props}

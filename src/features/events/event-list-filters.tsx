@@ -2,6 +2,7 @@
 
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -36,7 +37,7 @@ export const EventFilters = ({
     filters.continent !== undefined;
 
   return (
-    <div className="my-6 flex flex-wrap items-center justify-start gap-4">
+    <div className="my-6 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
       <label className="flex cursor-pointer items-center gap-2">
         <Checkbox
           id="bookmarkedOnly"
@@ -65,7 +66,7 @@ export const EventFilters = ({
           onSortChange({ sortBy: value as SortOptions["sortBy"] })
         }
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-[120px]">
           <SelectValue placeholder="Sort By" />
         </SelectTrigger>
         <SelectContent>
@@ -75,18 +76,30 @@ export const EventFilters = ({
         </SelectContent>
       </Select>
 
+      <Label htmlFor="limit" className="flex items-center gap-2">
+        Results per page:
+      </Label>
       <Select
+        name="limit"
         value={String(filters.limit)}
         onValueChange={(value) => onChange({ limit: parseInt(value, 10) })}
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-max min-w-16">
           <SelectValue placeholder="Limit" />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="1">1</SelectItem>
-          <SelectItem value="2">2</SelectItem>
-          <SelectItem value="10">10</SelectItem>
-          <SelectItem value="25">25</SelectItem>
+        <SelectContent className="min-w-auto">
+          <SelectItem fit value="1">
+            1
+          </SelectItem>
+          <SelectItem fit value="5">
+            5
+          </SelectItem>
+          <SelectItem fit value="10">
+            10
+          </SelectItem>
+          <SelectItem fit value="25">
+            25
+          </SelectItem>
         </SelectContent>
       </Select>
 
@@ -111,7 +124,7 @@ export const EventFilters = ({
         variant="basic"
         selectAll={false}
         hasSearch={false}
-        className="w-32"
+        className="w-32 border bg-background sm:h-9"
         shortResults
       />
 
