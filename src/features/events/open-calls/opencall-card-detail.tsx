@@ -84,6 +84,10 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   } = event;
   //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
 
+  const manualApplied =
+    artist?.applications?.find((app) => app.openCallId === openCall._id)
+      ?.manualApplied ?? false;
+
   const status: ApplicationStatus | null =
     artist?.applications?.find((app) => app.openCallId === openCall._id)
       ?.applicationStatus ?? null;
@@ -94,6 +98,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
     bookmarked: false,
     hidden: false,
   };
+
+  console.log(manualApplied);
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
   const { eventStart, eventEnd, ongoing } = dates;
@@ -209,7 +215,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   }, []);
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
-      {status !== null && (
+      {status !== null && !manualApplied && (
         <span
           className={cn(
             "col-start-2 w-fit rounded-full border-2 border-foreground/30 bg-white/70 px-2 py-1 text-xs",
@@ -545,6 +551,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                           <p className="font-medium">Design Fee:</p>
                           <p className="text-right">
                             {designFee && !allInclusive ? (
+                              //todo: format the currency and possibly allow a union of either number or string for these. Then use typeof to determine which display method is used
                               // formatCurrency(designFee, null, currency)
                               designFee
                             ) : (
