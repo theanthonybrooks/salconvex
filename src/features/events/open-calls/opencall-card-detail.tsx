@@ -45,6 +45,7 @@ import { ApplyButton } from "@/features/events/event-apply-btn";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { EventCardDetailProps as OpenCallCardDetailProps } from "@/types/event";
 
+import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { generateICSFile } from "@/lib/addToCalendar";
 import {
@@ -195,12 +196,25 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
 
   const hasBudget = budgetMin > 0 || (budgetMax && budgetMax > 0);
   const hasRate = budgetRate && budgetRate > 0;
+  const { toggleListAction } = useToggleListAction(event._id);
+
+  const onBookmark = () => {
+    toggleListAction({ bookmarked: !isBookmarked });
+  };
+
+  const onHide = () => {
+    toggleListAction({ hidden: !isHidden });
+  };
+
+  useEffect(() => {
+    setIsHidden(hidden);
+    setIsBookmarked(bookmarked);
+  }, [hidden, bookmarked]);
 
   useEffect(() => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
     return () => clearTimeout(timeout);
   }, []);
-
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
       {status !== null && (
@@ -250,19 +264,16 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
             {isBookmarked ? (
               <FaBookmark
                 className="mt-3 size-8 cursor-pointer text-red-500"
-                onClick={() => setIsBookmarked(false)}
+                onClick={onBookmark}
               />
             ) : (
               <FaRegBookmark
                 className="mt-3 size-8 cursor-pointer"
-                onClick={() => setIsBookmarked(true)}
+                onClick={onBookmark}
               />
             )}
             {isHidden && (
-              <EyeOff
-                className="h-6 w-6 cursor-pointer"
-                onClick={() => setIsHidden(!isHidden)}
-              />
+              <EyeOff className="h-6 w-6 cursor-pointer" onClick={onHide} />
             )}
           </div>
         </div>

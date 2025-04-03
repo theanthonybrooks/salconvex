@@ -31,6 +31,7 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatEventDates, isValidIsoDate } from "@/lib/dateFns";
@@ -67,6 +68,7 @@ const EventCardDetail = (props: EventCardDetailProps) => {
   //   bookmarked: false,
   //   hidden: false,
   // };
+  const { toggleListAction } = useToggleListAction(event._id);
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
   ) ?? { bookmarked: false, hidden: false };
@@ -126,6 +128,19 @@ const EventCardDetail = (props: EventCardDetailProps) => {
     return () => clearTimeout(timeout);
   }, []);
 
+  const onBookmark = () => {
+    toggleListAction({ bookmarked: !isBookmarked });
+  };
+
+  const onHide = () => {
+    toggleListAction({ hidden: !isHidden });
+  };
+
+  useEffect(() => {
+    setIsHidden(hidden);
+    setIsBookmarked(bookmarked);
+  }, [hidden, bookmarked]);
+
   return (
     <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
@@ -142,19 +157,16 @@ const EventCardDetail = (props: EventCardDetailProps) => {
             {isBookmarked ? (
               <FaBookmark
                 className="mt-3 size-8 cursor-pointer text-red-500"
-                onClick={() => setIsBookmarked(false)}
+                onClick={onBookmark}
               />
             ) : (
               <FaRegBookmark
                 className="mt-3 size-8 cursor-pointer"
-                onClick={() => setIsBookmarked(true)}
+                onClick={onBookmark}
               />
             )}
             {isHidden && (
-              <EyeOff
-                className="h-6 w-6 cursor-pointer"
-                onClick={() => setIsHidden(!isHidden)}
-              />
+              <EyeOff className="h-6 w-6 cursor-pointer" onClick={onHide} />
             )}
           </div>
         </div>
