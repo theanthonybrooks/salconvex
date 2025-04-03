@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import * as PopoverPrimitive from "@radix-ui/react-popover"
-import * as React from "react"
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
-import { X } from "lucide-react"
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
-const Popover = PopoverPrimitive.Root
+const Popover = PopoverPrimitive.Root;
 
-const PopoverTrigger = PopoverPrimitive.Trigger
+const PopoverTrigger = PopoverPrimitive.Trigger;
 
-const PopoverAnchor = PopoverPrimitive.Anchor
+const PopoverAnchor = PopoverPrimitive.Anchor;
 
 const CustomArrow = React.forwardRef<
   SVGSVGElement,
@@ -19,21 +19,22 @@ const CustomArrow = React.forwardRef<
   <PopoverPrimitive.Arrow asChild ref={ref} {...props}>
     <svg
       className={cn("block", className)}
-      width='15'
-      height='10'
-      viewBox='0 0 30 10'
-      preserveAspectRatio='none'>
-      <polygon points='0,0 30,0 15,10' fill='black' />
-      <polygon points='2,0 28,0 15,8' fill='white' />
+      width="15"
+      height="10"
+      viewBox="0 0 30 10"
+      preserveAspectRatio="none"
+    >
+      <polygon points="0,0 30,0 15,10" fill="black" />
+      <polygon points="2,0 28,0 15,8" fill="white" />
     </svg>
   </PopoverPrimitive.Arrow>
-))
-CustomArrow.displayName = "CustomArrow"
+));
+CustomArrow.displayName = "CustomArrow";
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
-    showCloseButton?: boolean
+    showCloseButton?: boolean;
   }
 >(
   (
@@ -45,7 +46,7 @@ const PopoverContent = React.forwardRef<
       showCloseButton = true,
       ...props
     },
-    ref
+    ref,
   ) => (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -53,24 +54,26 @@ const PopoverContent = React.forwardRef<
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 w-72 rounded-md  bg-popover p-4 text-popover-foreground shadow-md outline-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative",
-          className
+          "outline-hidden relative z-10 w-72 rounded-md bg-popover p-4 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          className,
         )}
-        {...props}>
+        {...props}
+      >
         {/* <PopoverPrimitive.Arrow className='fill-white' /> */}
         <CustomArrow />
         <PopoverPrimitive.Close
-          aria-label='Close popover'
-          className='absolute top-3 right-3 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75'>
+          aria-label="Close popover"
+          className="absolute right-3 top-3 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
+        >
           {showCloseButton && (
-            <X className='size-6 text-black/80 hover:text-red-600' />
+            <X className="size-6 text-black/80 hover:text-red-600" />
           )}
         </PopoverPrimitive.Close>
         {children}
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
-  )
-)
-PopoverContent.displayName = PopoverPrimitive.Content.displayName
+  ),
+);
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger }
+export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };

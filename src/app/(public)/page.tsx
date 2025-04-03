@@ -8,12 +8,24 @@ import {
 
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEnvelope, FaGlobe, FaInstagram } from "react-icons/fa6";
 
 // const font = Poppins({ subsets: ["latin"], weight: "600" })
 
 export default function Home() {
+  function useIsMobile(breakpoint = 640) {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth < breakpoint);
+      check();
+      window.addEventListener("resize", check);
+      return () => window.removeEventListener("resize", check);
+    }, [breakpoint]);
+
+    return isMobile;
+  }
   const searchParams = useSearchParams();
   const targetRef = useRef(null);
   // const { scrollY } = useScroll()
@@ -23,6 +35,8 @@ export default function Home() {
   //   mass: 0.4,
   // })
   // const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
+
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const errorDesc = searchParams.get("err");
@@ -66,7 +80,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute bottom-5 left-1/2 flex w-max -translate-x-1/2 flex-row gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
+              className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-row gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
             >
               <span className="flex items-center gap-2">
                 <i className="text-base">Artwork Name </i>
@@ -76,7 +90,10 @@ export default function Home() {
               </span>
             </motion.span>
           </PopoverTrigger>
-          <PopoverContent className="w-80 border-1.5" align="start">
+          <PopoverContent
+            className="w-80 border-1.5"
+            align={isMobile ? "center" : "start"}
+          >
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h3 className="font-bold italic">Artwork Name</h3>
