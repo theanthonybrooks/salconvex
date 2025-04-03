@@ -147,7 +147,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
         </div>
       )}
       {!!success && (
-        <div className="text-emerald mb-6 flex items-center gap-x-2 rounded-md bg-emerald-500/15 p-3 text-sm">
+        <div className="mx-auto mb-6 flex max-w-[90%] items-center gap-x-2 rounded-md bg-emerald-500/15 p-3 text-center text-sm">
           <Heart className="size-4" />
           <p>{success}</p>
         </div>

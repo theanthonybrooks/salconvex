@@ -79,6 +79,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
     eventType,
     location,
     dates,
+    slug,
   } = event;
   //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
 
@@ -150,7 +151,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isHidden, setIsHidden] = useState(hidden);
   const [activeTab, setActiveTab] = useState("opencall");
-  const [isManualApplied, setManualApplied] = useState(status);
+  const [isApplied] = useState(status);
   const [hasMounted, setHasMounted] = useState(false);
 
   const orgSlug = slugify(organizer.name);
@@ -701,16 +702,18 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                 )}
               </Accordion>
               <ApplyButton
-                id={openCallId}
+                id={event._id}
+                openCallId={openCallId}
+                slug={slug}
                 edition={event.dates.edition}
                 // status={status}
                 openCall={openCallStatus}
-                manualApplied={isManualApplied}
-                setManualApplied={setManualApplied}
+                manualApplied={isApplied}
+                // setManualApplied={setManualApplied}
                 isBookmarked={isBookmarked}
-                setIsBookmarked={setIsBookmarked}
+                // setIsBookmarked={setIsBookmarked}
                 isHidden={isHidden}
-                setIsHidden={setIsHidden}
+                // setIsHidden={setIsHidden}
                 eventCategory={eventCategory}
                 appFee={basicInfo?.appFee ?? 0}
                 className="w-full"

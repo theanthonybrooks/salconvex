@@ -1,15 +1,16 @@
 import { Button } from "@/components/ui/button";
+import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
 import { CircleDollarSignIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { Id } from "~/convex/_generated/dataModel";
 
 interface ApplyButtonShortProps {
-  id: string;
+  slug: string;
   edition: number;
   status: ApplicationStatus;
   openCall: OpenCallStatus;
@@ -18,7 +19,7 @@ interface ApplyButtonShortProps {
 }
 
 export const ApplyButtonShort = ({
-  id,
+  slug,
   edition,
   status,
   openCall,
@@ -29,12 +30,12 @@ export const ApplyButtonShort = ({
   const router = useRouter();
   const href =
     publicView && !openCall
-      ? `/thelist/event/${id}/${edition}`
+      ? `/thelist/event/${slug}/${edition}`
       : publicView && openCall === "active"
         ? "/pricing#plans"
         : openCall === "active"
-          ? `/thelist/event/${id}/call/${edition}`
-          : `/thelist/event/${id}/${edition}`;
+          ? `/thelist/event/${slug}/call/${edition}`
+          : `/thelist/event/${slug}/${edition}`;
 
   const buttonText =
     openCall === "coming-soon"
@@ -87,13 +88,15 @@ export const ApplyButtonShort = ({
 
 interface ApplyButtonProps {
   id: string;
+  openCallId: string;
+  slug: string;
   edition: number;
   manualApplied: ApplicationStatus;
-  setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>;
+  // setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>;
   isBookmarked: boolean;
-  setIsBookmarked: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsBookmarked: React.Dispatch<React.SetStateAction<boolean>>;
   isHidden: boolean;
-  setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
   eventCategory: EventCategory;
   appFee: number;
   isPreview?: boolean;
@@ -105,11 +108,13 @@ interface ApplyButtonProps {
 
 export const ApplyButton = ({
   id,
+  openCallId,
+  slug,
   manualApplied: status,
-  setManualApplied,
+  // setManualApplied,
   isBookmarked,
-  setIsBookmarked,
-  setIsHidden,
+  // setIsBookmarked,
+  // setIsHidden,
   isHidden,
   eventCategory,
   appFee,
@@ -120,16 +125,22 @@ export const ApplyButton = ({
   detailCard,
   edition,
 }: ApplyButtonProps) => {
+  const { toggleListAction } = useToggleListAction(id as Id<"events">);
+
+  const onBookmark = () => {
+    // setIsBookmarked(!isBookmarked);
+    toggleListAction({ bookmarked: !isBookmarked });
+  };
   const router = useRouter();
   const currentUrl = window.location.href;
   const href =
     publicView && !openCall
-      ? `/thelist/event/${id}/${edition}`
+      ? `/thelist/event/${slug}/${edition}`
       : publicView && openCall === "active"
         ? "/pricing#plans"
         : openCall === "active"
-          ? `/thelist/event/${id}/call/${edition}`
-          : `/thelist/event/${id}/${edition}`;
+          ? `/thelist/event/${slug}/call/${edition}`
+          : `/thelist/event/${slug}/${edition}`;
 
   const buttonText =
     openCall === "active"
@@ -189,7 +200,7 @@ export const ApplyButton = ({
         variant="salWithShadowHidden"
         size="lg"
         className="w-fit rounded-none border-x px-3 sm:px-3"
-        onClick={() => setIsBookmarked(!isBookmarked)}
+        onClick={onBookmark}
       >
         {isBookmarked ? (
           <FaBookmark className="size-6 text-red-500" />
@@ -209,14 +220,18 @@ export const ApplyButton = ({
       )}
     </Button> */}
       <EventContextMenu
+        eventId={id}
+        openCallId={openCallId}
+        // onHide={onHide}
         isHidden={isHidden}
-        setIsHidden={setIsHidden}
+        // setIsHidden={setIsHidden}
         publicView={publicView}
-        eventStatus={status}
+        appStatus={status}
         eventCategory={eventCategory}
         openCallStatus={openCall}
-        setManualApplied={setManualApplied}
+        // setManualApplied={setManualApplied}
         buttonTrigger={true}
+        align="end"
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { Artist } from "@/types/artist";
+import { ArtistFull } from "@/types/artist";
 import { OpenCall } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Id } from "~/convex/_generated/dataModel";
@@ -65,5 +65,5 @@ export interface EventData {
 
 export interface EventCardDetailProps {
   data: { event: EventData; openCall: OpenCall; organizer: Organizer };
-  artist?: Artist;
+  artist?: ArtistFull | null;
 }

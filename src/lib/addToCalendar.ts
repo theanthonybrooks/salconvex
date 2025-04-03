@@ -1,6 +1,7 @@
 import { getFourCharMonth } from "@/lib/dateFns";
 import { getEventCategoryLabel } from "@/lib/eventFns";
 import { EventCategory } from "@/types/event";
+import slugify from "slugify";
 
 export const generateICSFile = (
   title: string,
@@ -60,7 +61,8 @@ export const generateICSFile = (
       }
     }
   };
-
+  const slug = slugify(title);
+  const thisYear = new Date().getFullYear();
   let formattedStart: string | null = null;
   let formattedEnd: string | null = null;
   let formattedDateFull: string | null = null;
@@ -85,8 +87,8 @@ export const generateICSFile = (
 
   const urlFormatted = url
     ? `https://www.thestreetartlist.com/thelist/${
-        isOpenCall ? "call" : "event"
-      }/${url}`
+        isOpenCall ? `event/${slug}/call` : `event/${slug}`
+      }/${thisYear}`
     : "";
 
   // console.log("formattedIsoOcStart", formattedIsoOcStart)

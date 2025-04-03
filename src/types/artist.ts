@@ -27,14 +27,18 @@ export interface Artist {
     artistStatement?: string;
     images?: string[];
   };
+}
+
+export interface ArtistFull extends Artist {
   applications: Applications[];
   listActions: ListActions[];
 }
 
 export interface Applications {
+  artistId: Id<"users">;
   openCallId: string;
-  applicationId: string;
   applicationStatus: ApplicationStatus;
+  manualApplied?: boolean;
 }
 
 export interface ListActions {

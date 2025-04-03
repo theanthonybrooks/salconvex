@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaBookmark,
   FaEnvelope,
@@ -60,14 +60,17 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     logo,
     tabs,
     bookmarked,
+    // manualApplied,
     // organizerId,
     // hasActiveOpenCall,
     hidden,
     openCallStatus,
     // eventId,
     // orgName,
+    status: appStatus,
     slug,
   } = event;
+
   const { opencall } = tabs;
   const orgLinkName = slug;
 
@@ -109,7 +112,8 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
 
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isHidden, setIsHidden] = useState(hidden);
-  const [isManualApplied, setManualApplied] = useState(event.status);
+  const [isApplied, setIsApplied] = useState(appStatus);
+  console.log("isApplied", isApplied);
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
 
   // const icsLink =
@@ -137,12 +141,27 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
 
   // const userCurrency = userPref?.currency ?? ""
 
+  useEffect(() => {
+    setIsHidden(hidden);
+    setIsBookmarked(bookmarked);
+  }, [bookmarked, hidden]);
+
+  useEffect(() => {
+    setIsApplied(appStatus);
+  }, [appStatus]);
+
   return (
     <>
       {/* //---------------------- (Mobile) Layout ---------------------- */}
       <Card className="mb-10 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 lg:hidden">
         <div className="col-span-1 row-span-2 flex flex-col items-center justify-between pb-3 pl-2 pt-3">
-          <Link href={`/organization/${orgLinkName}`} target="_blank" passHref>
+          <Link
+            href={
+              !publicView ? `/organization/${orgLinkName}` : "/pricing#plans"
+            }
+            target="_blank"
+            passHref
+          >
             <Image
               src={logo}
               alt="Event Logo"
@@ -205,7 +224,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
                 </span>
                 {publicView ? (
-                  <span className="blur-[5px]">This Year</span>
+                  <span className="pointer-events-none blur-[5px]">
+                    This Year
+                  </span>
                 ) : (
                   formatOpenCallDeadline(
                     basicInfo.dates?.ocEnd || "",
@@ -220,7 +241,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               <p className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className="font-semibold">Budget:</span>
                 {publicView ? (
-                  <span className="blur-[5px]">Sign in to view</span>
+                  <span className="pointer-events-none blur-[5px]">
+                    Sign in to view
+                  </span>
                 ) : budget.min > 0 || (budget.max && budget.max > 0) ? (
                   formatCurrency(
                     budget.min,
@@ -252,7 +275,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               >
                 <span className="font-semibold">Eligible:</span>
                 {publicView ? (
-                  <span className="blur-[5px]">$3 per month</span>
+                  <span className="pointer-events-none blur-[5px]">
+                    $3 per month
+                  </span>
                 ) : (
                   <span
                     className={cn(
@@ -270,7 +295,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           </div>
 
           <ApplyButtonShort
-            id={eventNameUrl}
+            slug={eventNameUrl}
             edition={event.dates.edition}
             status={event.status}
             openCall={event.openCallStatus}
@@ -279,7 +304,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           />
         </div>
         <div className="flex flex-col items-center justify-between pb-5 pr-2 pt-5">
-          {event.status === null && !isManualApplied ? (
+          {event.status === null && !isApplied ? (
             <CircleDollarSignIcon
               className={cn(
                 "size-6 text-red-600",
@@ -314,7 +339,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
       {/* //---------------------- (Desktop) Layout ---------------------- */}
       <Card
         className={cn(
-          "mb-10 hidden min-h-[15em] w-[90vw] min-w-[640px] max-w-7xl grid-cols-[60px_minmax(0,auto)_15%_25%_25%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 first:mt-6 lg:grid",
+          "mb-10 hidden min-h-[15em] w-[90vw] min-w-[640px] max-w-7xl grid-cols-[60px_minmax(0,auto)_15%_25%_25%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg lg:grid",
         )}
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
@@ -330,7 +355,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 onClick={() => setIsBookmarked(!isBookmarked)}
               />
             )}
-            {isManualApplied === null ? (
+            {isApplied === null ? (
               <CircleDollarSignIcon
                 className={cn(
                   "size-6 text-red-600",
@@ -354,19 +379,27 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             {/* TODO: Add publicView check to this as well (when the state is set up) */}
           </div>
           <EventContextMenu
+            eventId={event._id}
+            openCallId={opencall ? opencall._id : ""}
             isHidden={isHidden}
-            setIsHidden={setIsHidden}
+            // setIsHidden={setIsHidden}
             publicView={publicView}
-            eventStatus={event.status}
+            appStatus={appStatus}
             eventCategory={eventCategory}
             openCallStatus={openCallStatus}
-            setManualApplied={setManualApplied}
+            // setManualApplied={setManualApplied}
+            align="start"
           />
         </div>
 
         <div className="flex flex-col gap-y-3 pb-3 pl-3 pt-5">
           <div className="mb-2 flex flex-col gap-y-1 p-2">
-            <Link href={`/organization/${orgLinkName}`} target="_blank">
+            <Link
+              href={
+                !publicView ? `/organization/${orgLinkName}` : "/pricing#plans"
+              }
+              target="_blank"
+            >
               <div className="mb-2 flex items-center gap-x-3">
                 <Image
                   src={logo}
@@ -445,7 +478,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   :
                 </span>
                 {publicView ? (
-                  <span className="blur-[5px]">This Year</span>
+                  <span className="pointer-events-none blur-[5px]">
+                    This Year
+                  </span>
                 ) : (
                   <>
                     <span className="hidden xl:block">
@@ -469,7 +504,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               <p className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className="font-semibold">Eligible:</span>
                 {publicView ? (
-                  <span className="blur-[5px]">$3 per month</span>
+                  <span className="pointer-events-none blur-[5px]">
+                    $3 per month
+                  </span>
                 ) : (
                   <span
                     className={cn(
@@ -486,7 +523,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               <p className="flex items-center gap-x-2">
                 <span className="font-semibold">Budget:</span>
                 {publicView ? (
-                  <span className="blur-[5px]">Get paid for your work</span>
+                  <span className="pointer-events-none blur-[5px]">
+                    Get paid for your work
+                  </span>
                 ) : (
                   <>
                     {hasBudget &&
@@ -666,17 +705,19 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           )}
 
           <ApplyButton
-            id={eventNameUrl}
+            id={event._id}
+            openCallId={opencall ? opencall._id : ""}
+            slug={eventNameUrl}
             edition={event.dates.edition}
             // status={status}
             openCall={event.openCallStatus}
             publicView={publicView}
-            manualApplied={isManualApplied}
-            setManualApplied={setManualApplied}
+            manualApplied={isApplied}
+            // setManualApplied={setManualApplied}
             isBookmarked={isBookmarked}
-            setIsBookmarked={setIsBookmarked}
+            // setIsBookmarked={setIsBookmarked}
             isHidden={isHidden}
-            setIsHidden={setIsHidden}
+            // setIsHidden={setIsHidden}
             eventCategory={eventCategory}
             isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}

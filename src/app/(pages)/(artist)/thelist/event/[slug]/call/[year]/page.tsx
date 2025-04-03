@@ -26,7 +26,7 @@ const OpenCallDetail = () => {
     // router.refresh(); // try to ensure that the page has a sec to load
   };
 
-  console.log("call data", data);
+  // console.log("call data", data);
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);

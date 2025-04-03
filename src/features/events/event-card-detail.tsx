@@ -61,13 +61,15 @@ const EventCardDetail = (props: EventCardDetailProps) => {
     dates,
   } = event;
 
+  // const { bookmarked, hidden } = artist?.listActions?.find(
+  //   (la) => la.eventId === event._id,
+  // ) ?? {
+  //   bookmarked: false,
+  //   hidden: false,
+  // };
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
-  ) ?? {
-    bookmarked: false,
-    hidden: false,
-  };
-
+  ) ?? { bookmarked: false, hidden: false };
   const { locale, city, stateAbbr, country, countryAbbr } = location;
 
   const latitude = location.coordinates?.latitude ?? 0;

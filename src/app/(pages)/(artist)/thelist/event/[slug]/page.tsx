@@ -19,6 +19,8 @@ const Event = () => {
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
+  const artist = artistData?.artist;
+
   //TODO: Make a new component for this that displays all past events and acts as an event directory for each event (with years and related docs/open calls). Proper archive stuff.
 
   // const data = useQuery(api.events.getEventWithDetails, {
@@ -56,7 +58,7 @@ const Event = () => {
           <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <EventCardDetail data={data} artist={artistData?.artist} />
+        <EventCardDetail data={data} artist={artist} />
       )}
     </div>
   );

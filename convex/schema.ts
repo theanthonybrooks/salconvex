@@ -60,24 +60,17 @@ const artistSchema = {
       images: v.optional(v.array(v.string())),
     }),
   ),
-  applications: v.array(
-    v.object({
-      openCallId: v.id("openCalls"),
-      applicationId: v.optional(v.string()),
-      applicationStatus: v.optional(v.string()),
-    }),
-  ),
 
-  listActions: v.array(
-    v.object({
-      eventId: v.id("events"),
-      hidden: v.boolean(),
-      bookmarked: v.boolean(),
-    }),
-  ),
   updatedAt: v.optional(v.number()),
   lastUpdatedBy: v.optional(v.string()),
   completedProfile: v.boolean(),
+};
+
+const listActionsSchema = {
+  eventId: v.id("events"),
+  artistId: v.id("users"),
+  hidden: v.optional(v.boolean()),
+  bookmarked: v.optional(v.boolean()),
 };
 
 const organizationSchema = {
@@ -131,6 +124,8 @@ const organizationSchema = {
   // TODO: Link organization to events and from events to open calls
 };
 
+//TODO: Make another table that joins the events and open calls. Will act as a quick lookup for totals.
+
 const eventSchema = {
   adminNote: v.optional(v.string()),
   organizerId: v.array(v.id("organizations")),
@@ -179,6 +174,7 @@ const eventSchema = {
   otherInfo: v.array(v.string()),
   // state: v.string(), //draft, submitted, published, archived
   state: v.string(), //draft, submitted, published, archived
+  active: v.optional(v.boolean()),
 };
 
 const eventOrganizerSchema = {
@@ -267,8 +263,9 @@ const openCallJudgesSchema = {
 const applicationsSchema = {
   openCallId: v.id("openCalls"),
   artistId: v.id("users"),
-  applicationId: v.string(),
-  applicationStatus: v.string(),
+  // applicationId: v.string(), //would just be the ._id of the application. No reason to make a separate field for this.
+  applicationStatus: v.optional(v.string()),
+  manualApplied: v.optional(v.boolean()),
 };
 
 export default defineSchema({
@@ -304,6 +301,11 @@ export default defineSchema({
   artists: defineTable(artistSchema)
     .index("by_artistId", ["artistId"])
     .index("by_artistNationality", ["artistNationality"]),
+
+  // List Actions Tables
+  listActions: defineTable(listActionsSchema)
+    .index("by_eventId", ["eventId"])
+    .index("by_artistId", ["artistId"]),
 
   // Application Tables
   applications: defineTable(applicationsSchema)

@@ -9,6 +9,7 @@ export type CombinedEventPreviewCardData = EventData & {
   tabs: { opencall: OpenCall | null };
 
   bookmarked: boolean;
+  manualApplied?: boolean;
   hidden: boolean;
   status: ApplicationStatus | null;
   hasActiveOpenCall: boolean;
@@ -114,6 +115,7 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
             hidden: listAction?.hidden ?? false,
             status:
               (application?.applicationStatus as ApplicationStatus) ?? null,
+            manualApplied: application?.manualApplied ?? false,
             adminNoteOC: openCall?.adminNoteOC ?? null,
             appFee: openCall?.basicInfo.appFee ?? 0,
             hasActiveOpenCall,

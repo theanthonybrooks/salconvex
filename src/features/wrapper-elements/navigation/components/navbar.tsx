@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import FullPageNav from "@/components/full-page-nav"
-import { Button } from "@/components/ui/button"
+import FullPageNav from "@/components/full-page-nav";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,28 +9,28 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
-import { UserProfile } from "@/components/ui/user-profile"
+} from "@/components/ui/navigation-menu";
+import { UserProfile } from "@/components/ui/user-profile";
 import {
   landingPageNavbarLinks,
   landingPageNavbarMenuLinksResources as resources,
   landingPageNavbarMenuLinksTheList as thelistitems,
-} from "@/constants/navbars"
-import { cn } from "@/lib/utils"
-import { User } from "@/types/user"
-import { Authenticated, Unauthenticated } from "convex/react"
+} from "@/constants/navbars";
+import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
+import { Authenticated, Unauthenticated } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
-import { motion, useMotionValueEvent, useScroll } from "framer-motion"
-import Image from "next/image"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import React, { useEffect, useState } from "react"
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 interface NavBarProps {
-  userId: string | undefined
-  user: User | undefined | null
+  userId: string | undefined;
+  user: User | undefined | null;
   // userPref: UserPref | null
-  subStatus: string | undefined
+  subStatus: string | undefined;
 }
 
 export default function NavBar({
@@ -39,60 +39,60 @@ export default function NavBar({
   subStatus,
 }: // userPref,
 NavBarProps) {
-  const pathname = usePathname()
-  const { scrollY } = useScroll()
-  const [isMobile, setIsMobile] = useState(false)
+  const pathname = usePathname();
+  const { scrollY } = useScroll();
+  const [isMobile, setIsMobile] = useState(false);
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
 
-  const currentPage = pathname.split("/")[1]
+  const currentPage = pathname.split("/")[1];
 
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const scrollThreshold = isMobile ? 50 : 150
-    setIsScrolled(latest > scrollThreshold)
-  })
+    const scrollThreshold = isMobile ? 50 : 150;
+    setIsScrolled(latest > scrollThreshold);
+  });
 
-  const statusKey = subStatus ? subStatus : "none"
+  const statusKey = subStatus ? subStatus : "none";
   const filteredNavbarLinks = landingPageNavbarLinks.filter(
     (link) =>
       link.sub.includes(statusKey) ||
       link.sub.includes("all") ||
       (link.sub.includes("public") &&
-        (subStatus === "none" || subStatus === "cancelled"))
-  )
+        (subStatus === "none" || subStatus === "cancelled")),
+  );
   const filteredNavbarMenuResources = resources.filter(
-    (link) => link.sub.includes(statusKey) || link.sub.includes("all")
-  )
+    (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
+  );
   const filteredNavbarMenuTheList = thelistitems.filter(
-    (link) => link.sub.includes(statusKey) || link.sub.includes("all")
-  )
+    (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
+  );
 
   const isActiveTheList = filteredNavbarMenuTheList.some(
-    (component) => component.href.includes(currentPage) && currentPage !== ""
-  )
+    (component) => component.href.includes(currentPage) && currentPage !== "",
+  );
   const isActiveResources = filteredNavbarMenuResources.some(
-    (component) => component.href.includes(currentPage) && currentPage !== ""
-  )
+    (component) => component.href.includes(currentPage) && currentPage !== "",
+  );
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1024px)")
-    setIsMobile(mediaQuery.matches)
+    const mediaQuery = window.matchMedia("(max-width: 1024px)");
+    setIsMobile(mediaQuery.matches);
 
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: NodeJS.Timeout;
     const handleChange = (e: MediaQueryListEvent) => {
-      clearTimeout(timeoutId)
-      timeoutId = setTimeout(() => setIsMobile(e.matches), 150)
-    }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
+    };
 
-    mediaQuery.addEventListener("change", handleChange)
+    mediaQuery.addEventListener("change", handleChange);
     return () => {
-      mediaQuery.removeEventListener("change", handleChange)
-      clearTimeout(timeoutId)
-    }
-  }, [])
+      mediaQuery.removeEventListener("change", handleChange);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   return (
     <>
@@ -103,8 +103,9 @@ NavBarProps) {
           height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-[19] h-25  '>
-        <div className='mx-auto flex w-screen items-center justify-between h-full lg:py-4 px-8 relative lg:hidden'>
+        className="fixed left-0 right-0 top-0 z-[19] h-25"
+      >
+        <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:hidden lg:py-4">
           <motion.div
             initial={{ boxShadow: "none", height: 90, width: 90 }}
             animate={{
@@ -114,7 +115,7 @@ NavBarProps) {
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={cn(
-              "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] flex items-center justify-center bg-background rounded-full lg:hidden "
+              "absolute bottom-0 left-1/2 z-0 flex -translate-x-1/2 translate-y-[24px] items-center justify-center rounded-full bg-background lg:hidden",
             )}
           />
         </div>
@@ -128,19 +129,21 @@ NavBarProps) {
           height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className='fixed left-0 right-0 top-0 z-20 h-25  border-foreground   bg-background '>
-        <div className='mx-auto flex w-screen h-full  items-center px-8 md:grid md:grid-cols-[300px_auto_200px]'>
+        className="fixed left-0 right-0 top-0 z-20 h-25 border-foreground bg-background"
+      >
+        <div className="mx-auto flex h-full w-screen items-center px-8 md:grid md:grid-cols-[300px_auto_200px]">
           {/* Mobile Logo and Navigation */}
 
-          <div className='lg:hidden items-center gap-2 flex'>
+          <div className="flex items-center gap-2 lg:hidden">
             <motion.div
               initial={{ translateX: "-50%", translateY: 14 }}
               animate={{ translateX: "-50%", translateY: 14 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className='absolute bottom-0 left-1/2  z-10'>
+              className="absolute bottom-0 left-1/2 z-10"
+            >
               {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
-              <Link href='/' prefetch={true}>
+              <Link href="/" prefetch={true}>
                 {/* <span className='font-semibold'>The Street Art List</span> */}
 
                 <motion.img
@@ -150,8 +153,8 @@ NavBarProps) {
                     width: isScrolled ? 50 : 70,
                   }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  src='/logotransparency.png'
-                  alt='The Street Art List'
+                  src="/logotransparency.png"
+                  alt="The Street Art List"
 
                   // className='z-10'
                 />
@@ -165,7 +168,7 @@ NavBarProps) {
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className={cn(
-                "z-0 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[24px] h-[90px] w-[90px] flex items-center justify-center bg-background rounded-full "
+                "absolute bottom-0 left-1/2 z-0 flex h-[90px] w-[90px] -translate-x-1/2 translate-y-[24px] items-center justify-center rounded-full bg-background",
               )}
             />
           </div>
@@ -174,22 +177,24 @@ NavBarProps) {
             <>
               {/* Desktop Logo & Navigation */}
               <motion.div
-                className='hidden lg:flex h-15 items-center gap-2 rounded-full border-2 border-foreground p-[5px] box-border overflow-hidden'
+                className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
                 animate={{
                   width: isScrolled ? "60px" : "250px",
                   backgroundColor: isScrolled ? "var(--background)" : "white",
                 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}>
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+              >
                 <Link
-                  href='/'
-                  className='flex items-center gap-2 overflow-hidden'>
+                  href="/"
+                  className="flex items-center gap-2 overflow-hidden"
+                >
                   <Image
-                    src='/logotransparency.png'
-                    alt='The Street Art List'
+                    src="/logotransparency.png"
+                    alt="The Street Art List"
                     width={48}
                     height={48}
                     priority={true}
-                    className=' shrink-0'
+                    className="shrink-0"
                   />
 
                   <motion.div
@@ -209,13 +214,14 @@ NavBarProps) {
                         ease: "linear",
                       },
                     }}
-                    className='shrink-0 whitespace-nowrap'>
+                    className="shrink-0 whitespace-nowrap"
+                  >
                     <Image
-                      src='/saltext.png'
-                      alt='The Street Art List'
+                      src="/saltext.png"
+                      alt="The Street Art List"
                       width={175}
                       height={80}
-                      className='mt-1'
+                      className="mt-1"
                     />
                   </motion.div>
                 </Link>
@@ -225,36 +231,40 @@ NavBarProps) {
               <motion.div
                 // animate={{ opacity: isScrolled ? 0 : 1 }}
                 // transition={{ duration: 0.3, ease: "easeOut" }}
-                className='hidden justify-center gap-2 lg:flex z-0 items-center'>
+                className="z-0 hidden items-center justify-center gap-2 lg:flex"
+              >
                 <NavigationMenu delayDuration={Infinity}>
-                  <NavigationMenuList className='gap-2'>
+                  <NavigationMenuList className="gap-2">
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
                         isCurrent={isActiveResources}
                         className={cn(
-                          "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-white",
                           isActiveResources &&
-                            "border-foreground/20 bg-backgroundDark/30 hover:bg-backgroundDark/50 hover:border-foreground/40"
+                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
                         )}
                         onPointerMove={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}>
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
                         Resources
                       </NavigationMenuTrigger>
                       <NavigationMenuContent
                         onPointerEnter={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}>
-                        <ul className='grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2 '>
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
                           {filteredNavbarMenuResources.map((component) => (
                             <ListItem
                               key={component.title}
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer  transition-colors duration-200 ease-in-out text-balance ",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                                 component.href.includes(currentPage) &&
                                   currentPage !== "" &&
-                                  "bg-background"
-                              )}>
+                                  "bg-background",
+                              )}
+                            >
                               {component.description}
                             </ListItem>
                           ))}
@@ -265,29 +275,32 @@ NavBarProps) {
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
                         className={cn(
-                          "border-2 border-transparent hover:bg-background hover:border-foreground data-[state=open]:bg-white data-[state=open]:border-foreground",
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-white",
                           isActiveTheList &&
-                            "border-foreground/20 bg-backgroundDark/30 hover:bg-backgroundDark/50 hover:border-foreground/40"
+                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
                         )}
                         onPointerMove={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}>
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
                         The List
                       </NavigationMenuTrigger>
                       <NavigationMenuContent
                         onPointerEnter={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}>
-                        <ul className='grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2 '>
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
                           {filteredNavbarMenuTheList.map((component) => (
                             <ListItem
                               key={component.title}
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer  transition-colors duration-200 ease-in-out text-balance",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                                 component.href.includes(currentPage) &&
                                   currentPage !== "" &&
-                                  "bg-background"
-                              )}>
+                                  "bg-background",
+                              )}
+                            >
                               {component.description}
                             </ListItem>
                           ))}
@@ -300,13 +313,14 @@ NavBarProps) {
                 {filteredNavbarLinks.map((link) => (
                   <Link key={link.title} href={link.href} prefetch={true}>
                     {!link.isIcon ? (
-                      <Button className='bg-background text-foreground border-2 border-transparent hover:bg-background hover:border-foreground h-9'>
+                      <Button className="h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background">
                         {link.title}
                       </Button>
                     ) : (
                       <Button
-                        className='bg-background text-foreground  hover:bg-background hover:scale-110'
-                        size='icon'>
+                        className="bg-background text-foreground hover:scale-110 hover:bg-background"
+                        size="icon"
+                      >
                         {link.icon}
                       </Button>
                     )}
@@ -316,19 +330,21 @@ NavBarProps) {
 
               {/* Right Side */}
               <Unauthenticated>
-                <div className='hidden lg:flex items-center justify-self-end h-15 w-fit'>
-                  <div className='flex items-center gap-4'>
-                    <Link href='/auth/sign-in' prefetch={true}>
+                <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
+                  <div className="flex items-center gap-4">
+                    <Link href="/auth/sign-in" prefetch={true}>
                       <Button
-                        variant='link'
-                        className='font-bold hidden lg:block rounded-full '>
+                        variant="link"
+                        className="hidden rounded-full font-bold lg:block"
+                      >
                         Sign in
                       </Button>
                     </Link>
-                    <Link href='/auth/register' prefetch={true}>
+                    <Link href="/auth/register" prefetch={true}>
                       <Button
-                        variant='salWithShadowHiddenYlw'
-                        className='font-bold hidden lg:block rounded-full '>
+                        variant="salWithShadowHiddenYlw"
+                        className="hidden rounded-full font-bold lg:block"
+                      >
                         Sign up
                       </Button>
                     </Link>
@@ -336,12 +352,12 @@ NavBarProps) {
                 </div>
               </Unauthenticated>
               <Authenticated>
-                <div className='hidden lg:flex items-center justify-self-end h-15 w-fit pr-5 '>
-                  <div className='flex items-center gap-4'>
+                <div className="hidden h-15 w-fit items-center justify-self-end pr-5 lg:flex">
+                  <div className="flex items-center gap-4">
                     {userId !== "guest" && user && (
                       <UserProfile
                         user={user}
-                        className='size-10'
+                        className="size-10"
                         subscription={subStatus}
                       />
                     )}
@@ -354,7 +370,7 @@ NavBarProps) {
 
           {/* ------ Mobile Right side ------ */}
 
-          <div className='flex items-center justify-end w-full  lg:hidden z-20'>
+          <div className="z-20 flex w-full items-center justify-end lg:hidden">
             {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
             {/* <Unauthenticated>
               <Link href='/auth/sign-in' prefetch={true}>
@@ -378,7 +394,7 @@ NavBarProps) {
         </div>
       </motion.div>
     </>
-  )
+  );
 }
 
 const ListItem = React.forwardRef<
@@ -392,17 +408,18 @@ const ListItem = React.forwardRef<
           href={href}
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-salPink/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
+            "outline-hidden block select-none space-y-1 rounded-md p-3 leading-none no-underline transition-colors hover:bg-salPink/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className,
           )}
-          {...props}>
-          <div className='text-sm font-medium leading-none'>{title}</div>
-          <p className='line-clamp-2 text-sm leading-snug text-muted-foreground'>
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
         </Link>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
+ListItem.displayName = "ListItem";

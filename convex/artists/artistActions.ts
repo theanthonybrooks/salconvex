@@ -1,4 +1,4 @@
-import { Artist } from "@/types/artist";
+import { ArtistFull } from "@/types/artist";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -30,8 +30,24 @@ export const getArtistFull = query({
       .unique();
     if (!artist) return null;
 
+    const applications = await ctx.db
+      .query("applications")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .collect();
+
+    const listActions = await ctx.db
+      .query("listActions")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .collect();
+
+    const joinedArtist = {
+      ...artist,
+      applications,
+      listActions,
+    };
+
     return {
-      artist: artist as Artist,
+      artist: joinedArtist as ArtistFull,
     };
   },
 });
@@ -78,8 +94,6 @@ export const updateOrCreateArtist = mutation({
         updatedAt: Date.now(),
         lastUpdatedBy: userId,
         completedProfile: false,
-        applications: [],
-        listActions: [],
       });
       return { artistId };
     }
@@ -112,9 +126,101 @@ export const getArtistApplications = query({
       .unique();
     if (!artist) return null;
 
-    const applications = artist.applications ?? [];
-    const listActions = artist.listActions ?? [];
+    const applications = await ctx.db
+      .query("applications")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .collect();
+
+    const listActions = await ctx.db
+      .query("listActions")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .collect();
 
     return { applications, listActions, artist };
+  },
+});
+
+export const artistApplicationActions = mutation({
+  args: {
+    openCallId: v.id("openCalls"),
+    manualApplied: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const openCallId = args.openCallId;
+    const hasApplied = args.manualApplied;
+
+    console.log("userId", userId);
+    console.log("openCallId", openCallId);
+    console.log("hasApplied", hasApplied);
+    if (!userId) throw new ConvexError("Not authenticated");
+
+    const application = await ctx.db
+      .query("applications")
+      .withIndex("by_openCallId", (q) => q.eq("openCallId", openCallId))
+      .filter((q) => q.eq(q.field("artistId"), userId))
+      .unique();
+
+    console.log("application", application);
+
+    if (!application) {
+      console.log("application not found");
+      await ctx.db.insert("applications", {
+        openCallId,
+        artistId: userId,
+        manualApplied: hasApplied ?? false,
+        ...(hasApplied ? { applicationStatus: "applied" } : {}),
+      });
+    } else {
+      await ctx.db.patch(application._id, {
+        manualApplied: hasApplied ?? false,
+        applicationStatus: hasApplied ? "applied" : undefined,
+      });
+    }
+  },
+});
+
+export const artistListActions = mutation({
+  args: {
+    eventId: v.id("events"),
+    hidden: v.optional(v.boolean()),
+    bookmarked: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const artist = await ctx.db
+      .query("artists")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .unique();
+
+    if (!artist) {
+      throw new ConvexError("User not found");
+    }
+
+    await ctx.db.patch(artist._id, {
+      updatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
+
+    const listEvent = await ctx.db
+      .query("listActions")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .filter((q) => q.eq(q.field("artistId"), userId))
+      .unique();
+
+    if (listEvent) {
+      await ctx.db.patch(listEvent._id, {
+        ...(args.hidden !== undefined && { hidden: args.hidden }),
+        ...(args.bookmarked !== undefined && { bookmarked: args.bookmarked }),
+      });
+    } else {
+      await ctx.db.insert("listActions", {
+        eventId: args.eventId,
+        artistId: userId,
+        hidden: args.hidden ?? false,
+        bookmarked: args.bookmarked ?? false,
+      });
+    }
   },
 });
