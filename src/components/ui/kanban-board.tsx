@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { Id } from "convex/_generated/dataModel"
-import { useMutation, useQuery } from "convex/react"
-import { motion } from "framer-motion"
-import { X } from "lucide-react"
-import { useState } from "react"
-import { FiPlus } from "react-icons/fi"
-import { api } from "~/convex/_generated/api"
+import { Id } from "convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import { useState } from "react";
+import { FiPlus } from "react-icons/fi";
+import { api } from "~/convex/_generated/api";
 
-import { cn } from "@/lib/utils"
-import { Pencil } from "lucide-react"
+import { cn } from "@/lib/utils";
+import { Pencil } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -21,64 +21,64 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
-type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done"
+type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done";
 
 interface Card {
-  title: string
-  id: string
-  column: ColumnType
-  priority?: string
+  title: string;
+  id: string;
+  column: ColumnType;
+  priority?: string;
 }
 
 interface MoveCardArgs {
-  id: Id<"todoKanban">
-  column: ColumnType
-  beforeId?: Id<"todoKanban"> | undefined
-  userId: string
+  id: Id<"todoKanban">;
+  column: ColumnType;
+  beforeId?: Id<"todoKanban"> | undefined;
+  userId: string;
 }
 
 interface AddCardArgs {
-  title: string
-  column: ColumnType
-  userId: string
-  order?: "start" | "end"
-  priority?: string
+  title: string;
+  column: ColumnType;
+  userId: string;
+  order?: "start" | "end";
+  priority?: string;
 }
 
 interface DeleteCardArgs {
-  id: Id<"todoKanban">
-  userId: string
+  id: Id<"todoKanban">;
+  userId: string;
 }
 
 // type ConvexCard = Omit<Card, "id"> & { _id: string }
 
 interface ColumnProps {
-  title: string
-  headingColor: string
-  column: ColumnType
-  cards: Card[]
-  userRole: string
-  moveCard: (args: MoveCardArgs) => void
-  addCard: (args: AddCardArgs) => void
-  deleteCard: (args: DeleteCardArgs) => void
+  title: string;
+  headingColor: string;
+  column: ColumnType;
+  cards: Card[];
+  userRole: string;
+  moveCard: (args: MoveCardArgs) => void;
+  addCard: (args: AddCardArgs) => void;
+  deleteCard: (args: DeleteCardArgs) => void;
 }
 
 interface CardProps {
-  title: string
-  id: string
-  column: ColumnType
-  priority?: string
-  handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
-  handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void
-  deleteCard: (args: DeleteCardArgs) => void
+  title: string;
+  id: string;
+  column: ColumnType;
+  priority?: string;
+  handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
+  handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
+  deleteCard: (args: DeleteCardArgs) => void;
 }
 
 interface DropIndicatorProps {
-  beforeId: string | undefined
-  column: ColumnType
+  beforeId: string | undefined;
+  column: ColumnType;
 }
 
 // interface BurnBarrelProps {
@@ -86,7 +86,7 @@ interface DropIndicatorProps {
 // }
 
 interface KanbanBoardProps {
-  userRole?: string
+  userRole?: string;
 }
 
 const getColumnColor = (column: ColumnType) => {
@@ -96,44 +96,44 @@ const getColumnColor = (column: ColumnType) => {
     todo: "bg-yellow-200",
     doing: "bg-blue-200",
     done: "bg-emerald-200",
-  }
-  return colors[column] || "bg-neutral-500"
-}
+  };
+  return colors[column] || "bg-neutral-500";
+};
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
 }) => {
-  return <Board userRole={userRole} />
-}
+  return <Board userRole={userRole} />;
+};
 
 const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   const rawCards =
     useQuery(api.kanban.cards.getCards) ||
     ([] as {
-      _id: Id<"todoKanban">
-      title: string
-      column: ColumnType
-      order: number
-      priority?: string
-    }[])
-  const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 }
+      _id: Id<"todoKanban">;
+      title: string;
+      column: ColumnType;
+      order: number;
+      priority?: string;
+    }[]);
+  const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 };
 
   const cards = rawCards
     .map(({ _id, ...rest }) => ({ id: _id, ...rest })) // Convert `_id` to `id`
     .sort((a, b) => {
       // Get priority levels, default to "medium" if undefined
-      const priorityA = priorityLevels[a.priority || "medium"]
-      const priorityB = priorityLevels[b.priority || "medium"]
+      const priorityA = priorityLevels[a.priority || "medium"];
+      const priorityB = priorityLevels[b.priority || "medium"];
 
       // Sort by priority first, then by order
-      return priorityA - priorityB || a.order - b.order
-    })
+      return priorityA - priorityB || a.order - b.order;
+    });
 
-  const addCard = useMutation(api.kanban.cards.addCard)
-  const moveCard = useMutation(api.kanban.cards.moveCard)
-  const deleteCard = useMutation(api.kanban.cards.deleteCard)
+  const addCard = useMutation(api.kanban.cards.addCard);
+  const moveCard = useMutation(api.kanban.cards.moveCard);
+  const deleteCard = useMutation(api.kanban.cards.deleteCard);
 
-  const [activeColumn, setActiveColumn] = useState<string | null>(null)
+  const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
   const columnDisplayNames: Record<ColumnType, string> = {
     proposed: "Proposed",
@@ -141,17 +141,17 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
     todo: "To Do",
     doing: "In Progress",
     done: "Complete",
-  }
+  };
 
-  const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"]
-  const hasProposed = cards.some((card) => card.column === "proposed")
+  const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"];
+  const hasProposed = cards.some((card) => card.column === "proposed");
 
   const orderedColumns: ColumnType[] = hasProposed
     ? ["proposed", ...baseColumns]
-    : baseColumns
+    : baseColumns;
 
   return (
-    <div className='flex  w-full h-full max-h-[80vh] overflow-hidden gap-3 p-6'>
+    <div className="scrollable mini flex h-full max-h-[80vh] w-full gap-3 overflow-hidden overflow-x-auto p-6">
       {orderedColumns.map((column) => (
         <Column
           key={column}
@@ -168,16 +168,16 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
         />
       ))}
     </div>
-  )
-}
+  );
+};
 
 const Column: React.FC<
   ColumnProps & {
-    moveCard: (args: MoveCardArgs) => void
-    addCard: (args: AddCardArgs) => void
-    deleteCard: (args: DeleteCardArgs) => void
-    activeColumn: string | null
-    setActiveColumn: (col: string | null) => void
+    moveCard: (args: MoveCardArgs) => void;
+    addCard: (args: AddCardArgs) => void;
+    deleteCard: (args: DeleteCardArgs) => void;
+    activeColumn: string | null;
+    setActiveColumn: (col: string | null) => void;
   }
 > = ({
   title,
@@ -191,32 +191,32 @@ const Column: React.FC<
 
   setActiveColumn,
 }) => {
-  const [active, setActive] = useState(false)
+  const [active, setActive] = useState(false);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
-    if (userRole !== "admin") return
-    e.dataTransfer.setData("cardId", card.id)
-    setActive(true)
-  }
+    if (userRole !== "admin") return;
+    e.dataTransfer.setData("cardId", card.id);
+    setActive(true);
+  };
 
   const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return
+    if (userRole !== "admin") return;
 
-    const cardId = e.dataTransfer.getData("cardId")
-    if (!cardId) return
+    const cardId = e.dataTransfer.getData("cardId");
+    if (!cardId) return;
 
-    setActive(false)
-    clearHighlights()
+    setActive(false);
+    clearHighlights();
 
-    const indicators = getIndicators()
-    const { element } = getNearestIndicator(e, indicators)
+    const indicators = getIndicators();
+    const { element } = getNearestIndicator(e, indicators);
     let beforeId =
       element.dataset.before !== "-1"
         ? (element.dataset.before as Id<"todoKanban">)
-        : undefined
+        : undefined;
 
     if (cards.length === 0) {
-      beforeId = undefined
+      beforeId = undefined;
     }
 
     moveCard({
@@ -224,73 +224,74 @@ const Column: React.FC<
       column,
       beforeId,
       userId: "admin",
-    })
-  }
+    });
+  };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return
-    e.preventDefault()
-    highlightIndicator(e)
-    setActive(true)
-  }
+    if (userRole !== "admin") return;
+    e.preventDefault();
+    highlightIndicator(e);
+    setActive(true);
+  };
 
   const handleDragLeave = () => {
-    clearHighlights()
-    setActive(false)
-  }
+    clearHighlights();
+    setActive(false);
+  };
 
   const clearHighlights = (els?: HTMLElement[]) => {
-    const indicators = els || getIndicators()
-    indicators.forEach((i) => (i.style.opacity = "0"))
-  }
+    const indicators = els || getIndicators();
+    indicators.forEach((i) => (i.style.opacity = "0"));
+  };
 
   const highlightIndicator = (e: React.DragEvent<HTMLDivElement>) => {
-    const indicators = getIndicators()
-    clearHighlights(indicators)
-    const el = getNearestIndicator(e, indicators)
-    el.element.style.opacity = "1"
-  }
+    const indicators = getIndicators();
+    clearHighlights(indicators);
+    const el = getNearestIndicator(e, indicators);
+    el.element.style.opacity = "1";
+  };
 
   const getNearestIndicator = (
     e: React.DragEvent<HTMLDivElement>,
-    indicators: HTMLElement[]
+    indicators: HTMLElement[],
   ) => {
-    const DISTANCE_OFFSET = 50
+    const DISTANCE_OFFSET = 50;
 
     return indicators.reduce<{ offset: number; element: HTMLElement }>(
       (closest, child) => {
-        const box = child.getBoundingClientRect()
-        const offset = e.clientY - (box.top + DISTANCE_OFFSET)
+        const box = child.getBoundingClientRect();
+        const offset = e.clientY - (box.top + DISTANCE_OFFSET);
         // const offset = Math.round(e.clientY - (box.top + DISTANCE_OFFSET))
 
         if (offset < 0 && offset > closest.offset) {
-          return { offset: offset, element: child }
+          return { offset: offset, element: child };
         } else {
-          return closest
+          return closest;
         }
       },
       {
         offset: Number.NEGATIVE_INFINITY,
         element: indicators[indicators.length - 1],
-      }
-    )
-  }
+      },
+    );
+  };
 
   const getIndicators = () => {
     return Array.from(
-      document.querySelectorAll(`[data-column="${column}"]`)
-    ) as HTMLElement[]
-  }
+      document.querySelectorAll(`[data-column="${column}"]`),
+    ) as HTMLElement[];
+  };
 
   return (
     <div
-      className='w-56 shrink-0 flex flex-col h-full relative'
+      className="relative flex h-full w-56 shrink-0 flex-col"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
-      onDrop={handleDragEnd}>
-      <div className='mb-3 sticky top-0 z-10 bg-background'>
-        <div className='flex items-center justify-between relative'>
-          <h3 className={cn("font-medium  p-4 rounded-lg z-10", headingColor)}>
+      onDrop={handleDragEnd}
+    >
+      <div className="sticky top-0 z-10 mb-3 bg-background">
+        <div className="relative flex items-center justify-between">
+          <h3 className={cn("z-10 rounded-lg p-4 font-medium", headingColor)}>
             {title}
           </h3>
           {userRole === "admin" && (
@@ -301,23 +302,24 @@ const Column: React.FC<
               setActiveColumn={setActiveColumn}
             />
           )}
-          <span className='rounded text-sm text-foreground dark:text-primary-foreground pr-4'>
+          <span className="rounded pr-4 text-sm text-foreground dark:text-primary-foreground">
             {cards.length}
           </span>
 
           {/* Fade at bottom of header */}
-          <div className='pointer-events-none absolute -bottom-6 left-0 w-full h-4 bg-gradient-to-b from-background to-transparent z-[9]' />
+          <div className="pointer-events-none absolute -bottom-6 left-0 z-[9] h-4 w-full bg-gradient-to-b from-background to-transparent" />
         </div>
       </div>
 
       <div
         className={cn(
-          "flex flex-col gap-[2px] overflow-y-auto scrollable mini  transition-colors px-2 flex-1",
-          "h-[calc(100vh-160px)] ",
+          "scrollable mini flex flex-1 flex-col gap-[2px] overflow-y-auto px-2 transition-colors",
+          "h-[calc(100vh-160px)]",
           active
             ? "bg-[hsl(295,100%,71%)]/30"
-            : "bg-[hsl(60, 100%, 99.6078431372549%)]/0"
-        )}>
+            : "bg-[hsl(60, 100%, 99.6078431372549%)]/0",
+        )}
+      >
         {cards.map((c) => (
           <Card
             key={c.id}
@@ -331,8 +333,8 @@ const Column: React.FC<
         <DropIndicator beforeId={undefined} column={column} />
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Card: React.FC<CardProps> = ({
   title,
@@ -342,26 +344,26 @@ const Card: React.FC<CardProps> = ({
   deleteCard,
   priority,
 }) => {
-  const [newPriority, setNewPriority] = useState(priority || "medium")
-  const [isHovered, setIsHovered] = useState(false)
+  const [newPriority, setNewPriority] = useState(priority || "medium");
+  const [isHovered, setIsHovered] = useState(false);
 
-  const editCard = useMutation(api.kanban.cards.editCard)
+  const editCard = useMutation(api.kanban.cards.editCard);
 
   // Delete function
   const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    await deleteCard({ id: id as Id<"todoKanban">, userId: "admin" })
-  }
+    e.stopPropagation();
+    await deleteCard({ id: id as Id<"todoKanban">, userId: "admin" });
+  };
 
   const handleTogglePriority = async () => {
     setNewPriority((prevPriority) => {
-      let updatedPriority
+      let updatedPriority;
       if (prevPriority === "high") {
-        updatedPriority = "low"
+        updatedPriority = "low";
       } else if (prevPriority === "low") {
-        updatedPriority = "medium"
+        updatedPriority = "medium";
       } else {
-        updatedPriority = "high"
+        updatedPriority = "high";
       }
 
       editCard({
@@ -369,19 +371,19 @@ const Card: React.FC<CardProps> = ({
         title,
         priority: updatedPriority,
         userId: "admin",
-      })
+      });
 
-      return updatedPriority
-    })
-  }
+      return updatedPriority;
+    });
+  };
 
   return (
-    <motion.div layout className='relative flex flex-col'>
+    <motion.div layout className="relative flex flex-col">
       <DropIndicator beforeId={id} column={column} />
       <motion.div
         layout
         layoutId={id}
-        draggable='true'
+        draggable="true"
         onDragStart={(e) =>
           handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
             title,
@@ -390,19 +392,20 @@ const Card: React.FC<CardProps> = ({
             priority,
           })
         }
-        className={`cursor-grab text-primary-foreground rounded-lg border border-foreground/20  relative p-3 active:cursor-grabbing grid grid-cols-[30px_minmax(0,1fr)] ${getColumnColor(
-          column
+        className={`relative grid cursor-grab grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground active:cursor-grabbing ${getColumnColor(
+          column,
         )}`}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}>
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {isHovered && (
-          <div className='absolute top-0 right-0 bg-card/90 dark:bg-foreground border border-primary p-3 rounded-lg flex gap-x-2 items-center justify-center'>
+          <div className="absolute right-0 top-0 flex items-center justify-center gap-x-2 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground">
             <TaskDialog
-              mode='edit'
+              mode="edit"
               trigger={
                 <Pencil
                   size={16}
-                  className='text-gray-500 hover:text-gray-700 cursor-pointer'
+                  className="cursor-pointer text-gray-500 hover:text-gray-700"
                 />
               }
               initialValues={{
@@ -417,64 +420,65 @@ const Card: React.FC<CardProps> = ({
                   id: id as Id<"todoKanban">,
                   ...data,
                   userId: "admin",
-                })
-                setNewPriority(data.priority)
+                });
+                setNewPriority(data.priority);
               }}
             />
 
             <X
               size={16}
               onClick={handleDelete}
-              className=' text-red-500 hover:text-red-700 cursor-pointer'
+              className="cursor-pointer text-red-500 hover:text-red-700"
             />
           </div>
         )}
         <span
           onClick={handleTogglePriority}
           className={cn(
-            "rounded-full h-2 w-2 p-[5px] mt-1 hover:cursor-pointer",
+            "mt-1 h-2 w-2 rounded-full p-[5px] hover:cursor-pointer",
             newPriority === "high"
               ? "bg-green-500"
               : newPriority === "low"
-              ? "bg-red-500"
-              : "bg-yellow-500"
+                ? "bg-red-500"
+                : "bg-yellow-500",
           )}
         />
 
-        <p className='text-sm text-foreground dark:text-primary-foreground'>
+        <p className="text-sm text-foreground dark:text-primary-foreground">
           {title}
         </p>
       </motion.div>
     </motion.div>
-  )
-}
+  );
+};
 
 const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
   return (
     <div
       data-before={beforeId || "-1"}
       data-column={column}
-      className='my-0.5 h-0.5 w-full bg-violet-400 opacity-0'
+      className="my-0.5 h-0.5 w-full bg-violet-400 opacity-0"
     />
-  )
-}
+  );
+};
 
 const AddCard: React.FC<{
-  column: ColumnType
-  addCard: (args: AddCardArgs) => void
+  column: ColumnType;
+  addCard: (args: AddCardArgs) => void;
 
-  setActiveColumn: (col: string | null) => void
-  userRole: string
+  setActiveColumn: (col: string | null) => void;
+  userRole: string;
 }> = ({ column, addCard, userRole }) => {
-  if (userRole !== "admin") return null
+  if (userRole !== "admin") return null;
 
   return (
     <TaskDialog
-      mode='add'
+      mode="add"
       trigger={
         <motion.button
           layout
-          className='text-xs text-neutral-500 hover:text-neutral-600 flex gap-x-1 items-center'>
+          className="flex items-center gap-x-1 text-xs text-neutral-500 hover:text-neutral-600"
+        >
           Add <FiPlus />
         </motion.button>
       }
@@ -483,33 +487,33 @@ const AddCard: React.FC<{
         addCard({
           ...data,
           userId: "admin",
-        })
+        });
       }}
     />
-  )
-}
+  );
+};
 
 type BaseTaskValues = {
-  title: string
-  column: ColumnType
-  priority: "low" | "medium" | "high"
-}
+  title: string;
+  column: ColumnType;
+  priority: "low" | "medium" | "high";
+};
 
 type AddTaskDialogProps = {
-  mode: "add"
-  trigger: React.ReactNode
-  initialValues?: BaseTaskValues & { order: "start" | "end" }
-  onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void
-}
+  mode: "add";
+  trigger: React.ReactNode;
+  initialValues?: BaseTaskValues & { order: "start" | "end" };
+  onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
+};
 
 type EditTaskDialogProps = {
-  mode: "edit"
-  trigger: React.ReactNode
-  initialValues?: BaseTaskValues
-  onSubmit: (values: BaseTaskValues) => void
-}
+  mode: "edit";
+  trigger: React.ReactNode;
+  initialValues?: BaseTaskValues;
+  onSubmit: (values: BaseTaskValues) => void;
+};
 
-type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps
+type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
 
 export const TaskDialog: React.FC<TaskDialogProps> = ({
   mode,
@@ -517,40 +521,40 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
   initialValues,
   onSubmit,
 }) => {
-  const [title, setTitle] = useState(initialValues?.title || "")
+  const [title, setTitle] = useState(initialValues?.title || "");
   const [column, setColumn] = useState<ColumnType>(
-    initialValues?.column || "todo"
-  )
+    initialValues?.column || "todo",
+  );
   const [priority, setPriority] = useState<"low" | "medium" | "high">(
-    initialValues?.priority || "medium"
-  )
+    initialValues?.priority || "medium",
+  );
   const [order, setOrder] = useState<"start" | "end">(
-    mode === "add" && initialValues?.order ? initialValues.order : "start"
-  )
+    mode === "add" && initialValues?.order ? initialValues.order : "start",
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim()) return
+    e.preventDefault();
+    if (!title.trim()) return;
 
     if (mode === "add") {
-      onSubmit({ title: title.trim(), column, priority, order })
+      onSubmit({ title: title.trim(), column, priority, order });
     } else {
-      onSubmit({ title: title.trim(), column, priority })
+      onSubmit({ title: title.trim(), column, priority });
     }
-    setTitle("")
-    setColumn(initialValues?.column || "todo")
-    setPriority(initialValues?.priority || "medium")
+    setTitle("");
+    setColumn(initialValues?.column || "todo");
+    setPriority(initialValues?.priority || "medium");
     setOrder(
-      mode === "add" && initialValues?.order ? initialValues.order : "end"
-    )
-  }
+      mode === "add" && initialValues?.order ? initialValues.order : "end",
+    );
+  };
 
-  const isEdit = mode === "edit"
+  const isEdit = mode === "edit";
 
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className='bg-card'>
+      <DialogContent className="bg-card">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
           <DialogDescription>
@@ -560,25 +564,26 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Label>Task</Label>
           <textarea
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder='Task title...'
-            className='w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none'
+            placeholder="Task title..."
+            className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none"
           />
 
           <Label>Column</Label>
           <select
             value={column}
             onChange={(e) => setColumn(e.target.value as ColumnType)}
-            className='border p-2 rounded bg-background text-foreground'>
-            <option value='proposed'>Proposed</option>
-            <option value='backlog'>Considering</option>
-            <option value='todo'>To Do</option>
-            <option value='doing'>In Progress</option>
-            <option value='done'>Complete</option>
+            className="rounded border bg-background p-2 text-foreground"
+          >
+            <option value="proposed">Proposed</option>
+            <option value="backlog">Considering</option>
+            <option value="todo">To Do</option>
+            <option value="doing">In Progress</option>
+            <option value="done">Complete</option>
           </select>
 
           <Label>Priority</Label>
@@ -587,10 +592,11 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
             onChange={(e) =>
               setPriority(e.target.value as "low" | "medium" | "high")
             }
-            className='border p-2 rounded bg-background text-foreground'>
-            <option value='high'>High</option>
-            <option value='medium'>Medium</option>
-            <option value='low'>Low</option>
+            className="rounded border bg-background p-2 text-foreground"
+          >
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
           </select>
 
           {!isEdit && (
@@ -599,21 +605,22 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
               <select
                 value={order}
                 onChange={(e) => setOrder(e.target.value as "start" | "end")}
-                className='border p-2 rounded bg-background text-foreground'>
-                <option value='start'>Add to Beginning</option>
-                <option value='end'>Add to End</option>
+                className="rounded border bg-background p-2 text-foreground"
+              >
+                <option value="start">Add to Beginning</option>
+                <option value="end">Add to End</option>
               </select>
             </>
           )}
 
-          <DialogFooter className='flex justify-end gap-2'>
+          <DialogFooter className="flex justify-end gap-2">
             <DialogClose asChild>
-              <Button type='button' variant='salWithShadowHiddenYlw'>
+              <Button type="button" variant="salWithShadowHiddenYlw">
                 Cancel
               </Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button type='submit' variant='salWithShadowHidden'>
+              <Button type="submit" variant="salWithShadowHidden">
                 {isEdit ? "Save Changes" : "Add Task"}
               </Button>
             </DialogClose>
@@ -621,5 +628,5 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

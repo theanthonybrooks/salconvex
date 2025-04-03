@@ -221,6 +221,7 @@ Props) => {
         totalResults={totalResults}
         onPageChange={setPage}
         bottomPag
+        className="mb-6"
       />
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (

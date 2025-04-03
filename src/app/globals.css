@@ -93,8 +93,8 @@ body,
 
     /* --nav-height: 100px; */
 
-    --nav-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --nav-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
     --radius: 0.5rem;
 
@@ -352,7 +352,7 @@ body,
 /* For WebKit-based browsers (Chrome, Safari, Edge) */
 .scrollable::-webkit-scrollbar {
   width: 1em;
-  height: 2px; /* if you also want horizontal scrollbars */
+  height: 1em; /* if you also want horizontal scrollbars */
 }
 
 .scrollable::-webkit-scrollbar-track {
@@ -363,7 +363,9 @@ body,
   background-color: var(--background);
   border-radius: 9999px; /* fully rounded */
   border: 1px solid black;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .scrollable::-webkit-scrollbar-thumb:hover {
@@ -371,6 +373,7 @@ body,
 }
 .scrollable.mini::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 .scrollable.mini.darkbar::-webkit-scrollbar-thumb {
   background: hsl(var(--primary) / 0.65);

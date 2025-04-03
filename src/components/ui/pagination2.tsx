@@ -17,6 +17,7 @@ interface BasicPaginationProps {
   totalPages: number;
   totalResults: number;
   bottomPag?: boolean;
+  className?: string;
 
   onPageChange: (page: number) => void;
 }
@@ -26,6 +27,7 @@ export const BasicPagination = ({
   totalPages,
   totalResults,
   bottomPag = false,
+  className,
 
   onPageChange: setPage,
 }: BasicPaginationProps) => {
@@ -48,7 +50,10 @@ export const BasicPagination = ({
       initial={{ opacity: 0 }}
       animate={totalPages >= 1 && { opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="my-6 flex w-full max-w-[70vw] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0"
+      className={cn(
+        "my-6 flex w-full max-w-[70vw] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0",
+        className,
+      )}
     >
       {!bottomPag && (
         <p className={cn("mx-auto text-center")}>

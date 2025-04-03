@@ -164,7 +164,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   return (
     <>
       {/* //---------------------- (Mobile) Layout ---------------------- */}
-      <Card className="mb-10 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 lg:hidden">
+      <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
         <div className="col-span-1 row-span-2 flex flex-col items-center justify-between pb-3 pl-2 pt-3">
           <Link
             href={
