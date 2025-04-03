@@ -42,7 +42,7 @@ export default function Home() {
         initial={{ y: 0, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="relative flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl"
+        className="relative mt-10 flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl sm:mt-auto"
         style={{
           maxHeight: "calc(100dvh - 8.5rem)",
         }}
@@ -66,20 +66,22 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute bottom-5 left-5 flex flex-row gap-1 rounded-3xl bg-white px-10 py-2 text-foreground hover:cursor-pointer"
+              className="absolute bottom-5 left-1/2 flex w-max -translate-x-1/2 flex-row gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
             >
-              <span>
-                <i className="text-base">Silent Rhythm </i> by{" "}
-                <span className="font-bold">Anthony Brooks</span>
+              <span className="flex items-center gap-2">
+                <i className="text-base">Artwork Name </i>
+                {/* <span className="block sm:hidden">-</span>{" "} */}
+                <span className="block text-xs">by</span>{" "}
+                <span className="font-bold">CHUS</span>
               </span>
             </motion.span>
           </PopoverTrigger>
-          <PopoverContent className="w-80">
+          <PopoverContent className="w-80 border-1.5" align="start">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h3 className="font-bold italic">Artwork Name</h3>
                 <p className="text-sm text-muted-foreground">
-                  Painted in 2024 for event/project name.
+                  Painted in 2023 for event/project name.
                   Description/size/materials/etc.
                 </p>
                 <h4 className="font-medium leading-none">More info:</h4>
