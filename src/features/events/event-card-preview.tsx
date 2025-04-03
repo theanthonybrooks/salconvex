@@ -148,6 +148,10 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     toggleListAction({ bookmarked: !isBookmarked });
   };
 
+  const onHide = () => {
+    toggleListAction({ hidden: !isHidden });
+  };
+
   useEffect(() => {
     setIsHidden(hidden);
     setIsBookmarked(bookmarked);
@@ -378,10 +382,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               />
             )}
             {isHidden && (
-              <EyeOff
-                className="size-6 cursor-pointer"
-                onClick={() => setIsHidden(!isHidden)}
-              />
+              <EyeOff className="size-6 cursor-pointer" onClick={onHide} />
             )}
             {/* TODO: Add publicView check to this as well (when the state is set up) */}
           </div>

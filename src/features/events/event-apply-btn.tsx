@@ -142,8 +142,6 @@ export const ApplyButton = ({
           ? `/thelist/event/${slug}/call/${edition}`
           : `/thelist/event/${slug}/${edition}`;
 
-  console.log(openCall, status, publicView, isPreview);
-
   const buttonText =
     openCall === "active"
       ? status !== null && !publicView && !isPreview
