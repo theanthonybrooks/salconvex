@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import {
   ApplyButton,
   ApplyButtonShort,
@@ -140,6 +141,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     basicInfo && budget && eligibility && event.hasActiveOpenCall;
 
   // const userCurrency = userPref?.currency ?? ""
+
+  const { toggleListAction } = useToggleListAction(event._id);
+
+  const onBookmark = () => {
+    toggleListAction({ bookmarked: !isBookmarked });
+  };
 
   useEffect(() => {
     setIsHidden(hidden);
@@ -325,12 +332,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             {isBookmarked ? (
               <FaBookmark
                 className="size-8 cursor-pointer text-red-600"
-                onClick={() => setIsBookmarked(!isBookmarked)}
+                onClick={onBookmark}
               />
             ) : (
               <FaRegBookmark
                 className="size-8 cursor-pointer"
-                onClick={() => setIsBookmarked(!isBookmarked)}
+                onClick={onBookmark}
               />
             )}
           </div>
