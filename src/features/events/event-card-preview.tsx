@@ -719,7 +719,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             isHidden={isHidden}
             // setIsHidden={setIsHidden}
             eventCategory={eventCategory}
-            isPreview={true}
+            isPreview={false}
             appFee={basicInfo ? basicInfo.appFee : 0}
           />
         </div>

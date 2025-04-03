@@ -142,12 +142,12 @@ export const ApplyButton = ({
           ? `/thelist/event/${slug}/call/${edition}`
           : `/thelist/event/${slug}/${edition}`;
 
+  console.log(openCall, status, publicView, isPreview);
+
   const buttonText =
     openCall === "active"
       ? status !== null && !publicView && !isPreview
-        ? `Applied: ${
-            status.slice(0, 1).toUpperCase() + status.slice(1).toLowerCase()
-          }`
+        ? status.slice(0, 1).toUpperCase() + status.slice(1).toLowerCase()
         : "Apply"
       : "View More";
 
