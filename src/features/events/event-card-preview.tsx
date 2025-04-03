@@ -358,12 +358,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             {isBookmarked ? (
               <FaBookmark
                 className="size-7 cursor-pointer text-red-600"
-                onClick={() => setIsBookmarked(!isBookmarked)}
+                onClick={onBookmark}
               />
             ) : (
               <FaRegBookmark
                 className="size-7 cursor-pointer"
-                onClick={() => setIsBookmarked(!isBookmarked)}
+                onClick={onBookmark}
               />
             )}
             {isApplied === null ? (
