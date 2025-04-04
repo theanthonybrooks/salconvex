@@ -51,10 +51,10 @@ export default function Footer() {
       <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:w-full xl:max-w-full xl:px-6">
         <div className="xl:grid xl:grid-cols-2 xl:gap-8">
           {/* Links */}
-          <div className="mt-5 grid grid-cols-2 gap-8 px-6 xl:col-span-2 xl:mt-0">
+          <div className="mt-5 grid gap-8 px-6 md:grid-cols-2 xl:col-span-2 xl:mt-0">
             <div
               className={cn(
-                "text-start md:grid md:gap-8 md:pl-8",
+                "hidden text-start md:grid md:gap-8 md:pl-8",
                 gridColsClass ? gridColsClass : "md:grid-cols-4",
               )}
             >
@@ -80,15 +80,14 @@ export default function Footer() {
             </div>
             <div
               data-type="newsletter"
-              className="width-full mx-auto flex flex-col justify-center border-l-[1px] border-border pl-[5rem]"
+              className="width-full mx-auto flex flex-col justify-center border-border md:border-l-[1px] md:pl-[5rem]"
             >
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-foreground">
                   Stay Updated
                 </h3>
-                <p className="mb-8 mt-4 text-sm text-gray-600 dark:text-gray-400">
-                  Subscribe to our newsletter for updates, tips, and special
-                  offers.
+                <p className="mb-4 mt-4 text-sm text-foreground md:mb-8">
+                  Subscribe to the newsletter for regular updates
                 </p>
               </div>
               <form
@@ -107,7 +106,7 @@ export default function Footer() {
                   <Button
                     type="submit"
                     variant="salWithShadowHidden"
-                    className="flex w-[150px] items-center justify-center gap-2 font-bold"
+                    className="flex w-full items-center justify-center gap-2 font-bold md:w-[150px]"
                   >
                     {subAction === "cta"
                       ? "Subscribe"
@@ -128,8 +127,8 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 border-t border-border pt-4 dark:border-gray-800">
-          <div className="flex items-center justify-between px-6">
-            <div className="flex space-x-4">
+          <div className="flex flex-col items-center justify-between gap-y-2 px-6 md:flex-row">
+            <div className="mb-2 flex space-x-4 md:mb-0">
               <Link
                 href="https://facebook.com/thestreetartlist"
                 target="_blank"

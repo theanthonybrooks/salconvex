@@ -114,7 +114,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isHidden, setIsHidden] = useState(hidden);
   const [isApplied, setIsApplied] = useState(appStatus);
-  console.log("isApplied", isApplied);
+  // console.log("isApplied", isApplied);
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
 
   // const icsLink =

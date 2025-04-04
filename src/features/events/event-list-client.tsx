@@ -1,6 +1,7 @@
 "use client";
 
 import { BasicPagination } from "@/components/ui/pagination2";
+import Loader from "@/components/ui/washing-loader";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
@@ -34,6 +35,10 @@ const ClientEventList = ({
 Props) => {
   const searchParams = useSearchParams();
   const allEvents = useEventPreviewCards();
+  const isLoading = allEvents?.length === 0;
+
+  console.log(isLoading);
+  const hasResults = allEvents?.length > 0;
 
   // console.log("allEvents", allEvents)
 
@@ -179,8 +184,12 @@ Props) => {
         </>
       )}
 
-      {filteredEvents.length === 0 ? (
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="text-center text-lg">Loading results...</p> <Loader />
+        </div>
+      ) : hasResults && filteredEvents.length === 0 ? (
+        <p className="mt-8 text-center text-sm text-foreground">
           No events found matching the selected filters.
         </p>
       ) : (

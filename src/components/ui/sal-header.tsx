@@ -1,30 +1,31 @@
-import SocialsRow from "@/components/ui/socials"
-import Image from "next/image"
-import Link from "next/link"
+import SocialsRow from "@/components/ui/socials";
+import Image from "next/image";
+import Link from "next/link";
 
 const SalHeader = () => {
   return (
-    <div className='flex flex-col justify-center items-center gap-2'>
+    <div className="mb-4 flex flex-col items-center justify-center gap-2">
       <Image
-        src='/saltext.png'
-        alt='The Street Art List'
+        src="/saltext.png"
+        alt="The Street Art List"
         width={250}
         height={100}
         priority={true}
       />
-      <p className='text-center text-sm mb-4'>
+      <p className="mb-4 mt-2 text-center text-sm">
         List of street art, graffiti, & mural projects.
         <br /> Info gathered and shared by{" "}
         <Link
-          href='https://instagram.com/anthonybrooksart'
-          target='_blank'
-          className='font-semibold'>
+          href="https://instagram.com/anthonybrooksart"
+          target="_blank"
+          className="font-semibold"
+        >
           @anthonybrooksart
         </Link>
       </p>
-      <SocialsRow className='mb-4 size-8 md:size-7' />
+      <SocialsRow className="mb-4 size-8 md:size-7" />
     </div>
-  )
-}
+  );
+};
 
-export default SalHeader
+export default SalHeader;
