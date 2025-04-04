@@ -23,7 +23,7 @@ export const addCard = mutation({
     order: v.optional(v.string()),
     priority: v.optional(v.string()),
     userId: v.string(),
-    isPublic: v.optional(v.boolean()),
+    isPublic: v.boolean(),
   },
   handler: async (ctx, args) => {
     const { column, order, title, userId, priority, isPublic } = args;
@@ -68,6 +68,7 @@ export const addCard = mutation({
       createdAt: Date.now(),
       lastUpdatedBy: userId,
       order: newOrder,
+      public: isPublic,
     });
   },
 });

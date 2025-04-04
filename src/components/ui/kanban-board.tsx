@@ -4,7 +4,7 @@ import { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
 
@@ -32,7 +32,7 @@ interface Card {
   id: string;
   column: ColumnType;
   priority?: string;
-  isPublic?: boolean;
+  isPublic: boolean;
 }
 
 interface MoveCardArgs {
@@ -40,7 +40,6 @@ interface MoveCardArgs {
   column: ColumnType;
   beforeId?: Id<"todoKanban"> | undefined;
   userId: string;
-  isPublic?: boolean;
 }
 
 interface AddCardArgs {
@@ -49,7 +48,7 @@ interface AddCardArgs {
   userId: string;
   order?: "start" | "end";
   priority?: string;
-  isPublic?: boolean;
+  isPublic: boolean;
 }
 
 interface DeleteCardArgs {
@@ -75,7 +74,7 @@ interface CardProps {
   id: string;
   column: ColumnType;
   priority?: string;
-  isPublic?: boolean;
+  isPublic: boolean;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
   deleteCard: (args: DeleteCardArgs) => void;
@@ -120,13 +119,17 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
       column: ColumnType;
       order: number;
       priority?: string;
-      isPublic?: boolean;
+      public: boolean;
       completedAt?: number;
     }[]);
   const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 };
 
   const cards = rawCards
-    .map(({ _id, ...rest }) => ({ id: _id, ...rest }))
+    .map(({ _id, public: isPublic, ...rest }) => ({
+      id: _id,
+      isPublic,
+      ...rest,
+    }))
     .sort((a, b) => {
       if (a.column === "done" && b.column === "done") {
         const aCompleted = a.completedAt || 0;
@@ -391,8 +394,6 @@ const Card: React.FC<CardProps> = ({
     });
   };
 
-  // console.log(isPublic);
-
   return (
     <motion.div layout className="relative flex flex-col">
       <DropIndicator beforeId={id} column={column} />
@@ -436,7 +437,7 @@ const Card: React.FC<CardProps> = ({
                 priority: (["low", "medium", "high"].includes(priority ?? "")
                   ? priority
                   : "medium") as "low" | "medium" | "high",
-                isPublic: isPublic ?? false,
+                isPublic: isPublic ?? true,
               }}
               onSubmit={(data) => {
                 editCard({
@@ -564,7 +565,7 @@ export const TaskDialog = ({
   const [priority, setPriority] = useState<"low" | "medium" | "high">(
     initialValues?.priority || "medium",
   );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [order, setOrder] = useState<"start" | "end">(
     mode === "add" && initialValues?.order ? initialValues.order : "start",
   );
@@ -573,37 +574,51 @@ export const TaskDialog = ({
     initialValues?.isPublic ?? true,
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    if (mode === "add") {
-      onSubmit({ title: title.trim(), column, priority, order, isPublic });
-    } else {
-      setIsSubmitting(true);
-      onSubmit({ title: title.trim(), column, priority, isPublic });
-      setIsSubmitting(false);
+    isSubmittingRef.current = true;
+    try {
+      if (mode === "add") {
+        await onSubmit({
+          title: title.trim(),
+          column,
+          priority,
+          order,
+          isPublic,
+        });
+      } else {
+        await onSubmit({
+          title: title.trim(),
+          column,
+          priority,
+          isPublic,
+        });
+      }
+
+      // Reset form
+      setTitle(initialValues?.title || "");
+      setColumn(initialValues?.column || "todo");
+      setPriority(initialValues?.priority || "medium");
+      setOrder(
+        mode === "add" && initialValues?.order ? initialValues.order : "end",
+      );
+      setIsPublic(initialValues?.isPublic ?? true);
+    } finally {
+      isSubmittingRef.current = false;
+      onClose?.();
     }
-    setTitle("");
-    setColumn(initialValues?.column || "todo");
-    setPriority(initialValues?.priority || "medium");
-    setOrder(
-      mode === "add" && initialValues?.order ? initialValues.order : "end",
-    );
-    setIsPublic(initialValues?.isPublic || true);
-    onClose?.();
   };
 
   const onCloseDialog = () => {
     setTimeout(() => {
-      if (!isSubmitting) {
+      if (!isSubmittingRef.current) {
         onClose?.();
         return;
       }
-    }, 300);
+    }, 500);
   };
-
-  // console.log(initialValues);
 
   const isEdit = mode === "edit";
 
