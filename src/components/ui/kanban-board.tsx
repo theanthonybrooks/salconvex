@@ -121,17 +121,22 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
       order: number;
       priority?: string;
       isPublic?: boolean;
+      completedAt?: number;
     }[]);
   const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 };
 
   const cards = rawCards
-    .map(({ _id, ...rest }) => ({ id: _id, ...rest })) // Convert `_id` to `id`
+    .map(({ _id, ...rest }) => ({ id: _id, ...rest }))
     .sort((a, b) => {
-      // Get priority levels, default to "medium" if undefined
+      if (a.column === "done" && b.column === "done") {
+        const aCompleted = a.completedAt || 0;
+        const bCompleted = b.completedAt || 0;
+        return bCompleted - aCompleted; // Newest done cards at top
+      }
+
       const priorityA = priorityLevels[a.priority || "medium"];
       const priorityB = priorityLevels[b.priority || "medium"];
 
-      // Sort by priority first, then by order
       return priorityA - priorityB || a.order - b.order;
     });
 
