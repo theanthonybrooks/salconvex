@@ -297,7 +297,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         actionClassName="px-10"
       />
       {step === "signUp" && (
-        <CardHeader>
+        <CardHeader className="space-y-0 pb-0">
           <section className="flex flex-col items-center justify-center space-y-2.5">
             <Link
               href="/"
@@ -319,7 +319,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               width={300}
               height={100}
               priority={true}
-              className="mb-5 ml-2"
+              className="mb-5 ml-1"
             />
             {/* <p className='text-sm'>
               Read more about account types{" "}
@@ -329,21 +329,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 here
               </Link>
             </p> */}
-            <p className="mb-5 mt-2 text-center text-base text-foreground">
-              Already have an account?{" "}
-              <span
-                onClick={switchFlow}
-                className="outline-hidden focus:outline-hidden cursor-pointer font-medium text-zinc-950 decoration-foreground underline-offset-4 hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline"
-                tabIndex={
-                  step === "signUp" && selectedOption.includes("organizer")
-                    ? 13
-                    : 12
-                }
-              >
-                Sign in
-              </span>
-            </p>
           </section>
+          <p className="py-5 text-center text-lg text-foreground">
+            Already have an account?{" "}
+            <span
+              onClick={switchFlow}
+              className="outline-hidden focus:outline-hidden cursor-pointer font-medium text-zinc-950 decoration-foreground underline-offset-4 hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline"
+              tabIndex={
+                step === "signUp" && selectedOption.includes("organizer")
+                  ? 13
+                  : 12
+              }
+            >
+              Sign in
+            </span>
+          </p>
         </CardHeader>
       )}
       {step === "verifyOtp" && (

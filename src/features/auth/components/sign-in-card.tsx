@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -136,8 +135,15 @@ const SignInCard: React.FC<SignInCardProps> = ({
             priority={true}
           />
         </Link>
-        <CardDescription className="mt-2 text-base text-foreground">
-          Please sign in to continue
+        <CardDescription className="mt-1 flex items-center gap-x-2 text-center text-lg text-foreground">
+          Don&apos;t have an account?
+          <span
+            onClick={switchFlow}
+            className="outline-hidden focus:outline-hidden cursor-pointer font-medium text-foreground decoration-foreground underline-offset-4 hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline"
+            tabIndex={7}
+          >
+            Sign up
+          </span>
         </CardDescription>
       </CardHeader>
       {!!error && (
@@ -272,18 +278,6 @@ const SignInCard: React.FC<SignInCardProps> = ({
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center pb-0">
-        <p className="mt-3 text-center text-sm text-foreground">
-          Don&apos;t have an account?{" "}
-          <span
-            onClick={switchFlow}
-            className="outline-hidden focus:outline-hidden cursor-pointer font-medium text-zinc-950 decoration-foreground underline-offset-4 hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline"
-            tabIndex={7}
-          >
-            Sign up
-          </span>
-        </p>
-      </CardFooter>
     </Card>
   );
 };

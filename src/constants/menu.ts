@@ -1,19 +1,19 @@
-import { LucideIcon } from "lucide-react"
+import { LucideIcon } from "lucide-react";
 
 export interface FullPageNavMenuItem {
-  title: string
-  path: string
-  icon?: React.ReactNode | LucideIcon
-  userType?: string[]
-  category: string
-  slug?: string
-  public?: boolean
-  view?: string
+  title: string;
+  path: string;
+  icon?: React.ReactNode | LucideIcon;
+  userType?: string[];
+  category: string;
+  slug?: string;
+  public?: boolean;
+  view?: string;
 }
 
 interface FullPageNavMenuSection {
-  title: string
-  items: FullPageNavMenuItem[]
+  title: string;
+  items: FullPageNavMenuItem[];
 }
 
 export const mainMenuItems: FullPageNavMenuSection[] = [
@@ -32,7 +32,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         path: "/thelist",
         category: "thelist",
         public: true,
-        userType: ["artist", "admin"],
+        userType: ["public"],
       },
       {
         title: "This Week",
@@ -298,4 +298,4 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
   //     },
   //   ],
   // },
-]
+];

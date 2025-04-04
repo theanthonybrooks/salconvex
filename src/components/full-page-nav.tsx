@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import MenuToggle from "@/components/ui/hamburger-icon"
-import { Separator } from "@/components/ui/separator"
-import SocialsRow from "@/components/ui/socials"
-import ThemeToggle from "@/components/ui/theme-toggle"
-import { mainMenuItems } from "@/constants/menu"
-import { footerCRText } from "@/constants/text"
-import SignOutBtn from "@/features/auth/components/sign-out-btn"
-import { cn } from "@/lib/utils"
-import { User } from "@/types/user"
-import { Authenticated, Unauthenticated } from "convex/react"
-import { AnimatePresence, motion } from "framer-motion"
-import { CheckCircle, XCircle } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import MenuToggle from "@/components/ui/hamburger-icon";
+import { Separator } from "@/components/ui/separator";
+import SocialsRow from "@/components/ui/socials";
+import ThemeToggle from "@/components/ui/theme-toggle";
+import { mainMenuItems } from "@/constants/menu";
+import { footerCRText } from "@/constants/text";
+import SignOutBtn from "@/features/auth/components/sign-out-btn";
+import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
+import { Authenticated, Unauthenticated } from "convex/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, XCircle } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface FullPageNavProps {
   // userId?: string | undefined
-  isScrolled?: boolean
-  user?: User | null
-  isMobile?: boolean
+  isScrolled?: boolean;
+  user?: User | null;
+  isMobile?: boolean;
   // className?: string
-  isDashboard?: boolean
+  isDashboard?: boolean;
   // userPref?: UserPref | null
   // subStatus?: string | undefined
 }
@@ -84,7 +84,7 @@ const menuVariants = {
     transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
     opacity: [0],
   },
-}
+};
 
 const getMobileMenuVariants = (isScrolled: boolean | undefined) => ({
   open: {
@@ -126,7 +126,7 @@ const getMobileMenuVariants = (isScrolled: boolean | undefined) => ({
     transition: { duration: 0, ease: [0.76, 0, 0.24, 1] },
     opacity: [0],
   },
-})
+});
 
 // const mobileMenuVariants = {
 //   open: {
@@ -224,7 +224,7 @@ const mobileTextVariants = {
       ease: "easeInOut",
     },
   },
-}
+};
 
 const mobileImageVariants = {
   open: {
@@ -236,7 +236,7 @@ const mobileImageVariants = {
 
     transition: { duration: 0.3, ease: "easeInOut" },
   },
-}
+};
 
 // const mobileHeaderVariants = {
 //   open: {
@@ -272,7 +272,7 @@ const screenOverlayVariants = {
     width: ["100vw", "100vw", "100vw"],
     transition: { duration: 1.15, ease: [0.68, -0.55, 0.27, 1.55] },
   },
-}
+};
 
 const FullPageNav = ({
   user,
@@ -280,62 +280,63 @@ const FullPageNav = ({
   isMobile = false,
   isDashboard = false,
 }: FullPageNavProps) => {
-  const footerText = footerCRText()
+  const footerText = footerCRText();
   // const { theme } = useTheme()
-  const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState("initial")
-  const [freshOpen, setFreshOpen] = useState(false)
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState("initial");
+  const [freshOpen, setFreshOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(
     mainMenuItems.find((section) =>
-      section.items.some((item) => item.path === pathname)
-    )?.title || "The List"
-  )
+      section.items.some((item) => item.path === pathname),
+    )?.title || "The List",
+  );
   const activeMenuItems = mainMenuItems.find(
-    (section) => section.title === activeCategory
-  )
+    (section) => section.title === activeCategory,
+  );
 
   useEffect(() => {
     if (isOpen === "open") {
-      setFreshOpen(true)
-      document.body.classList.add("no-scroll")
+      setFreshOpen(true);
+      document.body.classList.add("no-scroll");
       setActiveCategory(
         () =>
           mainMenuItems.find((section) =>
-            section.items.some((item) => item.path === pathname)
-          )?.title || "The List"
-      )
+            section.items.some((item) => item.path === pathname),
+          )?.title || "The List",
+      );
     } else {
-      document.body.classList.remove("no-scroll")
-      setActiveCategory("")
-      setFreshOpen(false)
+      document.body.classList.remove("no-scroll");
+      setActiveCategory("");
+      setFreshOpen(false);
     }
     return () => {
-      document.body.classList.remove("no-scroll")
-    }
-  }, [isOpen, pathname])
+      document.body.classList.remove("no-scroll");
+    };
+  }, [isOpen, pathname]);
 
   const onHandleLinkClick = () => {
     setTimeout(() => {
-      setIsOpen("closed")
-    }, 750)
-  }
+      setIsOpen("closed");
+    }, 750);
+  };
 
   return (
     <>
       <AnimatePresence>
         <motion.div
-          initial='overlayInitial'
+          initial="overlayInitial"
           variants={screenOverlayVariants}
           animate={isOpen}
-          className='absolute w-screen h-dvh backdrop-blur-md bg-foreground/20 right-0 top-0 origin-top-right'
+          className="absolute right-0 top-0 h-dvh w-screen origin-top-right bg-foreground/20 backdrop-blur-md"
         />
       </AnimatePresence>
 
       {/* Menu Button + Theme Toggle*/}
       <div
         className={cn(
-          "flex flex-row gap-x-4  items-center  z-20 justify-between"
-        )}>
+          "z-20 flex flex-row items-center justify-between gap-x-4",
+        )}
+      >
         {/* <ThemeToggle userPref={themePref} /> */}
 
         {/* //NOTE: Add sliding up animation later; will require making a button
@@ -349,11 +350,12 @@ const FullPageNav = ({
                 variants={mobileImageVariants}
                 animate={isOpen}
                 transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                className={cn("md:hidden absolute left-5 top-5")}>
-                <Link href='/'>
+                className={cn("absolute left-5 top-5 md:hidden")}
+              >
+                <Link href="/">
                   <Image
-                    src='/logotransparency.png'
-                    alt='The Street Art List'
+                    src="/logotransparency.png"
+                    alt="The Street Art List"
                     width={isScrolled || isDashboard ? 40 : 60}
                     height={isScrolled || isDashboard ? 40 : 60}
                     priority={true}
@@ -364,7 +366,7 @@ const FullPageNav = ({
             </>
           )}
         </AnimatePresence>
-        <div className='flex items-center gap-x-4 '>
+        <div className="flex items-center gap-x-4">
           <MenuToggle
             menuState={isOpen === "initial" ? "closed" : isOpen}
             setState={setIsOpen}
@@ -405,15 +407,15 @@ const FullPageNav = ({
          * */}
 
         <motion.div
-          id='mobile-menu'
-          key='mobile-menu'
+          id="mobile-menu"
+          key="mobile-menu"
           className={cn(
-            "xl:hidden top-5 right-5 w-full h-full  fixed  box-border bg-background"
+            "fixed right-5 top-5 box-border h-full w-full bg-background xl:hidden",
           )}
           variants={getMobileMenuVariants(isScrolled)}
           animate={isOpen}
-          initial='mobileInitial'
-          exit='mobileInitial'
+          initial="mobileInitial"
+          exit="mobileInitial"
           // initial={{ width: "4em", height: 30 }}
         >
           <motion.div
@@ -427,11 +429,12 @@ const FullPageNav = ({
               ease: [0.83, 0, 0.1, 1],
             }}
             className={cn(
-              "grid  grid-cols-1 h-dvh w-screen ",
+              "grid h-dvh w-screen grid-cols-1",
               isScrolled || isDashboard
                 ? "grid-rows-[80px_auto]"
-                : "grid-rows-[100px_auto]"
-            )}>
+                : "grid-rows-[100px_auto]",
+            )}
+          >
             {/* <motion.section
               initial={{ display: "none" }}
               variants={mobileHeaderVariants}
@@ -439,28 +442,29 @@ const FullPageNav = ({
               transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
               className='w-full border-b-2 border-foreground '
             /> */}
-            <AnimatePresence mode='wait'>
+            <AnimatePresence mode="wait">
               {isOpen === "open" && (
                 <motion.section
-                  key='border'
+                  key="border"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                  className='relative w-full'>
+                  className="relative w-full"
+                >
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: "100%" }}
                     exit={{ width: 0 }}
                     transition={{ duration: 0.4, ease: [0.83, 0, 0.1, 1] }}
-                    className='absolute bottom-0 right-0 h-[1.5px] bg-foreground'
+                    className="absolute bottom-0 right-0 h-[1.5px] bg-foreground"
                   />
                 </motion.section>
               )}
             </AnimatePresence>
 
             <motion.div
-              className='flex flex-col justify-start scrollable invis  h-full w-full '
+              className="scrollable invis flex h-full w-full flex-col justify-start"
               initial={{ opacity: 0, height: 0 }}
               variants={mobileTextVariants}
               animate={isOpen}
@@ -472,48 +476,51 @@ const FullPageNav = ({
             >
               <ul
                 className={cn(
-                  "font-foreground m-x-auto w-full text-[4rem] font-tanker  lowercase"
-                )}>
+                  "font-foreground m-x-auto w-full font-tanker text-[4rem] lowercase",
+                )}
+              >
                 {mainMenuItems.map((section) => {
                   const isExpanded =
-                    activeCategory === section.title && !freshOpen
+                    activeCategory === section.title && !freshOpen;
                   const filteredItems = section.items.filter((item) => {
-                    const itemUserType = item?.userType
-                    const isPublic = itemUserType?.includes("public")
+                    const itemUserType = item?.userType;
+                    const isPublic = itemUserType?.includes("public");
                     const typeMatch = user?.accountType?.some((type) =>
                       itemUserType?.some(
                         (userType) =>
-                          userType.toLowerCase() === type.toLowerCase()
-                      )
-                    )
+                          userType.toLowerCase() === type.toLowerCase(),
+                      ),
+                    );
 
-                    return isPublic || typeMatch
-                  })
+                    return isPublic || typeMatch;
+                  });
 
-                  if (filteredItems.length === 0) return null
+                  if (filteredItems.length === 0) return null;
 
                   return (
                     <li
                       key={`${section.title}-mobileCat`}
-                      className='border-b-2 border-foreground  w-full'>
+                      className="w-full border-b-2 border-foreground"
+                    >
                       <div
                         onClick={() => {
                           return (
                             setFreshOpen(false),
                             setActiveCategory(isExpanded ? null : section.title)
-                          )
+                          );
                         }}
                         className={cn(
-                          "cursor-pointer flex justify-start px-9 py-4",
+                          "flex cursor-pointer justify-start px-9 py-4 hover:bg-foreground/70 hover:text-background hover:unstroked focus:bg-foreground/70 focus:text-background focus:unstroked",
                           activeCategory === section.title &&
-                            "bg-foreground text-background unstroked"
+                            "bg-foreground text-background unstroked",
                           // activeCategory === section.title &&
                           //   theme === "default" &&
                           //   "text-white",
                           // activeCategory === section.title &&
                           //   theme === "light" &&
                           //   "text-salYellow"
-                        )}>
+                        )}
+                      >
                         {section.title}
                       </div>
 
@@ -528,28 +535,31 @@ const FullPageNav = ({
                               duration: 0.4,
                               ease: "easeInOut",
                             }}
-                            className='overflow-hidden pl-6 text-[2.5rem]'>
+                            className="overflow-hidden pl-6 text-[2.5rem]"
+                          >
                             <ul>
                               {filteredItems
                                 .filter(
                                   (item) =>
-                                    !(pathname === "/" && item.path === "/")
+                                    !(pathname === "/" && item.path === "/"),
                                 )
 
                                 .map((item) => (
                                   <li
                                     key={`${item.title}-${item.category}-mobileItem`}
-                                    className=' pl-4 '>
+                                    className="pl-4"
+                                  >
                                     <Link
                                       href={item.path}
                                       onClick={onHandleLinkClick}
                                       className={cn(
-                                        "cursor-pointer block py-2 transition-all duration-200 ease-in-out",
+                                        "block cursor-pointer py-2 transition-all duration-200 ease-in-out",
                                         pathname === item.path &&
-                                          "underline underline-offset-4 decoration-6 text-foreground"
+                                          "decoration-6 text-foreground underline underline-offset-4",
                                         // item.path.includes("dashboard") &&
                                         //   "text-salPink"
-                                      )}>
+                                      )}
+                                    >
                                       {item.title}
                                     </Link>
                                   </li>
@@ -559,22 +569,24 @@ const FullPageNav = ({
                         )}
                       </AnimatePresence>
                     </li>
-                  )
+                  );
                 })}
               </ul>
               <Unauthenticated>
                 <div
                   className={cn(
-                    "pl-8 py-5 font-foreground m-x-auto w-full text-[4rem] border-b-2 border-foreground font-tanker  lowercase"
-                  )}>
+                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase hover:bg-foreground hover:text-background hover:unstroked focus:bg-foreground focus:text-background focus:unstroked",
+                  )}
+                >
                   <Link onClick={onHandleLinkClick} href={"/pricing"}>
                     Pricing
                   </Link>
                 </div>
                 <div
                   className={cn(
-                    "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] border-b-2 border-foreground font-tanker  lowercase"
-                  )}>
+                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase hover:bg-foreground hover:text-background hover:unstroked focus:bg-foreground focus:text-background focus:unstroked",
+                  )}
+                >
                   <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
                     Login | Register
                   </Link>
@@ -584,11 +596,12 @@ const FullPageNav = ({
                 <SignOutBtn>
                   <div
                     onClick={() => {
-                      setTimeout(() => setIsOpen("closed"), 1000)
+                      setTimeout(() => setIsOpen("closed"), 1000);
                     }}
                     className={cn(
-                      "pl-8 py-6 font-foreground m-x-auto w-full text-[3rem] font-tanker  lowercase"
-                    )}>
+                      "font-foreground m-x-auto w-full py-6 pl-8 font-tanker text-[3rem] lowercase",
+                    )}
+                  >
                     log out
                   </div>
                 </SignOutBtn>
@@ -598,14 +611,16 @@ const FullPageNav = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.1, duration: 0.4 }}
-                className='flex flex-col space-y-5 py-6  items-center justify-center'>
+                className="flex flex-col items-center justify-center space-y-5 py-6"
+              >
                 <SocialsRow />
-                <div className='flex space-x-2 text-sm items-center'>
+                <div className="flex items-center space-x-2 text-sm">
                   <p>Made with ❤️ by</p>
                   <Link
-                    href='https://theanthonybrooks.com'
-                    target='_blank'
-                    className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2 m-0 p-0 focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                    href="https://theanthonybrooks.com"
+                    target="_blank"
+                    className="m-0 cursor-pointer p-0 decoration-foreground hover:underline hover:underline-offset-2 focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline-offset-2"
+                  >
                     Anthony Brooks
                   </Link>
                 </div>
@@ -629,78 +644,84 @@ const FullPageNav = ({
          * */}
         {!isMobile && (
           <motion.div
-            key='desktop-menu'
+            key="desktop-menu"
             className={cn(
-              "hidden xl:block top-5 right-5 w-full h-dvh fixed  box-border bg-background",
+              "fixed right-5 top-5 box-border hidden h-dvh w-full bg-background xl:block",
               isOpen === "open" || isOpen === "closed"
                 ? "bg-background"
                 : "bg-none",
-              "bg-background"
+              "bg-background",
             )}
             variants={menuVariants}
-            initial='initial'
+            initial="initial"
             // initial={{ width: "4em", height: 30 }}
             animate={isOpen}
-            exit='initial'>
+            exit="initial"
+          >
             <motion.div
               initial={{ height: 0 }}
               animate={{ height: "100%" }}
               transition={{ duration: 0.4, ease: "easeInOut", delay: 0.6 }}
-              className='w-full h-full hidden md:grid grid-row-1 md:grid-rows-[auto_70px] '>
+              className="grid-row-1 hidden h-full w-full md:grid md:grid-rows-[auto_70px]"
+            >
               {isOpen === "open" && (
                 <>
-                  <div className='grid grid-cols-1 md:grid-cols-3 divide-x-1.5 divide-solid row-span-1 w-screen px-5 divide-foreground overflow-hidden'>
+                  <div className="row-span-1 grid w-screen grid-cols-1 divide-x-1.5 divide-solid divide-foreground overflow-hidden px-5 md:grid-cols-3">
                     {/* Column 1 - Main Titles */}
                     <motion.div
-                      className='p-4 py-8 flex items-start justify-center scrollable mini darkbar'
+                      className="scrollable mini darkbar flex items-start justify-center p-4 py-8"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.7, duration: 0.4 }}>
+                      transition={{ delay: 0.7, duration: 0.4 }}
+                    >
                       <ul
                         className={cn(
-                          "font-foreground m-auto text-[3rem] lg:text-[4.5rem] 3xl:text-[6rem] space-y-3 ",
-                          "font-tanker   lowercase select-none"
-                        )}>
+                          "font-foreground m-auto space-y-3 text-[3rem] lg:text-[4.5rem] 3xl:text-[6rem]",
+                          "select-none font-tanker lowercase",
+                        )}
+                      >
                         {mainMenuItems.map((section) => {
                           const filteredItems = section.items.filter((item) => {
-                            const itemUserType = item?.userType
-                            const isPublic = itemUserType?.includes("public")
+                            const itemUserType = item?.userType;
+                            const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
                                 (userType) =>
-                                  userType.toLowerCase() === type.toLowerCase()
-                              )
-                            )
+                                  userType.toLowerCase() === type.toLowerCase(),
+                              ),
+                            );
 
-                            return isPublic || typeMatch
-                          })
+                            return isPublic || typeMatch;
+                          });
 
-                          if (filteredItems.length === 0) return null
+                          if (filteredItems.length === 0) return null;
 
                           return (
                             <li
                               key={`${section.title}-desktopCat`}
-                              className='cursor-pointer'>
+                              className="cursor-pointer"
+                            >
                               <div
                                 onClick={() => setActiveCategory(section.title)}
                                 className={cn(
-                                  "cursor-pointer hover:translate-x-3 transition-transform ease-in-out duration-300",
+                                  "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3",
                                   activeCategory === section.title &&
-                                    "stroked wshadow text-white"
+                                    "text-white stroked wshadow",
                                   // activeCategory === section.title &&
                                   //   theme === "default" &&
                                   //   "text-white",
                                   // activeCategory === section.title &&
                                   //   theme === "light" &&
                                   //   "text-white"
-                                )}>
+                                )}
+                              >
                                 {/* {activeCategory === section.title && (
                                       <GoDotFill className='text-foreground size-8 md:size-14' />
                                     )} */}
                                 {section.title}
                               </div>
                             </li>
-                          )
+                          );
                         })}
                         {!user && (
                           <Link onClick={onHandleLinkClick} href={"/pricing"}>
@@ -712,44 +733,48 @@ const FullPageNav = ({
 
                     {/* Column 2 - Secondary Titles */}
                     <motion.div
-                      className='p-4 py-8 flex items-start justify-center scrollable mini darkbar '
+                      className="scrollable mini darkbar flex items-start justify-center p-4 py-8"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.9, duration: 0.4 }}>
-                      <ul className='font-foreground m-auto text-[1.2rem] lg:text-[3rem] 3xl:text-[5rem] space-y-3 select-none font-tanker   lowercase'>
+                      transition={{ delay: 0.9, duration: 0.4 }}
+                    >
+                      <ul className="font-foreground m-auto select-none space-y-3 font-tanker text-[1.2rem] lowercase lg:text-[3rem] 3xl:text-[5rem]">
                         {activeMenuItems?.items
                           .filter((item) => {
-                            const itemUserType = item?.userType
-                            const isPublic = itemUserType?.includes("public")
+                            const itemUserType = item?.userType;
+                            const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
                                 (userType) =>
-                                  userType.toLowerCase() === type.toLowerCase()
-                              )
-                            )
+                                  userType.toLowerCase() === type.toLowerCase(),
+                              ),
+                            );
 
-                            return isPublic || typeMatch
+                            return isPublic || typeMatch;
                           })
                           .map((item) => (
                             <li
-                              key={`${item.title}-${item.category}-desktopItem`}>
+                              key={`${item.title}-${item.category}-desktopItem`}
+                            >
                               <div
                                 className={cn(
-                                  " cursor-pointer transition-all duration-100 ease-in-out hover:translate-x-2 ",
-                                  pathname === item.path && "text-background"
+                                  "cursor-pointer transition-all duration-100 ease-in-out hover:translate-x-2",
+                                  pathname === item.path && "text-background",
                                   // item.path.includes("dashboard") &&
                                   //   "text-salPink"
-                                )}>
+                                )}
+                              >
                                 <Link
                                   onClick={onHandleLinkClick}
                                   href={item.path}
                                   className={cn(
-                                    "cursor-pointer  ",
+                                    "cursor-pointer",
                                     pathname === item.path &&
-                                      "underline underline-offset-4 decoration-6 text-foreground translate-x-2"
+                                      "decoration-6 translate-x-2 text-foreground underline underline-offset-4",
                                     // item.path.includes("dashboard") &&
                                     //   "text-salPink"
-                                  )}>
+                                  )}
+                                >
                                   {item.title}
                                 </Link>
                               </div>
@@ -760,58 +785,59 @@ const FullPageNav = ({
 
                     {/* Column 3 */}
                     <motion.div
-                      className='p-4 pb-8 flex flex-col gap-y-4 items-center justify-end'
+                      className="flex flex-col items-center justify-end gap-y-4 p-4 pb-8"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.1, duration: 0.4 }}>
-                      <div className='h-[30%] w-[80%] flex flex-col  border-foreground border-1.5 border-dotted rounded-lg p-8 scrollable mini'>
+                      transition={{ delay: 1.1, duration: 0.4 }}
+                    >
+                      <div className="scrollable mini flex h-[30%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
                         <p>User Notifications</p>
                         <Separator />
-                        <p className='italic text-sm'>
+                        <p className="text-sm italic">
                           Nothing to see here yet
                         </p>
                       </div>
-                      <div className='h-[50%] w-[80%] flex flex-col  border-foreground border-1.5 border-dotted rounded-lg p-8'>
+                      <div className="flex h-[50%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
                         <p>Applications</p>
-                        <Separator className='mb-2' />
-                        <ol className='flex flex-col gap-y-3'>
-                          <li className='flex gap-x-4 text-emerald-500'>
-                            <p className=' text-sm'>Blah Event</p> -{" "}
-                            <span className='text-sm flex gap-x-2'>
+                        <Separator className="mb-2" />
+                        <ol className="flex flex-col gap-y-3">
+                          <li className="flex gap-x-4 text-emerald-500">
+                            <p className="text-sm">Blah Event</p> -{" "}
+                            <span className="flex gap-x-2 text-sm">
                               <CheckCircle />
                               Accepted
                             </span>
-                            <span className='text-sm flex gap-x-2'>
+                            <span className="flex gap-x-2 text-sm">
                               1-25-2025
                             </span>
                           </li>
-                          <li className='flex gap-x-4 text-emerald-500'>
-                            <p className=' text-sm'>Blah Event</p> -{" "}
-                            <span className='text-sm flex gap-x-2'>
+                          <li className="flex gap-x-4 text-emerald-500">
+                            <p className="text-sm">Blah Event</p> -{" "}
+                            <span className="flex gap-x-2 text-sm">
                               <CheckCircle />
                               Accepted
                             </span>
-                            <span className='text-sm flex gap-x-2'>
+                            <span className="flex gap-x-2 text-sm">
                               1-16-2025
                             </span>
                           </li>
-                          <li className='flex gap-x-4 text-red-500'>
-                            <p className=' text-sm'>Blah Event</p> -{" "}
-                            <span className='text-sm flex gap-x-2'>
+                          <li className="flex gap-x-4 text-red-500">
+                            <p className="text-sm">Blah Event</p> -{" "}
+                            <span className="flex gap-x-2 text-sm">
                               <XCircle />
                               Rejected
                             </span>
-                            <span className='text-sm flex gap-x-2'>
+                            <span className="flex gap-x-2 text-sm">
                               1-8-2025
                             </span>
                           </li>
-                          <li className='flex gap-x-4 text-red-500'>
-                            <p className=' text-sm'>Blah Event</p> -{" "}
-                            <span className='text-sm flex gap-x-2'>
+                          <li className="flex gap-x-4 text-red-500">
+                            <p className="text-sm">Blah Event</p> -{" "}
+                            <span className="flex gap-x-2 text-sm">
                               <XCircle />
                               Rejected
                             </span>
-                            <span className='text-sm flex gap-x-2'>
+                            <span className="flex gap-x-2 text-sm">
                               1-2-2025
                             </span>
                           </li>
@@ -822,30 +848,32 @@ const FullPageNav = ({
 
                   {/* Fixed Bottom Row */}
                   <motion.div
-                    className=' col-span-3 row-span-1 border-t-1.5 border-foreground text-foreground flex items-center justify-between px-8'
+                    className="col-span-3 row-span-1 flex items-center justify-between border-t-1.5 border-foreground px-8 text-foreground"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.9, duration: 0.4 }}>
-                    <div className='flex space-x-2 items-center'>
+                    transition={{ delay: 0.9, duration: 0.4 }}
+                  >
+                    <div className="flex items-center space-x-2">
                       <SocialsRow size={7} />
                     </div>
-                    <div className='flex space-x-2 text-sm items-center'>
+                    <div className="flex items-center space-x-2 text-sm">
                       <p>Made with ❤️ by</p>
                       <Link
-                        href='https://theanthonybrooks.com'
-                        target='_blank'
-                        className=' decoration-foreground focus:underline focus:decoration-foreground focus:decoration-2  focus-visible:underline-offset-2 hover:underline-offset-2 hover:underline cursor-pointer'>
+                        href="https://theanthonybrooks.com"
+                        target="_blank"
+                        className="cursor-pointer decoration-foreground hover:underline hover:underline-offset-2 focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline-offset-2"
+                      >
                         Anthony Brooks
                       </Link>
                     </div>
-                    <div className='flex gap-x-2 items-center text-center text-sm text-gray-600 dark:text-gray-400'>
+                    <div className="flex items-center gap-x-2 text-center text-sm text-gray-600 dark:text-gray-400">
                       {footerText.text}
                       <Image
-                        src='/logotransparency.png'
-                        alt='The Street Art List'
+                        src="/logotransparency.png"
+                        alt="The Street Art List"
                         width={40}
                         height={40}
-                        className=''
+                        className=""
                         priority={true}
                       />
                     </div>
@@ -857,7 +885,7 @@ const FullPageNav = ({
         )}
       </AnimatePresence>
     </>
-  )
-}
+  );
+};
 
-export default FullPageNav
+export default FullPageNav;
