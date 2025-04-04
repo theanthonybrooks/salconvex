@@ -510,7 +510,7 @@ const FullPageNav = ({
                           );
                         }}
                         className={cn(
-                          "flex cursor-pointer justify-start px-9 py-4 hover:bg-foreground/70 hover:text-background hover:unstroked focus:bg-foreground/70 focus:text-background focus:unstroked",
+                          "flex cursor-pointer justify-start px-9 py-4 hover:bg-foreground/80 hover:text-background hover:unstroked",
                           activeCategory === section.title &&
                             "bg-foreground text-background unstroked",
                           // activeCategory === section.title &&
@@ -575,7 +575,7 @@ const FullPageNav = ({
               <Unauthenticated>
                 <div
                   className={cn(
-                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase hover:bg-foreground hover:text-background hover:unstroked focus:bg-foreground focus:text-background focus:unstroked",
+                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase active:bg-foreground active:text-background active:unstroked",
                   )}
                 >
                   <Link onClick={onHandleLinkClick} href={"/pricing"}>
@@ -584,7 +584,7 @@ const FullPageNav = ({
                 </div>
                 <div
                   className={cn(
-                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase hover:bg-foreground hover:text-background hover:unstroked focus:bg-foreground focus:text-background focus:unstroked",
+                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase active:bg-foreground active:text-background active:unstroked",
                   )}
                 >
                   <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
