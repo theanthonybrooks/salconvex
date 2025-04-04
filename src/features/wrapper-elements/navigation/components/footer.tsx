@@ -18,7 +18,7 @@ interface NewsletterFormProps {
   email: string;
 }
 
-export default function Footer() {
+export default function Footer({ className }: { className?: string }) {
   const {
     register,
     handleSubmit,
@@ -47,7 +47,12 @@ export default function Footer() {
   };
 
   return (
-    <footer className="max-w-screen flex justify-center overflow-hidden border-t border-border">
+    <footer
+      className={cn(
+        "max-w-screen flex justify-center overflow-hidden border-t border-border",
+        className,
+      )}
+    >
       <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:w-full xl:max-w-full xl:px-6">
         <div className="xl:grid xl:grid-cols-2 xl:gap-8">
           {/* Links */}
@@ -68,7 +73,7 @@ export default function Footer() {
                       <li key={item.name}>
                         <Link
                           href={item.href}
-                          className="text-sm text-gray-600 underline-offset-2 transition-colors hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
+                          className="text-sm text-foreground underline-offset-2"
                         >
                           {item.name}
                         </Link>
@@ -99,7 +104,7 @@ export default function Footer() {
                     {...register("email", { required: true })}
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full min-w-0 rounded-lg border-foreground bg-background"
+                    className="w-full min-w-0 rounded-lg border-foreground bg-background text-foreground"
                   />
                 </div>
                 <div className="mt-3 sm:ml-3 sm:mt-0">
@@ -171,7 +176,7 @@ export default function Footer() {
                 Anthony Brooks
               </Link>
             </div>
-            <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-center text-sm text-foreground">
               {footerText.text}
             </div>
           </div>
