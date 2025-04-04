@@ -160,6 +160,7 @@ export default {
       },
       fontSize: {
         "2xs": "0.6rem",
+        "4h": "2.5rem",
       },
 
       keyframes: {

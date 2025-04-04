@@ -95,7 +95,7 @@ const PricingHeader = ({
   subtitle: string;
 }) => (
   <div className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8">
-    <h2 className="cursor-pointer font-tanker text-4xl lowercase tracking-wide text-foreground md:text-[4em]">
+    <h2 className="text-4h cursor-pointer font-tanker lowercase tracking-wide text-foreground md:text-[4em]">
       {title}
     </h2>
     <p className="max-w-2xl text-balance text-foreground">{subtitle}</p>

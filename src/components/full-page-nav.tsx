@@ -294,6 +294,8 @@ const FullPageNav = ({
     (section) => section.title === activeCategory,
   );
 
+  const isPricingPage = pathname.startsWith("/pricing");
+
   useEffect(() => {
     if (isOpen === "open") {
       setFreshOpen(true);
@@ -573,19 +575,21 @@ const FullPageNav = ({
                 })}
               </ul>
               <Unauthenticated>
-                <div
-                  className={cn(
-                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
-                  )}
-                >
-                  <Link
-                    onClick={onHandleLinkClick}
-                    href={"/pricing"}
-                    className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:underline active:decoration-[5px] active:underline-offset-4"
+                {!isPricingPage && (
+                  <div
+                    className={cn(
+                      "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
+                    )}
                   >
-                    Pricing
-                  </Link>
-                </div>
+                    <Link
+                      onClick={onHandleLinkClick}
+                      href={"/pricing"}
+                      className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:underline active:decoration-[5px] active:underline-offset-4"
+                    >
+                      Pricing
+                    </Link>
+                  </div>
+                )}
                 <div
                   className={cn(
                     "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase",

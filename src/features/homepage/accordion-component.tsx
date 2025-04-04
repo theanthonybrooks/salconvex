@@ -71,7 +71,7 @@ export function AccordionComponent({
                   iconClosed={src.iconClosed}
                   icon={src.icon}
                 >
-                  <span className="pr-3 text-left font-medium text-foreground transition-colors">
+                  <span className="pr-7 text-left font-medium text-foreground transition-colors md:pr-3">
                     {item.subtitle}
                   </span>
                 </AccordionTrigger>
