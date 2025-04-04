@@ -19,33 +19,33 @@ import {
   Upload,
   User,
   XCircle,
-} from "lucide-react"
+} from "lucide-react";
 
-import { TbBrandPatreon } from "react-icons/tb"
+import { TbBrandPatreon } from "react-icons/tb";
 
-import { JSX } from "react"
-import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6"
+import { JSX } from "react";
+import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
 
 export type MenuProps = {
-  id: number
-  label: string
-  icon: JSX.Element
-  path: string
-  section?: boolean
-  integration?: boolean
-}
+  id: number;
+  label: string;
+  icon: JSX.Element;
+  path: string;
+  section?: boolean;
+  integration?: boolean;
+};
 export type SocialProps = {
-  label: string
-  icon: JSX.Element
-  path: string
-}
+  label: string;
+  icon: JSX.Element;
+  path: string;
+};
 
 interface LinkItem {
-  name: string
-  href: string
+  name: string;
+  href: string;
 }
 
-type Links = Record<string, LinkItem[]>
+type Links = Record<string, LinkItem[]>;
 
 export const LANDING_PAGE_MENU: MenuProps[] = [
   {
@@ -69,7 +69,7 @@ export const LANDING_PAGE_MENU: MenuProps[] = [
     path: "#explore",
     section: true,
   },
-]
+];
 
 export const FOOTER_LINKS: Links = {
   about: [
@@ -80,7 +80,7 @@ export const FOOTER_LINKS: Links = {
     { name: "Contact", href: "/contact" },
   ],
   subscription: [
-    { name: "Features", href: "/features" },
+    { name: "Manage", href: "/manage" }, //only if you're logged in
     // { name: "Documentation", href: "/docs" },
     // { name: "Examples", href: "/examples" },
     { name: "Pricing", href: "/pricing" },
@@ -97,7 +97,7 @@ export const FOOTER_LINKS: Links = {
     // { name: "LinkedIn", href: "https://www.linkedin.com/in/thestreetartlist" },
     // { name: "GitHub", href: "https://github.com/thestreetartlist" },
   ],
-}
+};
 
 // note-to-self: Helper function to get the grid column class based on the number of columns in the FOOTER_LINKS object
 
@@ -110,48 +110,48 @@ export const getGridColsClass = (numColumns: number): string => {
       4: "md:grid-cols-4",
       5: "md:grid-cols-5",
       6: "md:grid-cols-6",
-    }[numColumns] || "md:grid-cols-4"
+    }[numColumns] || "md:grid-cols-4";
 
-  return gridColsClass
-}
+  return gridColsClass;
+};
 
 //TODO: Make a specific social media component that has props for the class and icon (and... else?)
 
 export const SOCIAL_MEDIA_LINKS: SocialProps[] = [
   {
     label: "Threads",
-    icon: <FaThreads className='h-5 w-5' />,
+    icon: <FaThreads className="h-5 w-5" />,
     path: "https://threads.net/thestreetartlist",
   },
   {
     label: "Instagram",
-    icon: <FaInstagram className='h-5 w-5' />,
+    icon: <FaInstagram className="h-5 w-5" />,
     path: "https://www.instagram.com/thestreetartlist",
   },
   {
     label: "Facebook",
-    icon: <FaFacebookF className='h-5 w-5' />,
+    icon: <FaFacebookF className="h-5 w-5" />,
     path: "https://facebook.com/thestreetartlist",
   },
   {
     label: "Patreon",
-    icon: <TbBrandPatreon className='h-5 w-5' />,
+    icon: <TbBrandPatreon className="h-5 w-5" />,
     path: "https://www.patreon.com/thestreetartlist",
   },
-]
+];
 interface DashNavItem {
-  label: string
-  href: string
-  icon: LucideIcon
-  sectionIcon?: LucideIcon
-  sub: string[]
-  userType: string[]
-  section?: boolean
-  sectionCat?: string
-  sectionHead?: boolean
-  subsection?: boolean
-  heading?: string
-  desc?: string
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  sectionIcon?: LucideIcon;
+  sub: string[];
+  userType: string[];
+  section?: boolean;
+  sectionCat?: string;
+  sectionHead?: boolean;
+  subsection?: boolean;
+  heading?: string;
+  desc?: string;
 }
 
 export const dashboardNavItems: DashNavItem[] = [
@@ -350,4 +350,4 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: ["all"],
     userType: ["public"],
   },
-]
+];

@@ -14,6 +14,15 @@ export const copyUpdatedAtToCompletedAt = migrations.define({
     }
   },
 });
+export const clearCompletedAtIfUndone = migrations.define({
+  table: "todoKanban",
+  migrateOne: async (ctx, todo) => {
+    // Only update if completedAt is undefined and updatedAt exists
+    if (todo.completedAt !== undefined && todo.column !== "done") {
+      await ctx.db.patch(todo._id, { completedAt: undefined });
+    }
+  },
+});
 export const updateIsPublic = migrations.define({
   table: "todoKanban",
   migrateOne: async (ctx, todo) => {
@@ -30,6 +39,10 @@ export const runCopyDates = migrations.runner(
 
 export const runUpdatePublic = migrations.runner(
   internal.migrations.updateIsPublic,
+);
+
+export const runClearIfUndone = migrations.runner(
+  internal.migrations.clearCompletedAtIfUndone,
 );
 
 //NOTE: (TO RUN THIS MIGRATION)

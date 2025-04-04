@@ -28,6 +28,19 @@ export const addCard = mutation({
   handler: async (ctx, args) => {
     const { column, order, title, userId, priority, isPublic } = args;
 
+    if (column === "done") {
+      return await ctx.db.insert("todoKanban", {
+        title,
+        column,
+        createdAt: Date.now(),
+        lastUpdatedBy: userId,
+        order: 0,
+        priority,
+        public: isPublic,
+        completedAt: Date.now(),
+      });
+    }
+
     if (order === "start") {
       // Get all cards in this column sorted by order ascending (smallest first)
       const cardsInColumn = await ctx.db
@@ -169,6 +182,14 @@ export const editCard = mutation({
     isPublic: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    if (args.column === "done") {
+      const card = await ctx.db.get(args.id);
+      if (!card) throw new Error("Card not found");
+      if (card.completedAt === undefined && args.column === "done") {
+        await ctx.db.patch(args.id, { completedAt: Date.now() });
+      }
+    }
+
     return await ctx.db.patch(args.id, {
       title: args.title,
       updatedAt: Date.now(),

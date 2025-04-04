@@ -85,7 +85,7 @@ export function AccordionComponent({
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-foreground">{item.text}</p>
+                    <span className="text-foreground">{item.text}</span>
                   )}
                 </AccordionContent>
               </AccordionItem>

@@ -1,3 +1,4 @@
+import { Link } from "@/components/ui/custom-link";
 import { cn } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import { JSX } from "react";
@@ -5,7 +6,7 @@ import { JSX } from "react";
 // Define the types
 interface AccordionItem {
   subtitle: string;
-  text: string[] | string;
+  text: string[] | string | JSX.Element;
 }
 
 export const iconOpenClass =
@@ -39,28 +40,172 @@ export const faqs: AccordionSection = {
 
   items: [
     {
-      subtitle: "Do I get access to this landing page in the starter kit?",
-      text: "Yes, this page isn't even a real landing page more so a template for you to build on.",
+      subtitle: "Who's behind The List?",
+      text: (
+        <p>
+          At the moment, it&apos;s just me,{" "}
+          <Link
+            href="https://www.instagram.com/anthonybrooksart"
+            className="font-bold"
+            target="_blank"
+          >
+            Anthony Brooks
+          </Link>
+          . I&apos;ve collaborated with{" "}
+          <Link
+            href="https://www.instagram.com/yessiow"
+            target="_blank"
+            className="font-bold"
+          >
+            Yessi
+          </Link>{" "}
+          from{" "}
+          <Link
+            href="https://www.instagram.com/streetartcalls"
+            className="font-bold"
+            target="_blank"
+          >
+            Street Art Calls
+          </Link>{" "}
+          in the past to get the word out about the project as well as{" "}
+          <Link
+            href="https://www.instagram.com/creagiovane"
+            target="_blank"
+            className="font-bold"
+          >
+            Giovane
+          </Link>{" "}
+          from{" "}
+          <Link
+            href="https://www.instagram.com/sticker_pasteup_fest_world_map"
+            className="font-bold"
+            target="_blank"
+          >
+            Stick & PasteUp Fest World Map
+          </Link>{" "}
+          to gather many of the sticker and pasteup events/projects, but
+          otherwise the work on gathering and maintaining the list and coding,
+          updating, and managing this website has all been done by me. Crazy,
+          right?
+        </p>
+      ),
     },
     {
-      subtitle: "Is the starter kit regularly updated?",
-      text: "Yes, we continuously update the starter kit with the latest features, security patches, and best practices to ensure you're always working with cutting-edge technology.",
+      subtitle: "How is the list updated?",
+      text: "Since 2019 up until now (April 2025), it's been manually updated. I look through all of the events, follow them on socials, newsletters, check websites, have google search alerts, and have had a handful actually submit the events to me. With this version of the site, I'm working on a much better application submission system that will hopefully make this just... so much easier for everyone involved.",
     },
     {
-      subtitle: "Do I get access to this landing page in the starter kit?",
-      text: "Yes, this page isn't even a real landing page more so a template for you to build on.",
+      subtitle: "Why is it paid? It was free.",
+      text: (
+        <p>
+          This is complicated for me. I have fought for years to keep this free,
+          but as the work compounded by just the sheer number of people now
+          using it, it went from something that I spend an hour or 2 per day
+          checking/updating to something that many times, would take 40-80
+          hours+ per week for the entirety of winter. All while juggling
+          applying for open calls myself so I could make enough money to keep
+          funding the work that I&apos;m doing here without burdening other
+          artists. And in the other months while painting, it would have low
+          swings since I couldn&apos;t do that and paint, and then would pick
+          back up in fall.
+          <br />
+          <br /> This isn&apos;t feasible. Especially not in the longterm. So I
+          decided that I would ask a small monthly fee in return for all of the
+          work that I&apos;m doing. If you&apos;re still unable to pay that,{" "}
+          <Link
+            href="mailto:thestreetartlist@gmail.com"
+            className="underline underline-offset-2"
+          >
+            contact me
+          </Link>{" "}
+          and we&apos;ll work something out. I don&apos;t want this to be a
+          paywall that stops people from being able to survive, but I also want
+          the value in what I&apos;m doing to be recognized as it&apos;s not
+          just reposting on IG and it does take an insane amount of work to do.
+        </p>
+      ),
     },
     {
-      subtitle: "Is the starter kit regularly updated?",
-      text: "Yes, we continuously update the starter kit with the latest features, security patches, and best practices to ensure you're always working with cutting-edge technology.",
+      subtitle: "What do I get if I subscribe?",
+      text: (
+        <>
+          <p>
+            Easy, you get access to the full list. Without paying, you&apos;ll
+            still have access to the list in some form, but only as a very
+            detailed archive and event calendar. You won&apos;t be able to view
+            open calls, apply, bookmark, keep track of applications, or really
+            anything else. I will still show a limited number of open calls each
+            month, so you won&apos;t completely miss out, plus there&apos;s a
+            2-week free trial to see how it all works.
+          </p>
+          <p className="mt-5">Besides that, it varies by tier what you get:</p>{" "}
+          <ol className="m-auto list-disc space-y-2 p-3 pl-10">
+            <li>
+              The basic tier <b>(Original Cap) </b>just gives you access to all
+              of the calls and ability to keep track of your applications,
+              bookmark, hide, etc. Full functionality.
+            </li>
+            <li>
+              The mid tier that I recommend <b>(Banana Cap) </b>gives you
+              everything from the previous tier, with the addition of automated
+              reminders for new calls, deadline reminders, the newsletter, and
+              earlier access to new paid features as I&apos;m always working on
+              adding things.
+            </li>
+            <li>
+              The highest tier <b>(Fat Cap)</b> is more for those that want to
+              and are able to pay a bit more. As with the others, you&apos;ll
+              still have access to everything, but with your name featured on
+              the site as a top supporter. I had this with Patreon and several
+              people were Fat Cap patrons, so I wanted to carry that over to the
+              site. You&apos;ll get first access to new site features, the
+              ability to give input while I&apos;m beta-testing new things, and
+              if there&apos;s anything else that I come up with, you&apos;ll be
+              the first to see it.
+            </li>{" "}
+          </ol>
+        </>
+      ),
     },
     {
-      subtitle: "Do I get access to this landing page in the starter kit?",
-      text: "Yes, this page isn't even a real landing page more so a template for you to build on.",
+      subtitle: "What about for organizers?",
+      text: "For organizers, you can always list your events for free. For open calls, if the event is a graffiti jam, pasteup/sticker project, street art festival, or a mural project with a really low budget, you can always list for free. If you have a project budget, then I just ask for a MAX of a 1% listing fee (starting at $50). And the first open call listed is free so you can see what I'm offering. I'm actively working on building an application system as well, so that will be included in the 1% fee when that's released. I don't allow for organizers to charge application fees for artists to apply. Any events with that notation on The List are external links and are only to ensure that artists are aware before clicking through. ",
     },
     {
-      subtitle: "Is the starter kit regularly updated?",
-      text: "Yes, we continuously update the starter kit with the latest features, security patches, and best practices to ensure you're always working with cutting-edge technology.",
+      subtitle: "Why charge here and not just do a Patreon/Buy Me A Coffee?",
+      text: (
+        <span>
+          I tried both of those.{" "}
+          <Link
+            href="https://buymeacoffee.com/thestreetartlist"
+            target="_blank"
+            className="font-bold"
+          >
+            Buy Me A Coffee
+          </Link>{" "}
+          was nice as it gave people the option for a one-off payment of
+          whatever amount. Patreon was nice because people know the name.
+          Neither was great for actually supporting the ongoing development of
+          The Street Art List, though, as one-time payments don&apos;t continue
+          to pay for the work that I do, and{" "}
+          <Link
+            href="https://patreon.com/thestreetartlist"
+            target="_blank"
+            className="font-bold"
+          >
+            Patreon
+          </Link>{" "}
+          takes a stupid amount of the support as fees AND adds a percentage on
+          top, so people were paying more in different places, which I&apos;m
+          really not a fan of. So I&apos;m handling the subscriptions myself, so
+          that I can charge less and still get enough to continue the site for
+          years to come.
+        </span>
+      ),
+    },
+    {
+      subtitle: "What if I don't want to pay? Can I cancel?",
+      text: "Yep, you can cancel at any time and you'll keep the benefits of your subscription for the remainder of that billing period. You can also access your invoices and manage your subscription from the billing portal at any time.",
     },
   ],
 };
