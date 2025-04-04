@@ -510,7 +510,7 @@ const FullPageNav = ({
                           );
                         }}
                         className={cn(
-                          "flex cursor-pointer justify-start px-9 py-4 hover:bg-foreground/80 hover:text-background hover:unstroked",
+                          "flex cursor-pointer justify-start px-9 py-4",
                           activeCategory === section.title &&
                             "bg-foreground text-background unstroked",
                           // activeCategory === section.title &&
@@ -553,9 +553,9 @@ const FullPageNav = ({
                                       href={item.path}
                                       onClick={onHandleLinkClick}
                                       className={cn(
-                                        "block cursor-pointer py-2 transition-all duration-200 ease-in-out",
+                                        "block cursor-pointer py-2 transition-all duration-200 ease-in-out focus:underline focus:decoration-[5px] focus:underline-offset-4",
                                         pathname === item.path &&
-                                          "decoration-6 text-foreground underline underline-offset-4",
+                                          "text-foreground underline decoration-[6px] underline-offset-4",
                                         // item.path.includes("dashboard") &&
                                         //   "text-salPink"
                                       )}
@@ -575,19 +575,27 @@ const FullPageNav = ({
               <Unauthenticated>
                 <div
                   className={cn(
-                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase active:bg-foreground active:text-background active:unstroked",
+                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
                   )}
                 >
-                  <Link onClick={onHandleLinkClick} href={"/pricing"}>
+                  <Link
+                    onClick={onHandleLinkClick}
+                    href={"/pricing"}
+                    className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:underline active:decoration-[5px] active:underline-offset-4"
+                  >
                     Pricing
                   </Link>
                 </div>
                 <div
                   className={cn(
-                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase active:bg-foreground active:text-background active:unstroked",
+                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase",
                   )}
                 >
-                  <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
+                  <Link
+                    onClick={onHandleLinkClick}
+                    href={"/auth/sign-in"}
+                    className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:underline active:decoration-[5px] active:underline-offset-4"
+                  >
                     Login | Register
                   </Link>
                 </div>
