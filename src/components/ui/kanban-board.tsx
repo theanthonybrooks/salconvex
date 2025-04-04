@@ -564,6 +564,7 @@ export const TaskDialog = ({
   const [priority, setPriority] = useState<"low" | "medium" | "high">(
     initialValues?.priority || "medium",
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [order, setOrder] = useState<"start" | "end">(
     mode === "add" && initialValues?.order ? initialValues.order : "start",
   );
@@ -579,7 +580,9 @@ export const TaskDialog = ({
     if (mode === "add") {
       onSubmit({ title: title.trim(), column, priority, order, isPublic });
     } else {
+      setIsSubmitting(true);
       onSubmit({ title: title.trim(), column, priority, isPublic });
+      setIsSubmitting(false);
     }
     setTitle("");
     setColumn(initialValues?.column || "todo");
@@ -588,6 +591,16 @@ export const TaskDialog = ({
       mode === "add" && initialValues?.order ? initialValues.order : "end",
     );
     setIsPublic(initialValues?.isPublic || true);
+    onClose?.();
+  };
+
+  const onCloseDialog = () => {
+    setTimeout(() => {
+      if (!isSubmitting) {
+        onClose?.();
+        return;
+      }
+    }, 300);
   };
 
   // console.log(initialValues);
@@ -595,7 +608,7 @@ export const TaskDialog = ({
   const isEdit = mode === "edit";
 
   return (
-    <Dialog onOpenChange={(open) => !open && onClose?.()}>
+    <Dialog onOpenChange={(open) => !open && onCloseDialog()}>
       <DialogTrigger asChild onClick={onClick}>
         {trigger}
       </DialogTrigger>
