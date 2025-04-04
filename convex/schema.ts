@@ -384,6 +384,8 @@ export default defineSchema({
     order: v.number(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    public: v.optional(v.boolean()),
     lastUpdatedBy: v.string(),
     priority: v.optional(v.string()),
   }).index("by_column_order", ["column", "order"]),

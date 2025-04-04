@@ -53,12 +53,13 @@ export const getCompletedTasksChangelog = query({
     const completedTasks = await ctx.db
       .query("todoKanban")
       .filter((q) => q.eq(q.field("column"), "done"))
+      .filter((q) => q.eq(q.field("public"), true))
       .collect();
 
     const sorted = completedTasks
       .map((task) => ({
         ...task,
-        timestamp: new Date(task.updatedAt ?? task._creationTime),
+        timestamp: new Date(task.completedAt ?? task._creationTime),
       }))
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
@@ -69,9 +70,9 @@ export const getCompletedTasksChangelog = query({
       const monthLabel = task.timestamp.toLocaleString("default", {
         month: "long",
         year: "numeric",
-      }); // e.g. "March 2025"
+      });
 
-      const dayLabel = `${task.timestamp.getMonth() + 1}.${task.timestamp.getDate()}`; // e.g. "3.21"
+      const dayLabel = `${task.timestamp.getMonth() + 1}.${task.timestamp.getDate()}`;
 
       const entry = `${dayLabel}: ${task.title}`;
 

@@ -23,6 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import PublicToggle from "@/components/ui/public-toggle";
 
 type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done";
 
@@ -31,6 +32,7 @@ interface Card {
   id: string;
   column: ColumnType;
   priority?: string;
+  isPublic?: boolean;
 }
 
 interface MoveCardArgs {
@@ -38,6 +40,7 @@ interface MoveCardArgs {
   column: ColumnType;
   beforeId?: Id<"todoKanban"> | undefined;
   userId: string;
+  isPublic?: boolean;
 }
 
 interface AddCardArgs {
@@ -46,6 +49,7 @@ interface AddCardArgs {
   userId: string;
   order?: "start" | "end";
   priority?: string;
+  isPublic?: boolean;
 }
 
 interface DeleteCardArgs {
@@ -71,6 +75,7 @@ interface CardProps {
   id: string;
   column: ColumnType;
   priority?: string;
+  isPublic?: boolean;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
   deleteCard: (args: DeleteCardArgs) => void;
@@ -115,6 +120,7 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
       column: ColumnType;
       order: number;
       priority?: string;
+      isPublic?: boolean;
     }[]);
   const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 };
 
@@ -343,9 +349,11 @@ const Card: React.FC<CardProps> = ({
   handleDragStart,
   deleteCard,
   priority,
+  isPublic,
 }) => {
   const [newPriority, setNewPriority] = useState(priority || "medium");
   const [isHovered, setIsHovered] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const editCard = useMutation(api.kanban.cards.editCard);
 
@@ -371,11 +379,14 @@ const Card: React.FC<CardProps> = ({
         title,
         priority: updatedPriority,
         userId: "admin",
+        isPublic,
       });
 
       return updatedPriority;
     });
   };
+
+  // console.log(isPublic);
 
   return (
     <motion.div layout className="relative flex flex-col">
@@ -390,18 +401,24 @@ const Card: React.FC<CardProps> = ({
             id,
             column,
             priority,
+            isPublic,
           })
         }
         className={`relative grid cursor-grab grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground active:cursor-grabbing ${getColumnColor(
           column,
         )}`}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseLeave={!isEditing ? () => setIsHovered(false) : () => {}}
       >
         {isHovered && (
           <div className="absolute right-0 top-0 flex items-center justify-center gap-x-2 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground">
             <TaskDialog
               mode="edit"
+              onClick={() => setIsEditing(true)}
+              onClose={() => {
+                setIsEditing(false);
+                setIsHovered(false);
+              }}
               trigger={
                 <Pencil
                   size={16}
@@ -414,6 +431,7 @@ const Card: React.FC<CardProps> = ({
                 priority: (["low", "medium", "high"].includes(priority ?? "")
                   ? priority
                   : "medium") as "low" | "medium" | "high",
+                isPublic: isPublic ?? false,
               }}
               onSubmit={(data) => {
                 editCard({
@@ -482,7 +500,13 @@ const AddCard: React.FC<{
           Add <FiPlus />
         </motion.button>
       }
-      initialValues={{ column, priority: "medium", order: "start", title: "" }}
+      initialValues={{
+        column,
+        priority: "medium",
+        order: "start",
+        title: "",
+        isPublic: true,
+      }}
       onSubmit={(data) => {
         addCard({
           ...data,
@@ -497,30 +521,37 @@ type BaseTaskValues = {
   title: string;
   column: ColumnType;
   priority: "low" | "medium" | "high";
+  isPublic: boolean;
+};
+
+type BaseTaskDialogSharedProps = {
+  trigger: React.ReactNode;
+  onClick?: () => void;
+  onClose?: () => void;
 };
 
 type AddTaskDialogProps = {
   mode: "add";
-  trigger: React.ReactNode;
   initialValues?: BaseTaskValues & { order: "start" | "end" };
   onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
-};
+} & BaseTaskDialogSharedProps;
 
 type EditTaskDialogProps = {
   mode: "edit";
-  trigger: React.ReactNode;
   initialValues?: BaseTaskValues;
   onSubmit: (values: BaseTaskValues) => void;
-};
+} & BaseTaskDialogSharedProps;
 
 type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
 
-export const TaskDialog: React.FC<TaskDialogProps> = ({
+export const TaskDialog = ({
   mode,
   trigger,
   initialValues,
   onSubmit,
-}) => {
+  onClick,
+  onClose,
+}: TaskDialogProps) => {
   const [title, setTitle] = useState(initialValues?.title || "");
   const [column, setColumn] = useState<ColumnType>(
     initialValues?.column || "todo",
@@ -532,14 +563,18 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
     mode === "add" && initialValues?.order ? initialValues.order : "start",
   );
 
+  const [isPublic, setIsPublic] = useState<boolean>(
+    initialValues?.isPublic ?? true,
+  );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     if (mode === "add") {
-      onSubmit({ title: title.trim(), column, priority, order });
+      onSubmit({ title: title.trim(), column, priority, order, isPublic });
     } else {
-      onSubmit({ title: title.trim(), column, priority });
+      onSubmit({ title: title.trim(), column, priority, isPublic });
     }
     setTitle("");
     setColumn(initialValues?.column || "todo");
@@ -547,13 +582,18 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
     setOrder(
       mode === "add" && initialValues?.order ? initialValues.order : "end",
     );
+    setIsPublic(initialValues?.isPublic || true);
   };
+
+  // console.log(initialValues);
 
   const isEdit = mode === "edit";
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog onOpenChange={(open) => !open && onClose?.()}>
+      <DialogTrigger asChild onClick={onClick}>
+        {trigger}
+      </DialogTrigger>
       <DialogContent className="bg-card">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
@@ -565,16 +605,18 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Label>Task</Label>
+          <Label htmlFor="title">Task</Label>
           <textarea
+            name="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Task title..."
             className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none"
           />
 
-          <Label>Column</Label>
+          <Label htmlFor="column">Column</Label>
           <select
+            name="column"
             value={column}
             onChange={(e) => setColumn(e.target.value as ColumnType)}
             className="rounded border bg-background p-2 text-foreground"
@@ -586,44 +628,67 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
             <option value="done">Complete</option>
           </select>
 
-          <Label>Priority</Label>
-          <select
-            value={priority}
-            onChange={(e) =>
-              setPriority(e.target.value as "low" | "medium" | "high")
-            }
-            className="rounded border bg-background p-2 text-foreground"
-          >
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
+          <div className="flex items-center gap-3">
+            <Label htmlFor="priority">Priority</Label>
+            <select
+              name="priority"
+              value={priority}
+              onChange={(e) =>
+                setPriority(e.target.value as "low" | "medium" | "high")
+              }
+              className="rounded border bg-card p-2 text-foreground"
+            >
+              <option value="high">🟢 High</option>
+              <option value="medium">🟡Medium</option>
+              <option value="low">🔴 Low</option>
+            </select>
 
-          {!isEdit && (
-            <>
-              <Label>Order</Label>
-              <select
-                value={order}
-                onChange={(e) => setOrder(e.target.value as "start" | "end")}
-                className="rounded border bg-background p-2 text-foreground"
-              >
-                <option value="start">Add to Beginning</option>
-                <option value="end">Add to End</option>
-              </select>
-            </>
-          )}
+            {!isEdit && (
+              <>
+                <Label htmlFor="order">Order</Label>
+                <select
+                  name="order"
+                  value={order}
+                  onChange={(e) => setOrder(e.target.value as "start" | "end")}
+                  className="rounded border bg-card p-2 text-foreground"
+                >
+                  <option value="start">Start</option>
+                  <option value="end">End</option>
+                </select>
+              </>
+            )}
+          </div>
 
-          <DialogFooter className="flex justify-end gap-2">
-            <DialogClose asChild>
-              <Button type="button" variant="salWithShadowHiddenYlw">
-                Cancel
-              </Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button type="submit" variant="salWithShadowHidden">
-                {isEdit ? "Save Changes" : "Add Task"}
-              </Button>
-            </DialogClose>
+          <DialogFooter className="flex w-full items-center justify-between sm:justify-between">
+            <div className="flex items-center gap-2">
+              {/* <input
+                type="checkbox"
+                id="public-toggle"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="size-4 border-foreground"
+              /> */}
+              <PublicToggle
+                name="public-toggle"
+                checked={isPublic}
+                onChange={() => setIsPublic(!isPublic)}
+              />
+              <Label htmlFor="public-toggle">
+                {isPublic ? "Public Task" : "Private Task"}
+              </Label>
+            </div>
+            <div className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button type="button" variant="salWithShadowHiddenYlw">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button type="submit" variant="salWithShadowHidden">
+                  {isEdit ? "Save Changes" : "Add Task"}
+                </Button>
+              </DialogClose>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
