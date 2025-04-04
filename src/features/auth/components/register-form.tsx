@@ -314,7 +314,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               />
             </Link>
             <Image
-              src="/create-new-account.svg"
+              src="/createaccount.svg"
               alt="The Street Art List"
               width={300}
               height={100}
