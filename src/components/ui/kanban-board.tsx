@@ -131,15 +131,20 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
       ...rest,
     }))
     .sort((a, b) => {
-      if (a.column === "done" && b.column === "done") {
-        const aCompleted = a.completedAt || 0;
-        const bCompleted = b.completedAt || 0;
-        return bCompleted - aCompleted; // Newest done cards at top
+      const aIsDone = a.column === "done";
+      const bIsDone = b.column === "done";
+
+      if (aIsDone && bIsDone) {
+        const aCompleted = a.completedAt ?? 0;
+        const bCompleted = b.completedAt ?? 0;
+        return bCompleted - aCompleted;
       }
+
+      if (aIsDone) return 1;
+      if (bIsDone) return -1;
 
       const priorityA = priorityLevels[a.priority || "medium"];
       const priorityB = priorityLevels[b.priority || "medium"];
-
       return priorityA - priorityB || a.order - b.order;
     });
 
@@ -643,6 +648,14 @@ export const TaskDialog = ({
             name="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              const isMac = navigator.userAgent.includes("Mac");
+              const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+              if (ctrlOrCmd && e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
             placeholder="Task title..."
             className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm placeholder-violet-300 focus:outline-none"
           />

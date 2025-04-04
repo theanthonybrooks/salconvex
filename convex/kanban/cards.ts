@@ -130,6 +130,10 @@ export const moveCard = mutation({
       await ctx.db.patch(id, { completedAt: Date.now() });
     }
 
+    if (column !== "done") {
+      await ctx.db.patch(id, { completedAt: undefined });
+    }
+
     cardsInColumn = await ctx.db
       .query("todoKanban")
       .withIndex("by_column_order", (q) => q.eq("column", column))
