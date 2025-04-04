@@ -138,7 +138,7 @@ export default function Footer({ className }: { className?: string }) {
                 href="https://facebook.com/thestreetartlist"
                 target="_blank"
               >
-                <Button variant="ghost" size="icon">
+                <Button variant="icon" size="icon">
                   <FaFacebookF className="h-5 w-5" />
                 </Button>
               </Link>
@@ -146,22 +146,22 @@ export default function Footer({ className }: { className?: string }) {
                 href="https://instagram.com/thestreetartlist"
                 target="_blank"
               >
-                <Button variant="ghost" size="icon">
+                <Button variant="icon" size="icon">
                   <FaInstagram className="h-5 w-5" />
                 </Button>
               </Link>
               <Link href="https://threads.net/thestreetartlist" target="_blank">
-                <Button variant="ghost" size="icon">
+                <Button variant="icon" size="icon">
                   <FaThreads className="h-5 w-5" />
                 </Button>
               </Link>
               {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
-                <Button variant='ghost' size='icon'>
+                <Button variant='icon' size='icon'>
                   <FaPatreon className='h-5 w-5' />
                 </Button>
               </Link> */}
               <Link href="mailto:info@thestreetartlist.com" target="_blank">
-                <Button variant="ghost" size="icon">
+                <Button variant="icon" size="icon">
                   <FaRegEnvelope className="h-5 w-5" />
                 </Button>
               </Link>
