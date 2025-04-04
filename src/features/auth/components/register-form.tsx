@@ -490,7 +490,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             setSelectedOption(value);
                           }}
                           defaultValue={field.value}
-                          placeholder="Select account type (select all that apply)"
+                          placeholder="Select account type(s)"
                           variant="basic"
                           maxCount={3}
                           height={8}
