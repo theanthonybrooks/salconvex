@@ -1,6 +1,7 @@
 "use client";
 
-import EventCardDetail from "@/features/events/event-detail/mobile/event-card-detail-mobile";
+import EventCardDetailDesktop from "@/features/events/event-detail/desktop/event-card-detail-desktop";
+import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
 import { useQuery } from "convex-helpers/react/cache";
 import { LoaderPinwheel } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -28,7 +29,7 @@ const Event = () => {
   //   edition: 2025,
   // });
 
-  console.log("event data", data);
+  // console.log("event data", data);
 
   const onBackClick = () => {
     router.back();
@@ -58,7 +59,18 @@ const Event = () => {
           <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <EventCardDetail data={data} artist={artist} />
+        <>
+          <EventCardDetailMobile
+            data={data}
+            artist={artist}
+            className="lg:hidden"
+          />
+          <EventCardDetailDesktop
+            data={data}
+            artist={artist}
+            className="hidden lg:block"
+          />
+        </>
       )}
     </div>
   );
