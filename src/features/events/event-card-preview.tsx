@@ -86,6 +86,8 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     : undefined;
   const budget = compensation?.budget;
   const categories = compensation?.categories ?? {};
+  const noCategories =
+    categories === null || Object.keys(categories).length === 0;
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
 
@@ -298,7 +300,9 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                     {eligibility.whom.length > 1
                       ? "See details"
                       : eligibility.whom[0]}
-                    {eligibility.type !== "International" && " Artists*"}
+                    {eligibility.type !== "International" &&
+                      eligibility.whom.length === 1 &&
+                      " Artists*"}
                   </span>
                 )}
               </p>
@@ -536,28 +540,35 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   </span>
                 ) : (
                   <>
-                    {hasBudget &&
-                      formatCurrency(
-                        budget.min,
-                        budget.max,
-                        budget.currency,
-                        false,
-                        budget.allInclusive,
-                      )}
-                    <span className="hidden xl:block">
-                      {hasBudget && hasRate && (
-                        <span className="text-sm"> | </span>
-                      )}
-
-                      {hasRate &&
-                        formatRate(
-                          budget.rate,
-                          budget.unit,
-                          budget.currency,
-                          true,
+                    {(hasBudget || hasRate) && (
+                      <span className="hidden items-center gap-x-1 xl:flex">
+                        {hasBudget &&
+                          formatCurrency(
+                            budget.min,
+                            budget.max,
+                            budget.currency,
+                            false,
+                            budget.allInclusive,
+                          )}
+                        {hasBudget && hasRate && (
+                          <span className="text-sm"> | </span>
                         )}
-                    </span>
-                    {!budget.allInclusive && <span className="text-sm">*</span>}
+
+                        {hasRate &&
+                          formatRate(
+                            budget.rate,
+                            budget.unit,
+                            budget.currency,
+                            true,
+                          )}
+                      </span>
+                    )}
+                    {!hasRate && !hasBudget && (
+                      <p className="text-sm">No Info</p>
+                    )}
+                    {!budget.allInclusive && !noCategories && (
+                      <span className="text-sm">*</span>
+                    )}
                   </>
                 )}
               </p>

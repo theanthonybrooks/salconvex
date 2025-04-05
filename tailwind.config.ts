@@ -35,6 +35,7 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         backgroundDark: "hsl(var(--background-dark))",
+        dashboardBgLt: "hsl(var(--dashboard-bg-lt))",
         foreground: "hsl(var(--foreground))",
         salYellow: "hsl(var(--sal-yellow))",
         salYellowLt: "hsl(var(--sal-yellow-light))",

@@ -1,15 +1,15 @@
-"use client"
-import { FormError } from "@/components/form-error"
-import { FormSuccess } from "@/components/form-success"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+"use client";
+import { FormError } from "@/components/form-error";
+import { FormSuccess } from "@/components/form-success";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 import {
   AlertDialog,
@@ -29,28 +29,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   UpdatePasswordSchema,
   UpdateUserPrefsSchema,
   UpdateUserSchema,
-} from "@/schemas/auth"
-import { useAuthActions } from "@convex-dev/auth/react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery } from "convex/react"
-import { ConvexError } from "convex/values"
+} from "@/schemas/auth";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import {
   Bell,
   Eye,
@@ -61,79 +61,79 @@ import {
   Palette,
   Shield,
   Upload,
-} from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { currencies, Currency } from "@/app/data/currencies"
-import { Timezone, timezones } from "@/app/data/timezones"
-import { SearchMappedSelect } from "@/components/ui/mapped-select"
-import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
-import { useTheme } from "next-themes"
-import { useCallback } from "react"
-import { FaUserNinja } from "react-icons/fa6"
-import { toast } from "react-toastify"
-import { api } from "~/convex/_generated/api"
+import { currencies, Currency } from "@/app/data/currencies";
+import { Timezone, timezones } from "@/app/data/timezones";
+import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
+import { useTheme } from "next-themes";
+import { useCallback } from "react";
+import { FaUserNinja } from "react-icons/fa6";
+import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
 
 export default function SettingsPage() {
-  const { signOut } = useAuthActions()
-  const userData = useQuery(api.users.getCurrentUser, {})
-  const user = userData?.user
-  const userPrefs = userData?.userPref
+  const { signOut } = useAuthActions();
+  const userData = useQuery(api.users.getCurrentUser, {});
+  const user = userData?.user;
+  const userPrefs = userData?.userPref;
   const sessionCount = useQuery(api.users.countSessions, {
     userId: user?.userId ?? "guest",
-  })
-  const updatePassword = useMutation(api.users.updatePassword)
-  const updateUserPrefs = useMutation(api.users.updateUserPrefs)
-  const deleteSessions = useMutation(api.users.deleteSessions)
-  const updateUser = useMutation(api.users.updateUser)
-  const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage)
-  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl)
+  });
+  const updatePassword = useMutation(api.users.updatePassword);
+  const updateUserPrefs = useMutation(api.users.updateUserPrefs);
+  const deleteSessions = useMutation(api.users.deleteSessions);
+  const updateUser = useMutation(api.users.updateUser);
+  const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage);
+  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const [selectedTimezone, setTimezone] = useState<string | undefined>(
-    undefined
-  )
+    undefined,
+  );
   const [selectedCurrency, setCurrency] = useState<string | undefined>(
-    undefined
-  )
-  const { setTheme, theme } = useTheme()
-  const [selectedTheme, setThemePref] = useState<string | undefined>(undefined)
+    undefined,
+  );
+  const { setTheme, theme } = useTheme();
+  const [selectedTheme, setThemePref] = useState<string | undefined>(undefined);
   // const [selectedLanguage, setLanguage] = useState("en")
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   // TODO: ensure that pending state isn't being misused
-  const [pending, setPending] = useState(false)
-  const [error, setError] = useState<string>("")
-  const [success, setSuccess] = useState<string>("")
-  const [uploading, setUploading] = useState(false)
-  const [firstName, setFirstName] = useState<string | undefined>(undefined)
-  const [lastName, setLastName] = useState<string | undefined>(undefined)
-  const [email, setEmail] = useState<string | undefined>(undefined)
-  const [name, setName] = useState<string | undefined>(undefined)
-  const [isSaving, setIsSaving] = useState(false)
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
+  const [firstName, setFirstName] = useState<string | undefined>(undefined);
+  const [lastName, setLastName] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [name, setName] = useState<string | undefined>(undefined);
+  const [isSaving, setIsSaving] = useState(false);
 
   const prevPrefs = useRef({
     timezone: selectedTimezone,
     currency: selectedCurrency,
     theme: selectedTheme,
-  })
+  });
 
-  const DeleteAccount = useMutation(api.users.deleteAccount)
+  const DeleteAccount = useMutation(api.users.deleteAccount);
   const onDeleteAccount = async () => {
-    setPending(true)
-    setError("")
-    localStorage.clear()
+    setPending(true);
+    setError("");
+    localStorage.clear();
 
     try {
-      await DeleteAccount({ method: "deleteAccount", userId: user?.userId })
-      await signOut()
+      await DeleteAccount({ method: "deleteAccount", userId: user?.userId });
+      await signOut();
     } catch (err) {
-      setError("Failed to delete account. Please try again.")
-      console.error(err)
+      setError("Failed to delete account. Please try again.");
+      console.error(err);
     } finally {
-      setPending(false)
+      setPending(false);
     }
-  }
+  };
   const {
     register,
     handleSubmit,
@@ -141,7 +141,7 @@ export default function SettingsPage() {
     formState: { errors },
   } = useForm<z.infer<typeof UpdatePasswordSchema>>({
     resolver: zodResolver(UpdatePasswordSchema),
-  })
+  });
 
   const {
     // register: updateRegister,
@@ -151,54 +151,54 @@ export default function SettingsPage() {
     setValue: updateSetValue,
   } = useForm<z.infer<typeof UpdateUserSchema>>({
     resolver: zodResolver(UpdateUserSchema),
-  })
+  });
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    if (!event.target.files || event.target.files.length === 0) return
+    if (!event.target.files || event.target.files.length === 0) return;
 
-    const file = event.target.files[0]
+    const file = event.target.files[0];
 
-    setUploading(true)
+    setUploading(true);
 
-    const uploadUrl = await generateUploadUrl()
+    const uploadUrl = await generateUploadUrl();
     const response = await fetch(uploadUrl, {
       method: "POST",
       headers: { "Content-Type": file.type },
       body: file,
-    })
+    });
 
     if (!response.ok) {
       toast.error("Failed to upload profile image", {
         autoClose: 2000,
         pauseOnHover: false,
         hideProgressBar: true,
-      })
-      setUploading(false)
-      return
+      });
+      setUploading(false);
+      return;
     }
 
-    const { storageId } = await response.json()
+    const { storageId } = await response.json();
 
-    await uploadProfileImage({ storageId })
+    await uploadProfileImage({ storageId });
 
-    setUploading(false)
+    setUploading(false);
     toast.success("Profile image updated successfully!", {
       autoClose: 2000,
       pauseOnHover: false,
       hideProgressBar: true,
-    })
-  }
+    });
+  };
 
   const handleUpdateUserSubmit = async (
-    data: z.infer<typeof UpdateUserSchema>
+    data: z.infer<typeof UpdateUserSchema>,
   ) => {
-    setPending(true)
-    setIsSaving(true)
-    setError("")
+    setPending(true);
+    setIsSaving(true);
+    setError("");
 
     if (!user || !user.email) {
-      throw new Error("No user found")
+      throw new Error("No user found");
     }
     try {
       await updateUser({
@@ -207,16 +207,16 @@ export default function SettingsPage() {
         email: data.email,
         name: data.name,
         organizationName: data.organizationName ?? "",
-      })
+      });
       // console.log("formData", formData)
-      setPending(false)
-      setIsSaving(false)
+      setPending(false);
+      setIsSaving(false);
       toast.success("User updated!", {
         autoClose: 2000,
         pauseOnHover: false,
         hideProgressBar: true,
-      })
-      reset()
+      });
+      reset();
     } catch (err: unknown) {
       // Type assertion: Explicitly check if it's a ConvexError
       if (err instanceof ConvexError) {
@@ -224,26 +224,26 @@ export default function SettingsPage() {
           autoClose: 2000,
           pauseOnHover: false,
           hideProgressBar: true,
-        })
+        });
       }
     } finally {
-      setPending(false)
-      setIsSaving(false)
+      setPending(false);
+      setIsSaving(false);
 
       setTimeout(() => {
-        setSuccess("")
-        setError("")
-      }, 5000)
+        setSuccess("");
+        setError("");
+      }, 5000);
     }
-  }
+  };
 
   const handleUpdateUserPrefs = useCallback(
     async (data: z.infer<typeof UpdateUserPrefsSchema>) => {
-      setPending(true)
-      setError("")
+      setPending(true);
+      setError("");
 
       if (!user || !user.email) {
-        throw new Error("No user found")
+        throw new Error("No user found");
       }
       try {
         await updateUserPrefs({
@@ -251,38 +251,38 @@ export default function SettingsPage() {
           timezone: data.timezone ?? "",
           language: data.language ?? "",
           theme: data.theme ?? "",
-        })
+        });
 
-        setPending(false)
-        setSuccess("User updated!")
-        reset()
+        setPending(false);
+        setSuccess("User updated!");
+        reset();
       } catch (err: unknown) {
         if (err instanceof ConvexError) {
-          setError(err.data || "An unexpected error occurred.")
+          setError(err.data || "An unexpected error occurred.");
         } else if (err instanceof Error) {
-          setError(err.message || "An unexpected error occurred.")
+          setError(err.message || "An unexpected error occurred.");
         } else {
-          setError("An unknown error occurred.")
+          setError("An unknown error occurred.");
         }
       } finally {
-        setPending(false)
+        setPending(false);
         setTimeout(() => {
-          setSuccess("")
-          setError("")
-        }, 5000)
+          setSuccess("");
+          setError("");
+        }, 5000);
       }
     },
-    [user, updateUserPrefs, reset] // Dependencies: Only re-create function if these change
-  )
+    [user, updateUserPrefs, reset], // Dependencies: Only re-create function if these change
+  );
 
   const handleUpdatePasswordSubmit = async (
-    data: z.infer<typeof UpdatePasswordSchema>
+    data: z.infer<typeof UpdatePasswordSchema>,
   ) => {
-    setPending(true)
-    setError("")
+    setPending(true);
+    setError("");
 
     if (!user || !user.email) {
-      throw new Error("No user found")
+      throw new Error("No user found");
     }
     try {
       await updatePassword({
@@ -291,131 +291,134 @@ export default function SettingsPage() {
         currentPassword: data.oldPassword,
         userId: user.userId,
         method: "userUpdate",
-      })
+      });
       // console.log("formData", formData)
-      setPending(false)
-      setSuccess("Password reset!")
+      setPending(false);
+      setSuccess("Password reset!");
 
-      reset()
+      reset();
     } catch (err: unknown) {
       // Type assertion: Explicitly check if it's a ConvexError
       if (err instanceof ConvexError) {
-        setError(err.data || "An unexpected error occurred.")
+        setError(err.data || "An unexpected error occurred.");
       } else if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred.")
+        setError(err.message || "An unexpected error occurred.");
       } else {
-        setError("An unknown error occurred.")
+        setError("An unknown error occurred.");
       }
     } finally {
-      setPending(false)
+      setPending(false);
 
       setTimeout(() => {
-        setSuccess("")
-        setError("")
-      }, 5000)
+        setSuccess("");
+        setError("");
+      }, 5000);
     }
-  }
+  };
 
   const handleDeleteSessions = async () => {
     try {
       if (!user) {
-        throw new Error("User not found")
+        throw new Error("User not found");
       }
-      await deleteSessions({ userId: user?.userId })
+      await deleteSessions({ userId: user?.userId });
       // await invalidateSessions({ userId: user?.userId })
-      setSuccess("Sessions deleted!")
-      signOut()
+      setSuccess("Sessions deleted!");
+      signOut();
     } catch (err: unknown) {
       if (err instanceof ConvexError) {
-        setError(err.data || "An unexpected error occurred.")
+        setError(err.data || "An unexpected error occurred.");
       } else if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred.")
+        setError(err.message || "An unexpected error occurred.");
       } else {
-        setError("An unknown error occurred.")
+        setError("An unknown error occurred.");
       }
     } finally {
-      setPending(false)
+      setPending(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (userPrefs) {
-      setTimezone(userPrefs.timezone ?? "GMT")
-      setCurrency(userPrefs.currency ?? "USD")
-      setThemePref(userPrefs.theme ?? "light")
+      setTimezone(userPrefs.timezone ?? "GMT");
+      setCurrency(userPrefs.currency ?? "USD");
+      setThemePref(userPrefs.theme ?? "light");
       // setTheme(userPrefs.theme ?? "light")
     }
-  }, [userPrefs])
+  }, [userPrefs]);
 
   useEffect(() => {
     if (user) {
-      setFirstName(user.firstName ?? "")
-      setLastName(user.lastName ?? "")
-      setEmail(user.email ?? "")
-      setName(user.name ?? "")
+      setFirstName(user.firstName ?? "");
+      setLastName(user.lastName ?? "");
+      setEmail(user.email ?? "");
+      setName(user.name ?? "");
 
-      updateSetValue("firstName", user.firstName ?? "")
-      updateSetValue("lastName", user.lastName ?? "")
-      updateSetValue("email", user.email ?? "")
-      updateSetValue("name", user.name ?? "")
+      updateSetValue("firstName", user.firstName ?? "");
+      updateSetValue("lastName", user.lastName ?? "");
+      updateSetValue("email", user.email ?? "");
+      updateSetValue("name", user.name ?? "");
     }
-  }, [user, updateSetValue])
+  }, [user, updateSetValue]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       const hasChanged =
         prevPrefs.current.timezone !== selectedTimezone ||
         prevPrefs.current.currency !== selectedCurrency ||
-        prevPrefs.current.theme !== selectedTheme
+        prevPrefs.current.theme !== selectedTheme;
 
       if (hasChanged) {
         handleUpdateUserPrefs({
           currency: selectedCurrency,
           timezone: selectedTimezone,
           theme: selectedTheme,
-        })
+        });
 
         prevPrefs.current = {
           timezone: selectedTimezone,
           currency: selectedCurrency,
           theme: selectedTheme,
-        }
+        };
       }
-    }, 500)
+    }, 500);
 
-    return () => clearTimeout(handler)
-  }, [selectedTheme, selectedTimezone, selectedCurrency, handleUpdateUserPrefs])
+    return () => clearTimeout(handler);
+  }, [
+    selectedTheme,
+    selectedTimezone,
+    selectedCurrency,
+    handleUpdateUserPrefs,
+  ]);
 
   return (
-    <div className='flex flex-col gap-6 p-6'>
+    <div className="flex flex-col gap-6 p-6">
       {/* Header */}
       <div>
-        <h1 className='text-3xl font-semibold tracking-tight'>Settings</h1>
-        <p className='mt-2 text-muted-foreground'>
+        <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
+        <p className="mt-2 text-foreground">
           Manage your account settings and preferences
         </p>
       </div>
 
-      <Tabs defaultValue='account' className='space-y-6'>
-        <TabsList className='max-w-full scrollable invis  bg-white/80 w-full  justify-around md:w-auto md:justify-start h-12'>
-          <TabsTrigger value='account' className='h-9 px-4'>
+      <Tabs defaultValue="account" className="space-y-6">
+        <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border bg-white/80 md:w-auto md:justify-start">
+          <TabsTrigger value="account" className="h-9 px-4" border>
             Account
           </TabsTrigger>
-          {/* <TabsTrigger value='notifications'>
-            Notifications
-          </TabsTrigger> */}
-          {/*          //NOTE: in order to disabled, just add "disabled" to the tabs trigger
-           */}
-          <TabsTrigger value='appearance' className='h-10 px-4'>
+          {/* /~ <TabsTrigger value="notifications">Notifications</TabsTrigger> ~/ */}
+          {/* /~ //NOTE: in order to disabled, just add "disabled" to the tabs    trigger ~/ */}
+
+          <TabsTrigger value="appearance" className="h-9 px-4" border>
             Appearance
           </TabsTrigger>
-          <TabsTrigger value='security' className='h-10 px-4'>
+          <TabsTrigger value="security" className="h-9 px-4" border>
             Security
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value='account'>
-          <div className='space-y-6'>
+        <TabsContent value="account">
+          <div className="space-y-6">
             {/* Profile Settings */}
             <Card>
               <CardHeader>
@@ -424,38 +427,39 @@ export default function SettingsPage() {
                   Update your personal information
                 </CardDescription>
               </CardHeader>
-              <CardContent className='space-y-6'>
-                <div className='flex items-center gap-6'>
-                  <Avatar className='h-20 w-20'>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <Avatar className="h-20 w-20">
                     <AvatarImage
                       src={user?.image || "/avatars/default.jpg"}
-                      alt='User'
+                      alt="User"
                     />
                     <AvatarFallback>
                       <FaUserNinja />
                     </AvatarFallback>
                   </Avatar>
-                  <div className='flex flex-col items-center'>
+                  <div className="flex flex-col items-center">
                     {/* Hidden File Input */}
                     <input
-                      type='file'
-                      accept='image/*'
+                      type="file"
+                      accept="image/*"
                       onChange={handleFileChange}
-                      className='hidden'
-                      id='file-upload'
+                      className="hidden"
+                      id="file-upload"
                     />
 
                     <label
-                      htmlFor='file-upload'
-                      className='cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-xs hover:bg-gray-100 hover:text-gray-900 transition'>
+                      htmlFor="file-upload"
+                      className="shadow-xs cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+                    >
                       {uploading ? (
-                        <div className='flex flex-row items-center gap-2'>
-                          <LoaderPinwheel className='h-4 w-4 animate-spin' />
+                        <div className="flex flex-row items-center gap-2">
+                          <LoaderPinwheel className="h-4 w-4 animate-spin" />
                           Uploading...
                         </div>
                       ) : (
-                        <div className='flex flex-row items-center gap-2'>
-                          <Upload className='h-4 w-4' />
+                        <div className="flex flex-row items-center gap-2 dark:text-foreground">
+                          <Upload className="h-4 w-4" />
                           Change Avatar
                         </div>
                       )}
@@ -464,77 +468,82 @@ export default function SettingsPage() {
                 </div>
                 <Separator />
                 <form onSubmit={updateHandleSubmit(handleUpdateUserSubmit)}>
-                  <div className='grid gap-4 md:grid-cols-2'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='firstName'>First Name</Label>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
                       <Input
                         disabled={pending}
-                        id='firstName'
-                        placeholder='Your first name/given name'
+                        id="firstName"
+                        placeholder="Your first name/given name"
                         defaultValue={firstName ?? ""}
                         onChange={(e) => {
-                          setFirstName(e.target.value)
-                          updateSetValue("firstName", e.target.value)
+                          setFirstName(e.target.value);
+                          updateSetValue("firstName", e.target.value);
                         }}
+                        className="dark:text-primary-foreground"
                       />
                     </div>
-                    <div className='space-y-2'>
-                      <Label htmlFor='lastName'>Last Name</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
                       <Input
                         disabled={pending}
-                        id='lastName'
-                        placeholder='Your last name/family name'
+                        id="lastName"
+                        placeholder="Your last name/family name"
                         defaultValue={lastName ?? ""}
                         onChange={(e) => {
-                          setLastName(e.target.value)
-                          updateSetValue("lastName", e.target.value)
+                          setLastName(e.target.value);
+                          updateSetValue("lastName", e.target.value);
                         }}
+                        className="dark:text-primary-foreground"
                       />
                     </div>
-                    <div className='space-y-2'>
-                      <Label htmlFor='email'>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">
                         Email{" "}
-                        <i className='font-light text-xs'>
+                        <i className="text-xs font-light">
                           (update to send new verification email when updated)
                         </i>
                       </Label>
                       <Input
                         disabled={pending}
-                        id='email'
-                        type='email'
+                        id="email"
+                        type="email"
                         // readOnly
-                        placeholder='Your email'
+                        placeholder="Your email"
                         defaultValue={email ?? ""}
                         onChange={(e) => {
-                          setEmail(e.target.value)
-                          updateSetValue("email", e.target.value)
+                          setEmail(e.target.value);
+                          updateSetValue("email", e.target.value);
                         }}
+                        className="dark:text-primary-foreground"
                       />
                     </div>
-                    <div className='space-y-2'>
-                      <div className='flex justify-start gap-x-2 items-center'>
-                        <Label htmlFor='name'>Artist Name/Preferred Name</Label>
-                        <p className='text-sm font-light italic'>(Optional)</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-start gap-x-2">
+                        <Label htmlFor="name">Artist Name/Preferred Name</Label>
+                        <p className="text-sm font-light italic">(Optional)</p>
                       </div>
                       <Input
-                        id='name'
-                        placeholder='Artist Name/Preferred Name'
+                        id="name"
+                        placeholder="Artist Name/Preferred Name"
                         defaultValue={name ?? ""}
                         onChange={(e) => {
-                          updateSetValue("name", e.target.value)
-                          setName(e.target.value)
+                          updateSetValue("name", e.target.value);
+                          setName(e.target.value);
                         }}
+                        className="dark:text-primary-foreground"
                       />
                     </div>
                   </div>
                   <Button
                     disabled={isSaving}
-                    type='submit'
-                    variant='salWithShadow'
-                    className='mt-4  w-full sm:w-auto'>
+                    type="submit"
+                    variant="salWithShadow"
+                    className="mt-4 w-full dark:text-primary-foreground sm:w-auto"
+                  >
                     {isSaving ? (
-                      <span className='flex items-center gap-2'>
-                        <LoaderPinwheel className='h-4 w-4 animate-spin' />
+                      <span className="flex items-center gap-2">
+                        <LoaderPinwheel className="h-4 w-4 animate-spin" />
                         Saving...
                       </span>
                     ) : (
@@ -557,7 +566,7 @@ export default function SettingsPage() {
                   Manage your account preferences
                 </CardDescription>
               </CardHeader>
-              <CardContent className='space-y-6'>
+              <CardContent className="space-y-6">
                 {/* <div className='flex items-center justify-between'>
                  //TODO: Add language selection in the future 
                    <div className='space-y-0.5'>
@@ -579,25 +588,13 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <Separator />*/}
-                <div className='flex  flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between '>
-                  <div className='space-y-0.5'>
+                <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                  <div className="space-y-0.5">
                     <Label>Timezone</Label>
-                    <p className='text-sm text-muted-foreground'>
+                    <p className="text-sm text-muted-foreground">
                       Set your local timezone
                     </p>
                   </div>
-                  {/* <Select defaultValue='est'>
-                    <SelectTrigger className='w-[180px]'>
-                      <SelectValue placeholder='Select timezone' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select> */}
 
                   <SearchMappedSelect<Timezone>
                     value={selectedTimezone ?? "GMT"}
@@ -631,10 +628,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <Separator />
-                <div className='flex  flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between '>
-                  <div className='space-y-0.5'>
+                <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                  <div className="space-y-0.5">
                     <Label>Currency</Label>
-                    <p className='text-sm text-muted-foreground'>
+                    <p className="text-sm text-muted-foreground">
                       Set your preferred currency
                     </p>
                   </div>
@@ -652,7 +649,7 @@ export default function SettingsPage() {
                   </Select> */}
 
                   <SearchMappedSelect<Currency>
-                    className='sm:w-[120px]'
+                    className="sm:w-[120px]"
                     value={selectedCurrency ?? "USD"}
                     onChange={setCurrency}
                     data={currencies[0]}
@@ -671,7 +668,7 @@ export default function SettingsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value='notifications'>
+        <TabsContent value="notifications">
           <Card>
             <CardHeader>
               <CardTitle>Notifications</CardTitle>
@@ -679,14 +676,14 @@ export default function SettingsPage() {
                 Manage your notification preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-4'>
-                    <Bell className='h-5 w-5 text-muted-foreground' />
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Bell className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <Label>Push Notifications</Label>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className="text-sm text-muted-foreground">
                         Receive push notifications
                       </p>
                     </div>
@@ -694,12 +691,12 @@ export default function SettingsPage() {
                   <Switch />
                 </div>
                 <Separator />
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-4'>
-                    <Mail className='h-5 w-5 text-muted-foreground' />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <Label>Email Notifications</Label>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className="text-sm text-muted-foreground">
                         Receive email updates
                       </p>
                     </div>
@@ -707,12 +704,12 @@ export default function SettingsPage() {
                   <Switch defaultChecked />
                 </div>
                 <Separator />
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-4'>
-                    <Globe className='h-5 w-5 text-muted-foreground' />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Globe className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <Label>Marketing Emails</Label>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className="text-sm text-muted-foreground">
                         Receive marketing emails
                       </p>
                     </div>
@@ -724,14 +721,14 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value='appearance'>
+        <TabsContent value="appearance">
           <Card>
             <CardHeader>
               <CardTitle>Appearance </CardTitle>
               <CardDescription>Customize the look and feel</CardDescription>
             </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
                 {/* <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-4'>
                     <Moon className='h-5 w-5 text-muted-foreground' />
@@ -745,14 +742,14 @@ export default function SettingsPage() {
                   <Switch defaultChecked disabled />
                 </div> */}
                 <Separator />
-                <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between '>
-                  <div className='flex items-center gap-4'>
-                    <Palette className='h-5 w-5 text-muted-foreground' />
+                <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                  <div className="flex items-center gap-4">
+                    <Palette className="h-5 w-5 text-muted-foreground" />
                     <div>
                       {/* 
                       TODO: Add theme (just use useTheme() hook and set the theme to whatever they choose + add it to their preferences to load on startup on any new devices) */}
                       <Label>Theme Color</Label>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className="text-sm text-muted-foreground">
                         Choose your theme color
                       </p>
                     </div>
@@ -760,19 +757,20 @@ export default function SettingsPage() {
                   <Select
                     defaultValue={userPrefs?.theme ?? theme}
                     onValueChange={(value) => {
-                      setThemePref(value)
-                      setTheme(value)
-                    }}>
-                    <SelectTrigger className='w-full sm:w-[180px]'>
-                      <SelectValue placeholder='Select color' />
+                      setThemePref(value);
+                      setTheme(value);
+                    }}
+                  >
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Select color" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='default'>
+                      <SelectItem value="default">
                         Default (SAL Yellow)
                       </SelectItem>
-                      <SelectItem value='light'>Light</SelectItem>
-                      <SelectItem value='dark'>Dark</SelectItem>
-                      <SelectItem value='white'>White</SelectItem>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="white">White</SelectItem>
                       {/* <SelectItem value='orange'>Orange</SelectItem> */}
                     </SelectContent>
                   </Select>
@@ -782,15 +780,15 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value='security'>
-          <div className='space-y-6'>
+        <TabsContent value="security">
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Security</CardTitle>
                 <CardDescription>Manage your security settings</CardDescription>
               </CardHeader>
-              <CardContent className='space-y-6'>
-                <div className='space-y-4'>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
                   {/* <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
                       <Lock className='h-5 w-5 text-muted-foreground' />
@@ -807,12 +805,12 @@ export default function SettingsPage() {
                     </Button>
                   </div>
                   <Separator />*/}
-                  <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between px-4'>
-                    <div className='flex items-center gap-4 '>
-                      <Shield className='h-5 w-5 text-muted-foreground' />
+                  <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="flex items-center gap-4">
+                      <Shield className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <Label>Password</Label>
-                        <p className='text-sm text-muted-foreground'>
+                        <p className="text-sm text-muted-foreground">
                           Change your password
                         </p>
                       </div>
@@ -820,12 +818,13 @@ export default function SettingsPage() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
-                          variant='outline'
-                          className='min-w-[150px] w-full sm:w-auto'>
+                          variant="outline"
+                          className="w-full min-w-[150px] sm:w-auto"
+                        >
                           Update
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className='sm:max-w-[425px]'>
+                      <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                           <DialogTitle>Edit profile</DialogTitle>
                           <DialogDescription>
@@ -838,14 +837,15 @@ export default function SettingsPage() {
 
                         <form
                           onSubmit={handleSubmit(handleUpdatePasswordSubmit)}
-                          className='space-y-2'>
-                          <div className='space-y-1'>
-                            <Label htmlFor='current' className='text-right'>
+                          className="space-y-2"
+                        >
+                          <div className="space-y-1">
+                            <Label htmlFor="current" className="text-right">
                               Current password
                             </Label>
-                            <div className='relative'>
+                            <div className="relative">
                               <Input
-                                id='current'
+                                id="current"
                                 type={showCurrentPassword ? "text" : "password"}
                                 placeholder={
                                   !showCurrentPassword
@@ -857,31 +857,32 @@ export default function SettingsPage() {
                                 })}
                               />
                               <button
-                                type='button'
+                                type="button"
                                 onClick={() =>
                                   setShowCurrentPassword((prev) => !prev)
                                 }
-                                className='absolute inset-y-0 right-0 flex items-center pr-3'>
+                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                              >
                                 {showCurrentPassword ? (
-                                  <Eye className='size-4 text-foreground' />
+                                  <Eye className="size-4 text-foreground" />
                                 ) : (
-                                  <EyeOff className='size-4 text-foreground' />
+                                  <EyeOff className="size-4 text-foreground" />
                                 )}
                               </button>
                             </div>
                             {errors.oldPassword && (
-                              <p className='text-destructive text-sm'>
+                              <p className="text-sm text-destructive">
                                 {errors.oldPassword.message}
                               </p>
                             )}
                           </div>
-                          <div className='space-y-1'>
-                            <Label htmlFor='new' className='text-right'>
+                          <div className="space-y-1">
+                            <Label htmlFor="new" className="text-right">
                               New password
                             </Label>
-                            <div className='relative'>
+                            <div className="relative">
                               <Input
-                                id='new'
+                                id="new"
                                 type={showNewPassword ? "text" : "password"}
                                 placeholder={
                                   !showNewPassword ? "********" : "New Password"
@@ -891,20 +892,21 @@ export default function SettingsPage() {
                                 })}
                               />
                               <button
-                                type='button'
+                                type="button"
                                 onClick={() =>
                                   setShowNewPassword((prev) => !prev)
                                 }
-                                className='absolute inset-y-0 right-0 flex items-center pr-3'>
+                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                              >
                                 {showNewPassword ? (
-                                  <Eye className='size-4 text-foreground' />
+                                  <Eye className="size-4 text-foreground" />
                                 ) : (
-                                  <EyeOff className='size-4 text-foreground' />
+                                  <EyeOff className="size-4 text-foreground" />
                                 )}
                               </button>
                             </div>
                             {errors.newPassword && (
-                              <p className='text-destructive text-sm'>
+                              <p className="text-sm text-destructive">
                                 {errors.newPassword.message}
                               </p>
                             )}
@@ -912,9 +914,10 @@ export default function SettingsPage() {
 
                           <DialogFooter>
                             <Button
-                              className='w-full mt-3'
-                              variant='salWithShadow'
-                              type='submit'>
+                              className="mt-3 w-full"
+                              variant="salWithShadow"
+                              type="submit"
+                            >
                               Update Password
                             </Button>
                           </DialogFooter>
@@ -932,27 +935,28 @@ export default function SettingsPage() {
                 <CardDescription>Manage your active sessions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className='space-y-4'>
-                  <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between px-4'>
-                    <p className='font-medium'>Current Session</p>
+                <div className="space-y-4">
+                  <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <p className="font-medium">Current Session</p>
                     <div>
                       {/* <p className='text-sm text-muted-foreground'>
                         Last active: Just now
                       </p> */}
                     </div>
                     <Button
-                      type='button'
-                      variant='outline'
-                      className='text-destructive min-w-[150px]  w-full sm:w-auto'
-                      onClick={signOut}>
+                      type="button"
+                      variant="outline"
+                      className="w-full min-w-[150px] text-destructive sm:w-auto"
+                      onClick={signOut}
+                    >
                       Sign Out
                     </Button>
                   </div>
                   <Separator />
-                  <div className='flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:justify-between px-4'>
+                  <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div>
-                      <p className='font-medium'>Other Sessions</p>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className="font-medium">Other Sessions</p>
+                      <p className="text-sm text-muted-foreground">
                         {sessionCount ?? 0} active session
                         {sessionCount && sessionCount > 1 ? "s" : ""}
                       </p>
@@ -961,19 +965,20 @@ export default function SettingsPage() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
-                          type='button'
-                          variant='outline'
-                          className='text-destructive min-w-[150px]  w-full sm:w-auto'>
+                          type="button"
+                          variant="outline"
+                          className="w-full min-w-[150px] text-destructive sm:w-auto"
+                        >
                           Sign Out All
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-foreground'>
+                      <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className='text-foreground'>
+                          <AlertDialogTitle className="text-foreground">
                             Sign out all sessions?
                           </AlertDialogTitle>
                         </AlertDialogHeader>
-                        <AlertDialogDescription className='text-foreground'>
+                        <AlertDialogDescription className="text-foreground">
                           Are you sure you want to sign out of all your
                           sessions? You&apos;ll need to re-login on all devices.
                         </AlertDialogDescription>
@@ -988,10 +993,10 @@ export default function SettingsPage() {
                     </AlertDialog>
                   </div>
                   <Separator />
-                  <div className=' flex flex-col items-start justify-start gap-y-2 md:items-center md:flex-row md:gap-y-0 md:gap-x-4 md:justify-between  bg-destructive/10 p-4 rounded-lg'>
+                  <div className="flex flex-col items-start justify-start gap-y-2 rounded-lg bg-destructive/10 p-4 md:flex-row md:items-center md:justify-between md:gap-x-4 md:gap-y-0">
                     <div>
-                      <p className='font-medium'>Delete Account</p>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className="font-medium">Delete Account</p>
+                      <p className="text-sm text-muted-foreground">
                         Permanently delete your account — any active
                         subscriptions need to be canceled before this is
                         possible
@@ -1001,19 +1006,20 @@ export default function SettingsPage() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
-                          type='button'
-                          variant='destructive'
-                          className=' min-w-[150px]  w-full sm:w-auto'>
+                          type="button"
+                          variant="destructive"
+                          className="w-full min-w-[150px] sm:w-auto"
+                        >
                           Delete Account
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className='w-[80dvw] bg-salYellow text-foreground'>
+                      <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className='text-foreground'>
+                          <AlertDialogTitle className="text-foreground">
                             Sign out all sessions?
                           </AlertDialogTitle>
                         </AlertDialogHeader>
-                        <AlertDialogDescription className='text-foreground'>
+                        <AlertDialogDescription className="text-foreground">
                           Are you sure you want to delete your account? Any
                           active subscriptions need to be canceled before this
                           is possible and all data will be permanently deleted.
@@ -1035,5 +1041,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

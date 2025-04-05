@@ -131,7 +131,7 @@ NavBarProps) {
         transition={{ duration: 0.3, ease: "easeOut" }}
         className="fixed left-0 right-0 top-0 z-[51] h-25 border-foreground bg-background"
       >
-        <div className="mx-auto flex h-full w-screen items-center px-8 md:grid md:grid-cols-[300px_auto_200px]">
+        <div className="mx-auto flex h-full w-screen items-center px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
           {/* Mobile Logo and Navigation */}
 
           <div className="flex items-center gap-2 lg:hidden">

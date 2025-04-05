@@ -37,6 +37,7 @@ import {
   PiHouseLineFill,
   PiPencilLineFill,
 } from "react-icons/pi";
+import { TiArrowRight } from "react-icons/ti";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TbStairs } from "react-icons/tb";
@@ -83,6 +84,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
     slug,
   } = event;
   //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
+
+  const orgHasOtherEvents = organizer?.events?.length > 1;
 
   const manualApplied =
     artist?.applications?.find((app) => app.openCallId === openCall._id)
@@ -198,8 +201,10 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
         )
       : null;
 
-  const hasBudget = budgetMin > 0 || (budgetMax && budgetMax > 0);
-  const hasRate = budgetRate && budgetRate > 0;
+  const hasBudget = !!(budgetMin > 0 || (budgetMax && budgetMax > 0));
+  const hasRate = !!budgetRate && budgetRate > 0;
+  const noBudgetInfo = !hasBudget && !hasRate;
+
   const { toggleListAction } = useToggleListAction(event._id);
 
   const onBookmark = () => {
@@ -216,7 +221,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
   }, []);
   return (
     <>
-      ---------------------- Mobile Layout ----------------------
+      {/* ---------------------- Mobile Layout ---------------------- */}
       <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 lg:hidden">
         {status !== null && !manualApplied && (
           <span
@@ -433,11 +438,33 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                       title=" Budget & Compensation:"
                       hasPreview
                       hidePreview
-                      className="mx-auto"
+                      className="w-full"
                     >
-                      <section className="flex w-full flex-col items-center justify-center">
-                        <br />
-                        {/* ----------------- Preview Section ------------------/ */}
+                      <section className="flex w-full flex-col items-center justify-center gap-y-3 pt-2">
+                        <div className="flex justify-start">
+                          {hasBudget &&
+                            formatCurrency(
+                              budgetMin,
+                              budgetMax,
+                              currency,
+                              false,
+                              allInclusive,
+                            )}
+
+                          {hasBudget && hasRate && (
+                            <span className="text-sm"> | </span>
+                          )}
+
+                          {hasRate &&
+                            formatRate(
+                              budget.rate,
+                              budget.unit,
+                              budget.currency,
+                              true,
+                            )}
+
+                          {noBudgetInfo && <p className="text-sm">No Info</p>}
+                        </div>
 
                         <div
                           id="budget-icons-${id}"
@@ -543,6 +570,8 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               budget.currency,
                               true,
                             )}
+
+                          {noBudgetInfo && <p className="text-sm">No Info</p>}
                         </p>
                         <p className="font-semibold underline underline-offset-2">
                           Compensation Includes:
@@ -558,8 +587,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                                 // formatCurrency(designFee, null, currency)
                                 designFee
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "No Info"}
                                 </span>
                               )}
                             </p>
@@ -571,8 +605,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {accommodation && !allInclusive ? (
                                 accommodation
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -583,8 +622,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {food && !allInclusive ? (
                                 food
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -595,8 +639,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {travelCosts && !allInclusive ? (
                                 travelCosts
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -606,8 +655,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                             {materials && !allInclusive ? (
                               materials
                             ) : (
-                              <span className="italic text-red-500">
-                                (not provided)
+                              <span
+                                className={cn(
+                                  "italic text-red-500",
+                                  noBudgetInfo && "text-muted-foreground",
+                                )}
+                              >
+                                {!noBudgetInfo ? "(not provided)" : "-"}
                               </span>
                             )}
                           </div>
@@ -618,8 +672,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {equipment && !allInclusive ? (
                                 equipment
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -632,7 +691,9 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                                   other
                                 ) : (
                                   <span className="italic text-red-500">
-                                    (not provided)
+                                    {!noBudgetInfo
+                                      ? "(not provided)"
+                                      : "No Info"}
                                   </span>
                                 )}
                               </p>
@@ -840,7 +901,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                     <p className="line-clamp-2 text-sm font-bold">
                       {organizer.name}
                     </p>
-                    <p className="text-sm font-medium">{orgLocationString}</p>
+                    <p className="text-sm">{orgLocationString}</p>
                   </div>
                 </div>
                 <div className="w-full space-y-5">
@@ -893,66 +954,70 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                       {organizer.links.website && (
                         <a
                           href={organizer.links.website}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <Globe className="h-6 w-6" />
+                          <Globe className="size-6" />
                         </a>
                       )}
                       {organizer.links.email && (
                         <a
                           href={`mailto:${organizer.links.email}`}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaEnvelope className="h-6 w-6" />
+                          <FaEnvelope className="size-6" />
                         </a>
                       )}
                       {organizer.links.phone && (
                         <a
                           href={`tel:${organizer.links.phone}`}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <Phone className="h-6 w-6" />
+                          <Phone className="size-6" />
                         </a>
                       )}
                       {organizer.links.instagram && (
                         <a
                           href={organizer.links.instagram}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaInstagram className="h-6 w-6" />
+                          <FaInstagram className="size-6" />
                         </a>
                       )}
                       {organizer.links.facebook && (
                         <a
                           href={organizer.links.facebook}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaFacebook className="h-6 w-6" />
+                          <FaFacebook className="size-6" />
                         </a>
                       )}
                       {organizer.links.threads && (
                         <a
                           href={organizer.links.threads}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaThreads className="h-6 w-6" />
+                          <FaThreads className="size-6" />
                         </a>
                       )}
                       {organizer.links.vk && (
                         <a
                           href={organizer.links.vk}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaVk className="h-6 w-6" />
+                          <FaVk className="size-6" />
                         </a>
                       )}
                     </div>
-                    <a
-                      className="mt-6 line-clamp-4 text-center text-sm underline-offset-2 hover:underline"
-                      href={`/organizer/${orgSlug}`}
-                    >
-                      Check out {organizer.name}&apos;s other events
-                    </a>
+                    {orgHasOtherEvents && (
+                      <a
+                        className="mt-6 line-clamp-4 flex items-center justify-center gap-1 text-sm underline-offset-2 hover:underline"
+                        href={`/organizer/${orgSlug}`}
+                      >
+                        See other events by this organizer
+                        <TiArrowRight className="size-6" />
+                        {/* Check out {organizer.name}&apos;s other events */}
+                      </a>
+                    )}
                   </section>
                 </div>
 
@@ -1189,11 +1254,35 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                       title=" Budget & Compensation:"
                       hasPreview
                       hidePreview
-                      className="mx-auto"
+                      className="w-full"
                     >
-                      <section className="flex w-full flex-col items-center justify-center">
-                        <br />
-                        {/* ----------------- Preview Section ------------------/ */}
+                      {/* ----------------- Preview Section ------------------/ */}
+                      {/*todo: add functionality for cases where no budget/no info is present*/}
+                      <section className="flex w-full flex-col items-center justify-center gap-y-3 pt-2">
+                        <div className="flex justify-start">
+                          {hasBudget &&
+                            formatCurrency(
+                              budgetMin,
+                              budgetMax,
+                              currency,
+                              false,
+                              allInclusive,
+                            )}
+
+                          {hasBudget && hasRate && (
+                            <span className="text-sm"> | </span>
+                          )}
+
+                          {hasRate &&
+                            formatRate(
+                              budget.rate,
+                              budget.unit,
+                              budget.currency,
+                              true,
+                            )}
+
+                          {noBudgetInfo && <p className="text-sm">No Info</p>}
+                        </div>
 
                         <div
                           id="budget-icons-${id}"
@@ -1274,32 +1363,32 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="mb-4 flex flex-col space-y-3 pb-3">
-                        <p>
+                        <div className="flex items-center gap-x-1">
                           <span className="font-semibold underline underline-offset-2">
                             Budget:
                           </span>
-                          <br />
-                          {hasBudget &&
-                            formatCurrency(
-                              budgetMin,
-                              budgetMax,
-                              currency,
-                              false,
-                              allInclusive,
+                          <span>
+                            {hasBudget &&
+                              formatCurrency(
+                                budgetMin,
+                                budgetMax,
+                                currency,
+                                false,
+                                allInclusive,
+                              )}
+                            {hasBudget && hasRate && (
+                              <span className="text-sm"> | </span>
                             )}
-
-                          {hasBudget && hasRate && (
-                            <span className="text-sm"> | </span>
-                          )}
-
-                          {hasRate &&
-                            formatRate(
-                              budget.rate,
-                              budget.unit,
-                              budget.currency,
-                              true,
-                            )}
-                        </p>
+                            {hasRate &&
+                              formatRate(
+                                budget.rate,
+                                budget.unit,
+                                budget.currency,
+                                true,
+                              )}
+                            {noBudgetInfo && <p className="text-sm">No Info</p>}
+                          </span>
+                        </div>
                         <p className="font-semibold underline underline-offset-2">
                           Compensation Includes:
                         </p>
@@ -1314,8 +1403,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                                 // formatCurrency(designFee, null, currency)
                                 designFee
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -1327,8 +1421,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {accommodation && !allInclusive ? (
                                 accommodation
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -1339,8 +1438,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {food && !allInclusive ? (
                                 food
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -1351,8 +1455,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {travelCosts && !allInclusive ? (
                                 travelCosts
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -1362,8 +1471,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                             {materials && !allInclusive ? (
                               materials
                             ) : (
-                              <span className="italic text-red-500">
-                                (not provided)
+                              <span
+                                className={cn(
+                                  "italic text-red-500",
+                                  noBudgetInfo && "text-muted-foreground",
+                                )}
+                              >
+                                {!noBudgetInfo ? "(not provided)" : "-"}
                               </span>
                             )}
                           </div>
@@ -1374,8 +1488,13 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                               {equipment && !allInclusive ? (
                                 equipment
                               ) : (
-                                <span className="italic text-red-500">
-                                  (not provided)
+                                <span
+                                  className={cn(
+                                    "italic text-red-500",
+                                    noBudgetInfo && "text-muted-foreground",
+                                  )}
+                                >
+                                  {!noBudgetInfo ? "(not provided)" : "-"}
                                 </span>
                               )}
                             </p>
@@ -1388,7 +1507,9 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                                   other
                                 ) : (
                                   <span className="italic text-red-500">
-                                    (not provided)
+                                    {!noBudgetInfo
+                                      ? "(not provided)"
+                                      : "No Info"}
                                   </span>
                                 )}
                               </p>
@@ -1596,7 +1717,7 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                     <p className="line-clamp-2 text-sm font-bold">
                       {organizer.name}
                     </p>
-                    <p className="text-sm font-medium">{orgLocationString}</p>
+                    <p className="text-sm">{orgLocationString}</p>
                   </div>
                 </div>
                 <div className="w-full space-y-5">
@@ -1649,66 +1770,70 @@ const OpenCallCardDetail = (props: OpenCallCardDetailProps) => {
                       {organizer.links.website && (
                         <a
                           href={organizer.links.website}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <Globe className="h-6 w-6" />
+                          <Globe className="size-6" />
                         </a>
                       )}
                       {organizer.links.email && (
                         <a
                           href={`mailto:${organizer.links.email}`}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaEnvelope className="h-6 w-6" />
+                          <FaEnvelope className="size-6" />
                         </a>
                       )}
                       {organizer.links.phone && (
                         <a
                           href={`tel:${organizer.links.phone}`}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <Phone className="h-6 w-6" />
+                          <Phone className="size-6" />
                         </a>
                       )}
                       {organizer.links.instagram && (
                         <a
                           href={organizer.links.instagram}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaInstagram className="h-6 w-6" />
+                          <FaInstagram className="size-6" />
                         </a>
                       )}
                       {organizer.links.facebook && (
                         <a
                           href={organizer.links.facebook}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaFacebook className="h-6 w-6" />
+                          <FaFacebook className="size-6" />
                         </a>
                       )}
                       {organizer.links.threads && (
                         <a
                           href={organizer.links.threads}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaThreads className="h-6 w-6" />
+                          <FaThreads className="size-6" />
                         </a>
                       )}
                       {organizer.links.vk && (
                         <a
                           href={organizer.links.vk}
-                          className="h-6 w-6 hover:scale-110"
+                          className="size-6 hover:scale-110"
                         >
-                          <FaVk className="h-6 w-6" />
+                          <FaVk className="size-6" />
                         </a>
                       )}
                     </div>
-                    <a
-                      className="mt-6 line-clamp-4 text-center text-sm underline-offset-2 hover:underline"
-                      href={`/organizer/${orgSlug}`}
-                    >
-                      Check out {organizer.name}&apos;s other events
-                    </a>
+                    {orgHasOtherEvents && (
+                      <a
+                        className="mt-6 line-clamp-4 flex items-center justify-center gap-1 text-sm underline-offset-2 hover:underline"
+                        href={`/organizer/${orgSlug}`}
+                      >
+                        Check out other events by this organizer
+                        <TiArrowRight className="inline-block size-6" />
+                        {/* Check out {organizer.name}&apos;s other events */}
+                      </a>
+                    )}
                   </section>
                 </div>
 

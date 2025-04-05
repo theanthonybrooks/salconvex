@@ -16,6 +16,10 @@ body,
 :root {
   height: 100vh;
   height: 100dvh;
+  font-variant-ligatures: none;
+  font-feature-settings:
+    "liga" 0,
+    "clig" 0;
 }
 
 /* body {
@@ -28,6 +32,7 @@ body,
     --sal-yellow-light: 50 100% 80%; /* #ffe770 */
     --sal-yellow-lt-hover: 50 100% 85%; /* #ffe770 */
     --sal-yellow-dark: 50 70% 62%; /* #ffe770 */
+    --dashboard-bg-lt: 83 50% 95%;
 
     /* --sal-yellow-old: hsl(50 100% 72%); /* #ffe770 */
     --sal-pink-dark: 303 70% 62%; /* #ff7bff #f4a9f6 */
@@ -124,6 +129,7 @@ body,
     --card: 40, 1%, 11%;
 
     --card-foreground: 38 0% 80%;
+    --dashboard-bg-lt: 45 0% 20%;
 
     --popover: 45.2 4% 18.9%;
 
@@ -188,6 +194,7 @@ body,
     /* --background: 0 0% 100%; */
     --background: 50 100% 72%;
     --background-dark: 50 70% 52%;
+    --dashboard-bg-lt: 50 100% 90%;
 
     --sal-progress: var(rgb(240, 121, 244));
     --user-icon: 0, 0%, 100%;

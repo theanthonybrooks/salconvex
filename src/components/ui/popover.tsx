@@ -63,7 +63,7 @@ const PopoverContent = React.forwardRef<
         <CustomArrow />
         <PopoverPrimitive.Close
           aria-label="Close popover"
-          className="absolute right-3 top-3 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
+          className="absolute right-3 top-2 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
         >
           {showCloseButton && (
             <X className="size-6 text-black/80 hover:text-red-600" />

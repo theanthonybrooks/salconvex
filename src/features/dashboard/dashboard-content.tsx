@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 interface DashboardContentProps {
-  children: React.ReactNode
+  children: React.ReactNode;
   //   setIsScrolled?: (value: boolean) => void
 }
 
@@ -10,8 +10,8 @@ export default function DashboardContent({
 }: //   setIsScrolled,
 DashboardContentProps) {
   return (
-    <main className='flex-1 scrollable max-h-[calc(100dvh-80px)]'>
+    <main className="scrollable bg-dashboardBgLt max-h-[calc(100dvh-80px)] flex-1 white:bg-stone-200">
       {children}
     </main>
-  )
+  );
 }
