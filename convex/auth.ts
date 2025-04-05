@@ -123,7 +123,8 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
       await ctx.db.insert("userPreferences", {
         userId: newUserId,
-        timezone: "GMT",
+        //todo: how to use this... do I enter a blank value for the timezone or leave it empty unless chosen? same for currency. Planning to leave currency as USD is the default shown, but for timezone, will leave it blank.
+        timezone: "",
         language: "EN",
         currency: "USD",
         theme: "default",

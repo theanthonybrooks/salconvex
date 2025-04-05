@@ -1,4 +1,6 @@
-import { SubmissionFormState } from "@/types/event";
+import { ArtistFull } from "@/types/artist";
+import { EventData, SubmissionFormState } from "@/types/event";
+import { Organizer } from "@/types/organizer";
 import { Id } from "~/convex/_generated/dataModel";
 
 export type CallType =
@@ -97,4 +99,10 @@ export interface OpenCallApplication {
   artistId: string;
   applicationId: string;
   applicationStatus: ApplicationStatus;
+}
+
+export interface OpenCallCardProps {
+  data: { event: EventData; openCall: OpenCall; organizer: Organizer };
+  artist?: ArtistFull | null; //todo:make this required
+  className?: string;
 }

@@ -209,3 +209,21 @@ export async function fetchTimezoneFromCoordinates(
   if (data.status === "OK") return data.zoneName;
   return undefined;
 }
+
+/**
+ * Converts a datetime-local input and IANA timezone into a properly
+ * formatted ISO 8601 string with the correct offset.
+ *
+ * @param localInput - A datetime string like '2025-03-15T08:00'
+ * @param timeZone - An IANA time zone, e.g. 'America/Chicago'
+ * @returns ISO 8601 string with offset, e.g. '2025-03-15T08:00:00-05:00'
+ */
+export function formatToZonedISOString(
+  localInput: string,
+  timeZone: string,
+): string {
+  const zoned = DateTime.fromISO(localInput, { zone: timeZone });
+
+  // Return ISO string with offset (includes -05:00 or -06:00)
+  return zoned.toISO() ?? "";
+}

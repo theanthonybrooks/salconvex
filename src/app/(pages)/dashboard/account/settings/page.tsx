@@ -583,7 +583,7 @@ export default function SettingsPage() {
                       <SelectItem value='en'>English</SelectItem>
                       <SelectItem value='fr'>French</SelectItem>
                       <SelectItem value='de'>German</SelectItem>
-                      <SelectItem value='es'>Spanish</SelectItem>
+                      // <SelectItem value='es'>Spanish</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -591,9 +591,14 @@ export default function SettingsPage() {
                 <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                   <div className="space-y-0.5">
                     <Label>Timezone</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Set your local timezone
-                    </p>
+                    <span className="flex items-center gap-x-1">
+                      <p className="text-sm text-muted-foreground">
+                        Set your local timezone
+                      </p>
+                      <p className="hidden text-xs italic text-muted-foreground lg:block">
+                        (if you want it used to display deadlines)
+                      </p>
+                    </span>
                   </div>
 
                   <SearchMappedSelect<Timezone>

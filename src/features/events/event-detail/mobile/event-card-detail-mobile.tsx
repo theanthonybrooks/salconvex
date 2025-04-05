@@ -36,16 +36,17 @@ import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatEventDates, isValidIsoDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
-import { EventCardDetailProps } from "@/types/event";
+import { EventCardProps } from "@/types/event";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import slugify from "slugify";
 
-const EventCardDetail = (props: EventCardDetailProps) => {
+export const EventCardDetailMobile = (props: EventCardProps) => {
   const {
     data,
     artist,
+    className,
     // openCall,
     // organizer,
   } = props;
@@ -135,7 +136,12 @@ const EventCardDetail = (props: EventCardDetailProps) => {
   };
 
   return (
-    <Card className="mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6">
+    <Card
+      className={cn(
+        "mb-10 grid w-full min-w-[340px] max-w-[400px] grid-cols-[75px_auto] gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6",
+        className,
+      )}
+    >
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
         <div className="col-span-1 flex flex-col items-center justify-around space-y-6 pb-3 pt-3">
           <Image
@@ -496,5 +502,3 @@ const EventCardDetail = (props: EventCardDetailProps) => {
     </Card>
   );
 };
-
-export default EventCardDetail;

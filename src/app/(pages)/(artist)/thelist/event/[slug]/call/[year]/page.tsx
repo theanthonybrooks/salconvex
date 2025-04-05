@@ -1,6 +1,7 @@
 "use client";
 
-import OpenCallCardDetail from "@/features/events/open-calls/opencall-card-detail";
+import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
+import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
 import { useQuery } from "convex-helpers/react/cache";
 import { LoaderPinwheel } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ const OpenCallDetail = () => {
     // }, 50); // small delay gives time for back nav
     // router.refresh(); // try to ensure that the page has a sec to load
   };
+  //todo: add userPref check to get timezone if it exists. If not, use the timezone from the open call.
 
   // console.log("call data", data);
 
@@ -44,7 +46,19 @@ const OpenCallDetail = () => {
           Loading <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <OpenCallCardDetail data={data} artist={artistData?.artist} />
+        // <OpenCallCardDetail data={data} artist={artistData?.artist} />
+        <>
+          <OpenCallCardDetailMobile
+            data={data}
+            artist={artistData?.artist}
+            className="lg:hidden"
+          />
+          <OpenCallCardDetailDesktop
+            data={data}
+            artist={artistData?.artist}
+            className="hidden lg:block"
+          />
+        </>
       )}
     </div>
   );

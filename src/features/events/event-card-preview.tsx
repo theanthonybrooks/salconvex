@@ -532,7 +532,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   </span>
                 )}
               </p>
-              <p className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-2">
                 <span className="font-semibold">Budget:</span>
                 {publicView ? (
                   <span className="pointer-events-none blur-[5px]">
@@ -571,7 +571,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                     )}
                   </>
                 )}
-              </p>
+              </div>
               {!publicView && (
                 <div
                   id="budget-icons-${id}"

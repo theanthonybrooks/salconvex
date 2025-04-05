@@ -67,3 +67,9 @@ export interface EventCardDetailProps {
   data: { event: EventData; openCall: OpenCall; organizer: Organizer };
   artist?: ArtistFull | null;
 }
+
+export interface EventCardProps {
+  data: { event: EventData; organizer: Organizer };
+  artist?: ArtistFull | null; //todo:make this required
+  className?: string;
+}

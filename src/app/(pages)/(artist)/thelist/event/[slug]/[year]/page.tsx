@@ -1,6 +1,7 @@
 "use client";
 
-import EventCardDetail from "@/features/events/event-card-detail";
+import EventCardDetailDesktop from "@/features/events/event-detail/desktop/event-card-detail-desktop";
+import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
 import { useQuery } from "convex-helpers/react/cache";
 import { LoaderPinwheel } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -60,7 +61,18 @@ const Event = () => {
           Loading <LoaderPinwheel className="animate-spin" />
         </span>
       ) : (
-        <EventCardDetail data={data} artist={artistData?.artist} />
+        <>
+          <EventCardDetailMobile
+            data={data}
+            artist={artistData?.artist}
+            className="lg:hidden"
+          />
+          <EventCardDetailDesktop
+            data={data}
+            artist={artistData?.artist}
+            className="hidden lg:block"
+          />
+        </>
       )}
     </div>
   );
