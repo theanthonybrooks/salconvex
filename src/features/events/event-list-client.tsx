@@ -36,8 +36,6 @@ Props) => {
   const searchParams = useSearchParams();
   const allEvents = useEventPreviewCards();
   const isLoading = allEvents?.length === 0;
-
-  console.log(isLoading);
   const hasResults = allEvents?.length > 0;
 
   // console.log("allEvents", allEvents)
@@ -137,7 +135,7 @@ Props) => {
     > = {};
     const orderedGroupKeys: string[] = [];
 
-    const list = publicView ? paginatedEvents.slice(0, 10) : paginatedEvents;
+    const list = publicView ? paginatedEvents.slice(0, 5) : paginatedEvents;
 
     for (const event of list) {
       const title = getGroupKeyFromEvent(event, sortOptions.sortBy);

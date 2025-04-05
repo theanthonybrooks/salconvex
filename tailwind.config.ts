@@ -34,6 +34,7 @@ export default {
       },
       colors: {
         background: "hsl(var(--background))",
+        backgroundHex: "var(--background-hex)",
         backgroundDark: "hsl(var(--background-dark))",
         dashboardBgLt: "hsl(var(--dashboard-bg-lt))",
         foreground: "hsl(var(--foreground))",

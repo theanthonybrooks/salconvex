@@ -1,3 +1,4 @@
+import SalHeader from "@/components/ui/sal-header";
 import ClientEventList from "@/features/events/event-list-client";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
@@ -22,13 +23,16 @@ const TheList = async () => {
   const publicView = !token || !subStatus?.hasActiveSubscription;
 
   return (
-    <div className="max-w-screen flex flex-col items-center px-4">
-      <ClientEventList
-        // initialEvents={testEventData}
-        publicView={publicView}
-        userPref={userPref}
-      />
-    </div>
+    <>
+      <SalHeader />
+      <main className="min-w-screen max-w-screen flex min-h-screen flex-col items-center px-4">
+        <ClientEventList
+          // initialEvents={testEventData}
+          publicView={publicView}
+          userPref={userPref}
+        />
+      </main>
+    </>
   );
 };
 

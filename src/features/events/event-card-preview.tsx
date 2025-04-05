@@ -404,7 +404,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           />
         </div>
 
-        <div className="flex flex-col gap-y-3 pb-3 pl-3 pt-5">
+        <div className="flex flex-col gap-y-3 pb-3 pl-3 pr-7 pt-5">
           <div className="mb-2 flex flex-col gap-y-1 p-2">
             <Link
               href={
