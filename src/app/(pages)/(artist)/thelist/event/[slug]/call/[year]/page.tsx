@@ -36,9 +36,9 @@ const OpenCallDetail = () => {
     <div className="flex flex-col items-center px-4">
       <div
         onClick={onBackClick}
-        className="flex cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline"
+        className="flex cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline md:hidden"
       >
-        <IoIosArrowRoundBack className="h-6 w-6" /> back to The List
+        <IoIosArrowRoundBack className="size-6" /> back to The List
       </div>
       {!data ? (
         // <p>Event: {data?.event.name}</p>

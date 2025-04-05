@@ -94,17 +94,20 @@ export default function FolderTabs() {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   return (
-    <div className="folder-container">
+    <div className="folder-container rotate-90">
       <div className="folder">
         <div className="tabs">
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={cn("tab", activeTab === tab.id && "active")}
+              className={cn(
+                "tab bg-yellow-100 px-2 py-2 before:bg-yellow-100 after:bg-yellow-100",
+                activeTab === tab.id ? "active" : "translate-y-1",
+              )}
               onClick={() => setActiveTab(tab.id)}
             >
-              <div>
-                <span>{tab.label}</span>
+              <div className="bg-yellow-100">
+                <span className="py-2">{tab.label}</span>
               </div>
             </button>
           ))}
@@ -116,11 +119,11 @@ export default function FolderTabs() {
               key={tab.id}
               id={tab.id}
               className={cn(
-                "content inner bg-backgroundHex",
+                "content inner bg-yellow-100",
                 activeTab !== tab.id && "hidden",
               )}
             >
-              <div className="page">{tab.content}</div>
+              <div className="p-4">{tab.content}</div>
             </div>
           ))}
         </div>
