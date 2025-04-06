@@ -5,173 +5,66 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { Minus, Plus } from "lucide-react";
 import * as React from "react";
 
-// Updated: Support multiple values
-interface AccordionProps
-  extends Omit<
-    React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Root>,
-    "type" | "value" | "defaultValue" | "onValueChange"
-  > {
-  defaultValue?: string[];
-  collapsible?: boolean;
-}
-
-// Context for tracking open values
-const AccordionContext = React.createContext<{
-  openValues: string[];
-  setOpenValues: React.Dispatch<React.SetStateAction<string[]>>;
-}>({
-  openValues: [],
-  setOpenValues: () => {},
-});
-
-interface AccordionItemContextProps {
-  value: string;
-  triggerProps?: Partial<AccordionTriggerProps>;
-}
-
-const AccordionItemContext = React.createContext<AccordionItemContextProps>({
-  value: "",
-});
-
-const AccordionItemUpdateContext = React.createContext<{
-  setTriggerProps?: (props: Partial<AccordionTriggerProps>) => void;
-}>({});
-
-// Root Accordion component (multiple)
-const AccordionMult = ({
-  children,
-  defaultValue = [],
-  ...props
-}: AccordionProps) => {
-  const [openValues, setOpenValues] = React.useState<string[]>(defaultValue);
-
-  return (
-    <AccordionContext.Provider value={{ openValues, setOpenValues }}>
-      <AccordionPrimitive.Root
-        type="multiple"
-        value={openValues}
-        onValueChange={setOpenValues}
-        {...props}
-      >
-        {children}
-      </AccordionPrimitive.Root>
-    </AccordionContext.Provider>
-  );
-};
-
-interface AccordionItemProps
-  extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item> {
-  value: string;
-}
+// Accordion Root — supports both single & multiple
+const AccordionMult = AccordionPrimitive.Root;
 
 const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
-  AccordionItemProps
->(({ className, value, ...props }, ref) => {
-  const [triggerProps, setTriggerProps] = React.useState<
-    Partial<AccordionTriggerProps>
-  >({});
-
-  return (
-    <AccordionItemContext.Provider value={{ value, triggerProps }}>
-      <AccordionItemUpdateContext.Provider value={{ setTriggerProps }}>
-        <AccordionPrimitive.Item
-          ref={ref}
-          value={value}
-          className={cn(
-            "border-b-2 border-dotted border-foreground/20",
-            className,
-          )}
-          {...props}
-        />
-      </AccordionItemUpdateContext.Provider>
-    </AccordionItemContext.Provider>
-  );
-});
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+>(({ className, ...props }, ref) => (
+  <AccordionPrimitive.Item
+    ref={ref}
+    className={cn("border-b border-border", className)}
+    {...props}
+  />
+));
 AccordionItem.displayName = "AccordionItem";
 
 interface AccordionTriggerProps
   extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> {
   title: string;
-  hasPreview?: boolean;
-  hidePreview?: boolean;
 }
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
->(
-  (
-    {
-      hidePreview = false,
-      className,
-      children,
-      title,
-      hasPreview = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const { openValues } = React.useContext(AccordionContext);
-    const { value } = React.useContext(AccordionItemContext);
-    const isOpen = openValues.includes(value);
-    const { setTriggerProps } = React.useContext(AccordionItemUpdateContext);
-
-    React.useEffect(() => {
-      setTriggerProps?.({ hidePreview, hasPreview, title });
-    }, [hidePreview, hasPreview, title, setTriggerProps]);
-
-    return (
-      <AccordionPrimitive.Header className="flex">
-        <AccordionPrimitive.Trigger
-          ref={ref}
-          className={cn(
-            "group flex flex-1 items-start py-4 text-left text-sm font-medium transition-all",
-            !hasPreview && className,
-            hasPreview && "flex-col gap-y-2",
-            isOpen && hasPreview && !hidePreview && "pb-0 pt-4",
-          )}
-          {...props}
-        >
-          <div className="flex w-full items-center justify-between">
-            <span className={cn("hover:underline")}>{title}</span>
-            {isOpen ? (
-              <Minus className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-            ) : (
-              <Plus className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-            )}
-          </div>
-          {(!isOpen || (isOpen && !hidePreview)) && (
-            <span className={cn(hasPreview && className)}>{children}</span>
-          )}
-        </AccordionPrimitive.Trigger>
-      </AccordionPrimitive.Header>
-    );
-  },
-);
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
-
-const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => {
-  const { triggerProps } = React.useContext(AccordionItemContext);
-
-  return (
-    <AccordionPrimitive.Content
+>(({ className, title, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+        "group flex flex-1 items-center justify-between py-4 text-left text-sm font-medium transition-all [&[data-state=open]>.mert]:hidden [&[data-state=open]>.ralph]:block",
         className,
       )}
       {...props}
     >
-      <div className={cn("pb-4 pt-0", triggerProps?.hasPreview && "pt-2")}>
-        {children}
-      </div>
-    </AccordionPrimitive.Content>
-  );
-});
-AccordionContent.displayName = AccordionPrimitive.Content.displayName;
+      <span className="hover:underline">{title}</span>
+
+      <span className="ml-2 flex items-center">
+        <Minus className="ralph h-4 w-4 shrink-0 text-muted-foreground group-data-[state=closed]:hidden" />
+        <Plus className="mert h-4 w-4 shrink-0 text-muted-foreground group-data-[state=open]:hidden" />
+      </span>
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+));
+
+AccordionTrigger.displayName = "AccordionTrigger";
+
+const AccordionContent = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Content
+    ref={ref}
+    className={cn(
+      "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+      className,
+    )}
+    {...props}
+  >
+    <div className="pb-4 pt-0">{children}</div>
+  </AccordionPrimitive.Content>
+));
+AccordionContent.displayName = "AccordionContent";
 
 export { AccordionContent, AccordionItem, AccordionMult, AccordionTrigger };
