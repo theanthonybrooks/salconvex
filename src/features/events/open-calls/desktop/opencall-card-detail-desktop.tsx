@@ -6,6 +6,7 @@ import {
   CalendarClockIcon,
   CircleCheck,
   Download,
+  EyeOff,
   Globe,
   Info,
   MapIcon,
@@ -304,7 +305,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           </div> */}
 
           <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 text-balance text-base font-semibold">
+            <p className="mb-1 text-balance pr-1 text-base font-semibold">
               {event?.name}
             </p>
           </div>
@@ -444,10 +445,14 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               finalButton
             />
             <p
-              className="flex w-full items-center justify-center gap-x-1 text-center text-xs italic text-muted-foreground hover:cursor-pointer"
+              className={cn(
+                "mt-2 flex w-full items-center justify-center gap-x-1 text-center text-sm italic text-muted-foreground hover:cursor-pointer",
+                hidden && "text-red-600 underline underline-offset-2",
+              )}
               onClick={onHide}
             >
               {hidden ? "Marked" : "Mark"} as not interested
+              {!hidden ? "?" : "."}
             </p>
           </Card>
           {/*    <Tabs
@@ -560,9 +565,26 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     {/* <CircleCheck className="inline-block size-3 text-emerald-600 xl:size-4" /> */}
                   </span>
                 )}
+                {!hasApplied && hidden && (
+                  <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
+                    Event is currently hidden from your feed.{" "}
+                    <p
+                      className="cursor-pointer underline-offset-1 hover:underline"
+                      onClick={onHide}
+                    >
+                      Unhide?
+                    </p>
+                    {/* <CircleCheck className="inline-block size-3 text-emerald-600 xl:size-4" /> */}
+                  </span>
+                )}
               </div>
               {appStatus ? (
                 <CircleCheck className="size-7 text-emerald-600" />
+              ) : hidden ? (
+                <EyeOff
+                  className="size-7 cursor-pointer text-muted-foreground"
+                  onClick={onHide}
+                />
               ) : bookmarked ? (
                 <FaBookmark
                   className="size-7 cursor-pointer text-red-500"
@@ -998,7 +1020,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </div>
           </div>
           <div id="event">
-            <Accordion type="single" defaultValue="item-1">
+            <Accordion
+              type="multiple"
+              defaultValue={["item-1", "item-2", "item-3"]}
+            >
               {location.coordinates && (
                 <AccordionItem value="item-1">
                   <AccordionTrigger title="Location:" />
