@@ -1104,7 +1104,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   </div>
                 </div>
 
-                <div className="9t-4">
+                <div className="flex flex-col gap-y-2 pt-4">
                   <section className="flex flex-col gap-y-2">
                     <span>
                       <p className="text-sm font-semibold">Organizer:</p>

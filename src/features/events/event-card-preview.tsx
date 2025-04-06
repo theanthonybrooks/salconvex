@@ -312,7 +312,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           <ApplyButtonShort
             slug={eventNameUrl}
             edition={event.dates.edition}
-            status={event.status}
+            appStatus={event.status}
             openCall={event.openCallStatus}
             publicView={publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
