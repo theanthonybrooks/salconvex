@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
-import LeafletMapIcon from "@/components/ui/map-icon"
-import "leaflet/dist/leaflet.css"
-import { MapContainer, TileLayer } from "react-leaflet"
+import LeafletMapIcon from "@/components/ui/map-icon";
+import ClickToZoom from "@/features/wrapper-elements/map/clickToZoom";
+import "leaflet/dist/leaflet.css";
+import { MapContainer, TileLayer } from "react-leaflet";
 
 interface MapComponentProps {
-  latitude: number
-  longitude: number
-  label?: string
-  className?: string
+  latitude: number;
+  longitude: number;
+  label?: string;
+  className?: string;
 }
 
 export default function MapComponent({
@@ -23,15 +24,17 @@ export default function MapComponent({
     <MapContainer
       center={[latitude, longitude]}
       zoom={4}
-      scrollWheelZoom={true}
+      scrollWheelZoom={false}
       attributionControl={false}
-      className={className}>
+      className={className}
+    >
       <TileLayer
-        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
 
       <LeafletMapIcon latitude={latitude} longitude={longitude} label={label} />
+      <ClickToZoom />
     </MapContainer>
-  )
+  );
 }

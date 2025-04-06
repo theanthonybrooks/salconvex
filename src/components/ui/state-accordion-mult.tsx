@@ -5,21 +5,23 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { Minus, Plus } from "lucide-react";
 import * as React from "react";
 
+// Updated: Support multiple values
 interface AccordionProps
   extends Omit<
     React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Root>,
     "type" | "value" | "defaultValue" | "onValueChange"
   > {
-  defaultValue?: string;
+  defaultValue?: string[];
   collapsible?: boolean;
 }
 
+// Context for tracking open values
 const AccordionContext = React.createContext<{
-  openValue?: string;
-  setOpenValue: (value?: string) => void;
+  openValues: string[];
+  setOpenValues: React.Dispatch<React.SetStateAction<string[]>>;
 }>({
-  openValue: undefined,
-  setOpenValue: () => {},
+  openValues: [],
+  setOpenValues: () => {},
 });
 
 interface AccordionItemContextProps {
@@ -30,24 +32,25 @@ interface AccordionItemContextProps {
 const AccordionItemContext = React.createContext<AccordionItemContextProps>({
   value: "",
 });
+
 const AccordionItemUpdateContext = React.createContext<{
   setTriggerProps?: (props: Partial<AccordionTriggerProps>) => void;
 }>({});
 
-const Accordion = ({ children, defaultValue, ...props }: AccordionProps) => {
-  const [openValue, setOpenValue] = React.useState<string | undefined>(
-    defaultValue,
-  );
+// Root Accordion component (multiple)
+const Accordion = ({
+  children,
+  defaultValue = [],
+  ...props
+}: AccordionProps) => {
+  const [openValues, setOpenValues] = React.useState<string[]>(defaultValue);
 
   return (
-    <AccordionContext.Provider value={{ openValue, setOpenValue }}>
+    <AccordionContext.Provider value={{ openValues, setOpenValues }}>
       <AccordionPrimitive.Root
-        type="single"
-        value={openValue}
-        onValueChange={(value) =>
-          setOpenValue(openValue === value ? "" : value)
-        }
-        collapsible
+        type="multiple"
+        value={openValues}
+        onValueChange={setOpenValues}
         {...props}
       >
         {children}
@@ -62,7 +65,7 @@ interface AccordionItemProps
 }
 
 const AccordionItem = React.forwardRef<
-  React.ComponentRef<typeof AccordionPrimitive.Item>,
+  React.ElementRef<typeof AccordionPrimitive.Item>,
   AccordionItemProps
 >(({ className, value, ...props }, ref) => {
   const [triggerProps, setTriggerProps] = React.useState<
@@ -95,7 +98,7 @@ interface AccordionTriggerProps
 }
 
 const AccordionTrigger = React.forwardRef<
-  React.ComponentRef<typeof AccordionPrimitive.Trigger>,
+  React.ElementRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
 >(
   (
@@ -109,10 +112,11 @@ const AccordionTrigger = React.forwardRef<
     },
     ref,
   ) => {
-    const { openValue } = React.useContext(AccordionContext);
+    const { openValues } = React.useContext(AccordionContext);
     const { value } = React.useContext(AccordionItemContext);
-    const isOpen = openValue === value;
+    const isOpen = openValues.includes(value);
     const { setTriggerProps } = React.useContext(AccordionItemUpdateContext);
+
     React.useEffect(() => {
       setTriggerProps?.({ hidePreview, hasPreview, title });
     }, [hidePreview, hasPreview, title, setTriggerProps]);
@@ -130,7 +134,7 @@ const AccordionTrigger = React.forwardRef<
           {...props}
         >
           <div className="flex w-full items-center justify-between">
-            <span className={cn("hover:underline")}> {title}</span>
+            <span className={cn("hover:underline")}>{title}</span>
             {isOpen ? (
               <Minus className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
             ) : (
@@ -148,7 +152,7 @@ const AccordionTrigger = React.forwardRef<
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const AccordionContent = React.forwardRef<
-  React.ComponentRef<typeof AccordionPrimitive.Content>,
+  React.ElementRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
   const { triggerProps } = React.useContext(AccordionItemContext);
@@ -163,11 +167,6 @@ const AccordionContent = React.forwardRef<
       {...props}
     >
       <div className={cn("pb-4 pt-0", triggerProps?.hasPreview && "pt-2")}>
-        {/* {triggerProps?.hasPreview && (
-          <div className='text-muted-foreground text-sm mb-2'>
-            Preview enabled: {triggerProps.title}
-          </div>
-        )} */}
         {children}
       </div>
     </AccordionPrimitive.Content>

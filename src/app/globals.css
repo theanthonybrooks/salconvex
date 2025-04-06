@@ -600,9 +600,9 @@ button:active {
 }
 
 .tab {
-  line-height: 1;
+  line-height: 0.8;
   display: inline-block;
-  margin-left: -30px;
+  margin-left: -20px;
   /* filter: drop-shadow(0px -3px 2px rgba(0, 0, 0, 0.05)); */
   border: none;
   border-radius: 6px 6px 0 0;
@@ -612,7 +612,7 @@ button:active {
   cursor: pointer;
 
   &:first-of-type {
-    margin-left: 70px;
+    margin-left: 30px;
   }
   div {
     padding: 6px 0;
@@ -639,11 +639,11 @@ button:active {
   }
   &:before {
     right: -16px;
-    transform: skew(25deg);
+    transform: skew(10deg);
     border-radius: 0 8px 0 0;
   }
   &:after {
-    transform: skew(-25deg);
+    transform: skew(-10deg);
     left: -16px;
     border-radius: 8px 0 0 0;
   }
@@ -669,11 +669,6 @@ button:active {
   }
 }
 
-.folder-container {
-  min-height: 100vh;
-  width: 100%;
-}
-
 .tabs {
   padding: 2rem 0 0 0;
   width: 100%;
@@ -690,25 +685,25 @@ button:active {
 .folder {
   .tab {
     top: 1.3px;
-    border: 1.5px solid rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
     border-width: 1.5px 0 0;
     &:before,
     &:after {
       top: -1px;
-      border-top: 1.5px solid rgba(0, 0, 0, 0.2);
+      border-top: 1.5px solid rgba(0, 0, 0, 0.15);
     }
     &:before {
-      border-right: 1.5px solid rgba(0, 0, 0, 0.2);
+      border-right: 1.5px solid rgba(0, 0, 0, 0.15);
     }
     &:after {
-      border-left: 1.5px solid rgba(0, 0, 0, 0.2);
+      border-left: 1.5px solid rgba(0, 0, 0, 0.15);
     }
 
     &:not(.active) {
       & > div {
         background: var(--background);
       }
-      border-bottom: 1.5px solid rgba(0, 0, 0, 0.2);
+      border-bottom: 1.5px solid rgba(0, 0, 0, 0.15);
       /* &:before,
       &:after {
         box-shadow: 0 1.5px 0 black;
@@ -716,7 +711,7 @@ button:active {
     }
   }
   .content {
-    border: 1.5px solid rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
     top: -2px;
     left: -2px;
   }

@@ -73,7 +73,7 @@ export default function NavTabs({
                   "tab text-sm transition-transform",
                   isActive
                     ? "active bg-[#fef9dd] px-2 py-2 font-bold before:bg-[#fef9dd] after:bg-[#fef9dd]"
-                    : "translate-y-2 bg-background px-2 py-2 text-foreground before:bg-background after:bg-background",
+                    : "translate-y-1 bg-background px-2 py-1 leading-[0.5] text-foreground before:bg-background after:bg-background",
                 )}
                 onClick={() => setActiveTab(tab.id)}
               >
@@ -85,7 +85,7 @@ export default function NavTabs({
           })}
         </div>
 
-        <div className="content z-[5] rounded-3xl bg-[#fef9dd] p-4 shadow-sm">
+        <div className="content z-[5] rounded-2xl bg-[#fef9dd] p-4 shadow-sm">
           {tabContent && <>{tabContent}</>}
         </div>
       </div>
