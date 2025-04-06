@@ -1,6 +1,6 @@
 "use client";
 
-import EventCardDetailDesktop from "@/features/events/event-detail/desktop/event-card-detail-desktop";
+import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
 import { useQuery } from "convex-helpers/react/cache";
 import { LoaderPinwheel } from "lucide-react";
