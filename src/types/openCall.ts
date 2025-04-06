@@ -1,7 +1,7 @@
 import { ArtistFull } from "@/types/artist";
 import { EventData, SubmissionFormState } from "@/types/event";
 import { Organizer } from "@/types/organizer";
-import { Id } from "~/convex/_generated/dataModel";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export type CallType =
   | "Fixed"
@@ -36,6 +36,7 @@ export type RateUnit = "ft²" | "m²";
 
 export interface OpenCall {
   _id: Id<"openCalls">;
+  _creationTime: number;
   adminNoteOC?: string;
 
   eventId: string;
@@ -94,15 +95,24 @@ export interface OpenCall {
   state: SubmissionFormState;
 }
 
-export interface OpenCallApplication {
-  openCallId: string;
-  artistId: string;
-  applicationId: string;
-  applicationStatus: ApplicationStatus;
-}
+// export interface OpenCallApplication {
+//   _id: Id<"applications">;
+//   openCallId: string;
+//   artistId: string;
+//   applicationStatus: ApplicationStatus;
+//   manualApplied?: boolean;
+//   _creationTime: number;
+// }
+
+export type OpenCallApplication = Doc<"applications">;
 
 export interface OpenCallCardProps {
-  data: { event: EventData; openCall: OpenCall; organizer: Organizer };
+  data: {
+    event: EventData;
+    openCall: OpenCall;
+    organizer: Organizer;
+    application?: OpenCallApplication | null;
+  };
   artist?: ArtistFull | null; //todo:make this required
   className?: string;
 }

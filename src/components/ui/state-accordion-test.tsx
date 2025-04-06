@@ -83,7 +83,7 @@ const AccordionTrigger = React.forwardRef<
         <AccordionPrimitive.Trigger
           ref={ref}
           className={cn(
-            "group flex flex-1 items-start py-4 text-left text-sm font-medium transition-all",
+            "group relative flex flex-1 items-start py-4 text-left text-sm font-medium transition-all",
             !hasPreview && className,
             hasPreview && "flex-col gap-y-2",
             hasPreview && !hidePreview && "pb-0 pt-4",
@@ -92,9 +92,9 @@ const AccordionTrigger = React.forwardRef<
         >
           <div className="flex w-full items-center justify-between">
             <span className="hover:underline">{title}</span>
-            <span className="ml-2 flex items-center">
-              <Minus className="ralph h-4 w-4 shrink-0 text-muted-foreground group-data-[state=closed]:hidden" />
-              <Plus className="mert h-4 w-4 shrink-0 text-muted-foreground group-data-[state=open]:hidden" />
+            <span className="absolute right-2">
+              <Minus className="ralph size-4 shrink-0 origin-center text-muted-foreground transition-transform ease-in hover:scale-125 group-data-[state=closed]:hidden" />
+              <Plus className="mert size-4 shrink-0 origin-center text-muted-foreground transition-transform ease-in hover:scale-125 group-data-[state=open]:hidden" />
             </span>
           </div>
 

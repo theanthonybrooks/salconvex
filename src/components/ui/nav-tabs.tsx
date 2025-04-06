@@ -42,7 +42,7 @@ export default function NavTabs({
   }) as ReactElement<{ id: string }> | undefined;
 
   return (
-    <div className={cn("folder-container max-w-[min(70vw,1200px)]", className)}>
+    <div className={cn("folder-container w-full", className)}>
       <div className="folder">
         <div className="tabs">
           {/*     {tabs.map((tab) => (

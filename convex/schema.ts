@@ -182,6 +182,13 @@ const eventOrganizerSchema = {
   organizerId: v.id("organizations"),
   isPrimary: v.boolean(),
 };
+
+//note: not sure if this is necessary as the same info is already in the openCalls table. Keeping for now. Have not actually "added" it to the db, though.
+const eventOpenCallSchema = {
+  eventId: v.id("events"),
+  openCallId: v.id("openCalls"),
+  edition: v.number(),
+};
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
 const openCallSchema = {
   adminNoteOC: v.optional(v.string()),
@@ -248,6 +255,8 @@ const openCallSchema = {
   }),
   // state: v.string(), //draft, submitted, published, archived
   state: v.optional(v.string()), //draft, submitted, published, archived
+  lastUpdatedBy: v.optional(v.id("users")),
+  lastUpdatedAt: v.optional(v.number()),
 };
 
 const openCallOrganizerSchema = {
@@ -264,8 +273,22 @@ const openCallJudgesSchema = {
 const applicationsSchema = {
   openCallId: v.id("openCalls"),
   artistId: v.id("users"),
+  applicationTime: v.optional(v.number()),
   // applicationId: v.string(), //would just be the ._id of the application. No reason to make a separate field for this.
-  applicationStatus: v.optional(v.string()),
+  applicationStatus: v.optional(
+    v.union(
+      v.literal("accepted"),
+      v.literal("rejected"),
+      v.literal("roster"),
+      v.literal("shortlisted"),
+      v.literal("to next step"),
+      v.literal("external apply"),
+      v.literal("considering"),
+      v.literal("applied"),
+      v.literal("pending"),
+      v.null(),
+    ),
+  ),
   manualApplied: v.optional(v.boolean()),
 };
 

@@ -35,7 +35,7 @@ export default async function HomeLayout({
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className="scrollable mini darkbar pt-32">
+      <div className="pt-32">
         {children}
 
         <Footer />

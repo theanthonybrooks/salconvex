@@ -20,6 +20,28 @@ export const getArtist = query({
   },
 });
 
+export const getArtistApplication = query({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const artist = await ctx.db
+      .query("artists")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .unique();
+    if (!artist) return null;
+
+    const applications = await ctx.db
+      .query("applications")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .collect();
+
+    return applications;
+  },
+});
+
 export const getArtistFull = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
@@ -167,6 +189,7 @@ export const artistApplicationActions = mutation({
       console.log("application not found");
       await ctx.db.insert("applications", {
         openCallId,
+        applicationTime: hasApplied ? Date.now() : undefined,
         artistId: userId,
         manualApplied: hasApplied ?? false,
         ...(hasApplied ? { applicationStatus: "applied" } : {}),
@@ -174,6 +197,7 @@ export const artistApplicationActions = mutation({
     } else {
       await ctx.db.patch(application._id, {
         manualApplied: hasApplied ?? false,
+        applicationTime: hasApplied ? Date.now() : undefined,
         applicationStatus: hasApplied ? "applied" : undefined,
       });
     }

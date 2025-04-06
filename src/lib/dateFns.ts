@@ -154,6 +154,19 @@ export const formatOpenCallDeadline = (
   return `${month} ${day}${ordinal}, ${year} @ ${time} (${timeZoneFormat})`;
 };
 
+export const formatSingleDate = (date: number) => {
+  if (!date) return "";
+  // const dt = DateTime.fromISO(date, { setZone: true }).setZone(timezone);
+  // const month = getFourCharMonth(dt);
+  // const day = dt.day;
+  // const year = dt.year;
+  // const ordinal = getOrdinalSuffix(day);
+  const output = new Date(date).toLocaleString("en-US");
+
+  // return `${month} ${day}${ordinal}, ${year}`;
+  return output;
+};
+
 export const getOrdinalSuffix = (day: number): string => {
   if (day >= 11 && day <= 13) return "th";
   switch (day % 10) {

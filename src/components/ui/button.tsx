@@ -3,6 +3,8 @@ import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
+export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
+
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 [&_svg]:h-5 [&_svg]:h-5  [&_svg]:pointer-events-none",
   {
@@ -45,9 +47,9 @@ const buttonVariants = cva(
         salWithoutShadow:
           "bg-white text-foreground  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-foreground focus:bg-salyellow/70 dark:border-primary-foreground dark:text-primary-foreground",
         salWithShadowYlw:
-          "bg-salyellow text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px] dark:border-primary-foreground dark:text-primary-foreground",
+          "bg-salyellow text-foreground border-2 hover:bg-salYellowLt border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px] dark:border-primary-foreground dark:text-primary-foreground",
         salWithShadowHiddenYlw:
-          "bg-salYellow text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0  dark:border-primary-foreground dark:text-primary-foreground",
+          "bg-salYellow  text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0  dark:border-primary-foreground dark:text-primary-foreground",
         salWithShadowPink:
           "bg-salPink hover:bg-salPinkLt text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  dark:border-primary-foreground dark:text-primary-foreground",
       },

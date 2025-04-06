@@ -43,11 +43,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TbStairs } from "react-icons/tb";
 
 import { ApplyButton } from "@/features/events/event-apply-btn";
-import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { OpenCallCardProps } from "@/types/openCall";
 
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
+import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { generateICSFile } from "@/lib/addToCalendar";
 import {
   formatEventDates,
@@ -60,7 +60,6 @@ import {
   getEventCategoryLabel,
   getEventTypeLabel,
 } from "@/lib/eventFns";
-import { ApplicationStatus } from "@/types/openCall";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -74,7 +73,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     // organizer,
   } = props;
 
-  const { event, organizer, openCall } = data;
+  const { event, organizer, openCall, application } = data;
   const {
     // id: eventId,
     logo: eventLogo,
@@ -88,13 +87,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   const orgHasOtherEvents = organizer?.events?.length > 1;
 
-  const manualApplied =
-    artist?.applications?.find((app) => app.openCallId === openCall._id)
-      ?.manualApplied ?? false;
+  const manualApplied = application?.manualApplied ?? false;
 
-  const status: ApplicationStatus | null =
-    artist?.applications?.find((app) => app.openCallId === openCall._id)
-      ?.applicationStatus ?? null;
+  const appStatus = application?.applicationStatus ?? null;
 
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
@@ -128,7 +123,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     travelCosts,
     materials,
     equipment,
-    other,
+    other: otherCat,
   } = categories;
   const {
     min: budgetMin,
@@ -136,7 +131,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     currency,
     rate: budgetRate,
 
-    allInclusive,
+    allInclusive: allInclusiveBudget,
   } = budget;
   const {
     requirements: reqs,
@@ -147,6 +142,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   const { callType, dates: callDates } = basicInfo;
   const { ocStart, ocEnd, timezone } = callDates;
+  const catLength = Object.keys(categories).length;
+  const hasCategories = catLength > 0;
+  const allInclusive = allInclusiveBudget && !hasCategories;
 
   const openCallStatus = getOpenCallStatus(
     ocStart ? new Date(ocStart) : null,
@@ -227,24 +225,24 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
         className,
       )}
     >
-      {status !== null && !manualApplied && (
+      {appStatus !== null && !manualApplied && (
         <span
           className={cn(
             "col-start-2 w-fit rounded-full border-2 border-foreground/30 bg-white/70 px-2 py-1 text-xs",
-            status === "accepted"
+            appStatus === "accepted"
               ? "border-emerald-500/50 text-emerald-600"
-              : status === "rejected"
+              : appStatus === "rejected"
                 ? "border-red-500/30 text-red-500"
-                : status === "pending"
+                : appStatus === "pending"
                   ? "italic text-foreground/50"
                   : "",
           )}
         >
           Application status:{" "}
           <span className="font-bold">
-            {status === "accepted"
+            {appStatus === "accepted"
               ? "Accepted"
-              : status === "rejected"
+              : appStatus === "rejected"
                 ? "Rejected"
                 : "Pending"}
           </span>
@@ -260,11 +258,11 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
             className={cn(
               "size-[60px] rounded-full border-2",
 
-              status === "accepted"
+              appStatus === "accepted"
                 ? "ring-4 ring-emerald-500 ring-offset-1"
-                : status === "rejected"
+                : appStatus === "rejected"
                   ? "ring-4 ring-red-500 ring-offset-1"
-                  : status === "pending"
+                  : appStatus === "pending"
                     ? "ring-4 ring-foreground/20 ring-offset-1"
                     : "",
             )}
@@ -445,7 +443,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                     className="w-full"
                   >
                     <section className="flex w-full flex-col items-center justify-center gap-y-3 pt-2">
-                      <div className="flex justify-start">
+                      <div className="flex justify-start gap-2">
                         {hasBudget &&
                           formatCurrency(
                             budgetMin,
@@ -537,7 +535,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <span
                           className={cn(
                             "rounded-full border-1.5 p-1",
-                            other
+                            otherCat
                               ? "border-emerald-500 text-emerald-500"
                               : "border-foreground/20 text-foreground/20",
                           )}
@@ -597,7 +595,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                                   noBudgetInfo && "text-muted-foreground",
                                 )}
                               >
-                                {!noBudgetInfo ? "(not provided)" : "No Info"}
+                                {!allInclusive ? "(not provided)" : "No Info"}
                               </span>
                             )}
                           </p>
@@ -615,7 +613,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                                   noBudgetInfo && "text-muted-foreground",
                                 )}
                               >
-                                {!noBudgetInfo ? "(not provided)" : "-"}
+                                {!allInclusive ? "(not provided)" : "-"}
                               </span>
                             )}
                           </p>
@@ -632,7 +630,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                                   noBudgetInfo && "text-muted-foreground",
                                 )}
                               >
-                                {!noBudgetInfo ? "(not provided)" : "-"}
+                                {!allInclusive ? "(not provided)" : "-"}
                               </span>
                             )}
                           </p>
@@ -649,7 +647,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                                   noBudgetInfo && "text-muted-foreground",
                                 )}
                               >
-                                {!noBudgetInfo ? "(not provided)" : "-"}
+                                {!allInclusive ? "(not provided)" : "-"}
                               </span>
                             )}
                           </p>
@@ -665,7 +663,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                                 noBudgetInfo && "text-muted-foreground",
                               )}
                             >
-                              {!noBudgetInfo ? "(not provided)" : "-"}
+                              {!allInclusive ? "(not provided)" : "-"}
                             </span>
                           )}
                         </div>
@@ -682,23 +680,15 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                                   noBudgetInfo && "text-muted-foreground",
                                 )}
                               >
-                                {!noBudgetInfo ? "(not provided)" : "-"}
+                                {!allInclusive ? "(not provided)" : "-"}
                               </span>
                             )}
                           </p>
                         </div>
-                        {categories && other && (
+                        {categories && otherCat && (
                           <div className="flex flex-col items-start justify-between gap-y-2">
                             <p className="font-medium">Other:</p>
-                            <p>
-                              {other && !allInclusive ? (
-                                other
-                              ) : (
-                                <span className="italic text-red-500">
-                                  {!noBudgetInfo ? "(not provided)" : "No Info"}
-                                </span>
-                              )}
-                            </p>
+                            <p>{otherCat && !allInclusive && otherCat}</p>
                           </div>
                         )}
                         {/* <li>Must have liability insurance</li> */
@@ -783,9 +773,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                 slug={slug}
                 appUrl={appUrl}
                 edition={event.dates.edition}
-                // status={status}
+                // appStatus={appStatus}
                 openCall={openCallStatus}
-                manualApplied={status}
+                manualApplied={appStatus}
                 // setManualApplied={setManualApplied}
                 isBookmarked={bookmarked}
                 // setIsBookmarked={setIsBookmarked}
@@ -795,6 +785,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                 appFee={basicInfo?.appFee ?? 0}
                 className="w-full"
                 detailCard
+                finalButton
               />
             </Card>
           </TabsContent>

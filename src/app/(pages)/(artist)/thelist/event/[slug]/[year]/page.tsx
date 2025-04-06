@@ -27,15 +27,13 @@ const Event = () => {
   // });
 
   const onBackClick = () => {
-    // const prevUrl = window.location.href;
-    router.back();
-    // router.refresh();
-
-    // setTimeout(() => {
-    //   if (window.location.href === prevUrl) {
-    //     window.location.href = `/thelist/`;
-    //   }
-    // }, 100);
+    const previous = sessionStorage.getItem("previousSalPage");
+    //  console.log(previous); //note-to-self: annoying as it doesn't actually save the full pagth. I'm using it as a flag, for now.
+    if (previous && previous.startsWith("/")) {
+      router.back();
+    } else {
+      router.push("/thelist");
+    }
   };
 
   // setTimeout(() => {

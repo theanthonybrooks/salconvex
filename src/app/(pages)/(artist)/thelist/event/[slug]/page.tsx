@@ -32,13 +32,13 @@ const Event = () => {
   // console.log("event data", data);
 
   const onBackClick = () => {
-    router.back();
-
-    // setTimeout(() => {
-    //   window.scrollTo({ top: 0, behavior: "smooth" });
-    // }, 50); // small delay gives time for back nav
-
-    // router.refresh(); // try to ensure that the page has a sec to load
+    const previous = sessionStorage.getItem("previousSalPage");
+    //  console.log(previous); //note-to-self: annoying as it doesn't actually save the full pagth. I'm using it as a flag, for now.
+    if (previous && previous.startsWith("/")) {
+      router.back();
+    } else {
+      router.push("/thelist");
+    }
   };
 
   // const allEvents = useEventDetailCards();

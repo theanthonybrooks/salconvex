@@ -3,7 +3,11 @@
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 
-export default function ClickToZoom() {
+interface ClickToZoomProps {
+  setOverlay: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function ClickToZoom({ setOverlay }: ClickToZoomProps) {
   const map = useMap();
 
   useEffect(() => {
@@ -15,13 +19,15 @@ export default function ClickToZoom() {
     const onClick = (e: MouseEvent) => {
       e.stopPropagation();
       enable();
-      // Disable scroll again when clicking anywhere else
+      setOverlay(false);
+
       document.addEventListener("click", handleOutsideClick);
     };
 
     const handleOutsideClick = (e: MouseEvent) => {
       if (!container.contains(e.target as Node)) {
         disable();
+        setOverlay(true);
         document.removeEventListener("click", handleOutsideClick);
       }
     };
@@ -32,7 +38,7 @@ export default function ClickToZoom() {
       container.removeEventListener("click", onClick);
       document.removeEventListener("click", handleOutsideClick);
     };
-  }, [map]);
+  }, [map, setOverlay]);
 
   return null;
 }
