@@ -38,7 +38,7 @@ const AccordionItemUpdateContext = React.createContext<{
 }>({});
 
 // Root Accordion component (multiple)
-const Accordion = ({
+const AccordionMult = ({
   children,
   defaultValue = [],
   ...props
@@ -174,4 +174,4 @@ const AccordionContent = React.forwardRef<
 });
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
 
-export { Accordion, AccordionContent, AccordionItem, AccordionTrigger };
+export { AccordionContent, AccordionItem, AccordionMult, AccordionTrigger };
