@@ -5,14 +5,6 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { Minus, Plus } from "lucide-react";
 import * as React from "react";
 
-const AccordionContext = React.createContext<{
-  openValue?: string;
-  setOpenValue: (value?: string) => void;
-}>({
-  openValue: undefined,
-  setOpenValue: () => {},
-});
-
 interface AccordionItemContextProps {
   value: string;
   triggerProps?: Partial<AccordionTriggerProps>;
@@ -80,9 +72,7 @@ const AccordionTrigger = React.forwardRef<
     },
     ref,
   ) => {
-    const { openValue } = React.useContext(AccordionContext);
-    const { value } = React.useContext(AccordionItemContext);
-    const isOpen = openValue === value;
+    // const { value } = React.useContext(AccordionItemContext);
     const { setTriggerProps } = React.useContext(AccordionItemUpdateContext);
     React.useEffect(() => {
       setTriggerProps?.({ hidePreview, hasPreview, title });
@@ -96,7 +86,7 @@ const AccordionTrigger = React.forwardRef<
             "group flex flex-1 items-start py-4 text-left text-sm font-medium transition-all",
             !hasPreview && className,
             hasPreview && "flex-col gap-y-2",
-            isOpen && hasPreview && !hidePreview && "pb-0 pt-4",
+            hasPreview && !hidePreview && "pb-0 pt-4",
           )}
           {...props}
         >
@@ -107,9 +97,17 @@ const AccordionTrigger = React.forwardRef<
               <Plus className="mert h-4 w-4 shrink-0 text-muted-foreground group-data-[state=open]:hidden" />
             </span>
           </div>
-          {(!isOpen || (isOpen && !hidePreview)) && (
-            <span className={cn(hasPreview && className)}>{children}</span>
-          )}
+
+          <span
+            className={cn(
+              className,
+              hasPreview && "group-data-[state=closed]:block",
+              hidePreview && "group-data-[state=open]:hidden",
+              !hidePreview && "group-data-[state=open]:block",
+            )}
+          >
+            {children}
+          </span>
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
     );

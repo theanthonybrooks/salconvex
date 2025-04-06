@@ -603,7 +603,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         </div>
         <NavTabs tabs={tabList}>
           <div id="openCall">
-            <Accordion type="multiple" defaultValue={["item-1"]}>
+            <Accordion
+              type="multiple"
+              defaultValue={["item-1", "item-2", "item-3"]}
+            >
               <AccordionItem value="item-1">
                 <AccordionTrigger title="Deadline & Eligibility:" />
                 <AccordionContent>
