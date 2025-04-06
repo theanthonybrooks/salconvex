@@ -227,7 +227,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     <div className="grid w-full max-w-[min(90vw,1400px)] grid-cols-[250px_auto] gap-x-6 pb-10 lg:grid-cols-[300px_auto]">
       <div
         onClick={onBackClick}
-        className="col-start-2 row-span-1 flex cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline"
+        className="col-start-2 row-span-1 flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline"
       >
         <IoIosArrowRoundBack className="size-6" /> back to The List
       </div>
@@ -583,7 +583,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           <div className="flex w-full items-center justify-between pr-2">
             <span className="px-4 text-3xl font-bold">{event?.name}</span>
             <div className="flex items-center gap-x-4">
-              <span className="flex items-center gap-x-2">
+              <span className="hidden items-center gap-x-2 xl:flex">
                 Deadline: &nbsp;
                 {formatOpenCallDeadline(ocEnd || "", timezone, callType)}
               </span>
