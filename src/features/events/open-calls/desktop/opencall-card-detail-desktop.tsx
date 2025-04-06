@@ -17,7 +17,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/state-accordion";
+} from "@/components/ui/state-accordion-test";
 
 import {
   FaBookmark,
@@ -603,7 +603,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         </div>
         <NavTabs tabs={tabList}>
           <div id="openCall">
-            <Accordion defaultValue="item-1">
+            <Accordion type="multiple" defaultValue={["item-1"]}>
               <AccordionItem value="item-1">
                 <AccordionTrigger title="Deadline & Eligibility:" />
                 <AccordionContent>
@@ -1019,7 +1019,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             />
           </div>
           <div id="event">
-            <Accordion defaultValue="item-1">
+            <Accordion type="single" defaultValue="item-1">
               {location.coordinates && (
                 <AccordionItem value="item-1">
                   <AccordionTrigger title="Location:" />
