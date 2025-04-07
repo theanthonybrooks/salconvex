@@ -46,7 +46,7 @@ const Event = () => {
   // const event = allEvents.find((e) => e.id === id);
 
   return (
-    <div className="flex flex-col items-center px-4">
+    <>
       <div
         onClick={onBackClick}
         className="flex cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline md:hidden"
@@ -83,7 +83,7 @@ const Event = () => {
           />
         </>
       )}
-    </div>
+    </>
   );
 };
 
