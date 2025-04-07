@@ -34,6 +34,8 @@ export interface EventData {
     edition: number;
     eventStart?: string;
     eventEnd?: string;
+    artistStart?: string;
+    artistEnd?: string;
     ongoing: boolean;
   };
 

@@ -28,7 +28,7 @@ export default function MapComponent({
       {overlay && (
         <>
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <p className="pointer-events-none select-none px-5 text-center text-2xl font-bold text-white">
+            <p className="pointer-events-none select-none text-balance px-5 text-center text-2xl font-bold text-white">
               Click to enable scroll-to-zoom
             </p>
           </div>

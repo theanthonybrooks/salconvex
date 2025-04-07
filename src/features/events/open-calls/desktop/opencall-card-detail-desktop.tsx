@@ -96,7 +96,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { eventStart, eventEnd, ongoing } = dates;
+  const { eventStart, eventEnd, ongoing, artistStart, artistEnd } = dates;
   const {
     compensation,
     basicInfo,
@@ -329,16 +329,15 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </p>
             {/*//todo: add this part */}
             {eventCategory === "project" ||
-              (eventCategory === "event" && (
+              (eventCategory === "event" && artistStart && artistEnd && (
                 <p className="flex flex-col items-start gap-1 text-sm">
                   <span className="space-x-1 font-semibold">
                     Painting/Production Dates:
                   </span>
                   {formatEventDates(
-                    eventStart || "",
-                    eventEnd || "",
+                    artistStart || "",
+                    artistEnd || "",
                     ongoing,
-                    "mobile",
                   )}
                 </p>
               ))}
@@ -350,12 +349,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               <p className="flex flex-col items-start gap-1 text-sm">
                 <span className="font-semibold">Type:</span>{" "}
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
-              </p>
-            )}
-            {basicInfo?.appFee !== 0 && (
-              <p className="flex items-center gap-x-1 text-sm text-red-600">
-                <span className="font-semibold">Application Fee:</span>
-                {`$${basicInfo?.appFee}`}
               </p>
             )}
 
@@ -418,10 +411,19 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           <Card className="flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">
             {!appUrl && (
               <p
-                className="flex items-center justify-center gap-x-2 text-center text-sm text-muted-foreground text-red-600"
+                className={cn(
+                  "flex items-center justify-center gap-x-2 text-center text-sm text-muted-foreground",
+                  basicInfo?.appFee === 0 && "text-red-600",
+                )}
                 onClick={onHide}
               >
                 <Info className="size-4" /> External Application
+              </p>
+            )}
+            {basicInfo?.appFee !== 0 && (
+              <p className="flex w-full items-center justify-center gap-x-1 text-center text-sm text-red-600">
+                <span className="font-semibold">Application Fee:</span>
+                {`$${basicInfo?.appFee}`}
               </p>
             )}
             <ApplyButton
@@ -1050,7 +1052,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 <AccordionTrigger title="About:" />
 
                 <AccordionContent>
-                  <div className="mb-4 flex flex-col space-y-3 pb-3">
+                  <div className="mb-4 flex flex-col space-y-3 p-3">
                     <p>{event.about}</p>
                   </div>
                 </AccordionContent>
@@ -1060,7 +1062,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   <AccordionTrigger title="Links:" />
 
                   <AccordionContent>
-                    <ul className="flex flex-col gap-y-2">
+                    <ul className="flex flex-col gap-y-2 p-3">
                       {event.links.map((link, index) => (
                         <li key={index}>
                           <a
@@ -1101,7 +1103,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               {event.otherInfo && (
                 <AccordionItem value="item-4">
                   <AccordionTrigger title="Other info:" />
-                  <AccordionContent>
+                  <AccordionContent className="p-3">
                     {event.otherInfo.map((info, index) => (
                       <p key={index}>{info}</p>
                     ))}

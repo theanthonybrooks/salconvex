@@ -143,6 +143,8 @@ const eventSchema = {
     edition: v.number(), //todo: make required
     eventStart: v.optional(v.string()),
     eventEnd: v.optional(v.string()),
+    artistStart: v.optional(v.string()),
+    artistEnd: v.optional(v.string()),
     ongoing: v.boolean(),
   }),
   location: v.object({
