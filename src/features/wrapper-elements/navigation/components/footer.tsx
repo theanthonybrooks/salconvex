@@ -49,7 +49,7 @@ export default function Footer({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "max-w-screen flex justify-center overflow-hidden border-t border-border",
+        "max-w-screen flex justify-center border-t border-border bg-background",
         className,
       )}
     >

@@ -25,13 +25,13 @@ const TheList = async () => {
   return (
     <>
       <SalHeader />
-      <main className="min-w-screen max-w-screen flex min-h-screen flex-col items-center px-4">
-        <ClientEventList
-          // initialEvents={testEventData}
-          publicView={publicView}
-          userPref={userPref}
-        />
-      </main>
+      {/* <main className="min-w-screen max-w-screen flex min-h-screen flex-col items-center px-4"> */}
+      <ClientEventList
+        // initialEvents={testEventData}
+        publicView={publicView}
+        userPref={userPref}
+      />
+      {/* </main> */}
     </>
   );
 };

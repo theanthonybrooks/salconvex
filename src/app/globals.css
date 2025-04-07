@@ -361,7 +361,7 @@ body,
 
 /* For WebKit-based browsers (Chrome, Safari, Edge) */
 .scrollable::-webkit-scrollbar {
-  width: 1em;
+  width: 0.75em;
   height: 1em; /* if you also want horizontal scrollbars */
 }
 

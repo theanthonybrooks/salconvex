@@ -1,5 +1,4 @@
 import TheListNavBar from "@/app/(pages)/(artist)/thelist/components/artist-navbar";
-import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
@@ -28,18 +27,22 @@ export default async function HomeLayout({
   const user = userData?.user ?? null;
 
   return (
-    <ClientAuthWrapper>
+    //<ClientAuthWrapper>
+    <>
       <TheListNavBar
         userId={userId ?? "guest"}
         user={user ?? null}
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className="pt-32">
-        {children}
+      <div className="flex flex-col pt-32">
+        <main className="flex flex-1 flex-col items-center px-4">
+          {children}
+        </main>
 
         <Footer />
       </div>
-    </ClientAuthWrapper>
+    </>
+    // </ClientAuthWrapper>
   );
 }

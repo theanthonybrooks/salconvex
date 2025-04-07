@@ -1,9 +1,8 @@
-import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import NavBar from "@/features/wrapper-elements/navigation/components/navbar";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
-import { api } from "../../../convex/_generated/api";
+import { api } from "~/convex/_generated/api";
 
 export default async function HomeLayout({
   children,
@@ -28,20 +27,20 @@ export default async function HomeLayout({
   const user = userData?.user ?? null;
 
   return (
-    <ClientAuthWrapper>
+    // <ClientAuthWrapper>
+    <>
       <NavBar
         userId={userId ?? "guest"}
         user={user ?? null}
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className="scrollable mini darkbar">
-        <main className="min-w-screen flex h-full flex-col px-4 pt-[100px]">
-          {children}
-        </main>
+      <div className="flex h-full flex-col pt-25">
+        <main className="flex flex-1 flex-col px-4">{children}</main>
 
         <Footer className="mt-10" />
       </div>
-    </ClientAuthWrapper>
+    </>
+    // </ClientAuthWrapper>
   );
 }
