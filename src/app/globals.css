@@ -119,6 +119,16 @@ body,
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* --------- Full Calendar --------- */
+    --fc-border-color: var(--border);
+    --fc-list-event-hover-bg-color: rgba(255, 255, 255, 0.8);
+    --fc-today-bg-color: rgba(255, 255, 255, 0.5);
+
+    --fc-event-bg-color: #fff;
+    --fc-event-border-color: #000;
+    --fc-event-text-color: #000;
+    --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
   }
   .dark {
     --color-picker-preview: hsl(47, 1%, 10%);
@@ -714,5 +724,95 @@ button:active {
     border: 1.5px solid rgba(0, 0, 0, 0.15);
     top: -2px;
     left: -2px;
+  }
+}
+
+/* FullCalendar */
+
+.fc-toolbar {
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding-block: 0.5rem;
+}
+
+.fc-toolbar-title {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.fc-toolbar-chunk {
+  display: inline-block;
+}
+
+.fc {
+  & .fc-button {
+    background-color: var(--button-bg, white);
+    color: var(--button-text, #000);
+    border: 1.5px solid black;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  & .fc-button:hover {
+    background-color: var(--sal-pink-hex);
+    color: black;
+  }
+  & .fc-button:disabled {
+    opacity: 0.5;
+    background: transparent;
+    color: black;
+    border: 1.5px solid black;
+  }
+  & .fc-button-primary:focus {
+    box-shadow: none;
+  }
+  & .fc-button-primary:not(:disabled):active:focus {
+    box-shadow: none;
+  }
+  & .fc-button:focus {
+    box-shadow: none;
+  }
+  & .fc-button-primary:not(:disabled):active {
+    background-color: rgb(226, 148, 228);
+    color: black;
+  }
+  & .fc-day-today {
+    position: relative;
+  }
+  & .fc-day-today:not(:has(.fc-daygrid-event-harness))::before {
+    left: 50%;
+    top: 50%;
+    /* transform: translateX(-50%); */
+    transform: translate(-50%, -50%);
+    content: "Today";
+    position: absolute;
+    font-weight: bold;
+  }
+}
+
+.fc-event {
+  padding: 0.25rem 0.5rem;
+  border-width: 1.5px;
+  &:hover {
+    background-color: rgba(244, 169, 246, 0.527);
+  }
+  & .fc-event-title {
+    font-weight: 600; /* bold or semi-bold */
+    font-size: 0.9rem;
+    max-width: 16ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.fc-popover {
+  /* display: none; */
+  opacity: 0;
+}
+
+.event-card-link:hover {
+  & * svg {
+    scale: 1.1;
   }
 }

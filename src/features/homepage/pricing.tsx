@@ -95,7 +95,7 @@ const PricingHeader = ({
   subtitle: string;
 }) => (
   <div className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8">
-    <h2 className="text-4h cursor-pointer font-tanker lowercase tracking-wide text-foreground md:text-[4em]">
+    <h2 className="cursor-pointer font-tanker text-4h lowercase tracking-wide text-foreground md:text-[4em]">
       {title}
     </h2>
     <p className="max-w-2xl text-balance text-foreground">{subtitle}</p>
@@ -285,10 +285,12 @@ const PricingCard = ({
   return (
     <Card
       className={cn(
-        "flex w-full min-w-[20vw] max-w-sm flex-col justify-between px-2 py-1",
+        "flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1",
         {
-          "relative border-2": popular || isFree,
+          relative: popular || isFree,
         },
+        isOrganizer && "self-start",
+        // isFree && "self-start",
       )}
     >
       {popular && (
@@ -382,8 +384,21 @@ const PricingCard = ({
           <div className="mt-6 space-y-2">
             {features?.map((feature) => (
               <div key={feature} className="flex gap-2">
-                <CheckCircle2 className={cn("h-5 w-5 text-foreground")} />
-                <p className={cn("text-muted-foreground")}>{feature}</p>
+                <CheckCircle2
+                  className={cn("size-5 shrink-0 text-foreground")}
+                />
+                <p className={cn("text-muted-foreground")}>
+                  {feature.includes("*") ? (
+                    <>
+                      {feature.split("*")[0]}
+                      <span className="text-sm italic text-muted-foreground">
+                        *{feature.split("*")[1]}
+                      </span>
+                    </>
+                  ) : (
+                    feature
+                  )}
+                </p>
               </div>
             ))}
           </div>
