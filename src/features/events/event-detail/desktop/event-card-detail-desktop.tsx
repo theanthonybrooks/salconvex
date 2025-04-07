@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Globe, MapIcon, MapPin, Phone } from "lucide-react";
+import { Eye, EyeOff, Globe, MapIcon, MapPin, Phone } from "lucide-react";
 
 import {
   Accordion,
@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/state-accordion-test";
 
 import {
+  FaBookmark,
   FaEnvelope,
   FaFacebook,
   FaGlobe,
   FaInstagram,
+  FaRegBookmark,
   FaThreads,
   FaVk,
 } from "react-icons/fa6";
@@ -23,6 +25,13 @@ import { TiArrowRight } from "react-icons/ti";
 
 import NavTabs from "@/components/ui/nav-tabs";
 // import { useToggleListAction } from "@/features/artists/helpers/listActions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { formatEventDates } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
@@ -35,7 +44,7 @@ import slugify from "slugify";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const router = useRouter();
-  const { data, className } = props; //note: removed artist from props. Add back when needed
+  const { data, artist, className } = props; //note: removed artist from props. Add back when needed
   const { event, organizer } = data;
   const {
     logo: eventLogo,
@@ -48,19 +57,19 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
   const orgHasOtherEvents = organizer?.events?.length > 1;
 
-  // const { bookmarked, hidden } = artist?.listActions?.find(
-  //   (la) => la.eventId === event._id,
-  // ) ?? {
-  //   bookmarked: false,
-  //   hidden: false,
-  // };
+  const { bookmarked, hidden } = artist?.listActions?.find(
+    (la) => la.eventId === event._id,
+  ) ?? {
+    bookmarked: false,
+    hidden: false,
+  };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
   const { eventStart, eventEnd, ongoing } = dates;
 
   const [activeTab, setActiveTab] = useState("event");
 
-  // const { toggleListAction } = useToggleListAction(event._id);
+  const { toggleListAction } = useToggleListAction(event._id);
 
   const orgSlug = slugify(organizer.name);
   const latitude = location.coordinates?.latitude ?? 0;
@@ -102,13 +111,13 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   //       )
   //     : null;
 
-  // const onBookmark = () => {
-  //   toggleListAction({ bookmarked: !bookmarked });
-  // };
+  const onBookmark = () => {
+    toggleListAction({ bookmarked: !bookmarked });
+  };
 
-  // const onHide = () => {
-  //   toggleListAction({ hidden: !hidden });
-  // };
+  const onHide = () => {
+    toggleListAction({ hidden: !hidden });
+  };
 
   const tabList = [
     // { id: "application", label: "My Application" },
@@ -280,6 +289,65 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   />
                 </span>
               </div>
+            </div>
+            <div className="flex items-center gap-x-4">
+              {hidden ? (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <EyeOff
+                        className="size-7 cursor-pointer text-muted-foreground"
+                        onClick={onHide}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent align="end">
+                      <p>Unhide {getEventCategoryLabel(event.eventCategory)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Eye className="size-7 cursor-pointer" onClick={onHide} />
+                    </TooltipTrigger>
+                    <TooltipContent align="end">
+                      <p>Hide {getEventCategoryLabel(event.eventCategory)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {bookmarked ? (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <FaBookmark
+                        className="size-7 cursor-pointer text-red-500"
+                        onClick={onBookmark}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent align="end">
+                      <p>Remove Bookmark</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <FaRegBookmark
+                        className="size-7 cursor-pointer"
+                        onClick={onBookmark}
+                      />{" "}
+                    </TooltipTrigger>
+                    <TooltipContent align="end">
+                      <p>
+                        Bookmark {getEventCategoryLabel(event.eventCategory)}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
           </div>
         </div>

@@ -1,6 +1,12 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import {
   ApplyButton,
@@ -25,7 +31,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import {
   FaBookmark,
   FaEnvelope,
@@ -113,10 +118,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
 
   const locationString = locationParts.join(",\n");
 
-  const [isBookmarked, setIsBookmarked] = useState(bookmarked);
-  const [isHidden, setIsHidden] = useState(hidden);
-  const [isApplied, setIsApplied] = useState(appStatus);
-  // console.log("isApplied", isApplied);
+  // console.log("appStatus", appStatus);
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
 
   // const icsLink =
@@ -147,21 +149,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   const { toggleListAction } = useToggleListAction(event._id);
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !isBookmarked });
+    toggleListAction({ bookmarked: !bookmarked });
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !isHidden });
+    toggleListAction({ hidden: !hidden });
   };
-
-  useEffect(() => {
-    setIsHidden(hidden);
-    setIsBookmarked(bookmarked);
-  }, [bookmarked, hidden]);
-
-  useEffect(() => {
-    setIsApplied(appStatus);
-  }, [appStatus]);
 
   return (
     <>
@@ -319,7 +312,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           />
         </div>
         <div className="flex flex-col items-center justify-between pb-5 pr-2 pt-5">
-          {event.status === null && !isApplied ? (
+          {event.status === null && !appStatus ? (
             <CircleDollarSignIcon
               className={cn(
                 "size-6 text-red-600",
@@ -335,9 +328,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             />
           )}
           <div className="flex items-center justify-center gap-x-2">
-            {/* <EyeOff className='size-6' /> //NOTE: Move this to the detailed card view */}
-            {/* TODO: Add publicView check to this as well (when the state is set up) */}
-            {isBookmarked ? (
+            {bookmarked ? (
               <FaBookmark
                 className="size-8 cursor-pointer text-red-600"
                 onClick={onBookmark}
@@ -359,42 +350,94 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
           <div className="flex flex-col items-center gap-y-3">
-            {isBookmarked ? (
-              <FaBookmark
-                className="size-7 cursor-pointer text-red-600"
-                onClick={onBookmark}
-              />
+            {bookmarked ? (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <FaBookmark
+                      className="size-7 cursor-pointer text-red-600"
+                      onClick={onBookmark}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent align="start">
+                    <p>Remove Bookmark</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ) : (
-              <FaRegBookmark
-                className="size-7 cursor-pointer"
-                onClick={onBookmark}
-              />
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <FaRegBookmark
+                      className="size-7 cursor-pointer"
+                      onClick={onBookmark}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent align="start">
+                    <p>Bookmark {getEventCategoryLabel(event.eventCategory)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
-            {isApplied === null ? (
-              <CircleDollarSignIcon
-                className={cn(
-                  "size-6 text-red-600",
-                  !basicInfo?.appFee && "hidden",
-                )}
-              />
+            {appStatus === null ? (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <CircleDollarSignIcon
+                      className={cn(
+                        "size-6 text-red-600",
+                        !basicInfo?.appFee && "hidden",
+                      )}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent align="start">
+                    <p>Has application fee</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ) : (
-              <CheckCircleIcon
-                className={cn(
-                  "size-6 text-emerald-600",
-                  publicView && "hidden",
-                )}
-              />
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <CheckCircleIcon
+                      className={cn(
+                        "size-6 text-emerald-600",
+                        publicView && "hidden",
+                      )}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent align="start">
+                    <p>
+                      Status:{" "}
+                      {appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1)}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
-            {isHidden && (
-              <EyeOff className="size-6 cursor-pointer" onClick={onHide} />
+
+            {hidden && (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <EyeOff
+                      className="size-6 cursor-pointer"
+                      onClick={onHide}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent align="start">
+                    <p>Unhide event?</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             {/* TODO: Add publicView check to this as well (when the state is set up) */}
           </div>
           <EventContextMenu
             eventId={event._id}
             openCallId={opencall ? opencall._id : ""}
-            isHidden={isHidden}
-            // setIsHidden={setIsHidden}
+            isHidden={hidden}
+            // sethidden={sethidden}
             publicView={publicView}
             appStatus={appStatus}
             eventCategory={eventCategory}
@@ -731,12 +774,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             // status={status}
             openCall={event.openCallStatus}
             publicView={publicView}
-            manualApplied={isApplied}
+            manualApplied={appStatus}
             // setManualApplied={setManualApplied}
-            isBookmarked={isBookmarked}
-            // setIsBookmarked={setIsBookmarked}
-            isHidden={isHidden}
-            // setIsHidden={setIsHidden}
+            isBookmarked={bookmarked}
+            // setbookmarked={setbookmarked}
+            isHidden={hidden}
+            // sethidden={sethidden}
             eventCategory={eventCategory}
             isPreview={false}
             appFee={basicInfo ? basicInfo.appFee : 0}
