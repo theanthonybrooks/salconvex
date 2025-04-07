@@ -65,7 +65,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { eventStart, eventEnd, ongoing } = dates;
+  const { eventStart, eventEnd, ongoing, artistStart, artistEnd } = dates;
 
   const [activeTab, setActiveTab] = useState("event");
 
@@ -190,16 +190,15 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
             </p>
             {/*//todo: add this part */}
             {eventCategory === "project" ||
-              (eventCategory === "event" && (
+              (eventCategory === "event" && artistStart && artistEnd && (
                 <p className="flex flex-col items-start gap-1 text-sm">
                   <span className="space-x-1 font-semibold">
                     Painting/Production Dates:
                   </span>
                   {formatEventDates(
-                    eventStart || "",
-                    eventEnd || "",
+                    artistStart || "",
+                    artistEnd || "",
                     ongoing,
-                    "mobile",
                   )}
                 </p>
               ))}

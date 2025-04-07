@@ -36,6 +36,23 @@ const customUserSchema = {
   emailVerified: v.optional(v.boolean()),
 };
 
+const userLogSchema = {
+  userId: v.string(),
+  firstName: v.string(),
+  lastName: v.string(),
+  active: v.boolean(),
+  banned: v.boolean(),
+  bannedReason: v.optional(v.string()),
+  bannedTimestamp: v.optional(v.number()),
+  banningAuthority: v.optional(v.string()),
+  deleted: v.boolean(),
+  deletedReason: v.optional(v.string()),
+  deletedTimestamp: v.optional(v.number()),
+  deletedBy: v.optional(v.string()),
+  accountTypes: v.array(v.string()),
+  userEmail: v.string(),
+};
+
 const artistSchema = {
   artistId: v.id("users"),
   artistName: v.optional(v.string()),
@@ -301,6 +318,11 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_token", ["tokenIdentifier"])
     .index("by_createdAt", ["createdAt"]),
+
+  userLog: defineTable(userLogSchema)
+    .index("by_userId", ["userId"])
+    .index("by_email", ["userEmail"]),
+
   passwordResetLog: defineTable({
     email: v.string(),
     userId: v.string(),

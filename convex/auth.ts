@@ -130,6 +130,22 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         theme: "default",
       });
 
+      await ctx.db.insert("userLog", {
+        userId: newUserId,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        active: true,
+        banned: false,
+        bannedReason: undefined,
+        bannedTimestamp: undefined,
+        banningAuthority: undefined,
+        deleted: false,
+        deletedReason: undefined,
+        deletedTimestamp: undefined,
+        accountTypes: ["artist"],
+        userEmail: profile.email,
+      });
+
       return newUserId;
     },
   },

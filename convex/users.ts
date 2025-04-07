@@ -491,6 +491,40 @@ async function performDeleteAccount(
     actionType: config.deleteType,
     accountCreatedAt: user.createdAt,
   });
+
+  const userLogId = await ctx.db
+    .query("userLog")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+  if (userLogId) {
+    await ctx.db.patch(userLogId._id, {
+      deleted: true,
+      deletedReason: config.deleteType,
+      deletedTimestamp: Date.now(),
+      deletedBy: config.userAgent,
+    });
+  } else {
+    await ctx.db.insert("userLog", {
+      userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      active: false,
+      banned: false,
+      bannedReason: undefined,
+      bannedTimestamp: undefined,
+      banningAuthority: undefined,
+      deleted: true,
+      deletedReason: config.deleteType,
+      deletedTimestamp: Date.now(),
+      deletedBy: config.userAgent,
+      accountTypes: user.accountType,
+      userEmail: user.email,
+    });
+  }
+
+  // await ctx.db.patch("userLog", userId), {
+
+  // }
 }
 
 async function deleteRelatedDocuments(
