@@ -81,7 +81,7 @@ export default function Home() {
               <div className="space-y-2">
                 <h3 className="font-bold italic">Marching Band Mural</h3>
                 <p className="text-sm text-muted-foreground">
-                  Painted in Pieve Santo Stefano, Tuscany (Italy)
+                  Pieve Santo Stefano, Tuscany (IT)
                 </p>
                 <h4 className="font-medium leading-none">More info:</h4>
                 <p className="text-sm text-muted-foreground">

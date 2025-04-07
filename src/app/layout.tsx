@@ -4,23 +4,24 @@ import {
   spaceGrotesk,
   spaceMono,
   tankerReg,
-} from "@/assets/fonts"
-import { ConvexClientProvider } from "@/components/convex-client-provider"
-import { cn } from "@/lib/utils"
-import { ThemedProvider } from "@/providers/themed-provider"
+} from "@/assets/fonts";
+import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { cn } from "@/lib/utils";
+import { PostHogProvider } from "@/providers/posthog-provider";
+import { ThemedProvider } from "@/providers/themed-provider";
 import {
   ConvexAuthNextjsServerProvider,
   convexAuthNextjsToken,
-} from "@convex-dev/auth/nextjs/server"
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider"
-import { fetchQuery } from "convex/nextjs"
-import { GeistSans } from "geist/font/sans"
-import "leaflet/dist/leaflet.css"
-import type { Metadata } from "next"
-import { ToastContainer } from "react-toastify"
-import { api } from "~/convex/_generated/api"
-import "./globals.css"
+} from "@convex-dev/auth/nextjs/server";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
+import { fetchQuery } from "convex/nextjs";
+import { GeistSans } from "geist/font/sans";
+import "leaflet/dist/leaflet.css";
+import type { Metadata } from "next";
+import { ToastContainer } from "react-toastify";
+import { api } from "~/convex/_generated/api";
+import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nextstarter.xyz/"),
@@ -50,46 +51,47 @@ export const metadata: Metadata = {
       "https://dwdwn8b5ye.ufs.sh/f/MD2AM9SEY8GucGJl7b5qyE7FjNDKYduLOG2QHWh3f5RgSi0c",
     ],
   },
-}
+};
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  const token = await convexAuthNextjsToken()
-  let userData = null
+  const token = await convexAuthNextjsToken();
+  let userData = null;
 
   if (token) {
-    userData = await fetchQuery(api.users.getCurrentUser, {}, { token })
+    userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
   }
 
-  const userPref = userData?.userPref ?? undefined
+  const userPref = userData?.userPref ?? undefined;
 
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang='en' suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning>
         <head>
           {/* <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' /> */}
         </head>
         <body
           className={cn(
             GeistSans.className,
-            " scrollable  darkbar antialiased  default:font-spaceGrotesk ",
+            "scrollable darkbar antialiased default:font-spaceGrotesk",
             // " scrollable invis darkbar antialiased",
             tankerReg.variable,
             spaceMono.variable,
             libreFranklin.variable,
             spaceGrotesk.variable,
-            bebasNeue.variable
-          )}>
+            bebasNeue.variable,
+          )}
+        >
           <ConvexClientProvider>
             <ConvexQueryCacheProvider>
               <ThemedProvider userPref={userPref}>
-                {children}
+                <PostHogProvider> {children}</PostHogProvider>
                 <SpeedInsights />
                 <ToastContainer
-                  position='top-right'
+                  position="top-right"
                   autoClose={5000}
                   hideProgressBar={false}
                   newestOnTop={false}
@@ -98,8 +100,8 @@ export default async function RootLayout({
                   pauseOnFocusLoss
                   draggable
                   pauseOnHover
-                  theme='light'
-                  toastClassName='rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] md:max-w-fit border-2'
+                  theme="light"
+                  toastClassName="rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] md:max-w-fit border-2"
                 />
               </ThemedProvider>
             </ConvexQueryCacheProvider>
@@ -107,5 +109,5 @@ export default async function RootLayout({
         </body>
       </html>
     </ConvexAuthNextjsServerProvider>
-  )
+  );
 }
