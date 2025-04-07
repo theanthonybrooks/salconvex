@@ -36,7 +36,7 @@ export default async function HomeLayout({
         // userPref={userPref ?? null}
       />
       <div className="flex flex-col pt-32">
-        <main className="flex flex-1 flex-col items-center px-4">
+        <main className="flex w-full flex-1 flex-col items-center px-4">
           {children}
         </main>
 
