@@ -39,10 +39,12 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { EventCardProps } from "@/types/event";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import slugify from "slugify";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
+  const router = useRouter();
   const {
     data,
     artist,
@@ -128,11 +130,19 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   }, []);
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !bookmarked });
+    if (!artist) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ bookmarked: !bookmarked });
+    }
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !hidden });
+    if (!artist) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ hidden: !hidden });
+    }
   };
 
   return (

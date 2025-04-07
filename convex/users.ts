@@ -482,6 +482,11 @@ async function performDeleteAccount(
     await ctx.db.delete(userId);
   }
 
+  const userSubscriptions = await ctx.db
+    .query("userSubscriptions")
+    .withIndex("userId", (q) => q.eq("userId", userId))
+    .collect();
+
   // Log the deletion.
   await ctx.db.insert("deleteAccountLog", {
     email: user.email ?? "unknown",
@@ -510,6 +515,7 @@ async function performDeleteAccount(
       lastName: user.lastName,
       active: false,
       banned: false,
+      hadTrial: userSubscriptions[0]?.hadTrial || null,
       bannedReason: undefined,
       bannedTimestamp: undefined,
       banningAuthority: undefined,

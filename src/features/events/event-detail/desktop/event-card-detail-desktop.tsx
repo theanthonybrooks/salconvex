@@ -112,11 +112,19 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   //     : null;
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !bookmarked });
+    if (!artist) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ bookmarked: !bookmarked });
+    }
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !hidden });
+    if (!artist) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ hidden: !hidden });
+    }
   };
 
   const tabList = [

@@ -136,13 +136,14 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         lastName: profile.lastName,
         active: true,
         banned: false,
+        hadTrial: false,
         bannedReason: undefined,
         bannedTimestamp: undefined,
         banningAuthority: undefined,
         deleted: false,
         deletedReason: undefined,
         deletedTimestamp: undefined,
-        accountTypes: ["artist"],
+        accountTypes: profile.accountType,
         userEmail: profile.email,
       });
 

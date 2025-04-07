@@ -197,7 +197,7 @@ const EventContextMenu = ({
 
               appStatus !== null &&
                 !publicView &&
-                "hover:shadow-slga border-foreground/50 bg-background text-foreground/50",
+                "border-foreground/50 bg-background text-foreground/50 hover:shadow-slga",
             )}
           >
             <Ellipsis className="size-8" />
@@ -275,9 +275,7 @@ const EventContextMenu = ({
                   : "text-black/80 hover:text-emerald-700",
               )}
             >
-              <Link href="/pricing#plans">
-                Subscribe to bookmark, hide, or apply
-              </Link>
+              <Link href="/pricing">Subscribe to bookmark, hide, or apply</Link>
             </div>
           )}
         </div>

@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   FaBookmark,
   FaEnvelope,
@@ -56,6 +57,7 @@ export interface EventCardPreviewProps {
 }
 
 const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
+  const router = useRouter();
   const {
     dates,
     location,
@@ -66,6 +68,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
     logo,
     tabs,
     bookmarked,
+
     // manualApplied,
     // organizerId,
     // hasActiveOpenCall,
@@ -149,11 +152,19 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   const { toggleListAction } = useToggleListAction(event._id);
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !bookmarked });
+    if (publicView) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ bookmarked: !bookmarked });
+    }
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !hidden });
+    if (publicView) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ hidden: !hidden });
+    }
   };
 
   return (

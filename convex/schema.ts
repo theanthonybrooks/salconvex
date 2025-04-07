@@ -41,7 +41,9 @@ const userLogSchema = {
   firstName: v.string(),
   lastName: v.string(),
   active: v.boolean(),
+  hadTrial: v.union(v.boolean(), v.null()),
   banned: v.boolean(),
+
   bannedReason: v.optional(v.string()),
   bannedTimestamp: v.optional(v.number()),
   banningAuthority: v.optional(v.string()),
