@@ -1,14 +1,15 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "convex-helpers/react/cache";
 // import { useUser } from "@clerk/nextjs";
-import { useAction, useQuery } from "convex/react";
+import { useAction } from "convex/react";
 import { format } from "date-fns";
 
 import { CreditCard, Users } from "lucide-react";
 import { FaStripeS } from "react-icons/fa6";
 import { toast } from "react-toastify";
-import { api } from "../../../../../convex/_generated/api";
+import { api } from "~/convex/_generated/api";
 
 export default function AccountPage() {
   const userData = useQuery(api.users.getCurrentUser, {});

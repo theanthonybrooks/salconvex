@@ -78,7 +78,7 @@ export const ResetOTP = Resend({
       <body>
          <div class="outer-container">
             <div class="container">
-                <div class="heading">The Street Art List</div>
+                   <div class="heading"><img src="https://github.com/theanthonybrooks/salconvex/blob/f32f38ca487d32a9ee13056a2782d21aca5f63d0/public/saltext.png" alt="The Street Art List" width="400" height="auto" style="display: block; margin: 0 auto;"></div>
                 <div class="text-sm">Please enter the following code to proceed to password reset.</div>
                 <div class="section">
                     <div class="subtext">Password reset code</div>

@@ -59,31 +59,20 @@ export default function DashboardSideBar({
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
 
-  // const { image, alt, width, height } = landingPageLogo[0]
-  // const {
-  //   image: image2,
-  //   alt: alt2,
-  //   width: width2,
-  //   height: height2,
-  // } = landingPageLogoText[0]
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
-  // const filteredNavItems = navItems.filter(
-  //   (item) =>
-  //     item.sub.includes(statusKey) ||
-  //     (item.sub.includes("admin") && hasAdminRole) ||
-  //     (item.sub.includes("all") && !item.label.includes("Help"))
-  // )
-  const helpNavItems = navItems.filter((item) => item.label.includes("Help"));
 
+  const helpNavItems = navItems.filter((item) => item.label.includes("Help"));
   const filteredNavItems = useMemo(() => {
-    return navItems.filter(
-      (item) =>
-        item.sub.includes(statusKey) ||
-        (item.sub.includes("admin") && hasAdminRole) ||
-        (item.sub.includes("all") && !item.label.includes("Help")),
-    );
-  }, [statusKey, hasAdminRole]); // Dependencies to prevent unnecessary recalculations
+    return navItems.filter((item) => {
+      const isAllowedBySub = item.sub.includes(statusKey);
+      const isAdmin = hasAdminRole && !item.label.includes("Help");
+      const isGeneralItem =
+        item.sub.includes("all") && !item.label.includes("Help");
+
+      return isAllowedBySub || isAdmin || isGeneralItem;
+    });
+  }, [statusKey, hasAdminRole]);
 
   useEffect(() => {
     const matchingSection = filteredNavItems.find(
@@ -247,9 +236,11 @@ export default function DashboardSideBar({
                               <sectionItem.icon className="h-4 w-4" />
                               {sectionItem.label}
                             </Link>
-                            {index === arr.length - 1 && (
-                              <Separator thickness={2} className="w-full" />
-                            )}
+                            {/* TODO: ensure that this is the correct separator to be checking the length on.  */}
+                            {index === arr.length - 1 &&
+                              filteredNavItems.length > 2 && (
+                                <Separator thickness={2} className="w-full" />
+                              )}
                           </div>
                         ))}
                     </motion.div>

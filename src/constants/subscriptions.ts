@@ -1,9 +1,9 @@
-type SubType = {
-  name: string
-  description: string
-}
+type AccountType = {
+  name: string;
+  description: string;
+};
 //NOTE: Organizer? Organization?
-export const SUB_TYPES: SubType[] = [
+export const SUB_TYPES: AccountType[] = [
   {
     name: "artist",
     description: "Artist",
@@ -25,4 +25,4 @@ export const SUB_TYPES: SubType[] = [
     name: "admin",
     description: "Administrator",
   },
-]
+];

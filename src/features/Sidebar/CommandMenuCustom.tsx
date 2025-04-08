@@ -22,6 +22,7 @@ export interface CommandItem {
   icon?: React.ComponentType<{ className?: string }>;
   path?: string;
   href?: string;
+  sub?: string[];
   userType: string[];
   sectionCat?: string;
   group?: string;
@@ -38,6 +39,8 @@ interface CommandMenuProps<T extends CommandItem> {
   placeholder?: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   userType?: string[];
+  subStatus?: string | undefined;
+  userRole?: string[] | undefined;
 }
 
 export const CommandMenuCustom = <T extends CommandItem>({
@@ -48,14 +51,17 @@ export const CommandMenuCustom = <T extends CommandItem>({
   shortcut = "/",
   isMobile = false,
   userType,
+  subStatus,
+  userRole,
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
 }: CommandMenuProps<T>) => {
+  // console.log(subStatus);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
   const shortcutRef = useRef(shortcut);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const router = useRouter();
 
   // Update the ref if shortcut changes
@@ -86,15 +92,31 @@ export const CommandMenuCustom = <T extends CommandItem>({
 
   const filteredItems = source.filter((item) => {
     const itemUserType = item?.userType;
+    const itemUserSub = item?.sub;
     const isPublic = itemUserType?.includes("public");
     const typeMatch = userType?.some((type) =>
       itemUserType?.some(
         (userType) => userType.toLowerCase() === type.toLowerCase(),
       ),
     );
+    const subMatch = itemUserSub?.some(
+      (sub) => sub.toLowerCase() === subStatus?.toLowerCase(),
+    );
 
-    return isPublic || typeMatch;
+    const isAdmin = userRole?.includes("admin");
+    const allSubs = itemUserSub?.includes("all");
+
+    const fitsSubReqs = subMatch || allSubs;
+
+    return (
+      (isPublic && typeMatch && fitsSubReqs) ||
+      (!isPublic && typeMatch && fitsSubReqs) ||
+      (isPublic && allSubs) ||
+      isAdmin
+    );
   });
+
+  // console.log(filteredItems);
 
   // Extract fields from source dynamically
   const extractedItems = filteredItems.map((item) => ({
@@ -225,8 +247,6 @@ export const CommandMenuCustom = <T extends CommandItem>({
                         <Command.Item
                           key={item.path}
                           className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected="true"]:bg-salYellow/40'
-                          onMouseEnter={() => setHoveredItem(item.path)}
-                          onMouseLeave={() => setHoveredItem(null)}
                           onSelect={() => {
                             setOpen(false);
                             router.push(item.path);
@@ -332,9 +352,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                       {groupItems.map((item) => (
                         <Command.Item
                           key={item.path}
-                          className="flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
-                          onMouseEnter={() => setHoveredItem(item.path)}
-                          onMouseLeave={() => setHoveredItem(null)}
+                          className="group flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
                           onSelect={() => router.push(item.path)}
                         >
                           {item.icon && <item.icon className="h-4 w-4" />}
@@ -346,17 +364,10 @@ export const CommandMenuCustom = <T extends CommandItem>({
                             <span>{item.title}</span>
                           </Link>
                           {item.desc && !isMobile && (
-                            <motion.span
-                              initial={{ opacity: 0 }}
-                              animate={{
-                                opacity: hoveredItem === item.path ? 1 : 0,
-                              }}
-                              transition={{ duration: 0.1 }}
-                              className="inline-flex items-center gap-2 text-stone-600"
-                            >
+                            <span className="inline-flex items-center gap-2 text-stone-600 opacity-0 transition-opacity ease-in-out group-hover:opacity-100">
                               <DashIcon />
                               <span>{item.desc}</span>
-                            </motion.span>
+                            </span>
                           )}
                         </Command.Item>
                       ))}

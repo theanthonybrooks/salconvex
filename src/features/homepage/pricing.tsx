@@ -459,7 +459,7 @@ export default function Pricing() {
   // const userAccountTypes = user?.accountType ?? []
   // const multiType = userAccountTypes.length > 1
   const accountType = user?.accountType[0] ?? "artist";
-  const isAdmin = user?.accountType?.includes("admin");
+  const isAdmin = user?.role?.includes("admin");
 
   // if (hasSub) {
   //   accountType = "organizer"

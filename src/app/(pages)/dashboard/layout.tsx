@@ -14,6 +14,7 @@ export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
   const token = await convexAuthNextjsToken();
+
   const subStatus = await fetchQuery(
     api.subscriptions.getUserSubscriptionStatus,
     {},
@@ -21,6 +22,8 @@ export default async function DashboardLayout({
   );
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
   const role = user?.user?.role;
+  // const userSub = subStatus?.subStatus;
+  // const userType = user?.user?.accountType;
 
   if (!user || !subStatus) redirect("/auth/sign-in");
   // if (subStatus?.subStatus === "cancelled") {
@@ -40,7 +43,7 @@ export default async function DashboardLayout({
           subStatus={subStatus?.subStatus}
           role={role}
         />
-        <main className="scrollable bg-dashboardBgLt max-h-[calc(100dvh-80px)] flex-1 white:bg-stone-200">
+        <main className="scrollable max-h-[calc(100dvh-80px)] flex-1 bg-dashboardBgLt white:bg-stone-200">
           {children}
         </main>
       </div>

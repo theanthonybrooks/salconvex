@@ -74,7 +74,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["admin", "organizer", "artist", "judge"],
+        userType: ["organizer", "artist", "judge"],
       },
       {
         title: "My Applications",
@@ -106,7 +106,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["admin", "organizer", "artist"],
+        userType: ["organizer", "artist"],
       },
       {
         title: "Settings",
@@ -114,7 +114,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["admin", "organizer", "artist", "judge"],
+        userType: ["organizer", "artist", "judge"],
       },
     ],
   },

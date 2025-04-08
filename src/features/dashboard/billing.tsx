@@ -8,9 +8,9 @@ import { format } from "date-fns";
 import { ConvexError } from "convex/values";
 import { CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "~/convex/_generated/api";
 
-export default function AccountPage() {
+export default function BillingPage() {
   // const userData = useQuery(api.users.getCurrentUser, {})
   // const user = userData?.user // This avoids destructuring null or undefined
 

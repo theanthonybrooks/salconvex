@@ -1,12 +1,12 @@
-import { JSX } from "react"
-import { FaInstagram } from "react-icons/fa"
+import { JSX } from "react";
+import { FaInstagram } from "react-icons/fa";
 
 export const landingPageNavbarMenuLinksResources: {
-  title: string
-  href: string
-  description: string
-  isIcon?: boolean
-  sub: string[]
+  title: string;
+  href: string;
+  description: string;
+  isIcon?: boolean;
+  sub: string[];
 }[] = [
   {
     title: "For Artists",
@@ -32,13 +32,13 @@ export const landingPageNavbarMenuLinksResources: {
     description: "The dragon that ate my family.",
     sub: ["admin"],
   },
-]
+];
 export const landingPageNavbarMenuLinksTheList: {
-  title: string
-  href: string
-  description: string
-  isIcon?: boolean
-  sub: string[]
+  title: string;
+  href: string;
+  description: string;
+  isIcon?: boolean;
+  sub: string[];
 }[] = [
   {
     title: "The List",
@@ -82,16 +82,16 @@ export const landingPageNavbarMenuLinksTheList: {
     description: "The dragon that ate my family.",
     sub: ["admin"],
   },
-]
+];
 
 export const landingPageNavbarLinks: {
-  title: string
-  href: string
-  description: string
-  icon?: JSX.Element
-  isIcon?: boolean
-  target?: string
-  sub: string[]
+  title: string;
+  href: string;
+  description: string;
+  icon?: JSX.Element;
+  isIcon?: boolean;
+  target?: string;
+  sub: string[];
 }[] = [
   {
     title: "Dashboard",
@@ -134,8 +134,8 @@ export const landingPageNavbarLinks: {
     title: "Instagram",
     href: "https://instagram.com/thestreetartlist",
     description: "View the IG profile",
-    icon: <FaInstagram className='h-5 w-5' />,
+    icon: <FaInstagram className="h-5 w-5" />,
     isIcon: true,
     sub: ["all"],
   },
-]
+];

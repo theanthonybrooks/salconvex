@@ -1,9 +1,20 @@
+import BillingPage from "@/features/dashboard/billing";
+import SettingsPage from "@/features/dashboard/settings";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
-import { api } from "../../../../../convex/_generated/api";
+import { api } from "~/convex/_generated/api";
 
-export default async function AccountPage() {
+interface Props {
+  params: {
+    slug: string;
+  };
+}
+
+export default async function AccountPage({ params }: Props) {
+  const { slug } = await params;
+
+  // Auth + sub gating (can use helper)
   const token = await convexAuthNextjsToken();
   const subscription = await fetchQuery(
     api.subscriptions.getUserSubscription,
@@ -17,20 +28,16 @@ export default async function AccountPage() {
   if (!user) {
     redirect("/auth/sign-in");
   }
-
-  if (!user?.role.includes("admin")) {
-    if (!subStatus || subStatus === "cancelled") {
-      redirect("/dashboard/account/settings");
-    }
-
-    redirect("/dashboard");
+  if (!subStatus || subStatus === "cancelled") {
+    return <SettingsPage />;
   }
 
-  redirect("/dashboard/admin/todos");
-
-  // return (
-  //   <>
-  //     <KanbanBoard userRole={user?.role?.[0]} />
-  //   </>
-  // )
+  switch (slug) {
+    case "billing":
+      return <BillingPage />;
+    case "settings":
+      return <SettingsPage />;
+    default:
+      redirect("/dashboard/account/settings");
+  }
 }

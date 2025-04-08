@@ -1,9 +1,19 @@
+import { KanbanBoard } from "@/components/ui/kanban-board";
+import AnalyticsPage from "@/features/dashboard/posthog-analytics";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
-import { api } from "../../../../../convex/_generated/api";
+import { api } from "~/convex/_generated/api";
 
-export default async function AccountPage() {
+interface Props {
+  params: {
+    slug: string;
+  };
+}
+
+export default async function AdminPage({ params }: Props) {
+  const { slug } = await params;
+
   const token = await convexAuthNextjsToken();
   const subscription = await fetchQuery(
     api.subscriptions.getUserSubscription,
@@ -26,11 +36,12 @@ export default async function AccountPage() {
     redirect("/dashboard");
   }
 
-  redirect("/dashboard/admin/todos");
-
-  // return (
-  //   <>
-  //     <KanbanBoard userRole={user?.role?.[0]} />
-  //   </>
-  // )
+  switch (slug) {
+    case "analytics":
+      return <AnalyticsPage />;
+    case "todos":
+      return <KanbanBoard userRole={user.role?.[0]} />;
+    default:
+      redirect("/dashboard/account/todos");
+  }
 }

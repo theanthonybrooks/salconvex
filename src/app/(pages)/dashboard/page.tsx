@@ -8,10 +8,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
 import { Activity, Code, Star, TrendingUp, Users, Zap } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { api } from "~/convex/_generated/api";
 
 export default async function Dashboard() {
+  const token = await convexAuthNextjsToken();
+
+  const subStatus = await fetchQuery(
+    api.subscriptions.getUserSubscriptionStatus,
+    {},
+    { token },
+  );
+  const userSub = subStatus?.subStatus;
+
+  if (!userSub || userSub === "cancelled") {
+    redirect("/dashboard/account/settings");
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <div>
