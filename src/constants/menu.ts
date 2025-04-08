@@ -179,7 +179,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       },
       {
         title: "Analytics",
-        path: "/admin/analytics",
+        path: "/dashboard/admin/analytics",
         category: "admin",
         public: false,
         userType: ["admin"],

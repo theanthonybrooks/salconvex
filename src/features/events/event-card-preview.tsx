@@ -38,6 +38,7 @@ import {
   FaFacebook,
   FaGlobe,
   FaInstagram,
+  FaMapLocationDot,
   FaPaintRoller,
   FaRegBookmark,
   FaRegCommentDots,
@@ -522,10 +523,19 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
         <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
           {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
           <span className="font-semibold">Location:</span>
-          <div>
-            {locationString.split("\n").map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
+          <div className="flex flex-col gap-y-4">
+            <div>
+              {locationString.split("\n").map((line, i) => (
+                <div key={i}>{line}</div>
+              ))}
+            </div>
+            {/* TODO: Add a link to the map */}
+            <span
+              className="inline-flex items-center gap-x-1 font-semibold hover:cursor-pointer [&>svg]:hover:scale-110"
+              onClick={() => console.log("map clicked")}
+            >
+              <FaMapLocationDot className="size-4" /> View on Map
+            </span>
           </div>
         </div>
         {isCurrentlyOpen ? (

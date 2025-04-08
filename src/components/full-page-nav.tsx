@@ -16,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PiHeartBold } from "react-icons/pi";
 
 interface FullPageNavProps {
   // userId?: string | undefined
@@ -626,8 +627,10 @@ const FullPageNav = ({
                 className="flex flex-col items-center justify-center space-y-5 py-6"
               >
                 <SocialsRow />
-                <div className="flex items-center space-x-2 text-sm">
-                  <p>Made with ❤️ by</p>
+                <div className="flex items-center space-x-1 text-sm">
+                  <p className="inline-flex items-center gap-x-1">
+                    Made with <PiHeartBold className="size-4" /> by
+                  </p>
                   <Link
                     href="https://theanthonybrooks.com"
                     target="_blank"
@@ -868,8 +871,10 @@ const FullPageNav = ({
                     <div className="flex items-center space-x-2">
                       <SocialsRow size={7} />
                     </div>
-                    <div className="flex items-center space-x-2 text-sm">
-                      <p>Made with ❤️ by</p>
+                    <div className="flex items-center space-x-1 text-sm">
+                      <p className="inline-flex items-center gap-x-1">
+                        Made with <PiHeartBold className="size-4" /> by
+                      </p>
                       <Link
                         href="https://theanthonybrooks.com"
                         target="_blank"
@@ -878,7 +883,7 @@ const FullPageNav = ({
                         Anthony Brooks
                       </Link>
                     </div>
-                    <div className="flex items-center gap-x-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-x-2 text-center text-sm text-foreground">
                       {footerText.text}
                       <Image
                         src="/logotransparency.png"

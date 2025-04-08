@@ -24,7 +24,9 @@ import {
 import { TbBrandPatreon } from "react-icons/tb";
 
 import { JSX } from "react";
+import { IconType } from "react-icons";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
+import { PiGraph } from "react-icons/pi";
 
 export type MenuProps = {
   id: number;
@@ -145,8 +147,8 @@ export const SOCIAL_MEDIA_LINKS: SocialProps[] = [
 interface DashNavItem {
   label: string;
   href: string;
-  icon: LucideIcon;
-  sectionIcon?: LucideIcon;
+  icon: LucideIcon | IconType;
+  sectionIcon?: LucideIcon | IconType;
   sub: string[];
   userType: string[];
   section?: boolean;
@@ -225,6 +227,17 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: ["admin"],
     userType: ["admin"],
   },
+  {
+    label: "Site Analytics",
+    href: "/dashboard/admin/analytics",
+    icon: PiGraph,
+    subsection: true,
+    sectionCat: "admin",
+    desc: "Posthog Analytics",
+    sub: ["admin"],
+    userType: ["admin"],
+  },
+
   {
     label: "My Applications",
     href: "/dashboard/apps",

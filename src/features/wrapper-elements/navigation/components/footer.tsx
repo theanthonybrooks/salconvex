@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaInstagram, FaRegEnvelope } from "react-icons/fa";
 import { FaFacebookF, FaThreads } from "react-icons/fa6";
+import { PiHeartBold } from "react-icons/pi";
 
 interface NewsletterFormProps {
   email: string;
@@ -166,8 +167,10 @@ export default function Footer({ className }: { className?: string }) {
                 </Button>
               </Link>
             </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <p>Made with ❤️ by</p>
+            <div className="flex items-center space-x-1 text-sm">
+              <p className="inline-flex items-center gap-x-1">
+                Made with <PiHeartBold className="size-4" /> by
+              </p>
               <Link
                 href="https://theanthonybrooks.com"
                 target="_blank"
