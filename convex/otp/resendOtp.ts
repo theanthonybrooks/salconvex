@@ -32,20 +32,16 @@ export const ResendOTP = Resend({
           <style>
               body {
                   font-family: sans-serif;
-                  padding:  20px;
+                  padding: 20px;
                   background-color: #f9fafb;
               }
-              .outer-container {
-                  padding: 20px;
-              }
-
               .container {
                   max-width: 600px;
                   margin: auto;
                   background-color: #ffffff;
                   border-radius: 8px;
-                  border:4px solid black;
-                  box-shadow: -10px 10px black
+                  border: 4px solid #000000;
+                 box-shadow: -10px 10px #000000;
                   padding: 40px 0;
               }
               .heading {
@@ -76,20 +72,19 @@ export const ResendOTP = Resend({
           </style>
       </head>
       <body>
-         <div class="outer-container">
-            <div class="container">
-                <div class="heading"><img src="https://github.com/theanthonybrooks/salconvex/blob/f32f38ca487d32a9ee13056a2782d21aca5f63d0/public/saltext.png" alt="The Street Art List" width="400" height="auto" style="display: block; margin: 0 auto;"></div>
-                <div class="text-sm">Please enter the following code to finish signing up.</div>
-                <div class="section">
-                    <div class="subtext">Verification code</div>
-                    <div class="verification-code">${token}</div>
-                    <div class="subtext">(This code is valid for ${validHours} minutes)</div>
-                </div>
-                <div class="section">
-                    <div class="subtext">If you did not request this email, please ignore this message.</div>
-                </div>
-            </div>
-         </div>
+          <div class="container">
+          
+              <img src="https://salconvex.vercel.app/saltext.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
+              <div class="text-sm">Please enter the following code to finish signing up.</div>
+              <div class="section">
+                  <div class="subtext">Verification code</div>
+                  <div class="verification-code">${token}</div>
+                  <div class="subtext">(This code is valid for ${validHours} minutes)</div>
+              </div>
+              <div class="section">
+                  <div class="subtext">If you did not request this email, please ignore this message.</div>
+              </div>
+          </div>
       </body>
       </html>
     `;
