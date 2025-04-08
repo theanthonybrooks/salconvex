@@ -308,7 +308,7 @@ const Column: React.FC<
       onDragLeave={handleDragLeave}
       onDrop={handleDragEnd}
     >
-      <div className="sticky top-0 z-10 mb-3 bg-background">
+      <div className="sticky top-0 z-10 mb-3">
         <div className="relative flex items-center justify-between">
           <h3 className={cn("z-10 rounded-lg p-4 font-medium", headingColor)}>
             {title}
