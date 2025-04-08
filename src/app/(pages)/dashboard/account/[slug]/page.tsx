@@ -5,16 +5,13 @@ import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 
-interface Props {
-  params: {
-    slug: string;
-  };
-}
-
-export default async function AccountPage({ params }: Props) {
+export default async function AccountPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
 
-  // Auth + sub gating (can use helper)
   const token = await convexAuthNextjsToken();
   const subscription = await fetchQuery(
     api.subscriptions.getUserSubscription,

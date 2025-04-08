@@ -5,13 +5,11 @@ import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 
-interface Props {
-  params: {
-    slug: string;
-  };
-}
-
-export default async function AdminPage({ params }: Props) {
+export default async function AdminPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
 
   const token = await convexAuthNextjsToken();
