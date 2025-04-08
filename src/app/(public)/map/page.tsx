@@ -3,8 +3,13 @@
 import { Separator } from "@/components/ui/separator";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { Plus } from "lucide-react";
+import { useEffect } from "react";
 
 const WorldMapPage = () => {
+  useEffect(() => {
+    sessionStorage.setItem("previousSalPage", "/map");
+  }, []);
+
   return (
     <div className="flex h-full w-full flex-1 flex-col items-center justify-center gap-x-4 px-4">
       <h1 className="font-tanker text-[5rem] lowercase tracking-wide">

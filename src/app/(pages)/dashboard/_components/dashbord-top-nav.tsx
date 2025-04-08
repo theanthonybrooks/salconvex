@@ -38,6 +38,8 @@ export default function NavBar({
   });
 
   useEffect(() => {
+    sessionStorage.removeItem("previousSalPage");
+
     const mediaQuery = window.matchMedia("(max-width: 1024px)");
     setIsMobile(mediaQuery.matches);
 

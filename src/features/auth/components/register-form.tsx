@@ -79,6 +79,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [obsEmail, setObsEmail] = useState("");
   const [otp, setOtp] = useState<string>("");
   const callBackSrc = sessionStorage.getItem("src");
+  const prevSalPage = sessionStorage.getItem("previousSalPage");
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -240,6 +241,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         if (callBackSrc && callBackSrc === "newUser") {
           sessionStorage.removeItem("src");
           router.replace("/pricing");
+        } else if (prevSalPage) {
+          router.replace(prevSalPage);
         } else {
           router.replace("/");
         }

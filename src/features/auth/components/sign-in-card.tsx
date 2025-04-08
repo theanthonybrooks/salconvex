@@ -48,6 +48,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
 
   const searchParams = useSearchParams();
   const callBackSrc = sessionStorage.getItem("src");
+  const prevSalPage = sessionStorage.getItem("previousSalPage");
 
   const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,6 +64,8 @@ const SignInCard: React.FC<SignInCardProps> = ({
         if (callBackSrc && callBackSrc === "newUser") {
           sessionStorage.removeItem("src");
           router.replace("/pricing");
+        } else if (prevSalPage) {
+          router.replace(prevSalPage);
         } else {
           router.replace("/");
         }

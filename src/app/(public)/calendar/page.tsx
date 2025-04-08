@@ -13,12 +13,13 @@ import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 import { useQuery } from "convex-helpers/react/cache";
 import { ExternalLink, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 const Calendar = () => {
   const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
+
   // const handleDateClick = (arg: { eventStr: string }) => {
   //   console.log("Clicked date:", arg.eventStr);
   // };
@@ -117,6 +118,11 @@ const Calendar = () => {
       },
     },
   ];
+
+  useEffect(() => {
+    sessionStorage.setItem("previousSalPage", "/calendar");
+  }, []);
+
   return (
     <div className="flex h-full w-full flex-1 flex-col items-center justify-center gap-x-4 px-4">
       <h1 className="font-tanker text-[5rem] lowercase tracking-wide">

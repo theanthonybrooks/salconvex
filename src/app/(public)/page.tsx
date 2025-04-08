@@ -36,6 +36,10 @@ export default function Home() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    sessionStorage.removeItem("previousSalPage");
+  }, []);
+
   return (
     <motion.div ref={targetRef}>
       <motion.div

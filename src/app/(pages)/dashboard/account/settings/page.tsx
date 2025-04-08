@@ -126,6 +126,7 @@ export default function SettingsPage() {
 
     try {
       await DeleteAccount({ method: "deleteAccount", userId: user?.userId });
+      sessionStorage.clear();
       await signOut();
     } catch (err) {
       setError("Failed to delete account. Please try again.");
@@ -324,6 +325,7 @@ export default function SettingsPage() {
       await deleteSessions({ userId: user?.userId });
       // await invalidateSessions({ userId: user?.userId })
       setSuccess("Sessions deleted!");
+      sessionStorage.clear();
       signOut();
     } catch (err: unknown) {
       if (err instanceof ConvexError) {

@@ -33,9 +33,9 @@ const Event = () => {
 
   const onBackClick = () => {
     const previous = sessionStorage.getItem("previousSalPage");
-    //  console.log(previous); //note-to-self: annoying as it doesn't actually save the full pagth. I'm using it as a flag, for now.
-    if (previous && previous.startsWith("/")) {
-      router.back();
+
+    if (previous && previous.includes("/thelist")) {
+      router.push(previous);
     } else {
       router.push("/thelist");
     }

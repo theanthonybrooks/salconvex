@@ -1,25 +1,27 @@
-import { useAuthActions } from "@convex-dev/auth/react"
-import { useRouter } from "next/navigation"
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useRouter } from "next/navigation";
 
-import React from "react"
+import React from "react";
 
 interface SignOutBtnProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 const SignOutBtn: React.FC<SignOutBtnProps> = ({ children }) => {
-  const { signOut } = useAuthActions()
-  const router = useRouter()
+  const { signOut } = useAuthActions();
+  const router = useRouter();
   return (
     <span
-      className='hover:underline underline-offset-2 hover:cursor-pointer'
+      className="underline-offset-2 hover:cursor-pointer hover:underline"
       onClick={() => {
-        signOut()
-        router.push("/auth/sign-in")
-      }}>
+        sessionStorage.clear();
+        signOut();
+        router.push("/auth/sign-in");
+      }}
+    >
       {children}
     </span>
-  )
-}
+  );
+};
 
-export default SignOutBtn
+export default SignOutBtn;

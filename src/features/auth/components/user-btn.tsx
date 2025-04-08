@@ -10,8 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { Loader, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const UserBtn = () => {
+  const router = useRouter();
   const { signOut } = useAuthActions();
   const { data, isLoading } = useCurrentUser();
 
@@ -46,7 +48,11 @@ export const UserBtn = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center" side="right" className="w-60">
         <DropdownMenuItem
-          onClick={() => signOut()}
+          onClick={() => {
+            sessionStorage.clear();
+            signOut();
+            router.push("/auth/sign-in");
+          }}
           className="flex h-10 cursor-pointer items-center"
         >
           <LogOut className="mr-2 size-4 text-muted-foreground" />
