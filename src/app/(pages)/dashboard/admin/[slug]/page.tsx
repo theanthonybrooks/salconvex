@@ -40,6 +40,6 @@ export default async function AdminPage({
     case "todos":
       return <KanbanBoard userRole={user.role?.[0]} />;
     default:
-      redirect("/dashboard/account/todos");
+      redirect("/dashboard/admin/todos");
   }
 }

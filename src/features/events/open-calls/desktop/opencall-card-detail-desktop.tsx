@@ -1290,16 +1290,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     </AccordionContent>
                   </AccordionItem>
                 )}
-              {event.otherInfo && (
-                <AccordionItem value="item-4">
-                  <AccordionTrigger title="Other info:" />
-                  <AccordionContent>
-                    {event.otherInfo.map((info, index) => (
-                      <p key={index}>{info}</p>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
 
               {event.otherInfo && (
                 <AccordionItem value="item-4">
