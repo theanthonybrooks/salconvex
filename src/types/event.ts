@@ -55,12 +55,18 @@ export interface EventData {
     };
   };
   about?: string;
-  links: {
-    type: string;
-    title: string;
-    href: string;
-    handle?: string;
-  }[];
+  links?: {
+    sameAsOrganizer?: boolean;
+    website?: string;
+    instagram?: string;
+    facebook?: string;
+    threads?: string;
+    email?: string;
+    vk?: string;
+    phone?: string;
+    address?: string;
+    linkAggregate?: string;
+  };
   otherInfo?: string[];
   state: SubmissionFormState;
 }

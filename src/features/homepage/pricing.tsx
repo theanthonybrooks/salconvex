@@ -410,11 +410,6 @@ const PricingCard = ({
           user={user}
           mode={accountType as ModeType}
           onClick={() => {
-            // if (isFree) {
-            //   router.push("/submit?src=freecall")
-            //   //TODO: utilize this src param when submitting a free call
-            //   return
-            // }
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false);
           }}
         >

@@ -35,6 +35,7 @@ export type Organizer = {
     vk?: string;
     phone?: string;
     address?: string;
+    linkAggregate?: string;
   };
   hadFreeCall: boolean;
   updatedAt?: number;

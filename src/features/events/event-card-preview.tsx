@@ -43,6 +43,7 @@ import {
   FaRegBookmark,
   FaRegCommentDots,
   FaThreads,
+  FaVk,
 } from "react-icons/fa6";
 import { IoAirplane } from "react-icons/io5";
 import {
@@ -357,7 +358,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
       {/* //---------------------- (Desktop) Layout ---------------------- */}
       <Card
         className={cn(
-          "mb-10 hidden min-h-[15em] w-[90vw] min-w-[640px] max-w-7xl grid-cols-[60px_minmax(0,auto)_15%_25%_25%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg lg:grid",
+          "mb-10 hidden min-h-[15em] w-[90vw] min-w-[640px] max-w-7xl grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg lg:grid xl:grid-cols-[60px_minmax(0,auto)_15%_25%_25%]",
         )}
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
@@ -584,19 +585,35 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                     $3 per month
                   </span>
                 ) : (
-                  <span
-                    className={cn(
-                      eligibility.type !== "International" && "text-red-600",
-                    )}
-                  >
-                    {eligibility.type !== "International" &&
-                      `${eligibility.type}: `}
-                    {eligibility.whom.map((whom) => whom).join(" & ")}
-                    {eligibility.type !== "International" && " Artists*"}
-                  </span>
+                  <>
+                    <span
+                      className={cn(
+                        "hidden xl:block",
+                        eligibility.type !== "International" && "text-red-600",
+                      )}
+                    >
+                      {eligibility.type !== "International" &&
+                        `${eligibility.type}: `}
+                      {eligibility.whom.map((whom) => whom).join(" & ")}
+                      {eligibility.type !== "International" && " Artists*"}
+                    </span>
+                    <span
+                      className={cn(
+                        "xl:hidden",
+                        eligibility.type !== "International" && "text-red-600",
+                      )}
+                    >
+                      {eligibility.whom.length > 1
+                        ? "See app details"
+                        : eligibility.whom[0]}
+                      {eligibility.type !== "International" &&
+                        eligibility.whom.length === 1 &&
+                        " Artists*"}
+                    </span>
+                  </>
                 )}
               </p>
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-1">
                 <span className="font-semibold">Budget:</span>
                 {publicView ? (
                   <span className="pointer-events-none blur-[5px]">
@@ -605,27 +622,39 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 ) : (
                   <>
                     {(hasBudget || hasRate) && (
-                      <span className="hidden items-center gap-x-1 xl:flex">
-                        {hasBudget &&
-                          formatCurrency(
-                            budget.min,
-                            budget.max,
-                            budget.currency,
-                            false,
-                            budget.allInclusive,
+                      <>
+                        <span className="hidden items-center gap-x-1 xl:flex">
+                          {hasBudget &&
+                            formatCurrency(
+                              budget.min,
+                              budget.max,
+                              budget.currency,
+                              false,
+                              budget.allInclusive,
+                            )}
+                          {hasBudget && hasRate && (
+                            <span className="text-sm"> | </span>
                           )}
-                        {hasBudget && hasRate && (
-                          <span className="text-sm"> | </span>
-                        )}
 
-                        {hasRate &&
-                          formatRate(
-                            budget.rate,
-                            budget.unit,
-                            budget.currency,
-                            true,
-                          )}
-                      </span>
+                          {hasRate &&
+                            formatRate(
+                              budget.rate,
+                              budget.unit,
+                              budget.currency,
+                              true,
+                            )}
+                        </span>
+                        <span className="xl:hidden">
+                          {hasBudget &&
+                            formatCurrency(
+                              budget.min,
+                              budget.max,
+                              budget.currency,
+                              false,
+                              budget.allInclusive,
+                            )}
+                        </span>
+                      </>
                     )}
                     {!hasRate && !hasBudget && (
                       <p className="text-sm">No Info</p>
@@ -719,34 +748,93 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
           <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
             <span className="font-semibold">Event Links:</span>
             <div className="flex flex-col gap-y-2">
-              {event.links.map((link, index) => {
-                return (
-                  <Link key={index} href={link.href} target="_blank">
-                    <div className="flex items-center justify-start gap-x-2">
-                      {link.type === "website" && (
-                        <FaGlobe className="size-5 hover:scale-110" />
-                      )}
-                      {link.type === "instagram" && (
-                        <FaInstagram className="size-5 hover:scale-110" />
-                      )}
-                      {link.type === "facebook" && (
-                        <FaFacebook className="size-5 hover:scale-110" />
-                      )}
-                      {link.type === "threads" && (
-                        <FaThreads className="size-5 hover:scale-110" />
-                      )}
-                      {link.type === "email" && (
-                        <FaEnvelope className="size-5 hover:scale-110" />
-                      )}
-                      <span className="underline-offset-2 hover:underline">
-                        {link.type === "email" || link.type === "website"
-                          ? link.href.split("www.").slice(-1)[0]
-                          : link.handle}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
+              {/*TODO: In the future, this should first check if it has sameAsOrganizer checked, and if so, should use the links from the organizer. Otherwise, it should check if there are any links at all. */}
+              {(Object.keys(event.links || {}).length === 0 ||
+                (Object.keys(event.links || {}).length > 0 &&
+                  event.links?.sameAsOrganizer === true)) && (
+                <div className="flex items-center gap-x-2">
+                  <Info className="size-5" />
+                  <span className="underline-offset-2 hover:underline">
+                    No links found
+                  </span>
+                </div>
+              )}
+              {event.links?.email && (
+                <a href={`mailto:${event.links.email}?subject=${event.name}`}>
+                  <div className="flex items-center gap-x-2">
+                    <FaEnvelope className="size-5" />
+                    <span className="underline-offset-2 hover:underline">
+                      {event.links.email}
+                    </span>
+                  </div>
+                </a>
+              )}
+              {event.links?.website && (
+                <a href={event.links.website}>
+                  <div className="flex items-center gap-x-2">
+                    <FaGlobe className="size-5" />
+                    <span className="underline-offset-2 hover:underline">
+                      {event.links.website.split("www.").slice(-1)[0]}
+                    </span>
+                  </div>
+                </a>
+              )}
+
+              {/* {event.links?.phone && (
+                <a href={`tel:${event.links.phone}`}>
+                  <div className="flex items-center gap-x-2">
+                    <Phone className="size-5" />
+
+                    <span className="underline-offset-2 hover:underline">
+                      {event.links.phone}
+                    </span>
+                  </div>
+                </a>
+              )} */}
+              {event.links?.instagram && (
+                <a href={event.links.instagram}>
+                  <div className="flex items-center gap-x-2">
+                    <FaInstagram className="size-5" />
+
+                    <span className="underline-offset-2 hover:underline">
+                      @{event.links.instagram.split(".com/").slice(-1)[0]}
+                    </span>
+                  </div>
+                </a>
+              )}
+              {event.links?.facebook && (
+                <a href={event.links.facebook}>
+                  <div className="flex items-center gap-x-2">
+                    <FaFacebook className="size-5" />
+
+                    <span className="underline-offset-2 hover:underline">
+                      @{event.links.facebook.split(".com/").slice(-1)[0]}
+                    </span>
+                  </div>
+                </a>
+              )}
+              {event.links?.threads && (
+                <a href={event.links.threads}>
+                  <div className="flex items-center gap-x-2">
+                    <FaThreads className="size-5" />
+
+                    <span className="underline-offset-2 hover:underline">
+                      @{event.links.threads.split(".net/").slice(-1)[0]}
+                    </span>
+                  </div>
+                </a>
+              )}
+              {event.links?.vk && (
+                <a href={event.links.vk}>
+                  <div className="flex items-center gap-x-2">
+                    <FaVk className="size-5" />
+
+                    <span className="underline-offset-2 hover:underline">
+                      @{event.links.vk.split(".com/").slice(-1)[0]}
+                    </span>
+                  </div>
+                </a>
+              )}
             </div>
           </div>
         )}
@@ -786,6 +874,15 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               {`$${basicInfo.appFee}`}
             </p>
           )}
+          <ApplyButtonShort
+            slug={eventNameUrl}
+            edition={event.dates.edition}
+            appStatus={event.status}
+            openCall={event.openCallStatus}
+            publicView={publicView}
+            appFee={basicInfo ? basicInfo.appFee : 0}
+            className="max-w-40 xl:hidden"
+          />
 
           <ApplyButton
             id={event._id}
@@ -804,6 +901,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             eventCategory={eventCategory}
             isPreview={false}
             appFee={basicInfo ? basicInfo.appFee : 0}
+            className="hidden xl:flex"
           />
         </div>
       </Card>

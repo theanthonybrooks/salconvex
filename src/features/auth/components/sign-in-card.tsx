@@ -47,7 +47,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
   const [success, setSuccess] = useState<string | undefined>("");
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("src");
+  const callBackSrc = sessionStorage.getItem("src");
 
   const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,8 +60,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
     signIn("password", formData)
       .then(() => {
         setSuccess("Successfully signed in!");
-        if (callbackUrl && callbackUrl === "newUser") {
-          router.replace("/pricing#plans");
+        if (callBackSrc && callBackSrc === "newUser") {
+          sessionStorage.removeItem("src");
+          router.replace("/pricing");
         } else {
           router.replace("/");
         }

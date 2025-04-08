@@ -110,6 +110,10 @@ Props) => {
 
     const queryString = params.toString();
     const baseUrl = window.location.origin + window.location.pathname;
+    sessionStorage.setItem(
+      "previousSalPage",
+      baseUrl + (queryString ? `?${queryString}` : ""),
+    );
     window.history.replaceState(
       null,
       "",

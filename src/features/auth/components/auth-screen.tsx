@@ -1,44 +1,41 @@
-"use client"
+"use client";
 
-import ForgotPassword from "@/features/auth/components/forgot-password"
-import RegisterForm from "@/features/auth/components/register-form"
-import SignInCard from "@/features/auth/components/sign-in-card"
-import { cn } from "@/lib/utils"
+import ForgotPassword from "@/features/auth/components/forgot-password";
+import RegisterForm from "@/features/auth/components/register-form";
+import SignInCard from "@/features/auth/components/sign-in-card";
+import { cn } from "@/lib/utils";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation";
 
 export default function AuthScreen() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const callbackUrl = useSearchParams().get("src")
+  const router = useRouter();
+  const pathname = usePathname();
+  // const callbackUrl = useSearchParams().get("src")
 
   // Create booleans based on the URL.
-  const isRegister = pathname.endsWith("/register")
-  const isForgotPassword = pathname.endsWith("/forgot-password")
+  const isRegister = pathname.endsWith("/register");
+  const isForgotPassword = pathname.endsWith("/forgot-password");
   // const isSignIn = !isRegister && !isForgotPassword // default
 
   const switchFlow = (target: "signIn" | "register" | "forgotPassword") => {
-    let targetPath = "/auth/sign-in" // default
+    let targetPath = "/auth/sign-in"; // default
     if (target === "register") {
-      targetPath = "/auth/register"
+      targetPath = "/auth/register";
     } else if (target === "forgotPassword") {
-      targetPath = "/auth/forgot-password"
+      targetPath = "/auth/forgot-password";
     }
 
-    if (callbackUrl) {
-      router.push(`${targetPath}?src=${encodeURIComponent(callbackUrl)}`)
-    } else {
-      router.push(targetPath)
-    }
-  }
+    router.push(targetPath);
+  };
 
   return (
     <div
       className={cn(
-        "h-dvh   grid place-items-center overflow-y-auto bg-salYellow auth-cont scrollable invis"
-      )}>
+        "auth-cont scrollable invis grid h-dvh place-items-center overflow-y-auto bg-salYellow",
+      )}
+    >
       {/* //note-to-self: this md:py value is a hack to center the auth card vertically. The 900px portion is the ~height of the card element (for the register card). The 40px is the min height.  */}
-      <div className='md:h-auto md:w-[500px] grid place-items-center md:py-10'>
+      <div className="grid place-items-center md:h-auto md:w-[500px] md:py-10">
         {isRegister ? (
           <RegisterForm switchFlow={() => switchFlow("signIn")} />
         ) : isForgotPassword ? (
@@ -52,5 +49,5 @@ export default function AuthScreen() {
         )}
       </div>
     </div>
-  )
+  );
 }

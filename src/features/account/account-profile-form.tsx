@@ -5,14 +5,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
-import { ArtistProfileForm } from "@/features/artists/artist-profile-form"
-import { EventOCForm } from "@/features/events/event-add-form"
-import { cn } from "@/lib/utils"
-import { User } from "@/types/user"
-import { useRouter } from "next/navigation"
-import React from "react"
+import { ArtistProfileForm } from "@/features/artists/artist-profile-form";
+import { EventOCForm } from "@/features/events/event-add-form";
+import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 // type BaseTaskValues = {
 //   title: string
@@ -20,14 +20,14 @@ import React from "react"
 //   priority: "low" | "medium" | "high"
 // }
 
-export type ModeType = "artist" | "organizer"
+export type ModeType = "artist" | "organizer";
 
 interface AccountSubscribeFormProps {
-  className?: string
-  mode: ModeType
-  user: User | undefined
-  onClick: () => void
-  children?: React.ReactNode
+  className?: string;
+  mode: ModeType;
+  user: User | undefined;
+  onClick: () => void;
+  children?: React.ReactNode;
 }
 
 export const AccountSubscribeForm = ({
@@ -37,32 +37,35 @@ export const AccountSubscribeForm = ({
   children,
   onClick,
 }: AccountSubscribeFormProps) => {
-  const router = useRouter()
-  const isArtist = mode === "artist"
+  const router = useRouter();
+  const isArtist = mode === "artist";
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <DialogHeader
-          className='w-full'
+          className="w-full"
           onClick={(e) => {
             if (!user) {
-              e.preventDefault()
-              e.stopPropagation()
-              router.push("/auth/register?src=newUser")
+              e.preventDefault();
+              e.stopPropagation();
+              sessionStorage.setItem("src", "newUser");
+              router.push("/auth/register");
             }
-          }}>
+          }}
+        >
           {children}
         </DialogHeader>
       </DialogTrigger>
 
       <DialogContent
         className={cn(
-          "bg-card max-w-full max-h-full w-full  md:h-auto md:max-w-lg ",
+          "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
           className,
           !isArtist &&
-            "lg:h-full lg:max-w-full h-dvh xl:max-w-[98vw]  xl:max-h-[95vh]"
-        )}>
+            "h-dvh lg:h-full lg:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
+        )}
+      >
         <>
           <DialogTitle className={cn(!isArtist && "sr-only")}>
             {isArtist ? "Create Artist Profile" : "Add New Call"}
@@ -82,5 +85,5 @@ export const AccountSubscribeForm = ({
         )}
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

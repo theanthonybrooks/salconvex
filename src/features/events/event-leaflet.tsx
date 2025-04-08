@@ -27,12 +27,12 @@ export default function MapComponent({
       {/* Add an overlay to let people know that they need to click to zoom. Also added some state that controls its visibility */}
       {overlay && (
         <>
-          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:flex">
             <p className="pointer-events-none select-none text-balance px-5 text-center text-2xl font-bold text-white">
               Click to enable scroll-to-zoom
             </p>
           </div>
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/50 opacity-0 blur-sm transition-opacity duration-200 group-hover:opacity-100"></div>
+          <div className="pointer-events-none absolute inset-0 z-10 hidden items-center justify-center rounded-xl bg-black/50 opacity-0 blur-sm transition-opacity duration-200 group-hover:opacity-100 lg:flex"></div>
         </>
       )}
       <MapContainer

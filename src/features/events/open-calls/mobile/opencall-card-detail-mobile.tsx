@@ -7,6 +7,7 @@ import {
   Download,
   EyeOff,
   Globe,
+  Info,
   MapIcon,
   MapPin,
   Phone,
@@ -25,6 +26,7 @@ import {
   FaFacebook,
   FaGlobe,
   FaInstagram,
+  FaLink,
   FaPaintRoller,
   FaRegBookmark,
   FaRegCommentDots,
@@ -828,40 +830,60 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                     <AccordionTrigger title="Links:" />
 
                     <AccordionContent>
-                      <ul className="flex flex-col gap-y-2">
-                        {event.links.map((link, index) => (
-                          <li key={index}>
-                            <a
-                              href={
-                                link.type === "email"
-                                  ? `mailto:${link.href}?subject=${event.name}`
-                                  : link.href
-                              }
-                              target="_blank"
-                              className="flex items-center gap-x-2 underline-offset-2 hover:underline"
-                            >
-                              {link.type === "website" && (
-                                <FaGlobe className="size-4" />
-                              )}
-                              {link.type === "instagram" && (
-                                <FaInstagram className="size-4" />
-                              )}
-                              {link.type === "facebook" && (
-                                <FaFacebook className="size-4" />
-                              )}
-                              {link.type === "threads" && (
-                                <FaThreads className="size-4" />
-                              )}
-                              {link.type === "email" && (
-                                <FaEnvelope className="size-4" />
-                              )}
-                              {link.type === "email" || link.type === "website"
-                                ? link.href
-                                : link.handle}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="flex flex-col gap-y-2 p-3">
+                        {Object.keys(event.links || {}).length === 0 && (
+                          <div className="flex items-center gap-x-2">
+                            <Info className="size-4" />
+                            <span className="underline-offset-2 hover:underline">
+                              No links found
+                            </span>
+                          </div>
+                        )}
+                        {event.links?.email && (
+                          <a
+                            href={`mailto:${event.links.email}?subject=${event.name}`}
+                          >
+                            <FaEnvelope className="size-4" />
+                          </a>
+                        )}
+                        {event.links?.website && (
+                          <a href={event.links.website}>
+                            <FaGlobe className="size-4" />
+                          </a>
+                        )}
+
+                        {/* {event.links?.phone && (
+                               <a href={`tel:${event.links.phone}`}>
+                                 <div className="flex items-center gap-x-2">
+                                   <Phone className="size-4" />
+               
+                                   <span className="underline-offset-2 hover:underline">
+                                     {event.links.phone}
+                                   </span>
+                                 </div>
+                               </a>
+                             )} */}
+                        {event.links?.instagram && (
+                          <a href={event.links.instagram}>
+                            <FaInstagram className="size-4" />
+                          </a>
+                        )}
+                        {event.links?.facebook && (
+                          <a href={event.links.facebook}>
+                            <FaFacebook className="size-4" />
+                          </a>
+                        )}
+                        {event.links?.threads && (
+                          <a href={event.links.threads}>
+                            <FaThreads className="size-4" />
+                          </a>
+                        )}
+                        {event.links?.vk && (
+                          <a href={event.links.vk}>
+                            <FaVk className="size-4" />
+                          </a>
+                        )}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 )}
@@ -943,7 +965,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                 <section>
                   <p className="text-sm font-semibold">Links:</p>
                   <div className="flex items-center justify-start gap-x-6 pt-3">
-                    {organizer.links.website && (
+                    {organizer.links?.website && (
                       <a
                         href={organizer.links.website}
                         className="size-6 hover:scale-110"
@@ -951,7 +973,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <Globe className="size-6" />
                       </a>
                     )}
-                    {organizer.links.email && (
+                    {organizer.links?.email && (
                       <a
                         href={`mailto:${organizer.links.email}`}
                         className="size-6 hover:scale-110"
@@ -959,7 +981,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <FaEnvelope className="size-6" />
                       </a>
                     )}
-                    {organizer.links.phone && (
+                    {organizer.links?.phone && (
                       <a
                         href={`tel:${organizer.links.phone}`}
                         className="size-6 hover:scale-110"
@@ -967,7 +989,15 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <Phone className="size-6" />
                       </a>
                     )}
-                    {organizer.links.instagram && (
+                    {organizer.links?.linkAggregate && (
+                      <a
+                        href={organizer.links.linkAggregate}
+                        className="size-6 hover:scale-110"
+                      >
+                        <FaLink className="size-6" />
+                      </a>
+                    )}
+                    {organizer.links?.instagram && (
                       <a
                         href={organizer.links.instagram}
                         className="size-6 hover:scale-110"
@@ -975,7 +1005,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <FaInstagram className="size-6" />
                       </a>
                     )}
-                    {organizer.links.facebook && (
+                    {organizer.links?.facebook && (
                       <a
                         href={organizer.links.facebook}
                         className="size-6 hover:scale-110"
@@ -983,7 +1013,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <FaFacebook className="size-6" />
                       </a>
                     )}
-                    {organizer.links.threads && (
+                    {organizer.links?.threads && (
                       <a
                         href={organizer.links.threads}
                         className="size-6 hover:scale-110"
@@ -991,7 +1021,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                         <FaThreads className="size-6" />
                       </a>
                     )}
-                    {organizer.links.vk && (
+                    {organizer.links?.vk && (
                       <a
                         href={organizer.links.vk}
                         className="size-6 hover:scale-110"

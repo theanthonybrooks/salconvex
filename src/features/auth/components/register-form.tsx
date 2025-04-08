@@ -42,7 +42,7 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { ExternalLink, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -78,8 +78,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [email, setEmail] = useState<string>("");
   const [obsEmail, setObsEmail] = useState("");
   const [otp, setOtp] = useState<string>("");
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("src");
+  const callBackSrc = sessionStorage.getItem("src");
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -238,8 +237,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         setIsLoading(false);
         setSuccess("Successfully signed up and verified!");
         form.reset();
-        if (callbackUrl && callbackUrl === "newUser") {
-          router.replace("/pricing#plans");
+        if (callBackSrc && callBackSrc === "newUser") {
+          sessionStorage.removeItem("src");
+          router.replace("/pricing");
         } else {
           router.replace("/");
         }

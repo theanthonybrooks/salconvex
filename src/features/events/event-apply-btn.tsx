@@ -28,6 +28,7 @@ interface ApplyButtonShortProps {
   openCall: OpenCallStatus;
   publicView?: boolean;
   appFee: number;
+  className?: string;
 }
 
 export const ApplyButtonShort = ({
@@ -37,6 +38,7 @@ export const ApplyButtonShort = ({
   openCall,
   publicView,
   appFee,
+  className,
 }: ApplyButtonShortProps) => {
   const currentUrl = window.location.href;
   const router = useRouter();
@@ -71,13 +73,14 @@ export const ApplyButtonShort = ({
         // }}
         onClick={() => {
           window.history.pushState({}, "", currentUrl);
-          sessionStorage.setItem("previousSalPage", window.location.pathname);
+          // sessionStorage.setItem("previousSalPage", window.location.pathname);
           router.push(href);
         }}
         variant="salWithShadowHidden"
         size="lg"
         className={cn(
           "w-full min-w-[100px] cursor-pointer bg-white/60",
+          className,
           appStatus !== null &&
             !publicView &&
             "border-foreground/50 bg-background text-foreground/50",
@@ -195,7 +198,7 @@ export const ApplyButton = ({
             //   setManualApplied("applied")
             // }
             window.history.pushState({}, "", currentUrl);
-            sessionStorage.setItem("previousSalPage", window.location.pathname);
+            // sessionStorage.setItem("previousSalPage", window.location.pathname);
             router.push(href);
             // router.push(href, { scroll: false });
           }}
@@ -211,7 +214,7 @@ export const ApplyButton = ({
             "relative z-[1] w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
             appStatus !== null &&
               !publicView &&
-              "hover:shadow-llga border-foreground/50 bg-background text-foreground/50",
+              "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
           )}
         >
           <span className="flex items-center gap-x-1">
@@ -243,7 +246,7 @@ export const ApplyButton = ({
                 "relative z-[1] w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
                 appStatus !== null &&
                   !publicView &&
-                  "hover:shadow-llga border-foreground/50 bg-background text-foreground/50",
+                  "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
               )}
             >
               <span className="flex items-center gap-x-1">
@@ -318,7 +321,7 @@ export const ApplyButton = ({
           "relative z-[2] w-fit rounded-none border-x px-3 sm:px-3",
           appStatus !== null &&
             !publicView &&
-            "hover:shadow-vlga border-foreground/50 bg-background text-foreground/50",
+            "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
         )}
         onClick={onBookmark}
       >

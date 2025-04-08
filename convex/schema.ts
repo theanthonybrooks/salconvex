@@ -93,6 +93,7 @@ const listActionsSchema = {
 };
 
 const organizationSchema = {
+  isPlaceholderName: v.optional(v.boolean()),
   ownerId: v.id("users"),
   // organizationName: v.optional(v.string()),
   name: v.string(),
@@ -120,6 +121,7 @@ const organizationSchema = {
         email: v.optional(v.string()),
         phone: v.optional(v.string()),
         href: v.optional(v.string()),
+        social: v.optional(v.string()),
       }),
     }),
   ),
@@ -133,6 +135,8 @@ const organizationSchema = {
       vk: v.optional(v.string()),
       phone: v.optional(v.string()),
       address: v.optional(v.string()),
+      linkAggregate: v.optional(v.string()),
+      other: v.optional(v.string()),
     }),
   ),
   hadFreeCall: v.boolean(),
@@ -184,12 +188,19 @@ const eventSchema = {
     ),
   }),
   about: v.optional(v.string()),
-  links: v.array(
+  links: v.optional(
     v.object({
-      type: v.string(),
-      title: v.string(),
-      href: v.string(),
-      handle: v.optional(v.string()),
+      sameAsOrganizer: v.optional(v.boolean()),
+      website: v.optional(v.string()),
+      instagram: v.optional(v.string()),
+      facebook: v.optional(v.string()),
+      threads: v.optional(v.string()),
+      email: v.optional(v.string()),
+      vk: v.optional(v.string()),
+      phone: v.optional(v.string()),
+      address: v.optional(v.string()),
+      linkAggregate: v.optional(v.string()),
+      other: v.optional(v.string()),
     }),
   ),
   otherInfo: v.array(v.string()),
