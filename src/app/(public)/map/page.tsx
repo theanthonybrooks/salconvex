@@ -11,12 +11,12 @@ const WorldMapPage = () => {
   }, []);
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col items-center justify-center gap-x-4 px-4">
-      <h1 className="font-tanker text-[5rem] lowercase tracking-wide">
+    <div className="mt-mobile flex h-full w-full flex-1 flex-col items-center justify-center gap-4 px-4">
+      <h1 className="font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
         World Map
       </h1>
 
-      <div className="w-full max-w-[80dvw] grid-cols-[20%_minmax(0,1fr)] gap-x-10 xl:grid">
+      <div className="flex w-full max-w-[80dvw] grid-cols-[20%_minmax(0,1fr)] flex-col gap-x-10 gap-y-3 xl:grid">
         <div className="col-span-1 h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3">
           <p className="px-3 pb-2 text-xl font-bold">Filters</p>
           <Separator className="mb-4" thickness={2} />

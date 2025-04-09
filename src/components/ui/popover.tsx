@@ -76,4 +76,43 @@ const PopoverContent = React.forwardRef<
 );
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };
+type PopoverGroupProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+const PopoverGroup = ({ children, className }: PopoverGroupProps) => {
+  return (
+    <div className={cn("flex flex-col gap-y-2", className)}>{children}</div>
+  );
+};
+
+type PopoverItemProps = {
+  children: React.ReactNode;
+  className?: string;
+  inset?: boolean;
+};
+
+const PopoverItem = ({ children, className, inset }: PopoverItemProps) => {
+  return (
+    <div
+      className={cn(
+        "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors focus:bg-accent focus:text-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0",
+        inset && "pl-8",
+        // "flex items-center gap-x-2 rounded-md text-sm hover:bg-salYellow/50 focus:bg-salYellow/50",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverGroup,
+  PopoverItem,
+  PopoverTrigger,
+};

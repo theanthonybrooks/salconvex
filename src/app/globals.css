@@ -331,6 +331,12 @@ body,
   }
 }
 
+.mt-mobile {
+  @media (max-width: 768px) {
+    margin-top: 2em;
+  }
+}
+
 /* ----------- Components ------------ */
 
 .search {
@@ -781,13 +787,15 @@ button:active {
     position: relative;
   }
   & .fc-day-today:not(:has(.fc-daygrid-event-harness))::before {
-    left: 50%;
-    top: 50%;
-    /* transform: translateX(-50%); */
-    transform: translate(-50%, -50%);
-    content: "Today";
-    position: absolute;
-    font-weight: bold;
+    @media (width > 1024px) {
+      left: 50%;
+      top: 50%;
+      /* transform: translateX(-50%); */
+      transform: translate(-50%, -50%);
+      content: "Today";
+      position: absolute;
+      font-weight: bold;
+    }
   }
 }
 

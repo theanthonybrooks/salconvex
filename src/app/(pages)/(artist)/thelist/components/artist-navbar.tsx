@@ -3,16 +3,28 @@
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  // NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
+import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbars";
 import { Search } from "@/features/Sidebar/Search";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { Authenticated, Unauthenticated } from "convex/react";
+
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 interface TheListNavBarProps {
   userId: string | undefined;
@@ -28,11 +40,16 @@ export default function TheListNavBar({
 }: //   subStatus,
 // userPref,
 TheListNavBarProps) {
+  const pathname = usePathname();
   const { scrollY } = useScroll();
   const [isMobile, setIsMobile] = useState(false);
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
+  const fullPagePath = pathname;
+  const currentPage = pathname.split("/")[1];
+
+  console.log(currentPage);
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -41,10 +58,15 @@ TheListNavBarProps) {
     setIsScrolled(latest > scrollThreshold);
   });
 
-  // const { subStatus } =
-  //   useQuery(api.subscriptions.getUserSubscriptionStatus) || {}
+  const statusKey = subStatus ? subStatus : "none";
 
-  //   const statusKey = subStatus ? subStatus : "none"
+  const filteredNavbarMenuTheList = thelistitems.filter(
+    (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
+  );
+
+  const isActiveTheList = filteredNavbarMenuTheList.some(
+    (component) => component.href.includes(currentPage) && currentPage !== "",
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)");
@@ -100,10 +122,20 @@ TheListNavBarProps) {
           />
           <div className="absolute bottom-0 left-1/2 h-full w-25 -translate-x-1/2 bg-background" />
           <motion.div
-            initial={{ translateX: "-50%", translateY: 14 }}
-            animate={{ translateX: "-50%", translateY: 14 }}
+            initial={{
+              translateX: "-50%",
+              translateY: 14,
+              backgroundColor: "rgba(255, 255, 255, 1)",
+            }}
+            animate={{
+              translateX: "-50%",
+              translateY: 14,
+              backgroundColor: isScrolled
+                ? "rgba(255, 255, 255, 0)"
+                : "rgba(255, 255, 255, 1)",
+            }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute bottom-0 left-1/2"
+            className="absolute bottom-0 left-1/2 rounded-full"
           >
             {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
@@ -116,12 +148,27 @@ TheListNavBarProps) {
                   height: isScrolled ? 50 : 70,
                   width: isScrolled ? 50 : 70,
                 }}
+                whileTap={{
+                  rotate: 180,
+                  transition: {
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 5,
+                    mass: 1.2,
+                  },
+                }}
+                whileHover={{
+                  rotate: 180,
+                  transition: {
+                    type: "spring",
+                    stiffness: 80,
+                    damping: 5,
+                    mass: 1.2,
+                  },
+                }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 src="/logotransparency.png"
                 alt="The Street Art List"
-                className="transition-transform duration-300 ease-in-out active:rotate-180 lg:hover:rotate-180 lg:active:rotate-0"
-
-                // className='z-10'
               />
             </Link>
           </motion.div>
@@ -162,7 +209,51 @@ TheListNavBarProps) {
           )}
 
           {!isMobile && (
-            <>
+            <div className="hidden items-center gap-6 pr-5 lg:flex">
+              <NavigationMenu
+                delayDuration={Infinity}
+                className="z-0"
+                align="right"
+              >
+                <NavigationMenuList className="christoph gap-2">
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger
+                      isCurrent={isActiveTheList}
+                      className={cn(
+                        "z-0 border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                        isActiveTheList &&
+                          "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                      )}
+                      onPointerMove={(event) => event.preventDefault()}
+                      onPointerLeave={(event) => event.preventDefault()}
+                    >
+                      The List
+                    </NavigationMenuTrigger>
+
+                    <NavigationMenuContent
+                      onPointerEnter={(event) => event.preventDefault()}
+                      onPointerLeave={(event) => event.preventDefault()}
+                    >
+                      <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
+                        {filteredNavbarMenuTheList.map((component) => (
+                          <ListItem
+                            key={component.title}
+                            title={component.title}
+                            href={component.href}
+                            className={cn(
+                              "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                              component.href === fullPagePath &&
+                                "bg-background",
+                            )}
+                          >
+                            {component.description}
+                          </ListItem>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
               {/* Right Side */}
               <Unauthenticated>
                 <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
@@ -186,20 +277,16 @@ TheListNavBarProps) {
                 </div>
               </Unauthenticated>
               <Authenticated>
-                <div className="hidden h-15 w-fit items-center justify-self-end pr-5 lg:flex">
-                  <div className="flex items-center gap-4">
-                    {userId !== "guest" && user && (
-                      <UserProfile
-                        user={user}
-                        className="size-10"
-                        subscription={subStatus}
-                      />
-                    )}
-                    <FullPageNav user={user} />
-                  </div>
-                </div>
+                {userId !== "guest" && user && (
+                  <UserProfile
+                    user={user}
+                    className="size-10"
+                    subscription={subStatus}
+                  />
+                )}
               </Authenticated>
-            </>
+              <FullPageNav user={user} />
+            </div>
           )}
 
           {/* ------ Mobile Right side ------ */}
@@ -221,3 +308,35 @@ TheListNavBarProps) {
     </>
   );
 }
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & { href: string }
+>(({ className, title, children, href, ...props }, ref) => {
+  return (
+    <li
+      className={cn(
+        "rounded-md transition-colors hover:bg-salPink/50",
+        className,
+      )}
+    >
+      <NavigationMenuLink asChild>
+        <Link
+          href={href}
+          ref={ref}
+          variant="standard"
+          className={cn(
+            "outline-hidden block select-none space-y-1 p-3 leading-none no-underline",
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-foreground">
+            {children}
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";

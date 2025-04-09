@@ -487,7 +487,11 @@ const FullPageNav = ({
                     activeCategory === section.title && !freshOpen;
                   const filteredItems = section.items.filter((item) => {
                     const itemUserType = item?.userType;
+                    const itemCategory = item?.category;
+                    const isAdmin =
+                      user?.role.includes("admin") && itemCategory === "admin";
                     const isPublic = itemUserType?.includes("public");
+
                     const typeMatch = user?.accountType?.some((type) =>
                       itemUserType?.some(
                         (userType) =>
@@ -495,7 +499,7 @@ const FullPageNav = ({
                       ),
                     );
 
-                    return isPublic || typeMatch;
+                    return isPublic || typeMatch || isAdmin;
                   });
 
                   if (filteredItems.length === 0) return null;
@@ -698,6 +702,10 @@ const FullPageNav = ({
                         {mainMenuItems.map((section) => {
                           const filteredItems = section.items.filter((item) => {
                             const itemUserType = item?.userType;
+                            const itemCategory = item?.category;
+                            const isAdmin =
+                              user?.role.includes("admin") &&
+                              itemCategory === "admin";
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
@@ -706,7 +714,7 @@ const FullPageNav = ({
                               ),
                             );
 
-                            return isPublic || typeMatch;
+                            return isPublic || typeMatch || isAdmin;
                           });
 
                           if (filteredItems.length === 0) return null;
@@ -757,6 +765,10 @@ const FullPageNav = ({
                         {activeMenuItems?.items
                           .filter((item) => {
                             const itemUserType = item?.userType;
+                            const itemCategory = item?.category;
+                            const isAdmin =
+                              user?.role.includes("admin") &&
+                              itemCategory === "admin";
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
@@ -765,7 +777,7 @@ const FullPageNav = ({
                               ),
                             );
 
-                            return isPublic || typeMatch;
+                            return isPublic || typeMatch || isAdmin;
                           })
                           .map((item) => (
                             <li

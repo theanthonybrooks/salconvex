@@ -39,13 +39,16 @@ export function UserProfile({
           className={cn("relative h-[50px] w-[50px] rounded-full", className)}
         >
           <Avatar
-            className={cn("h-[50px] w-[50px] border border-border", className)}
+            className={cn(
+              "h-[50px] w-[50px] border-1.5 border-border",
+              className,
+            )}
           >
             <AvatarImage src={user?.image} alt={user?.name || "User Profile"} />
 
             <AvatarFallback
               className={cn(
-                "border border-border bg-userIcon font-bold text-blue-900 dark:bg-blue-950 dark:text-blue-200",
+                "border border-border bg-userIcon font-bold text-foreground",
               )}
             >
               {user?.firstName?.[0].toUpperCase()}
@@ -57,7 +60,7 @@ export function UserProfile({
       <DropdownMenuContent className="z-[60] w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-row items-center gap-2 overflow-hidden">
-            <Avatar className="h-9 w-9 rounded-full border border-border">
+            <Avatar className="size-9 rounded-full border border-border">
               <AvatarImage
                 src={user?.image}
                 alt={user?.name || "User Profile"}
@@ -65,12 +68,12 @@ export function UserProfile({
 
               <AvatarFallback
                 className={cn(
-                  "border border-border bg-userIcon font-bold text-blue-900 dark:bg-blue-950 dark:text-blue-200",
+                  "border-1.5 border-border bg-userIcon font-bold text-foreground",
                 )}
               >
                 {/* {user?.firstName?.[0]}
                 {user?.lastName?.[0]} */}
-                <FaUserNinja className="h-6 w-6" />
+                <FaUserNinja className="size-5" />
                 {/* <FaRegFaceFlushed className='h-6 w-6' /> */}
               </AvatarFallback>
             </Avatar>
@@ -91,8 +94,8 @@ export function UserProfile({
             href="/dashboard/account/settings"
             className="underline-offset-2 hover:cursor-pointer hover:underline"
           >
-            <DropdownMenuItem className="focus:bg-blue-50 dark:focus:bg-blue-950">
-              <Settings className="mr-2 h-4 w-4" />
+            <DropdownMenuItem className="focus:bg-salYellow/50">
+              <Settings className="mr-2 size-4" />
               <span>Settings</span>
             </DropdownMenuItem>
           </Link>
@@ -102,7 +105,7 @@ export function UserProfile({
             href='/user-profile'
             className='hover:underline underline-offset-2 hover:cursor-pointer'>
             <DropdownMenuItem className='focus:bg-blue-50 dark:focus:bg-blue-950'>
-              <User className='mr-2 h-4 w-4' />
+              <User className='mr-2 size-4' />
               <span>Profile</span>
             </DropdownMenuItem>
           </Link> */}
@@ -111,8 +114,8 @@ export function UserProfile({
                 href="/dashboard/account"
                 className="underline-offset-2 hover:cursor-pointer hover:underline"
               >
-                <DropdownMenuItem className="focus:bg-blue-50 dark:focus:bg-blue-950">
-                  <Sparkles className="mr-2 h-4 w-4" />
+                <DropdownMenuItem className="focus:bg-salYellow/50">
+                  <Sparkles className="mr-2 size-4" />
                   <span>Manage Subscription</span>
                 </DropdownMenuItem>
               </Link>
@@ -123,8 +126,8 @@ export function UserProfile({
               href="/pricing#plans"
               className="underline-offset-2 hover:cursor-pointer hover:underline"
             >
-              <DropdownMenuItem className="focus:bg-blue-50 dark:focus:bg-blue-950">
-                <Sparkles className="mr-2 h-4 w-4" />
+              <DropdownMenuItem className="focus:bg-salYellow/50">
+                <Sparkles className="mr-2 size-4" />
                 <span>Renew Subscription</span>
               </DropdownMenuItem>
             </Link>
@@ -132,8 +135,8 @@ export function UserProfile({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <SignOutBtn>
-          <DropdownMenuItem className="focus:bg-blue-50 dark:focus:bg-blue-950">
-            <LogOut className="mr-2 h-4 w-4" />
+          <DropdownMenuItem className="focus:bg-salPink/50">
+            <LogOut className="mr-2 size-4" />
             <span>Log out</span>
           </DropdownMenuItem>
         </SignOutBtn>

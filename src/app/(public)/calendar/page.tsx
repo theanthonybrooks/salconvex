@@ -124,13 +124,13 @@ const Calendar = () => {
   }, []);
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col items-center justify-center gap-x-4 px-4">
-      <h1 className="font-tanker text-[5rem] lowercase tracking-wide">
+    <div className="mt-mobile flex h-full w-full flex-1 flex-col items-center justify-center gap-4 px-4">
+      <h1 className="font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
         Event & Open Call Calendar
       </h1>
 
       <div className="w-full max-w-[90dvw] grid-cols-[15%_minmax(0,1fr)] gap-x-10 xl:grid">
-        <div className="col-span-1 mt-[85px] h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3">
+        <div className="col-span-1 h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3 xl:mt-[85px]">
           <p className="px-3 pb-2 text-xl font-bold">Filters</p>
           <Separator className="mb-4" thickness={2} />
           <div className="flex flex-col gap-y-2 px-4">
@@ -159,83 +159,6 @@ const Calendar = () => {
           onEventClick={handleEventClick}
           onMoreLinkClick={handleMoreClick}
         />
-        {/*        <section className="relative w-full">
-          /~ Skeleton shown on top until calendar is ready ~/
-          {!calendarLoaded && (
-            // <div className=" flex inset-0 flex-col space-y-4 bg-white p-4">
-
-            <div className="absolute h-[600px] w-full rounded-md border-1.5 border-foreground/30 bg-muted/40 p-4">
-              <div className="h-max w-full rounded-md">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-2">
-                      <Skeleton className="h-8 w-24" />
-                      <Skeleton className="h-8 w-24" />
-                    </div>
-                    <Skeleton className="h-8 w-24" />
-                  </div>
-                  <Skeleton className="h-[500px] w-full rounded-md" />
-                </div>
-              </div>
-            </div>
-            // /~ </div> ~/
-          )}
-
-          <div
-            className={
-              calendarLoaded
-                ? "opacity-100"
-                : "opacity-0 transition-opacity duration-300"
-            }
-          >
-            <FullCalendar
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              events={events}
-              eventClassNames="hover:cursor-pointer"
-              eventClick={handleEventClick}
-              moreLinkClick={handleMoreClick}
-              dayMaxEventRows={4}
-              dayMaxEvents={true} //without this, I don't know... it shows the number (index +1) of events, but it adds some janky spacing and I don't know why. Couldn't see anything in inspect.
-              datesSet={() => setCalendarLoaded(false)}
-            />
-          </div>
-        </section>*/}
-
-        {/*       <section className="w-full">
-          {!calendarLoaded ? (
-            <div className="w-full rounded-md border border-border bg-muted/40 p-4">
-              <div className="h-[600px] w-full rounded-md">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-2">
-                      <Skeleton className="h-8 w-24" />
-                      <Skeleton className="h-8 w-24" />
-                    </div>
-                    <Skeleton className="h-8 w-24" />
-                  </div>
-                  <Skeleton className="h-[500px] w-full rounded-md" />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <FullCalendar
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              events={events}
-              eventClassNames="hover:cursor-pointer"
-              eventClick={handleEventClick}
-              moreLinkClick={handleMoreClick}
-              dayMaxEventRows={4}
-              // datesSet={() => setCalendarLoaded(true)}
-              datesSet={() => {
-                console.log("datesSet");
-                setCalendarLoaded(true);
-              }}
-            
-            />
-          )}
-        </section>*/}
 
         <Dialog open={showModal} onOpenChange={setShowModal}>
           <DialogContent>

@@ -136,10 +136,20 @@ NavBarProps) {
 
           <div className="flex items-center gap-2 lg:hidden">
             <motion.div
-              initial={{ translateX: "-50%", translateY: 14 }}
-              animate={{ translateX: "-50%", translateY: 14 }}
+              initial={{
+                translateX: "-50%",
+                translateY: 14,
+                backgroundColor: "rgba(255, 255, 255, 1)",
+              }}
+              animate={{
+                translateX: "-50%",
+                translateY: 14,
+                backgroundColor: isScrolled
+                  ? "rgba(255, 255, 255, 0)"
+                  : "rgba(255, 255, 255, 1)",
+              }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute bottom-0 left-1/2 z-10"
+              className="absolute bottom-0 left-1/2 z-10 rounded-full"
             >
               {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
 
@@ -152,11 +162,27 @@ NavBarProps) {
                     height: isScrolled ? 50 : 70,
                     width: isScrolled ? 50 : 70,
                   }}
+                  whileTap={{
+                    rotate: 180,
+                    transition: {
+                      type: "spring",
+                      stiffness: 120,
+                      damping: 5,
+                      mass: 1.2,
+                    },
+                  }}
+                  whileHover={{
+                    rotate: 180,
+                    transition: {
+                      type: "spring",
+                      stiffness: 80,
+                      damping: 5,
+                      mass: 1.2,
+                    },
+                  }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                   src="/logotransparency.png"
                   alt="The Street Art List"
-
-                  // className='z-10'
                 />
               </Link>
             </motion.div>
@@ -239,7 +265,7 @@ NavBarProps) {
                       <NavigationMenuTrigger
                         isCurrent={isActiveResources}
                         className={cn(
-                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-white",
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
                           isActiveResources &&
                             "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
                         )}
@@ -275,7 +301,7 @@ NavBarProps) {
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
                         className={cn(
-                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-white",
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
                           isActiveTheList &&
                             "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
                         )}
@@ -352,17 +378,15 @@ NavBarProps) {
                 </div>
               </Unauthenticated>
               <Authenticated>
-                <div className="hidden h-15 w-fit items-center justify-self-end pr-5 lg:flex">
-                  <div className="flex items-center gap-4">
-                    {userId !== "guest" && user && (
-                      <UserProfile
-                        user={user}
-                        className="size-10"
-                        subscription={subStatus}
-                      />
-                    )}
-                    <FullPageNav user={user} />
-                  </div>
+                <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
+                  {userId !== "guest" && user && (
+                    <UserProfile
+                      user={user}
+                      className="size-10"
+                      subscription={subStatus}
+                    />
+                  )}
+                  <FullPageNav user={user} />
                 </div>
               </Authenticated>
             </>
@@ -402,19 +426,23 @@ const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<"a"> & { href: string }
 >(({ className, title, children, href, ...props }, ref) => {
   return (
-    <li>
+    <li
+      className={cn(
+        "rounded-md transition-colors hover:bg-salPink/50",
+        className,
+      )}
+    >
       <NavigationMenuLink asChild>
         <Link
           href={href}
           ref={ref}
           className={cn(
-            "outline-hidden block select-none space-y-1 rounded-md p-3 leading-none no-underline transition-colors hover:bg-salPink/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className,
+            "outline-hidden block select-none space-y-1 p-3 leading-none no-underline",
           )}
           {...props}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          <p className="line-clamp-2 text-sm leading-snug text-foreground">
             {children}
           </p>
         </Link>

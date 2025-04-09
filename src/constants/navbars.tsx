@@ -139,3 +139,48 @@ export const landingPageNavbarLinks: {
     sub: ["all"],
   },
 ];
+
+export const theListNavbarMenuLinks: {
+  title: string;
+  href: string;
+  description: string;
+  isIcon?: boolean;
+  sub: string[];
+}[] = [
+  {
+    title: "The List",
+    href: "/thelist",
+    description: "View all current open calls & events",
+    sub: ["all"],
+  },
+  {
+    title: "This Week",
+    href: "/thisweek",
+    description: "Open calls ending this week",
+    sub: ["all"],
+  },
+  {
+    title: "Archive",
+    href: "/thelist/archive",
+    description: "Archive of all events - past and current",
+    sub: ["all"],
+  },
+  {
+    title: "World Map",
+    href: "/map",
+    description: "Map of all street art fests, mural projects, etc",
+    sub: ["all"],
+  },
+  {
+    title: "Calendar",
+    href: "/calendar",
+    description: "View upcoming events",
+    sub: ["all"],
+  },
+  {
+    title: "Submit",
+    href: "/submit",
+    description: "Submit an open call",
+    sub: ["all"],
+  },
+];
