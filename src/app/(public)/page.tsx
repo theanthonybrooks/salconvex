@@ -66,7 +66,7 @@ export default function Home() {
           className={cn(
             "absolute left-7 top-7 z-10 font-tanker lowercase tracking-wide text-background transition-all duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,0.5)]",
             currentSlide === 1 &&
-              "leading-9 text-[3.75] md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
+              "text-[3.75rem] leading-9 md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
             currentSlide === 2 &&
               "text-4xl lg:text-[8.5rem] lg:leading-[8.5rem]",
             currentSlide === 3 &&
@@ -75,19 +75,7 @@ export default function Home() {
         >
           CHUS
         </h1>
-        {/* <motion.img
-          src="/chus.jpg"
-          alt="The Street Art List"
-          loading="lazy"
-          width={1920}
-          height={1080}
-          className="min-h-full min-w-full object-cover object-[50%_10%]"
 
-          // style={{
-          //   borderBottomLeftRadius: borderRadius,
-          //   borderBottomRightRadius: borderRadius,
-          // }}
-        /> */}
         <Carousel className="h-full w-full">
           <CarouselContent>
             <CarouselItem className="relative w-full">
