@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const SalHeader = () => {
   return (
-    <div className="mb-4 flex flex-col items-center justify-center gap-2">
+    <div className="mb-6 flex w-full flex-col items-center justify-center gap-2">
       <Image
         src="/saltext.png"
         alt="The Street Art List"
@@ -23,7 +23,7 @@ const SalHeader = () => {
           @anthonybrooksart
         </Link>
       </p>
-      <SocialsRow className="mb-4 size-8 md:size-7" />
+      <SocialsRow className="mb-6 size-8 md:size-7" />
     </div>
   );
 };
