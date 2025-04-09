@@ -20,7 +20,7 @@ import Link from "next/link";
 import { FaUserNinja } from "react-icons/fa6";
 
 interface UserProfileProps {
-  user: UserType | null;
+  user: UserType;
   className?: string;
   subscription?: string;
 }

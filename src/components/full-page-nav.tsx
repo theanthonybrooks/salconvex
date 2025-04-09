@@ -340,11 +340,6 @@ const FullPageNav = ({
           "z-20 flex flex-row items-center justify-between gap-x-4",
         )}
       >
-        {/* <ThemeToggle userPref={themePref} /> */}
-
-        {/* //NOTE: Add sliding up animation later; will require making a button
-          lookalike with two divs/spans inside that move up and down and have an
-          overflow of hidden */}
         <AnimatePresence>
           {isOpen === "open" && (
             <>
@@ -376,22 +371,23 @@ const FullPageNav = ({
           />
         </div>
         {/* <Button
-            variant='salWithShadowHidden'
-            onClick={() =>
-              setIsOpen(
-                isOpen === "initial"
-                  ? "open"
-                  : isOpen === "open"
+          variant="salWithShadowHidden"
+          onClick={() =>
+            setIsOpen(
+              isOpen === "initial"
+                ? "open"
+                : isOpen === "open"
                   ? "closed"
-                  : "open"
-              )
-            }
-            className={cn(
-              "w-[6em] bg-background font-bold",
-              isOpen === "open" ? "bg-salPink" : "bg-background"
-            )}>
-            {isOpen === "open" ? "CLOSE" : "MENU"}
-          </Button> */}
+                  : "open",
+            )
+          }
+          className={cn(
+            "w-[6em] bg-background font-bold",
+            isOpen === "open" ? "bg-salPink" : "bg-background",
+          )}
+        >
+          {isOpen === "open" ? "CLOSE" : "MENU"}
+        </Button> */}
       </div>
 
       {/* /~ Fullscreen Menu Overlay ~/ */}

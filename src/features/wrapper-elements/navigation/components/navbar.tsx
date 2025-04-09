@@ -18,7 +18,7 @@ import {
 } from "@/constants/navbars";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-import { Authenticated, Unauthenticated } from "convex/react";
+import { Unauthenticated } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
@@ -34,7 +34,6 @@ interface NavBarProps {
 }
 
 export default function NavBar({
-  userId,
   user,
   subStatus,
 }: // userPref,
@@ -183,197 +182,198 @@ NavBarProps) {
             />
           </div>
 
-          <>
-            {/* Desktop Logo & Navigation */}
-            <motion.div
-              id="logo-text-container"
-              className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
-              animate={{
-                width: isScrolled ? "60px" : "250px",
-                backgroundColor: isScrolled ? "var(--background)" : "white",
-              }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-            >
-              <Link
-                href="/"
-                className="flex items-center gap-2 overflow-hidden"
+          {!isMobile && (
+            <>
+              {/* Desktop Logo & Navigation */}
+              <motion.div
+                id="logo-text-container"
+                className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
+                animate={{
+                  width: isScrolled ? "60px" : "250px",
+                  backgroundColor: isScrolled ? "var(--background)" : "white",
+                }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
               >
-                <Image
-                  src="/logotransparency.png"
-                  alt="The Street Art List"
-                  width={48}
-                  height={48}
-                  priority={true}
-                  className="shrink-0"
-                />
-
-                <motion.div
-                  initial={{ x: 0, opacity: 1 }}
-                  animate={{
-                    x: isScrolled ? "-100%" : "0%",
-                    opacity: isScrolled ? 0 : 1,
-                  }}
-                  transition={{
-                    opacity: {
-                      duration: 0.01,
-                      ease: "linear",
-                      delay: isScrolled ? 0 : 0.3,
-                    },
-                    x: {
-                      duration: 0.3,
-                      ease: "linear",
-                    },
-                  }}
-                  className="shrink-0 whitespace-nowrap"
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 overflow-hidden"
                 >
                   <Image
-                    src="/saltext.png"
+                    src="/logotransparency.png"
                     alt="The Street Art List"
-                    width={175}
-                    height={80}
-                    className="mt-1"
+                    width={48}
+                    height={48}
+                    priority={true}
+                    className="shrink-0"
                   />
-                </motion.div>
-              </Link>
-            </motion.div>
 
-            {/* Desktop Navigation */}
-            <motion.div
-              // animate={{ opacity: isScrolled ? 0 : 1 }}
-              // transition={{ duration: 0.3, ease: "easeOut" }}
-              className="z-0 hidden items-center justify-center gap-2 lg:flex"
-            >
-              <NavigationMenu delayDuration={Infinity}>
-                <NavigationMenuList className="gap-2">
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger
-                      isCurrent={isActiveResources}
-                      className={cn(
-                        "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                        isActiveResources &&
-                          "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
-                      )}
-                      onPointerMove={(event) => event.preventDefault()}
-                      onPointerLeave={(event) => event.preventDefault()}
-                    >
-                      Resources
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent
-                      onPointerEnter={(event) => event.preventDefault()}
-                      onPointerLeave={(event) => event.preventDefault()}
-                    >
-                      <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
-                        {filteredNavbarMenuResources.map((component) => (
-                          <ListItem
-                            key={component.title}
-                            title={component.title}
-                            href={component.href}
-                            className={cn(
-                              "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                              component.href.includes(currentPage) &&
-                                fullPagePath === component.href &&
-                                "bg-background",
-                            )}
-                          >
-                            {component.description}
-                          </ListItem>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger
-                      isCurrent={isActiveTheList}
-                      className={cn(
-                        "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                        isActiveTheList &&
-                          "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
-                      )}
-                      onPointerMove={(event) => event.preventDefault()}
-                      onPointerLeave={(event) => event.preventDefault()}
-                    >
-                      The List
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent
-                      onPointerEnter={(event) => event.preventDefault()}
-                      onPointerLeave={(event) => event.preventDefault()}
-                    >
-                      <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
-                        {filteredNavbarMenuTheList.map((component) => (
-                          <ListItem
-                            key={component.title}
-                            title={component.title}
-                            href={component.href}
-                            className={cn(
-                              "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                              component.href.includes(currentPage) &&
-                                currentPage !== "" &&
-                                "bg-background",
-                            )}
-                          >
-                            {component.description}
-                          </ListItem>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-
-              {filteredNavbarLinks.map((link) => (
-                <Link key={link.title} href={link.href} prefetch={true}>
-                  {!link.isIcon ? (
-                    <Button className="h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background">
-                      {link.title}
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-background text-foreground hover:scale-110 hover:bg-background"
-                      size="icon"
-                    >
-                      {link.icon}
-                    </Button>
-                  )}
+                  <motion.div
+                    initial={{ x: 0, opacity: 1 }}
+                    animate={{
+                      x: isScrolled ? "-100%" : "0%",
+                      opacity: isScrolled ? 0 : 1,
+                    }}
+                    transition={{
+                      opacity: {
+                        duration: 0.01,
+                        ease: "linear",
+                        delay: isScrolled ? 0 : 0.3,
+                      },
+                      x: {
+                        duration: 0.3,
+                        ease: "linear",
+                      },
+                    }}
+                    className="shrink-0 whitespace-nowrap"
+                  >
+                    <Image
+                      src="/saltext.png"
+                      alt="The Street Art List"
+                      width={175}
+                      height={80}
+                      className="mt-1"
+                    />
+                  </motion.div>
                 </Link>
-              ))}
-            </motion.div>
+              </motion.div>
 
-            {/* Right Side */}
-            <Unauthenticated>
-              <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
-                <div className="flex items-center gap-4">
-                  <Link href="/auth/sign-in" prefetch={true}>
-                    <Button
-                      variant="link"
-                      className="hidden rounded-full font-bold lg:block"
-                    >
-                      Sign in
-                    </Button>
+              {/* Desktop Navigation */}
+              <motion.div
+                // animate={{ opacity: isScrolled ? 0 : 1 }}
+                // transition={{ duration: 0.3, ease: "easeOut" }}
+                className="z-0 hidden items-center justify-center gap-2 lg:flex"
+              >
+                <NavigationMenu delayDuration={Infinity}>
+                  <NavigationMenuList className="gap-2">
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        isCurrent={isActiveResources}
+                        className={cn(
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                          isActiveResources &&
+                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                        )}
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        Resources
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
+                          {filteredNavbarMenuResources.map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                              className={cn(
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                component.href.includes(currentPage) &&
+                                  fullPagePath === component.href &&
+                                  "bg-background",
+                              )}
+                            >
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        isCurrent={isActiveTheList}
+                        className={cn(
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                          isActiveTheList &&
+                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                        )}
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        The List
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
+                          {filteredNavbarMenuTheList.map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                              className={cn(
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                component.href.includes(currentPage) &&
+                                  currentPage !== "" &&
+                                  "bg-background",
+                              )}
+                            >
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+
+                {filteredNavbarLinks.map((link) => (
+                  <Link key={link.title} href={link.href} prefetch={true}>
+                    {!link.isIcon ? (
+                      <Button className="h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background">
+                        {link.title}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="bg-background text-foreground hover:scale-110 hover:bg-background"
+                        size="icon"
+                      >
+                        {link.icon}
+                      </Button>
+                    )}
                   </Link>
-                  <Link href="/auth/register" prefetch={true}>
-                    <Button
-                      variant="salWithShadowHiddenYlw"
-                      className="hidden rounded-full font-bold lg:block"
-                    >
-                      Sign up
-                    </Button>
-                  </Link>
+                ))}
+              </motion.div>
+
+              {/* Right Side */}
+              <Unauthenticated>
+                <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
+                  <div className="flex items-center gap-4">
+                    <Link href="/auth/sign-in" prefetch={true}>
+                      <Button
+                        variant="link"
+                        className="hidden rounded-full font-bold lg:block"
+                      >
+                        Sign in
+                      </Button>
+                    </Link>
+                    <Link href="/auth/register" prefetch={true}>
+                      <Button
+                        variant="salWithShadowHiddenYlw"
+                        className="hidden rounded-full font-bold lg:block"
+                      >
+                        Sign up
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </Unauthenticated>
-            <Authenticated>
-              <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
-                {userId !== "guest" && user && (
+              </Unauthenticated>
+              {user && (
+                <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
                   <UserProfile
                     user={user}
                     className="size-10"
                     subscription={subStatus}
                   />
-                )}
-                <FullPageNav user={user} />
-              </div>
-            </Authenticated>
-          </>
+
+                  <FullPageNav user={user} />
+                </div>
+              )}
+            </>
+          )}
 
           {/* ------ Mobile Right side ------ */}
 
