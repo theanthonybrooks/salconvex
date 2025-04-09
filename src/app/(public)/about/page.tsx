@@ -1,6 +1,6 @@
 const AboutPage = () => {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="mt-8 flex h-full w-full flex-col items-center justify-center">
       <h1 className="font-tanker text-[5rem] lowercase tracking-wide">
         About Page
       </h1>

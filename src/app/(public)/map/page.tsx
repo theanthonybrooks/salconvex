@@ -11,7 +11,7 @@ const WorldMapPage = () => {
   }, []);
 
   return (
-    <div className="mt-mobile flex h-full w-full flex-1 flex-col items-center justify-center gap-4 px-4">
+    <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-4 px-4">
       <h1 className="font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
         World Map
       </h1>

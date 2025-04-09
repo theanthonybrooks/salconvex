@@ -17,25 +17,23 @@ export default function Changelog() {
 
   return (
     <div>
-      <div className="container mx-auto px-4">
-        <section className="relative flex flex-col items-center justify-center py-20">
+      <div className="container mx-auto mt-8 px-4">
+        <section className="relative flex flex-col items-center justify-center pb-20">
           <div className="space-y-6 text-center">
-            {/* Main heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="pb-2 font-tanker text-4xl tracking-wide md:text-6xl lg:text-7xl"
+              className="text-center font-tanker text-3xl lowercase tracking-wide lg:text-[5rem] lg:leading-[6.5rem]"
             >
               Changelog
             </motion.h1>
 
-            {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400 md:text-xl"
+              className="mx-auto max-w-2xl text-lg text-foreground"
             >
               What I&apos;ve been up to and what&apos;s in the works.
             </motion.p>

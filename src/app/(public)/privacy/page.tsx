@@ -2,7 +2,7 @@ import { Link } from "@/components/ui/custom-link";
 
 const PrivacyPage = () => {
   return (
-    <div className="mt-mobile mx-auto mb-10 flex h-full w-full max-w-[80vw] flex-col gap-y-3 px-4 lg:max-w-[60vw]">
+    <div className="mx-auto mb-10 mt-8 flex h-full w-full max-w-[80vw] flex-col gap-y-3 px-4 lg:max-w-[60vw]">
       <span className="mb-8">
         <h1 className="text-center font-tanker text-3xl lowercase tracking-wide lg:text-[5rem] lg:leading-[6.5rem]">
           Privacy Policy

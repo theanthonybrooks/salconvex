@@ -49,8 +49,6 @@ TheListNavBarProps) {
   const fullPagePath = pathname;
   const currentPage = pathname.split("/")[1];
 
-  console.log(currentPage);
-
   const [isScrolled, setIsScrolled] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -243,7 +241,7 @@ TheListNavBarProps) {
                             className={cn(
                               "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                               component.href === fullPagePath &&
-                                "border-b-2 bg-background",
+                                "bg-background",
                             )}
                           >
                             {component.description}
