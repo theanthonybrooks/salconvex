@@ -1,12 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  FOOTER_LINKS as footerLinks,
-  getGridColsClass,
-} from "@/constants/links";
+import { FOOTER_LINKS as footerLinks } from "@/constants/links";
 import { footerCRText } from "@/constants/text";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex-helpers/react/cache";
 import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -14,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { FaInstagram, FaRegEnvelope } from "react-icons/fa";
 import { FaFacebookF, FaThreads } from "react-icons/fa6";
 import { PiHeartBold } from "react-icons/pi";
+import { api } from "~/convex/_generated/api";
 
 interface NewsletterFormProps {
   email: string;
@@ -28,11 +27,17 @@ export default function Footer({ className }: { className?: string }) {
   } = useForm<NewsletterFormProps>();
 
   const links = footerLinks;
-  // const { image, alt, width, height, text, path } = landingPageLogo[0]
   const footerText = footerCRText();
   const numColumns = Object.keys(links).length;
-  const gridColsClass = getGridColsClass(numColumns);
   const [subAction, setSubAction] = useState("cta");
+  const subscription = useQuery(api.subscriptions.getUserSubscription);
+  const subStatus = subscription?.status || "none";
+  const filteredLinks = links
+    .map(({ section, items }) => ({
+      section,
+      items: items.filter((item) => !item.sub || item.sub.includes(subStatus)),
+    }))
+    .filter(({ items }) => items.length > 0);
 
   const onSubscribe = async (data: NewsletterFormProps) => {
     setSubAction("subbing");
@@ -54,17 +59,17 @@ export default function Footer({ className }: { className?: string }) {
         className,
       )}
     >
-      <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:w-full xl:max-w-full xl:px-6">
+      <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:max-w-full xl:px-6">
         <div className="xl:grid xl:grid-cols-2 xl:gap-8">
           {/* Links */}
-          <div className="mt-5 grid gap-8 px-6 md:grid-cols-2 xl:col-span-2 xl:mt-0">
+          <div className="mt-5 grid gap-8 px-6 lg:grid-cols-2 xl:col-span-2 xl:mt-0">
             <div
-              className={cn(
-                "hidden text-start md:grid md:gap-8 md:pl-8",
-                gridColsClass ? gridColsClass : "md:grid-cols-4",
-              )}
+              className={cn("hidden text-start lg:grid lg:gap-8 lg:pl-8")}
+              style={{
+                gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`,
+              }}
             >
-              {Object.entries(links).map(([section, items]) => (
+              {filteredLinks.map(({ section, items }) => (
                 <div key={section}>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                     {section.charAt(0).toUpperCase() + section.slice(1)}

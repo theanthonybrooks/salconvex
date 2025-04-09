@@ -42,12 +42,16 @@ export type SocialProps = {
   path: string;
 };
 
-interface LinkItem {
+export interface LinkItem {
   name: string;
   href: string;
+  sub?: string[];
 }
 
-type Links = Record<string, LinkItem[]>;
+export interface FooterSection {
+  section: string;
+  items: LinkItem[];
+}
 
 export const LANDING_PAGE_MENU: MenuProps[] = [
   {
@@ -73,36 +77,48 @@ export const LANDING_PAGE_MENU: MenuProps[] = [
   },
 ];
 
-export const FOOTER_LINKS: Links = {
-  "The List": [
-    { name: "About", href: "/about" },
-    { name: "Changelog", href: "/changelog" },
-    { name: "Collaborations", href: "/collabs" },
-    // { name: "Careers", href: "/careers" },
-    {
-      name: "Contact",
-      href: "mailto:info@thestreetartlist.com&subject=Site%20Contact",
-    },
-  ],
-  subscription: [
-    { name: "Manage", href: "/manage" }, //only if you're logged in
-    // { name: "Documentation", href: "/docs" },
-    // { name: "Examples", href: "/examples" },
-    { name: "Pricing", href: "/pricing" },
-  ],
-  legal: [
-    { name: "Privacy", href: "/privacy" },
-    { name: "Terms", href: "/terms" },
-    // { name: "License", href: "/license" },
-  ],
-  social: [
-    { name: "Instagram", href: "https://www.instagram.com/thestreetartlist" },
-    { name: "Threads", href: "https://threads.net/thestreetartlist" },
-    { name: "Facebook", href: "https://facebook.com/thestreetartlist" },
-    // { name: "LinkedIn", href: "https://www.linkedin.com/in/thestreetartlist" },
-    // { name: "GitHub", href: "https://github.com/thestreetartlist" },
-  ],
-};
+export const FOOTER_LINKS: FooterSection[] = [
+  {
+    section: "The List",
+    items: [
+      { name: "About", href: "/about" },
+      { name: "Changelog", href: "/changelog" },
+      { name: "Collaborations", href: "/collabs" },
+      // { name: "Careers", href: "/careers" },
+      {
+        name: "Contact",
+        href: "mailto:info@thestreetartlist.com&subject=Site%20Contact",
+      },
+    ],
+  },
+  {
+    section: "subscription",
+    items: [
+      { name: "Manage", href: "/manage", sub: ["active", "trialing"] }, //only if you're logged in
+      // { name: "Documentation", href: "/docs" },
+      // { name: "Examples", href: "/examples" },
+      { name: "Pricing", href: "/pricing" },
+    ],
+  },
+  {
+    section: "legal",
+    items: [
+      { name: "Privacy", href: "/privacy" },
+      { name: "Terms", href: "/terms" },
+      // { name: "License", href: "/license" },
+    ],
+  },
+  {
+    section: "social",
+    items: [
+      { name: "Instagram", href: "https://www.instagram.com/thestreetartlist" },
+      { name: "Threads", href: "https://threads.net/thestreetartlist" },
+      { name: "Facebook", href: "https://facebook.com/thestreetartlist" },
+      // { name: "LinkedIn", href: "https://www.linkedin.com/in/thestreetartlist" },
+      // { name: "GitHub", href: "https://github.com/thestreetartlist" },
+    ],
+  },
+];
 
 // note-to-self: Helper function to get the grid column class based on the number of columns in the FOOTER_LINKS object
 

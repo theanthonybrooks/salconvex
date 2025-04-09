@@ -27,7 +27,6 @@ export default function Home() {
   const targetRef = useRef(null);
 
   const [currentSlide, setCurrentSlide] = useState(1);
-  console.log(currentSlide);
   // const { scrollY } = useScroll()
   // const smoothScrollY = useSpring(scrollY, {
   //   stiffness: 100,
@@ -58,7 +57,7 @@ export default function Home() {
         initial={{ y: 0, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="relative mt-10 flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl sm:mt-auto"
+        className="relative flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl sm:mt-auto"
         style={{
           maxHeight: "calc(100dvh - 8.5rem)",
         }}

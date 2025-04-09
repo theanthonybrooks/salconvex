@@ -35,7 +35,7 @@ export default async function HomeLayout({
         subStatus={subStatus?.subStatus ?? "none"}
         // userPref={userPref ?? null}
       />
-      <div className="flex h-full flex-col pt-25">
+      <div className="flex h-full flex-col pt-36 lg:pt-25">
         <main className="flex flex-1 flex-col px-4">{children}</main>
 
         <Footer className="mt-10" />
