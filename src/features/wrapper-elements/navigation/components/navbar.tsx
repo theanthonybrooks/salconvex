@@ -96,16 +96,19 @@ NavBarProps) {
 
   return (
     <>
-      {/* ------ Mobile Only circle underlay ----- */}
-
+      {/* ------ Desktop & Mobile: Main Navbar ----- */}
       <motion.div
+        id="navbar"
+        initial={{ boxShadow: "none" }}
         animate={{
+          boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
           height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed left-0 right-0 top-0 z-[19] h-25"
+        className="fixed left-0 right-0 top-0 z-[51] h-25 w-screen bg-background"
       >
-        <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:hidden lg:py-4">
+        <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
+          {/* Mobile Logo and Navigation */}
           <motion.div
             initial={{ boxShadow: "none", height: 90, width: 90 }}
             animate={{
@@ -118,24 +121,9 @@ NavBarProps) {
               "absolute bottom-0 left-1/2 z-0 flex -translate-x-1/2 translate-y-[24px] items-center justify-center rounded-full bg-background lg:hidden",
             )}
           />
-        </div>
-      </motion.div>
-
-      {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <motion.div
-        initial={{ boxShadow: "none" }}
-        animate={{
-          boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
-          height: isScrolled ? "80px" : "100px",
-        }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed left-0 right-0 top-0 z-[51] h-25 border-foreground bg-background"
-      >
-        <div className="mx-auto flex h-full w-screen items-center px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
-          {/* Mobile Logo and Navigation */}
-
           <div className="flex items-center gap-2 lg:hidden">
             <motion.div
+              id="logo-background-front"
               initial={{
                 translateX: "-50%",
                 translateY: 14,
@@ -151,11 +139,7 @@ NavBarProps) {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute bottom-0 left-1/2 z-10 rounded-full"
             >
-              {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
-
               <Link href="/" prefetch={true}>
-                {/* <span className='font-semibold'>The Street Art List</span> */}
-
                 <motion.img
                   initial={{ height: 70, width: 70 }}
                   animate={{
@@ -203,6 +187,7 @@ NavBarProps) {
             <>
               {/* Desktop Logo & Navigation */}
               <motion.div
+                id="logo-text-container"
                 className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
                 animate={{
                   width: isScrolled ? "60px" : "250px",

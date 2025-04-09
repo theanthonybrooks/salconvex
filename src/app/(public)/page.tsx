@@ -6,9 +6,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Link } from "@/components/ui/custom-link";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
 
 // const font = Poppins({ subsets: ["latin"], weight: "600" })
@@ -16,6 +25,8 @@ import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
 export default function Home() {
   const searchParams = useSearchParams();
   const targetRef = useRef(null);
+
+  const [currentSlide, setCurrentSlide] = useState(1);
   // const { scrollY } = useScroll()
   // const smoothScrollY = useSpring(scrollY, {
   //   stiffness: 100,
@@ -51,7 +62,20 @@ export default function Home() {
           maxHeight: "calc(100dvh - 8.5rem)",
         }}
       >
-        <motion.img
+        <h1
+          className={cn(
+            "absolute left-7 top-7 z-10 font-tanker lowercase tracking-wide text-background transition-all duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,0.5)]",
+            currentSlide === 1 &&
+              "text-6xl leading-9 md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
+            currentSlide === 2 &&
+              "text-4xl lg:text-[8.5rem] lg:leading-[8.5rem]",
+            currentSlide === 3 &&
+              "text-4xl lg:text-[8.5rem] lg:leading-[8.5rem]",
+          )}
+        >
+          CHUS
+        </h1>
+        {/* <motion.img
           src="/chus.jpg"
           alt="The Street Art List"
           loading="lazy"
@@ -63,7 +87,64 @@ export default function Home() {
           //   borderBottomLeftRadius: borderRadius,
           //   borderBottomRightRadius: borderRadius,
           // }}
-        />
+        /> */}
+        <Carousel className="h-full w-full">
+          <CarouselContent>
+            <CarouselItem className="relative w-full">
+              <motion.img
+                src="/artist-highlight/chus3.jpg"
+                alt="The Street Art List"
+                loading="lazy"
+                width={1920}
+                height={1080}
+                className="h-full w-full object-cover object-[50%_42%]"
+
+                // style={{
+                //   borderBottomLeftRadius: borderRadius,
+                //   borderBottomRightRadius: borderRadius,
+                // }}
+              />
+            </CarouselItem>
+
+            <CarouselItem className="relative w-full">
+              <motion.img
+                src="/artist-highlight/chus2.jpg"
+                alt="The Street Art List"
+                loading="lazy"
+                width={1920}
+                height={1080}
+                className="h-full w-full object-cover object-[50%_90%]"
+
+                // style={{
+                //   borderBottomLeftRadius: borderRadius,
+                //   borderBottomRightRadius: borderRadius,
+                // }}
+              />
+            </CarouselItem>
+            <CarouselItem className="relative w-full">
+              <motion.img
+                src="/artist-highlight/chus.jpg"
+                alt="The Street Art List"
+                loading="lazy"
+                width={1920}
+                height={1080}
+                className="h-full w-full object-cover object-[50%_13%]"
+
+                // style={{
+                //   borderBottomLeftRadius: borderRadius,
+                //   borderBottomRightRadius: borderRadius,
+                // }}
+              />
+            </CarouselItem>
+          </CarouselContent>
+          <div onClick={() => setCurrentSlide(currentSlide - 1)}>
+            <CarouselPrevious />
+          </div>
+          <div onClick={() => setCurrentSlide(currentSlide + 1)}>
+            <CarouselNext />
+          </div>
+        </Carousel>
+
         <Popover>
           <PopoverTrigger asChild>
             <motion.span
@@ -87,47 +168,53 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">
                   Pieve Santo Stefano, Tuscany (IT)
                 </p>
+              </div>
+              <div className="space-y-2">
                 <h4 className="font-medium leading-none">More info:</h4>
                 <p className="text-sm text-muted-foreground">
-                  Artist located in Copenhagen, Denmark
+                  Italian artist located in Copenhagen, Denmark
                 </p>
               </div>
               <ul>
                 <li className="flex items-center gap-x-4">
-                  <FaInstagram />{" "}
-                  <a
+                  <FaInstagram />
+                  <Link
                     href="https://instagram.com/chus.art"
-                    className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+                    className="text-sm text-muted-foreground"
+                    target="_blank"
                   >
                     @chus.art
-                  </a>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-x-4">
-                  <FaFacebook />{" "}
-                  <a
+                  <FaFacebook />
+                  <Link
                     href="https://www.facebook.com/mattiachus"
-                    className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+                    className="text-sm text-muted-foreground"
+                    target="_blank"
                   >
                     @mattiachus
-                  </a>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-x-4">
                   <FaGlobe />
-                  <a
+                  <Link
                     href="https://chus.it"
-                    className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+                    className="text-sm text-muted-foreground"
+                    target="_blank"
                   >
                     www.chus.it
-                  </a>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-x-4">
                   <FaEnvelope />
-                  <a
+                  <Link
                     href="mailto:mattia.chus@gmail.com"
-                    className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+                    className="text-sm text-muted-foreground"
+                    target="_blank"
                   >
                     mattia.chus@gmail.com
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
