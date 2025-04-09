@@ -27,6 +27,7 @@ export default function Home() {
   const targetRef = useRef(null);
 
   const [currentSlide, setCurrentSlide] = useState(1);
+  console.log(currentSlide);
   // const { scrollY } = useScroll()
   // const smoothScrollY = useSpring(scrollY, {
   //   stiffness: 100,
@@ -62,7 +63,7 @@ export default function Home() {
           maxHeight: "calc(100dvh - 8.5rem)",
         }}
       >
-        <h1
+        {/* <h1
           className={cn(
             "absolute left-7 top-7 z-10 font-tanker lowercase tracking-wide text-background transition-all duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,0.5)]",
             currentSlide === 1 &&
@@ -71,6 +72,17 @@ export default function Home() {
               "text-4xl lg:text-[8.5rem] lg:leading-[8.5rem]",
             currentSlide === 3 &&
               "text-4xl lg:text-[8.5rem] lg:leading-[8.5rem]",
+          )}
+        >
+          CHUS
+        </h1>*/}
+        <h1
+          className={cn(
+            "absolute left-5 top-5 z-10 font-tanker lowercase tracking-wide text-background transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,0.5)] md:left-7",
+            "text-[3.75rem] leading-[3.5rem] md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
+            currentSlide === 1
+              ? "scale-100"
+              : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
           )}
         >
           CHUS
