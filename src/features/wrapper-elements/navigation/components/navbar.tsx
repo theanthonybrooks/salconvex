@@ -188,8 +188,9 @@ NavBarProps) {
               <motion.div
                 id="logo-text-container"
                 className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
+                initial={{ width: 60, backgroundColor: "white" }}
                 animate={{
-                  width: isScrolled ? "60px" : "250px",
+                  width: isScrolled ? 60 : 250,
                   backgroundColor: isScrolled ? "var(--background)" : "white",
                 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
