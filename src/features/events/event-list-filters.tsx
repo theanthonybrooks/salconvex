@@ -38,7 +38,7 @@ export const EventFilters = ({
     filters.continent !== undefined;
 
   return (
-    <div className="mb-6 flex w-full flex-col items-center gap-4 px-8 lg:max-w-[60vw]">
+    <div className="mb-6 flex w-full flex-col items-start gap-4 px-8 lg:max-w-[60vw]">
       <Separator className="w-full" thickness={2} />
 
       <div className="my-6 flex gap-4">

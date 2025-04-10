@@ -36,7 +36,7 @@ Props) => {
   const searchParams = useSearchParams();
   const allEvents = useEventPreviewCards();
   const isLoading = allEvents?.length === 0;
-  const hasResults = allEvents?.length > 0;
+  // const hasResults = allEvents?.length > 0;
 
   // console.log("allEvents", allEvents)
 
@@ -190,10 +190,6 @@ Props) => {
         <div className="flex flex-col items-center justify-center gap-4">
           <p className="text-center text-lg">Loading results...</p> <Loader />
         </div>
-      ) : hasResults && filteredEvents.length === 0 ? (
-        <p className="mt-8 text-center text-sm text-foreground">
-          No events found matching the selected filters.
-        </p>
       ) : (
         groupedEvents.map((group) => (
           <div key={group.title.raw} className="mb-6">
