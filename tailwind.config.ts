@@ -166,7 +166,10 @@ export default {
         "2xs": "0.6rem",
         "4h": "2.5rem",
       },
-
+      size: {
+        "15": "60px",
+        "25": "100px",
+      },
       keyframes: {
         "background-shine": {
           from: {

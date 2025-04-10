@@ -77,6 +77,8 @@ export const getArtistFull = query({
 export const updateOrCreateArtist = mutation({
   args: {
     artistName: v.optional(v.string()),
+    // artistLogo: v.optional(v.string()),
+    artistLogoStorageId: v.optional(v.id("_storage")),
     artistNationality: v.optional(v.array(v.string())),
     artistResidency: v.object({
       full: v.optional(v.string()),
@@ -92,7 +94,11 @@ export const updateOrCreateArtist = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
+    let fileUrl = null;
     if (!userId) throw new ConvexError("Not authenticated");
+    if (args.artistLogoStorageId) {
+      fileUrl = await ctx.storage.getUrl(args.artistLogoStorageId);
+    }
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -101,10 +107,16 @@ export const updateOrCreateArtist = mutation({
     if (!user) {
       throw new ConvexError("User not found");
     }
+
     const artist = await ctx.db
       .query("artists")
       .withIndex("by_artistId", (q) => q.eq("artistId", userId))
       .unique();
+    if (fileUrl) {
+      await ctx.db.patch(user._id, {
+        image: fileUrl,
+      });
+    }
 
     if (!artist) {
       // If they don't exist, create a new "artist"

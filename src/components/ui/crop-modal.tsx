@@ -50,16 +50,11 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
-              restrictPosition={false}
+              restrictPosition={true}
             />
           )}
         </div>
-        <input
-          type="color"
-          value={paddingColor}
-          onChange={(e) => setPaddingColor(e.target.value)}
-          className="mt-4 size-6 w-full rounded-full"
-        />
+
         <div className="mt-4 flex flex-col items-center">
           <label htmlFor="zoom" className="mb-1 text-sm text-foreground">
             Zoom
@@ -68,23 +63,39 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
             value={zoom}
             onChange={setZoom}
             marks={[
-              { value: 1, label: "1x" },
-
-              { value: 100, label: "2x" },
+              { value: 1, label: "Original" },
+              { value: 2.5, label: "2.5x" },
+              { value: 5, label: "5x" },
+              { value: 10, label: "10x" },
             ]}
             step={0.1}
+            min={1}
+            max={10}
             prefix=""
             suffix="x"
             label="Zoom"
             width={200}
             labelDisplay="auto"
+            className="w-full max-w-[80%]"
+          />
+        </div>
+        <div className="flex items-center justify-center gap-x-3">
+          <label htmlFor="color" className="mb-1 text-sm text-foreground">
+            Background Color
+          </label>
+          <input
+            id="color"
+            type="color"
+            value={paddingColor}
+            onChange={(e) => setPaddingColor(e.target.value)}
+            className="size-10 w-full max-w-40 cursor-pointer rounded-md border border-foreground px-2 py-1 text-sm shadow-sm focus:outline-none"
           />
         </div>
         <div className="mt-4 flex justify-between">
-          <Button variant="salWithShadowPink" onClick={onClose}>
+          <Button type="button" variant="salWithShadowPink" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave} variant="salWithShadowYlw">
+          <Button type="button" onClick={handleSave} variant="salWithShadowYlw">
             Crop & Save
           </Button>
         </div>

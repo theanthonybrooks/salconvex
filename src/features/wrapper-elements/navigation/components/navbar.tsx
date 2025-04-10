@@ -370,11 +370,7 @@ NavBarProps) {
               </Unauthenticated>
               {user && (
                 <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
-                  <UserProfile
-                    user={user}
-                    className="size-10"
-                    subscription={subStatus}
-                  />
+                  <UserProfile className="size-10" subscription={subStatus} />
 
                   <FullPageNav user={user} />
                 </div>

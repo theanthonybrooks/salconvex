@@ -33,8 +33,8 @@ export default function DiscreteSlider({
   className,
   disabled,
   step = null,
-  min = 1,
-  max = 100,
+  min,
+  max,
 }: DiscreteSliderProps) {
   const formatValue = (val: number) =>
     labelFormatter?.(val) ?? `${prefix}${val}${suffix}`;

@@ -4,7 +4,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -18,12 +18,17 @@ import {
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 import { Input } from "@/components/ui/input";
 import { OrgSearch } from "@/features/organizers/components/org-search";
-import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schema";
+import {
+  eventWithOCSchema,
+  step1Schema,
+} from "@/features/organizers/schemas/event-add-schema";
 
 import AvatarUploader from "@/components/ui/logo-uploader";
+import { MapboxInput } from "@/components/ui/mapbox-search";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Path, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -32,37 +37,29 @@ const steps = [
   {
     id: 1,
     label: "Add/Update Open Call",
-    fields: [
-      "organization.name",
-      "organization.logo",
-      "organization.location",
-      "organization.contact",
-    ],
+
+    schema: step1Schema,
   },
   {
     id: 2,
     label: "Create New Event",
-    fields: ["event.name", "event.type", "event.category"],
+    schema: eventWithOCSchema,
   },
   {
     id: 3,
     label: "step 3",
-    fields: ["openCall.deadline", "openCall.eligibility", "openCall.budget"],
   },
   {
     id: 4,
     label: "step 4",
-    fields: ["openCall.description"],
   },
   {
     id: 5,
     label: "step 5",
-    fields: ["openCall.description"],
   },
   {
     id: 6,
     label: "step 6",
-    fields: ["openCall.description"],
   },
 ];
 
@@ -89,6 +86,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     register,
     control,
     watch,
+    setValue,
+    getValues,
+    setError,
 
     // setValue,
     handleSubmit: handleSubmit,
@@ -105,8 +105,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   //     control,
   //     name: "organization",
   //   })
-  // console.log(form.watch())
   const orgValue = watch("organization");
+
   const orgName =
     typeof orgValue === "string" ? orgValue : (orgValue?.name ?? "");
 
@@ -123,22 +123,36 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const [lastSaved, setLastSaved] = useState(
     existingOrg ? existingOrg.updatedAt : null,
   );
-  console.log(user?.image);
-  const isValidForm = true; //TODO: check if form is valid
+
   const existingOrgs = typeof existingOrg === "object" && existingOrg !== null;
-  const formIsValid = isValidForm && isValidOrg === "valid";
+  const formIsValid = isValidOrg === "valid";
   const lastSavedDate = lastSaved
     ? new Date(Math.floor(lastSaved)).toLocaleString()
     : null;
 
+  const watchedValues = useWatch({ control });
+  const currentSchema = steps[activeStep]?.schema;
+
+  const isStepValid = useMemo(() => {
+    if (!currentSchema) return true;
+    const result = currentSchema.safeParse(watchedValues);
+    return result.success;
+  }, [watchedValues, currentSchema]);
+
+  const isValid = formIsValid && isStepValid;
   //
   //
   // ------------- Console Logs --------------
   //
   //
+  // console.log(formIsValid);
+  console.log("isValidOrg", isValidOrg);
+  console.log("isStepValid", isStepValid);
+  console.log("isValid", isValid);
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
   // console.log("existingOrg", existingOrg);
+  // console.log(existingOrg?.logo);
   // console.log("is valid org", isValidOrg);
   // console.log("last saved", lastSavedDate);
   //
@@ -158,6 +172,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   };
 
   const onSubmit = async (data: EventOCFormValues) => {
+    //todo: insert some validation that checks for blob images (new submissions) or existing images (edits). Edits shouldn't submit anything to the db if the logo is the same. Only blobs, which I'm assuming that I would use typeof to check for.
+    if (typeof data.organization.logo === "string") {
+      console.log("Logo is an existing image URL:", data.organization.logo);
+    } else {
+      console.log("Logo is a new Blob upload:", data.organization.logo);
+    }
+
     console.log("data", data);
     try {
       console.log("organizer mode)");
@@ -171,6 +192,29 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
     }
+  };
+
+  const handleNextStep = async () => {
+    const currentStep = steps[activeStep];
+    const schema = currentStep.schema;
+
+    if (schema) {
+      const values = getValues();
+      console.log(values);
+      const result = schema.safeParse(values);
+      console.log(result);
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          const path = issue.path.join(".") as Path<EventOCFormValues>;
+          setError(path, { type: "manual", message: issue.message });
+        });
+
+        toast.error("Please fix errors before continuing.");
+        return;
+      }
+    }
+
+    setActiveStep((prev) => prev + 1);
   };
 
   // -------------UseEffects --------------
@@ -196,10 +240,17 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       } else if (existingOrg?._creationTime) {
         setLastSaved(existingOrg._creationTime);
       }
+      reset({
+        organization: {
+          name: existingOrg.name,
+          logo: existingOrg.logo,
+          location: existingOrg.location,
+        },
+      });
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, isValidOrg, existingOrgs]);
+  }, [existingOrg, isValidOrg, existingOrgs, reset]);
 
   //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
@@ -207,6 +258,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     <HorizontalLinearStepper
       activeStep={activeStep}
       setActiveStep={setActiveStep}
+      onNextStep={handleNextStep}
       steps={steps}
       className="px-2 xl:px-8"
       finalLabel="Submit"
@@ -214,7 +266,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       isDirty={isDirty}
       onSave={handleSubmit(onSubmit)}
       lastSaved={lastSavedDate}
-      disabled={!formIsValid}
+      disabled={!isValid}
       cancelButton={
         <DialogClose asChild>
           <Button
@@ -233,7 +285,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         className="flex h-full min-h-96 grow flex-col p-4"
       >
         {activeStep === 0 && (
-          <div className="flex h-full flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6">
+          <div className="flex h-full flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6 xl:divide-x-1.5">
             <section className="flex flex-col gap-2">
               <div className="flex flex-col items-center justify-center gap-y-6">
                 <section className="flex flex-col items-center justify-center">
@@ -269,15 +321,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       : "To start, select from an existing organization or create a new one!"}
                   </p>
                 </section>
-                <section className="flex max-w-min flex-col items-center gap-2">
-                  <Label htmlFor="organization" className="sr-only">
+                <section className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <Label htmlFor="organization" className="">
                     Organization Name
                   </Label>
                   <div className="flex flex-col items-center gap-4 lg:flex-row">
-                    <div className="flex items-start gap-x-2 lg:flex-col">
+                    {/* <div className="flex items-start gap-x-2 lg:flex-col">
                       <p className="font-bold lg:text-xl">Step 1: </p>
                       <p className="lg:text-xs">Organization</p>
-                    </div>
+                    </div> */}
                     <Controller
                       name="organization.name"
                       control={control}
@@ -303,23 +355,75 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     </span>
                   )}
                 </section>
-                <section>
+                <section className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
                   <Controller
                     name="organization.logo"
                     control={control}
                     render={({ field }) => (
                       <AvatarUploader
+                        title="Organization Logo"
                         onChange={(file) => field.onChange(file)}
-                        initialImage={user?.image}
-
-                        // initialImage={field.value ? URL.createObjectURL(field.value) : undefined}
+                        onRemove={() => field.onChange(undefined)}
+                        reset={!formIsValid}
+                        required
+                        initialImage={existingOrg?.logo}
+                        size={72}
+                      />
+                    )}
+                  />
+                </section>
+                <section className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <Label htmlFor="residence">Organization Location</Label>
+                  <Controller
+                    name="organization.location.fullLocation"
+                    control={control}
+                    render={({ field }) => (
+                      <MapboxInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        reset={!formIsValid}
+                        onSelect={(location) => {
+                          setValue(
+                            "organization.location.fullLocation",
+                            location.full,
+                          );
+                          setValue("organization.location.city", location.city);
+                          setValue(
+                            "organization.location.state",
+                            location.state,
+                          );
+                          setValue(
+                            "organization.location.stateAbbr",
+                            location.stateAbbr,
+                          );
+                          setValue(
+                            "organization.location.country",
+                            location.country,
+                          );
+                          setValue(
+                            "organization.location.countryAbbr",
+                            location.countryAbbr,
+                          );
+                          setValue(
+                            "organization.location.coordinates.latitude",
+                            location.coordinates[0],
+                          );
+                          setValue(
+                            "organization.location.coordinates.longitude",
+                            location.coordinates[1],
+                          );
+                        }}
+                        tabIndex={3}
+                        placeholder="Organization Location (city, state, country, etc)..."
+                        className="w-full"
+                        inputClassName="rounded-lg border-foreground "
                       />
                     )}
                   />
                 </section>
               </div>
             </section>
-            <section>
+            <section className="xl:pl-18">
               {existingOrgs && (
                 <Select onValueChange={() => {}} defaultValue={"1"}>
                   <SelectTrigger className="mt-6 max-w-sm p-8 text-center text-base">

@@ -42,7 +42,31 @@ import { z } from "zod";
 // })
 const organizationSchema = z.object({
   name: z.string().min(3, "At least 3 chars").max(35, "Max 35 chars"),
-  logo: z.string().url().or(z.string().startsWith("data:image/")),
+  logo: z.union([
+    z
+      .instanceof(Blob)
+      .refine((b) => b.size > 0, { message: "Logo is required" }),
+    z.string().min(1, "Logo is required"),
+  ]),
+  location: z.object({
+    fullLocation: z.optional(z.string()),
+    locale: z.optional(z.string()),
+    city: z.optional(z.string()),
+    state: z.optional(z.string()),
+    stateAbbr: z.optional(z.string()),
+    region: z.optional(z.string()),
+    country: z.string(),
+    countryAbbr: z.string(),
+    continent: z.optional(z.string()),
+    coordinates: z.optional(
+      z.object({
+        latitude: z.number(),
+        longitude: z.number(),
+      }),
+    ),
+    // timezone: z.string(),
+    // timezoneOffset: z.optional(z.number()),
+  }),
 });
 
 const eventSchema = z.object({

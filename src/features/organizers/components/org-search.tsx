@@ -164,7 +164,7 @@ export const OrgSearch = ({
 
   return (
     <div
-      className="relative mx-auto max-w-sm lg:min-w-[400px] lg:max-w-md"
+      className="relative mx-auto w-full max-w-sm lg:min-w-[400px] lg:max-w-md"
       ref={containerRef}
     >
       <section className="relative z-[2]">

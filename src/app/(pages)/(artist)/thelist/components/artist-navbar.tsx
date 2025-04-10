@@ -326,11 +326,7 @@ TheListNavBarProps) {
               </Authenticated> */}
               {user && (
                 <div className="flex items-center gap-4">
-                  <UserProfile
-                    user={user}
-                    className="size-10"
-                    subscription={subStatus}
-                  />
+                  <UserProfile className="size-10" subscription={subStatus} />
                   <FullPageNav user={user} />
                 </div>
               )}

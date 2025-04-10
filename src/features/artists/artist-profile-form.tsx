@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 
 import { Label } from "@/components/ui/label";
+import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInput } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { sortedGroupedCountries } from "@/lib/locations";
@@ -13,6 +14,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Country } from "world-countries";
 import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
 
 interface ArtistProfileFormProps {
   className?: string;
@@ -24,6 +26,7 @@ interface ArtistProfileFormProps {
 
 type ArtistFormValues = {
   artistName: string;
+  logo: Blob | undefined;
   residence: string;
   nationalities: string[]; // cca2 codes for now
 
@@ -59,10 +62,12 @@ export const ArtistProfileForm = ({
       artistName: userName,
       nationalities: [],
       residence: "",
+      logo: undefined,
     },
     mode: "onChange",
   });
-
+  // NOTE: Generate the upload url to use Convex's storage
+  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const artistInfo = useQuery(api.artists.artistActions.getArtist, {});
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const updateArtist = useMutation(
@@ -74,6 +79,7 @@ export const ArtistProfileForm = ({
 
     reset({
       artistName: artistInfo.artistName ?? userName,
+      logo: user?.image ?? undefined,
       nationalities: artistInfo.artistNationality ?? [],
       residence: artistInfo.artistResidency?.full ?? "",
       locationCity: artistInfo.artistResidency?.city ?? "",
@@ -83,11 +89,12 @@ export const ArtistProfileForm = ({
       locationCountryAbbr: artistInfo.artistResidency?.countryAbbr ?? "",
       locationCoordinates: artistInfo.artistResidency?.location ?? [],
     });
-  }, [artistInfo, reset, userName]);
+  }, [artistInfo, reset, userName, user]);
 
   const onSubmit = async (data: ArtistFormValues) => {
     let timezone: string | undefined;
     let timezoneOffset: number | undefined;
+    let artistLogoStorageId: Id<"_storage"> | undefined;
     if (data.locationCoordinates?.length === 2) {
       const timezoneData = await getTimezone({
         latitude: data.locationCoordinates[1],
@@ -97,10 +104,30 @@ export const ArtistProfileForm = ({
       timezoneOffset = timezoneData?.gmtOffset;
       //could also get dst, abbreviation (CEST, CET, etc)
     }
+    //NOTE: Upload the image to Convex's storage and get the
+    if (data.logo) {
+      const uploadUrl = await generateUploadUrl();
+      const uploadRes = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": data.logo.type },
+        body: data.logo,
+      });
+      if (!uploadRes.ok) {
+        toast.error("Failed to upload logo", {
+          autoClose: 2000,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        });
+        return;
+      }
+      const { storageId } = await uploadRes.json();
+      artistLogoStorageId = storageId;
+    }
 
     try {
       await updateArtist({
         artistName: data.artistName,
+        artistLogoStorageId,
         artistNationality: data.nationalities,
         artistResidency: {
           full: data.residence,
@@ -132,14 +159,32 @@ export const ArtistProfileForm = ({
       onSubmit={handleSubmit(onSubmit)}
       className={cn("flex flex-col gap-6", className)}
     >
-      <div className="mt-4 flex flex-col gap-2 lg:px-4">
-        <Label htmlFor="artistName">Artist Name </Label>
-        <input
-          tabIndex={1}
-          id="artistName"
-          {...register("artistName")}
-          placeholder="(if different from your profile name)"
-          className="w-full rounded border border-foreground/30 p-3 text-base placeholder-shown:bg-salYellow/50 focus:outline-none focus:ring-1 focus:ring-foreground"
+      <div className="flex items-center gap-4">
+        <div className="mt-4 flex flex-grow flex-col gap-2 lg:px-4">
+          <Label htmlFor="artistName">Artist Name </Label>
+          <input
+            tabIndex={1}
+            id="artistName"
+            {...register("artistName")}
+            placeholder="(if different from your profile name)"
+            className="w-full rounded border border-foreground/30 p-3 text-base placeholder-shown:bg-salYellow/50 focus:outline-none focus:ring-1 focus:ring-foreground"
+          />
+        </div>
+
+        <Controller
+          name="logo"
+          control={control}
+          render={({ field }) => (
+            <AvatarUploader
+              onChange={(file) => field.onChange(file)}
+              onRemove={() => field.onChange(undefined)}
+              initialImage={user?.image}
+              required
+              imageOnly
+              className="gap-0 pr-8"
+              // initialImage={field.value ? URL.createObjectURL(field.value) : undefined}
+            />
+          )}
         />
       </div>
       <div className="relative mt-3 flex flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pt-8 text-foreground/75 lg:pt-4">

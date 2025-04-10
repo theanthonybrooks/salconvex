@@ -4,14 +4,24 @@ import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import { Check, CheckCircle2 } from "lucide-react";
 import * as React from "react";
+import { z } from "zod";
 
 interface StepperProps {
   activeStep: number;
+  onNextStep?: () => void;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+
+  // setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   skipped?: Set<number>;
   setSkipped?: React.Dispatch<React.SetStateAction<Set<number>>>;
   steps:
-    | { id: number; label: string; fields: string[]; optional?: boolean }[]
+    | {
+        id: number;
+        label: string;
+        fields?: string[];
+        optional?: boolean;
+        schema?: z.ZodTypeAny;
+      }[]
     | number;
   children?: React.ReactNode;
   className?: string;
@@ -26,6 +36,7 @@ interface StepperProps {
 
 export default function HorizontalLinearStepper({
   activeStep,
+  onNextStep,
   setActiveStep,
   skipped,
   setSkipped,
@@ -72,12 +83,12 @@ export default function HorizontalLinearStepper({
   const handleReset = () => setActiveStep(0);
   const lastStep = stepArray.length - 1;
 
-  console.log(activeStep);
+  // console.log(activeStep);
 
   return (
     <div
       className={cn(
-        "flex h-full max-h-[90dvh] w-full flex-col pt-8 lg:max-h-[85dvh] lg:pb-4 lg:pt-4",
+        "flex h-full max-h-[90dvh] w-full flex-col pt-8 lg:max-h-[85dvh] lg:pb-2 lg:pt-4",
         className,
       )}
     >
@@ -220,7 +231,11 @@ export default function HorizontalLinearStepper({
                 variant="salWithShadowHidden"
                 className="min-w-32"
                 disabled={disabled}
-                onClick={activeStep === lastStep ? onFinalSubmit : handleNext}
+                onClick={
+                  activeStep === lastStep
+                    ? onFinalSubmit
+                    : (onNextStep ?? handleNext)
+                }
               >
                 {activeStep === stepArray.length - 1 ? (
                   finalLabel ? (
