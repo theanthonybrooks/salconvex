@@ -44,6 +44,7 @@ export const useFilteredEvents = (
       })
       .sort((a, b) => {
         const { sortBy, sortDirection } = sortOptions;
+        const directionMultiplier = sortDirection === "asc" ? 1 : -1;
 
         if (sortBy === "eventStart") {
           const getPriority = (item: CombinedEventPreviewCardData) => {
@@ -124,6 +125,7 @@ export const useFilteredEvents = (
             const isPast = ocEnd < now; //is technically handled by the combiner, but I'm keeping it here for now
 
             let priority: number;
+
             if (hasOpenCall && (!isPast || isRolling)) {
               if (callType === "Fixed") priority = 0;
               else if (callType === "Rolling") priority = 1;
@@ -145,19 +147,32 @@ export const useFilteredEvents = (
           const priorityA = getPriority(a);
           const priorityB = getPriority(b);
 
-          // Step 1: sort by priority
+          // // Step 1: sort by priority
+          // if (priorityA.priority !== priorityB.priority) {
+          //   return priorityA.priority - priorityB.priority;
+          // }
+
+          // // Step 2: if both have same priority, and it’s for active open calls, sort by ocEnd
+          // if (priorityA.priority < 3) {
+          //   return priorityA.ocEnd - priorityB.ocEnd;
+          // }
+
+          // return sortDirection === "asc"
+          //   ? priorityA.ocEnd - priorityB.ocEnd
+          //   : priorityB.ocEnd - priorityA.ocEnd;
+
+          // Step 1: sort by priority (keeps the priority order while just reversing the order of the dates)
           if (priorityA.priority !== priorityB.priority) {
             return priorityA.priority - priorityB.priority;
           }
 
-          // Step 2: if both have same priority, and it’s for active open calls, sort by ocEnd
+          // Step 2: for same priority, sort by ocEnd if priority < 3
           if (priorityA.priority < 3) {
-            return priorityA.ocEnd - priorityB.ocEnd;
+            return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
           }
 
-          return sortDirection === "asc"
-            ? priorityA.eventStart - priorityB.eventStart
-            : priorityB.eventStart - priorityA.eventStart;
+          // Step 3: fallback to eventStart
+          return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
         }
 
         if (sortBy === "name") {
