@@ -1,7 +1,6 @@
 "use client";
 
 import MenuToggle from "@/components/ui/hamburger-icon";
-import { Separator } from "@/components/ui/separator";
 import SocialsRow from "@/components/ui/socials";
 import ThemeToggle from "@/components/ui/theme-toggle";
 import { mainMenuItems } from "@/constants/menu";
@@ -11,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -813,7 +811,7 @@ const FullPageNav = ({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1.1, duration: 0.4 }}
                     >
-                      <div className="scrollable mini flex h-[30%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
+                      {/* <div className="scrollable mini flex h-[30%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
                         <p>User Notifications</p>
                         <Separator />
                         <p className="text-sm italic">
@@ -865,7 +863,7 @@ const FullPageNav = ({
                             </span>
                           </li>
                         </ol>
-                      </div>
+                      </div> */}
                     </motion.div>
                   </div>
 

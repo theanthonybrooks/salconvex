@@ -560,14 +560,14 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                   </span>
                 ) : (
                   <>
-                    <span className="hidden xl:block">
+                    <span className="hidden 2xl:block">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
                         basicInfo.dates?.timezone,
                         basicInfo.callType,
                       )}
                     </span>
-                    <span className="block xl:hidden">
+                    <span className="block 2xl:hidden">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
                         basicInfo.dates?.timezone,
@@ -905,14 +905,17 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             className="hidden xl:flex"
           />
           {isCurrentlyOpen && basicInfo.callFormat && (
-            <p className="flex items-center gap-x-1 text-sm">
-              <span className="flex items-center gap-x-1 rounded-sm font-bold">
+            <div className="flex max-w-40 items-center justify-center gap-x-1 text-center text-sm xl:max-w-none">
+              <span className="flex items-center gap-x-1 rounded-sm text-xl font-bold xl:text-sm">
                 {basicInfo.callFormat}:
               </span>
-              {basicInfo.callFormat === "RFP"
-                ? "Request for Proposals"
-                : "Request for Qualifications"}
-            </p>
+
+              <p>
+                {basicInfo.callFormat === "RFP"
+                  ? "Request for Proposals"
+                  : "Request for Qualifications"}
+              </p>
+            </div>
           )}
         </div>
       </Card>
