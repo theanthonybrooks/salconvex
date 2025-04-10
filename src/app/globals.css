@@ -825,4 +825,36 @@ button:active {
   }
 }
 
-/* Hamburger icon */
+/* Zoom Slider */
+
+.zoom-slider::-webkit-slider-thumb {
+  appearance: none;
+  margin-top: -5px;
+  width: 16px;
+  height: 16px;
+  background: rgb(241, 232, 74); /* emerald-500 */
+  border-radius: 100%;
+  z-index: 1;
+
+  cursor: pointer;
+  box-shadow:
+    /* 0 0 0 2px white, */ 0 0 0 2px #000000;
+  &:hover {
+    scale: 1.1;
+  }
+}
+
+.zoom-slider::-webkit-slider-runnable-track {
+  background-color: #22c55e; /* Tailwind's emerald-500 */
+  height: 4px;
+  border-radius: 20px;
+}
+
+.zoom-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #10b981;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+}

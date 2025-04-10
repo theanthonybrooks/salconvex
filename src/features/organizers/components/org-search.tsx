@@ -167,7 +167,7 @@ export const OrgSearch = ({
       className="relative mx-auto max-w-sm lg:min-w-[400px] lg:max-w-md"
       ref={containerRef}
     >
-      <section className="relative z-[51]">
+      <section className="relative z-[2]">
         <input
           ref={orgInputRef}
           value={inputValue}
@@ -229,7 +229,7 @@ export const OrgSearch = ({
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
             layout
-            className="scrollable mini absolute left-0 top-full z-50 max-h-52 w-full -translate-y-4 overflow-auto rounded-b border-x border-b bg-white pt-6 shadow-md"
+            className="scrollable mini absolute left-0 top-full z-[1] max-h-52 w-full -translate-y-4 overflow-auto rounded-b border-x border-b bg-white pt-6 shadow-md"
             style={{ scrollPaddingTop: "1.2rem" }}
           >
             {results.map((org, idx) => (

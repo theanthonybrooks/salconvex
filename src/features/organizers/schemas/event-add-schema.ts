@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 // export const eventOCSchema = z.object({
 //   organization: z
@@ -42,11 +42,12 @@ import { z } from "zod"
 // })
 const organizationSchema = z.object({
   name: z.string().min(3, "At least 3 chars").max(35, "Max 35 chars"),
-})
+  logo: z.string().url().or(z.string().startsWith("data:image/")),
+});
 
 const eventSchema = z.object({
   name: z.string().min(3, "Event name must be at least 3 characters"),
-})
+});
 
 const openCallSchema = z.object({
   deadline: z.date().min(new Date(), "Deadline must be after today"),
@@ -55,20 +56,20 @@ const openCallSchema = z.object({
     .min(3, "Eligibility criteria must be at least 3 characters"),
   description: z.string().min(3, "Description must be at least 3 characters"),
   budget: z.number().min(0, "Budget must be at least 0"),
-})
+});
 
 export const step1Schema = z.object({
   organization: organizationSchema,
   event: eventSchema,
-})
+});
 
 export const eventOnlySchema = z.object({
   organization: organizationSchema,
   event: eventSchema,
-})
+});
 
 export const eventWithOCSchema = z.object({
   organization: organizationSchema,
   event: eventSchema,
   openCall: openCallSchema,
-})
+});

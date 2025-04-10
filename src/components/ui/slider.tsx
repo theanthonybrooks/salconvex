@@ -7,7 +7,9 @@ import Slider from "@mui/material/Slider";
 type DiscreteSliderProps = {
   value: number;
   onChange: (value: number) => void;
-  marks: { value: number; label: string }[];
+  marks?: { value: number; label: string }[];
+  min?: number;
+  max?: number;
   prefix?: string;
   suffix?: string;
   width?: number;
@@ -16,6 +18,7 @@ type DiscreteSliderProps = {
   labelDisplay?: "auto" | "on" | "off";
   className?: string;
   disabled?: boolean;
+  step?: number | null;
 };
 
 export default function DiscreteSlider({
@@ -29,6 +32,9 @@ export default function DiscreteSlider({
   label = "slider",
   className,
   disabled,
+  step = null,
+  min = 1,
+  max = 100,
 }: DiscreteSliderProps) {
   const formatValue = (val: number) =>
     labelFormatter?.(val) ?? `${prefix}${val}${suffix}`;
@@ -64,8 +70,10 @@ export default function DiscreteSlider({
         onChange={(_, newValue) => onChange(newValue as number)}
         getAriaValueText={formatValue}
         valueLabelDisplay={labelDisplay}
-        step={null}
+        step={step}
         marks={marks}
+        min={min}
+        max={max}
         disabled={disabled}
       />
     </Box>

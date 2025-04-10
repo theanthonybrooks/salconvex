@@ -31,3 +31,27 @@ function createImage(url: string): Promise<HTMLImageElement> {
     img.src = url;
   });
 }
+
+export async function padImageToSquare(
+  imageSrc: string,
+  backgroundColor: string = "#ffffff",
+): Promise<string> {
+  const image = await createImage(imageSrc);
+
+  const size = Math.max(image.width, image.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas context not available");
+
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(0, 0, size, size);
+
+  const offsetX = (size - image.width) / 2;
+  const offsetY = (size - image.height) / 2;
+  ctx.drawImage(image, offsetX, offsetY);
+
+  return canvas.toDataURL("image/jpeg");
+}

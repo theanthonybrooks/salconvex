@@ -24,8 +24,6 @@ import AvatarUploader from "@/components/ui/logo-uploader";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PlusIcon } from "lucide-react";
-import Image from "next/image";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -36,6 +34,7 @@ const steps = [
     label: "Add/Update Open Call",
     fields: [
       "organization.name",
+      "organization.logo",
       "organization.location",
       "organization.contact",
     ],
@@ -80,6 +79,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     resolver: zodResolver(eventWithOCSchema),
     defaultValues: {
       organization: undefined,
+      // orgLogo: undefined,
       // eventName: "",
     },
     mode: "onChange",
@@ -123,7 +123,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const [lastSaved, setLastSaved] = useState(
     existingOrg ? existingOrg.updatedAt : null,
   );
-
+  console.log(user?.image);
   const isValidForm = true; //TODO: check if form is valid
   const existingOrgs = typeof existingOrg === "object" && existingOrg !== null;
   const formIsValid = isValidForm && isValidOrg === "valid";
@@ -137,9 +137,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   //
   //
   // console.log("orgValue", orgValue);
-  console.log("existing orgs", existingOrgs);
-  console.log("existingOrg", existingOrg);
-  console.log("is valid org", isValidOrg);
+  // console.log("existing orgs", existingOrgs);
+  // console.log("existingOrg", existingOrg);
+  // console.log("is valid org", isValidOrg);
   // console.log("last saved", lastSavedDate);
   //
   //
@@ -304,19 +304,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   )}
                 </section>
                 <section>
-                  <div className="relative flex size-20 items-center justify-center rounded-full border-2">
-                    <div className="absolute right-0 top-4 flex size-6 translate-x-[45%] items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-110 hover:cursor-pointer hover:bg-emerald-400 active:scale-95">
-                      <PlusIcon className="size-6 text-white" />
-                    </div>
-                    <Image
-                      src="/1.jpg"
-                      alt="Event"
-                      width={0}
-                      height={0}
-                      className="h-auto w-full rounded-full opacity-0"
-                    />
-                  </div>
-                  <AvatarUploader />
+                  <Controller
+                    name="organization.logo"
+                    control={control}
+                    render={({ field }) => (
+                      <AvatarUploader
+                        onChange={(file) => field.onChange(file)}
+                        initialImage={user?.image}
+
+                        // initialImage={field.value ? URL.createObjectURL(field.value) : undefined}
+                      />
+                    )}
+                  />
                 </section>
               </div>
             </section>
