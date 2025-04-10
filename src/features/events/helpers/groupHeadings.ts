@@ -135,5 +135,9 @@ export function getGroupKeyFromEvent(
     };
   }
 
+  if (sortBy === "name") {
+    return { raw: `"${event.name.slice(0, 1)}"` };
+  }
+
   return { raw: "Ungrouped" };
 }

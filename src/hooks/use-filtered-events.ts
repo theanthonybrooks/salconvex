@@ -45,88 +45,6 @@ export const useFilteredEvents = (
       .sort((a, b) => {
         const { sortBy, sortDirection } = sortOptions;
 
-        // if (sortBy === "openCall") {
-        //   const hasOpenCallA = a.hasActiveOpenCall
-        //   const hasOpenCallB = b.hasActiveOpenCall
-
-        //   console.log("has open call a", hasOpenCallA, hasOpenCallB)
-
-        //   // Step 1: prioritize events with open calls
-        //   if (hasOpenCallA && !hasOpenCallB) return -1
-        //   if (!hasOpenCallA && hasOpenCallB) return 1
-
-        //   // Step 2: sort those with open calls by ocEnd
-        //   if (hasOpenCallA && hasOpenCallB) {
-        //     const aOCDate = new Date(
-        //       a.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
-        //     )
-        //     const bOCDate = new Date(
-        //       b.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
-        //     )
-        //     return aOCDate.getTime() - bOCDate.getTime()
-        //   }
-
-        //   // Step 3: sort the rest by eventStart
-        //   const aEventDate = new Date(a.dates.eventStart ?? Infinity)
-        //   const bEventDate = new Date(b.dates.eventStart ?? Infinity)
-        //   return aEventDate.getTime() - bEventDate.getTime()
-        // }
-
-        // if (sortBy === "openCall") {
-        //   const hasOpenCallA = a.hasActiveOpenCall
-        //   const hasOpenCallB = b.hasActiveOpenCall
-
-        //   // Step 1: prioritize events with open calls
-        //   if (hasOpenCallA && !hasOpenCallB) return -1
-        //   if (!hasOpenCallA && hasOpenCallB) return 1
-
-        //   // If neither has open call, fall back to eventStart sort
-        //   if (!hasOpenCallA && !hasOpenCallB) {
-        //     const aEventDate = new Date(a.dates.eventStart ?? Infinity)
-        //     const bEventDate = new Date(b.dates.eventStart ?? Infinity)
-        //     return aEventDate.getMonth() - bEventDate.getMonth()
-        //   }
-
-        //   const isFixedA = a.tabs.opencall?.basicInfo?.callType === "Fixed"
-        //   const isFixedB = b.tabs.opencall?.basicInfo?.callType === "Fixed"
-        //   const isRollingA = a.tabs.opencall?.basicInfo?.callType === "Rolling"
-        //   const isRollingB = b.tabs.opencall?.basicInfo?.callType === "Rolling"
-        //   const isEmailA = a.tabs.opencall?.basicInfo?.callType === "Email"
-        //   const isEmailB = b.tabs.opencall?.basicInfo?.callType === "Email"
-
-        //   if (isFixedA && !isFixedB) return -1
-        //   if (!isFixedA && isFixedB) return 1
-        //   if (isRollingA && !isRollingB) return -1
-        //   if (!isRollingA && isRollingB) return 1
-        //   if (isEmailA && !isEmailB) return -1
-        //   if (!isEmailA && isEmailB) return 1
-
-        //   // Step 2: categorize current/future vs past open calls
-        //   const now = new Date()
-        //   now.setHours(0, 0, 0, 0)
-
-        //   const aOCDate = new Date(
-        //     a.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
-        //   )
-        //   const bOCDate = new Date(
-        //     b.tabs.opencall?.basicInfo?.dates?.ocEnd ?? Infinity
-        //   )
-
-        //   const aIsPast = aOCDate < now
-        //   const bIsPast = bOCDate < now
-
-        //   if (!aIsPast && bIsPast) return -1
-        //   if (aIsPast && !bIsPast) return 1
-
-        //   // Step 3a: if both are current/future, sort by ocEnd
-        //   if (!aIsPast && !bIsPast) {
-        //     return aOCDate.getTime() - bOCDate.getTime()
-        //   }
-
-        //   // Step 3b: if both are in the past, sort by ocEnd month
-        //   return aOCDate.getTime() - bOCDate.getTime()
-        // }
-
         if (sortBy === "eventStart") {
           const getPriority = (item: CombinedEventPreviewCardData) => {
             const now = new Date();
@@ -155,16 +73,6 @@ export const useFilteredEvents = (
               priority = 5;
             }
 
-            // console.log(
-            //   `${item.name}:`,
-            //   eventStartDate,
-            //   isValid,
-            //   isOngoing,
-
-            //   isPast,
-            //   priority
-            // )
-
             return {
               priority,
               eventStart: eventStartDate.getTime(),
@@ -178,13 +86,6 @@ export const useFilteredEvents = (
           if (priorityA.priority !== priorityB.priority) {
             return priorityA.priority - priorityB.priority;
           }
-
-          // // Step 2: fallback to sorting by month for past events
-          // if (priorityA.priority === 3 && priorityB.priority === 3) {
-          //   const monthA = new Date(a.dates.eventStart!).getMonth()
-          //   const monthB = new Date(b.dates.eventStart!).getMonth()
-          //   return monthA - monthB
-          // }
 
           if (priorityA.priority === 3 && priorityB.priority === 3) {
             const aDate = new Date(a.dates.eventStart ?? 0);
@@ -205,7 +106,10 @@ export const useFilteredEvents = (
           }
 
           // Step 2: fallback to eventStart
-          return priorityA.eventStart - priorityB.eventStart;
+
+          return sortDirection === "asc"
+            ? priorityA.eventStart - priorityB.eventStart
+            : priorityB.eventStart - priorityA.eventStart;
         }
         if (sortBy === "openCall") {
           const getPriority = (item: CombinedEventPreviewCardData) => {
@@ -231,16 +135,6 @@ export const useFilteredEvents = (
               priority = 5;
             }
 
-            // console.log(
-            //   `${item.name}:`,
-            //   hasOpenCall,
-            //   callType,
-            //   isRolling,
-            //   ocEnd,
-            //   isPast,
-            //   priority
-            // )
-
             return {
               priority,
               ocEnd: ocEnd.getTime(),
@@ -261,47 +155,10 @@ export const useFilteredEvents = (
             return priorityA.ocEnd - priorityB.ocEnd;
           }
 
-          // Step 3: fallback to eventStart
-          return priorityA.eventStart - priorityB.eventStart;
+          return sortDirection === "asc"
+            ? priorityA.eventStart - priorityB.eventStart
+            : priorityB.eventStart - priorityA.eventStart;
         }
-
-        // if (sortBy === "eventStart") {
-        //   const hasStartA = a.dates.eventStart !== null
-        //   const hasStartB = b.dates.eventStart !== null
-
-        //   if (hasStartA && !hasStartB) return -1
-        //   if (!hasStartA && hasStartB) return 1
-
-        //   if (a.dates.eventStart && b.dates.eventStart) {
-        //     const now = new Date()
-        //     now.setHours(0, 0, 0, 0) // strip time portion to compare dates only
-
-        //     const aDate = new Date(a.dates.eventStart)
-        //     const bDate = new Date(b.dates.eventStart)
-
-        //     const aIsToday = aDate.toDateString() === now.toDateString()
-        //     const bIsToday = bDate.toDateString() === now.toDateString()
-
-        //     const aInFuture = aDate > now
-        //     const bInFuture = bDate > now
-
-        //     console.log(`${a.name}:`, aDate, aIsToday, aInFuture)
-        //     console.log(`${b.name}:`, bDate, bIsToday, bInFuture)
-
-        //     // Prioritize today first
-        //     if (aIsToday && !bIsToday) return -1
-        //     if (!aIsToday && bIsToday) return 1
-
-        //     // Then future dates
-        //     if (aInFuture && !bInFuture) return -1
-        //     if (!aInFuture && bInFuture) return 1
-
-        //     // If both are in the past, sort by month (Jan = 0, Dec = 11)
-        //     return aDate.getMonth() - bDate.getMonth()
-        //   }
-
-        //   return 0
-        // }
 
         if (sortBy === "name") {
           const aName = a.name.toLowerCase();

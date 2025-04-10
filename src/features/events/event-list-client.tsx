@@ -124,6 +124,7 @@ Props) => {
   const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
   const totalPages = Math.ceil(filteredEvents.length / filters.limit);
   const totalResults = filteredEvents.length;
+
   const paginatedEvents = useMemo(() => {
     const start = (page - 1) * filters.limit;
     return filteredEvents.slice(start, start + filters.limit);

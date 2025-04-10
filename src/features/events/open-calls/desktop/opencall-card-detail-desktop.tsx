@@ -962,7 +962,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
               <AccordionItem
                 value="item-4"
-                className="rounded-lg border-2 bg-white/30 px-4 pt-3"
+                className="rounded-lg border-2 bg-white/30 px-4"
               >
                 <AccordionTrigger title="Documents:" />
                 <AccordionContent>

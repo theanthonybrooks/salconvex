@@ -139,13 +139,13 @@ export default function Footer({ className }: { className?: string }) {
         </div>
         <div className="mt-12 border-t border-border pt-4 dark:border-gray-800">
           <div className="flex flex-col items-center justify-between gap-y-2 px-6 md:flex-row">
-            <div className="mb-2 flex space-x-4 md:mb-0">
+            <div className="mb-2 flex space-x-6 md:mb-0 md:space-x-3">
               <Link
                 href="https://facebook.com/thestreetartlist"
                 target="_blank"
               >
                 <Button variant="icon" size="icon">
-                  <FaFacebookF className="h-5 w-5" />
+                  <FaFacebookF className="size-7 md:size-5" />
                 </Button>
               </Link>
               <Link
@@ -153,22 +153,22 @@ export default function Footer({ className }: { className?: string }) {
                 target="_blank"
               >
                 <Button variant="icon" size="icon">
-                  <FaInstagram className="h-5 w-5" />
+                  <FaInstagram className="size-7 md:size-5" />
                 </Button>
               </Link>
               <Link href="https://threads.net/thestreetartlist" target="_blank">
                 <Button variant="icon" size="icon">
-                  <FaThreads className="h-5 w-5" />
+                  <FaThreads className="size-7 md:size-5" />
                 </Button>
               </Link>
               {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
                 <Button variant='icon' size='icon'>
-                  <FaPatreon className='h-5 w-5' />
+                  <FaPatreon className='size-7 md:size-5' />
                 </Button>
               </Link> */}
               <Link href="mailto:info@thestreetartlist.com" target="_blank">
                 <Button variant="icon" size="icon">
-                  <FaRegEnvelope className="h-5 w-5" />
+                  <FaRegEnvelope className="size-7 md:size-5" />
                 </Button>
               </Link>
             </div>

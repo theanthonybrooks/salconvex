@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { motion as m } from "framer-motion"
-import { useTheme } from "next-themes"
+import { cn } from "@/lib/utils";
+import { motion as m } from "framer-motion";
+import { useTheme } from "next-themes";
 
 interface ThemeToggleProps {
-  className?: string
+  className?: string;
 }
 
 export default function ThemeToggle({ className }: ThemeToggleProps) {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme } = useTheme();
 
   const raysVariants = {
     hidden: {
@@ -25,7 +25,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
         staggerChildren: 0.05,
       },
     },
-  }
+  };
 
   const rayVariant = {
     hidden: {
@@ -45,7 +45,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
         scale: { duration: 0.3 },
       },
     },
-  }
+  };
 
   // const shineVariant = {
   //   hidden: {
@@ -67,32 +67,34 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
   // }
 
   const sunPath =
-    "M70 49.5C70 60.8218 60.8218 70 49.5 70C38.1782 70 29 60.8218 29 49.5C29 38.1782 38.1782 29 49.5 29C60 29 69.5 38 70 49.5Z"
+    "M70 49.5C70 60.8218 60.8218 70 49.5 70C38.1782 70 29 60.8218 29 49.5C29 38.1782 38.1782 29 49.5 29C60 29 69.5 38 70 49.5Z";
   const moonPath =
-    "M70 49.5C70 60.8218 60.8218 70 49.5 70C38.1782 70 29 60.8218 29 49.5C29 38.1782 38.1782 29 49.5 29C39 45 49.5 59.5 70 49.5Z"
+    "M70 49.5C70 60.8218 60.8218 70 49.5 70C38.1782 70 29 60.8218 29 49.5C29 38.1782 38.1782 29 49.5 29C39 45 49.5 59.5 70 49.5Z";
 
   return (
-    <div className='flex items-center justify-center'>
+    <div className="flex items-center justify-center">
       <div
-        className={cn(className)}
+        className={cn(className, "cursor-pointer")}
         onClick={() =>
           theme === "default"
             ? setTheme("light")
             : theme === "light"
-            ? setTheme("dark")
-            : theme === "dark"
-            ? setTheme("white")
-            : setTheme("default")
-        }>
+              ? setTheme("dark")
+              : theme === "dark"
+                ? setTheme("white")
+                : setTheme("default")
+        }
+      >
         <m.svg
-          strokeWidth='4'
-          strokeLinecap='round'
+          strokeWidth="4"
+          strokeLinecap="round"
           width={30}
           height={30}
-          viewBox='0 0 100 100'
-          fill='none'
-          xmlns='http://www.w3.org/2000/svg'
-          className='relative size-[30px] md:size-7 overflow-visible'>
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="relative size-[30px] overflow-visible md:size-7"
+        >
           {/* <m.path
             variants={shineVariant}
             d={moonPath}
@@ -103,27 +105,28 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
 
           <m.g
             variants={raysVariants}
-            initial='hidden'
+            initial="hidden"
             animate={theme === "default" ? "visible" : "hidden"}
-            className='stroke-6 stroke-foreground'
-            style={{ strokeLinecap: "round", strokeWidth: 8 }}>
+            className="stroke-6 stroke-foreground"
+            style={{ strokeLinecap: "round", strokeWidth: 8 }}
+          >
             <m.path
-              className='origin-center'
+              className="origin-center"
               variants={rayVariant}
-              d='M50 2V11'
+              d="M50 2V11"
             />
-            <m.path variants={rayVariant} d='M85 15L78 22' />
-            <m.path variants={rayVariant} d='M98 50H89' />
-            <m.path variants={rayVariant} d='M85 85L78 78' />
-            <m.path variants={rayVariant} d='M50 98V89' />
-            <m.path variants={rayVariant} d='M23 78L16 84' />
-            <m.path variants={rayVariant} d='M11 50H2' />
-            <m.path variants={rayVariant} d='M23 23L16 16' />
+            <m.path variants={rayVariant} d="M85 15L78 22" />
+            <m.path variants={rayVariant} d="M98 50H89" />
+            <m.path variants={rayVariant} d="M85 85L78 78" />
+            <m.path variants={rayVariant} d="M50 98V89" />
+            <m.path variants={rayVariant} d="M23 78L16 84" />
+            <m.path variants={rayVariant} d="M11 50H2" />
+            <m.path variants={rayVariant} d="M23 23L16 16" />
           </m.g>
 
           <m.path
             d={sunPath}
-            fill='transparent'
+            fill="transparent"
             transition={{ duration: 1, type: "spring" }}
             initial={{
               d: sunPath,
@@ -146,32 +149,32 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
                     scale: 2.25,
                   }
                 : theme === "default"
-                ? {
-                    d: sunPath,
-                    rotate: 0,
-                    strokeWidth: 6,
-                    stroke: "var(--foreground-hex)",
-                    fill: "transparent",
-                    fillOpacity: 0.35,
-                    strokeOpacity: 1,
+                  ? {
+                      d: sunPath,
+                      rotate: 0,
+                      strokeWidth: 6,
+                      stroke: "var(--foreground-hex)",
+                      fill: "transparent",
+                      fillOpacity: 0.35,
+                      strokeOpacity: 1,
 
-                    scale: 1,
-                  }
-                : {
-                    d: sunPath,
-                    rotate: 0,
-                    strokeWidth: 4,
-                    stroke: "var(--foreground-hex)",
-                    fill: "transparent",
-                    fillOpacity: 0.35,
-                    strokeOpacity: 1,
+                      scale: 1,
+                    }
+                  : {
+                      d: sunPath,
+                      rotate: 0,
+                      strokeWidth: 4,
+                      stroke: "var(--foreground-hex)",
+                      fill: "transparent",
+                      fillOpacity: 0.35,
+                      strokeOpacity: 1,
 
-                    scale: 2.3,
-                  }
+                      scale: 2.3,
+                    }
             }
           />
         </m.svg>
       </div>
     </div>
-  )
+  );
 }
