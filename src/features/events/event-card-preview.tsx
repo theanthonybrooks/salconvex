@@ -871,9 +871,10 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               <span className="flex items-center gap-x-1 font-semibold">
                 <Info /> Application Fee:
               </span>
-              {`$${basicInfo.appFee}`}
+              ${basicInfo.appFee}
             </p>
           )}
+
           <ApplyButtonShort
             slug={eventNameUrl}
             edition={event.dates.edition}
@@ -903,6 +904,16 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             appFee={basicInfo ? basicInfo.appFee : 0}
             className="hidden xl:flex"
           />
+          {isCurrentlyOpen && basicInfo.callFormat && (
+            <p className="flex items-center gap-x-1 text-sm">
+              <span className="flex items-center gap-x-1 rounded-sm font-bold">
+                {basicInfo.callFormat}:
+              </span>
+              {basicInfo.callFormat === "RFP"
+                ? "Request for Proposals"
+                : "Request for Qualifications"}
+            </p>
+          )}
         </div>
       </Card>
     </>
