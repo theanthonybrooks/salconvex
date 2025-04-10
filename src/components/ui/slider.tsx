@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import Box from "@mui/material/Box"
-import Slider from "@mui/material/Slider"
+import { cn } from "@/lib/utils";
+import Box from "@mui/material/Box";
+import Slider from "@mui/material/Slider";
 
 type DiscreteSliderProps = {
-  value: number
-  onChange: (value: number) => void
-  marks: { value: number; label: string }[]
-  prefix?: string
-  suffix?: string
-  width?: number
-  labelFormatter?: (value: number) => string
-  label?: string
-  labelDisplay?: "auto" | "on" | "off"
-  className?: string
-  disabled?: boolean
-}
+  value: number;
+  onChange: (value: number) => void;
+  marks: { value: number; label: string }[];
+  prefix?: string;
+  suffix?: string;
+  width?: number;
+  labelFormatter?: (value: number) => string;
+  label?: string;
+  labelDisplay?: "auto" | "on" | "off";
+  className?: string;
+  disabled?: boolean;
+};
 
 export default function DiscreteSlider({
   value,
@@ -31,29 +31,29 @@ export default function DiscreteSlider({
   disabled,
 }: DiscreteSliderProps) {
   const formatValue = (val: number) =>
-    labelFormatter?.(val) ?? `${prefix}${val}${suffix}`
+    labelFormatter?.(val) ?? `${prefix}${val}${suffix}`;
 
   return (
     <Box className={cn("w-full", className)}>
       <Slider
         sx={{
-          color: "#f4a9f6",
+          color: "rgb(244, 169, 246)",
           "& .MuiSlider-thumb": {
-            border: "2px solid #db8ade",
+            border: "2px solid rgb(219, 138, 222)",
           },
           "& .MuiSlider-track": {
             height: 6,
-            backgroundColor: "#db8ade",
+            backgroundColor: "rgb(219, 138, 222)",
             border: "none",
           },
 
           "& .MuiSlider-rail": {
-            color: "#f4a9f6",
+            color: "rgb(244, 169, 246)",
             opacity: 0.8,
             height: 4,
           },
           "& .MuiSlider-mark": {
-            backgroundColor: "#db8ade",
+            backgroundColor: "rgb(219, 138, 222)",
             height: 8,
             width: 3,
             borderRadius: 1,
@@ -69,5 +69,5 @@ export default function DiscreteSlider({
         disabled={disabled}
       />
     </Box>
-  )
+  );
 }

@@ -188,10 +188,15 @@ NavBarProps) {
               <motion.div
                 id="logo-text-container"
                 className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
-                initial={{ width: 60, backgroundColor: "white" }}
+                initial={{
+                  width: 60,
+                  backgroundColor: "rgba(255, 255, 255, 1)",
+                }}
                 animate={{
                   width: isScrolled ? 60 : 250,
-                  backgroundColor: isScrolled ? "var(--background)" : "white",
+                  backgroundColor: isScrolled
+                    ? "rgba(255, 255, 255, 0)"
+                    : "rgba(255, 255, 255, 1)",
                 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
               >
@@ -230,9 +235,10 @@ NavBarProps) {
                     <Image
                       src="/saltext.png"
                       alt="The Street Art List"
-                      width={175}
-                      height={80}
-                      className="mt-1"
+                      width={0}
+                      height={0}
+                      className="mt-1 h-auto w-44"
+                      priority
                     />
                   </motion.div>
                 </Link>

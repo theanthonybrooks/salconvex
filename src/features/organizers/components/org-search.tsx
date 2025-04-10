@@ -8,12 +8,7 @@ import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 
 interface OrgSearchProps {
-  value:
-    | string
-    | {
-        organizationName: string;
-      }
-    | null;
+  value: string | null;
   onChange: (
     value:
       | string
@@ -38,86 +33,107 @@ export const OrgSearch = ({
   onReset,
   onLoadClick,
 }: OrgSearchProps) => {
-  const [inputValue, setInputValue] = useState(
-    typeof value === "string" ? value : (value?.organizationName ?? ""),
-  );
+  const [inputValue, setInputValue] = useState(value || "");
 
   const invalid = isValid === "invalid";
   const valid = isValid === "valid";
+
   const [focused, setFocused] = useState(false);
   const [clearHovered, setClearHovered] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+
   const [selectedVal, setSelectedVal] = useState<string>("");
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const orgInputRef = useRef<HTMLInputElement>(null);
   const trimmedQuery = inputValue.trim();
+  const [debouncedQuery, setDebouncedQuery] = useState(trimmedQuery);
+
   const results = useQuery(
     api.organizer.organizations.getUserOrganizations,
-    hasUserInteracted ? { query: trimmedQuery || "" } : "skip",
+    hasUserInteracted ? { query: debouncedQuery || "" } : "skip",
   );
-  console.log("results", results);
+
+  // useEffect(() => {
+  //   console.log("debouncedQuery", debouncedQuery);
+  //   console.log("results", results);
+  //   console.log(focused);
+  // }, [debouncedQuery, results, focused]);
 
   const showSuggestions = focused && results && results.length > 0;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
     setInputValue(newVal);
-    onChange(newVal);
-    onLoadClick(null);
   };
 
   const handleSelect = (org: Doc<"organizations">) => {
-    console.log("organization: ", org);
     onChange(org.name);
     setInputValue(org.name);
     setSelectedVal(org.name);
+    setSelectedIndex(-1);
     onLoadClick(org);
     setFocused(false);
+    orgInputRef.current?.blur();
   };
 
   const handleReset = () => {
     setInputValue("");
+    setSelectedVal("");
     onLoadClick(null);
     if (value !== null) onChange(null);
     if (onReset) onReset();
     orgInputRef.current?.focus();
   };
 
+  // console.log(selectedIndex);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!results || results.length === 0) return;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev + 1) % results.length);
+      if (showSuggestions) {
+        setSelectedIndex((prev) => (prev + 1) % results.length);
+      }
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex((prev) =>
-        prev === -1
-          ? results.length - 1
-          : (prev - 1 + results.length) % results.length,
-      );
+      if (showSuggestions) {
+        setSelectedIndex((prev) =>
+          prev === -1
+            ? results.length - 1
+            : (prev - 1 + results.length) % results.length,
+        );
+      }
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       e.preventDefault();
       handleSelect(results[selectedIndex]);
+      setSelectedIndex(-1);
       // setSelectedVal(results[selectedIndex].organizationName)
     } else if (e.key === "Escape") {
       setFocused(false);
       setSelectedIndex(-1);
+    } else if (
+      e.key.length === 1 ||
+      e.key === "Backspace" ||
+      e.key === "Delete"
+    ) {
+      setSelectedVal("");
+      onLoadClick(null);
     }
   };
 
-  useEffect(() => {
-    if (
-      typeof value === "object" &&
-      value !== null &&
-      "organizationName" in value &&
-      inputValue !== value.organizationName
-    ) {
-      setInputValue(value.organizationName);
-    }
-  }, [value, inputValue]);
+  // useEffect(() => {
+  //   if (
+  //     typeof value === "object" &&
+  //     value !== null &&
+  //     "organizationName" in value &&
+  //     inputValue !== value.organizationName
+  //   ) {
+  //     setInputValue(value.organizationName);
+  //   }
+  // }, [value, inputValue]);
 
   useEffect(() => {
     const selectedEl = itemRefs.current[selectedIndex];
@@ -125,6 +141,26 @@ export const OrgSearch = ({
       selectedEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [selectedIndex]);
+
+  useEffect(() => {
+    if (showSuggestions) {
+      setSelectedIndex(0);
+    } else {
+      setSelectedIndex(-1);
+    }
+  }, [showSuggestions]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedQuery(trimmedQuery);
+      if (hasUserInteracted) {
+        onChange(trimmedQuery);
+        // onLoadClick(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [trimmedQuery, hasUserInteracted, onChange, onLoadClick]);
 
   return (
     <div
@@ -137,7 +173,10 @@ export const OrgSearch = ({
           value={inputValue}
           onChange={handleInputChange}
           autoFocus={false}
-          onFocus={() => setFocused(true)}
+          onFocus={() => {
+            if (!hasUserInteracted) setHasUserInteracted(true);
+            setFocused(true);
+          }}
           onBlur={() => setTimeout(() => setFocused(false), 100)}
           onKeyDown={(e) => {
             if (!hasUserInteracted) setHasUserInteracted(true);

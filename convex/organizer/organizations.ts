@@ -2,6 +2,7 @@ import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { Doc } from "~/convex/_generated/dataModel";
 import { query } from "~/convex/_generated/server";
 
 export const isNewOrg = query({
@@ -44,8 +45,8 @@ export const getUserOrganizations = query({
     if (!user) return null;
 
     const q = args.query.toLowerCase();
-    const filterFn = (org: any) =>
-      q === "" || org.organizationName?.toLowerCase().includes(q);
+    const filterFn = (org: Doc<"organizations">) =>
+      q === "" || org.name?.toLowerCase().includes(q);
 
     if (user?.role.includes("admin")) {
       const all = await ctx.db.query("organizations").collect();
@@ -110,6 +111,7 @@ export const isOwnerOrIsNewOrg = query({
     ).unique();
 
     console.log("org", org);
+    console.log("user id", userId);
 
     if (org) return "orgNameExists";
 
