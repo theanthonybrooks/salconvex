@@ -121,7 +121,6 @@ export default function NavBar({
                 {userId !== "guest" && user && (
                   <UserProfile
                     className="h-[40px] w-[40px]"
-                    user={user}
                     subscription={subStatus}
                   />
                 )}
