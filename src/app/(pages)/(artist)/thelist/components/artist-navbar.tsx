@@ -22,9 +22,10 @@ import { Unauthenticated } from "convex/react";
 
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { ArrowUpIcon } from "lucide-react";
 
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface TheListNavBarProps {
   userId: string | undefined;
@@ -40,11 +41,14 @@ export default function TheListNavBar({
 // userPref,
 TheListNavBarProps) {
   const pathname = usePathname();
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
+  const [canGoToTop, setCanGoToTop] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
+
   const fullPagePath = pathname;
   const currentPage = pathname.split("/")[1];
 
@@ -53,6 +57,10 @@ TheListNavBarProps) {
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrollThreshold = 50;
     setIsScrolled(latest > scrollThreshold);
+  });
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    // console.log("scroll progress: ", latest);
+    setCanGoToTop(latest > 0.25);
   });
 
   const statusKey = subStatus ? subStatus : "none";
@@ -64,6 +72,13 @@ TheListNavBarProps) {
   const isActiveTheList = filteredNavbarMenuTheList.some(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
+
+  const onGoToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant",
+    });
+  };
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)");
@@ -82,8 +97,36 @@ TheListNavBarProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (canGoToTop) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setCanGoToTop(false);
+        timeoutRef.current = null;
+      }, 5000);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [canGoToTop]);
+
   return (
     <>
+      {canGoToTop && (
+        <div
+          onClick={onGoToTop}
+          className="fixed bottom-7 right-7 rounded-full border-2 bg-background p-1 hover:scale-110 hover:cursor-pointer active:scale-95"
+        >
+          <ArrowUpIcon className="size-6" />
+        </div>
+      )}
       <motion.div
         initial={{ boxShadow: "none" }}
         animate={{

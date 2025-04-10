@@ -71,7 +71,7 @@ export default function Footer({ className }: { className?: string }) {
             >
               {filteredLinks.map(({ section, items }) => (
                 <div key={section}>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-semibold text-foreground">
                     {section.charAt(0).toUpperCase() + section.slice(1)}
                   </h3>
                   <ul className="mt-4 space-y-4">
@@ -110,7 +110,7 @@ export default function Footer({ className }: { className?: string }) {
                     {...register("email", { required: true })}
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full min-w-0 rounded-lg border-foreground bg-background text-foreground"
+                    className="w-full min-w-0 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
                   />
                 </div>
                 <div className="mt-3 sm:ml-3 sm:mt-0">
@@ -138,7 +138,7 @@ export default function Footer({ className }: { className?: string }) {
           </div>
         </div>
         <div className="mt-12 border-t border-border pt-4 dark:border-gray-800">
-          <div className="flex flex-col items-center justify-between gap-y-2 px-6 md:flex-row">
+          <div className="flex flex-col items-center justify-between gap-y-2 px-12 md:flex-row">
             <div className="mb-2 flex space-x-6 md:mb-0 md:space-x-3">
               <Link
                 href="https://facebook.com/thestreetartlist"
