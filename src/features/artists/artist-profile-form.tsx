@@ -179,7 +179,6 @@ export const ArtistProfileForm = ({
               onChange={(file) => field.onChange(file)}
               onRemove={() => field.onChange(undefined)}
               initialImage={user?.image}
-              required
               imageOnly
               className="gap-0 pr-8"
               // initialImage={field.value ? URL.createObjectURL(field.value) : undefined}

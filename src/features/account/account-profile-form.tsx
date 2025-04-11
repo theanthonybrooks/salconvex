@@ -59,6 +59,7 @@ export const AccountSubscribeForm = ({
       </DialogTrigger>
 
       <DialogContent
+        onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(
           "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
           className,

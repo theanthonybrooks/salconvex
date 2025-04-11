@@ -83,8 +83,6 @@ export default function HorizontalLinearStepper({
   const handleReset = () => setActiveStep(0);
   const lastStep = stepArray.length - 1;
 
-  // console.log(activeStep);
-
   return (
     <div
       className={cn(
@@ -166,36 +164,40 @@ export default function HorizontalLinearStepper({
         <>
           <div className={cn("flex items-center justify-between gap-x-4")}>
             <section className="flex items-center gap-x-2">
-              <Button
-                variant="salWithShadowHidden"
-                className={cn(
-                  "bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:hidden",
-                  isDirty &&
-                    onSave !== undefined &&
-                    activeStep >= 1 &&
-                    "opacity-100",
+              <div>
+                {activeStep >= 1 && (
+                  <>
+                    <Button
+                      variant="salWithShadowHidden"
+                      className={cn(
+                        "bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:hidden",
+                        isDirty &&
+                          onSave !== undefined &&
+                          activeStep >= 1 &&
+                          "opacity-100",
+                      )}
+                      //todo: fix the conditional styling that uses isDirty and onSave
+                      disabled={!isDirty}
+                      onClick={onSave}
+                    >
+                      Save
+                    </Button>
+
+                    <Button
+                      variant="salWithShadowHidden"
+                      className={cn(
+                        "hidden bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:block",
+                        isDirty && onSave !== undefined && "opacity-100",
+                      )}
+                      //todo: fix the conditional styling that uses isDirty and onSave
+                      disabled={!isDirty}
+                      onClick={onSave}
+                    >
+                      Save Progress
+                    </Button>
+                  </>
                 )}
-                //todo: fix the conditional styling that uses isDirty and onSave
-                disabled={!isDirty}
-                onClick={onSave}
-              >
-                Save
-              </Button>
-              <Button
-                variant="salWithShadowHidden"
-                className={cn(
-                  "hidden bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:block",
-                  isDirty &&
-                    onSave !== undefined &&
-                    activeStep >= 1 &&
-                    "opacity-100",
-                )}
-                //todo: fix the conditional styling that uses isDirty and onSave
-                disabled={!isDirty}
-                onClick={onSave}
-              >
-                Save Progress
-              </Button>
+              </div>
               {lastSaved && activeStep >= 1 && (
                 <p className="hidden text-xs italic text-muted-foreground lg:block">
                   Last saved: {lastSaved}
@@ -214,13 +216,15 @@ export default function HorizontalLinearStepper({
                 </p>
               )}
               {cancelButton}
-              <Button
-                variant="salWithShadowHiddenYlw"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-              >
-                Back
-              </Button>
+              {activeStep !== 0 && (
+                <Button
+                  variant="salWithShadowHiddenYlw"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                >
+                  Back
+                </Button>
+              )}
 
               {stepArray[activeStep].optional && (
                 <Button variant="salWithShadowHidden" onClick={handleSkip}>
@@ -257,7 +261,7 @@ export default function HorizontalLinearStepper({
                 Last saved: {lastSaved}
               </p>
             )}
-            {onSave !== undefined && !lastSaved && (
+            {onSave !== undefined && !lastSaved && activeStep !== 0 && (
               <p className="text-balance text-sm italic">
                 (Form will autosave any new info after 1 minute)
               </p>

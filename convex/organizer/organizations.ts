@@ -1,5 +1,5 @@
 import { filter } from "convex-helpers/server/filter";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -82,6 +82,10 @@ export const isOwnerOrIsNewOrg = query({
 
     if (!user) return null;
 
+    const isAdmin = user.role.includes("admin");
+
+    if (isAdmin) return "userIsAdmin";
+
     // const owner = await ctx.db
     //   .query("organizations")
     //   .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
@@ -97,7 +101,7 @@ export const isOwnerOrIsNewOrg = query({
     console.log("owner", owner);
 
     if (owner && owner.ownerId === user._id) return "ownedByUser";
-    if (owner) return "ownedByOther";
+    if (owner) throw new ConvexError("Organization already exists");
 
     // const org = await ctx.db
     //   .query("organizations")
@@ -113,7 +117,7 @@ export const isOwnerOrIsNewOrg = query({
     console.log("org", org);
     console.log("user id", userId);
 
-    if (org) return "orgNameExists";
+    if (org) throw new ConvexError("Organization already exists");
 
     console.log("if org");
     if (inputName === "") return null;
@@ -127,5 +131,22 @@ const getAllOrganizations = query({
   handler: async (ctx) => {
     const allOrgs = await ctx.db.query("organizations").collect();
     return allOrgs;
+  },
+});
+
+export const getEventsByOrgId = query({
+  args: {
+    orgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const org = await ctx.db.get(args.orgId);
+    if (!org) return null;
+
+    const events = await ctx.db
+      .query("eventOrganizers")
+      .withIndex("by_organizerId", (q) => q.eq("organizerId", org._id))
+      .collect();
+
+    return events;
   },
 });

@@ -8,13 +8,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 import { Input } from "@/components/ui/input";
 import { OrgSearch } from "@/features/organizers/components/org-search";
@@ -24,9 +17,12 @@ import {
 } from "@/features/organizers/schemas/event-add-schema";
 
 import AvatarUploader from "@/components/ui/logo-uploader";
-import { MapboxInput } from "@/components/ui/mapbox-search";
+import { MapboxInputFull } from "@/components/ui/mapbox-search";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "convex/react";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 import { AnimatePresence, motion } from "framer-motion";
 import { Path, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -86,17 +82,17 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     register,
     control,
     watch,
-    setValue,
+    // setValue,
     getValues,
     setError,
-
+    // trigger,
     // setValue,
     handleSubmit: handleSubmit,
     formState: {
       // isValid,
       //   dirtyFields,
       isDirty,
-      //   errors,
+      errors,
     },
     reset,
   } = form;
@@ -105,18 +101,16 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   //     control,
   //     name: "organization",
   //   })
-  const orgValue = watch("organization");
+  // const orgValue = watch("organization");
 
-  const orgName =
-    typeof orgValue === "string" ? orgValue : (orgValue?.name ?? "");
+  // const orgName =
+  //   typeof orgValue === "string" ? orgValue : (orgValue?.name ?? "");
 
-  const orgValidation = useQuery(
-    api.organizer.organizations.isOwnerOrIsNewOrg,
-    orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
-  );
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+
   const [activeStep, setActiveStep] = useState(0);
-  const [createOrgError, setCreateOrgError] = useState("");
-  const [isValidOrg, setIsValidOrg] = useState<string>("");
+  // const [createOrgError, setCreateOrgError] = useState("");
+  // const [isValidOrg, setIsValidOrg] = useState<string>("");
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
     null,
   );
@@ -125,7 +119,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   );
 
   const existingOrgs = typeof existingOrg === "object" && existingOrg !== null;
-  const formIsValid = isValidOrg === "valid";
+
   const lastSavedDate = lastSaved
     ? new Date(Math.floor(lastSaved)).toLocaleString()
     : null;
@@ -133,27 +127,81 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const watchedValues = useWatch({ control });
   const currentSchema = steps[activeStep]?.schema;
 
-  const isStepValid = useMemo(() => {
+  const isStepValidZod = useMemo(() => {
     if (!currentSchema) return true;
     const result = currentSchema.safeParse(watchedValues);
     return result.success;
   }, [watchedValues, currentSchema]);
 
-  const isValid = formIsValid && isStepValid;
   //
+  //
+  // ------------- Step 1 - Organization --------------
+  //
+  //
+  // TODO: Timezone and timezone offset will be gathered on submit (existing convex action)
+  const orgData = watch("organization");
+  const orgName = orgData?.name ?? "";
+  const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
+  const orgLocationValid =
+    !errors.organization?.location?.country && Boolean(orgData?.location?.full);
+
+  // Then use it like:
+  const {
+    // data: orgValidation,
+    // status,
+    // isPending,
+    isSuccess: orgValidationSuccess,
+    isError: orgValidationError,
+    // error,
+  } = useQueryWithStatus(
+    api.organizer.organizations.isOwnerOrIsNewOrg,
+    orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
+  );
+
+  // const orgValidation = useQuery(
+  //   api.organizer.organizations.isOwnerOrIsNewOrg,
+  //   orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
+  // );
+  const validOrgWZod = orgValidationSuccess && orgNameValid;
+  const invalidOrgWZod = orgValidationError && orgNameValid;
+
+  const isValid = validOrgWZod && isStepValidZod;
+
+  //
+
   //
   // ------------- Console Logs --------------
+
+  // console.log(
+  //   orgValidation,
+  //   status,
+  //   isPending,
+  //   orgValidationSuccess,
+  //   orgValidationError,
+  //   validOrgWZod,
+  //   invalidOrgWZod,
+
+  //   // error,
+  // );
+
+  console.log(errors);
   //
   //
   // console.log(formIsValid);
-  console.log("isValidOrg", isValidOrg);
-  console.log("isStepValid", isStepValid);
-  console.log("isValid", isValid);
+  // console.log("isValidOrg", isValidOrg);
+  // console.log("isStepValid", isStepValid);
+  // console.log("isValid", isValid);
+  console.log(watch("organization.location.country"));
+  console.log(errors.organization?.location?.country);
+  // console.log(orgNameValid, orgLocationValid);
+  console.log(orgData);
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
   // console.log("existingOrg", existingOrg);
   // console.log(existingOrg?.logo);
   // console.log("is valid org", isValidOrg);
+  console.log(isValid, "wZod:", validOrgWZod);
+
   // console.log("last saved", lastSavedDate);
   //
   //
@@ -217,24 +265,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     setActiveStep((prev) => prev + 1);
   };
 
+  const handleReset = () => {
+    setActiveStep(0);
+    reset();
+  };
+
   // -------------UseEffects --------------
-  useEffect(() => {
-    if (orgValidation === "available" || orgValidation === "ownedByUser") {
-      setCreateOrgError("");
-      setIsValidOrg("valid");
-    } else if (!orgValidation) {
-      setCreateOrgError("");
-      setIsValidOrg("");
-    } else {
-      setCreateOrgError(
-        "Organization already exists. Contact support for assistance.",
-      );
-      setIsValidOrg("invalid");
-    }
-  }, [orgValidation]);
 
   useEffect(() => {
-    if (existingOrgs && isValidOrg === "valid") {
+    if (existingOrgs && validOrgWZod) {
       if (existingOrg?.updatedAt) {
         setLastSaved(existingOrg.updatedAt);
       } else if (existingOrg?._creationTime) {
@@ -250,7 +289,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, isValidOrg, existingOrgs, reset]);
+  }, [existingOrg, validOrgWZod, existingOrgs, reset]);
 
   //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
@@ -285,158 +324,175 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         className="flex h-full min-h-96 grow flex-col p-4"
       >
         {activeStep === 0 && (
-          <div className="flex h-full flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6 xl:divide-x-1.5">
-            <section className="flex flex-col gap-2">
-              <div className="flex flex-col items-center justify-center gap-y-6">
-                <section className="flex flex-col items-center justify-center">
-                  <div
-                    id="welcome-text"
-                    className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]"
-                  >
-                    Welcome{" "}
-                    <AnimatePresence>
-                      {existingOrgs && isValidOrg === "valid" && (
-                        <motion.span
-                          key="back-text"
-                          initial={{ opacity: 0, rotate: -10 }}
-                          animate={{
-                            opacity: 1,
-                            rotate: [0, -10, 10, -8, 8, -5, 5, 0],
-                          }}
-                          exit={{ opacity: 0 }}
-                          transition={{
-                            duration: 0.6,
-                            ease: "easeOut",
-                          }}
-                          className="inline-block"
-                        >
-                          Back
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <p className="text-balance text-center">
-                    {existingOrgs
-                      ? "Please select from your existing events or create a new open call"
-                      : "To start, select from an existing organization or create a new one!"}
-                  </p>
-                </section>
-                <section className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                  <Label htmlFor="organization" className="">
+          <div
+            id="form-container"
+            className="flex h-full flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-6 xl:divide-x-1.5"
+          >
+            <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto lg:max-w-[80%]">
+              <section className="flex flex-col items-center justify-center">
+                <div
+                  id="welcome-text"
+                  className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]"
+                >
+                  Welcome{" "}
+                  <AnimatePresence>
+                    {existingOrgs && validOrgWZod && (
+                      <motion.span
+                        key="back-text"
+                        initial={{ opacity: 0, rotate: -10 }}
+                        animate={{
+                          opacity: 1,
+                          rotate: [0, -10, 10, -8, 8, -5, 5, 0],
+                        }}
+                        exit={{ opacity: 0 }}
+                        transition={{
+                          duration: 0.6,
+                          ease: "easeOut",
+                        }}
+                        className="inline-block"
+                      >
+                        Back
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <p className="text-balance text-center">
+                  {existingOrgs
+                    ? "Please select from your existing events or create a new open call"
+                    : "To start, select from an existing organization or create a new one!"}
+                </p>
+              </section>
+              <section
+                className={cn(
+                  "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
+                )}
+              >
+                <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
+                  <p className="font-bold lg:text-xl">Step 1: </p>
+                  <p className="lg:text-xs">Organization</p>
+                </div>
+                <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <Label htmlFor="organization.name" className="sr-only">
                     Organization Name
                   </Label>
-                  <div className="flex flex-col items-center gap-4 lg:flex-row">
-                    {/* <div className="flex items-start gap-x-2 lg:flex-col">
-                      <p className="font-bold lg:text-xl">Step 1: </p>
-                      <p className="lg:text-xs">Organization</p>
-                    </div> */}
+                  <Controller
+                    name="organization.name"
+                    control={control}
+                    render={({ field }) => (
+                      <OrgSearch
+                        value={field.value}
+                        onChange={field.onChange}
+                        isValid={validOrgWZod}
+                        validationError={invalidOrgWZod}
+                        onLoadClick={setExistingOrg}
+                        onReset={handleReset}
+                        placeholder="Search or enter new name"
+                        className="rounded-lg py-2 text-base lg:h-20 lg:text-xl"
+                      />
+                    )}
+                  />
+                  {(orgValidationError ||
+                    (errors.organization?.name && orgName.length > 3)) && (
+                    <span className="mt-2 w-full text-center text-sm text-red-600">
+                      {errors.organization?.name?.message ||
+                        "Organization already exists. Contact support for assistance"}
+                    </span>
+                  )}
+                </div>
+              </section>
+
+              {orgNameValid && (
+                <section
+                  className={cn(
+                    "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
+                    orgNameValid ? "opacity-100" : "opacity-0",
+                  )}
+                >
+                  <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
+                    <p className="font-bold lg:text-xl">Step 2: </p>
+                    <p className="lg:text-xs">Location</p>
+                  </div>
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <Label
+                      htmlFor="organization.location.fullLocation"
+                      className="sr-only"
+                    >
+                      Organization Location
+                    </Label>
                     <Controller
-                      name="organization.name"
+                      name="organization.location"
                       control={control}
                       render={({ field }) => (
-                        <OrgSearch
+                        <MapboxInputFull
                           value={field.value}
                           onChange={field.onChange}
-                          isValid={isValidOrg}
-                          onReset={() => {
-                            setIsValidOrg("");
-                            setCreateOrgError("");
-                          }}
-                          onLoadClick={setExistingOrg}
-                          placeholder="Search or enter new name"
-                          className="rounded-lg py-2 text-base lg:h-20 lg:text-xl"
+                          reset={!validOrgWZod}
+                          tabIndex={3}
+                          disabled={!orgNameValid}
+                          placeholder="Organization Location (city, state, country, etc)..."
+                          className="w-full"
+                          inputClassName="rounded-lg border-foreground "
                         />
                       )}
                     />
+                    {errors.organization?.location && (
+                      <span className="mt-2 w-full text-center text-sm text-red-600">
+                        {errors.organization?.location?.country?.message
+                          ? errors.organization?.location?.country?.message
+                          : errors.organization?.location?.full?.message
+                            ? errors.organization?.location?.full?.message
+                            : "Please select a location from the dropdown"}
+                      </span>
+                    )}
                   </div>
-                  {createOrgError && (
-                    <span className="mt-2 w-full text-right text-sm text-red-600">
-                      {createOrgError}
-                    </span>
-                  )}
                 </section>
-                <section className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                  <Controller
-                    name="organization.logo"
-                    control={control}
-                    render={({ field }) => (
-                      <AvatarUploader
-                        title="Organization Logo"
-                        onChange={(file) => field.onChange(file)}
-                        onRemove={() => field.onChange(undefined)}
-                        reset={!formIsValid}
-                        required
-                        initialImage={existingOrg?.logo}
-                        size={72}
-                      />
-                    )}
-                  />
-                </section>
-                <section className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                  <Label htmlFor="residence">Organization Location</Label>
-                  <Controller
-                    name="organization.location.fullLocation"
-                    control={control}
-                    render={({ field }) => (
-                      <MapboxInput
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        reset={!formIsValid}
-                        onSelect={(location) => {
-                          setValue(
-                            "organization.location.fullLocation",
-                            location.full,
-                          );
-                          setValue("organization.location.city", location.city);
-                          setValue(
-                            "organization.location.state",
-                            location.state,
-                          );
-                          setValue(
-                            "organization.location.stateAbbr",
-                            location.stateAbbr,
-                          );
-                          setValue(
-                            "organization.location.country",
-                            location.country,
-                          );
-                          setValue(
-                            "organization.location.countryAbbr",
-                            location.countryAbbr,
-                          );
-                          setValue(
-                            "organization.location.coordinates.latitude",
-                            location.coordinates[0],
-                          );
-                          setValue(
-                            "organization.location.coordinates.longitude",
-                            location.coordinates[1],
-                          );
-                        }}
-                        tabIndex={3}
-                        placeholder="Organization Location (city, state, country, etc)..."
-                        className="w-full"
-                        inputClassName="rounded-lg border-foreground "
-                      />
-                    )}
-                  />
-                </section>
-              </div>
-            </section>
-            <section className="xl:pl-18">
-              {existingOrgs && (
-                <Select onValueChange={() => {}} defaultValue={"1"}>
-                  <SelectTrigger className="mt-6 max-w-sm p-8 text-center text-base">
-                    <SelectValue placeholder="Select from your events " />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="1">Event 1</SelectItem>
-                    <SelectItem value="2">Event 2</SelectItem>
-                    <SelectItem value="3">Event 3</SelectItem>
-                  </SelectContent>
-                </Select>
               )}
+
+              <AnimatePresence>
+                {orgLocationValid && (
+                  <motion.section
+                    key="orgLocation"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    layout
+                    className={cn(
+                      "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
+                      orgLocationValid ? "opacity-100" : "opacity-0",
+                    )}
+                  >
+                    <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
+                      <p className="font-bold lg:text-xl">Step 3: </p>
+                      <p className="lg:text-xs">Logo</p>
+                    </div>
+                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                      <Label htmlFor="organization.logo" className="sr-only">
+                        Organization Logo
+                        {/* <span className="text-xs italic text-muted-foreground">
+                  {required ? "(required)" : "(optional)"}
+                </span> */}
+                      </Label>
+                      <Controller
+                        name="organization.logo"
+                        control={control}
+                        render={({ field }) => (
+                          <AvatarUploader
+                            onChange={(file) => field.onChange(file)}
+                            onRemove={() => field.onChange(undefined)}
+                            reset={!validOrgWZod}
+                            disabled={!orgNameValid}
+                            initialImage={existingOrg?.logo}
+                            size={72}
+                          />
+                        )}
+                      />
+                    </div>
+                  </motion.section>
+                )}
+              </AnimatePresence>
+            </section>
+            <Separator thickness={2} className="my-4 lg:hidden" />
+            <section className="xl:pl-18">
               <Label>Event Name</Label>
               <Input
                 {...register("event.name")}

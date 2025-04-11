@@ -40,22 +40,15 @@ import { z } from "zod";
 //     )
 //     .nullable(),
 // })
-const organizationSchema = z.object({
-  name: z.string().min(3, "At least 3 chars").max(35, "Max 35 chars"),
-  logo: z.union([
-    z
-      .instanceof(Blob)
-      .refine((b) => b.size > 0, { message: "Logo is required" }),
-    z.string().min(1, "Logo is required"),
-  ]),
-  location: z.object({
-    fullLocation: z.optional(z.string()),
+const locationSchema = z
+  .object({
+    full: z.string().min(3, "Location is required"),
     locale: z.optional(z.string()),
     city: z.optional(z.string()),
     state: z.optional(z.string()),
     stateAbbr: z.optional(z.string()),
     region: z.optional(z.string()),
-    country: z.string(),
+    country: z.string(), // base check moved to superRefine
     countryAbbr: z.string(),
     continent: z.optional(z.string()),
     coordinates: z.optional(
@@ -64,9 +57,44 @@ const organizationSchema = z.object({
         longitude: z.number(),
       }),
     ),
-    // timezone: z.string(),
-    // timezoneOffset: z.optional(z.number()),
-  }),
+    currency: z.optional(
+      z.object({
+        code: z.string(),
+        name: z.string(),
+        symbol: z.string(),
+      }),
+    ),
+    demonym: z.optional(z.string()),
+  })
+  .superRefine((data, ctx) => {
+    if ((data.city || data.state) && !data.country) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Country is required - please select from the dropdown",
+        path: ["country"],
+      });
+    } else if (!data.country || data.country.trim().length < 3) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select from the dropdown",
+        path: ["country"],
+      });
+    }
+  });
+
+const organizationSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(35, "Max 35 characters")
+    .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+  logo: z.union([
+    z
+      .instanceof(Blob)
+      .refine((b) => b.size > 0, { message: "Logo is required" }),
+    z.string().min(1, "Logo is required"),
+  ]),
+  location: locationSchema,
 });
 
 const eventSchema = z.object({

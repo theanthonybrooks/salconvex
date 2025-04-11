@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Check, CircleCheck, CircleX, Search } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -19,8 +18,9 @@ interface OrgSearchProps {
   ) => void;
   placeholder?: string;
   className?: string;
-  isValid?: string;
-  onReset?: () => void;
+  isValid: boolean;
+  validationError: boolean;
+  onReset: () => void;
   onLoadClick: (org: Doc<"organizations"> | null) => void;
 }
 
@@ -30,14 +30,11 @@ export const OrgSearch = ({
   placeholder,
   className,
   isValid,
+  validationError: invalid,
   onReset,
   onLoadClick,
 }: OrgSearchProps) => {
   const [inputValue, setInputValue] = useState(value || "");
-
-  const invalid = isValid === "invalid";
-  const valid = isValid === "valid";
-
   const [focused, setFocused] = useState(false);
   const [clearHovered, setClearHovered] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
@@ -46,6 +43,8 @@ export const OrgSearch = ({
   const [selectedVal, setSelectedVal] = useState<string>("");
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
   const orgInputRef = useRef<HTMLInputElement>(null);
   const trimmedQuery = inputValue.trim();
   const [debouncedQuery, setDebouncedQuery] = useState(trimmedQuery);
@@ -82,8 +81,9 @@ export const OrgSearch = ({
     setInputValue("");
     setSelectedVal("");
     onLoadClick(null);
-    if (value !== null) onChange(null);
-    if (onReset) onReset();
+    // onChange(null);
+    onReset();
+
     orgInputRef.current?.focus();
   };
 
@@ -162,6 +162,14 @@ export const OrgSearch = ({
     return () => clearTimeout(timeout);
   }, [trimmedQuery, hasUserInteracted, onChange, onLoadClick]);
 
+  useEffect(() => {
+    if (!showSuggestions || !listRef.current) return;
+
+    setTimeout(() => {
+      listRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
+  }, [showSuggestions]);
+
   return (
     <div
       className="relative mx-auto w-full max-w-sm lg:min-w-[400px] lg:max-w-md"
@@ -201,14 +209,14 @@ export const OrgSearch = ({
         {/* {focused && inputValue === "" && (
           <span className='absolute left-10 top-1/2 -translate-y-1/2 h-10 w-[2px] bg-foreground animate-caret-blink pointer-events-none' />
         )} */}
-        {valid && !clearHovered && (
+        {isValid && !clearHovered && (
           <CircleCheck
             onMouseEnter={() => setClearHovered(true)}
             onMouseLeave={() => setClearHovered(false)}
             className="absolute right-[9px] top-1/2 size-6 -translate-y-1/2 cursor-pointer font-bold text-emerald-600 lg:right-4 lg:size-7"
           />
         )}
-        {(invalid || clearHovered) && (
+        {(invalid || (clearHovered && isValid === true)) && (
           <CircleX
             onMouseEnter={() => setClearHovered(true)}
             onMouseLeave={() => setClearHovered(false)}
@@ -221,49 +229,42 @@ export const OrgSearch = ({
         )}
       </section>
 
-      <AnimatePresence>
-        {showSuggestions && (
-          <motion.ul
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            layout
-            className="scrollable mini absolute left-0 top-full z-[1] max-h-52 w-full -translate-y-4 overflow-auto rounded-b border-x border-b bg-white pt-6 shadow-md"
-            style={{ scrollPaddingTop: "1.2rem" }}
-          >
-            {results.map((org, idx) => (
-              <li
-                key={org._id}
-                ref={(el) => {
-                  itemRefs.current[idx] = el;
-                }}
-                onMouseDown={() => handleSelect(org)}
-                className={cn(
-                  "relative flex cursor-pointer items-center gap-x-4 py-3 pl-4 pr-2",
-                  selectedIndex === idx
-                    ? "bg-salYellow/50"
-                    : "hover:bg-salYellow/40",
-                )}
-              >
-                {org.logo && (
-                  <Image
-                    src={org.logo}
-                    alt={org.name}
-                    width={35}
-                    height={35}
-                    className="rounded-full"
-                  />
-                )}
-                {org.name}
-                {org.name.toLowerCase() === selectedVal.toLowerCase() && (
-                  <Check className="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-foreground" />
-                )}
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
+      {showSuggestions && (
+        <ul
+          ref={listRef}
+          className="scrollable mini absolute z-50 mt-1 w-full rounded-md border-1.5 bg-white shadow"
+        >
+          {results.map((org, idx) => (
+            <li
+              key={org._id}
+              ref={(el) => {
+                itemRefs.current[idx] = el;
+              }}
+              onMouseDown={() => handleSelect(org)}
+              className={cn(
+                "relative flex cursor-pointer items-center gap-x-4 py-3 pl-4 pr-2",
+                selectedIndex === idx
+                  ? "bg-salYellow/50"
+                  : "hover:bg-salYellow/40",
+              )}
+            >
+              {org.logo && (
+                <Image
+                  src={org.logo}
+                  alt={org.name}
+                  width={35}
+                  height={35}
+                  className="rounded-full"
+                />
+              )}
+              {org.name}
+              {org.name.toLowerCase() === selectedVal.toLowerCase() && (
+                <Check className="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-foreground" />
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

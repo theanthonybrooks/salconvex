@@ -12,12 +12,12 @@ type AvatarUploaderProps = {
   onChange: (imageBlob: Blob) => void;
   onRemove?: () => void;
   initialImage?: string;
-  title?: string;
-  required?: boolean;
+
   imageOnly?: boolean;
   className?: string;
   reset?: boolean;
   size?: number;
+  disabled?: boolean;
 };
 
 export default function AvatarUploader({
@@ -26,8 +26,8 @@ export default function AvatarUploader({
   onRemove,
   initialImage,
   className,
-  title,
-  required,
+
+  disabled,
   size = 80,
   imageOnly = false,
 }: AvatarUploaderProps) {
@@ -66,6 +66,7 @@ export default function AvatarUploader({
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (disabled) return;
     setDragActive(false);
     const file = e.dataTransfer.files?.[0];
     if (file) openCropperWithFile(file);
@@ -102,9 +103,11 @@ export default function AvatarUploader({
       <div className={cn("flex items-center gap-6", className)}>
         <div
           className={cn(
-            "relative flex items-center justify-center rounded-full border-1.5 hover:cursor-pointer hover:bg-salYellow/50",
+            "relative flex cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50",
             dragActive && "border-emerald-400 bg-emerald-50",
             imageForCropping ? "border-solid" : "border-dashed",
+            disabled &&
+              "cursor-default text-muted-foreground hover:bg-transparent",
           )}
           style={{ height: size, width: size }}
           onClick={() => fileInputRef.current?.click()}
@@ -121,6 +124,7 @@ export default function AvatarUploader({
             ref={fileInputRef}
             onChange={handleFileChange}
             className="hidden"
+            disabled={disabled}
           />
 
           {croppedPreviewUrl ? (
@@ -135,24 +139,26 @@ export default function AvatarUploader({
             <span className="text-sm text-gray-400">+ Upload</span>
           )}
 
-          <div className="absolute bottom-0 right-3 flex size-5 translate-x-[45%] items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-110 hover:cursor-pointer hover:bg-emerald-400 active:scale-95">
+          <div
+            className={cn(
+              "absolute bottom-0 right-3 flex size-5 translate-x-[45%] cursor-pointer items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-110 hover:bg-emerald-400 active:scale-95",
+              disabled &&
+                "cursor-default bg-muted-foreground hover:scale-100 hover:bg-muted-foreground",
+            )}
+          >
             <PlusIcon className="size-4 text-white" />
           </div>
         </div>
         {!imageOnly && (
-          <div className="flex flex-col gap-3">
-            <p>
-              {title}{" "}
-              <span className="text-xs italic text-muted-foreground">
-                {required ? "(required)" : "(optional)"}
-              </span>
-            </p>
-
+          <>
             {!imageForCropping && !originalImage && (
               <div className="flex flex-col gap-3">
                 <label
                   htmlFor="urlInput"
-                  className="text-xs font-medium text-gray-600"
+                  className={cn(
+                    "text-xs font-medium text-foreground",
+                    disabled && "text-muted-foreground",
+                  )}
                 >
                   Upload image or paste image URL
                 </label>
@@ -161,7 +167,8 @@ export default function AvatarUploader({
                   type="url"
                   placeholder="https://example.com/image.jpg"
                   onBlur={handleUrlInput}
-                  className="w-64 rounded-md border px-2 py-1 text-sm shadow-sm focus:border-emerald-400 focus:outline-none"
+                  className="rounded-md border px-2 py-1 text-sm shadow-sm focus:border-emerald-400 focus:outline-none disabled:border-muted-foreground disabled:text-muted-foreground lg:w-64"
+                  disabled={disabled}
                 />
               </div>
             )}
@@ -175,7 +182,7 @@ export default function AvatarUploader({
                       setEditMode(true);
                     }
                   }}
-                  className="w-40"
+                  className="w-fit lg:w-40"
                 >
                   Edit
                 </Button>
@@ -193,7 +200,7 @@ export default function AvatarUploader({
                 </Button>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
 
