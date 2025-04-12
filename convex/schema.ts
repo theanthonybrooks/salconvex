@@ -103,7 +103,7 @@ const organizationSchema = {
   logo: v.string(), //will default to /1.jpg as always
   location: v.optional(
     v.object({
-      fullLocation: v.optional(v.string()),
+      full: v.optional(v.string()),
       locale: v.optional(v.string()),
       city: v.optional(v.string()),
       state: v.optional(v.string()),
@@ -118,6 +118,14 @@ const organizationSchema = {
           longitude: v.number(),
         }),
       ),
+      currency: v.optional(
+        v.object({
+          code: v.string(),
+          name: v.string(),
+          symbol: v.string(),
+        }),
+      ),
+      demonym: v.optional(v.string()),
     }),
   ),
   about: v.optional(v.string()),

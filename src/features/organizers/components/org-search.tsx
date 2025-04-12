@@ -78,12 +78,15 @@ export const OrgSearch = ({
   };
 
   const handleReset = () => {
+    setClearHovered(false);
     setInputValue("");
     setSelectedVal("");
     onLoadClick(null);
     // onChange(null);
     onReset();
-
+    setTimeout(() => {
+      setClearHovered(false);
+    }, 1000);
     orgInputRef.current?.focus();
   };
 
@@ -232,7 +235,7 @@ export const OrgSearch = ({
       {showSuggestions && (
         <ul
           ref={listRef}
-          className="scrollable mini absolute z-50 mt-1 w-full rounded-md border-1.5 bg-white shadow"
+          className="scrollable mini z-1 absolute mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
         >
           {results.map((org, idx) => (
             <li

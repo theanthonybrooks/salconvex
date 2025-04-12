@@ -71,7 +71,12 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
     resolver: zodResolver(eventWithOCSchema),
     defaultValues: {
-      organization: undefined,
+      organization: {
+        name: undefined,
+        logo: undefined,
+        location: undefined,
+      },
+      event: undefined,
       // orgLogo: undefined,
       // eventName: "",
     },
@@ -141,10 +146,12 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // TODO: Timezone and timezone offset will be gathered on submit (existing convex action)
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
+
   const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
   const orgLocationValid =
     !errors.organization?.location?.country && Boolean(orgData?.location?.full);
-
+  const orgLogoValid = !errors.organization?.logo && Boolean(orgData?.logo);
+  const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
   // Then use it like:
   const {
     // data: orgValidation,
@@ -191,13 +198,11 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // console.log("isValidOrg", isValidOrg);
   // console.log("isStepValid", isStepValid);
   // console.log("isValid", isValid);
-  console.log(watch("organization.location.country"));
-  console.log(errors.organization?.location?.country);
   // console.log(orgNameValid, orgLocationValid);
   console.log(orgData);
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
-  // console.log("existingOrg", existingOrg);
+  console.log("existingOrg", existingOrg);
   // console.log(existingOrg?.logo);
   // console.log("is valid org", isValidOrg);
   console.log(isValid, "wZod:", validOrgWZod);
@@ -267,7 +272,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   const handleReset = () => {
     setActiveStep(0);
-    reset();
+    console.log("reset");
+    reset({
+      organization: {
+        name: undefined,
+        logo: undefined,
+        location: undefined,
+      },
+      event: undefined,
+    });
   };
 
   // -------------UseEffects --------------
@@ -435,7 +448,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         />
                       )}
                     />
-                    {errors.organization?.location && (
+                    {errors.organization?.location && orgData?.location && (
                       <span className="mt-2 w-full text-center text-sm text-red-600">
                         {errors.organization?.location?.country?.message
                           ? errors.organization?.location?.country?.message
@@ -448,58 +461,52 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 </section>
               )}
 
-              <AnimatePresence>
-                {orgLocationValid && (
-                  <motion.section
-                    key="orgLocation"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    layout
-                    className={cn(
-                      "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                      orgLocationValid ? "opacity-100" : "opacity-0",
-                    )}
-                  >
-                    <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                      <p className="font-bold lg:text-xl">Step 3: </p>
-                      <p className="lg:text-xs">Logo</p>
-                    </div>
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                      <Label htmlFor="organization.logo" className="sr-only">
-                        Organization Logo
-                        {/* <span className="text-xs italic text-muted-foreground">
+              {orgLocationValid && (
+                <section
+                  className={cn(
+                    "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
+                    orgLocationValid ? "opacity-100" : "opacity-0",
+                  )}
+                >
+                  <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
+                    <p className="font-bold lg:text-xl">Step 3: </p>
+                    <p className="lg:text-xs">Logo</p>
+                  </div>
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <Label htmlFor="organization.logo" className="sr-only">
+                      Organization Logo
+                      {/* <span className="text-xs italic text-muted-foreground">
                   {required ? "(required)" : "(optional)"}
                 </span> */}
-                      </Label>
-                      <Controller
-                        name="organization.logo"
-                        control={control}
-                        render={({ field }) => (
-                          <AvatarUploader
-                            onChange={(file) => field.onChange(file)}
-                            onRemove={() => field.onChange(undefined)}
-                            reset={!validOrgWZod}
-                            disabled={!orgNameValid}
-                            initialImage={existingOrg?.logo}
-                            size={72}
-                          />
-                        )}
-                      />
-                    </div>
-                  </motion.section>
-                )}
-              </AnimatePresence>
+                    </Label>
+                    <Controller
+                      name="organization.logo"
+                      control={control}
+                      render={({ field }) => (
+                        <AvatarUploader
+                          onChange={(file) => field.onChange(file)}
+                          onRemove={() => field.onChange(undefined)}
+                          reset={!validOrgWZod}
+                          disabled={!orgNameValid}
+                          initialImage={existingOrg?.logo}
+                          size={72}
+                        />
+                      )}
+                    />
+                  </div>
+                </section>
+              )}
             </section>
             <Separator thickness={2} className="my-4 lg:hidden" />
-            <section className="xl:pl-18">
-              <Label>Event Name</Label>
-              <Input
-                {...register("event.name")}
-                placeholder="Task title..."
-                className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
-              />
-              {/* <p>
+            {orgDataValid && (
+              <section className="xl:pl-18">
+                <Label>Event Name</Label>
+                <Input
+                  {...register("event.name")}
+                  placeholder="Task title..."
+                  className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+                />
+                {/* <p>
                 Check here if the organizer (a) already exists,
                 <br /> (b) has any current events (that they may want to add a
                 new open call for) ,
@@ -510,7 +517,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 a starting point and a sort of welcome/intro page to posting an
                 open call here.
               </p> */}
-            </section>
+              </section>
+            )}
           </div>
         )}
         {activeStep === 1 && (

@@ -26,7 +26,7 @@ interface ArtistProfileFormProps {
 
 type ArtistFormValues = {
   artistName: string;
-  logo: Blob | undefined;
+  logo: Blob | string | undefined;
   residence: string;
   nationalities: string[]; // cca2 codes for now
 
@@ -50,6 +50,7 @@ export const ArtistProfileForm = ({
     register,
     control,
     setValue,
+    watch,
     handleSubmit: handleSubmit,
     formState: {
       // isDirty,
@@ -104,8 +105,9 @@ export const ArtistProfileForm = ({
       timezoneOffset = timezoneData?.gmtOffset;
       //could also get dst, abbreviation (CEST, CET, etc)
     }
-    //NOTE: Upload the image to Convex's storage and get the
-    if (data.logo) {
+    console.log(data?.logo);
+    //NOTE: Upload the image to Convex's storage and get the url in the convex mutation.
+    if (data.logo && typeof data.logo !== "string") {
       const uploadUrl = await generateUploadUrl();
       const uploadRes = await fetch(uploadUrl, {
         method: "POST",
@@ -154,12 +156,15 @@ export const ArtistProfileForm = ({
     }
   };
 
+  console.log(watch("residence"));
+  // console.log(watch("location"));
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className={cn("flex flex-col gap-6", className)}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-end gap-4">
         <div className="mt-4 flex flex-grow flex-col gap-2 lg:px-4">
           <Label htmlFor="artistName">Artist Name </Label>
           <input

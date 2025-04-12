@@ -3,6 +3,7 @@ import {
   countryToCurrencyMap,
   countryToDemonymMap,
   fetchMapboxSuggestions,
+  fetchMapboxSuggestionsFull,
   MapboxSuggestion,
   stateToRegionMap,
 } from "@/lib/locations";
@@ -42,25 +43,9 @@ export const MapboxInput = ({
 }: MapboxInputProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
-        setSuggestions([]);
-        setIsFocused(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const [suggestions, setSuggestions] = useState<MapboxSuggestion[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(value || "");
 
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -76,8 +61,7 @@ export const MapboxInput = ({
       );
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const selected = suggestions[highlightedIndex];
-      if (selected) handleSelect(selected);
+      handleSelect(suggestions[highlightedIndex]);
     }
   };
 
@@ -100,6 +84,8 @@ export const MapboxInput = ({
     };
 
     onSelect(locationData);
+
+    setInputValue(locationData.full);
     setSuggestions([]);
   };
 
@@ -114,10 +100,12 @@ export const MapboxInput = ({
 
   useEffect(() => {
     if (suggestions.length > 0 && listRef.current) {
-      listRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end", // or "nearest", depending on how it’s being cut off
-      });
+      setTimeout(() => {
+        listRef?.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }, 100);
     }
   }, [suggestions]);
 
@@ -136,9 +124,9 @@ export const MapboxInput = ({
     return () => clearTimeout(timeout);
   }, [inputValue]);
 
-  useEffect(() => {
-    onChange(inputValue);
-  }, [inputValue, onChange]);
+  // useEffect(() => {
+  //   onChange(inputValue);
+  // }, [inputValue, onChange]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -158,7 +146,7 @@ export const MapboxInput = ({
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>
       <input
-        value={value}
+        value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setTimeout(() => setIsFocused(false), 150)}
@@ -238,8 +226,12 @@ export const MapboxInputFull = ({
   const [suggestions, setSuggestions] = useState<MapboxSuggestion[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
+
   const listRef = useRef<HTMLUListElement>(null);
   const clickedSuggestionRef = useRef(false);
+
+  const fullLocation = value?.full ?? null;
+  const newLocation = value?.full !== inputValue && !isFocused;
 
   const emptyObject: FullLocation = {
     full: inputValue,
@@ -385,15 +377,21 @@ export const MapboxInputFull = ({
         setSuggestions([]);
         return;
       }
-      console.log(inputValue.trim());
 
-      const results = await fetchMapboxSuggestions(inputValue);
+      const results = await fetchMapboxSuggestionsFull(inputValue);
       setSuggestions(results);
       setHighlightedIndex(0);
     }, 500);
 
     return () => clearTimeout(timeout);
   }, [inputValue]);
+
+  useEffect(() => {
+    if (fullLocation && newLocation) {
+      setInputValue(fullLocation);
+      console.log("new location", fullLocation);
+    }
+  }, [fullLocation, value, newLocation]);
 
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>

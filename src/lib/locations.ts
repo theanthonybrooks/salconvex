@@ -190,6 +190,22 @@ export async function fetchMapboxSuggestions(query: string) {
 
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
     query,
+  )}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&types=place,region,country`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch suggestions");
+
+  const data = await res.json();
+  console.log("suggestion data:", data);
+  return data.features as MapboxSuggestion[];
+}
+
+//NOTE: For only city/state/country searches, do this:  `...json?access_token=${MAPBOX_TOKEN}&autocomplete=true&types=place,region,country`
+export async function fetchMapboxSuggestionsFull(query: string) {
+  if (!query.trim()) return [];
+
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+    query,
   )}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&types=locality,neighborhood,district,place,region,country`;
 
   const res = await fetch(url);

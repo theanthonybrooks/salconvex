@@ -104,7 +104,7 @@ NavBarProps) {
           height: isScrolled ? "80px" : "100px",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed left-0 right-0 top-0 z-[51] h-25 w-screen bg-background"
+        className="fixed left-0 right-0 top-0 z-10 h-25 w-screen bg-background"
       >
         <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
           {/* Mobile Logo and Navigation */}
