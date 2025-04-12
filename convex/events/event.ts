@@ -2,7 +2,8 @@ import { EventCategory, EventType, SubmissionFormState } from "@/types/event";
 import { OpenCall, OpenCallApplication } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { filter } from "convex-helpers/server/filter";
+import { ConvexError, v } from "convex/values";
 import { query } from "~/convex/_generated/server";
 
 export const getEventByOrgId = query({
@@ -19,6 +20,28 @@ export const getEventByOrgId = query({
       .collect();
 
     return events;
+  },
+});
+
+export const checkEventNameExists = query({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    const inputName = args.name.trim().toLowerCase();
+    console.log("args", inputName);
+
+    const existingEvent = await filter(
+      ctx.db.query("events"),
+      (event) => event.name.toLowerCase() === inputName,
+    ).first();
+    // const existing = await ctx.db
+    //   .query("events")
+    //   .filter((q) => q.eq(q.field("name"), args.name.toLowerCase()))
+    //   .first();
+
+    if (existingEvent)
+      throw new ConvexError("An event with that name already exists.");
+    console.log("existing", existingEvent);
+    return true;
   },
 });
 

@@ -97,9 +97,53 @@ const organizationSchema = z.object({
   location: locationSchema,
 });
 
-const eventSchema = z.object({
-  name: z.string().min(3, "Event name must be at least 3 characters"),
-});
+const eventSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, "Name must be at least 3 characters")
+      .max(35, "Max 35 characters")
+      .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+    category: z.string().min(3, "Event category is required"),
+    type: z.optional(
+      z
+        .array(z.string())
+        .min(1, "Event type is required")
+        .max(2, "You can select up to 2 event types"),
+    ),
+    location: z.object({
+      sameAsOrganizer: z.boolean().optional(),
+      locale: z.string().optional(),
+      city: z.string().optional(),
+      state: z.string().optional(),
+      stateAbbr: z.string().optional(),
+      region: z.string().optional(),
+      country: z.string().optional(),
+      countryAbbr: z.string().optional(),
+      continent: z.string().optional(),
+      coordinates: z.object({
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
+      }),
+      currency: z.optional(
+        z.object({
+          code: z.string(),
+          name: z.string(),
+          symbol: z.string(),
+        }),
+      ),
+      demonym: z.optional(z.string()),
+    }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.category === "event" && (!data.type || data.type.length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Event type is required when category is 'event'",
+        path: ["type"],
+      });
+    }
+  });
 
 const openCallSchema = z.object({
   deadline: z.date().min(new Date(), "Deadline must be after today"),

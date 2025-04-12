@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 
 type AvatarUploaderProps = {
   // onChange: (base64Image: string) => void;
+  id: string;
   onChange: (imageBlob: Blob) => void;
   onRemove?: () => void;
   initialImage?: string;
@@ -21,6 +22,7 @@ type AvatarUploaderProps = {
 };
 
 export default function AvatarUploader({
+  id,
   reset,
   onChange,
   onRemove,
@@ -119,6 +121,7 @@ export default function AvatarUploader({
           onDragLeave={() => setDragActive(false)}
         >
           <input
+            id={id}
             type="file"
             accept="image/*"
             ref={fileInputRef}

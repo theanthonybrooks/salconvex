@@ -130,6 +130,9 @@ interface MultiSelectProps
   height?: number;
   shortResults?: boolean;
   value?: string[];
+  id?: string;
+  limit?: number;
+  shiftOffset?: number;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -138,10 +141,13 @@ export const MultiSelect = React.forwardRef<
 >(
   (
     {
+      limit,
+      id,
       value,
       options,
       onValueChange,
       variant,
+      shiftOffset,
       height = 10,
       hasSearch = true,
       selectAll = true,
@@ -180,6 +186,8 @@ export const MultiSelect = React.forwardRef<
 
     const toggleOption = (option: string) => {
       if (lockedValue.includes(option)) return;
+      const isSelected = selectedValues.includes(option);
+      if (!isSelected && limit && selectedValues.length >= limit) return;
       const newSelectedValues = selectedValues.includes(option)
         ? selectedValues.filter((value) => value !== option)
         : [...selectedValues, option];
@@ -288,7 +296,7 @@ export const MultiSelect = React.forwardRef<
                   {!shortResults && selectedValues.length > maxCount && (
                     <Badge
                       className={cn(
-                        "border-foreground/1 bg-transparent text-foreground hover:bg-red-500",
+                        "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/40",
                         isAnimating ? "animate-bounce" : "",
                       )}
                       style={{ animationDuration: `${animation}s` }}
@@ -355,6 +363,7 @@ export const MultiSelect = React.forwardRef<
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          shiftOffset={shiftOffset}
           showCloseButton={false}
           className={cn(
             "max-w-max border border-foreground p-0",
@@ -367,6 +376,7 @@ export const MultiSelect = React.forwardRef<
           <Command>
             {hasSearch && (
               <CommandInput
+                id={id}
                 placeholder="Search..."
                 onKeyDown={handleInputKeyDown}
               />
@@ -393,56 +403,7 @@ export const MultiSelect = React.forwardRef<
                     <span>(Select All)</span>
                   </CommandItem>
                 )}
-                {/* {options.map((option) => {
-                  const isSelected = selectedValues.includes(option.value)
-                  return (
-                    <CommandItem
-                      key={option.value}
-                      onSelect={() => toggleOption(option.value)}
-                      className='cursor-pointer'>
-                      <div
-                        className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                          isSelected
-                            ? "bg-primary text-primary-foreground"
-                            : "opacity-50 [&_svg]:invisible"
-                        )}>
-                        <CheckIcon className='h-4 w-4' />
-                      </div>
-                      {option.icon && (
-                        <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
-                      )}
-                      <span>{option.label}</span>
-                    </CommandItem>
-                  )
-                })} */}
-                {/* {Object.entries(groupedOptions).map(([groupLabel, items]) => (
-                  <CommandGroup key={groupLabel} heading={groupLabel}>
-                    {items.map((option) => {
-                      const isSelected = selectedValues.includes(option.value)
-                      return (
-                        <CommandItem
-                          key={option.value}
-                          onSelect={() => toggleOption(option.value)}
-                          className='cursor-pointer'>
-                          <div
-                            className={cn(
-                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                              isSelected
-                                ? "bg-primary text-primary-foreground"
-                                : "opacity-50 [&_svg]:invisible"
-                            )}>
-                            <CheckIcon className='h-4 w-4' />
-                          </div>
-                          {option.icon && (
-                            <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
-                          )}
-                          <span>{option.label}</span>
-                        </CommandItem>
-                      )
-                    })}
-                  </CommandGroup>
-                ))} */}
+
                 {options.some((o) => o.group) ? (
                   Object.entries(
                     options.reduce<Record<string, typeof options>>(
@@ -463,11 +424,18 @@ export const MultiSelect = React.forwardRef<
                         const isSelected = selectedValues.includes(
                           option.value,
                         );
+                        const isDisabled = !!(
+                          !isSelected &&
+                          limit &&
+                          selectedValues.length >= limit
+                        );
+                        console.log(isDisabled, "if");
                         return (
                           <CommandItem
                             key={option.value}
                             onSelect={() => toggleOption(option.value)}
-                            className="cursor-pointer"
+                            disabled={isDisabled}
+                            className={cn("cursor-pointer")}
                           >
                             <div
                               className={cn(
@@ -492,8 +460,14 @@ export const MultiSelect = React.forwardRef<
                   <CommandGroup>
                     {options.map((option) => {
                       const isSelected = selectedValues.includes(option.value);
+                      const isDisabled = !!(
+                        !isSelected &&
+                        limit &&
+                        selectedValues.length >= limit
+                      );
                       return (
                         <CommandItem
+                          disabled={isDisabled}
                           key={option.value}
                           onSelect={() => toggleOption(option.value)}
                           className="cursor-pointer"

@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 
 interface MapboxInputProps {
+  id: string;
   value: string;
   onChange: (value: string) => void;
   onSelect: (location: {
@@ -31,6 +32,7 @@ interface MapboxInputProps {
 }
 
 export const MapboxInput = ({
+  id,
   reset,
   value,
   onChange,
@@ -46,6 +48,8 @@ export const MapboxInput = ({
   const [suggestions, setSuggestions] = useState<MapboxSuggestion[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [inputValue, setInputValue] = useState(value || "");
+
+  const newValue = value && value !== inputValue && !isFocused;
 
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -124,6 +128,12 @@ export const MapboxInput = ({
     return () => clearTimeout(timeout);
   }, [inputValue]);
 
+  useEffect(() => {
+    if (newValue) {
+      setInputValue(value);
+    }
+  }, [newValue, value]);
+
   // useEffect(() => {
   //   onChange(inputValue);
   // }, [inputValue, onChange]);
@@ -146,6 +156,7 @@ export const MapboxInput = ({
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>
       <input
+        id={id}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onFocus={() => setIsFocused(true)}
@@ -200,6 +211,7 @@ export interface FullLocation {
 }
 
 interface MapboxInputFullProps {
+  id: string;
   value: FullLocation | null;
   onChange: (location: FullLocation | null) => void;
   placeholder?: string;
@@ -211,6 +223,7 @@ interface MapboxInputFullProps {
 }
 
 export const MapboxInputFull = ({
+  id,
   reset,
   value,
   onChange,
@@ -389,13 +402,13 @@ export const MapboxInputFull = ({
   useEffect(() => {
     if (fullLocation && newLocation) {
       setInputValue(fullLocation);
-      console.log("new location", fullLocation);
     }
   }, [fullLocation, value, newLocation]);
 
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>
       <input
+        id={id}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onFocus={() => setIsFocused(true)}

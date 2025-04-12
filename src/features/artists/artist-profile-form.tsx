@@ -75,6 +75,8 @@ export const ArtistProfileForm = ({
     api.artists.artistActions.updateOrCreateArtist,
   );
 
+  console.log(artistInfo, userName, user);
+
   useEffect(() => {
     if (!artistInfo) return;
 
@@ -181,6 +183,7 @@ export const ArtistProfileForm = ({
           control={control}
           render={({ field }) => (
             <AvatarUploader
+              id="logo"
               onChange={(file) => field.onChange(file)}
               onRemove={() => field.onChange(undefined)}
               initialImage={user?.image}
@@ -230,6 +233,7 @@ export const ArtistProfileForm = ({
             control={control}
             render={({ field }) => (
               <MapboxInput
+                id="residence"
                 value={field.value}
                 onChange={field.onChange}
                 onSelect={(location) => {
