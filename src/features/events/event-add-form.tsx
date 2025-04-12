@@ -133,6 +133,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
+  const [isMobile, setIsMobile] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   // const [createOrgError, setCreateOrgError] = useState("");
   // const [isValidOrg, setIsValidOrg] = useState<string>("");
@@ -354,6 +355,23 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1024px)");
+    setIsMobile(mediaQuery.matches);
+
+    let timeoutId: NodeJS.Timeout;
+    const handleChange = (e: MediaQueryListEvent) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   return (
     <HorizontalLinearStepper
       activeStep={activeStep}
@@ -389,7 +407,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
             id="form-container"
             className="flex h-full flex-col gap-4 xl:grid xl:grid-cols-[minmax(0,_1fr)_1em_minmax(0,_1fr)] xl:gap-6"
           >
-            <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto lg:max-w-[80%]">
+            <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
               <section className="flex flex-col items-center justify-center">
                 <div
                   id="welcome-text"
@@ -417,10 +435,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     )}
                   </AnimatePresence>
                 </div>
-                <p className="text-balance text-center">
-                  {existingOrgs
-                    ? "Please select from your existing events or create a new open call"
-                    : "To start, select from an existing organization or create a new one!"}
+                <p className="text-balance text-center text-xl lg:text-base">
+                  To start, select from an existing organization or create a new
+                  one!
                 </p>
               </section>
               <section
@@ -429,7 +446,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 )}
               >
                 <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                  <p className="font-bold lg:text-xl">Step 1: </p>
+                  <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
                   <p className="lg:text-xs">Organization</p>
                 </div>
                 <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
@@ -449,7 +466,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         onLoadClick={setExistingOrg}
                         onReset={handleReset}
                         placeholder="Search or enter new name"
-                        className="rounded-lg py-2 text-base lg:h-20 lg:text-xl"
+                        className="h-12 rounded-lg py-2 text-base lg:h-20 lg:text-xl"
                       />
                     )}
                   />
@@ -471,7 +488,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   )}
                 >
                   <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                    <p className="font-bold lg:text-xl">Step 2: </p>
+                    <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
                     <p className="lg:text-xs">Location</p>
                   </div>
                   <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
@@ -516,7 +533,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   )}
                 >
                   <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                    <p className="font-bold lg:text-xl">Step 3: </p>
+                    <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
                     <p className="lg:text-xs">Logo</p>
                   </div>
                   <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
@@ -554,7 +571,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   className="mx-4 hidden lg:block"
                   orientation="vertical"
                 />
-                <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto lg:max-w-[80%]">
+                <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
+                  <div
+                    id="event-header"
+                    className="w-full text-center font-tanker text-2xl lowercase tracking-wide text-foreground underline decoration-4 underline-offset-4"
+                  >
+                    Event/Project
+                  </div>
                   <section
                     className={cn(
                       "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
@@ -562,7 +585,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     )}
                   >
                     <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                      <p className="font-bold lg:text-xl">Step 4: </p>
+                      <p className="min-w-max font-bold lg:text-xl">Step 4: </p>
                       <p className="lg:text-xs">Category</p>
                     </div>
 
@@ -580,7 +603,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 field.onChange(value);
                               }}
                             >
-                              <SelectTrigger className="w-full border text-center sm:h-[50px]">
+                              <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
                                 <SelectValue placeholder="Event/Project Category" />
                               </SelectTrigger>
                               <SelectContent className="min-w-auto">
@@ -624,7 +647,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       )}
                     >
                       <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="font-bold lg:text-xl">Step 5: </p>
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step 5:{" "}
+                        </p>
                         <p className="lg:text-xs">Event Type</p>
                       </div>
 
@@ -638,12 +663,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                           render={({ field }) => (
                             <MultiSelect
                               id="event.type"
-                              className="border sm:h-[50px]"
+                              className="h-12 border sm:h-[50px]"
                               options={options}
                               onValueChange={(value) => {
                                 field.onChange(value);
                               }}
-                              // defaultValue={field.value}
+                              defaultValue={field.value ?? []}
+                              shortResults={isMobile}
                               placeholder="Select up to 2 event types"
                               variant="basic"
                               maxCount={1}
@@ -676,7 +702,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       )}
                     >
                       <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="font-bold lg:text-xl">
+                        <p className="min-w-max font-bold lg:text-xl">
                           Step {eventCategoryEvent ? 6 : 5}:{" "}
                         </p>
                         <p className="lg:text-xs">
@@ -720,7 +746,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       )}
                     >
                       <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="font-bold lg:text-xl">
+                        <p className="min-w-max font-bold lg:text-xl">
                           Step {eventCategoryEvent ? 7 : 6}:{" "}
                         </p>
                         <p className="lg:text-xs">

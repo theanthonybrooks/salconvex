@@ -178,6 +178,7 @@ export default function AvatarUploader({
             {(imageForCropping || originalImage) && (
               <div className="flex w-max items-center gap-2">
                 <Button
+                  type="button"
                   variant="salWithShadowHidden"
                   onClick={() => {
                     if (originalImage) {
@@ -190,6 +191,7 @@ export default function AvatarUploader({
                   Edit
                 </Button>
                 <Button
+                  type="button"
                   variant="salWithShadowHidden"
                   onClick={() => {
                     if (originalImage) {

@@ -37,7 +37,7 @@ export function EventNameSearch({
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         className={cn(
-          "text-base",
+          "h-12 border-foreground text-base",
           className,
           isExisting && "border-red-600 ring-red-600",
         )}

@@ -112,7 +112,7 @@ const eventSchema = z
         .max(2, "You can select up to 2 event types"),
     ),
     location: z.object({
-      sameAsOrganizer: z.boolean().optional(),
+      sameAsOrganizer: z.boolean(),
       locale: z.string().optional(),
       city: z.string().optional(),
       state: z.string().optional(),
@@ -121,10 +121,12 @@ const eventSchema = z
       country: z.string().optional(),
       countryAbbr: z.string().optional(),
       continent: z.string().optional(),
-      coordinates: z.object({
-        latitude: z.number().optional(),
-        longitude: z.number().optional(),
-      }),
+      coordinates: z.optional(
+        z.object({
+          latitude: z.number(),
+          longitude: z.number(),
+        }),
+      ),
       currency: z.optional(
         z.object({
           code: z.string(),
@@ -141,6 +143,14 @@ const eventSchema = z
         code: z.ZodIssueCode.custom,
         message: "Event type is required when category is 'event'",
         path: ["type"],
+      });
+    }
+    if (data.location.sameAsOrganizer === false) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Location is required when 'same as organizer' is not selected",
+        path: ["location.country"],
       });
     }
   });
