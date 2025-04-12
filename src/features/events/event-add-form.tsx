@@ -435,7 +435,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     )}
                   </AnimatePresence>
                 </div>
-                <p className="text-balance text-center text-xl lg:text-base">
+                <p className="hidden text-balance text-center text-xl lg:block lg:text-base">
                   To start, select from an existing organization or create a new
                   one!
                 </p>

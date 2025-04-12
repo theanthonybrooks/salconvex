@@ -255,7 +255,7 @@ export default function HorizontalLinearStepper({
               </Button>
             </section>
           </div>
-          <div className="mt-4 gap-2 text-center lg:hidden">
+          <div className="mt-4 hidden gap-2 text-center lg:hidden">
             {lastSaved && (
               <p className="text-xs italic text-muted-foreground">
                 Last saved: {lastSaved}
