@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 
-interface OrgSearchProps {
+interface EventSearchProps {
   value:
     | string
     | {
@@ -29,7 +29,7 @@ interface OrgSearchProps {
   onLoadClick: (org: Doc<"organizations"> | null) => void;
 }
 
-export const OrgSearch = ({
+export const EventSearch = ({
   value,
   onChange,
   placeholder,
@@ -37,7 +37,7 @@ export const OrgSearch = ({
   isValid,
   onReset,
   onLoadClick,
-}: OrgSearchProps) => {
+}: EventSearchProps) => {
   const [inputValue, setInputValue] = useState(
     typeof value === "string" ? value : (value?.organizationName ?? ""),
   );

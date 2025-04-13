@@ -268,10 +268,17 @@ export const MapboxInputFull = ({
       );
     } else if (e.key === "Enter") {
       e.preventDefault();
+      setIsFocused(false);
       handleSelect(suggestions[highlightedIndex]);
       if (!suggestions) {
         onChange(emptyObject);
       }
+    } else if (
+      e.key.length === 1 ||
+      e.key === "Backspace" ||
+      e.key === "Delete"
+    ) {
+      setIsFocused(true);
     }
   };
 
@@ -283,7 +290,6 @@ export const MapboxInputFull = ({
     const placeContext = findContext("place");
     const stateContext = findContext("region");
     const countryContext = findContext("country");
-    console.log(s);
     let locale = "";
     let city = s.text;
     let state = stateContext?.text || "";
@@ -344,6 +350,7 @@ export const MapboxInputFull = ({
     };
 
     onChange(locationData);
+    setIsFocused(false);
     setInputValue(locationData.full);
     setSuggestions([]);
   };
@@ -411,7 +418,7 @@ export const MapboxInputFull = ({
         id={id}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
-        onFocus={() => setIsFocused(true)}
+        onClick={() => setIsFocused(true)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}

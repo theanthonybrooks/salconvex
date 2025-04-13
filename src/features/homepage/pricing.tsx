@@ -285,7 +285,7 @@ const PricingCard = ({
   return (
     <Card
       className={cn(
-        "flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1",
+        "mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 lg:mx-0",
         {
           relative: popular || isFree,
         },

@@ -19,10 +19,12 @@ interface OrgSearchProps {
   ) => void;
   placeholder?: string;
   className?: string;
+  inputClassName?: string;
   isValid: boolean;
   validationError: boolean;
   onReset: () => void;
   onLoadClick: (org: Doc<"organizations"> | null) => void;
+  tabIndex?: number;
 }
 
 export const OrgSearch = ({
@@ -31,10 +33,12 @@ export const OrgSearch = ({
   onChange,
   placeholder,
   className,
+  inputClassName,
   isValid,
   validationError: invalid,
   onReset,
   onLoadClick,
+  tabIndex,
 }: OrgSearchProps) => {
   const [inputValue, setInputValue] = useState(value || "");
   const [focused, setFocused] = useState(false);
@@ -129,17 +133,6 @@ export const OrgSearch = ({
     }
   };
 
-  // useEffect(() => {
-  //   if (
-  //     typeof value === "object" &&
-  //     value !== null &&
-  //     "organizationName" in value &&
-  //     inputValue !== value.organizationName
-  //   ) {
-  //     setInputValue(value.organizationName);
-  //   }
-  // }, [value, inputValue]);
-
   useEffect(() => {
     const selectedEl = itemRefs.current[selectedIndex];
     if (selectedEl) {
@@ -177,17 +170,17 @@ export const OrgSearch = ({
 
   return (
     <div
-      className="relative mx-auto w-full max-w-sm lg:min-w-[400px] lg:max-w-md"
+      className="relative mx-auto w-full lg:min-w-[400px] lg:max-w-md"
       ref={containerRef}
     >
-      <section className="relative z-[2]">
+      <section className={cn("relative z-[2] h-12 lg:h-auto", className)}>
         <input
           id={id}
           ref={orgInputRef}
           value={inputValue}
           onChange={handleInputChange}
           autoFocus={false}
-          onFocus={() => {
+          onClick={() => {
             if (!hasUserInteracted) setHasUserInteracted(true);
             setFocused(true);
           }}
@@ -198,9 +191,11 @@ export const OrgSearch = ({
           }}
           placeholder={placeholder}
           maxLength={35}
+          tabIndex={tabIndex}
           className={cn(
-            "w-full rounded border p-2 pl-8 pr-10 lg:pl-14 lg:pr-14",
-            className,
+            "h-full w-full rounded border p-2 pl-8 pr-10 lg:pl-14 lg:pr-14",
+
+            inputClassName,
             invalid && "italic text-red-500 ring-2 ring-red-500 ring-offset-1",
             clearHovered && "italic text-red-500 line-through",
           )}
@@ -233,44 +228,43 @@ export const OrgSearch = ({
             )}
           />
         )}
+        {showSuggestions && (
+          <ul
+            ref={listRef}
+            className="scrollable mini z-1 absolute mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
+          >
+            {results.map((org, idx) => (
+              <li
+                key={org._id}
+                ref={(el) => {
+                  itemRefs.current[idx] = el;
+                }}
+                onMouseDown={() => handleSelect(org)}
+                className={cn(
+                  "relative flex cursor-pointer items-center gap-x-4 py-3 pl-4 pr-2",
+                  selectedIndex === idx
+                    ? "bg-salYellow/50"
+                    : "hover:bg-salYellow/40",
+                )}
+              >
+                {org.logo && (
+                  <Image
+                    src={org.logo}
+                    alt={org.name}
+                    width={35}
+                    height={35}
+                    className="rounded-full"
+                  />
+                )}
+                {org.name}
+                {org.name.toLowerCase() === selectedVal.toLowerCase() && (
+                  <Check className="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-foreground" />
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
-
-      {showSuggestions && (
-        <ul
-          ref={listRef}
-          className="scrollable mini z-1 absolute mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
-        >
-          {results.map((org, idx) => (
-            <li
-              key={org._id}
-              ref={(el) => {
-                itemRefs.current[idx] = el;
-              }}
-              onMouseDown={() => handleSelect(org)}
-              className={cn(
-                "relative flex cursor-pointer items-center gap-x-4 py-3 pl-4 pr-2",
-                selectedIndex === idx
-                  ? "bg-salYellow/50"
-                  : "hover:bg-salYellow/40",
-              )}
-            >
-              {org.logo && (
-                <Image
-                  src={org.logo}
-                  alt={org.name}
-                  width={35}
-                  height={35}
-                  className="rounded-full"
-                />
-              )}
-              {org.name}
-              {org.name.toLowerCase() === selectedVal.toLowerCase() && (
-                <Check className="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-foreground" />
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 };

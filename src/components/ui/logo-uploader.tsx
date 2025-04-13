@@ -19,6 +19,7 @@ type AvatarUploaderProps = {
   reset?: boolean;
   size?: number;
   disabled?: boolean;
+  tabIndex?: number;
 };
 
 export default function AvatarUploader({
@@ -28,7 +29,7 @@ export default function AvatarUploader({
   onRemove,
   initialImage,
   className,
-
+  tabIndex,
   disabled,
   size = 80,
   imageOnly = false,
@@ -105,7 +106,7 @@ export default function AvatarUploader({
       <div className={cn("flex items-center gap-6", className)}>
         <div
           className={cn(
-            "relative flex cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50",
+            "relative flex cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50 focus:bg-salYellow/50",
             dragActive && "border-emerald-400 bg-emerald-50",
             imageForCropping ? "border-solid" : "border-dashed",
             disabled &&
@@ -113,6 +114,13 @@ export default function AvatarUploader({
           )}
           style={{ height: size, width: size }}
           onClick={() => fileInputRef.current?.click()}
+          tabIndex={tabIndex}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();
@@ -172,6 +180,7 @@ export default function AvatarUploader({
                   onBlur={handleUrlInput}
                   className="rounded-md border px-2 py-1 text-sm shadow-sm focus:border-emerald-400 focus:outline-none disabled:border-muted-foreground disabled:text-muted-foreground lg:w-64"
                   disabled={disabled}
+                  tabIndex={tabIndex ? tabIndex + 1 : -1}
                 />
               </div>
             )}

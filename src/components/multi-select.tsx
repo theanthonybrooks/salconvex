@@ -133,6 +133,7 @@ interface MultiSelectProps
   id?: string;
   limit?: number;
   shiftOffset?: number;
+  tabIndex?: number;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -159,6 +160,7 @@ export const MultiSelect = React.forwardRef<
       maxCount = 3,
       modalPopover = false,
       shortResults = false,
+      tabIndex,
       // asChild = false,
       className,
       ...props
@@ -170,6 +172,8 @@ export const MultiSelect = React.forwardRef<
 
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
+    const commandInputRef = React.useRef<HTMLInputElement>(null);
+    const firstItemRef = React.useRef<HTMLDivElement>(null);
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>,
@@ -226,17 +230,18 @@ export const MultiSelect = React.forwardRef<
       }
     }, [value]);
 
-    // useEffect(() => {
-    //   if (defaultValue.length === 0) {
-    //     handleClear()
-    //   }
-    // }, [defaultValue, handleClear])
-
-    // useEffect(() => {
-    //   setSelectedValues([...new Set([...defaultValue, ...lockedValue])]) /
-    // }, [defaultValue, lockedValue])
-
-    // Group options if any have a group property
+    useEffect(() => {
+      if (isPopoverOpen) {
+        const timeout = setTimeout(() => {
+          if (hasSearch && commandInputRef.current) {
+            commandInputRef.current.focus();
+          } else if (firstItemRef.current) {
+            firstItemRef.current.focus();
+          }
+        }, 0);
+        return () => clearTimeout(timeout);
+      }
+    }, [isPopoverOpen, hasSearch]);
 
     return (
       <Popover
@@ -248,6 +253,7 @@ export const MultiSelect = React.forwardRef<
           <Button
             ref={ref}
             {...props}
+            tabIndex={tabIndex}
             onClick={handleTogglePopover}
             // style={{ height: `${height * 4}px` }}
             className={cn(
@@ -379,6 +385,7 @@ export const MultiSelect = React.forwardRef<
                 id={id}
                 placeholder="Search..."
                 onKeyDown={handleInputKeyDown}
+                ref={commandInputRef}
               />
             )}
             <CommandList>
@@ -420,7 +427,7 @@ export const MultiSelect = React.forwardRef<
                       key={group}
                       heading={group === "Ungrouped" ? undefined : group}
                     >
-                      {groupOptions.map((option) => {
+                      {groupOptions.map((option, idx) => {
                         const isSelected = selectedValues.includes(
                           option.value,
                         );
@@ -432,10 +439,12 @@ export const MultiSelect = React.forwardRef<
                         console.log(isDisabled, "if");
                         return (
                           <CommandItem
+                            ref={idx === 0 ? firstItemRef : null}
                             key={option.value}
                             onSelect={() => toggleOption(option.value)}
                             disabled={isDisabled}
                             className={cn("cursor-pointer")}
+                            tabIndex={0}
                           >
                             <div
                               className={cn(
@@ -458,7 +467,7 @@ export const MultiSelect = React.forwardRef<
                   ))
                 ) : (
                   <CommandGroup>
-                    {options.map((option) => {
+                    {options.map((option, idx) => {
                       const isSelected = selectedValues.includes(option.value);
                       const isDisabled = !!(
                         !isSelected &&
@@ -467,10 +476,12 @@ export const MultiSelect = React.forwardRef<
                       );
                       return (
                         <CommandItem
+                          ref={idx === 0 ? firstItemRef : null}
                           disabled={isDisabled}
                           key={option.value}
                           onSelect={() => toggleOption(option.value)}
                           className="cursor-pointer"
+                          tabIndex={0}
                         >
                           <div
                             className={cn(
