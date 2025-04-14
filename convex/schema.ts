@@ -220,8 +220,14 @@ const eventSchema = {
   ),
   otherInfo: v.array(v.string()),
   // state: v.string(), //draft, submitted, published, archived
-  state: v.string(), //draft, submitted, published, archived
+  state: v.union(
+    v.literal("draft"),
+    v.literal("submitted"),
+    v.literal("published"),
+    v.literal("archived"),
+  ),
   active: v.optional(v.boolean()),
+  lastEditedAt: v.optional(v.number()),
 };
 
 const eventOrganizerSchema = {

@@ -166,7 +166,6 @@ const openCallSchema = z.object({
 
 export const step1Schema = z.object({
   organization: organizationSchema,
-  event: eventSchema,
 });
 
 export const eventOnlySchema = z.object({

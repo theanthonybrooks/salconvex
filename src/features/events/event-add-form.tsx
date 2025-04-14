@@ -27,13 +27,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { columns } from "@/features/artists/applications/data-table/columns";
+import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventNameSearch } from "@/features/events/components/event-search";
 import { getEventCategoryLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
 import { AnimatePresence, motion } from "framer-motion";
 import { Path, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -140,6 +142,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
     null,
   );
+  const [newOrgEvent, setNewOrgEvent] = useState(false);
+  const [existingEvent, setExistingEvent] = useState<Doc<"events"> | null>(
+    null,
+  );
   const [lastSaved, setLastSaved] = useState(
     existingOrg ? existingOrg.updatedAt : null,
   );
@@ -175,6 +181,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     !errors.organization?.location?.country && Boolean(orgData?.location?.full);
   const orgLogoValid = !errors.organization?.logo && Boolean(orgData?.logo);
   const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
+  const data = useQuery(
+    api.events.event.getEventByOrgId,
+    existingOrg ? { orgId: existingOrg?._id } : "skip",
+  );
+  const eventsData = data ?? [];
+
+  const eventChoiceMade = existingEvent || newOrgEvent;
+
   const eventCategory = eventData?.category as EventCategory;
   const eventCategoryEvent = eventCategory === "event";
   const eventCategoryProject = eventCategory === "project";
@@ -220,7 +234,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
 
-  const isValid = validOrgWZod && isStepValidZod && eventNameValid;
+  const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
 
   //
 
@@ -249,6 +263,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // console.log(orgNameValid, orgLocationValid);
   console.log(orgData);
   console.log(eventData);
+  console.log(eventsData);
+  console.log(existingEvent);
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
   console.log("existingOrg", existingOrg);
@@ -572,7 +588,58 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     orientation="vertical"
                   />
                 )}
-                <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
+                <section className="flex flex-col items-center justify-center gap-4">
+                  <div
+                    id="event-header"
+                    className="mb-2 flex w-full flex-col items-center justify-center gap-2 sm:flex-row"
+                  >
+                    <p className="font-tanker text-xl lowercase tracking-wide text-foreground sm:text-2xl">
+                      Select an existing Event/Project
+                    </p>
+                    <p className="text-sm italic text-muted-foreground">
+                      (or continue a draft)
+                    </p>
+                  </div>
+                  <DataTable
+                    columns={columns}
+                    data={eventsData}
+                    defaultVisibility={{
+                      eventCategory: false,
+                      lastEditedAt: false,
+                    }}
+                    onRowSelect={(event) => {
+                      setExistingEvent(event as Doc<"events">);
+                    }}
+                    className="w-full max-w-[300px] overflow-x-auto"
+                  />
+
+                  <span>or</span>
+                  {/* <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      setExistingEvent(null);
+                    }}
+                  >
+                    Create New Event
+                  </Button> */}
+
+                  <label className="flex cursor-pointer items-start gap-2 md:items-center">
+                    <Checkbox
+                      id="event.location.sameAsOrganizer"
+                      checked={newOrgEvent}
+                      onCheckedChange={(checked) => {
+                        setExistingEvent(null);
+                        setNewOrgEvent(!!checked);
+                      }}
+                    />
+                    <span className="text-sm">
+                      No thanks, I&apos;d like to create a new event/project
+                    </span>
+                  </label>
+                </section>
+                {/* <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
                   <div
                     id="event-header"
                     className="w-full text-center font-tanker text-2xl lowercase tracking-wide text-foreground underline decoration-4 underline-offset-4"
@@ -783,7 +850,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       </div>
                     </section>
                   )}
-                </section>
+                </section> */}
               </>
             )}
           </div>

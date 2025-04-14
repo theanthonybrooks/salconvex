@@ -1,5 +1,6 @@
 import {
   EVENT_CATEGORY_LABELS,
+  EVENT_CATEGORY_LABELS_ABBR,
   EVENT_TYPE_LABELS,
 } from "@/constants/eventConsts";
 import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
@@ -29,6 +30,10 @@ export const getEventTypeLabel = (
 
 export const getEventCategoryLabel = (eventCategory: EventCategory): string =>
   EVENT_CATEGORY_LABELS[eventCategory] ?? "Unknown";
+
+export const getEventCategoryLabelAbbr = (
+  eventCategory: EventCategory,
+): string => EVENT_CATEGORY_LABELS_ABBR[eventCategory] ?? "Unknown";
 
 import currencies from "currency-codes";
 

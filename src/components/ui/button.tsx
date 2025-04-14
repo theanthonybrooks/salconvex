@@ -14,12 +14,10 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        outline: "border-1.5 border-foreground bg-background hover:bg-white/30",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          "hover:bg-backgroundDark hover:border-2 border-foreground rounded",
+        ghost: "hover:scale-110 active:scale-95 border border-transparent",
         ghost2: "hover:bg-none hover:text-accent-foreground hover:scale-105",
         link: "text-primary underline-offset-4 hover:underline",
         expandIcon:

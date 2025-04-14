@@ -23,6 +23,13 @@ export const getEventByOrgId = query({
   },
 });
 
+export const getAllEvents = query({
+  handler: async (ctx) => {
+    const allEvents = await ctx.db.query("events").collect();
+    return allEvents;
+  },
+});
+
 export const checkEventNameExists = query({
   args: { name: v.string() },
   handler: async (ctx, args) => {

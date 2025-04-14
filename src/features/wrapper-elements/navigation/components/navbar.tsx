@@ -16,6 +16,7 @@ import {
   landingPageNavbarMenuLinksResources as resources,
   landingPageNavbarMenuLinksTheList as thelistitems,
 } from "@/constants/navbars";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { Unauthenticated } from "convex/react";
@@ -24,7 +25,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface NavBarProps {
   userId: string | undefined;
@@ -40,7 +41,7 @@ export default function NavBar({
 NavBarProps) {
   const pathname = usePathname();
   const { scrollY } = useScroll();
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
@@ -75,23 +76,6 @@ NavBarProps) {
   const isActiveResources = filteredNavbarMenuResources.some(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1024px)");
-    setIsMobile(mediaQuery.matches);
-
-    let timeoutId: NodeJS.Timeout;
-    const handleChange = (e: MediaQueryListEvent) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-      clearTimeout(timeoutId);
-    };
-  }, []);
 
   return (
     <>

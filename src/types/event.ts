@@ -69,6 +69,8 @@ export interface EventData {
   };
   otherInfo?: string[];
   state: SubmissionFormState;
+  active?: boolean;
+  lastEditedAt?: number;
 }
 
 export interface EventCardDetailProps {
