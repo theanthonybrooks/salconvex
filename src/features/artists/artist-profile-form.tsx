@@ -50,7 +50,7 @@ export const ArtistProfileForm = ({
     register,
     control,
     setValue,
-    watch,
+    // watch,
     handleSubmit: handleSubmit,
     formState: {
       // isDirty,
@@ -158,7 +158,7 @@ export const ArtistProfileForm = ({
     }
   };
 
-  console.log(watch("residence"));
+  // console.log(watch("residence"));
   // console.log(watch("location"));
 
   return (

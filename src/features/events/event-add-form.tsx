@@ -36,11 +36,12 @@ import { EventCategory, EventType } from "@/types/event";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
+import { useAction, useMutation } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Path, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 
 const steps = [
   {
@@ -132,7 +133,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   // const orgName =
   //   typeof orgValue === "string" ? orgValue : (orgValue?.name ?? "");
-
+  const getTimezone = useAction(api.actions.getTimezone.getTimezone);
+  const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
+  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const [isMobile, setIsMobile] = useState(false);
@@ -186,8 +189,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     existingOrg ? { orgId: existingOrg?._id } : "skip",
   );
   const eventsData = data ?? [];
+  const orgHasNoEvents = eventsData?.length === 0 && existingOrg;
 
-  const eventChoiceMade = existingEvent || newOrgEvent;
+  const eventChoiceMade = existingEvent || newOrgEvent || !existingOrg;
 
   const eventCategory = eventData?.category as EventCategory;
   const eventCategoryEvent = eventCategory === "event";
@@ -211,7 +215,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
   );
   const {
-    data: eventNameData,
+    // data: eventNameData,
     // status,
     // isPending,
     isSuccess: eventNameValid,
@@ -222,10 +226,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     eventName.trim().length >= 3 ? { name: eventName } : "skip",
   );
 
-  console.log("eventNameData", eventNameData);
+  // console.log("eventNameData", eventNameData);
 
-  console.log("eventNameExists", eventNameValid);
-  console.log("eventNameExistsError", eventNameExistsError);
+  // console.log("eventNameExists", eventNameValid);
+  // console.log("eventNameExistsError", eventNameExistsError);
 
   // const orgValidation = useQuery(
   //   api.organizer.organizations.isOwnerOrIsNewOrg,
@@ -262,8 +266,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // console.log("isValid", isValid);
   // console.log(orgNameValid, orgLocationValid);
   console.log(orgData);
-  console.log(eventData);
-  console.log(eventsData);
+  console.log(newOrgEvent);
+  // console.log(eventData);
+  console.log(eventsData, "now");
   console.log(existingEvent);
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
@@ -331,6 +336,93 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         return;
       }
     }
+    if (activeStep === 0) {
+      //TODO: Run a check to see if anything has changed in the form since last save. If so, prompt to save. If not, skip to step 2.
+      let orgLogoId: Id<"_storage"> | undefined;
+      let logoUrl: string = "/1.jpg";
+      let timezone: string | undefined;
+      let timezoneOffset: number | undefined;
+      const data = watch("organization");
+      console.log("data", data);
+      if (data.location?.coordinates) {
+        const timezoneData = await getTimezone({
+          latitude: data.location.coordinates?.latitude || 52,
+          longitude: data.location.coordinates?.longitude || 13.4,
+        });
+        timezone = timezoneData?.zoneName;
+        timezoneOffset = timezoneData?.gmtOffset;
+      }
+      if (data.logo && typeof data.logo !== "string") {
+        const uploadUrl = await generateUploadUrl();
+        const uploadRes = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": data.logo.type },
+          body: data.logo,
+        });
+        if (!uploadRes.ok) {
+          toast.error("Failed to upload logo", {
+            autoClose: 2000,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+          return;
+        }
+        const { storageId } = await uploadRes.json();
+        orgLogoId = storageId;
+      } else if (data.logo && typeof data.logo === "string") {
+        logoUrl = data.logo;
+      }
+      console.log("orgLogoId", orgLogoId);
+      console.log("logoUrl", logoUrl);
+      try {
+        await createNewOrg({
+          organizationName: data.name,
+          logoId: orgLogoId,
+          logo: logoUrl,
+          location: {
+            full: data.location.full,
+            locale: data.location.locale,
+            city: data.location.city,
+            state: data.location.state,
+            stateAbbr: data.location.stateAbbr,
+            region: data.location.region,
+            country: data.location.country,
+            countryAbbr: data.location.countryAbbr,
+            continent: data.location?.continent || "",
+            coordinates: {
+              latitude: data.location.coordinates?.latitude || 0,
+              longitude: data.location.coordinates?.longitude || 0,
+            },
+            currency: {
+              code: data.location?.currency?.code || "",
+              name: data.location?.currency?.name || "",
+              symbol: data.location?.currency?.symbol || "",
+            },
+            demonym: data.location.demonym,
+            timezone: timezone,
+            timezoneOffset: timezoneOffset,
+          },
+        });
+        toast.success("Organization created! Going to step 2...");
+      } catch (error) {
+        console.error("Failed to create new organization:", error);
+        toast.error("Failed to create new organization");
+      }
+      // const result = await createNewOrg({
+      //   organizationName: data.organization.name,
+      //   logo: data.organization.logo,
+      //   location: data.organization.location,
+      // });
+      //save logic here
+      console.log("saving...");
+      // get timezone
+      // use existing event as default values for next step if applicable
+      // if past event (or past open call), the event cannot be changed an selecting it will create a new event using the old one as a template.
+    }
+
+    {
+      /* TODO: Add logic to save the event after step 1 and to gather the user's timezone. Plus ensure that it uses that event info to populate the next step (if applicable) */
+    }
 
     setActiveStep((prev) => prev + 1);
   };
@@ -388,6 +480,12 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (orgHasNoEvents && activeStep === 0) {
+      setNewOrgEvent(true);
+    }
+  }, [orgHasNoEvents, activeStep]);
+
   return (
     <HorizontalLinearStepper
       activeStep={activeStep}
@@ -422,14 +520,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           <div
             id="form-container"
             className={cn(
-              "flex h-full flex-col justify-center gap-4",
+              "flex h-full flex-col gap-4 lg:justify-center",
               existingOrg &&
                 "xl:grid xl:grid-cols-[minmax(0,_1fr)_1em_minmax(0,_1fr)] xl:gap-6",
             )}
           >
             <section
               id="first-section"
-              className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]"
+              className="flex flex-col items-center gap-y-6 lg:mx-auto lg:justify-center xl:max-w-[80%]"
             >
               <section className="flex flex-col items-center justify-center">
                 <div
@@ -545,7 +643,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
                 {orgLocationValid && (
                   <>
-                    <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
+                    <div className="mb-2 flex w-full items-start gap-x-2 lg:mb-0 lg:w-28 lg:flex-col">
                       <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
                       <p className="lg:text-xs">Logo</p>
                     </div>
@@ -578,7 +676,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
               </div>
             </section>
             {/* second half of first page */}
-            {orgDataValid && (
+            {orgDataValid && existingOrg && (
               <>
                 <Separator thickness={2} className="my-4 xl:hidden" />
                 {existingOrg && (
@@ -608,12 +706,55 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       lastEditedAt: false,
                     }}
                     onRowSelect={(event) => {
+                      if (newOrgEvent) {
+                        setNewOrgEvent(false);
+                      }
                       setExistingEvent(event as Doc<"events">);
                     }}
-                    className="w-full max-w-[300px] overflow-x-auto"
+                    className="w-full max-w-[300px] overflow-x-auto sm:max-w-[90vw]"
+                    containerClassName={cn(
+                      "lg:hidden",
+                      newOrgEvent && "opacity-50",
+                    )}
                   />
-
-                  <span>or</span>
+                  <DataTable
+                    columns={columns}
+                    data={eventsData}
+                    onRowSelect={(event) => {
+                      if (newOrgEvent) {
+                        setNewOrgEvent(false);
+                      }
+                      setExistingEvent(event as Doc<"events">);
+                    }}
+                    className="flex w-full max-w-[90vw] overflow-x-auto"
+                    containerClassName={cn(
+                      "hidden lg:block xl:hidden  ",
+                      newOrgEvent && "opacity-50",
+                    )}
+                  />
+                  <DataTable
+                    columns={columns}
+                    data={eventsData}
+                    onRowSelect={(event) => {
+                      if (newOrgEvent) {
+                        setNewOrgEvent(false);
+                      }
+                      setExistingEvent(event as Doc<"events">);
+                    }}
+                    defaultVisibility={{
+                      eventCategory: false,
+                      // lastEditedAt: false,
+                    }}
+                    className="flex w-full max-w-[90vw] overflow-x-auto"
+                    containerClassName={cn(
+                      "hidden xl:block ",
+                      newOrgEvent && "opacity-50",
+                      eventsData?.length > 0 &&
+                        "opacity-50 pointer-events-none",
+                    )}
+                  />
+                  {/* 
+                  <span>or</span> */}
                   {/* <Button
                     variant="outline"
                     size="sm"
@@ -627,17 +768,33 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
                   <label className="flex cursor-pointer items-start gap-2 md:items-center">
                     <Checkbox
+                      tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
                       id="event.location.sameAsOrganizer"
-                      checked={newOrgEvent}
+                      className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                      checked={eventsData?.length === 0 ? true : newOrgEvent}
                       onCheckedChange={(checked) => {
                         setExistingEvent(null);
-                        setNewOrgEvent(!!checked);
+                        if (eventsData?.length === 0) {
+                          setNewOrgEvent(true);
+                        } else {
+                          setNewOrgEvent(!!checked);
+                        }
                       }}
                     />
-                    <span className="text-sm">
-                      No thanks, I&apos;d like to create a new event/project
-                    </span>
+                    {eventsData?.length > 0 ? (
+                      <span className="text-sm">
+                        No thanks, I&apos;d like to create a new event/project
+                      </span>
+                    ) : (
+                      <span className="text-sm">
+                        I&apos;d like to create a new event/project
+                      </span>
+                    )}
                   </label>
+                  <p className="mt-2 text-center text-xs italic text-muted-foreground">
+                    Past events are no longer editable but are still viewable
+                    and able to be used as a template for new events.
+                  </p>
                 </section>
                 {/* <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
                   <div

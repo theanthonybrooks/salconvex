@@ -64,7 +64,7 @@ export const AccountSubscribeForm = ({
           "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
           className,
           !isArtist &&
-            "h-dvh lg:h-full lg:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
+            "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
         )}
       >
         <>

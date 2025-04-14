@@ -18,6 +18,7 @@ export const columnLabels: Record<string, string> = {
   state: "State",
   lastEditedAt: "Last Edited",
   category: "Category",
+  eventType: "Event Type",
 };
 
 export type Event = {

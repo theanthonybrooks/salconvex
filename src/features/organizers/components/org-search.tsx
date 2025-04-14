@@ -123,13 +123,41 @@ export const OrgSearch = ({
     } else if (e.key === "Escape") {
       setFocused(false);
       setSelectedIndex(-1);
+    } else if (e.key === "Tab") {
+      if (selectedIndex >= 0) {
+        handleSelect(results[selectedIndex]);
+        setFocused(false);
+        setSelectedIndex(-1);
+      }
     } else if (
       e.key.length === 1 ||
       e.key === "Backspace" ||
       e.key === "Delete"
     ) {
+      if (!showSuggestions && results?.length > 0) {
+        setFocused(true);
+        setSelectedIndex(0);
+      }
       setSelectedVal("");
       onLoadClick(null);
+    }
+  };
+
+  const handleBlur = () => {
+    console.log("handleBlur");
+    if (inputValue.trim() !== "" && inputValue.trim() !== selectedVal) {
+      if (results && results?.length > 0) {
+        handleSelect(results[selectedIndex]);
+      }
+      setFocused(false);
+      setSelectedIndex(-1);
+      console.log("if");
+    } else {
+      setTimeout(() => {
+        setFocused(false);
+        setSelectedIndex(-1);
+      }, 100);
+      console.log("else");
     }
   };
 
@@ -184,7 +212,7 @@ export const OrgSearch = ({
             if (!hasUserInteracted) setHasUserInteracted(true);
             setFocused(true);
           }}
-          onBlur={() => setTimeout(() => setFocused(false), 100)}
+          onBlur={handleBlur}
           onKeyDown={(e) => {
             if (!hasUserInteracted) setHasUserInteracted(true);
             handleKeyDown(e);

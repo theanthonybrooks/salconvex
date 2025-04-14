@@ -106,7 +106,7 @@ export default function AvatarUploader({
       <div className={cn("flex items-center gap-6", className)}>
         <div
           className={cn(
-            "relative flex cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50 focus:bg-salYellow/50",
+            "relative flex cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50 focus:bg-salYellow/50 focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1",
             dragActive && "border-emerald-400 bg-emerald-50",
             imageForCropping ? "border-solid" : "border-dashed",
             disabled &&

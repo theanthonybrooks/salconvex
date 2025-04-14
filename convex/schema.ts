@@ -126,6 +126,8 @@ const organizationSchema = {
         }),
       ),
       demonym: v.optional(v.string()),
+      timezone: v.optional(v.string()),
+      timezoneOffset: v.optional(v.number()),
     }),
   ),
   about: v.optional(v.string()),
@@ -407,6 +409,9 @@ export default defineSchema({
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_mainOrgName", ["mainOrgName"])
     .index("by_startDate", ["dates.eventStart"])
+    .index("by_lastEditedAt", ["lastEditedAt"])
+    .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])
+
     // .index("by_eventId", ["event"])
     .index("by_eventType", ["eventType"])
     .index("by_category", ["eventCategory"])

@@ -198,11 +198,11 @@ export default function HorizontalLinearStepper({
                   </>
                 )}
               </div>
-              {lastSaved && activeStep >= 1 && (
+              {/* {lastSaved && activeStep >= 1 && (
                 <p className="hidden text-xs italic text-muted-foreground lg:block">
                   Last saved: {lastSaved}
                 </p>
-              )}
+              )} */}
             </section>
             {onSave !== undefined && !lastSaved && activeStep >= 1 && (
               <p className="hidden text-balance text-sm italic lg:block">
@@ -210,7 +210,7 @@ export default function HorizontalLinearStepper({
               </p>
             )}
             <section className="flex min-w-24 items-center justify-end gap-2">
-              {lastSaved && activeStep === 0 && (
+              {lastSaved && activeStep >= 1 && (
                 <p className="mr-2 hidden text-xs italic text-muted-foreground lg:block">
                   Last saved: {lastSaved}
                 </p>

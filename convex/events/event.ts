@@ -16,7 +16,8 @@ export const getEventByOrgId = query({
 
     const events = await ctx.db
       .query("events")
-      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", org._id))
+      .withIndex("by_mainOrgId_lastEditedAt", (q) => q.eq("mainOrgId", org._id))
+      .order("desc")
       .collect();
 
     return events;
