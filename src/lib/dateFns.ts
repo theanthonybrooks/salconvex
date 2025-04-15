@@ -233,10 +233,30 @@ export const getOrdinalSuffix = (day: number): string => {
 export const isoDateRegex =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
-export const isValidIsoDate = (value: string | null): value is string =>
+// Allow: YYYY, YYYY-MM, YYYY-MM-DD, full ISO with time
+export const relaxedIsoRegex =
+  /^\d{4}(-\d{2}){0,2}(T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2}))?$/;
+
+/*export const isValidIsoDate = (value: string | null): value is string =>
   typeof value === "string" &&
   isoDateRegex.test(value) &&
-  !isNaN(Date.parse(value));
+  !isNaN(Date.parse(value));*/
+
+export const isValidIsoDate = (value: string | null): value is string => {
+  if (typeof value !== "string") return false;
+
+  if (!relaxedIsoRegex.test(value)) return false;
+
+  // Pad partials for Date.parse()
+  const padded =
+    value.length === 4
+      ? `${value}-01-01`
+      : value.length === 7
+        ? `${value}-01`
+        : value;
+
+  return !isNaN(Date.parse(padded));
+};
 
 export const getFourCharMonth = (date: Date): string => {
   const monthMap: Record<number, string> = {
