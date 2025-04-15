@@ -140,7 +140,9 @@ export const useFilteredEvents = (
             return {
               priority,
               ocEnd: ocEnd.getTime(),
-              eventStart: new Date(item.dates.eventStart ?? Infinity).getTime(),
+              eventStart: new Date(
+                item.dates.eventDates[0].start ?? Infinity,
+              ).getTime(),
             };
           };
 

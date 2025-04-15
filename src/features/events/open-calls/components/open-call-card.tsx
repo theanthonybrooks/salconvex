@@ -116,8 +116,8 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
           event.about ?? "",
           eventCategory,
           true,
-          hasEventDates ? dates.eventStart! : "",
-          hasEventDates ? dates.eventEnd! : "",
+          hasEventDates ? eventStart! : "",
+          hasEventDates ? eventEnd! : "",
           `${openCallId}`,
         )
       : null;

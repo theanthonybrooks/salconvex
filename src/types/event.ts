@@ -33,8 +33,6 @@ export interface EventData {
   dates: {
     edition: number;
     eventDates: { start: string; end: string }[];
-    eventStart?: string;
-    eventEnd?: string;
     artistStart?: string;
     artistEnd?: string;
     ongoing: boolean;
