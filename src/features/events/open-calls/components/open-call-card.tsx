@@ -164,7 +164,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                         ? `${eligibilityType}: ${eligibilityWhom
                             .map((whom) => whom)
                             .join("/ ")} Artists*`
-                        : eligibilityWhom}
+                        : "International (all)"}
                     </span>
                   </p>
                   {eligibilityDetails && (
@@ -554,7 +554,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                       ? `${eligibilityType}: ${eligibilityWhom
                           .map((whom) => whom)
                           .join("/ ")} Artists*`
-                      : eligibilityWhom}
+                      : "International (all)"}
                   </span>
                 </p>
                 {eligibilityDetails && (

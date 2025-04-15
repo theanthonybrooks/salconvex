@@ -173,7 +173,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // ------------- Step 1 - Organization & Event --------------
   //
   //
-  // TODO: Timezone and timezone offset will be gathered on submit (existing convex action)
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
   const eventData = watch("event");
@@ -316,7 +315,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       toast.error("Failed to submit form");
     }
   };
-
+  // TODO: Convert timezone to user timezone on submit to ensure that displayed time is correct.
+  // use convertOpenCallDatesToUserTimezone()
   const handleNextStep = async () => {
     const currentStep = steps[activeStep];
     const schema = currentStep.schema;

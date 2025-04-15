@@ -203,6 +203,24 @@ export const formatOpenCallDeadline = (
   return `${month} ${day}${ordinal}, ${year} @ ${time} (${timeZoneFormat})`;
 };
 
+export const convertOpenCallDatesToUserTimezone = (
+  dates: {
+    ocStart?: string;
+    ocEnd?: string;
+  },
+  userTimezone: string,
+) => {
+  const convertToUTC = (localISODate: string | undefined, zone: string) => {
+    if (!localISODate) return undefined;
+    const dt = DateTime.fromISO(localISODate, { zone });
+    return dt.isValid ? dt.toUTC().toISO() : undefined;
+  };
+
+  return {
+    ocStart: convertToUTC(dates.ocStart, userTimezone),
+    ocEnd: convertToUTC(dates.ocEnd, userTimezone),
+  };
+};
 export const formatSingleDate = (date: number) => {
   if (!date) return "";
   // const dt = DateTime.fromISO(date, { setZone: true }).setZone(timezone);

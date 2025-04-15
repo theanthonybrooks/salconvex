@@ -40,10 +40,12 @@ const EventDates = ({
               format,
               preview,
             )}
-            <p className="text-sm italic text-muted-foreground">
-              {shouldShowPlus &&
-                `+${mappedDates.length - sliceLimit} more date${mappedDates.length - sliceLimit > 1 ? "s" : ""}`}
-            </p>
+            {shouldShowPlus && (
+              <p className="text-sm italic text-muted-foreground">
+                {shouldShowPlus &&
+                  `+${mappedDates.length - sliceLimit} more date${mappedDates.length - sliceLimit > 1 ? "s" : ""}`}
+              </p>
+            )}
           </span>
         );
       })}

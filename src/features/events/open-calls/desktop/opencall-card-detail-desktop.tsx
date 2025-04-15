@@ -206,16 +206,17 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             {/*//todo: add this part */}
             {eventCategory === "project" ||
               (eventCategory === "event" && artistStart && artistEnd && (
-                <p className="flex flex-col items-start gap-1 text-sm">
+                <div className="flex flex-col items-start gap-1 text-sm">
                   <span className="space-x-1 font-semibold">
                     Painting/Production Dates:
                   </span>
+                  {/* TODO: Add this functionality after there are some artist/painting dates entered */}
                   {formatEventDates(
                     artistStart || "",
                     artistEnd || "",
                     ongoing,
                   )}
-                </p>
+                </div>
               ))}
             <p className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Category:</span>
