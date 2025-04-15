@@ -32,10 +32,7 @@ const EventDates = ({
         const shouldShowPlus = isLastVisible && mappedDates.length > sliceLimit;
 
         return (
-          <span
-            key={index}
-            className="flex flex-col gap-1 sm:flex-row sm:items-center"
-          >
+          <span key={index} className="flex flex-col gap-1">
             {formatEventDates(
               start || "",
               end || "",
