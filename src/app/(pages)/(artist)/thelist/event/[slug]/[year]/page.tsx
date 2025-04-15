@@ -3,24 +3,46 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
+
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useQuery } from "convex-helpers/react/cache";
+
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+
   const router = useRouter();
   const { slug, year } = useParams();
-
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
-  const data = useQuery(
+  const {
+    data,
+    // status,
+    // isPending,
+    // isSuccess,
+    isError,
+    // error,
+  } = useQueryWithStatus(
     api.events.event.getEventWithDetails,
     slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
   );
 
+  // const data = useQuery(
+  //   api.events.event.getEventWithDetails,
+  //   slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
+  // );
+
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
+  // console.log(slugValue, year);
+  // console.log(data);
+  // console.log(isSuccess, isError, error);
+  // console.log(artistData);
   // const data = useQuery(api.events.getEventWithDetails, {
   //   slug: "mural-fest",
   //   edition: 2025,
@@ -43,6 +65,11 @@ const Event = () => {
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
+  useEffect(() => {
+    if (isError) {
+      router.push("/404");
+    }
+  }, [isError, router]);
 
   return (
     <>

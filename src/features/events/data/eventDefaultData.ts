@@ -24,8 +24,7 @@
 //     continent: "",
 //   },
 //   dates: {
-//     eventStart: null,
-//     eventEnd: "",
+
 //     ocStart: "",
 //     ocEnd: "",
 //     timezone: "UTC",

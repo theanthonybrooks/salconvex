@@ -37,7 +37,7 @@ export default function MapComponent({
       )}
       <MapContainer
         center={[latitude, longitude]}
-        zoom={4}
+        zoom={6}
         scrollWheelZoom={false}
         attributionControl={false}
         className={className}

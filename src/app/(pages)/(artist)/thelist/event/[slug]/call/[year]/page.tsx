@@ -3,18 +3,23 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
 import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { api } from "~/convex/_generated/api";
 
 const OpenCallDetail = () => {
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+
   const router = useRouter();
   const { slug, year } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
-  const data = useQuery(
-    api.events.event.getEventWithAppDetails,
+  const { data, isError } = useQueryWithStatus(
+    api.events.event.getEventWithDetails,
     slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
   );
 
@@ -43,6 +48,11 @@ const OpenCallDetail = () => {
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
+  useEffect(() => {
+    if (isError) {
+      router.push("/404");
+    }
+  }, [isError, router]);
   return (
     <>
       <div

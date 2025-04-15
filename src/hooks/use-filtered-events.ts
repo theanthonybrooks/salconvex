@@ -51,7 +51,7 @@ export const useFilteredEvents = (
             const now = new Date();
             now.setHours(0, 0, 0, 0);
 
-            const startDate = item.dates.eventStart;
+            const startDate = item.dates.eventDates[0].start;
             const isValid = startDate && isValidIsoDate(startDate);
             const validStartDate = isValid ? new Date(startDate) : null;
             const isOngoing = item.dates.ongoing;
@@ -89,8 +89,8 @@ export const useFilteredEvents = (
           }
 
           if (priorityA.priority === 3 && priorityB.priority === 3) {
-            const aDate = new Date(a.dates.eventStart ?? 0);
-            const bDate = new Date(b.dates.eventStart ?? 0);
+            const aDate = new Date(a.dates.eventDates[0].start ?? 0);
+            const bDate = new Date(b.dates.eventDates[0].start ?? 0);
 
             const aYear = aDate.getFullYear();
             const bYear = bDate.getFullYear();

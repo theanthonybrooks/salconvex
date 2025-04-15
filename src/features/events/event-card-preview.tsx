@@ -8,13 +8,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
+import EventDates from "@/features/events/components/event-dates";
 import {
   ApplyButton,
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
-import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns";
+import { formatOpenCallDeadline } from "@/lib/dateFns";
 import {
   formatCurrency,
   formatRate,
@@ -61,7 +62,6 @@ export interface EventCardPreviewProps {
 const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   const router = useRouter();
   const {
-    dates,
     location,
     eventCategory,
 
@@ -84,9 +84,6 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
 
   const { opencall } = tabs;
   const orgLinkName = slug;
-
-  // const { compensation, basicInfo, eligibility } = opencall
-  // const { budget, categories } = compensation
   const compensation = event.hasActiveOpenCall
     ? opencall?.compensation
     : undefined;
@@ -125,20 +122,6 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
 
   // console.log("appStatus", appStatus);
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
-
-  // const icsLink =
-  //   callType === "Fixed" && dates.ocStart && dates.ocEnd
-  //     ? generateICSFile(
-  //         event.name,
-  //         dates.ocStart,
-  //         dates.ocEnd,
-  //         locationString,
-  //         eventTab.about,
-  //         dates.eventStart ? dates.eventStart : "",
-  //         dates.eventEnd,
-  //         `${id}`
-  //       )
-  //     : null
 
   const hasBudget = !!(
     budget &&
@@ -226,17 +209,16 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
               <p className="text-base font-semibold">{event?.name}</p>
               <p className="text-sm">{locationString}</p>
             </div>
-            <p className="flex items-center gap-x-1 text-sm">
+            <div className="flex items-start gap-x-1 text-sm">
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className="font-semibold">Dates:</span>
-              {formatEventDates(
-                dates?.eventStart || "",
-                dates?.eventEnd || "",
-                dates?.ongoing,
-                "mobile",
-                true,
-              )}
-            </p>
+              <EventDates
+                event={event}
+                format="mobile"
+                limit={1}
+                preview={true}
+              />
+            </div>
             {isCurrentlyOpen && (
               <p className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className={"font-semibold"}>
@@ -491,16 +473,11 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 {/* <p className='text-sm'>{locationString}</p> */}
               </div>
             </Link>
-            <p className="flex items-center gap-x-1 text-sm">
+            <div className="flex items-start gap-x-1 text-sm">
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className="font-semibold">Dates:</span>
-              {formatEventDates(
-                dates?.eventStart || "",
-                dates?.eventEnd || "",
-                dates.ongoing,
-                "desktop",
-              )}
-            </p>
+              <EventDates event={event} format="desktop" limit={1} />
+            </div>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>
 

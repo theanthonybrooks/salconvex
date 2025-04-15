@@ -7,8 +7,7 @@ import { DataTableColumnHeader } from "@/features/artists/applications/data-tabl
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { SubmissionFormState } from "@/types/event";
-import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -154,7 +153,7 @@ export const columns: ColumnDef<Event>[] = [
             {state === "draft" ? (
               <FaRegFloppyDisk className="size-4 shrink-0" />
             ) : state === "submitted" ? (
-              <QuestionMarkCircledIcon className="size-4 shrink-0" />
+              <Circle className="size-4 shrink-0" />
             ) : state === "published" ? (
               <CheckCircle2 className="size-4 shrink-0" />
             ) : (
@@ -207,7 +206,9 @@ export const columns: ColumnDef<Event>[] = [
       return (
         <div className="flex justify-center space-x-2">
           <span className="max-w-[175px] truncate font-medium capitalize">
-            {new Date(value).toLocaleString()}
+            {!isNaN(new Date(value).getTime())
+              ? new Date(value).toLocaleString()
+              : "-"}
           </span>
         </div>
       );

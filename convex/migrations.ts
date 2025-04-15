@@ -32,6 +32,21 @@ export const updateIsPublic = migrations.define({
   },
 });
 
+export const removeStartEndDates = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, event) => {
+    if (event.dates.eventStart) {
+      await ctx.db.patch(event._id, {
+        dates: {
+          ...event.dates,
+          eventStart: undefined,
+          eventEnd: undefined,
+        },
+      });
+    }
+  },
+});
+
 // Create a runner specifically for this migration
 export const runCopyDates = migrations.runner(
   internal.migrations.copyUpdatedAtToCompletedAt,
@@ -43,6 +58,10 @@ export const runUpdatePublic = migrations.runner(
 
 export const runClearIfUndone = migrations.runner(
   internal.migrations.clearCompletedAtIfUndone,
+);
+
+export const runRemoveStartDates = migrations.runner(
+  internal.migrations.removeStartEndDates,
 );
 
 //NOTE: (TO RUN THIS MIGRATION)

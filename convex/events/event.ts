@@ -99,13 +99,14 @@ export const getEventWithDetails = query({
     edition: v.number(),
   },
   handler: async (ctx, args) => {
+    console.log(args);
     const events = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .collect();
 
     const event = events.find((e) => e.dates.edition === args.edition);
-    if (!event) return null;
+    if (!event) throw new ConvexError("No event found");
 
     const [openCalls, organizer] = await Promise.all([
       ctx.db

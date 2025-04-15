@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Eye, EyeOff, Globe, MapIcon, MapPin, Phone } from "lucide-react";
+import { Eye, EyeOff, MapPin } from "lucide-react";
 
 import {
   Accordion,
@@ -11,21 +11,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 
-import {
-  FaBookmark,
-  FaEnvelope,
-  FaFacebook,
-  FaGlobe,
-  FaInstagram,
-  FaLink,
-  FaRegBookmark,
-  FaThreads,
-  FaVk,
-} from "react-icons/fa6";
-import { TiArrowRight } from "react-icons/ti";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 import NavTabs from "@/components/ui/nav-tabs";
-// import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import {
   Tooltip,
   TooltipContent,
@@ -33,7 +21,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
-import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
+import EventDates from "@/features/events/components/event-dates";
+import { EventCard } from "@/features/events/components/events-card";
+import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { EventCardProps } from "@/types/event";
@@ -41,22 +31,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
-import slugify from "slugify";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const router = useRouter();
   const { data, artist, className } = props; //note: removed artist from props. Add back when needed
   const { event, organizer } = data;
-  const {
-    logo: eventLogo,
-    eventCategory,
-    eventType,
-    location,
-    dates,
-    // slug,
-  } = event;
-
-  const orgHasOtherEvents = organizer?.events?.length > 1;
+  const { logo: eventLogo, eventCategory, eventType, location, dates } = event;
 
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
@@ -66,21 +46,14 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { eventStart, eventEnd, ongoing, artistStart, artistEnd } = dates;
-
+  const { ongoing, artistStart, artistEnd } = dates;
+  const tabList = [
+    // { id: "application", label: "My Application" },
+    { id: "event", label: getEventCategoryLabel(eventCategory) },
+    { id: "organizer", label: "Organizer" },
+  ];
   const [activeTab, setActiveTab] = useState("event");
-
   const { toggleListAction } = useToggleListAction(event._id);
-
-  const orgSlug = slugify(organizer.name);
-  const latitude = location.coordinates?.latitude ?? 0;
-  const longitude = location.coordinates?.longitude ?? 0;
-
-  // const hasEventDates =
-  //   eventStart &&
-  //   isValidIsoDate(eventStart) &&
-  //   eventEnd &&
-  //   isValidIsoDate(eventEnd);
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
@@ -95,22 +68,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
       ? organizer.location.countryAbbr
       : organizer.location.country
   }`;
-
-  // const icsLink =
-  //   callType === "Fixed" && isValidIsoDate(ocStart) && isValidIsoDate(ocEnd)
-  //     ? generateICSFile(
-  //         event.name,
-  //         ocStart,
-  //         ocEnd,
-  //         locationString,
-  //         event.about ?? "",
-  //         eventCategory,
-  //         true,
-  //         hasEventDates ? dates.eventStart! : "",
-  //         hasEventDates ? dates.eventEnd! : "",
-  //         `${openCallId}`,
-  //       )
-  //     : null;
 
   const onBookmark = () => {
     if (!artist) {
@@ -128,21 +85,16 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     }
   };
 
-  const tabList = [
-    // { id: "application", label: "My Application" },
-    { id: "event", label: getEventCategoryLabel(eventCategory) },
-    { id: "organizer", label: "Organizer" },
-  ];
-
   const onBackClick = () => {
     const previous = sessionStorage.getItem("previousSalPage");
-    //  console.log(previous); //note-to-self: annoying as it doesn't actually save the full pagth. I'm using it as a flag, for now.
     if (previous && previous.startsWith("/")) {
-      router.back();
+      router.push(previous);
     } else {
       router.push("/thelist");
     }
   };
+
+  const isHtml = (str: string) => /<\/?[a-z][\s\S]*>/i.test(str);
 
   return (
     <div
@@ -191,12 +143,12 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 />
               </span>
             </p>
-            <p className="flex flex-col items-start gap-1 text-sm">
+            <div className="flex flex-col items-start gap-1 text-sm">
               <span className="space-x-1 font-semibold">
                 {getEventCategoryLabel(eventCategory)} Dates:
               </span>
-              {formatEventDates(eventStart || "", eventEnd || "", ongoing)}
-            </p>
+              <EventDates event={event} format="desktop" limit={0} />
+            </div>
             {/*//todo: add this part */}
             {eventCategory === "project" ||
               (eventCategory === "event" && artistStart && artistEnd && (
@@ -228,11 +180,16 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 <AccordionItem value="about">
                   <AccordionTrigger title="About:" className="pb-2" />
                   <AccordionContent className="text-sm">
-                    {event.about}
+                    {isHtml(event.about) ? (
+                      <div dangerouslySetInnerHTML={{ __html: event.about }} />
+                    ) : (
+                      <p>{event.about}</p>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             )}
+
             <div className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Organized by:</span>
               <Card
@@ -262,15 +219,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 </div>
               </Card>
             </div>
-
-            {/* NOTE: Make these dynamic and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
-            {/* <div className='flex gap-x-4 mt-3 items-center justify-start'>
-                    <MailIcon size={24} />
-                    <Globe size={24} />
-                    <FaInstagram size={24} />
-                    <FiFacebook size={24} />
-                    <FaVk size={24} />
-                  </div> */}
           </div>
         </div>
       </Card>
@@ -365,425 +313,10 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           setActiveTab={setActiveTab}
         >
           <div id="event">
-            <Accordion
-              type="multiple"
-              defaultValue={["item-1", "item-2", "item-3"]}
-            >
-              {location.coordinates && (
-                <AccordionItem value="item-1">
-                  <AccordionTrigger title="Location:" />
-
-                  <AccordionContent>
-                    <LazyMap
-                      latitude={latitude}
-                      longitude={longitude}
-                      label={event.name}
-                      className="z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"
-                    />
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
-                      className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
-                    >
-                      Get directions
-                      <MapIcon className="size-5 md:size-4" />
-                    </a>
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-
-              <AccordionItem value="item-2">
-                <AccordionTrigger title="About:" />
-
-                <AccordionContent>
-                  <div className="mb-4 flex flex-col space-y-3 pb-3">
-                    <p>{event.about}</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              {event.links && !event.links?.sameAsOrganizer && (
-                <AccordionItem value="item-3">
-                  <AccordionTrigger title="Links:" />
-
-                  <AccordionContent>
-                    <div className="flex flex-col gap-y-2 p-3">
-                      {event.links?.email && (
-                        <a
-                          href={`mailto:${event.links.email}?subject=${event.name}`}
-                        >
-                          <div className="flex items-center gap-x-2">
-                            <FaEnvelope className="size-5" />
-                            <span className="underline-offset-2 hover:underline">
-                              {event.links.email}
-                            </span>
-                          </div>
-                        </a>
-                      )}
-                      {event.links?.website && (
-                        <a href={event.links.website}>
-                          <div className="flex items-center gap-x-2">
-                            <FaGlobe className="size-5" />
-                            <span className="underline-offset-2 hover:underline">
-                              {event.links.website.split("www.").slice(-1)[0]}
-                            </span>
-                          </div>
-                        </a>
-                      )}
-                      {event.links?.linkAggregate && (
-                        <a href={event.links.linkAggregate}>
-                          <div className="flex items-center gap-x-2">
-                            <FaLink className="size-5" />
-                            <span className="underline-offset-2 hover:underline">
-                              {
-                                event.links.linkAggregate
-                                  .split("www.")
-                                  .slice(-1)[0]
-                              }
-                            </span>
-                          </div>
-                        </a>
-                      )}
-
-                      {/* {event.links?.phone && (
-                                 <a href={`tel:${event.links.phone}`}>
-                                   <div className="flex items-center gap-x-2">
-                                     <Phone className="size-5" />
-                 
-                                     <span className="underline-offset-2 hover:underline">
-                                       {event.links.phone}
-                                     </span>
-                                   </div>
-                                 </a>
-                               )} */}
-                      {event.links?.instagram && (
-                        <a href={event.links.instagram}>
-                          <div className="flex items-center gap-x-2">
-                            <FaInstagram className="size-5" />
-
-                            <span className="underline-offset-2 hover:underline">
-                              @
-                              {
-                                event.links.instagram
-                                  .split(".com/")
-                                  .slice(-1)[0]
-                              }
-                            </span>
-                          </div>
-                        </a>
-                      )}
-                      {event.links?.facebook && (
-                        <a href={event.links.facebook}>
-                          <div className="flex items-center gap-x-2">
-                            <FaFacebook className="size-5" />
-
-                            <span className="underline-offset-2 hover:underline">
-                              @
-                              {event.links.facebook.split(".com/").slice(-1)[0]}
-                            </span>
-                          </div>
-                        </a>
-                      )}
-                      {event.links?.threads && (
-                        <a href={event.links.threads}>
-                          <div className="flex items-center gap-x-2">
-                            <FaThreads className="size-5" />
-
-                            <span className="underline-offset-2 hover:underline">
-                              @{event.links.threads.split(".net/").slice(-1)[0]}
-                            </span>
-                          </div>
-                        </a>
-                      )}
-                      {event.links?.vk && (
-                        <a href={event.links.vk}>
-                          <div className="flex items-center gap-x-2">
-                            <FaVk className="size-5" />
-
-                            <span className="underline-offset-2 hover:underline">
-                              @{event.links.vk.split(".com/").slice(-1)[0]}
-                            </span>
-                          </div>
-                        </a>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-              {event.links &&
-                event.links?.sameAsOrganizer &&
-                Object.keys(organizer.links || {}).length > 0 && (
-                  <AccordionItem value="item-3">
-                    <AccordionTrigger title="Links:" />
-
-                    <AccordionContent>
-                      <div className="flex flex-col gap-y-2 p-3">
-                        {organizer.links?.email && (
-                          <a
-                            href={`mailto:${organizer.links.email}?subject=${event.name}`}
-                          >
-                            <div className="flex items-center gap-x-2">
-                              <FaEnvelope className="size-5" />
-                              <span className="underline-offset-2 hover:underline">
-                                {organizer.links.email}
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                        {organizer.links?.website && (
-                          <a href={organizer.links.website}>
-                            <div className="flex items-center gap-x-2">
-                              <FaGlobe className="size-5" />
-                              <span className="underline-offset-2 hover:underline">
-                                {
-                                  organizer.links.website
-                                    .split("www.")
-                                    .slice(-1)[0]
-                                }
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                        {organizer.links?.linkAggregate && (
-                          <a href={organizer.links.linkAggregate}>
-                            <div className="flex items-center gap-x-2">
-                              <FaLink className="size-5" />
-                              <span className="underline-offset-2 hover:underline">
-                                {
-                                  organizer.links.linkAggregate
-                                    .split("www.")
-                                    .slice(-1)[0]
-                                }
-                              </span>
-                            </div>
-                          </a>
-                        )}
-
-                        {organizer.links?.phone && (
-                          <a href={`tel:${organizer.links.phone}`}>
-                            <div className="flex items-center gap-x-2">
-                              <Phone className="size-5" />
-
-                              <span className="underline-offset-2 hover:underline">
-                                {organizer.links.phone}
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                        {organizer.links?.instagram && (
-                          <a href={organizer.links.instagram}>
-                            <div className="flex items-center gap-x-2">
-                              <FaInstagram className="size-5" />
-
-                              <span className="underline-offset-2 hover:underline">
-                                @
-                                {
-                                  organizer.links.instagram
-                                    .split(".com/")
-                                    .slice(-1)[0]
-                                }
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                        {organizer.links?.facebook && (
-                          <a href={organizer.links.facebook}>
-                            <div className="flex items-center gap-x-2">
-                              <FaFacebook className="size-5" />
-
-                              <span className="underline-offset-2 hover:underline">
-                                @
-                                {
-                                  organizer.links.facebook
-                                    .split(".com/")
-                                    .slice(-1)[0]
-                                }
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                        {organizer.links?.threads && (
-                          <a href={organizer.links.threads}>
-                            <div className="flex items-center gap-x-2">
-                              <FaThreads className="size-5" />
-
-                              <span className="underline-offset-2 hover:underline">
-                                @
-                                {
-                                  organizer.links.threads
-                                    .split(".net/")
-                                    .slice(-1)[0]
-                                }
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                        {organizer.links?.vk && (
-                          <a href={organizer.links.vk}>
-                            <div className="flex items-center gap-x-2">
-                              <FaVk className="size-5" />
-
-                              <span className="underline-offset-2 hover:underline">
-                                @
-                                {organizer.links.vk.split(".com/").slice(-1)[0]}
-                              </span>
-                            </div>
-                          </a>
-                        )}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-              {event.otherInfo && (
-                <AccordionItem value="item-4">
-                  <AccordionTrigger title="Other info:" />
-                  <AccordionContent>
-                    {event.otherInfo.map((info, index) => (
-                      <p key={index}>{info}</p>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
+            <EventCard event={event} organizer={organizer} format="desktop" />
           </div>
           <div id="organizer">
-            <Card className="grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-xl border-2 border-dotted border-foreground/20 bg-white/30 p-5">
-              <div className="w-full space-y-5 divide-y-2 divide-dotted divide-foreground/20">
-                <div className="grid w-full grid-cols-[60px_minmax(0,1fr)] items-center">
-                  <Image
-                    src={organizer.logo}
-                    alt="Event Logo"
-                    width={50}
-                    height={50}
-                    className={cn("size-[50px] rounded-full border-2")}
-                  />
-                  <div className="col-span-1">
-                    <p className="line-clamp-2 text-sm font-bold">
-                      {organizer.name}
-                    </p>
-                    <p className="text-sm">{orgLocationString}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-y-2 pt-4">
-                  <section className="flex flex-col gap-y-2">
-                    <span>
-                      <p className="text-sm font-semibold">Organizer:</p>
-                      <p className="line-clamp-4 text-sm">
-                        {organizer.contact.organizer}
-                      </p>
-                    </span>
-                    <span>
-                      <p className="text-sm font-semibold">Main Contact:</p>
-                      <div className="flex items-center gap-x-2">
-                        {organizer.contact.primaryContact.email ? (
-                          <FaEnvelope />
-                        ) : organizer.contact.primaryContact.phone ? (
-                          <Phone />
-                        ) : (
-                          <Globe />
-                        )}
-
-                        <a
-                          href={
-                            organizer.contact.primaryContact.email
-                              ? `mailto:${organizer.contact.primaryContact.email}`
-                              : organizer.contact.primaryContact.href
-                                ? organizer.contact.primaryContact.href
-                                : `tel:${organizer.contact.primaryContact.phone}`
-                          }
-                          className="line-clamp-4 text-sm underline-offset-2 hover:underline"
-                        >
-                          {organizer.contact.primaryContact.phone
-                            ? organizer.contact.primaryContact.phone
-                            : organizer.contact.primaryContact.href
-                              ? organizer.contact.primaryContact.href
-                              : organizer.contact.primaryContact.email}
-                        </a>
-                      </div>
-                    </span>
-                  </section>
-                  <section>
-                    <p className="text-sm font-semibold">Links:</p>
-                    <div className="flex items-center justify-start gap-x-6 pt-3">
-                      {organizer.links.website && (
-                        <a
-                          href={organizer.links.website}
-                          className="size-6 hover:scale-110"
-                        >
-                          <Globe className="size-6" />
-                        </a>
-                      )}
-                      {organizer.links.email && (
-                        <a
-                          href={`mailto:${organizer.links.email}`}
-                          className="size-6 hover:scale-110"
-                        >
-                          <FaEnvelope className="size-6" />
-                        </a>
-                      )}
-                      {organizer.links.phone && (
-                        <a
-                          href={`tel:${organizer.links.phone}`}
-                          className="size-6 hover:scale-110"
-                        >
-                          <Phone className="size-6" />
-                        </a>
-                      )}
-                      {organizer.links.instagram && (
-                        <a
-                          href={organizer.links.instagram}
-                          className="size-6 hover:scale-110"
-                        >
-                          <FaInstagram className="size-6" />
-                        </a>
-                      )}
-                      {organizer.links.facebook && (
-                        <a
-                          href={organizer.links.facebook}
-                          className="size-6 hover:scale-110"
-                        >
-                          <FaFacebook className="size-6" />
-                        </a>
-                      )}
-                      {organizer.links.threads && (
-                        <a
-                          href={organizer.links.threads}
-                          className="size-6 hover:scale-110"
-                        >
-                          <FaThreads className="size-6" />
-                        </a>
-                      )}
-                      {organizer.links.vk && (
-                        <a
-                          href={organizer.links.vk}
-                          className="size-6 hover:scale-110"
-                        >
-                          <FaVk className="size-6" />
-                        </a>
-                      )}
-                    </div>
-                  </section>
-                </div>
-              </div>
-              <section className="flex flex-col justify-between pl-10">
-                <span>
-                  <p className="text-sm font-semibold">
-                    About the Organization:
-                  </p>
-                  <p className="line-clamp-4 text-sm">{organizer.about}</p>
-                </span>
-                {orgHasOtherEvents && (
-                  <a
-                    className="mt-6 line-clamp-4 flex items-center justify-center gap-1 text-sm underline-offset-2 hover:underline"
-                    href={`/organizer/${orgSlug}`}
-                  >
-                    Check out other events by this organizer
-                    <TiArrowRight className="inline-block size-6" />
-                    {/* Check out {organizer.name}&apos;s other events */}
-                  </a>
-                )}
-              </section>
-            </Card>
+            <OrganizerCard organizer={organizer} format="desktop" />
           </div>
           <div id="application">
             <p>Application content</p>

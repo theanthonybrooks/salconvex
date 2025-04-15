@@ -32,6 +32,7 @@ export interface EventData {
   eventCategory: EventCategory;
   dates: {
     edition: number;
+    eventDates: { start: string; end: string }[];
     eventStart?: string;
     eventEnd?: string;
     artistStart?: string;

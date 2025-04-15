@@ -8,9 +8,10 @@ export const formatEventDates = (
   mode: "desktop" | "mobile" = "desktop",
   preview?: boolean,
 ) => {
-  // console.log("ongoing", ongoing, start, end)
   const isMobile = mode === "mobile";
+  if (ongoing) console.log("ongoing");
   if (ongoing) return "Ongoing";
+  if (ongoing) console.log("ongoingafter");
 
   const seasonalTerms = ["spring", "summer", "fall", "winter"];
 
@@ -41,6 +42,51 @@ export const formatEventDates = (
     return startYear === endYear
       ? `${startSeason} - ${endSeason} ${startYear}`
       : `${start} - ${end}`;
+  }
+
+  // Checking for non-full date strings (month and year/year only)
+  const isYearOnly = (str: string) => /^\d{4}$/.test(str);
+  const isYearAndMonth = (str: string) => /^\d{4}-(0[1-9]|1[0-2])$/.test(str);
+
+  if (isYearOnly(start) && isYearOnly(end)) {
+    return start === end ? start : `${start}-${end}`;
+  }
+
+  if (isYearAndMonth(start) && isYearAndMonth(end)) {
+    const startDate = new Date(start + "-01");
+    const endDate = new Date(end + "-01");
+
+    const fullStartMonth = isMobile
+      ? getFourCharMonth(startDate)
+      : startDate.toLocaleString("en-US", { month: "long" });
+    const startMonth = isMobile
+      ? startDate.toLocaleString("en-US", { month: "short" })
+      : getFourCharMonth(startDate);
+    const endMonth = isMobile
+      ? endDate.toLocaleString("en-US", { month: "short" })
+      : getFourCharMonth(endDate);
+
+    const startYear = startDate.getFullYear();
+    const endYear = endDate.getFullYear();
+
+    if (start === end) return `${fullStartMonth} ${startYear}`;
+
+    return startYear === endYear
+      ? `${startMonth} - ${endMonth} ${startYear}`
+      : `${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+  }
+
+  if (isYearOnly(start)) return start;
+  if (!isYearOnly(start) && isYearOnly(end)) return `By ${end}`;
+  if (isYearAndMonth(start)) {
+    const date = new Date(start + "-01");
+    const month = date.toLocaleString("en-US", { month: "long" });
+    return `${month} ${date.getFullYear()}`;
+  }
+  if (!isYearAndMonth(start) && isYearAndMonth(end)) {
+    const date = new Date(end + "-01");
+    const month = date.toLocaleString("en-US", { month: "long" });
+    return `By ${month} ${date.getFullYear()}`;
   }
 
   const startDate = new Date(start);
@@ -100,6 +146,8 @@ export const formatEventDates = (
     }
   } else if (startMonthFull !== endMonthFull) {
     return `${startMonthShort} ${startDay} - ${endMonthShort} ${endDay} (${startYear})`;
+  } else if (start === end) {
+    return `${getFourCharMonth(startDate)} ${startDay} (${startYear})`;
   } else {
     return `${startMonthShort} ${startDay}-${endDay} (${startYear})`;
   }
@@ -109,6 +157,7 @@ export const formatOcDates = (start: string, end: string) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
+  //TODO: Format this with the four-string length months and ensure that isMobile is also used here.
   const startMonth = startDate.toLocaleString("en-US", { month: "short" });
   const endMonth = endDate.toLocaleString("en-US", { month: "short" });
 

@@ -133,7 +133,7 @@ const organizationSchema = {
   about: v.optional(v.string()),
   contact: v.optional(
     v.object({
-      organizer: v.string(),
+      organizer: v.optional(v.string()),
       primaryContact: v.object({
         email: v.optional(v.string()),
         phone: v.optional(v.string()),
@@ -181,6 +181,12 @@ const eventSchema = {
   eventCategory: v.string(),
   dates: v.object({
     edition: v.number(), //todo: make required
+    eventDates: v.array(
+      v.object({
+        start: v.string(),
+        end: v.string(),
+      }),
+    ), //todo: make it possible to list multiple sets of dates (for events that take place over multiple weeks/months, but not continuously)
     eventStart: v.optional(v.string()),
     eventEnd: v.optional(v.string()),
     artistStart: v.optional(v.string()),
@@ -189,6 +195,7 @@ const eventSchema = {
   }),
   location: v.object({
     sameAsOrganizer: v.optional(v.boolean()),
+    full: v.optional(v.string()),
     locale: v.optional(v.string()),
     city: v.optional(v.string()),
     state: v.optional(v.string()),
@@ -203,6 +210,8 @@ const eventSchema = {
         longitude: v.number(),
       }),
     ),
+    timezone: v.optional(v.string()),
+    timezoneOffset: v.optional(v.number()),
   }),
   about: v.optional(v.string()),
   links: v.optional(
@@ -275,6 +284,7 @@ const openCallSchema = {
       unit: v.string(),
       currency: v.string(),
       allInclusive: v.boolean(),
+      moreInfo: v.optional(v.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
     }),
     categories: v.object({
       designFee: v.optional(v.string()),
@@ -408,7 +418,6 @@ export default defineSchema({
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_mainOrgName", ["mainOrgName"])
-    .index("by_startDate", ["dates.eventStart"])
     .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])
 
