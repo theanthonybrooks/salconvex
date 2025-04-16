@@ -21,6 +21,7 @@ import { TbStairs } from "react-icons/tb";
 import { OpenCall } from "@/types/openCall";
 
 import { Card } from "@/components/ui/card";
+import { Link } from "@/components/ui/custom-link";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
@@ -80,6 +81,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
     more: reqsMore,
     destination: reqsDestination,
     documents: reqsDocs,
+    links: reqsLinks,
   } = requirements;
 
   const catLength = Object.keys(categories).length;
@@ -475,23 +477,42 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-4">
-              <AccordionTrigger title="Documents:" />
-              <AccordionContent>
-                <ol className="list-outside list-decimal px-4 pl-6">
-                  {reqsDocs?.map((document, index) => (
-                    <li key={index} className="py-2">
-                      <div className="flex items-center gap-x-2">
-                        {document.title}
-                        <a href={document.href} download={document.title}>
-                          <Download className="size-5 hover:scale-110" />
-                        </a>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </AccordionContent>
-            </AccordionItem>
+            {reqsDocs && reqsDocs.length > 0 && (
+              <AccordionItem value="item-4">
+                <AccordionTrigger title="Documents:" />
+                <AccordionContent>
+                  <ol className="list-outside list-decimal px-4 pl-6">
+                    {reqsDocs?.map((document, index) => (
+                      <li key={index} className="py-2">
+                        <div className="flex items-center gap-x-2">
+                          {document.title}
+                          <a href={document.href} download={document.title}>
+                            <Download className="size-5 hover:scale-110" />
+                          </a>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+            {reqsLinks && reqsLinks.length > 0 && (
+              <AccordionItem value="item-5">
+                <AccordionTrigger title="Links:" />
+                <AccordionContent>
+                  <ol className="list-outside list-decimal px-4 pl-6">
+                    {reqsLinks?.map((link, index) => (
+                      <li key={index} className="py-2">
+                        <Link href={link.href} target="_blank">
+                          {link.href.split("https://").pop()}
+                        </Link>
+                      </li>
+                    ))}
+                  </ol>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
             {openCall?.requirements?.otherInfo && (
               <AccordionItem value="item-5">
                 <AccordionTrigger title="Other info:" />
@@ -819,13 +840,17 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
                   </div>
                 </div>
-                <div className="col-span-full">
-                  <div className="flex flex-col items-start gap-1">
-                    <span className="font-semibold underline underline-offset-2">
-                      More Info:
-                    </span>
+                {budget?.moreInfo && (
+                  <div className="col-span-full">
+                    <div className="flex flex-col items-start gap-1">
+                      <span className="font-semibold underline underline-offset-2">
+                        More Info:
+                      </span>
+                      {/* TODO: Ensure that this is formatted properly; will require markdown or something like quill as an input for users to format their text properly (though this section should probably be its own internal accordion or expandable item as it could get quite long). Or character limit */}
+                      <p>{budget.moreInfo}</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -866,26 +891,48 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem
-            value="item-4"
-            className="rounded-lg border-2 bg-white/30 px-4"
-          >
-            <AccordionTrigger title="Documents:" />
-            <AccordionContent>
-              <ol className="list-outside list-decimal px-4 pl-6">
-                {reqsDocs?.map((document, index) => (
-                  <li key={index} className="py-2">
-                    <div className="flex items-center gap-x-2">
-                      {document.title}
-                      <a href={document.href} download={document.title}>
-                        <Download className="size-5 hover:scale-110" />
-                      </a>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </AccordionContent>
-          </AccordionItem>
+          {reqsDocs && reqsDocs.length > 0 && (
+            <AccordionItem
+              value="item-4"
+              className="rounded-lg border-2 bg-white/30 px-4"
+            >
+              <AccordionTrigger title="Documents:" />
+              <AccordionContent>
+                <ol className="list-outside list-decimal px-4 pl-6">
+                  {reqsDocs?.map((document, index) => (
+                    <li key={index} className="py-2">
+                      <div className="flex items-center gap-x-2">
+                        {document.title}
+                        <a href={document.href} download={document.title}>
+                          <Download className="size-5 hover:scale-110" />
+                        </a>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+          {reqsLinks && reqsLinks.length > 0 && (
+            <AccordionItem
+              value="item-5"
+              className="rounded-lg border-2 bg-white/30 px-4"
+            >
+              <AccordionTrigger title="Links:" />
+              <AccordionContent>
+                <ol className="list-outside list-decimal px-4 pl-6">
+                  {reqsLinks?.map((link, index) => (
+                    <li key={index} className="py-2">
+                      <Link href={link.href} target="_blank">
+                        {/* {link.title} */}
+                        {link.href.split("https://").pop()}
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </AccordionContent>
+            </AccordionItem>
+          )}
           {openCall?.requirements?.otherInfo && (
             <AccordionItem value="item-5">
               <AccordionTrigger title="Other info:" />

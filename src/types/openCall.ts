@@ -66,6 +66,7 @@ export interface OpenCall {
       unit: RateUnit;
       currency: string;
       allInclusive: boolean;
+      moreInfo?: string;
     };
     categories: {
       designFee?: string;

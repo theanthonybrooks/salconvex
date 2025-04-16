@@ -53,10 +53,12 @@ export const OrganizerCard = ({ organizer, format }: OrganizerCardProps) => {
             </div>
           </div>
           <div className="w-full space-y-5">
-            <section>
-              <p className="text-sm font-semibold">About the Organization:</p>
-              <p className="line-clamp-4 text-sm">{organizer.about}</p>
-            </section>
+            {organizer.about && (
+              <section>
+                <p className="text-sm font-semibold">About the Organization:</p>
+                <p className="line-clamp-4 text-sm">{organizer.about}</p>
+              </section>
+            )}
             <section className="flex flex-col gap-y-2">
               {organizer.contact?.organizer && (
                 <span>
@@ -308,10 +310,12 @@ export const OrganizerCard = ({ organizer, format }: OrganizerCardProps) => {
             </div>
           </div>
           <section className="flex flex-col justify-between pl-10">
-            <span>
-              <p className="text-sm font-semibold">About the Organization:</p>
-              <p className="line-clamp-4 text-sm">{organizer.about}</p>
-            </span>
+            {organizer.about && (
+              <span>
+                <p className="text-sm font-semibold">About the Organization:</p>
+                <p className="line-clamp-4 text-sm">{organizer.about}</p>
+              </span>
+            )}
             {orgHasOtherEvents && (
               <a
                 className="mt-6 line-clamp-4 flex items-center justify-center gap-1 text-sm underline-offset-2 hover:underline"

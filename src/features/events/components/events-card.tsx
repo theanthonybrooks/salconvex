@@ -90,7 +90,7 @@ export const EventCard = ({ event, organizer, format }: EventCardProps) => {
             )}
             {event.links && <LinkList event={event} organizer={organizer} />}
 
-            {event.otherInfo && (
+            {event.otherInfo && event.otherInfo.length > 0 && (
               <AccordionItem value="item-4">
                 <AccordionTrigger title="Other info:" />
                 <AccordionContent>
@@ -147,7 +147,7 @@ export const EventCard = ({ event, organizer, format }: EventCardProps) => {
 
           <LinkList event={event} organizer={organizer} />
 
-          {event.otherInfo && (
+          {event.otherInfo && event.otherInfo.length > 0 && (
             <AccordionItem value="item-4">
               <AccordionTrigger title="Other info:" />
               <AccordionContent>
