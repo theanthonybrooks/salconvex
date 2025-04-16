@@ -863,3 +863,22 @@ button:active {
   visibility: visible !important;
   opacity: 1 !important;
 } */
+.react-activity-calendar rect {
+  stroke: #b8a247 !important;
+  stroke-width: 1 !important;
+  &[data-level="0"] {
+    fill: var(--background-hex) !important;
+  }
+  &[data-level="1"] {
+    fill: #fbb2fb !important;
+  }
+  &[data-level="2"] {
+    fill: #ff7bff !important;
+  }
+  &[data-level="3"] {
+    fill: #e151e1 !important;
+  }
+  &[data-level="4"] {
+    fill: #a917a9 !important;
+  }
+}

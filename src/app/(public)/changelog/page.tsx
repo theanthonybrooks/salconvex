@@ -8,12 +8,18 @@ import { useQuery } from "convex-helpers/react/cache";
 // import { useQuery } from "convex/react"
 import { motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
+import GitHubCalendar from "react-github-calendar";
 import { api } from "~/convex/_generated/api";
 
 export default function Changelog() {
   const changelogTasks = useQuery(
     api.kanban.display.getCompletedTasksChangelog,
   );
+
+  const explicitTheme = {
+    light: ["#ffe770", " #fbb2fb", "#ff7bff", "#e151e1", "#a917a9"],
+    dark: ["#e4f0d1", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
+  };
 
   return (
     <div>
@@ -40,6 +46,13 @@ export default function Changelog() {
           </div>
         </section>
       </div>
+      <GitHubCalendar
+        username="theanthonybrooks"
+        theme={explicitTheme}
+        colorScheme="light"
+        year={2025}
+        style={{ margin: "0 auto", maxWidth: "90vw" }}
+      />
 
       {changelogTasks && (
         <AccordionComponent

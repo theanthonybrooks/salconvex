@@ -35,7 +35,6 @@ export const checkEventNameExists = query({
   args: { name: v.string() },
   handler: async (ctx, args) => {
     const inputName = args.name.trim().toLowerCase();
-    console.log("args", inputName);
 
     const existingEvent = await filter(
       ctx.db.query("events"),
@@ -48,7 +47,6 @@ export const checkEventNameExists = query({
 
     if (existingEvent)
       throw new ConvexError("An event with that name already exists.");
-    console.log("existing", existingEvent);
     return true;
   },
 });
@@ -99,7 +97,6 @@ export const getEventWithDetails = query({
     edition: v.number(),
   },
   handler: async (ctx, args) => {
-    console.log(args);
     const events = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
@@ -168,8 +165,6 @@ export const getEventWithAppDetails = query({
         .filter((q) => q.eq(q.field("artistId"), userId))
         .first();
     }
-
-    console.log("application", application);
 
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
 
