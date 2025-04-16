@@ -326,7 +326,8 @@ const Column: React.FC<
           </span>
 
           {/* Fade at bottom of header */}
-          <div className="pointer-events-none absolute -bottom-6 left-0 z-[9] h-4 w-full bg-gradient-to-b from-background to-transparent" />
+          {/* <div className="pointer-events-none absolute -bottom-6 left-0 z-[9] h-4 w-full bg-gradient-to-b from-background to-transparent" /> */}
+          {/* Mask fade at bottom of header */}
         </div>
       </div>
 
@@ -337,6 +338,7 @@ const Column: React.FC<
           active
             ? "bg-[hsl(295,100%,71%)]/30"
             : "bg-[hsl(60, 100%, 99.6078431372549%)]/0",
+          "mask-fade-top-bottom",
         )}
       >
         {cards.map((c) => (

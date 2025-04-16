@@ -173,6 +173,7 @@ export default {
         "15": "60px",
         "25": "100px",
       },
+
       keyframes: {
         "background-shine": {
           from: {
@@ -291,6 +292,37 @@ export default {
         ".wshadow": {
           "text-shadow": "black -5px 5px",
         },
+        ".mask-fade-bottom": {
+          "-webkit-mask-image":
+            "linear-gradient(to top, transparent 0%, black 2%)",
+          "mask-image": "linear-gradient(to top, transparent 0%, black 2%)",
+          "-webkit-mask-repeat": "no-repeat",
+          "mask-repeat": "no-repeat",
+          "-webkit-mask-size": "100% 100%",
+          "mask-size": "100% 100%",
+        },
+
+        ".mask-fade-top": {
+          "-webkit-mask-image":
+            "linear-gradient(to bottom, transparent 0%, black 2%)",
+          "mask-image": "linear-gradient(to bottom, transparent 0%, black 2%)",
+          "-webkit-mask-repeat": "no-repeat",
+          "mask-repeat": "no-repeat",
+          "-webkit-mask-size": "100% 100%",
+          "mask-size": "100% 100%",
+        },
+
+        ".mask-fade-top-bottom": {
+          "-webkit-mask-image":
+            "linear-gradient(to bottom, transparent 0%, black 2%, black 98%, transparent 100%)",
+          "mask-image":
+            "linear-gradient(to bottom, transparent 0%, black 2%, black 98%, transparent 100%)",
+          "-webkit-mask-repeat": "no-repeat",
+          "mask-repeat": "no-repeat",
+          "-webkit-mask-size": "100% 100%",
+          "mask-size": "100% 100%",
+        },
+
         // ".hover\\:wshadow:hover": {
         //   "text-shadow": "black -7px 7px", // Optional: Increase shadow on hover
         // },
