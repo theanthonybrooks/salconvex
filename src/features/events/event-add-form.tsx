@@ -18,6 +18,7 @@ import {
 
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import {
@@ -28,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { columns } from "@/features/artists/applications/data-table/columns";
 import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventNameSearch } from "@/features/events/components/event-search";
@@ -486,6 +488,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           },
           event: {
             ...existingEvent,
+            links: {
+              ...existingEvent.links,
+              sameAsOrganizer: true,
+            },
             category: existingEvent.eventCategory,
             type: existingEvent.eventType ?? [],
             location: locationFromEvent,
@@ -499,6 +505,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           event: {
             name: "",
             logo: orgLogoFullUrl,
+            links: {
+              sameAsOrganizer: true,
+            },
             location:
               orgResult?.location ?? currentValues.organization.location,
           },
@@ -799,7 +808,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           >
             <section
               id="first-section"
-              className="flex flex-col items-center gap-y-6 lg:mx-auto lg:justify-center xl:max-w-[80%]"
+              className="lg:justify-cente flex flex-col items-center gap-y-6 self-start lg:mx-auto"
             >
               <section className="flex flex-col items-center justify-center">
                 <div
@@ -835,8 +844,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
               </section>
               <div
                 className={cn(
-                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-6 lg:gap-x-4",
-                  "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:mx-auto lg:grid lg:max-w-[500px] lg:gap-6 lg:gap-x-4",
+                  "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
                 )}
               >
                 <div className="input-section">
@@ -1093,242 +1102,519 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
             id="step-1-container"
             className={cn(
               "flex h-full flex-col gap-4 lg:justify-center",
-              "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
+              "xl:grid xl:grid-cols-[45%_10%_45%] xl:gap-0",
             )}
           >
-            <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
-              <div
-                className={cn(
-                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-6 lg:gap-x-4",
-                  "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-                )}
-              >
-                <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
-                  <p className="lg:text-xs">Category</p>
-                </div>
+            <div
+              className={cn(
+                "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+              )}
+            >
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
+                <p className="lg:text-xs">Category</p>
+              </div>
 
-                <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                  <Label htmlFor="event.type" className="sr-only">
-                    Event Category
-                  </Label>
-                  <Controller
-                    name="event.category"
-                    control={control}
-                    render={({ field }) => {
-                      return (
-                        <Select
-                          onValueChange={(value: EventCategory) => {
+              <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                <Label htmlFor="event.category" className="sr-only">
+                  Event Category
+                </Label>
+                <Controller
+                  name="event.category"
+                  control={control}
+                  render={({ field }) => {
+                    return (
+                      <Select
+                        onValueChange={(value: EventCategory) => {
+                          field.onChange(value);
+                        }}
+                        defaultValue={field.value ?? ""}
+                      >
+                        <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                          <SelectValue placeholder="Event/Project Category (select one)" />
+                        </SelectTrigger>
+                        <SelectContent className="min-w-auto">
+                          <SelectItem fit value="event">
+                            Event
+                          </SelectItem>
+                          <SelectItem fit value="project">
+                            Project
+                          </SelectItem>
+                          <SelectItem fit value="residency">
+                            Residency
+                          </SelectItem>
+                          <SelectItem fit value="gfund">
+                            Grant/Fund
+                          </SelectItem>
+                          <SelectItem fit value="roster">
+                            Artist Roster
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    );
+                  }}
+                />
+                {errors.event?.category && eventData?.category && (
+                  <span className="mt-2 w-full text-center text-sm text-red-600">
+                    {errors.event?.category?.message
+                      ? errors.event?.category?.message
+                      : "Please select a category from the dropdown"}
+                  </span>
+                )}
+              </div>
+
+              {eventCategoryEvent && (
+                <>
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
+                    <p className="lg:text-xs">Event Type</p>
+                  </div>
+
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <Label htmlFor="event.type" className="sr-only">
+                      Event Type
+                    </Label>
+                    <Controller
+                      name="event.type"
+                      control={control}
+                      render={({ field }) => (
+                        <MultiSelect
+                          id="event.type"
+                          className="h-12 border sm:h-[50px]"
+                          badgeClassName="py-2 lg:py-2 lg:text-sm "
+                          options={options}
+                          onValueChange={(value) => {
                             field.onChange(value);
                           }}
-                          defaultValue={field.value ?? ""}
-                        >
-                          <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                            <SelectValue placeholder="Event/Project Category (select one)" />
-                          </SelectTrigger>
-                          <SelectContent className="min-w-auto">
-                            <SelectItem fit value="event">
-                              Event
-                            </SelectItem>
-                            <SelectItem fit value="project">
-                              Project
-                            </SelectItem>
-                            <SelectItem fit value="residency">
-                              Residency
-                            </SelectItem>
-                            <SelectItem fit value="gfund">
-                              Grant/Fund
-                            </SelectItem>
-                            <SelectItem fit value="roster">
-                              Artist Roster
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      );
-                    }}
-                  />
-                  {errors.organization?.location && orgData?.location && (
-                    <span className="mt-2 w-full text-center text-sm text-red-600">
-                      {errors.organization?.location?.country?.message
-                        ? errors.organization?.location?.country?.message
-                        : errors.organization?.location?.full?.message
-                          ? errors.organization?.location?.full?.message
-                          : "Please select a location from the dropdown"}
-                    </span>
-                  )}
-                </div>
+                          defaultValue={field.value ?? []}
+                          shortResults={isMobile}
+                          placeholder="Select up to 2 event types"
+                          variant="basic"
+                          maxCount={1}
+                          limit={2}
+                          height={10}
+                          shiftOffset={-10}
+                          hasSearch={false}
+                          selectAll={false}
+                          tabIndex={4}
+                        />
+                      )}
+                    />
+                    {errors.organization?.location && orgData?.location && (
+                      <span className="mt-2 w-full text-center text-sm text-red-600">
+                        {errors.organization?.location?.country?.message
+                          ? errors.organization?.location?.country?.message
+                          : errors.organization?.location?.full?.message
+                            ? errors.organization?.location?.full?.message
+                            : "Please select a location from the dropdown"}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+              {canNameEvent && (
+                <>
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {eventCategoryEvent ? 3 : 2}:{" "}
+                    </p>
+                    <p className="lg:text-xs">
+                      {getEventCategoryLabelAbbr(eventCategory)} Name
+                    </p>
+                  </div>
 
-                {eventCategoryEvent && (
-                  <>
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
-                      <p className="lg:text-xs">Event Type</p>
-                    </div>
-
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                      <Label htmlFor="event.type" className="sr-only">
-                        Event Type
-                      </Label>
-                      <Controller
-                        name="event.type"
-                        control={control}
-                        render={({ field }) => (
-                          <MultiSelect
-                            id="event.type"
-                            className="h-12 border sm:h-[50px]"
-                            options={options}
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                            }}
-                            defaultValue={field.value ?? []}
-                            shortResults={isMobile}
-                            placeholder="Select up to 2 event types"
-                            variant="basic"
-                            maxCount={1}
-                            limit={2}
-                            height={10}
-                            shiftOffset={-10}
-                            hasSearch={false}
-                            selectAll={false}
-                            tabIndex={4}
-                          />
-                        )}
-                      />
-                      {errors.organization?.location && orgData?.location && (
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <Label htmlFor="event.name" className="sr-only">
+                      {getEventCategoryLabelAbbr(eventCategory)} Name
+                    </Label>
+                    <Controller
+                      name="event.name"
+                      control={control}
+                      render={({ field }) => (
+                        <EventNameSearch
+                          value={field.value ?? ""}
+                          isExisting={eventNameExistsError}
+                          onChange={field.onChange}
+                          className="border sm:h-[50px]"
+                        />
+                      )}
+                    />
+                    {(errors.event?.name || eventNameExistsError) &&
+                      eventNameIsDirty && (
                         <span className="mt-2 w-full text-center text-sm text-red-600">
-                          {errors.organization?.location?.country?.message
-                            ? errors.organization?.location?.country?.message
-                            : errors.organization?.location?.full?.message
-                              ? errors.organization?.location?.full?.message
-                              : "Please select a location from the dropdown"}
+                          {errors.event?.name?.message
+                            ? errors.event?.name?.message
+                            : eventCategory === "event"
+                              ? "An event with that name already exists."
+                              : `A ${getEventCategoryLabelAbbr(eventCategory)} with this name already exists.`}
                         </span>
                       )}
-                    </div>
-                  </>
-                )}
-                {canNameEvent && (
-                  <>
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">
-                        Step {eventCategoryEvent ? 3 : 2}:{" "}
-                      </p>
-                      <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(eventCategory)} Name
-                      </p>
-                    </div>
+                  </div>
+                  {eventNameValid && (
+                    <>
+                      <div className="input-section">
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step {eventCategoryEvent ? 4 : 3}:{" "}
+                        </p>
+                        <p className="lg:text-xs">Location</p>
+                      </div>
 
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                      <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabelAbbr(eventCategory)} Name
-                      </Label>
-                      <Controller
-                        name="event.name"
-                        control={control}
-                        render={({ field }) => (
-                          <EventNameSearch
-                            value={field.value ?? ""}
-                            isExisting={eventNameExistsError}
-                            onChange={field.onChange}
-                            className="border sm:h-[50px]"
-                          />
-                        )}
-                      />
-                      {(errors.event?.name || eventNameExistsError) &&
-                        eventNameIsDirty && (
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                        <Label htmlFor="event.name" className="sr-only">
+                          {getEventCategoryLabelAbbr(eventCategory)} Location
+                        </Label>
+
+                        {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
+                        <Controller
+                          name="event.location"
+                          control={control}
+                          render={({ field }) => (
+                            <MapboxInputFull
+                              id="event.location"
+                              isEvent
+                              value={field.value}
+                              onChange={field.onChange}
+                              reset={!validOrgWZod}
+                              tabIndex={2}
+                              placeholder="Event Location (if different from organization)..."
+                              className="mb-3 w-full lg:mb-0"
+                              inputClassName="rounded-lg border-foreground disabled:opacity-50"
+                            />
+                          )}
+                        />
+                        {errors.event?.location && eventData?.location && (
                           <span className="mt-2 w-full text-center text-sm text-red-600">
-                            {errors.event?.name?.message
-                              ? errors.event?.name?.message
-                              : eventCategory === "event"
-                                ? "An event with that name already exists."
-                                : `A ${getEventCategoryLabelAbbr(eventCategory)} with this name already exists.`}
+                            {errors.event?.location?.country?.message
+                              ? errors.event?.location?.country?.message
+                              : errors.event?.location?.full?.message
+                                ? errors.event?.location?.full?.message
+                                : "Please select a location from the dropdown"}
                           </span>
                         )}
-                    </div>
-                    {eventNameValid && (
-                      <>
-                        <div className="input-section">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {eventCategoryEvent ? 4 : 3}:{" "}
-                          </p>
-                          <p className="lg:text-xs">Location</p>
-                        </div>
+                      </div>
+                      <div className="input-section">
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step {eventCategoryEvent ? 5 : 4}:{" "}
+                        </p>
+                        <p className="lg:text-xs">
+                          {getEventCategoryLabelAbbr(eventCategory)} Logo
+                        </p>
+                      </div>
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                        <Label htmlFor="organization.logo" className="sr-only">
+                          Event/Project Logo
+                        </Label>
+                        <Controller
+                          name="event.logo"
+                          control={control}
+                          render={({ field }) => (
+                            <AvatarUploader
+                              id="event.logo"
+                              onChange={(file) => field.onChange(file)}
+                              onRemove={() => field.onChange(undefined)}
+                              reset={!validOrgWZod}
+                              disabled={!orgNameValid}
+                              initialImage={
+                                typeof field.value === "string"
+                                  ? field.value
+                                  : undefined
+                              }
+                              size={72}
+                              tabIndex={3}
+                            />
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+            {canNameEvent && (
+              <>
+                <Separator thickness={2} className="my-4 xl:hidden" />
 
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                          <Label htmlFor="event.name" className="sr-only">
-                            {getEventCategoryLabelAbbr(eventCategory)} Location
-                          </Label>
+                <Separator
+                  thickness={2}
+                  className="mx-auto hidden xl:block"
+                  orientation="vertical"
+                />
+                <div
+                  className={cn(
+                    "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                    "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                  )}
+                >
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {eventCategoryEvent ? 6 : 5}:{" "}
+                    </p>
+                    <p className="lg:text-xs">
+                      {getEventCategoryLabelAbbr(eventCategory)} Dates
+                    </p>
+                  </div>
 
-                          {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
-                          <Controller
-                            name="event.location"
-                            control={control}
-                            render={({ field }) => (
-                              <MapboxInputFull
-                                id="event.location"
-                                isEvent
-                                value={field.value}
-                                onChange={field.onChange}
-                                reset={!validOrgWZod}
-                                tabIndex={2}
-                                placeholder="Event Location (if different from organization)..."
-                                className="mb-3 w-full lg:mb-0"
-                                inputClassName="rounded-lg border-foreground disabled:opacity-50"
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <Label
+                      htmlFor="event.dates.eventFormat"
+                      className="sr-only"
+                    >
+                      Event Dates Format
+                    </Label>
+                    <Controller
+                      name="event.dates.eventFormat"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <Select
+                            onValueChange={(value: EventCategory) => {
+                              field.onChange(value);
+                            }}
+                            defaultValue={field.value ?? ""}
+                          >
+                            <SelectTrigger className="h-12 w-full border text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
+                              <SelectValue
+                                placeholder="*If there's an event (select one)"
+                                className="placeholder:text-muted-foreground/70"
                               />
-                            )}
-                          />
-                          {errors.organization?.location &&
-                            orgData?.location && (
+                            </SelectTrigger>
+                            <SelectContent className="min-w-auto">
+                              <SelectItem fit value="noEvent">
+                                No Event
+                              </SelectItem>
+                              <SelectItem fit value="setDates">
+                                Set Dates (MM DD YYYY)
+                              </SelectItem>
+                              <SelectItem fit value="monthRange">
+                                Month Range
+                              </SelectItem>
+                              <SelectItem fit value="yearRange">
+                                Year Range
+                              </SelectItem>
+                              <SelectItem fit value="seasonRange">
+                                Season Range
+                              </SelectItem>
+                              <SelectItem fit value="ongoing">
+                                Ongoing
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        );
+                      }}
+                    />
+                    {errors.event?.location &&
+                      eventData?.dates?.eventFormat && (
+                        <span className="mt-2 w-full text-center text-sm text-red-600">
+                          {errors.event?.dates?.eventFormat?.message
+                            ? errors.event?.dates?.eventFormat?.message
+                            : "Please select a date format from the dropdown"}
+                        </span>
+                      )}
+                    {eventData?.dates?.eventFormat &&
+                      eventData.dates.eventFormat !== "ongoing" &&
+                      eventData.dates.eventFormat !== "noEvent" && (
+                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                          <Label
+                            htmlFor="event.dates.eventDates"
+                            className="sr-only"
+                          >
+                            Event Dates Format
+                          </Label>
+                          <div className="flex items-center gap-x-2">
+                            <Controller
+                              name="event.dates.eventDates.0.start"
+                              control={control}
+                              render={({ field }) => {
+                                return (
+                                  <Input
+                                    type="date"
+                                    value={field.value ?? ""}
+                                    onChange={field.onChange}
+                                    placeholder="MM DD YYYY"
+                                    className="h-12 border-foreground text-center"
+                                  />
+                                );
+                              }}
+                            />
+                            -
+                            <Controller
+                              name="event.dates.eventDates.0.end"
+                              control={control}
+                              render={({ field }) => {
+                                return (
+                                  <Input
+                                    type="date"
+                                    value={field.value ?? ""}
+                                    onChange={field.onChange}
+                                    placeholder="MM DD YYYY"
+                                    className="h-12 border-foreground text-center"
+                                  />
+                                );
+                              }}
+                            />
+                          </div>
+                          {errors.event?.location &&
+                            eventData?.dates?.eventFormat && (
                               <span className="mt-2 w-full text-center text-sm text-red-600">
-                                {errors.event?.location?.country?.message
-                                  ? errors.event?.location?.country?.message
-                                  : errors.event?.location?.full?.message
-                                    ? errors.event?.location?.full?.message
-                                    : "Please select a location from the dropdown"}
+                                {errors.event?.dates?.eventFormat?.message
+                                  ? errors.event?.dates?.eventFormat?.message
+                                  : "Please select a date format from the dropdown"}
                               </span>
                             )}
                         </div>
-                        <div className="input-section">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {eventCategoryEvent ? 5 : 4}:{" "}
-                          </p>
-                          <p className="lg:text-xs">
-                            {getEventCategoryLabelAbbr(eventCategory)} Logo
-                          </p>
-                        </div>
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                          <Label
-                            htmlFor="organization.logo"
-                            className="sr-only"
+                      )}
+                  </div>
+
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {eventCategoryEvent ? 7 : 6}:{" "}
+                    </p>
+                    <p className="lg:text-xs">Production Dates</p>
+                  </div>
+
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <Label htmlFor="event.dates.prodFormat" className="sr-only">
+                      Production Dates Format
+                    </Label>
+                    <Controller
+                      name="event.dates.prodFormat"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <Select
+                            onValueChange={(value: EventCategory) => {
+                              field.onChange(value);
+                            }}
+                            defaultValue={field.value ?? ""}
                           >
-                            Event/Project Logo
-                          </Label>
-                          <Controller
-                            name="event.logo"
-                            control={control}
-                            render={({ field }) => (
-                              <AvatarUploader
-                                id="event.logo"
-                                onChange={(file) => field.onChange(file)}
-                                onRemove={() => field.onChange(undefined)}
-                                reset={!validOrgWZod}
-                                disabled={!orgNameValid}
-                                initialImage={
-                                  typeof field.value === "string"
-                                    ? field.value
-                                    : undefined
-                                }
-                                size={72}
-                                tabIndex={3}
+                            <SelectTrigger className="h-12 w-full border text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
+                              <SelectValue
+                                placeholder="Select artist dates format"
+                                className="placeholder:text-muted-foreground/70"
                               />
-                            )}
+                            </SelectTrigger>
+                            <SelectContent className="min-w-auto">
+                              <SelectItem fit value="setDates">
+                                Set Dates (MM DD YYYY)
+                              </SelectItem>
+                              <SelectItem fit value="monthRange">
+                                Month Range
+                              </SelectItem>
+                              <SelectItem fit value="yearRange">
+                                Year Range
+                              </SelectItem>
+                              <SelectItem fit value="seasonRange">
+                                Season Range
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        );
+                      }}
+                    />
+                    {errors.event?.dates?.prodFormat &&
+                      eventData?.dates?.prodFormat && (
+                        <span className="mt-2 w-full text-center text-sm text-red-600">
+                          {errors.event?.dates?.prodFormat?.message
+                            ? errors.event?.dates?.prodFormat?.message
+                            : "Please select a date format from the dropdown"}
+                        </span>
+                      )}
+                    {eventData?.dates?.prodFormat && (
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                        <Label
+                          htmlFor="event.dates.artistStart"
+                          className="sr-only"
+                        >
+                          Artist Dates
+                        </Label>
+                        <div className="flex items-center gap-x-2">
+                          <Controller
+                            name="event.dates.artistStart"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <Input
+                                  type="date"
+                                  value={field.value ?? ""}
+                                  onChange={field.onChange}
+                                  placeholder="MM DD YYYY"
+                                  className="h-12 border-foreground text-center"
+                                />
+                              );
+                            }}
+                          />
+                          -
+                          <Controller
+                            name="event.dates.artistEnd"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <Input
+                                  type="date"
+                                  value={field.value ?? ""}
+                                  onChange={field.onChange}
+                                  placeholder="MM DD YYYY"
+                                  className="h-12 border-foreground text-center"
+                                />
+                              );
+                            }}
                           />
                         </div>
-                      </>
+                        {errors.event?.location &&
+                          eventData?.dates?.eventFormat && (
+                            <span className="mt-2 w-full text-center text-sm text-red-600">
+                              {errors.event?.dates?.eventFormat?.message
+                                ? errors.event?.dates?.eventFormat?.message
+                                : "Please select a date format from the dropdown"}
+                            </span>
+                          )}
+                      </div>
                     )}
-                  </>
-                )}
-              </div>
-            </section>
+                  </div>
+
+                  {canNameEvent && (
+                    <>
+                      <div className="input-section">
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step {eventCategoryEvent ? 8 : 7}:{" "}
+                        </p>
+                        <p className="lg:text-xs">
+                          {getEventCategoryLabelAbbr(eventCategory)} (About)
+                        </p>
+                      </div>
+
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                        <Label htmlFor="event.name" className="sr-only">
+                          {getEventCategoryLabelAbbr(eventCategory)} Name
+                        </Label>
+                        <Controller
+                          name="event.about"
+                          control={control}
+                          render={({ field }) => (
+                            <Textarea
+                              value={field.value ?? ""}
+                              onChange={field.onChange}
+                              className="border border-foreground sm:h-25"
+                            />
+                          )}
+                        />
+                        {(errors.event?.name || eventNameExistsError) &&
+                          eventNameIsDirty && (
+                            <span className="mt-2 w-full text-center text-sm text-red-600">
+                              {errors.event?.name?.message
+                                ? errors.event?.name?.message
+                                : eventCategory === "event"
+                                  ? "An event with that name already exists."
+                                  : `A ${getEventCategoryLabelAbbr(eventCategory)} with this name already exists.`}
+                            </span>
+                          )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
         {activeStep === 2 && (

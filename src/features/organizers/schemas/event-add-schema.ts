@@ -124,6 +124,8 @@ const eventSchema = z
     }),
 
     dates: z.object({
+      eventFormat: z.string().min(1, "Date format is required"),
+      prodFormat: z.string().min(1, "Date format is required"),
       edition: z.number(),
       eventDates: z.array(
         z.object({

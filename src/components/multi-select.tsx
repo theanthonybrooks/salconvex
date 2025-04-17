@@ -127,6 +127,7 @@ interface MultiSelectProps
    * Optional, can be used to add custom styles.
    */
   className?: string;
+  badgeClassName?: string;
   height?: number;
   shortResults?: boolean;
   value?: string[];
@@ -163,6 +164,7 @@ export const MultiSelect = React.forwardRef<
       tabIndex,
       // asChild = false,
       className,
+      badgeClassName,
       ...props
     },
     ref,
@@ -277,6 +279,7 @@ export const MultiSelect = React.forwardRef<
                             "m-0 first:ml-0",
                             isAnimating ? "animate-bounce" : "",
                             multiSelectVariants({ variant }),
+                            badgeClassName,
                           )}
                           style={{
                             animationDuration: `${animation}s`,
@@ -304,6 +307,7 @@ export const MultiSelect = React.forwardRef<
                       className={cn(
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/40",
                         isAnimating ? "animate-bounce" : "",
+                        badgeClassName,
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
@@ -324,6 +328,7 @@ export const MultiSelect = React.forwardRef<
                       className={cn(
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/50",
                         isAnimating ? "animate-bounce" : "",
+                        badgeClassName,
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
