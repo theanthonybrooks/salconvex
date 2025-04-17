@@ -188,7 +188,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     existingOrg ? { orgId: existingOrg?._id } : "skip",
   );
   const eventsData = data ?? [];
-  const orgHasNoEvents = eventsData?.length === 0 && existingOrg;
+  console.log(eventsData?.length, data);
+  const orgHasNoEvents = eventsData?.length === 0 && !!existingOrg;
+
+  console.log(orgHasNoEvents);
 
   const eventChoiceMade = existingEvent || newOrgEvent || !existingOrg;
 
@@ -252,8 +255,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // );
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
-
+  console.log(validOrgWZod, isStepValidZod);
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
+  console.log(eventChoiceMade, newOrgEvent, orgHasNoEvents);
   const existingOrgUpdateTrigger =
     existingOrgs && validOrgWZod && hasuserEditedStep0;
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
@@ -283,7 +287,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // console.log(formIsValid);
   // console.log("isValidOrg", isValidOrg);
   // console.log("isStepValid", isStepValid);
-  // console.log("isValid", isValid);
+  console.log("isValid", isValid);
   // console.log(orgNameValid, orgLocationValid);
   console.log(orgData);
   // console.log(newOrgEvent);
@@ -688,7 +692,11 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       } else if (existingOrg?._creationTime) {
         setLastSaved(existingOrg._creationTime);
       }
-      setNewOrgEvent(false);
+      if (existingOrg?.events?.length === 0) {
+        setNewOrgEvent(true);
+      } else {
+        setNewOrgEvent(false);
+      }
       reset({
         organization: {
           ...existingOrg,
@@ -723,6 +731,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       setNewOrgEvent(true);
     }
   }, [orgHasNoEvents, activeStep]);
+
+  useEffect(() => {
+    console.log("newOrgEvent changed", newOrgEvent);
+  }, [newOrgEvent]);
 
   useEffect(() => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
@@ -1112,7 +1124,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                           defaultValue={field.value ?? ""}
                         >
                           <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                            <SelectValue placeholder="Event/Project Category" />
+                            <SelectValue placeholder="Event/Project Category (select one)" />
                           </SelectTrigger>
                           <SelectContent className="min-w-auto">
                             <SelectItem fit value="event">
