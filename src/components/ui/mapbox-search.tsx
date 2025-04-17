@@ -208,6 +208,7 @@ export interface FullLocation {
   coordinates?: { latitude: number; longitude: number };
   currency?: { code: string; name: string; symbol: string };
   demonym?: string;
+  sameAsOrganizer?: boolean;
 }
 
 interface MapboxInputFullProps {
@@ -220,6 +221,7 @@ interface MapboxInputFullProps {
   tabIndex?: number;
   reset?: boolean;
   disabled?: boolean;
+  isEvent?: boolean;
 }
 
 export const MapboxInputFull = ({
@@ -233,6 +235,7 @@ export const MapboxInputFull = ({
   inputClassName,
   tabIndex,
   disabled,
+  isEvent,
 }: MapboxInputFullProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState(value?.full ?? "");
@@ -348,8 +351,26 @@ export const MapboxInputFull = ({
       currency,
       demonym,
     };
+    const locationDataEvent: FullLocation = {
+      full: s.place_name,
+      locale,
+      city,
+      state,
+      stateAbbr,
+      region,
+      country,
+      countryAbbr,
+      continent,
+      coordinates: {
+        latitude: s.center[1], // Mapbox: [lng, lat]
+        longitude: s.center[0],
+      },
+      currency,
+      demonym,
+      sameAsOrganizer: isEvent ? false : true,
+    };
 
-    onChange(locationData);
+    onChange(isEvent ? locationDataEvent : locationData);
     setIsFocused(false);
     setInputValue(locationData.full);
     setSuggestions([]);

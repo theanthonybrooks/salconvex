@@ -210,6 +210,14 @@ const eventSchema = {
         longitude: v.number(),
       }),
     ),
+    currency: v.optional(
+      v.object({
+        code: v.string(),
+        name: v.string(),
+        symbol: v.string(),
+      }),
+    ),
+    demonym: v.optional(v.string()),
     timezone: v.optional(v.string()),
     timezoneOffset: v.optional(v.number()),
   }),

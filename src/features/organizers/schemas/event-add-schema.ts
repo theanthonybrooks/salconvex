@@ -40,49 +40,50 @@ import { z } from "zod";
 //     )
 //     .nullable(),
 // })
-const locationSchema = z
-  .object({
-    full: z.string().min(3, "Location is required"),
-    locale: z.optional(z.string()),
-    city: z.optional(z.string()),
-    state: z.optional(z.string()),
-    stateAbbr: z.optional(z.string()),
-    region: z.optional(z.string()),
-    country: z.string(), // base check moved to superRefine
-    countryAbbr: z.string(),
-    continent: z.optional(z.string()),
-    coordinates: z.optional(
-      z.object({
-        latitude: z.number(),
-        longitude: z.number(),
-      }),
-    ),
-    currency: z.optional(
-      z.object({
-        code: z.string(),
-        name: z.string(),
-        symbol: z.string(),
-      }),
-    ),
-    demonym: z.optional(z.string()),
-  })
-  .superRefine((data, ctx) => {
-    if ((data.city || data.state) && !data.country) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Country is required - please select from the dropdown",
-        path: ["country"],
-      });
-    } else if (!data.country || data.country.trim().length < 3) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please select from the dropdown",
-        path: ["country"],
-      });
-    }
-  });
+const locationBase = z.object({
+  full: z.string().min(3, "Location is required"),
+  locale: z.optional(z.string()),
+  city: z.optional(z.string()),
+  state: z.optional(z.string()),
+  stateAbbr: z.optional(z.string()),
+  region: z.optional(z.string()),
+  country: z.string(), // base check moved to superRefine
+  countryAbbr: z.string(),
+  continent: z.optional(z.string()),
+  coordinates: z.optional(
+    z.object({
+      latitude: z.number(),
+      longitude: z.number(),
+    }),
+  ),
+  currency: z.optional(
+    z.object({
+      code: z.string(),
+      name: z.string(),
+      symbol: z.string(),
+    }),
+  ),
+  demonym: z.optional(z.string()),
+});
+
+const locationSchema = locationBase.superRefine((data, ctx) => {
+  if ((data.city || data.state) && !data.country) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Country is required - please select from the dropdown",
+      path: ["country"],
+    });
+  } else if (!data.country || data.country.trim().length < 3) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Please select from the dropdown",
+      path: ["country"],
+    });
+  }
+});
 
 const organizationSchema = z.object({
+  _id: z.optional(z.string()),
   name: z
     .string()
     .min(3, "Name must be at least 3 characters")
@@ -99,6 +100,7 @@ const organizationSchema = z.object({
 
 const eventSchema = z
   .object({
+    _id: z.optional(z.string()),
     name: z
       .string()
       .min(3, "Name must be at least 3 characters")
@@ -111,31 +113,43 @@ const eventSchema = z
         .min(1, "Event type is required")
         .max(2, "You can select up to 2 event types"),
     ),
-    location: z.object({
+    logo: z.union([
+      z
+        .instanceof(Blob)
+        .refine((b) => b.size > 0, { message: "Logo is required" }),
+      z.string().min(1, "Logo is required"),
+    ]),
+    location: locationBase.extend({
       sameAsOrganizer: z.boolean(),
-      locale: z.string().optional(),
-      city: z.string().optional(),
-      state: z.string().optional(),
-      stateAbbr: z.string().optional(),
-      region: z.string().optional(),
-      country: z.string().optional(),
-      countryAbbr: z.string().optional(),
-      continent: z.string().optional(),
-      coordinates: z.optional(
-        z.object({
-          latitude: z.number(),
-          longitude: z.number(),
-        }),
-      ),
-      currency: z.optional(
-        z.object({
-          code: z.string(),
-          name: z.string(),
-          symbol: z.string(),
-        }),
-      ),
-      demonym: z.optional(z.string()),
     }),
+
+    dates: z.object({
+      edition: z.number(),
+      eventDates: z.array(
+        z.object({
+          start: z.string(),
+          end: z.string(),
+        }),
+      ),
+      artistStart: z.string().optional(),
+      artistEnd: z.string().optional(),
+      ongoing: z.boolean(),
+    }),
+    links: z.object({
+      sameAsOrganizer: z.boolean(),
+      website: z.string().optional(),
+      instagram: z.string().optional(),
+      facebook: z.string().optional(),
+      threads: z.string().optional(),
+      email: z.string().optional(),
+      vk: z.string().optional(),
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      linkAggregate: z.string().optional(),
+    }),
+    otherInfo: z.array(z.string()).optional(),
+    about: z.string().optional(),
+    active: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.category === "event" && (!data.type || data.type.length === 0)) {
@@ -143,14 +157,6 @@ const eventSchema = z
         code: z.ZodIssueCode.custom,
         message: "Event type is required when category is 'event'",
         path: ["type"],
-      });
-    }
-    if (data.location.sameAsOrganizer === false) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Location is required when 'same as organizer' is not selected",
-        path: ["location.country"],
       });
     }
   });

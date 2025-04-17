@@ -33,9 +33,10 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   defaultVisibility?: VisibilityState;
-  onRowSelect?: (row: TData | null) => void;
+  onRowSelect?: (row: TData | null, selection: Record<string, boolean>) => void;
   className?: string;
   containerClassName?: string;
+  selectedRow?: Record<string, boolean>;
 }
 
 export function DataTable<TData, TValue>({
@@ -45,15 +46,15 @@ export function DataTable<TData, TValue>({
   defaultVisibility,
   className,
   containerClassName,
+  selectedRow,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(defaultVisibility ?? {});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-
   const table = useReactTable({
     data,
     columns,
@@ -77,7 +78,7 @@ export function DataTable<TData, TValue>({
       const selectedRow =
         selectedKey !== undefined ? data[Number(selectedKey)] : null;
 
-      onRowSelect?.(selectedRow);
+      onRowSelect?.(selectedRow, newSelection);
     },
 
     onSortingChange: setSorting,

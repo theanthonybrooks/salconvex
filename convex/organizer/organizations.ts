@@ -127,8 +127,8 @@ export const createNewOrg = mutation({
           },
         });
       }
-
-      return { orgId: org._id };
+      const updatedOrg = await ctx.db.get(org._id);
+      return { orgId: org._id, org: updatedOrg };
     }
 
     const orgId = await ctx.db.insert("organizations", {
@@ -143,7 +143,8 @@ export const createNewOrg = mutation({
       lastUpdatedBy: userId,
     });
 
-    return { orgId };
+    const newOrg = await ctx.db.get(orgId);
+    return { orgId, org: newOrg };
   },
 });
 

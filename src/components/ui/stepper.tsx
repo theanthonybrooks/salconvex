@@ -9,6 +9,7 @@ import { z } from "zod";
 interface StepperProps {
   activeStep: number;
   onNextStep?: () => void;
+  onBackStep?: () => void;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 
   // setActiveStep: React.Dispatch<React.SetStateAction<number>>;
@@ -37,6 +38,7 @@ interface StepperProps {
 export default function HorizontalLinearStepper({
   activeStep,
   onNextStep,
+  onBackStep,
   setActiveStep,
   skipped,
   setSkipped,
@@ -220,7 +222,8 @@ export default function HorizontalLinearStepper({
                 <Button
                   variant="salWithShadowHiddenYlw"
                   disabled={activeStep === 0}
-                  onClick={handleBack}
+                  // onClick={handleBack}
+                  onClick={onBackStep ?? handleBack}
                 >
                   Back
                 </Button>
@@ -249,6 +252,8 @@ export default function HorizontalLinearStepper({
                   ) : (
                     "Finish"
                   )
+                ) : activeStep === 0 ? (
+                  "Continue"
                 ) : (
                   "Next"
                 )}

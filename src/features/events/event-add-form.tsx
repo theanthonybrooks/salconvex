@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import {
+  eventOnlySchema,
   eventWithOCSchema,
   step1Schema,
 } from "@/features/organizers/schemas/event-add-schema";
@@ -30,7 +31,7 @@ import { Separator } from "@/components/ui/separator";
 import { columns } from "@/features/artists/applications/data-table/columns";
 import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventNameSearch } from "@/features/events/components/event-search";
-import { getEventCategoryLabel } from "@/lib/eventFns";
+import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,6 +40,7 @@ import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Path, useWatch } from "react-hook-form";
+import slugify from "slugify";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
@@ -52,8 +54,8 @@ const steps = [
   },
   {
     id: 2,
-    label: "Create New Event",
-    schema: eventWithOCSchema,
+    label: "Event, Project, Fund, etc",
+    schema: eventOnlySchema,
   },
   {
     id: 3,
@@ -118,30 +120,24 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     handleSubmit: handleSubmit,
     formState: {
       // isValid,
-      //   dirtyFields,
+      dirtyFields,
       isDirty,
       errors,
     },
     reset,
   } = form;
-
-  //   const selectedOrg = useWatch({
-  //     control,
-  //     name: "organization",
-  //   })
-  // const orgValue = watch("organization");
-
-  // const orgName =
-  //   typeof orgValue === "string" ? orgValue : (orgValue?.name ?? "");
+  const currentValues = getValues();
+  console.log(dirtyFields.event);
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
+  const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
   const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const [isMobile, setIsMobile] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  // const [createOrgError, setCreateOrgError] = useState("");
-  // const [isValidOrg, setIsValidOrg] = useState<string>("");
+  const [furthestStep, setFurthestStep] = useState(0);
+
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
     null,
   );
@@ -149,6 +145,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const [existingEvent, setExistingEvent] = useState<Doc<"events"> | null>(
     null,
   );
+  const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
+  console.log("selected row", selectedRow);
   const [lastSaved, setLastSaved] = useState(
     existingOrg ? existingOrg.updatedAt : null,
   );
@@ -177,6 +175,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const orgName = orgData?.name ?? "";
   const eventData = watch("event");
   const eventName = eventData?.name ?? "";
+  const clearEventDataTrigger =
+    newOrgEvent && activeStep === 0 && furthestStep > 0 && eventData;
 
   const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
   const orgLocationValid =
@@ -194,12 +194,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   const eventCategory = eventData?.category as EventCategory;
   const eventCategoryEvent = eventCategory === "event";
-  const eventCategoryProject = eventCategory === "project";
+
   const eventTypeEvent =
-    eventData?.type && eventData?.type?.length > 0 && eventCategoryEvent;
+    ((eventData?.type && eventData?.type?.length > 0) ||
+      (existingEvent && existingEvent?.eventType?.length > 0)) &&
+    eventCategoryEvent;
 
   const canNameEvent =
-    (eventCategoryEvent && eventTypeEvent) || eventCategoryProject;
+    (eventCategoryEvent && eventTypeEvent) ||
+    (eventCategory && !eventCategoryEvent);
 
   // Then use it like:
   const {
@@ -222,8 +225,21 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     // error,
   } = useQueryWithStatus(
     api.events.event.checkEventNameExists,
-    eventName.trim().length >= 3 ? { name: eventName } : "skip",
+    eventName.trim().length >= 3
+      ? { name: eventName, organizationId: existingOrg?._id }
+      : "skip",
   );
+
+  const hasuserEditedStep0 =
+    activeStep === 0 &&
+    (orgData?.name?.trim() !== existingOrg?.name?.trim() ||
+      orgData?.logo !== existingOrg?.logo ||
+      orgData?.location?.full !== existingOrg?.location?.full);
+
+  const hasUserEditedStep1 = dirtyFields.event ?? false;
+
+  console.log(hasuserEditedStep0);
+  console.log("hasUserEditedStep1", hasUserEditedStep1);
 
   // console.log("eventNameData", eventNameData);
 
@@ -238,6 +254,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const invalidOrgWZod = orgValidationError && orgNameValid;
 
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
+  const existingOrgUpdateTrigger =
+    existingOrgs && validOrgWZod && hasuserEditedStep0;
+  const eventNameIsDirty = dirtyFields.event?.name ?? false;
+  console.log("eventNameIsDirty", eventNameIsDirty);
 
   //
 
@@ -257,6 +277,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // );
 
   console.log(errors);
+  // console.log(hasuserEditedStep0);
   //
   //
   // console.log(formIsValid);
@@ -265,16 +286,17 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // console.log("isValid", isValid);
   // console.log(orgNameValid, orgLocationValid);
   console.log(orgData);
-  console.log(newOrgEvent);
-  // console.log(eventData);
-  console.log(eventsData, "now");
+  // console.log(newOrgEvent);
+  console.log(eventData);
+  // console.log(eventsData, "now");
   console.log(existingEvent);
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
   console.log("existingOrg", existingOrg);
   // console.log(existingOrg?.logo);
   // console.log("is valid org", isValidOrg);
-  console.log(isValid, "wZod:", validOrgWZod);
+  //
+  // console.log(isValid, "wZod:", validOrgWZod);
 
   // console.log("last saved", lastSavedDate);
   //
@@ -315,17 +337,18 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       toast.error("Failed to submit form");
     }
   };
-  // TODO: Convert timezone to user timezone on submit to ensure that displayed time is correct.
+  // TODO: Convert timezone on deadline to user timezone on submit to ensure that displayed time is correct.
   // use convertOpenCallDatesToUserTimezone()
   const handleNextStep = async () => {
     const currentStep = steps[activeStep];
     const schema = currentStep.schema;
+    let orgResult = null;
 
     if (schema) {
       const values = getValues();
-      console.log(values);
+      // console.log(values);
       const result = schema.safeParse(values);
-      console.log(result);
+      // console.log(result);
       if (!result.success) {
         result.error.issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
@@ -336,14 +359,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         return;
       }
     }
-    if (activeStep === 0) {
-      //TODO: Run a check to see if anything has changed in the form since last save. If so, prompt to save. If not, skip to step 2.
+    if (hasuserEditedStep0) {
+      console.log("hasuserEditedStep0");
+      let orgLogoUrl: string = "/1.jpg";
       let orgLogoId: Id<"_storage"> | undefined;
-      let logoUrl: string = "/1.jpg";
       let timezone: string | undefined;
       let timezoneOffset: number | undefined;
       const data = watch("organization");
-      console.log("data", data);
       if (data.location?.coordinates) {
         const timezoneData = await getTimezone({
           latitude: data.location.coordinates?.latitude || 52,
@@ -370,15 +392,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         const { storageId } = await uploadRes.json();
         orgLogoId = storageId;
       } else if (data.logo && typeof data.logo === "string") {
-        logoUrl = data.logo;
+        orgLogoUrl = data.logo;
       }
-      console.log("orgLogoId", orgLogoId);
-      console.log("logoUrl", logoUrl);
+
       try {
-        await createNewOrg({
+        const { org } = await createNewOrg({
           organizationName: data.name,
           logoId: orgLogoId,
-          logo: logoUrl,
+          logo: orgLogoUrl,
           location: {
             full: data.location.full,
             locale: data.location.locale,
@@ -403,7 +424,28 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
             timezoneOffset: timezoneOffset,
           },
         });
-        toast.success("Organization created! Going to step 2...");
+        orgResult = org;
+        toast.success(
+          existingOrg
+            ? "Organization updated!"
+            : "Organization created! Going to step 2...",
+        );
+
+        // Updating existingOrg state with new values
+        //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
+        if (existingOrg) {
+          setExistingOrg({
+            ...existingOrg,
+            logo: typeof data.logo === "string" ? data.logo : orgLogoUrl,
+            location: {
+              ...existingOrg.location,
+              ...data.location,
+              continent: data.location?.continent ?? "",
+              timezone,
+              timezoneOffset,
+            },
+          });
+        }
       } catch (error) {
         console.error("Failed to create new organization:", error);
         toast.error("Failed to create new organization");
@@ -414,22 +456,219 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       //   location: data.organization.location,
       // });
       //save logic here
-      console.log("saving...");
       // get timezone
       // use existing event as default values for next step if applicable
       // if past event (or past open call), the event cannot be changed an selecting it will create a new event using the old one as a template.
-    }
 
-    {
-      /* TODO: Add logic to save the event after step 1 and to gather the user's timezone. Plus ensure that it uses that event info to populate the next step (if applicable) */
+      const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
+      console.log(existingEvent);
+
+      if (existingEvent) {
+        console.log("existing event");
+        const locationFromEvent = existingEvent.location?.sameAsOrganizer
+          ? {
+              ...currentValues.organization?.location,
+              sameAsOrganizer: true,
+            }
+          : {
+              ...existingEvent.location,
+            };
+
+        //TODO: run a check on whether the logo has changed since the org data was loaded (if existing) and if so, update the logo to the new one. Also use this for the event logo.
+
+        reset({
+          organization: {
+            ...orgResult,
+          },
+          event: {
+            ...existingEvent,
+            category: existingEvent.eventCategory,
+            type: existingEvent.eventType ?? [],
+            location: locationFromEvent,
+          },
+        });
+      } else {
+        reset({
+          organization: {
+            ...orgResult,
+          },
+          event: {
+            name: "",
+            logo: orgLogoFullUrl,
+            location:
+              orgResult?.location ?? currentValues.organization.location,
+          },
+        });
+      }
+    } else if (activeStep === 0 && !hasuserEditedStep0 && furthestStep === 0) {
+      console.log(
+        "activeStep === 0 && !hasuserEditedStep0 && furthestStep === 0",
+      );
+      if (existingEvent) {
+        const locationFromEvent = existingEvent.location?.sameAsOrganizer
+          ? {
+              ...currentValues.organization?.location,
+              sameAsOrganizer: true,
+            }
+          : {
+              ...existingEvent.location,
+            };
+
+        reset({
+          ...currentValues,
+          event: {
+            ...existingEvent,
+            category: existingEvent.eventCategory,
+            type: existingEvent.eventType ?? [],
+            location: locationFromEvent,
+          },
+        });
+      } else {
+        reset({
+          ...currentValues,
+          event: {
+            name: "",
+            logo: currentValues.organization.logo,
+            location: {
+              ...currentValues.organization.location,
+              sameAsOrganizer: true,
+            },
+          },
+        });
+      }
+    } else if (
+      activeStep === 0 &&
+      existingEvent &&
+      eventData &&
+      eventData?._id !== existingEvent?._id
+    ) {
+      console.log("else if last");
+      reset({
+        ...currentValues,
+        event: {
+          ...existingEvent,
+          category: existingEvent.eventCategory,
+          type: existingEvent.eventType ?? [],
+          location: existingEvent.location,
+        },
+      });
     }
 
     setActiveStep((prev) => prev + 1);
   };
 
+  const handleBackStep = async () => {
+    const currentStep = steps[activeStep];
+    const schema = currentStep.schema;
+
+    if (schema) {
+      const values = getValues();
+      const result = schema.safeParse(values);
+      console.log(values, result);
+      if (!result.success && hasUserEditedStep1) {
+        result.error.issues.forEach((issue) => {
+          const path = issue.path.join(".") as Path<EventOCFormValues>;
+          setError(path, { type: "manual", message: issue.message });
+        });
+
+        toast.error("Please fix errors before continuing.");
+        return;
+      }
+    }
+
+    if (activeStep === 1) {
+      if (hasUserEditedStep1) {
+        let eventLogoUrl: string = "/1.jpg";
+        let eventLogoId: Id<"_storage"> | undefined;
+        let timezone: string | undefined;
+        let timezoneOffset: number | undefined;
+        const data = watch("event");
+        const orgData = watch("organization");
+        if (data.location?.coordinates) {
+          const timezoneData = await getTimezone({
+            latitude: data.location.coordinates?.latitude || 52,
+            longitude: data.location.coordinates?.longitude || 13.4,
+          });
+          timezone = timezoneData?.zoneName;
+          timezoneOffset = timezoneData?.gmtOffset;
+        }
+        if (data.logo && typeof data.logo !== "string") {
+          const uploadUrl = await generateUploadUrl();
+          const uploadRes = await fetch(uploadUrl, {
+            method: "POST",
+            headers: { "Content-Type": data.logo.type },
+            body: data.logo,
+          });
+          if (!uploadRes.ok) {
+            toast.error("Failed to upload logo", {
+              autoClose: 2000,
+              pauseOnHover: false,
+              hideProgressBar: true,
+            });
+            return;
+          }
+          const { storageId } = await uploadRes.json();
+          eventLogoId = storageId;
+        } else if (data.logo && typeof data.logo === "string") {
+          eventLogoUrl = data.logo;
+        }
+
+        try {
+          const { event } = await createOrUpdateEvent({
+            _id: data._id || "",
+            name: data.name,
+            slug: slugify(data.name),
+            logoId: eventLogoId,
+            logo: eventLogoUrl,
+            eventType: data.type || [],
+            eventCategory: data.category,
+            dates: {
+              edition: data.dates.edition,
+              eventDates: data.dates.eventDates,
+              ongoing: data.dates.ongoing,
+            },
+            location: {
+              ...data.location,
+              timezone: timezone,
+              timezoneOffset: timezoneOffset,
+            },
+            about: data.about,
+            links: data.links,
+            otherInfo: data.otherInfo || [],
+            active: data.active,
+            orgId: orgData._id as Id<"organizations">,
+          });
+          console.log("event", event);
+
+          reset({
+            ...currentValues,
+            event: {
+              ...event,
+              category: event?.eventCategory || "",
+              type: event?.eventType || [],
+            },
+          });
+          toast.success(
+            existingOrg
+              ? "Organization updated!"
+              : "Organization created! Going to step 2...",
+          );
+        } catch (error) {
+          console.error("Failed to create new organization:", error);
+          toast.error("Failed to create new organization");
+        }
+      }
+    }
+    setActiveStep((prev) => prev - 1);
+  };
+
   const handleReset = () => {
     setActiveStep(0);
-    console.log("reset");
+    setFurthestStep(0);
+    setSelectedRow({ 0: false });
+    setExistingOrg(null);
+    setExistingEvent(null);
+    setNewOrgEvent(false);
     reset({
       organization: {
         name: undefined,
@@ -443,23 +682,22 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // -------------UseEffects --------------
 
   useEffect(() => {
-    if (existingOrgs && validOrgWZod) {
+    if (existingOrgUpdateTrigger) {
       if (existingOrg?.updatedAt) {
         setLastSaved(existingOrg.updatedAt);
       } else if (existingOrg?._creationTime) {
         setLastSaved(existingOrg._creationTime);
       }
+      setNewOrgEvent(false);
       reset({
         organization: {
-          name: existingOrg.name,
-          logo: existingOrg.logo,
-          location: existingOrg.location,
+          ...existingOrg,
         },
       });
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, validOrgWZod, existingOrgs, reset]);
+  }, [existingOrg, existingOrgUpdateTrigger, reset]);
 
   //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
@@ -486,11 +724,34 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     }
   }, [orgHasNoEvents, activeStep]);
 
+  useEffect(() => {
+    setFurthestStep((prev) => Math.max(prev, activeStep));
+    console.log("furthest step", furthestStep);
+  }, [activeStep, furthestStep]);
+
+  useEffect(() => {
+    if (clearEventDataTrigger) {
+      setFurthestStep(0);
+      reset({
+        ...existingOrg,
+        event: {
+          name: "",
+          logo: existingOrg?.logo || "/1.jpg",
+          location: {
+            ...(existingOrg?.location ?? {}),
+            sameAsOrganizer: true,
+          },
+        },
+      });
+    }
+  }, [clearEventDataTrigger, reset, existingOrg]);
+
   return (
     <HorizontalLinearStepper
       activeStep={activeStep}
       setActiveStep={setActiveStep}
       onNextStep={handleNextStep}
+      onBackStep={handleBackStep}
       steps={steps}
       className="px-2 xl:px-8"
       finalLabel="Submit"
@@ -518,11 +779,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       >
         {activeStep === 0 && (
           <div
-            id="form-container"
+            id="step-1-container"
             className={cn(
               "flex h-full flex-col gap-4 lg:justify-center",
-              existingOrg &&
-                "xl:grid xl:grid-cols-[minmax(0,_1fr)_1em_minmax(0,_1fr)] xl:gap-6",
+              existingOrg && "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
             )}
           >
             <section
@@ -561,8 +821,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   one!
                 </p>
               </section>
-              <div className="flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-6 lg:gap-x-4">
-                <div className="mb-2 flex w-full items-start gap-x-2 lg:mb-0 lg:w-28 lg:flex-col">
+              <div
+                className={cn(
+                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-6 lg:gap-x-4",
+                  "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                )}
+              >
+                <div className="input-section">
                   <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
                   <p className="lg:text-xs">Organization</p>
                 </div>
@@ -600,7 +865,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
                 {orgNameValid && (
                   <>
-                    <div className="mb-2 flex w-full items-start gap-x-2 lg:mb-0 lg:w-28 lg:flex-col">
+                    <div className="input-section">
                       <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
                       <p className="lg:text-xs">Location</p>
                     </div>
@@ -643,7 +908,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
                 {orgLocationValid && (
                   <>
-                    <div className="mb-2 flex w-full items-start gap-x-2 lg:mb-0 lg:w-28 lg:flex-col">
+                    <div className="input-section">
                       <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
                       <p className="lg:text-xs">Logo</p>
                     </div>
@@ -682,7 +947,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 {existingOrg && (
                   <Separator
                     thickness={2}
-                    className="mx-4 hidden xl:block"
+                    className="mx-auto hidden xl:block"
                     orientation="vertical"
                   />
                 )}
@@ -705,12 +970,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       eventCategory: false,
                       lastEditedAt: false,
                     }}
-                    onRowSelect={(event) => {
+                    onRowSelect={(event, selection) => {
                       if (newOrgEvent) {
                         setNewOrgEvent(false);
                       }
                       setExistingEvent(event as Doc<"events">);
+                      setSelectedRow(selection);
                     }}
+                    selectedRow={selectedRow}
                     className="w-full max-w-[300px] overflow-x-auto sm:max-w-[90vw]"
                     containerClassName={cn(
                       "lg:hidden",
@@ -720,12 +987,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   <DataTable
                     columns={columns}
                     data={eventsData}
-                    onRowSelect={(event) => {
+                    onRowSelect={(event, selection) => {
                       if (newOrgEvent) {
                         setNewOrgEvent(false);
                       }
                       setExistingEvent(event as Doc<"events">);
+                      setSelectedRow(selection);
                     }}
+                    selectedRow={selectedRow}
                     className="flex w-full max-w-[90vw] overflow-x-auto"
                     containerClassName={cn(
                       "hidden lg:block xl:hidden  ",
@@ -735,12 +1004,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   <DataTable
                     columns={columns}
                     data={eventsData}
-                    onRowSelect={(event) => {
+                    onRowSelect={(event, selection) => {
                       if (newOrgEvent) {
                         setNewOrgEvent(false);
                       }
                       setExistingEvent(event as Doc<"events">);
+                      setSelectedRow(selection);
                     }}
+                    selectedRow={selectedRow}
                     defaultVisibility={{
                       eventCategory: false,
                       // lastEditedAt: false,
@@ -748,9 +1019,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     className="flex w-full max-w-[90vw] overflow-x-auto"
                     containerClassName={cn(
                       "hidden xl:block ",
-                      newOrgEvent && "opacity-50",
-                      eventsData?.length > 0 &&
-                        "opacity-50 pointer-events-none",
+                      newOrgEvent && "opacity-50 pointer-events-none",
                     )}
                   />
                   {/* 
@@ -766,10 +1035,17 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     Create New Event
                   </Button> */}
 
-                  <label className="flex cursor-pointer items-start gap-2 md:items-center">
+                  <label
+                    className={cn(
+                      "flex cursor-pointer items-start gap-2 md:items-center",
+                      existingEvent !== null &&
+                        "pointer-events-none opacity-50 hover:cursor-default",
+                    )}
+                  >
                     <Checkbox
+                      disabled={existingEvent !== null}
                       tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
-                      id="event.location.sameAsOrganizer"
+                      id="newEvent"
                       className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
                       checked={eventsData?.length === 0 ? true : newOrgEvent}
                       onCheckedChange={(checked) => {
@@ -782,7 +1058,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       }}
                     />
                     {eventsData?.length > 0 ? (
-                      <span className="text-sm">
+                      <span className={cn("text-sm")}>
                         No thanks, I&apos;d like to create a new event/project
                       </span>
                     ) : (
@@ -796,291 +1072,115 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     and able to be used as a template for new events.
                   </p>
                 </section>
-                {/* <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
-                  <div
-                    id="event-header"
-                    className="w-full text-center font-tanker text-2xl lowercase tracking-wide text-foreground underline decoration-4 underline-offset-4"
-                  >
-                    Event/Project
-                  </div>
-                  <section
-                    className={cn(
-                      "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                      orgNameValid ? "opacity-100" : "opacity-0",
-                    )}
-                  >
-                    <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                      <p className="min-w-max font-bold lg:text-xl">Step 4: </p>
-                      <p className="lg:text-xs">Category</p>
-                    </div>
-
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                      <Label htmlFor="event.type" className="sr-only">
-                        Event Category
-                      </Label>
-                      <Controller
-                        name="event.category"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <Select
-                              onValueChange={(value: EventCategory) => {
-                                field.onChange(value);
-                              }}
-                            >
-                              <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                                <SelectValue placeholder="Event/Project Category" />
-                              </SelectTrigger>
-                              <SelectContent className="min-w-auto">
-                                <SelectItem fit value="event">
-                                  Event
-                                </SelectItem>
-                                <SelectItem fit value="project">
-                                  Project
-                                </SelectItem>
-                                <SelectItem fit value="residency">
-                                  Residency
-                                </SelectItem>
-                                <SelectItem fit value="gfund">
-                                  Grant/Fund
-                                </SelectItem>
-                                <SelectItem fit value="roster">
-                                  Artist Roster
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          );
-                        }}
-                      />
-                      {errors.organization?.location && orgData?.location && (
-                        <span className="mt-2 w-full text-center text-sm text-red-600">
-                          {errors.organization?.location?.country?.message
-                            ? errors.organization?.location?.country?.message
-                            : errors.organization?.location?.full?.message
-                              ? errors.organization?.location?.full?.message
-                              : "Please select a location from the dropdown"}
-                        </span>
-                      )}
-                    </div>
-                  </section>
-
-                  {eventCategoryEvent && (
-                    <section
-                      className={cn(
-                        "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                        eventCategoryEvent ? "opacity-100" : "opacity-0",
-                      )}
-                    >
-                      <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="min-w-max font-bold lg:text-xl">
-                          Step 5:{" "}
-                        </p>
-                        <p className="lg:text-xs">Event Type</p>
-                      </div>
-
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                        <Label htmlFor="event.type" className="sr-only">
-                          Event Type
-                        </Label>
-                        <Controller
-                          name="event.type"
-                          control={control}
-                          render={({ field }) => (
-                            <MultiSelect
-                              id="event.type"
-                              className="h-12 border sm:h-[50px]"
-                              options={options}
-                              onValueChange={(value) => {
-                                field.onChange(value);
-                              }}
-                              defaultValue={field.value ?? []}
-                              shortResults={isMobile}
-                              placeholder="Select up to 2 event types"
-                              variant="basic"
-                              maxCount={1}
-                              limit={2}
-                              height={10}
-                              shiftOffset={-10}
-                              hasSearch={false}
-                              selectAll={false}
-                              tabIndex={4}
-                            />
-                          )}
-                        />
-                        {errors.organization?.location && orgData?.location && (
-                          <span className="mt-2 w-full text-center text-sm text-red-600">
-                            {errors.organization?.location?.country?.message
-                              ? errors.organization?.location?.country?.message
-                              : errors.organization?.location?.full?.message
-                                ? errors.organization?.location?.full?.message
-                                : "Please select a location from the dropdown"}
-                          </span>
-                        )}
-                      </div>
-                    </section>
-                  )}
-                  {canNameEvent && (
-                    <section
-                      className={cn(
-                        "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                        canNameEvent ? "opacity-100" : "opacity-0",
-                      )}
-                    >
-                      <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="min-w-max font-bold lg:text-xl">
-                          Step {eventCategoryEvent ? 6 : 5}:{" "}
-                        </p>
-                        <p className="lg:text-xs">
-                          {getEventCategoryLabel(eventCategory)} Name
-                        </p>
-                      </div>
-
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                        <Label htmlFor="event.name" className="sr-only">
-                          {getEventCategoryLabel(eventCategory)} Name
-                        </Label>
-                        <Controller
-                          name="event.name"
-                          control={control}
-                          render={({ field }) => (
-                            <EventNameSearch
-                              value={field.value ?? ""}
-                              isExisting={eventNameExistsError}
-                              onChange={field.onChange}
-                              className="border sm:h-[50px]"
-                            />
-                          )}
-                        />
-                        {(errors.event?.name || eventNameExistsError) && (
-                          <span className="mt-2 w-full text-center text-sm text-red-600">
-                            {errors.event?.name?.message
-                              ? errors.event?.name?.message
-                              : eventCategory === "event"
-                                ? "An event with that name already exists."
-                                : `A ${getEventCategoryLabel(eventCategory)} with this name already exists.`}
-                          </span>
-                        )}
-                      </div>
-                    </section>
-                  )}
-                  {eventNameValid && (
-                    <section
-                      className={cn(
-                        "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                        canNameEvent ? "opacity-100" : "opacity-0",
-                      )}
-                    >
-                      <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="min-w-max font-bold lg:text-xl">
-                          Step {eventCategoryEvent ? 7 : 6}:{" "}
-                        </p>
-                        <p className="lg:text-xs">
-                          {getEventCategoryLabel(eventCategory)} Location
-                        </p>
-                      </div>
-
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                        <Label htmlFor="event.name" className="sr-only">
-                          {getEventCategoryLabel(eventCategory)} Location
-                        </Label>
-                        <Controller
-                          name="event.location.sameAsOrganizer"
-                          control={control}
-                          render={({ field }) => (
-                            <label className="flex cursor-pointer items-center gap-2">
-                              <Checkbox
-                                id="event.location.sameAsOrganizer"
-                                checked={!!field.value}
-                                onCheckedChange={(checked) =>
-                                  field.onChange(Boolean(checked))
-                                }
-                              />
-                              <span className="text-sm">
-                                Use organization&apos;s location for{" "}
-                                {getEventCategoryLabel(
-                                  eventCategory,
-                                ).toLowerCase()}
-                              </span>
-                            </label>
-                          )}
-                        />
-                      </div>
-                    </section>
-                  )}
-                </section> */}
               </>
             )}
           </div>
         )}
         {activeStep === 1 && (
-          <>
-            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Second Step</p>
-            {/* second half of first page */}
-            {orgDataValid && (
-              <>
-                <Separator thickness={2} className="my-4 xl:hidden" />
-                {existingOrg && (
-                  <Separator
-                    thickness={2}
-                    className="mx-4 hidden xl:block"
-                    orientation="vertical"
-                  />
+          <div
+            id="step-1-container"
+            className={cn(
+              "flex h-full flex-col gap-4 lg:justify-center",
+              "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
+            )}
+          >
+            <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
+              <div
+                className={cn(
+                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-6 lg:gap-x-4",
+                  "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
                 )}
-                <section className="flex flex-col items-center justify-center gap-y-6 lg:mx-auto xl:max-w-[80%]">
-                  <div
-                    id="event-header"
-                    className="w-full text-center font-tanker text-2xl lowercase tracking-wide text-foreground underline decoration-4 underline-offset-4"
-                  >
-                    Event/Project
-                  </div>
-                  <section
-                    className={cn(
-                      "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                      orgNameValid ? "opacity-100" : "opacity-0",
-                    )}
-                  >
-                    <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                      <p className="min-w-max font-bold lg:text-xl">Step 4: </p>
-                      <p className="lg:text-xs">Category</p>
+              >
+                <div className="input-section">
+                  <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
+                  <p className="lg:text-xs">Category</p>
+                </div>
+
+                <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <Label htmlFor="event.type" className="sr-only">
+                    Event Category
+                  </Label>
+                  <Controller
+                    name="event.category"
+                    control={control}
+                    render={({ field }) => {
+                      return (
+                        <Select
+                          onValueChange={(value: EventCategory) => {
+                            field.onChange(value);
+                          }}
+                          defaultValue={field.value ?? ""}
+                        >
+                          <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                            <SelectValue placeholder="Event/Project Category" />
+                          </SelectTrigger>
+                          <SelectContent className="min-w-auto">
+                            <SelectItem fit value="event">
+                              Event
+                            </SelectItem>
+                            <SelectItem fit value="project">
+                              Project
+                            </SelectItem>
+                            <SelectItem fit value="residency">
+                              Residency
+                            </SelectItem>
+                            <SelectItem fit value="gfund">
+                              Grant/Fund
+                            </SelectItem>
+                            <SelectItem fit value="roster">
+                              Artist Roster
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      );
+                    }}
+                  />
+                  {errors.organization?.location && orgData?.location && (
+                    <span className="mt-2 w-full text-center text-sm text-red-600">
+                      {errors.organization?.location?.country?.message
+                        ? errors.organization?.location?.country?.message
+                        : errors.organization?.location?.full?.message
+                          ? errors.organization?.location?.full?.message
+                          : "Please select a location from the dropdown"}
+                    </span>
+                  )}
+                </div>
+
+                {eventCategoryEvent && (
+                  <>
+                    <div className="input-section">
+                      <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
+                      <p className="lg:text-xs">Event Type</p>
                     </div>
 
                     <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
                       <Label htmlFor="event.type" className="sr-only">
-                        Event Category
+                        Event Type
                       </Label>
                       <Controller
-                        name="event.category"
+                        name="event.type"
                         control={control}
-                        render={({ field }) => {
-                          return (
-                            <Select
-                              onValueChange={(value: EventCategory) => {
-                                field.onChange(value);
-                              }}
-                            >
-                              <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                                <SelectValue placeholder="Event/Project Category" />
-                              </SelectTrigger>
-                              <SelectContent className="min-w-auto">
-                                <SelectItem fit value="event">
-                                  Event
-                                </SelectItem>
-                                <SelectItem fit value="project">
-                                  Project
-                                </SelectItem>
-                                <SelectItem fit value="residency">
-                                  Residency
-                                </SelectItem>
-                                <SelectItem fit value="gfund">
-                                  Grant/Fund
-                                </SelectItem>
-                                <SelectItem fit value="roster">
-                                  Artist Roster
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          );
-                        }}
+                        render={({ field }) => (
+                          <MultiSelect
+                            id="event.type"
+                            className="h-12 border sm:h-[50px]"
+                            options={options}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                            }}
+                            defaultValue={field.value ?? []}
+                            shortResults={isMobile}
+                            placeholder="Select up to 2 event types"
+                            variant="basic"
+                            maxCount={1}
+                            limit={2}
+                            height={10}
+                            shiftOffset={-10}
+                            hasSearch={false}
+                            selectAll={false}
+                            tabIndex={4}
+                          />
+                        )}
                       />
                       {errors.organization?.location && orgData?.location && (
                         <span className="mt-2 w-full text-center text-sm text-red-600">
@@ -1092,155 +1192,132 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         </span>
                       )}
                     </div>
-                  </section>
+                  </>
+                )}
+                {canNameEvent && (
+                  <>
+                    <div className="input-section">
+                      <p className="min-w-max font-bold lg:text-xl">
+                        Step {eventCategoryEvent ? 3 : 2}:{" "}
+                      </p>
+                      <p className="lg:text-xs">
+                        {getEventCategoryLabelAbbr(eventCategory)} Name
+                      </p>
+                    </div>
 
-                  {eventCategoryEvent && (
-                    <section
-                      className={cn(
-                        "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                        eventCategoryEvent ? "opacity-100" : "opacity-0",
-                      )}
-                    >
-                      <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="min-w-max font-bold lg:text-xl">
-                          Step 5:{" "}
-                        </p>
-                        <p className="lg:text-xs">Event Type</p>
-                      </div>
-
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                        <Label htmlFor="event.type" className="sr-only">
-                          Event Type
-                        </Label>
-                        <Controller
-                          name="event.type"
-                          control={control}
-                          render={({ field }) => (
-                            <MultiSelect
-                              id="event.type"
-                              className="h-12 border sm:h-[50px]"
-                              options={options}
-                              onValueChange={(value) => {
-                                field.onChange(value);
-                              }}
-                              defaultValue={field.value ?? []}
-                              shortResults={isMobile}
-                              placeholder="Select up to 2 event types"
-                              variant="basic"
-                              maxCount={1}
-                              limit={2}
-                              height={10}
-                              shiftOffset={-10}
-                              hasSearch={false}
-                              selectAll={false}
-                              tabIndex={4}
-                            />
-                          )}
-                        />
-                        {errors.organization?.location && orgData?.location && (
-                          <span className="mt-2 w-full text-center text-sm text-red-600">
-                            {errors.organization?.location?.country?.message
-                              ? errors.organization?.location?.country?.message
-                              : errors.organization?.location?.full?.message
-                                ? errors.organization?.location?.full?.message
-                                : "Please select a location from the dropdown"}
-                          </span>
+                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                      <Label htmlFor="event.name" className="sr-only">
+                        {getEventCategoryLabelAbbr(eventCategory)} Name
+                      </Label>
+                      <Controller
+                        name="event.name"
+                        control={control}
+                        render={({ field }) => (
+                          <EventNameSearch
+                            value={field.value ?? ""}
+                            isExisting={eventNameExistsError}
+                            onChange={field.onChange}
+                            className="border sm:h-[50px]"
+                          />
                         )}
-                      </div>
-                    </section>
-                  )}
-                  {canNameEvent && (
-                    <section
-                      className={cn(
-                        "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                        canNameEvent ? "opacity-100" : "opacity-0",
-                      )}
-                    >
-                      <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="min-w-max font-bold lg:text-xl">
-                          Step {eventCategoryEvent ? 6 : 5}:{" "}
-                        </p>
-                        <p className="lg:text-xs">
-                          {getEventCategoryLabel(eventCategory)} Name
-                        </p>
-                      </div>
-
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                        <Label htmlFor="event.name" className="sr-only">
-                          {getEventCategoryLabel(eventCategory)} Name
-                        </Label>
-                        <Controller
-                          name="event.name"
-                          control={control}
-                          render={({ field }) => (
-                            <EventNameSearch
-                              value={field.value ?? ""}
-                              isExisting={eventNameExistsError}
-                              onChange={field.onChange}
-                              className="border sm:h-[50px]"
-                            />
-                          )}
-                        />
-                        {(errors.event?.name || eventNameExistsError) && (
+                      />
+                      {(errors.event?.name || eventNameExistsError) &&
+                        eventNameIsDirty && (
                           <span className="mt-2 w-full text-center text-sm text-red-600">
                             {errors.event?.name?.message
                               ? errors.event?.name?.message
                               : eventCategory === "event"
                                 ? "An event with that name already exists."
-                                : `A ${getEventCategoryLabel(eventCategory)} with this name already exists.`}
+                                : `A ${getEventCategoryLabelAbbr(eventCategory)} with this name already exists.`}
                           </span>
                         )}
-                      </div>
-                    </section>
-                  )}
-                  {eventNameValid && (
-                    <section
-                      className={cn(
-                        "flex w-full flex-col items-center gap-4 transition-opacity lg:flex-row",
-                        canNameEvent ? "opacity-100" : "opacity-0",
-                      )}
-                    >
-                      <div className="flex w-full items-start gap-x-2 lg:w-28 lg:flex-col">
-                        <p className="min-w-max font-bold lg:text-xl">
-                          Step {eventCategoryEvent ? 7 : 6}:{" "}
-                        </p>
-                        <p className="lg:text-xs">
-                          {getEventCategoryLabel(eventCategory)} Location
-                        </p>
-                      </div>
+                    </div>
+                    {eventNameValid && (
+                      <>
+                        <div className="input-section">
+                          <p className="min-w-max font-bold lg:text-xl">
+                            Step {eventCategoryEvent ? 4 : 3}:{" "}
+                          </p>
+                          <p className="lg:text-xs">Location</p>
+                        </div>
 
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
-                        <Label htmlFor="event.name" className="sr-only">
-                          {getEventCategoryLabel(eventCategory)} Location
-                        </Label>
-                        <Controller
-                          name="event.location.sameAsOrganizer"
-                          control={control}
-                          render={({ field }) => (
-                            <label className="flex cursor-pointer items-center gap-2">
-                              <Checkbox
-                                id="event.location.sameAsOrganizer"
-                                checked={!!field.value}
-                                onCheckedChange={(checked) =>
-                                  field.onChange(Boolean(checked))
-                                }
+                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                          <Label htmlFor="event.name" className="sr-only">
+                            {getEventCategoryLabelAbbr(eventCategory)} Location
+                          </Label>
+
+                          {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
+                          <Controller
+                            name="event.location"
+                            control={control}
+                            render={({ field }) => (
+                              <MapboxInputFull
+                                id="event.location"
+                                isEvent
+                                value={field.value}
+                                onChange={field.onChange}
+                                reset={!validOrgWZod}
+                                tabIndex={2}
+                                placeholder="Event Location (if different from organization)..."
+                                className="mb-3 w-full lg:mb-0"
+                                inputClassName="rounded-lg border-foreground disabled:opacity-50"
                               />
-                              <span className="text-sm">
-                                Use organization&apos;s location for{" "}
-                                {getEventCategoryLabel(
-                                  eventCategory,
-                                ).toLowerCase()}
+                            )}
+                          />
+                          {errors.organization?.location &&
+                            orgData?.location && (
+                              <span className="mt-2 w-full text-center text-sm text-red-600">
+                                {errors.event?.location?.country?.message
+                                  ? errors.event?.location?.country?.message
+                                  : errors.event?.location?.full?.message
+                                    ? errors.event?.location?.full?.message
+                                    : "Please select a location from the dropdown"}
                               </span>
-                            </label>
-                          )}
-                        />
-                      </div>
-                    </section>
-                  )}
-                </section>
-              </>
-            )}
-          </>
+                            )}
+                        </div>
+                        <div className="input-section">
+                          <p className="min-w-max font-bold lg:text-xl">
+                            Step {eventCategoryEvent ? 5 : 4}:{" "}
+                          </p>
+                          <p className="lg:text-xs">
+                            {getEventCategoryLabelAbbr(eventCategory)} Logo
+                          </p>
+                        </div>
+                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                          <Label
+                            htmlFor="organization.logo"
+                            className="sr-only"
+                          >
+                            Event/Project Logo
+                          </Label>
+                          <Controller
+                            name="event.logo"
+                            control={control}
+                            render={({ field }) => (
+                              <AvatarUploader
+                                id="event.logo"
+                                onChange={(file) => field.onChange(file)}
+                                onRemove={() => field.onChange(undefined)}
+                                reset={!validOrgWZod}
+                                disabled={!orgNameValid}
+                                initialImage={
+                                  typeof field.value === "string"
+                                    ? field.value
+                                    : undefined
+                                }
+                                size={72}
+                                tabIndex={3}
+                              />
+                            )}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            </section>
+          </div>
         )}
         {activeStep === 2 && (
           <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Third Step </p>
