@@ -197,10 +197,7 @@ export const OrgSearch = ({
   }, [showSuggestions]);
 
   return (
-    <div
-      className="relative mx-auto w-full lg:min-w-[400px] lg:max-w-md"
-      ref={containerRef}
-    >
+    <div className="relative mx-auto w-full lg:max-w-md" ref={containerRef}>
       <section className={cn("relative z-[2] h-12 lg:h-auto", className)}>
         <input
           id={id}
@@ -259,7 +256,7 @@ export const OrgSearch = ({
         {showSuggestions && (
           <ul
             ref={listRef}
-            className="scrollable mini z-1 absolute mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
+            className="scrollable mini absolute z-1 mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
           >
             {results.map((org, idx) => (
               <li

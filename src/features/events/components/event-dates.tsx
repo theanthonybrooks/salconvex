@@ -41,7 +41,7 @@ const EventDates = ({
               preview,
             )}
             {shouldShowPlus && (
-              <p className="text-sm italic text-muted-foreground">
+              <p className="text-sm italic text-foreground">
                 {shouldShowPlus &&
                   `+${mappedDates.length - sliceLimit} more date${mappedDates.length - sliceLimit > 1 ? "s" : ""}`}
               </p>

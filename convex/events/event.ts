@@ -72,17 +72,48 @@ export const getPublishedEvents = query({
   },
 });
 
-export const getEventsBySlug = query({
+export const getEventBySlug = query({
   args: {
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    const events = await ctx.db
+    console.log(args.slug);
+    const event = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .collect();
+      .first();
 
-    return events;
+    console.log(event);
+
+    if (!event) throw new ConvexError("No event found");
+
+    const [organizer] = await Promise.all([
+      // const [openCalls, organizer] = await Promise.all([
+      // ctx.db
+      //   .query("openCalls")
+      //   .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      //   .collect(),
+      ctx.db.get(event.mainOrgId),
+    ]);
+    console.log(organizer);
+
+    // const openCall = openCalls.find(
+    //   (e) => e.basicInfo.dates.edition === args.edition,
+    // );
+
+    return {
+      event: {
+        ...event,
+        state: event.state as SubmissionFormState,
+        eventCategory: event.eventCategory as EventCategory,
+        eventType:
+          Array.isArray(event.eventType) && event.eventType.length <= 2
+            ? (event.eventType as [EventType] | [EventType, EventType])
+            : undefined,
+      },
+      // openCall: openCall as OpenCall,
+      organizer: organizer as Organizer,
+    };
   },
 });
 

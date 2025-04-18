@@ -52,6 +52,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const appStatus = application?.applicationStatus ?? null;
   const hasApplied = appStatus !== null;
 
+  console.log(application?.applicationStatus, application?.manualApplied);
+
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
   ) ?? {

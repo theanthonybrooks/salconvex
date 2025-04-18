@@ -19,7 +19,7 @@ const OpenCallDetail = () => {
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
   const { data, isError } = useQueryWithStatus(
-    api.events.event.getEventWithDetails,
+    api.events.event.getEventWithAppDetails,
     slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
   );
 

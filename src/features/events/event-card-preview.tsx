@@ -83,7 +83,6 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
   } = event;
 
   const { opencall } = tabs;
-  const orgLinkName = slug;
   const compensation = event.hasActiveOpenCall
     ? opencall?.compensation
     : undefined;
@@ -158,9 +157,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
       <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
         <div className="col-span-1 row-span-2 flex flex-col items-center justify-between pb-3 pl-2 pt-3">
           <Link
-            href={
-              !publicView ? `/organization/${orgLinkName}` : "/pricing#plans"
-            }
+            href={!publicView ? `/thelist/event/${slug}` : "/pricing#plans"}
             target="_blank"
             passHref
           >
@@ -445,9 +442,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
         <div className="flex flex-col gap-y-3 pb-3 pl-3 pr-7 pt-5">
           <div className="mb-2 flex flex-col gap-y-1 p-2">
             <Link
-              href={
-                !publicView ? `/organization/${orgLinkName}` : "/pricing#plans"
-              }
+              href={!publicView ? `/thelist/event/${slug}` : "/pricing#plans"}
               target="_blank"
             >
               <div className="mb-2 flex items-center gap-x-3">

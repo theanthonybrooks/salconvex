@@ -5,8 +5,8 @@ import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/e
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
 
 import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useQuery } from "convex-helpers/react/cache";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";

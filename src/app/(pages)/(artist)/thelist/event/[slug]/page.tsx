@@ -10,13 +10,15 @@ import { api } from "~/convex/_generated/api";
 
 const Event = () => {
   const router = useRouter();
-  const { slug, year } = useParams();
+  const { slug } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
   const data = useQuery(
-    api.events.event.getEventWithDetails,
-    slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
+    api.events.event.getEventBySlug,
+    slugValue ? { slug: slugValue } : "skip",
   );
+
+  console.log(data);
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 

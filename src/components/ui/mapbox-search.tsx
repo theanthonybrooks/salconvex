@@ -345,7 +345,7 @@ export const MapboxInputFull = ({
       countryAbbr,
       continent,
       coordinates: {
-        latitude: s.center[1], // Mapbox: [lng, lat]
+        latitude: s.center[1],
         longitude: s.center[0],
       },
       currency,
@@ -362,13 +362,16 @@ export const MapboxInputFull = ({
       countryAbbr,
       continent,
       coordinates: {
-        latitude: s.center[1], // Mapbox: [lng, lat]
+        latitude: s.center[1],
         longitude: s.center[0],
       },
       currency,
       demonym,
       sameAsOrganizer: isEvent ? false : true,
     };
+
+    console.log("locationData", locationData);
+    console.log("locationDataEvent", locationDataEvent);
 
     onChange(isEvent ? locationDataEvent : locationData);
     setIsFocused(false);

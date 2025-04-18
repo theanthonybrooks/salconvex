@@ -9,8 +9,8 @@ import {
 // const isSubOnlyPage = createRouteMatcher(["/dashboard/:path*"])
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
 const isOpenCallPage = createRouteMatcher([
-  "/thelist/event/:slug/call",
-  "/thelist/event/:slug/call/:path*",
+  "/thelist/event/:slug/:year/call",
+  "/thelist/event/:slug/:year/call/:path*",
 ]);
 
 export default convexAuthNextjsMiddleware(

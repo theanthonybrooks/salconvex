@@ -112,7 +112,6 @@ export default function AvatarUploader({
             disabled &&
               "cursor-default text-muted-foreground hover:bg-transparent",
           )}
-          style={{ height: size, width: size }}
           onClick={() => fileInputRef.current?.click()}
           tabIndex={tabIndex}
           onKeyDown={(e) => {

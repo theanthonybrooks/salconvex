@@ -4,7 +4,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -41,6 +41,7 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
+import DatePicker from "react-datepicker";
 import { Path, useWatch } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
@@ -242,6 +243,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       orgData?.location?.full !== existingOrg?.location?.full);
 
   const hasUserEditedStep1 = dirtyFields.event ?? false;
+  const prevOrgRef = useRef(existingOrg);
 
   console.log(hasuserEditedStep0);
   console.log("hasUserEditedStep1", hasUserEditedStep1);
@@ -680,6 +682,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     setFurthestStep(0);
     setSelectedRow({ 0: false });
     setExistingOrg(null);
+    prevOrgRef.current = null;
     setExistingEvent(null);
     setNewOrgEvent(false);
     reset({
@@ -694,23 +697,22 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   // -------------UseEffects --------------
 
+  //checking if/when the existingOrg changes and loading new info
   useEffect(() => {
-    if (existingOrgUpdateTrigger) {
+    const orgChanged = existingOrg?._id !== prevOrgRef.current?._id;
+    if (orgChanged && existingOrgUpdateTrigger) {
       if (existingOrg?.updatedAt) {
         setLastSaved(existingOrg.updatedAt);
       } else if (existingOrg?._creationTime) {
         setLastSaved(existingOrg._creationTime);
-      }
-      if (existingOrg?.events?.length === 0) {
-        setNewOrgEvent(true);
-      } else {
-        setNewOrgEvent(false);
       }
       reset({
         organization: {
           ...existingOrg,
         },
       });
+
+      prevOrgRef.current = existingOrg;
     } else {
       setLastSaved(null);
     }
@@ -742,12 +744,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   }, [orgHasNoEvents, activeStep]);
 
   useEffect(() => {
-    console.log("newOrgEvent changed", newOrgEvent);
-  }, [newOrgEvent]);
-
-  useEffect(() => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
-    console.log("furthest step", furthestStep);
   }, [activeStep, furthestStep]);
 
   useEffect(() => {
@@ -796,19 +793,19 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex h-full min-h-96 grow flex-col p-4"
+        className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px]"
       >
         {activeStep === 0 && (
           <div
             id="step-1-container"
             className={cn(
-              "flex h-full flex-col gap-4 lg:justify-center",
+              "flex h-full flex-col gap-4 xl:justify-center",
               existingOrg && "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
             )}
           >
             <section
               id="first-section"
-              className="lg:justify-cente flex flex-col items-center gap-y-6 self-start lg:mx-auto"
+              className="mx-auto flex flex-col items-center gap-y-6 self-start xl:justify-center xl:self-center"
             >
               <section className="flex flex-col items-center justify-center">
                 <div
@@ -852,7 +849,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                   <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
                   <p className="lg:text-xs">Organization</p>
                 </div>
-                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="organization.name" className="sr-only">
                     Organization Name
                   </Label>
@@ -890,7 +887,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
                       <p className="lg:text-xs">Location</p>
                     </div>
-                    <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label
                         htmlFor="organization.location"
                         className="sr-only"
@@ -933,7 +930,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
                       <p className="lg:text-xs">Logo</p>
                     </div>
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="organization.logo" className="sr-only">
                         Organization Logo
                         {/* <span className="text-xs italic text-muted-foreground">
@@ -999,7 +996,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                       setSelectedRow(selection);
                     }}
                     selectedRow={selectedRow}
-                    className="w-full max-w-[300px] overflow-x-auto sm:max-w-[90vw]"
+                    className="w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
                     containerClassName={cn(
                       "lg:hidden",
                       newOrgEvent && "opacity-50",
@@ -1101,14 +1098,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           <div
             id="step-1-container"
             className={cn(
-              "flex h-full flex-col gap-4 lg:justify-center",
-              "xl:grid xl:grid-cols-[45%_10%_45%] xl:gap-0",
+              "flex h-full flex-col gap-4 xl:justify-center",
+              "mx-auto max-w-max",
+              "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
             )}
           >
             <div
               className={cn(
                 "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-                "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                "self-start xl:self-center [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
               )}
             >
               <div className="input-section">
@@ -1116,7 +1114,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 <p className="lg:text-xs">Category</p>
               </div>
 
-              <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+              <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.category" className="sr-only">
                   Event Category
                 </Label>
@@ -1171,7 +1169,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     <p className="lg:text-xs">Event Type</p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.type" className="sr-only">
                       Event Type
                     </Label>
@@ -1224,7 +1222,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     </p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.name" className="sr-only">
                       {getEventCategoryLabelAbbr(eventCategory)} Name
                     </Label>
@@ -1260,7 +1258,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         <p className="lg:text-xs">Location</p>
                       </div>
 
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                         <Label htmlFor="event.name" className="sr-only">
                           {getEventCategoryLabelAbbr(eventCategory)} Location
                         </Label>
@@ -1301,7 +1299,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                           {getEventCategoryLabelAbbr(eventCategory)} Logo
                         </p>
                       </div>
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                         <Label htmlFor="organization.logo" className="sr-only">
                           Event/Project Logo
                         </Label>
@@ -1333,8 +1331,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
             </div>
             {canNameEvent && (
               <>
-                <Separator thickness={2} className="my-4 xl:hidden" />
-
                 <Separator
                   thickness={2}
                   className="mx-auto hidden xl:block"
@@ -1343,7 +1339,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 <div
                   className={cn(
                     "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-                    "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                    "self-start lg:items-start xl:self-center [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
                   )}
                 >
                   <div className="input-section">
@@ -1355,7 +1351,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     </p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label
                       htmlFor="event.dates.eventFormat"
                       className="sr-only"
@@ -1414,46 +1410,85 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     {eventData?.dates?.eventFormat &&
                       eventData.dates.eventFormat !== "ongoing" &&
                       eventData.dates.eventFormat !== "noEvent" && (
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                           <Label
                             htmlFor="event.dates.eventDates"
                             className="sr-only"
                           >
                             Event Dates Format
                           </Label>
-                          <div className="flex items-center gap-x-2">
-                            <Controller
-                              name="event.dates.eventDates.0.start"
-                              control={control}
-                              render={({ field }) => {
-                                return (
-                                  <Input
-                                    type="date"
-                                    value={field.value ?? ""}
-                                    onChange={field.onChange}
-                                    placeholder="MM DD YYYY"
-                                    className="h-12 border-foreground text-center"
-                                  />
-                                );
-                              }}
-                            />
-                            -
-                            <Controller
-                              name="event.dates.eventDates.0.end"
-                              control={control}
-                              render={({ field }) => {
-                                return (
-                                  <Input
-                                    type="date"
-                                    value={field.value ?? ""}
-                                    onChange={field.onChange}
-                                    placeholder="MM DD YYYY"
-                                    className="h-12 border-foreground text-center"
-                                  />
-                                );
-                              }}
-                            />
-                          </div>
+                          {eventData.dates.eventFormat === "setDates" && (
+                            <div className="flex items-center gap-x-2">
+                              <Controller
+                                name="event.dates.eventDates.0.start"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <Input
+                                      type="date"
+                                      value={field.value ?? ""}
+                                      onChange={field.onChange}
+                                      placeholder="MM DD YYYY"
+                                      className="h-12 border-foreground text-center"
+                                    />
+                                  );
+                                }}
+                              />
+                              -
+                              <Controller
+                                name="event.dates.eventDates.0.end"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <Input
+                                      type="date"
+                                      value={field.value ?? ""}
+                                      onChange={field.onChange}
+                                      placeholder="MM DD YYYY"
+                                      className="h-12 border-foreground text-center"
+                                    />
+                                  );
+                                }}
+                              />
+                            </div>
+                          )}
+                          {eventData.dates.eventFormat === "monthRange" && (
+                            <div className="flex items-center gap-x-2">
+                              <Controller
+                                name="event.dates.eventDates.0.start"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <DatePicker
+                                      selected={field.value ?? null}
+                                      onChange={(value) => console.log(value)}
+                                      dateFormat="MM/yyyy"
+                                      showMonthYearPicker
+                                      className="your-class"
+                                      placeholderText="Select month"
+                                    />
+                                  );
+                                }}
+                              />
+                              -
+                              <Controller
+                                name="event.dates.eventDates.0.end"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <DatePicker
+                                      selected={field.value ?? null}
+                                      onChange={(value) => console.log(value)}
+                                      dateFormat="MM/yyyy"
+                                      showMonthYearPicker
+                                      className="your-class"
+                                      placeholderText="Select month"
+                                    />
+                                  );
+                                }}
+                              />
+                            </div>
+                          )}
                           {errors.event?.location &&
                             eventData?.dates?.eventFormat && (
                               <span className="mt-2 w-full text-center text-sm text-red-600">
@@ -1473,7 +1508,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                     <p className="lg:text-xs">Production Dates</p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.dates.prodFormat" className="sr-only">
                       Production Dates Format
                     </Label>
@@ -1521,7 +1556,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         </span>
                       )}
                     {eventData?.dates?.prodFormat && (
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                         <Label
                           htmlFor="event.dates.artistStart"
                           className="sr-only"
@@ -1584,7 +1619,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         </p>
                       </div>
 
-                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[400px] lg:max-w-md">
+                      <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                         <Label htmlFor="event.name" className="sr-only">
                           {getEventCategoryLabelAbbr(eventCategory)} Name
                         </Label>
