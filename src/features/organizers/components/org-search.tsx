@@ -87,7 +87,9 @@ export const OrgSearch = ({
     setClearHovered(false);
     setInputValue("");
     setSelectedVal("");
+    setDebouncedQuery("");
     onLoadClick(null);
+    console.log(inputValue, debouncedQuery, selectedVal, value);
     // onChange(null);
     onReset();
     setTimeout(() => {
@@ -95,6 +97,11 @@ export const OrgSearch = ({
     }, 1000);
     orgInputRef.current?.focus();
   };
+
+  useEffect(() => {
+    console.log("OrgSearch mounted or updated", { value });
+    console.trace(); // See who called it
+  }, [value]);
 
   // console.log(selectedIndex);
 
@@ -144,20 +151,20 @@ export const OrgSearch = ({
   };
 
   const handleBlur = () => {
-    console.log("handleBlur");
+    // console.log("handleBlur");
     if (inputValue.trim() !== "" && inputValue.trim() !== selectedVal) {
       if (results && results?.length > 0) {
         handleSelect(results[selectedIndex]);
       }
       setFocused(false);
       setSelectedIndex(-1);
-      console.log("if");
+      // console.log("if");
     } else {
       setTimeout(() => {
         setFocused(false);
         setSelectedIndex(-1);
       }, 100);
-      console.log("else");
+      // console.log("else");
     }
   };
 
@@ -178,10 +185,12 @@ export const OrgSearch = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebouncedQuery(trimmedQuery);
-      if (hasUserInteracted) {
-        onChange(trimmedQuery);
-        // onLoadClick(null);
+      if (trimmedQuery.trim().length > 0) {
+        setDebouncedQuery(trimmedQuery);
+        if (hasUserInteracted) {
+          onChange(trimmedQuery);
+          // onLoadClick(null);
+        }
       }
     }, 500);
 

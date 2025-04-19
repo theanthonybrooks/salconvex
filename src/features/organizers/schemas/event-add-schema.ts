@@ -67,12 +67,7 @@ const eventSchema = z
       .max(35, "Max 35 characters")
       .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
     category: z.string().min(3, "Event category is required"),
-    type: z.optional(
-      z
-        .array(z.string())
-        .min(1, "Event type is required")
-        .max(2, "You can select up to 2 event types"),
-    ),
+    type: z.array(z.string()).optional(),
     logo: z.union([
       z
         .instanceof(Blob)
@@ -114,12 +109,20 @@ const eventSchema = z
     active: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.category === "event" && (!data.type || data.type.length === 0)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Event type is required when category is 'event'",
-        path: ["type"],
-      });
+    if (data.category === "event") {
+      if (!data.type || data.type.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Event type is required when category is 'event'",
+          path: ["type"],
+        });
+      } else if (data.type.length > 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "You can select up to 2 event types",
+          path: ["type"],
+        });
+      }
     }
   });
 
