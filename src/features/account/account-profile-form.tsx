@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -6,13 +8,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 
 import { ArtistProfileForm } from "@/features/artists/artist-profile-form";
 import { EventOCForm } from "@/features/events/event-add-form";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 // type BaseTaskValues = {
 //   title: string
@@ -39,9 +42,46 @@ export const AccountSubscribeForm = ({
 }: AccountSubscribeFormProps) => {
   const router = useRouter();
   const isArtist = mode === "artist";
+  const [open, setOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [shouldExit, setShouldExit] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const alertDialogDescription = isArtist
+    ? "You can always continue the subscription process later."
+    : activeStep > 0
+      ? "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
+      : "Sure? You can always start the submission process at a later time.";
+
+  const unsavedAlertDescription = isArtist
+    ? "All unsaved changes will be lost. Please save first"
+    : "Please save to ensure your changes are saved";
+
+  const unsavedAlertTitle = isArtist
+    ? "Discard unsaved changes?"
+    : "Exit submission form?";
+
+  const AlertTitle = isArtist
+    ? "Exit artist profile form?"
+    : "Exit submission form?";
+
+  const handleClose = () => {
+    setActiveStep(0);
+    setShouldExit(true);
+    //save changes if necessary (within the form)
+
+    if (!hasUnsavedChanges) {
+      setOpen(false);
+    }
+    console.log("clicked exit");
+    setTimeout(() => {
+      setOpen(false);
+      setShouldExit(false);
+    }, 100);
+  };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <DialogHeader
           className="w-full"
@@ -59,6 +99,7 @@ export const AccountSubscribeForm = ({
       </DialogTrigger>
 
       <DialogContent
+        showCloseButton={false}
         onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(
           "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
@@ -80,9 +121,41 @@ export const AccountSubscribeForm = ({
           )}
         </>
         {isArtist ? (
-          <ArtistProfileForm user={user} onClick={onClick} />
+          <ArtistProfileForm
+            user={user}
+            onClick={onClick}
+            hasUnsavedChanges={hasUnsavedChanges}
+            setHasUnsavedChanges={setHasUnsavedChanges}
+          />
         ) : (
-          <EventOCForm user={user} onClick={onClick} />
+          <EventOCForm
+            user={user}
+            onClick={onClick}
+            hasUnsavedChanges={hasUnsavedChanges}
+            setHasUnsavedChanges={setHasUnsavedChanges}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            shouldClose={shouldExit}
+          />
+        )}
+        {hasUnsavedChanges ? (
+          <DialogCloseBtn
+            title={unsavedAlertTitle}
+            description={unsavedAlertDescription}
+            onAction={handleClose}
+            actionTitle="Save Draft & Exit"
+            onPrimaryAction={handleClose}
+            primaryActionTitle="Exit"
+            className="w-full"
+          />
+        ) : (
+          <DialogCloseBtn
+            title={AlertTitle}
+            description={alertDialogDescription}
+            onAction={handleClose}
+            actionTitle="Exit"
+            className="w-full"
+          />
         )}
       </DialogContent>
     </Dialog>

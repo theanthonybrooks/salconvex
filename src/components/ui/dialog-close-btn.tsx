@@ -17,35 +17,34 @@ import { X } from "lucide-react";
 interface CloseBtnProps {
   title?: string;
   description: string;
-  onAction: () => void;
+  className?: string;
   actionTitle?: string;
+  onAction?: () => void;
   onPrimaryAction?: () => void | string;
   primaryActionTitle?: string;
-  className?: string;
   actionClassName?: string;
 }
 
-const CloseBtn: React.FC<CloseBtnProps> = ({
-  title = "Where would you like to go?",
-  description,
+export const DialogCloseBtn = ({
+  title = "Discard unsaved changes?",
+  description = "If you close now, your changes will be lost. Are you sure you want to leave?",
+  className,
+  actionTitle = "Discard",
   onAction,
-  actionTitle = "Yes",
   onPrimaryAction,
   primaryActionTitle = "Return to homepage",
   actionClassName,
-  className,
-}) => {
+}: CloseBtnProps) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
           variant="icon"
           className={cn(
-            "absolute right-5 top-4 z-10 rounded text-lg font-bold text-foreground hover:rounded-full hover:text-red-600 focus:text-red-600",
+            "absolute right-5 top-4 z-10 !w-max rounded text-lg font-bold text-foreground hover:rounded-full hover:text-red-600 focus:text-red-600",
             className,
           )}
           aria-label="Close modal"
-          // tabIndex={successfulCreation ? 6 : 4}
         >
           <X size={25} />
         </Button>
@@ -58,19 +57,17 @@ const CloseBtn: React.FC<CloseBtnProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onAction} className={actionClassName}>
-            {actionTitle}
-          </AlertDialogAction>
+          <AlertDialogCancel onClick={() => {}}>Cancel</AlertDialogCancel>
           {onPrimaryAction && (
             <AlertDialogPrimaryAction onClick={onPrimaryAction}>
               {primaryActionTitle}
             </AlertDialogPrimaryAction>
           )}
+          <AlertDialogAction onClick={onAction} className={actionClassName}>
+            {actionTitle}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 };
-
-export default CloseBtn;

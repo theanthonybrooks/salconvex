@@ -92,17 +92,18 @@ export default async function RootLayout({
                 <PostHogProvider> {children}</PostHogProvider>
                 <SpeedInsights />
                 <ToastContainer
+                  closeButton={false}
                   position="top-right"
                   autoClose={5000}
                   hideProgressBar={false}
                   newestOnTop={false}
-                  closeOnClick={false}
+                  closeOnClick={true}
                   rtl={false}
                   pauseOnFocusLoss
                   draggable
                   pauseOnHover
                   theme="light"
-                  toastClassName="rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] md:max-w-fit border-2"
+                  toastClassName="rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] border-2 z-top"
                 />
               </ThemedProvider>
             </ConvexQueryCacheProvider>

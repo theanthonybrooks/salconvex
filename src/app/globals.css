@@ -888,12 +888,19 @@ button:active {
 
 .react-datepicker__day--today,
 .react-datepicker__month-text--today,
-.react-datepicker__quarter-text--today,
 .react-datepicker__year-text--today {
   /* background-color: rgba(248, 241, 107, 0.7); */
   background-color: rgba(244, 169, 246, 0.5);
   font-weight: bold;
   border-radius: 0.3rem;
+}
+.react-datepicker__quarter-text--keyboard-selected,
+.react-datepicker__quarter-text--today {
+  background: none !important;
+  &:hover {
+    background-color: rgba(244, 169, 246, 0.5) !important;
+    color: black !important;
+  }
 }
 .react-datepicker-wrapper {
   width: 100%;
@@ -953,6 +960,17 @@ button:active {
 .react-datepicker__month .react-datepicker__quarter-text {
   width: auto;
   padding: 0.25rem 0.85rem;
+}
+.react-datepicker__current-month,
+.react-datepicker__current-month--hasYearDropdown,
+.react-datepicker__current-month--hasMonthDropdown {
+  display: none;
+}
+
+.react-datepicker__month-read-view,
+.react-datepicker__year-read-view {
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .react-datepicker__day:not([aria-disabled="true"]):hover,

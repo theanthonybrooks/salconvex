@@ -22,6 +22,8 @@ interface ArtistProfileFormProps {
   user: User | undefined;
   onClick: () => void;
   children?: React.ReactNode;
+  hasUnsavedChanges: boolean;
+  setHasUnsavedChanges: (value: boolean) => void;
 }
 
 type ArtistFormValues = {
@@ -42,6 +44,8 @@ export const ArtistProfileForm = ({
   className,
   onClick,
   user,
+  // hasUnsavedChanges,
+  // setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
   const userName = user?.name ? user.name : userFullName;

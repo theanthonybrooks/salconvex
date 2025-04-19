@@ -16,6 +16,7 @@ interface CustomDatePickerProps {
   maxDate?: Date | string;
   tabIndex?: number;
   pickerType: PickerType;
+  isAdmin?: boolean;
 }
 
 const getSeasonLabel = (val: string): string => {
@@ -82,12 +83,15 @@ export const CustomDatePicker = ({
   maxDate,
   tabIndex,
   pickerType,
+  isAdmin,
 }: CustomDatePickerProps) => {
   const parsedDate =
     pickerType === "season" ? fromSeason(value ?? "") : toDate(value);
 
   const minToDate = minDate ? toDate(minDate) : null;
   const maxToDate = maxDate ? toDate(maxDate) : null;
+  console.log(minToDate, maxToDate);
+  console.log(parsedDate);
 
   const dateFormat =
     pickerType === "year"
@@ -107,10 +111,16 @@ export const CustomDatePicker = ({
       onChange={onChange}
       dateFormat={dateFormat}
       openToDate={new Date()}
+      showYearDropdown={pickerType === "dates"}
+      showMonthDropdown={pickerType === "dates"}
       showYearPicker={pickerType === "year"}
       showMonthYearPicker={pickerType === "month"}
       showQuarterYearPicker={pickerType === "season"}
-      minDate={minToDate ?? new Date(new Date().getFullYear(), 0, 1)}
+      minDate={
+        isAdmin
+          ? new Date(2010, 0, 1)
+          : (minToDate ?? new Date(new Date().getFullYear(), 0, 1))
+      }
       maxDate={maxToDate ?? new Date(2099, 11, 31)}
       placeholderText={
         placeholder ??

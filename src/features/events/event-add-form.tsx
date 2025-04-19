@@ -34,8 +34,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { columns } from "@/features/artists/applications/data-table/columns";
 import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventNameSearch } from "@/features/events/components/event-search";
-import { toDateString, toSeason, toYear, toYearMonth } from "@/lib/dateFns";
+import {
+  fromSeason,
+  toDateString,
+  toSeason,
+  toYear,
+  toYearMonth,
+} from "@/lib/dateFns";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import { handleFileUrl } from "@/lib/fileUploadFns";
 import { cn } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,12 +98,28 @@ const options: { value: EventType; label: string }[] = [
 interface EventOCFormProps {
   user: User | undefined;
   onClick: () => void;
+  shouldClose: boolean;
   children?: React.ReactNode;
+  hasUnsavedChanges: boolean;
+  setHasUnsavedChanges: (value: boolean) => void;
+  activeStep: number;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
 
 type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
-export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
+export const EventOCForm = ({
+  user,
+  onClick,
+  shouldClose,
+  // hasUnsavedChanges,
+  setHasUnsavedChanges,
+  activeStep,
+  setActiveStep,
+}: EventOCFormProps) => {
+  const currentStep = steps[activeStep];
+  const schema = currentStep.schema;
+  const isAdmin = user?.role?.includes("admin");
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
     resolver: zodResolver(eventWithOCSchema),
     defaultValues: {
@@ -139,7 +162,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const [isMobile, setIsMobile] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  // const [activeStep, setActiveStep] = useState(0);
   const [furthestStep, setFurthestStep] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -242,13 +265,14 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       : "skip",
   );
 
-  const hasuserEditedStep0 =
+  const hasUserEditedStep0 =
     activeStep === 0 &&
     (orgData?.name?.trim() !== existingOrg?.name?.trim() ||
       orgData?.logo !== existingOrg?.logo ||
       orgData?.location?.full !== existingOrg?.location?.full);
 
   const hasUserEditedStep1 = dirtyFields.event ?? false;
+  const hasUserEditedForm = hasUserEditedStep1 || hasUserEditedStep0;
   const prevOrgRef = useRef(existingOrg);
 
   // const orgValidation = useQuery(
@@ -261,10 +285,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
   console.log(eventChoiceMade, newOrgEvent, orgHasNoEvents);
   const existingOrgUpdateTrigger =
-    existingOrgs && validOrgWZod && hasuserEditedStep0;
+    existingOrgs && validOrgWZod && hasUserEditedStep0;
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
   console.log("eventNameIsDirty", eventNameIsDirty);
-
+  const hasEventLocation =
+    (dirtyFields.event?.location || eventData?.location?.full !== undefined) &&
+    eventNameValid;
+  const hasNoEventDatesEdition =
+    eventData?.dates?.edition === undefined &&
+    eventData?.dates?.eventDates?.length === 0;
   //
 
   //
@@ -281,15 +310,16 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   //   // error,
   // );
-  // console.log(hasuserEditedStep0);
+  console.log(hasUserEditedStep0);
   console.log("hasUserEditedStep1", hasUserEditedStep1);
+  console.log("hasUserEditedForm", hasUserEditedForm);
 
   // console.log("eventNameData", eventNameData);
 
   // console.log("eventNameExists", eventNameValid);
   // console.log("eventNameExistsError", eventNameExistsError);
   console.log(errors);
-  // console.log(hasuserEditedStep0);
+  // console.log(hasUserEditedStep0);
   //
   //
   // console.log(formIsValid);
@@ -311,6 +341,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // console.log(isValid, "wZod:", validOrgWZod);
 
   // console.log("last saved", lastSavedDate);
+
   //
   //
   //
@@ -352,31 +383,121 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   // TODO: Convert timezone on deadline to user timezone on submit to ensure that displayed time is correct.
   // use convertOpenCallDatesToUserTimezone()
   const handleNextStep = async () => {
-    const currentStep = steps[activeStep];
-    const schema = currentStep.schema;
-    let orgResult = null;
+    handleCheckSchema();
+    await handleSave();
+    handleFormValues();
+    setActiveStep((prev) => prev + 1);
+  };
 
-    if (schema) {
-      const values = getValues();
-      // console.log(values);
-      const result = schema.safeParse(values);
-      // console.log(result);
-      if (!result.success) {
-        result.error.issues.forEach((issue) => {
-          const path = issue.path.join(".") as Path<EventOCFormValues>;
-          setError(path, { type: "manual", message: issue.message });
-          setErrorMsg(issue.message);
+  const handleBackStep = async () => {
+    handleCheckSchema();
+
+    if (activeStep === 1) {
+      if (hasUserEditedStep1) {
+        // let eventLogoUrl: string = "/1.jpg";
+        // let eventLogoId: Id<"_storage"> | undefined;
+        // let timezone: string | undefined;
+        // let timezoneOffset: number | undefined;
+        // if (eventData.location?.coordinates) {
+        //   const timezoneData = await getTimezone({
+        //     latitude: eventData.location.coordinates?.latitude || 52,
+        //     longitude: eventData.location.coordinates?.longitude || 13.4,
+        //   });
+        //   timezone = timezoneData?.zoneName;
+        //   timezoneOffset = timezoneData?.gmtOffset;
+        // }
+        // if (eventData.logo && typeof eventData.logo !== "string") {
+        //   const uploadUrl = await generateUploadUrl();
+        //   const uploadRes = await fetch(uploadUrl, {
+        //     method: "POST",
+        //     headers: { "Content-Type": eventData.logo.type },
+        //     body: eventData.logo,
+        //   });
+        //   if (!uploadRes.ok) {
+        //     toast.error("Failed to upload logo", {
+        //       autoClose: 2000,
+        //       pauseOnHover: false,
+        //       hideProgressBar: true,
+        //     });
+        //     return;
+        //   }
+        //   const { storageId } = await uploadRes.json();
+        //   eventLogoId = storageId;
+        // } else if (eventData.logo && typeof eventData.logo === "string") {
+        //   eventLogoUrl = eventData.logo;
+        // }
+
+        const result = await handleFileUrl({
+          data: eventData,
+          generateUploadUrl,
+          getTimezone,
         });
 
-        // toast.error("Please fix errors before continuing.", {
-        //   position: "bottom-left",
-        // });
-        return;
+        if (!result) {
+          toast.error("Failed to upload logo", {
+            autoClose: 2000,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+          return;
+        }
+        const { logoUrl, logoId, timezone, timezoneOffset } = result;
+        console.log(eventData.dates);
+        try {
+          const { event } = await createOrUpdateEvent({
+            _id: eventData._id || "",
+            name: eventData.name,
+            slug: slugify(eventData.name),
+            logoId,
+            logo: logoUrl,
+            eventType: eventData.type || [],
+            eventCategory: eventData.category,
+            dates: {
+              edition: eventData.dates.edition,
+              eventDates: eventData.dates.eventDates,
+              ongoing: eventData.dates.ongoing,
+              eventFormat: eventData.dates.eventFormat,
+              prodFormat: eventData.dates.prodFormat,
+            },
+            location: {
+              ...eventData.location,
+              timezone: timezone,
+              timezoneOffset: timezoneOffset,
+            },
+            about: eventData.about,
+            links: eventData.links,
+            otherInfo: eventData.otherInfo || [],
+            active: eventData.active,
+            orgId: orgData._id as Id<"organizations">,
+          });
+          console.log("event", event);
+
+          reset({
+            ...currentValues,
+            event: {
+              ...event,
+              category: event?.eventCategory || "",
+              type: event?.eventType || [],
+            },
+          });
+          toast.success(
+            existingOrg
+              ? "Organization updated!"
+              : "Organization created! Going to step 2...",
+          );
+        } catch (error) {
+          console.error("Failed to create new organization:", error);
+          toast.error("Failed to create new organization");
+        }
       }
-      setErrorMsg("");
     }
-    if (hasuserEditedStep0) {
-      console.log("hasuserEditedStep0");
+    setActiveStep((prev) => prev - 1);
+  };
+
+  const handleSave = async () => {
+    let orgResult = null;
+    console.log("handleSave");
+    if (hasUserEditedStep0) {
       let orgLogoUrl: string = "/1.jpg";
       let orgLogoId: Id<"_storage"> | undefined;
       let timezone: string | undefined;
@@ -466,11 +587,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         console.error("Failed to create new organization:", error);
         toast.error("Failed to create new organization");
       }
-      // const result = await createNewOrg({
-      //   organizationName: data.organization.name,
-      //   logo: data.organization.logo,
-      //   location: data.organization.location,
-      // });
+
       //save logic here
       // get timezone
       // use existing event as default values for next step if applicable
@@ -479,7 +596,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
 
       if (existingEvent) {
-        // console.log("existing event");
         const locationFromEvent = existingEvent.location?.sameAsOrganizer
           ? {
               ...currentValues.organization?.location,
@@ -504,7 +620,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           },
         });
       } else {
-        console.log("else reset");
         reset({
           organization: {
             ...orgResult,
@@ -520,7 +635,32 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           },
         });
       }
-    } else if (activeStep === 0 && !hasuserEditedStep0 && furthestStep === 0) {
+    }
+  };
+
+  const handleCheckSchema = () => {
+    if (schema) {
+      const result = schema.safeParse(currentValues);
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          const path = issue.path.join(".") as Path<EventOCFormValues>;
+          setError(path, { type: "manual", message: issue.message });
+          setErrorMsg(issue.message);
+        });
+
+        toast.dismiss("form-validation-error");
+        toast.error("Please fix errors before continuing.", {
+          toastId: "form-validation-error",
+        });
+
+        return;
+      }
+      setErrorMsg("");
+    }
+  };
+
+  const handleFormValues = () => {
+    if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
       if (existingEvent) {
         const locationFromEvent = existingEvent.location?.sameAsOrganizer
           ? {
@@ -576,117 +716,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         },
       });
     }
-
-    setActiveStep((prev) => prev + 1);
-  };
-
-  const handleBackStep = async () => {
-    const currentStep = steps[activeStep];
-    const schema = currentStep.schema;
-
-    if (schema) {
-      const values = getValues();
-      const result = schema.safeParse(values);
-      console.log(values, result);
-      if (!result.success && hasUserEditedStep1) {
-        result.error.issues.forEach((issue) => {
-          const path = issue.path.join(".") as Path<EventOCFormValues>;
-          setError(path, { type: "manual", message: issue.message });
-          setErrorMsg(issue.message);
-        });
-
-        // toast.error("Please fix errors before continuing.");
-        return;
-      }
-      setErrorMsg("");
-    }
-
-    if (activeStep === 1) {
-      if (hasUserEditedStep1) {
-        let eventLogoUrl: string = "/1.jpg";
-        let eventLogoId: Id<"_storage"> | undefined;
-        let timezone: string | undefined;
-        let timezoneOffset: number | undefined;
-        const data = watch("event");
-        const orgData = watch("organization");
-        if (data.location?.coordinates) {
-          const timezoneData = await getTimezone({
-            latitude: data.location.coordinates?.latitude || 52,
-            longitude: data.location.coordinates?.longitude || 13.4,
-          });
-          timezone = timezoneData?.zoneName;
-          timezoneOffset = timezoneData?.gmtOffset;
-        }
-        if (data.logo && typeof data.logo !== "string") {
-          const uploadUrl = await generateUploadUrl();
-          const uploadRes = await fetch(uploadUrl, {
-            method: "POST",
-            headers: { "Content-Type": data.logo.type },
-            body: data.logo,
-          });
-          if (!uploadRes.ok) {
-            toast.error("Failed to upload logo", {
-              autoClose: 2000,
-              pauseOnHover: false,
-              hideProgressBar: true,
-            });
-            return;
-          }
-          const { storageId } = await uploadRes.json();
-          eventLogoId = storageId;
-        } else if (data.logo && typeof data.logo === "string") {
-          eventLogoUrl = data.logo;
-        }
-        console.log(data.dates);
-        try {
-          const { event } = await createOrUpdateEvent({
-            _id: data._id || "",
-            name: data.name,
-            slug: slugify(data.name),
-            logoId: eventLogoId,
-            logo: eventLogoUrl,
-            eventType: data.type || [],
-            eventCategory: data.category,
-            dates: {
-              edition: data.dates.edition,
-              eventDates: data.dates.eventDates,
-              ongoing: data.dates.ongoing,
-              eventFormat: data.dates.eventFormat,
-              prodFormat: data.dates.prodFormat,
-            },
-            location: {
-              ...data.location,
-              timezone: timezone,
-              timezoneOffset: timezoneOffset,
-            },
-            about: data.about,
-            links: data.links,
-            otherInfo: data.otherInfo || [],
-            active: data.active,
-            orgId: orgData._id as Id<"organizations">,
-          });
-          console.log("event", event);
-
-          reset({
-            ...currentValues,
-            event: {
-              ...event,
-              category: event?.eventCategory || "",
-              type: event?.eventType || [],
-            },
-          });
-          toast.success(
-            existingOrg
-              ? "Organization updated!"
-              : "Organization created! Going to step 2...",
-          );
-        } catch (error) {
-          console.error("Failed to create new organization:", error);
-          toast.error("Failed to create new organization");
-        }
-      }
-    }
-    setActiveStep((prev) => prev - 1);
   };
 
   const handleReset = () => {
@@ -778,24 +807,63 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   useEffect(() => {
     const format = eventData?.dates?.eventFormat;
-    const otherFormats = ["setDates", "monthRange", "yearRange", "seasonRange"];
+    const otherFormats = [
+      "noEvent",
+      "setDates",
+      "monthRange",
+      "yearRange",
+      "seasonRange",
+    ];
 
     if (!format) return;
 
     if (format === "ongoing") {
       setValue("event.dates.ongoing", true);
+    }
+
+    if (format === "noEvent" || format === "setDates" || format === "ongoing") {
       setValue("event.dates.eventDates", [{ start: "", end: "" }]);
     }
 
-    if (format === "noEvent") {
-      setValue("event.dates.ongoing", false);
-      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+    if (format === "yearRange") {
+      setValue("event.dates.eventDates", [
+        {
+          start: new Date().getFullYear().toString(),
+          end: new Date().getFullYear().toString(),
+        },
+      ]);
+    }
+
+    if (format === "seasonRange") {
+      setValue("event.dates.eventDates", [
+        {
+          start: toSeason(new Date()),
+          end: toSeason(new Date()),
+        },
+      ]);
     }
     if (otherFormats.includes(format)) {
       setValue("event.dates.ongoing", false);
       setValue("event.dates.edition", new Date().getFullYear());
     }
-  }, [eventData?.dates?.eventFormat, setValue]);
+  }, [eventData?.dates?.eventFormat, setValue, hasNoEventDatesEdition]);
+
+  useEffect(() => {
+    if (hasUserEditedForm) {
+      setHasUnsavedChanges(true);
+    } else {
+      setHasUnsavedChanges(false);
+    }
+  }, [setHasUnsavedChanges, hasUserEditedForm]);
+
+  useEffect(() => {
+    console.log("shouldClose", shouldClose);
+    if (shouldClose) {
+      console.log("onClose");
+    } else {
+      console.log("after timeout");
+    }
+  }, [shouldClose]);
 
   return (
     <HorizontalLinearStepper
@@ -1364,7 +1432,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                 </>
               )}
             </div>
-            {canNameEvent && (
+            {hasEventLocation && (
               <>
                 <Separator
                   thickness={2}
@@ -1434,7 +1502,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                         );
                       }}
                     />
-                    {errors.event?.location &&
+                    {errors.event?.dates?.eventFormat &&
                       eventData?.dates?.eventFormat && (
                         <span className="mt-2 w-full text-center text-sm text-red-600">
                           {errors.event?.dates?.eventFormat?.message
@@ -1460,6 +1528,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="dates"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1481,6 +1550,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="dates"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1505,6 +1575,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="month"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1526,6 +1597,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="month"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1550,6 +1622,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="year"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1571,6 +1644,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="year"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1595,6 +1669,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="season"
                                       value={field.value}
                                       onChange={(date) => {
@@ -1603,7 +1678,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                       className="w-full rounded border p-2 text-center"
                                       inputClassName="h-12"
                                       maxDate={
-                                        eventData?.dates?.eventDates[0]?.end
+                                        fromSeason(
+                                          eventData?.dates?.eventDates[0]?.end,
+                                        ) ?? new Date()
                                       }
                                     />
                                   );
@@ -1616,6 +1693,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 render={({ field }) => {
                                   return (
                                     <CustomDatePicker
+                                      isAdmin={isAdmin}
                                       pickerType="season"
                                       value={field.value}
                                       onChange={(date) =>
@@ -1624,7 +1702,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                       className="w-full rounded border p-2 text-center"
                                       inputClassName="h-12"
                                       minDate={
-                                        eventData?.dates?.eventDates[0]?.start
+                                        fromSeason(
+                                          eventData?.dates?.eventDates[0]
+                                            ?.start,
+                                        ) ?? new Date()
                                       }
                                     />
                                   );
@@ -1739,7 +1820,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                             }}
                           />
                         </div>
-                        {errors.event?.location &&
+                        {errors.event?.dates?.eventFormat &&
                           eventData?.dates?.eventFormat && (
                             <span className="mt-2 w-full text-center text-sm text-red-600">
                               {errors.event?.dates?.eventFormat?.message
