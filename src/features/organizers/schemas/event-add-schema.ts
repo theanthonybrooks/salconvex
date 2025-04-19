@@ -93,7 +93,7 @@ const eventSchema = z
       ongoing: z.boolean(),
     }),
     links: z.object({
-      sameAsOrganizer: z.boolean(),
+      sameAsOrganizer: z.boolean().optional(),
       website: z.string().optional(),
       instagram: z.string().optional(),
       facebook: z.string().optional(),

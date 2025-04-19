@@ -90,8 +90,8 @@ export const CustomDatePicker = ({
 
   const minToDate = minDate ? toDate(minDate) : null;
   const maxToDate = maxDate ? toDate(maxDate) : null;
-  console.log(minToDate, maxToDate);
-  console.log(parsedDate);
+  //   console.log(minToDate, maxToDate);
+  //   console.log(parsedDate);
 
   const dateFormat =
     pickerType === "year"

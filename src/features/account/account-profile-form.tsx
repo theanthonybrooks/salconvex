@@ -136,6 +136,7 @@ export const AccountSubscribeForm = ({
             activeStep={activeStep}
             setActiveStep={setActiveStep}
             shouldClose={shouldExit}
+            setOpen={setOpen}
           />
         )}
         {hasUnsavedChanges ? (

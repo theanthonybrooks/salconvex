@@ -212,6 +212,6 @@ export async function fetchMapboxSuggestionsFull(query: string) {
   if (!res.ok) throw new Error("Failed to fetch suggestions");
 
   const data = await res.json();
-  console.log("suggestion data:", data);
+  // console.log("suggestion data:", data);
   return data.features as MapboxSuggestion[];
 }

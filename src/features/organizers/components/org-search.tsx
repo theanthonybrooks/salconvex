@@ -89,7 +89,6 @@ export const OrgSearch = ({
     setSelectedVal("");
     setDebouncedQuery("");
     onLoadClick(null);
-    console.log(inputValue, debouncedQuery, selectedVal, value);
     // onChange(null);
     onReset();
     setTimeout(() => {
@@ -97,11 +96,6 @@ export const OrgSearch = ({
     }, 1000);
     orgInputRef.current?.focus();
   };
-
-  useEffect(() => {
-    console.log("OrgSearch mounted or updated", { value });
-    console.trace(); // See who called it
-  }, [value]);
 
   // console.log(selectedIndex);
 

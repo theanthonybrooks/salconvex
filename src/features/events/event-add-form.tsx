@@ -4,7 +4,13 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -19,6 +25,7 @@ import {
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CustomDatePicker } from "@/components/ui/date-picker";
+import { DebouncedTextarea } from "@/components/ui/debounced-textarea";
 import { Input } from "@/components/ui/input";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
@@ -30,7 +37,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
 import { columns } from "@/features/artists/applications/data-table/columns";
 import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventNameSearch } from "@/features/events/components/event-search";
@@ -99,6 +105,7 @@ interface EventOCFormProps {
   user: User | undefined;
   onClick: () => void;
   shouldClose: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children?: React.ReactNode;
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: (value: boolean) => void;
@@ -112,6 +119,7 @@ export const EventOCForm = ({
   user,
   onClick,
   shouldClose,
+  setOpen,
   // hasUnsavedChanges,
   setHasUnsavedChanges,
   activeStep,
@@ -148,7 +156,7 @@ export const EventOCForm = ({
     formState: {
       // isValid,
       dirtyFields,
-      isDirty,
+      // isDirty,
       errors,
     },
     reset,
@@ -176,6 +184,7 @@ export const EventOCForm = ({
   const [lastSaved, setLastSaved] = useState(
     existingOrg ? existingOrg.updatedAt : null,
   );
+  const [loading] = useState(false);
 
   const existingOrgs = typeof existingOrg === "object" && existingOrg !== null;
 
@@ -197,6 +206,7 @@ export const EventOCForm = ({
   // ------------- Step 1 - Organization & Event --------------
   //
   //
+  const isFirstRun = useRef(true);
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
   const eventData = watch("event");
@@ -271,7 +281,7 @@ export const EventOCForm = ({
       orgData?.location?.full !== existingOrg?.location?.full);
 
   const hasUserEditedStep1 = dirtyFields.event ?? false;
-  const hasUserEditedForm = hasUserEditedStep1 || hasUserEditedStep0;
+  const hasUserEditedForm = !!(hasUserEditedStep1 || hasUserEditedStep0);
   const prevOrgRef = useRef(existingOrg);
 
   // const orgValidation = useQuery(
@@ -287,9 +297,9 @@ export const EventOCForm = ({
   const hasEventLocation =
     (dirtyFields.event?.location || eventData?.location?.full !== undefined) &&
     eventNameValid;
-  const hasNoEventDatesEdition =
-    eventData?.dates?.edition === undefined &&
-    eventData?.dates?.eventDates?.length === 0;
+  const eventDates = eventData?.dates?.eventDates;
+  const eventDatesFormat = eventData?.dates?.eventFormat;
+  const hasNoEventDates = eventDates?.length === 0 || !eventDates;
   //
 
   //
@@ -318,7 +328,7 @@ export const EventOCForm = ({
 
   // console.log("eventNameExists", eventNameValid);
   // console.log("eventNameExistsError", eventNameExistsError);
-  // console.log(errors);
+  console.log(errors);
   // console.log(hasUserEditedStep0);
   //
   //
@@ -329,9 +339,9 @@ export const EventOCForm = ({
   // console.log(orgNameValid, orgLocationValid);
   // console.log(newOrgEvent);
   console.log(orgData);
-  // console.log(eventData);
-  // console.log(existingEvent);
-  console.log("existingOrg", existingOrg);
+  console.log(eventData);
+  console.log(existingEvent);
+  // console.log("existingOrg", existingOrg);
   // console.log(eventsData, "now");
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", existingOrgs);
@@ -385,206 +395,33 @@ export const EventOCForm = ({
   const handleNextStep = async () => {
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
+
     await handleSave();
-    await handleFormValues();
+
+    // setLoading(true);
+    // handleFormValues();
+
+    // if (activeStep === 0) {
+
+    //   // setTimeout(() => {
+    //   //   setActiveStep((prev) => prev + 1);
+    //   //   setLoading(false);
+    //   // }, 1000);
+    //   setActiveStep((prev) => prev + 1);
+    //   setLoading(false);
+    // } else {
     setActiveStep((prev) => prev + 1);
+    // }
   };
 
   const handleBackStep = async () => {
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
-
-    if (activeStep === 1 && hasUserEditedStep1) {
-      const result = await handleFileUrl({
-        data: eventData,
-        generateUploadUrl,
-        getTimezone,
-      });
-
-      if (!result) {
-        toast.error("Failed to upload logo", {
-          autoClose: 2000,
-          pauseOnHover: false,
-          hideProgressBar: true,
-        });
-        return;
-      }
-      const { logoUrl, logoId, timezone, timezoneOffset } = result;
-      console.log(eventData.dates);
-      try {
-        const { event } = await createOrUpdateEvent({
-          _id: eventData._id || "",
-          name: eventData.name,
-          slug: slugify(eventData.name),
-          logoId,
-          logo: logoUrl,
-          eventType: eventData.type || [],
-          eventCategory: eventData.category,
-          dates: {
-            edition: eventData.dates.edition,
-            eventDates: eventData.dates.eventDates,
-            ongoing: eventData.dates.ongoing,
-            eventFormat: eventData.dates.eventFormat,
-            prodFormat: eventData.dates.prodFormat,
-          },
-          location: {
-            ...eventData.location,
-            timezone: timezone,
-            timezoneOffset: timezoneOffset,
-          },
-          about: eventData.about,
-          links: eventData.links,
-          otherInfo: eventData.otherInfo || [],
-          active: eventData.active,
-          orgId: orgData._id as Id<"organizations">,
-        });
-
-        reset({
-          ...currentValues,
-          event: {
-            ...event,
-            category: event?.eventCategory || "",
-            type: event?.eventType || [],
-          },
-        });
-        toast.success(
-          existingOrg
-            ? "Organization updated!"
-            : "Organization created! Going to step 2...",
-        );
-      } catch (error) {
-        console.error("Failed to create new organization:", error);
-        toast.error("Failed to create new organization");
-      }
-    }
+    await handleSave();
     setActiveStep((prev) => prev - 1);
   };
 
-  const handleSave = async () => {
-    let orgResult = null;
-    if (hasUserEditedStep0) {
-      const result = await handleFileUrl({
-        data: orgData,
-        generateUploadUrl,
-        getTimezone,
-      });
-      if (!result) {
-        toast.error("Failed to upload logo", {
-          autoClose: 2000,
-          pauseOnHover: false,
-          hideProgressBar: true,
-        });
-        return;
-      }
-      const { logoUrl, logoId, timezone, timezoneOffset } = result;
-
-      try {
-        const { org } = await createNewOrg({
-          organizationName: orgData.name,
-          logoId,
-          logo: logoUrl,
-          location: {
-            full: orgData.location.full,
-            locale: orgData.location.locale,
-            city: orgData.location.city,
-            state: orgData.location.state,
-            stateAbbr: orgData.location.stateAbbr,
-            region: orgData.location.region,
-            country: orgData.location.country,
-            countryAbbr: orgData.location.countryAbbr,
-            continent: orgData.location?.continent || "",
-            coordinates: {
-              latitude: orgData.location.coordinates?.latitude || 0,
-              longitude: orgData.location.coordinates?.longitude || 0,
-            },
-            currency: {
-              code: orgData.location?.currency?.code || "",
-              name: orgData.location?.currency?.name || "",
-              symbol: orgData.location?.currency?.symbol || "",
-            },
-            demonym: orgData.location.demonym,
-            timezone: timezone,
-            timezoneOffset: timezoneOffset,
-          },
-        });
-        orgResult = org;
-        toast.success(
-          existingOrg
-            ? "Organization updated!"
-            : "Organization created! Going to step 2...",
-        );
-
-        // Updating existingOrg state with new values
-        //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
-        if (existingOrg) {
-          setExistingOrg({
-            ...existingOrg,
-            logo: typeof orgData.logo === "string" ? orgData.logo : logoUrl,
-            location: {
-              ...existingOrg.location,
-              ...orgData.location,
-              continent: orgData.location?.continent ?? "",
-              timezone,
-              timezoneOffset,
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Failed to create new organization:", error);
-        toast.error("Failed to create new organization");
-      }
-
-      //save logic here
-      // get timezone
-      // use existing event as default values for next step if applicable
-      // if past event (or past open call), the event cannot be changed an selecting it will create a new event using the old one as a template.
-
-      const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
-
-      if (existingEvent) {
-        const locationFromEvent = existingEvent.location?.sameAsOrganizer
-          ? {
-              ...currentValues.organization?.location,
-              sameAsOrganizer: true,
-            }
-          : {
-              ...existingEvent.location,
-            };
-        reset({
-          organization: {
-            ...orgResult,
-          },
-          event: {
-            ...existingEvent,
-            links: {
-              ...existingEvent.links,
-              sameAsOrganizer: true,
-            },
-            category: existingEvent.eventCategory,
-            type: existingEvent.eventType ?? [],
-            location: locationFromEvent,
-          },
-        });
-      } else {
-        reset({
-          organization: {
-            ...orgResult,
-          },
-          event: {
-            name: "",
-            logo: orgLogoFullUrl,
-            links: {
-              sameAsOrganizer: true,
-            },
-            location:
-              orgResult?.location ?? currentValues.organization.location,
-          },
-        });
-      }
-    }
-  };
-
-  const handleCheckSchema = (): boolean => {
+  const handleCheckSchema = useCallback((): boolean => {
     if (!schema) return true;
     if (!hasUserEditedForm) return true;
 
@@ -607,25 +444,208 @@ export const EventOCForm = ({
 
     setErrorMsg("");
     return true;
-  };
+  }, [schema, currentValues, hasUserEditedForm, setError]);
 
-  const handleFormValues = async (): Promise<void> => {
-    return new Promise((resolve) => {
-      if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
-        if (existingEvent) {
-          const locationFromEvent = existingEvent.location?.sameAsOrganizer
+  const handleFormValues = useCallback(async () => {
+    console.log(activeStep, hasUserEditedStep0, furthestStep);
+    if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
+      console.log("huh");
+      if (existingEvent) {
+        console.log("what");
+        const eventLinks = existingEvent.links ?? { sameAsOrganizer: true };
+        const locationFromEvent = existingEvent.location?.full
+          ? existingEvent.location?.sameAsOrganizer
             ? {
                 ...currentValues.organization?.location,
                 sameAsOrganizer: true,
               }
             : {
                 ...existingEvent.location,
-              };
+              }
+          : {
+              ...currentValues.organization?.location,
+              sameAsOrganizer: true,
+            };
+        console.log("reset existing event");
+        reset({
+          ...currentValues,
+          event: {
+            ...existingEvent,
+            category: existingEvent.eventCategory,
+            type: existingEvent.eventType ?? [],
+            location: locationFromEvent,
+            links: {
+              ...eventLinks,
+            },
+          },
+        });
+      } else {
+        reset({
+          ...currentValues,
+          event: {
+            name: "",
+            logo: currentValues.organization.logo,
+            location: {
+              ...currentValues.organization.location,
+              sameAsOrganizer: true,
+            },
+            dates: {
+              ongoing: false,
+              edition: new Date().getFullYear(),
+            },
+            links: {
+              sameAsOrganizer: true,
+            },
+          },
+        });
+      }
+    } else if (
+      activeStep === 0 &&
+      existingEvent &&
+      eventData &&
+      eventData?._id !== existingEvent?._id
+    ) {
+      console.log("elsie");
+      console.log("unicorns");
+      const eventLinks = existingEvent.links ?? { sameAsOrganizer: true };
+      reset({
+        ...currentValues,
+        event: {
+          ...existingEvent,
+          category: existingEvent.eventCategory,
+          type: existingEvent.eventType ?? [],
+          location: existingEvent.location,
+          links: {
+            ...eventLinks,
+          },
+        },
+      });
+    }
+  }, [
+    activeStep,
+    currentValues,
+    existingEvent,
+    furthestStep,
+    eventData,
+    hasUserEditedStep0,
+    reset,
+  ]);
 
+  const handleSave = useCallback(
+    async (direct = false) => {
+      if (direct) {
+        const isStepValid = handleCheckSchema();
+        if (!isStepValid) {
+          toast.error("Please fix errors before continuing.", {
+            toastId: "form-validation-error",
+          });
+          return;
+        }
+      }
+      let orgResult = null;
+      if (hasUserEditedStep0) {
+        const result = await handleFileUrl({
+          data: orgData,
+          generateUploadUrl,
+          getTimezone,
+        });
+        if (!result) {
+          toast.error("Failed to upload logo", {
+            autoClose: 2000,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+          return;
+        }
+        const { logoUrl, logoId, timezone, timezoneOffset } = result;
+
+        try {
+          const { org } = await createNewOrg({
+            organizationName: orgData.name,
+            logoId,
+            logo: logoUrl,
+            location: {
+              full: orgData.location.full,
+              locale: orgData.location.locale,
+              city: orgData.location.city,
+              state: orgData.location.state,
+              stateAbbr: orgData.location.stateAbbr,
+              region: orgData.location.region,
+              country: orgData.location.country,
+              countryAbbr: orgData.location.countryAbbr,
+              continent: orgData.location?.continent || "",
+              coordinates: {
+                latitude: orgData.location.coordinates?.latitude || 0,
+                longitude: orgData.location.coordinates?.longitude || 0,
+              },
+              currency: {
+                code: orgData.location?.currency?.code || "",
+                name: orgData.location?.currency?.name || "",
+                symbol: orgData.location?.currency?.symbol || "",
+              },
+              demonym: orgData.location.demonym,
+              timezone: timezone,
+              timezoneOffset: timezoneOffset,
+            },
+          });
+          orgResult = org;
+          toast.success(
+            existingOrg
+              ? "Organization updated!"
+              : "Organization created! Going to step 2...",
+          );
+
+          // Updating existingOrg state with new values
+          //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
+          if (existingOrg) {
+            setExistingOrg({
+              ...existingOrg,
+              logo: typeof orgData.logo === "string" ? orgData.logo : logoUrl,
+              location: {
+                ...existingOrg.location,
+                ...orgData.location,
+                continent: orgData.location?.continent ?? "",
+                timezone,
+                timezoneOffset,
+              },
+            });
+          }
+        } catch (error) {
+          console.error("Failed to create new organization:", error);
+          toast.error("Failed to create new organization");
+        }
+
+        //save logic here
+        // get timezone
+        // use existing event as default values for next step if applicable
+        // if past event (or past open call), the event cannot be changed an selecting it will create a new event using the old one as a template.
+
+        const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
+
+        if (existingEvent) {
+          const locationFromEvent = existingEvent.location?.full
+            ? existingEvent.location?.sameAsOrganizer
+              ? {
+                  ...currentValues.organization?.location,
+                  sameAsOrganizer: true,
+                }
+              : {
+                  ...existingEvent.location,
+                }
+            : {
+                ...currentValues.organization?.location,
+                sameAsOrganizer: true,
+              };
           reset({
-            ...currentValues,
+            organization: {
+              ...orgResult,
+            },
             event: {
               ...existingEvent,
+              links: {
+                ...existingEvent.links,
+                sameAsOrganizer: true,
+              },
               category: existingEvent.eventCategory,
               type: existingEvent.eventType ?? [],
               location: locationFromEvent,
@@ -633,46 +653,108 @@ export const EventOCForm = ({
           });
         } else {
           reset({
-            ...currentValues,
+            organization: {
+              ...orgResult,
+            },
             event: {
               name: "",
-              logo: currentValues.organization.logo,
-              location: {
-                ...currentValues.organization.location,
-                sameAsOrganizer: true,
-              },
-              dates: {
-                ongoing: false,
-                edition: new Date().getFullYear(),
-              },
+              logo: orgLogoFullUrl,
               links: {
                 sameAsOrganizer: true,
               },
+              location:
+                orgResult?.location ?? currentValues.organization.location,
             },
           });
         }
-      } else if (
-        activeStep === 0 &&
-        existingEvent &&
-        eventData &&
-        eventData?._id !== existingEvent?._id
-      ) {
-        console.log("unicorns");
-        reset({
-          ...currentValues,
-          event: {
-            ...existingEvent,
-            category: existingEvent.eventCategory,
-            type: existingEvent.eventType ?? [],
-            location: existingEvent.location,
-          },
-        });
       }
-      setTimeout(() => {
-        resolve();
-      }, 100);
-    });
-  };
+      await handleFormValues();
+      if (activeStep === 1 && hasUserEditedStep1) {
+        const result = await handleFileUrl({
+          data: eventData,
+          generateUploadUrl,
+          getTimezone,
+        });
+
+        console.log(result);
+
+        if (!result) {
+          toast.error("Failed to upload logo", {
+            autoClose: 2000,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+          return;
+        }
+        const { logoUrl, logoId, timezone, timezoneOffset } = result;
+        let eventResult = null;
+        console.log(eventData.dates);
+        try {
+          const { event } = await createOrUpdateEvent({
+            _id: eventData._id || "",
+            name: eventData.name,
+            slug: slugify(eventData.name),
+            logoId,
+            logo: logoUrl,
+            eventType: eventData.type || [],
+            eventCategory: eventData.category,
+            dates: {
+              edition: eventData.dates.edition,
+              eventDates: eventData.dates.eventDates,
+              ongoing: eventData.dates.ongoing,
+              eventFormat: eventData.dates.eventFormat,
+              prodFormat: eventData.dates.prodFormat,
+            },
+            location: {
+              ...eventData.location,
+              timezone: timezone,
+              timezoneOffset: timezoneOffset,
+            },
+            about: eventData.about,
+            links: eventData.links,
+            otherInfo: eventData.otherInfo || [],
+            active: eventData.active,
+            orgId: orgData._id as Id<"organizations">,
+          });
+
+          eventResult = event;
+
+          setExistingEvent(eventResult);
+
+          reset({
+            ...currentValues,
+            event: {
+              ...event,
+              category: event?.eventCategory || "",
+              type: event?.eventType || [],
+            },
+          });
+          toast.success(existingEvent ? "Event updated!" : "Event created!");
+        } catch (error) {
+          console.error("Failed to create new event:", error);
+          toast.error("Failed to create new event");
+        }
+      }
+    },
+    [
+      hasUserEditedStep0,
+      orgData,
+      generateUploadUrl,
+      getTimezone,
+      createNewOrg,
+      existingOrg,
+      reset,
+      handleFormValues,
+      activeStep,
+      hasUserEditedStep1,
+      eventData,
+      createOrUpdateEvent,
+      existingEvent,
+      currentValues,
+      setExistingEvent,
+      handleCheckSchema,
+    ],
+  );
 
   const handleReset = () => {
     setActiveStep(0);
@@ -747,7 +829,6 @@ export const EventOCForm = ({
 
   useEffect(() => {
     if (clearEventDataTrigger) {
-      console.log("fucking clear event data");
       setFurthestStep(0);
       reset({
         organization: {
@@ -767,7 +848,12 @@ export const EventOCForm = ({
   }, [clearEventDataTrigger, reset, existingOrg]);
 
   useEffect(() => {
-    const format = eventData?.dates?.eventFormat;
+    if (!eventDatesFormat) return;
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      if (!hasNoEventDates) return;
+    }
+
     const otherFormats = [
       "noEvent",
       "setDates",
@@ -776,17 +862,22 @@ export const EventOCForm = ({
       "seasonRange",
     ];
 
-    if (!format) return;
+    if (!eventDatesFormat) return;
+    // if (!hasNoEventDatesEdition) return;
 
-    if (format === "ongoing") {
+    if (eventDatesFormat === "ongoing") {
       setValue("event.dates.ongoing", true);
     }
 
-    if (format === "noEvent" || format === "setDates" || format === "ongoing") {
+    if (
+      eventDatesFormat === "noEvent" ||
+      eventDatesFormat === "setDates" ||
+      eventDatesFormat === "ongoing"
+    ) {
       setValue("event.dates.eventDates", [{ start: "", end: "" }]);
     }
 
-    if (format === "yearRange") {
+    if (eventDatesFormat === "yearRange") {
       setValue("event.dates.eventDates", [
         {
           start: new Date().getFullYear().toString(),
@@ -795,7 +886,7 @@ export const EventOCForm = ({
       ]);
     }
 
-    if (format === "seasonRange") {
+    if (eventDatesFormat === "seasonRange") {
       setValue("event.dates.eventDates", [
         {
           start: toSeason(new Date()),
@@ -803,11 +894,11 @@ export const EventOCForm = ({
         },
       ]);
     }
-    if (otherFormats.includes(format)) {
+    if (otherFormats.includes(eventDatesFormat)) {
       setValue("event.dates.ongoing", false);
       setValue("event.dates.edition", new Date().getFullYear());
     }
-  }, [eventData?.dates?.eventFormat, setValue, hasNoEventDatesEdition]);
+  }, [eventDatesFormat, setValue, hasNoEventDates]);
 
   useEffect(() => {
     if (hasUserEditedForm) {
@@ -817,20 +908,33 @@ export const EventOCForm = ({
     }
   }, [setHasUnsavedChanges, hasUserEditedForm]);
 
-  useEffect(() => {
-    // console.log("shouldClose", shouldClose);
-    if (shouldClose) {
-      // console.log("onClose");
-    } else {
-      // console.log("after timeout");
-    }
-  }, [shouldClose]);
+  // useEffect(() => {
+  //   if (!shouldClose) return;
+  //   const saveOnClose = async () => {
+  //     await handleSave(true);
+  //   };
+  //   saveOnClose();
+  //   setOpen(false);
+  // }, [shouldClose, handleSave, setOpen]);
 
   useEffect(() => {
     if (!orgData?.name && activeStep > 0) {
       setActiveStep(0);
     }
   }, [orgData, activeStep, setActiveStep]);
+
+  // 1. Create a stable callback that saves and then closes:
+  const saveAndClose = useCallback(async () => {
+    await handleSave(true);
+    setOpen(false);
+  }, [handleSave, setOpen]);
+
+  // 2. Fire it only when shouldClose goes true:
+  useEffect(() => {
+    if (shouldClose) {
+      saveAndClose();
+    }
+  }, [shouldClose, saveAndClose]);
 
   return (
     <HorizontalLinearStepper
@@ -843,10 +947,10 @@ export const EventOCForm = ({
       className="px-2 xl:px-8"
       finalLabel="Submit"
       onFinalSubmit={handleSubmit(onSubmit)}
-      isDirty={isDirty}
-      onSave={handleSubmit(onSubmit)}
+      isDirty={hasUserEditedForm}
+      onSave={() => handleSave(true)}
       lastSaved={lastSavedDate}
-      disabled={!isValid}
+      disabled={!isValid || loading}
       cancelButton={
         <DialogClose asChild>
           <Button
@@ -1830,9 +1934,10 @@ export const EventOCForm = ({
                             name="event.about"
                             control={control}
                             render={({ field }) => (
-                              <Textarea
+                              <DebouncedTextarea
                                 value={field.value ?? ""}
                                 onChange={field.onChange}
+                                delay={500}
                                 className="border border-foreground sm:h-25"
                               />
                             )}

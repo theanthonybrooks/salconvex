@@ -328,20 +328,42 @@ export function formatToZonedISOString(
   return zoned.toISO() ?? "";
 }
 
+// export const toDate = (
+//   value: string | Date | null | undefined,
+// ): Date | null => {
+//   // console.log("toDate", value);
+//   if (!value) return null;
+//   if (value instanceof Date) return value;
+//   const date = new Date(value);
+//   // console.log("toDate", date);
+//   return isNaN(date.getTime()) ? null : date;
+// };
+
 export const toDate = (
   value: string | Date | null | undefined,
 ): Date | null => {
-  // console.log("toDate", value);
   if (!value) return null;
   if (value instanceof Date) return value;
+
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    const [, yearStr, monthStr, dayStr] = match;
+    return new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)); // Local time
+  }
+
   const date = new Date(value);
-  // console.log("toDate", date);
+  console.log(date);
   return isNaN(date.getTime()) ? null : date;
 };
 
 export const toYearMonth = (date: Date | null | undefined): string => {
   if (!date) return "";
-  return date.toISOString().slice(0, 7); // "YYYY-MM"
+  // return date.toISOString().slice(0, 7); // "YYYY-MM" but also gave the wrong month sometimes. Need to test this more.
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  console.log(year, month);
+  console.log(`${year}-${month}`);
+  return `${year}-${month}`; // Local YYYY-MM
 };
 
 export const toSeason = (date: Date | null | undefined): string => {
@@ -366,10 +388,21 @@ export const toYear = (date: Date | null | undefined): string => {
   return date.getFullYear().toString();
 };
 
+// export const toDateString = (date: Date | null | undefined): string => {
+//   if (!date) return "";
+//   return date.toISOString().slice(0, 10);
+// };
+
 export const toDateString = (date: Date | null | undefined): string => {
   if (!date) return "";
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  console.log(year, month, day);
+  console.log(`${year}-${month}-${day}`);
+  return `${year}-${month}-${day}`; // Local YYYY-MM-DD
 };
+
 export const fromSeason = (input: string): Date | null => {
   const match = input.match(/^(Spring|Summer|Fall|Winter)\s+(\d{4})$/i);
   if (!match) return null;

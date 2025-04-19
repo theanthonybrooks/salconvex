@@ -299,6 +299,7 @@ export const createOrUpdateEvent = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    console.log(args.logoId, args.logo);
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     let fileUrl = "/1.jpg" as string | null;
