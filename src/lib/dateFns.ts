@@ -327,3 +327,60 @@ export function formatToZonedISOString(
   // Return ISO string with offset (includes -05:00 or -06:00)
   return zoned.toISO() ?? "";
 }
+
+export const toDate = (
+  value: string | Date | null | undefined,
+): Date | null => {
+  // console.log("toDate", value);
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  const date = new Date(value);
+  // console.log("toDate", date);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+export const toYearMonth = (date: Date | null | undefined): string => {
+  if (!date) return "";
+  return date.toISOString().slice(0, 7); // "YYYY-MM"
+};
+
+export const toSeason = (date: Date | null | undefined): string => {
+  console.log("toSeason", date);
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const quarter = Math.floor(month / 3) + 1;
+
+  const seasonMap: Record<number, string> = {
+    1: "Spring",
+    2: "Summer",
+    3: "Fall",
+    4: "Winter",
+  };
+  console.log("toSeason", seasonMap[quarter], year);
+  return `${seasonMap[quarter]} ${year}`;
+};
+
+export const toYear = (date: Date | null | undefined): string => {
+  if (!date) return "";
+  return date.getFullYear().toString();
+};
+
+export const fromSeason = (input: string): Date | null => {
+  const match = input.match(/^(Spring|Summer|Fall|Winter)\s+(\d{4})$/i);
+  if (!match) return null;
+
+  const [, seasonRaw, yearStr] = match;
+  const year = parseInt(yearStr, 10);
+  const season = seasonRaw.toLowerCase();
+
+  const monthMap: Record<string, number> = {
+    spring: 0, // Jan
+    summer: 3, // April
+    fall: 6, // July
+    winter: 9, // October
+  };
+
+  const month = monthMap[season];
+  return new Date(year, month, 1);
+};

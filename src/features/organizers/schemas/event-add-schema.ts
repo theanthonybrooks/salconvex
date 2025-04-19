@@ -89,8 +89,8 @@ const eventSchema = z
       edition: z.number(),
       eventDates: z.array(
         z.object({
-          start: z.string(),
-          end: z.string(),
+          start: z.string({ required_error: "Start date is required" }),
+          end: z.string({ required_error: "End date is required" }),
         }),
       ),
       artistStart: z.string().optional(),

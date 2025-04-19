@@ -882,3 +882,125 @@ button:active {
     fill: #a917a9 !important;
   }
 }
+
+/* .react-datepicker-popper {
+} */
+
+.react-datepicker__day--today,
+.react-datepicker__month-text--today,
+.react-datepicker__quarter-text--today,
+.react-datepicker__year-text--today {
+  /* background-color: rgba(248, 241, 107, 0.7); */
+  background-color: rgba(244, 169, 246, 0.5);
+  font-weight: bold;
+  border-radius: 0.3rem;
+}
+.react-datepicker-wrapper {
+  width: 100%;
+  & * input {
+    cursor: pointer;
+  }
+}
+
+.react-datepicker {
+  font-size: 14px;
+  background-color: white;
+  z-index: 50;
+  border: 1px solid black;
+  border-radius: 0.25rem;
+  min-width: max-content;
+}
+
+.react-datepicker__header {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.react-datepicker__month {
+  margin: 0.5rem;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #facc15; /* Tailwind yellow-400 */
+  color: black;
+}
+
+.react-datepicker__day:hover {
+  background-color: #fde68a; /* Tailwind yellow-200 */
+}
+
+.react-datepicker__triangle {
+  z-index: 50;
+}
+
+.react-datepicker__tab-loop {
+  position: absolute;
+}
+.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
+  border-bottom-color: white;
+  fill: white;
+  stroke: black;
+}
+
+.react-datepicker__month react-datepicker__monthPicker {
+  display: flex;
+  flex-direction: column;
+  row-gap: 2px;
+}
+
+.react-datepicker__month .react-datepicker__month-text,
+.react-datepicker__month .react-datepicker__quarter-text {
+  width: auto;
+  padding: 0.25rem 0.85rem;
+}
+
+.react-datepicker__day:not([aria-disabled="true"]):hover,
+.react-datepicker__month-text:not([aria-disabled="true"]):hover,
+.react-datepicker__quarter-text:not([aria-disabled="true"]):hover,
+.react-datepicker__year-text:not([aria-disabled="true"]):hover {
+  background-color: rgba(244, 169, 246, 0.527);
+}
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__month-text--keyboard-selected,
+.react-datepicker__year-text--keyboard-selected,
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range,
+.react-datepicker__month-text--selected,
+.react-datepicker__month-text--in-selecting-range,
+.react-datepicker__month-text--in-range,
+/* .react-datepicker__quarter-text--selected, */
+.react-datepicker__year-text--selected,
+.react-datepicker__year-text--in-selecting-range,
+.react-datepicker__year-text--in-range {
+  border-radius: 0.3rem;
+  background-color: rgb(248, 241, 107);
+  border: 1.5px solid black;
+  color: black;
+}
+
+.react-datepicker__quarter-wrapper div:nth-child(1)::after {
+  content: "Spring";
+}
+.react-datepicker__quarter-wrapper div:nth-child(2)::after {
+  content: "Summer";
+}
+.react-datepicker__quarter-wrapper div:nth-child(3)::after {
+  content: "Fall";
+}
+.react-datepicker__quarter-wrapper div:nth-child(4)::after {
+  content: "Winter";
+}
+
+.react-datepicker__quarter-wrapper div::after {
+  display: block;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: center;
+  content: attr(data-season); /* fallback if using JS-injected attributes */
+}
+
+.react-datepicker__quarter-wrapper div {
+  font-size: 0 !important; /* hide original Q1 text */
+}

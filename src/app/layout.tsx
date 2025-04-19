@@ -19,6 +19,7 @@ import { fetchQuery } from "convex/nextjs";
 import { GeistSans } from "geist/font/sans";
 import "leaflet/dist/leaflet.css";
 import type { Metadata } from "next";
+import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import "./globals.css";

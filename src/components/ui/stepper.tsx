@@ -33,6 +33,7 @@ interface StepperProps {
   isDirty?: boolean;
   disabled?: boolean;
   lastSaved?: string | null;
+  errorMsg?: string;
 }
 
 export default function HorizontalLinearStepper({
@@ -52,6 +53,7 @@ export default function HorizontalLinearStepper({
   isDirty,
   disabled,
   lastSaved,
+  errorMsg,
 }: StepperProps) {
   const stepArray =
     typeof steps === "number"
@@ -206,9 +208,17 @@ export default function HorizontalLinearStepper({
                 </p>
               )} */}
             </section>
-            {onSave !== undefined && !lastSaved && activeStep >= 1 && (
-              <p className="hidden text-balance text-sm italic lg:block">
-                You can save at any time and come back to it later.
+            {onSave !== undefined &&
+              !errorMsg &&
+              !lastSaved &&
+              activeStep >= 1 && (
+                <p className="hidden text-balance text-sm italic lg:block">
+                  You can save at any time and come back to it later.
+                </p>
+              )}
+            {errorMsg && (
+              <p className="hidden text-sm italic text-red-600 lg:block">
+                {errorMsg}
               </p>
             )}
             <section className="flex min-w-24 items-center justify-end gap-2">

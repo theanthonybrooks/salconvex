@@ -18,6 +18,7 @@ import {
 
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CustomDatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
@@ -33,15 +34,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { columns } from "@/features/artists/applications/data-table/columns";
 import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventNameSearch } from "@/features/events/components/event-search";
+import { toDateString, toSeason, toYear, toYearMonth } from "@/lib/dateFns";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import DatePicker from "react-datepicker";
 import { Path, useWatch } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
@@ -140,6 +141,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [furthestStep, setFurthestStep] = useState(0);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
     null,
@@ -149,7 +151,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     null,
   );
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
-  console.log("selected row", selectedRow);
   const [lastSaved, setLastSaved] = useState(
     existingOrg ? existingOrg.updatedAt : null,
   );
@@ -186,16 +187,21 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     !errors.organization?.location?.country && Boolean(orgData?.location?.full);
   const orgLogoValid = !errors.organization?.logo && Boolean(orgData?.logo);
   const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
-  const data = useQuery(
+  // const data = useQuery(
+  //   api.events.event.getEventByOrgId,
+  //   existingOrg ? { orgId: existingOrg?._id } : "skip",
+  // );
+  const {
+    data: orgEventsData,
+    // isPending: orgEventsPending, //use this later for some loading state for the events table. Use skeleton loaders
+    isSuccess: orgEventsSuccess,
+  } = useQueryWithStatus(
     api.events.event.getEventByOrgId,
     existingOrg ? { orgId: existingOrg?._id } : "skip",
   );
-  const eventsData = data ?? [];
-  console.log(eventsData?.length, data);
-  const orgHasNoEvents = eventsData?.length === 0 && !!existingOrg;
-
-  console.log(orgHasNoEvents);
-
+  const eventsData = orgEventsData ?? [];
+  const orgHasNoEvents =
+    orgEventsSuccess && eventsData?.length === 0 && !!existingOrg;
   const eventChoiceMade = existingEvent || newOrgEvent || !existingOrg;
 
   const eventCategory = eventData?.category as EventCategory;
@@ -245,14 +251,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
   const hasUserEditedStep1 = dirtyFields.event ?? false;
   const prevOrgRef = useRef(existingOrg);
 
-  console.log(hasuserEditedStep0);
-  console.log("hasUserEditedStep1", hasUserEditedStep1);
-
-  // console.log("eventNameData", eventNameData);
-
-  // console.log("eventNameExists", eventNameValid);
-  // console.log("eventNameExistsError", eventNameExistsError);
-
   // const orgValidation = useQuery(
   //   api.organizer.organizations.isOwnerOrIsNewOrg,
   //   orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
@@ -283,7 +281,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   //   // error,
   // );
+  // console.log(hasuserEditedStep0);
+  console.log("hasUserEditedStep1", hasUserEditedStep1);
 
+  // console.log("eventNameData", eventNameData);
+
+  // console.log("eventNameExists", eventNameValid);
+  // console.log("eventNameExistsError", eventNameExistsError);
   console.log(errors);
   // console.log(hasuserEditedStep0);
   //
@@ -325,15 +329,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   const onSubmit = async (data: EventOCFormValues) => {
     //todo: insert some validation that checks for blob images (new submissions) or existing images (edits). Edits shouldn't submit anything to the db if the logo is the same. Only blobs, which I'm assuming that I would use typeof to check for.
-    if (typeof data.organization.logo === "string") {
-      console.log("Logo is an existing image URL:", data.organization.logo);
-    } else {
-      console.log("Logo is a new Blob upload:", data.organization.logo);
-    }
+    // if (typeof data.organization.logo === "string") {
+    //   console.log("Logo is an existing image URL:", data.organization.logo);
+    // } else {
+    //   console.log("Logo is a new Blob upload:", data.organization.logo);
+    // }
 
     console.log("data", data);
     try {
-      console.log("organizer mode)");
+      // console.log("organizer mode)");
       reset();
       toast.success("Successfully updated profile! Forwarding to Stripe...");
 
@@ -361,11 +365,15 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         result.error.issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
           setError(path, { type: "manual", message: issue.message });
+          setErrorMsg(issue.message);
         });
 
-        toast.error("Please fix errors before continuing.");
+        // toast.error("Please fix errors before continuing.", {
+        //   position: "bottom-left",
+        // });
         return;
       }
+      setErrorMsg("");
     }
     if (hasuserEditedStep0) {
       console.log("hasuserEditedStep0");
@@ -469,10 +477,9 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       // if past event (or past open call), the event cannot be changed an selecting it will create a new event using the old one as a template.
 
       const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
-      console.log(existingEvent);
 
       if (existingEvent) {
-        console.log("existing event");
+        // console.log("existing event");
         const locationFromEvent = existingEvent.location?.sameAsOrganizer
           ? {
               ...currentValues.organization?.location,
@@ -481,9 +488,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           : {
               ...existingEvent.location,
             };
-
-        //TODO: run a check on whether the logo has changed since the org data was loaded (if existing) and if so, update the logo to the new one. Also use this for the event logo.
-
         reset({
           organization: {
             ...orgResult,
@@ -516,9 +520,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         });
       }
     } else if (activeStep === 0 && !hasuserEditedStep0 && furthestStep === 0) {
-      console.log(
-        "activeStep === 0 && !hasuserEditedStep0 && furthestStep === 0",
-      );
       if (existingEvent) {
         const locationFromEvent = existingEvent.location?.sameAsOrganizer
           ? {
@@ -557,7 +558,6 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       eventData &&
       eventData?._id !== existingEvent?._id
     ) {
-      console.log("else if last");
       reset({
         ...currentValues,
         event: {
@@ -584,11 +584,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         result.error.issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
           setError(path, { type: "manual", message: issue.message });
+          setErrorMsg(issue.message);
         });
 
-        toast.error("Please fix errors before continuing.");
+        // toast.error("Please fix errors before continuing.");
         return;
       }
+      setErrorMsg("");
     }
 
     if (activeStep === 1) {
@@ -766,6 +768,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   return (
     <HorizontalLinearStepper
+      errorMsg={errorMsg}
       activeStep={activeStep}
       setActiveStep={setActiveStep}
       onNextStep={handleNextStep}
@@ -1181,6 +1184,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                           id="event.type"
                           className="h-12 border sm:h-[50px]"
                           badgeClassName="py-2 lg:py-2 lg:text-sm "
+                          textClassName="text-base"
                           options={options}
                           onValueChange={(value) => {
                             field.onChange(value);
@@ -1234,7 +1238,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                           value={field.value ?? ""}
                           isExisting={eventNameExistsError}
                           onChange={field.onChange}
-                          className="border sm:h-[50px]"
+                          className="border !text-base sm:h-[50px]"
                         />
                       )}
                     />
@@ -1418,18 +1422,23 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                             Event Dates Format
                           </Label>
                           {eventData.dates.eventFormat === "setDates" && (
-                            <div className="flex items-center gap-x-2">
+                            <div className="flex max-w-full items-center gap-x-2">
                               <Controller
                                 name="event.dates.eventDates.0.start"
                                 control={control}
                                 render={({ field }) => {
                                   return (
-                                    <Input
-                                      type="date"
-                                      value={field.value ?? ""}
-                                      onChange={field.onChange}
-                                      placeholder="MM DD YYYY"
-                                      className="h-12 border-foreground text-center"
+                                    <CustomDatePicker
+                                      pickerType="dates"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toDateString(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      maxDate={
+                                        eventData?.dates?.eventDates[0]?.end
+                                      }
                                     />
                                   );
                                 }}
@@ -1440,12 +1449,17 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 control={control}
                                 render={({ field }) => {
                                   return (
-                                    <Input
-                                      type="date"
-                                      value={field.value ?? ""}
-                                      onChange={field.onChange}
-                                      placeholder="MM DD YYYY"
-                                      className="h-12 border-foreground text-center"
+                                    <CustomDatePicker
+                                      pickerType="dates"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toDateString(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      minDate={
+                                        eventData?.dates?.eventDates[0]?.start
+                                      }
                                     />
                                   );
                                 }}
@@ -1453,19 +1467,23 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                             </div>
                           )}
                           {eventData.dates.eventFormat === "monthRange" && (
-                            <div className="flex items-center gap-x-2">
+                            <div className="flex max-w-full items-center gap-x-2">
                               <Controller
                                 name="event.dates.eventDates.0.start"
                                 control={control}
                                 render={({ field }) => {
                                   return (
-                                    <DatePicker
-                                      selected={field.value ?? null}
-                                      onChange={(value) => console.log(value)}
-                                      dateFormat="MM/yyyy"
-                                      showMonthYearPicker
-                                      className="your-class"
-                                      placeholderText="Select month"
+                                    <CustomDatePicker
+                                      pickerType="month"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toYearMonth(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      maxDate={
+                                        eventData?.dates?.eventDates[0]?.end
+                                      }
                                     />
                                   );
                                 }}
@@ -1476,13 +1494,107 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
                                 control={control}
                                 render={({ field }) => {
                                   return (
-                                    <DatePicker
-                                      selected={field.value ?? null}
-                                      onChange={(value) => console.log(value)}
-                                      dateFormat="MM/yyyy"
-                                      showMonthYearPicker
-                                      className="your-class"
-                                      placeholderText="Select month"
+                                    <CustomDatePicker
+                                      pickerType="month"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toYearMonth(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      minDate={
+                                        eventData?.dates?.eventDates[0]?.start
+                                      }
+                                    />
+                                  );
+                                }}
+                              />
+                            </div>
+                          )}
+                          {eventData.dates.eventFormat === "yearRange" && (
+                            <div className="flex max-w-full items-center gap-x-2">
+                              <Controller
+                                name="event.dates.eventDates.0.start"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <CustomDatePicker
+                                      pickerType="year"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toYear(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      maxDate={
+                                        eventData?.dates?.eventDates[0]?.end
+                                      }
+                                    />
+                                  );
+                                }}
+                              />
+                              -
+                              <Controller
+                                name="event.dates.eventDates.0.end"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <CustomDatePicker
+                                      pickerType="year"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toYear(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      minDate={
+                                        eventData?.dates?.eventDates[0]?.start
+                                      }
+                                    />
+                                  );
+                                }}
+                              />
+                            </div>
+                          )}
+                          {eventData.dates.eventFormat === "seasonRange" && (
+                            <div className="flex max-w-full items-center gap-x-2">
+                              <Controller
+                                name="event.dates.eventDates.0.start"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <CustomDatePicker
+                                      pickerType="season"
+                                      value={field.value}
+                                      onChange={(date) => {
+                                        field.onChange(toSeason(date));
+                                      }}
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      maxDate={
+                                        eventData?.dates?.eventDates[0]?.end
+                                      }
+                                    />
+                                  );
+                                }}
+                              />
+                              -
+                              <Controller
+                                name="event.dates.eventDates.0.end"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <CustomDatePicker
+                                      pickerType="season"
+                                      value={field.value}
+                                      onChange={(date) =>
+                                        field.onChange(toSeason(date))
+                                      }
+                                      className="w-full rounded border p-2 text-center"
+                                      inputClassName="h-12"
+                                      minDate={
+                                        eventData?.dates?.eventDates[0]?.start
+                                      }
                                     />
                                   );
                                 }}

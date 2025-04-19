@@ -224,6 +224,15 @@ const PricingCard = ({
   accountType,
   image,
 }: PricingCardProps) => {
+  const [comingSoon, setComingSoon] = useState(false);
+  useEffect(() => {
+    if (features?.some((feature) => feature.includes("*"))) {
+      setComingSoon(true);
+    } else {
+      setComingSoon(false);
+    }
+  }, [features]);
+
   const isArtist = accountType === "artist";
   const isOrganizer = accountType === "organizer";
   const isFree = prices.rate === 0;
@@ -387,25 +396,19 @@ const PricingCard = ({
                 <CheckCircle2
                   className={cn("size-5 shrink-0 text-foreground")}
                 />
-                <p className={cn("text-muted-foreground")}>
-                  {feature.includes("*") ? (
-                    <>
-                      {feature.split("*")[0]}
-                      <span className="text-sm italic text-muted-foreground">
-                        *{feature.split("*")[1]}
-                      </span>
-                    </>
-                  ) : (
-                    feature
-                  )}
-                </p>
+                <p className={cn("text-muted-foreground")}>{feature}</p>
               </div>
             ))}
           </div>
         </CardContent>
       </div>
 
-      <CardFooter>
+      <CardFooter className={cn("flex flex-col gap-y-2")}>
+        {comingSoon && (
+          <p className="mt-2 w-full text-right text-sm italic text-muted-foreground">
+            *Feature Coming Soon
+          </p>
+        )}
         <AccountSubscribeForm
           user={user}
           mode={accountType as ModeType}
@@ -431,6 +434,7 @@ const PricingCard = ({
 
 export default function Pricing() {
   const [isYearly, setIsYearly] = useState<boolean>(false);
+
   const { isAuthenticated } = useConvexAuth();
 
   const userData = useQuery(

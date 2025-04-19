@@ -128,6 +128,7 @@ interface MultiSelectProps
    */
   className?: string;
   badgeClassName?: string;
+  textClassName?: string;
   height?: number;
   shortResults?: boolean;
   value?: string[];
@@ -165,6 +166,7 @@ export const MultiSelect = React.forwardRef<
       // asChild = false,
       className,
       badgeClassName,
+      textClassName,
       ...props
     },
     ref,
@@ -289,7 +291,11 @@ export const MultiSelect = React.forwardRef<
                           {IconComponent && (
                             <IconComponent className="mr-2 h-4 w-4" />
                           )}
-                          <p className="text-sm font-normal">{option?.label}</p>
+                          <p
+                            className={cn("text-sm font-normal", textClassName)}
+                          >
+                            {option?.label}
+                          </p>
                           {!lockedValue.includes(value) && (
                             <X
                               className="ml-2 h-3 w-3 cursor-pointer"
@@ -361,7 +367,12 @@ export const MultiSelect = React.forwardRef<
               </div>
             ) : (
               <div className="mx-auto flex w-full items-center justify-between">
-                <span className="mx-3 text-sm font-normal text-foreground">
+                <span
+                  className={cn(
+                    "mx-3 text-sm font-normal text-foreground",
+                    textClassName,
+                  )}
+                >
                   {placeholder}
                 </span>
                 {isPopoverOpen ? (

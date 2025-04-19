@@ -319,6 +319,7 @@ NavBarProps) {
                       </Button>
                     ) : (
                       <Button
+                        variant="icon"
                         className="bg-background text-foreground hover:scale-110 hover:bg-background"
                         size="icon"
                       >
