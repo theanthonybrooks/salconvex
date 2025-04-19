@@ -249,6 +249,8 @@ export const createOrUpdateEvent = mutation({
       artistStart: v.optional(v.string()),
       artistEnd: v.optional(v.string()),
       ongoing: v.boolean(),
+      eventFormat: v.optional(v.string()),
+      prodFormat: v.optional(v.string()),
     }),
     location: v.object({
       sameAsOrganizer: v.boolean(),
@@ -334,6 +336,8 @@ export const createOrUpdateEvent = mutation({
           edition: args.dates.edition || new Date().getFullYear(),
           eventDates: args.dates.eventDates || [{ start: "", end: "" }],
           ongoing: args.dates.ongoing || false,
+          eventFormat: args.dates.eventFormat || "",
+          prodFormat: args.dates.prodFormat || "",
         },
         location: {
           ...args.location,
@@ -361,6 +365,8 @@ export const createOrUpdateEvent = mutation({
         edition: args.dates.edition || new Date().getFullYear(),
         eventDates: args.dates.eventDates || [{ start: "", end: "" }],
         ongoing: args.dates.ongoing || false,
+        eventFormat: args.dates.eventFormat || "",
+        prodFormat: args.dates.prodFormat || "",
       },
       location: {
         ...args.location,

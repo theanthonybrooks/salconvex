@@ -192,6 +192,8 @@ const eventSchema = {
     artistStart: v.optional(v.string()),
     artistEnd: v.optional(v.string()),
     ongoing: v.boolean(),
+    eventFormat: v.optional(v.string()),
+    prodFormat: v.optional(v.string()),
   }),
   location: v.object({
     sameAsOrganizer: v.optional(v.boolean()),

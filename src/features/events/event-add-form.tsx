@@ -116,7 +116,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     // register,
     control,
     watch,
-    // setValue,
+    setValue,
     getValues,
     setError,
     // trigger,
@@ -629,7 +629,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
         } else if (data.logo && typeof data.logo === "string") {
           eventLogoUrl = data.logo;
         }
-
+        console.log(data.dates);
         try {
           const { event } = await createOrUpdateEvent({
             _id: data._id || "",
@@ -643,6 +643,8 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
               edition: data.dates.edition,
               eventDates: data.dates.eventDates,
               ongoing: data.dates.ongoing,
+              eventFormat: data.dates.eventFormat,
+              prodFormat: data.dates.prodFormat,
             },
             location: {
               ...data.location,
@@ -765,6 +767,22 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
       });
     }
   }, [clearEventDataTrigger, reset, existingOrg]);
+
+  useEffect(() => {
+    const format = eventData?.dates?.eventFormat;
+
+    if (!format) return;
+
+    if (format === "ongoing") {
+      setValue("event.dates.ongoing", true);
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+    }
+
+    if (format === "noEvent") {
+      setValue("event.dates.ongoing", false);
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+    }
+  }, [eventData?.dates?.eventFormat, setValue]);
 
   return (
     <HorizontalLinearStepper
