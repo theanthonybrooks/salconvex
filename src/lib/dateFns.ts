@@ -9,9 +9,7 @@ export const formatEventDates = (
   preview?: boolean,
 ) => {
   const isMobile = mode === "mobile";
-  if (ongoing) console.log("ongoing");
   if (ongoing) return "Ongoing";
-  if (ongoing) console.log("ongoingafter");
 
   const seasonalTerms = ["spring", "summer", "fall", "winter"];
 
@@ -37,6 +35,9 @@ export const formatEventDates = (
 
     if (!startSeason && endSeason) {
       return `By ${end}`;
+    }
+    if (start === end) {
+      return `${start}`;
     }
 
     return startYear === endYear

@@ -36,6 +36,13 @@ export interface EventData {
     artistStart?: string;
     artistEnd?: string;
     ongoing: boolean;
+    eventFormat?:
+      | "noEvent"
+      | "setDates"
+      | "monthRange"
+      | "yearRange"
+      | "seasonRange";
+    prodFormat?: "setDates" | "monthRange" | "yearRange" | "seasonRange";
   };
 
   location: {

@@ -33,13 +33,15 @@ const EventDates = ({
 
         return (
           <span key={index} className="flex flex-col gap-1">
-            {formatEventDates(
-              start || "",
-              end || "",
-              dates.ongoing,
-              format,
-              preview,
-            )}
+            {dates?.eventFormat !== "noEvent"
+              ? formatEventDates(
+                  start || "",
+                  end || "",
+                  dates.ongoing,
+                  format,
+                  preview,
+                )
+              : "No Event"}
             {shouldShowPlus && (
               <p className="text-sm italic text-foreground">
                 {shouldShowPlus &&

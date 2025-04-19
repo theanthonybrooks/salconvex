@@ -722,7 +722,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             <div className="flex flex-col gap-y-2">
               {/*TODO: In the future, this should first check if it has sameAsOrganizer checked, and if so, should use the links from the organizer. Otherwise, it should check if there are any links at all. */}
               {(Object.keys(event.links || {}).length === 0 ||
-                (Object.keys(event.links || {}).length > 0 &&
+                (Object.keys(event.links || {}).length === 1 &&
                   event.links?.sameAsOrganizer === true)) && (
                 <div className="flex items-center gap-x-2">
                   <Info className="size-5" />
