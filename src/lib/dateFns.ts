@@ -366,6 +366,10 @@ export const toYear = (date: Date | null | undefined): string => {
   return date.getFullYear().toString();
 };
 
+export const toDateString = (date: Date | null | undefined): string => {
+  if (!date) return "";
+  return date.toISOString().slice(0, 10);
+};
 export const fromSeason = (input: string): Date | null => {
   const match = input.match(/^(Spring|Summer|Fall|Winter)\s+(\d{4})$/i);
   if (!match) return null;

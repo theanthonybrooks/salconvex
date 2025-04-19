@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { Button } from "./button";
 
-type PickerType = "month" | "year" | "season";
+type PickerType = "month" | "year" | "season" | "dates";
 
 interface CustomDatePickerProps {
   value?: string;
@@ -94,7 +94,9 @@ export const CustomDatePicker = ({
       ? "yyyy"
       : pickerType === "season"
         ? "QQQ yyyy"
-        : "MMMM yyyy";
+        : pickerType === "dates"
+          ? "MMMM d, yyyy"
+          : "MMMM yyyy";
 
   //   console.log(parsedDate, value);
 
