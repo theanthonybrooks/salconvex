@@ -504,6 +504,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
           },
         });
       } else {
+        console.log("else reset");
         reset({
           organization: {
             ...orgResult,
@@ -547,6 +548,13 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
             logo: currentValues.organization.logo,
             location: {
               ...currentValues.organization.location,
+              sameAsOrganizer: true,
+            },
+            dates: {
+              ongoing: false,
+              edition: new Date().getFullYear(),
+            },
+            links: {
               sameAsOrganizer: true,
             },
           },
@@ -770,6 +778,7 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
 
   useEffect(() => {
     const format = eventData?.dates?.eventFormat;
+    const otherFormats = ["setDates", "monthRange", "yearRange", "seasonRange"];
 
     if (!format) return;
 
@@ -781,6 +790,10 @@ export const EventOCForm = ({ user, onClick }: EventOCFormProps) => {
     if (format === "noEvent") {
       setValue("event.dates.ongoing", false);
       setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+    }
+    if (otherFormats.includes(format)) {
+      setValue("event.dates.ongoing", false);
+      setValue("event.dates.edition", new Date().getFullYear());
     }
   }, [eventData?.dates?.eventFormat, setValue]);
 

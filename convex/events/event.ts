@@ -317,7 +317,11 @@ export const createOrUpdateEvent = mutation({
     const organization = await ctx.db.get(args.orgId);
     console.log("organization", organization);
 
-    const event = await ctx.db.get(args._id as Id<"events">);
+    function isValidEventId(id: string): id is Id<"events"> {
+      return typeof id === "string" && id.trim() !== "";
+    }
+
+    const event = isValidEventId(args._id) ? await ctx.db.get(args._id) : null;
 
     if (event) {
       const isOwner = event.mainOrgId === args.orgId;
