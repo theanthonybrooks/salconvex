@@ -4,13 +4,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -45,7 +39,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
-import { Path, useWatch } from "react-hook-form";
+import { Path } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
@@ -94,6 +88,7 @@ interface EventOCFormProps {
   user: User | undefined;
   onClick: () => void;
   shouldClose: boolean;
+  setShouldClose: React.Dispatch<React.SetStateAction<boolean>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children?: React.ReactNode;
   hasUnsavedChanges: boolean;
@@ -109,6 +104,7 @@ export const EventOCForm = ({
   onClick,
   shouldClose,
   setOpen,
+  setShouldClose,
   // hasUnsavedChanges,
   setHasUnsavedChanges,
   activeStep,
@@ -158,7 +154,6 @@ export const EventOCForm = ({
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const [isMobile, setIsMobile] = useState(false);
-  // const [activeStep, setActiveStep] = useState(0);
   const [furthestStep, setFurthestStep] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -173,7 +168,7 @@ export const EventOCForm = ({
   const [lastSaved, setLastSaved] = useState(
     existingEvent ? existingEvent.lastEditedAt : null,
   );
-  const [loading] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const hasExistingOrg =
     typeof existingOrg === "object" && existingOrg !== null;
@@ -182,21 +177,28 @@ export const EventOCForm = ({
     ? new Date(Math.floor(lastSaved)).toLocaleString()
     : null;
 
-  const watchedValues = useWatch({ control });
-  const currentSchema = steps[activeStep]?.schema;
+  const eventLastEditedAt =
+    (existingEvent && existingEvent?.lastEditedAt) || null;
 
-  const isStepValidZod = useMemo(() => {
-    if (!currentSchema) return true;
-    const result = currentSchema.safeParse(watchedValues);
-    return result.success;
-  }, [watchedValues, currentSchema]);
+  // const watchedValues = useWatch({ control });
+  // const currentSchema = steps[activeStep]?.schema;
+
+  // const isStepValidZod = useMemo(() => {
+  //   if (!currentSchema) return true;
+  //   const result = currentSchema.safeParse(watchedValues);
+  //   return result.success;
+  // }, [watchedValues, currentSchema]);
+
+  const isStepValidZod = true;
 
   //
   //
   // ------------- Step 1 - Organization & Event --------------
   //
   //
+  const hasClosed = useRef(false);
   const isFirstRun = useRef(true);
+  const savedState = useRef(false);
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
   const eventData = watch("event");
@@ -287,6 +289,7 @@ export const EventOCForm = ({
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
+  const hasErrors = !!errors && Object.keys(errors).length > 0;
   // const existingOrgUpdateTrigger =
   //   hasExistingOrg && validOrgWZod && hasUserEditedStep0;
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
@@ -296,6 +299,7 @@ export const EventOCForm = ({
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
+
   //
 
   //
@@ -317,12 +321,12 @@ export const EventOCForm = ({
   // console.log(eventChoiceMade, newOrgEvent, orgHasNoEvents);
   // console.log("eventNameIsDirty", eventNameIsDirty);
   // console.log(hasUserEditedStep0);
-  if (activeStep === 0) {
-    console.log("hasUserEditedStep0", hasUserEditedStep0);
-  } else if (activeStep === 1) {
-    console.log("hasUserEditedStep1", hasUserEditedStep1);
-  }
-  console.log("hasUserEditedForm", hasUserEditedForm);
+  // if (activeStep === 0) {
+  //   console.log("hasUserEditedStep0", hasUserEditedStep0);
+  // } else if (activeStep === 1) {
+  //   console.log("hasUserEditedStep1", hasUserEditedStep1);
+  // }
+  // console.log("hasUserEditedForm", hasUserEditedForm);
 
   // console.log("eventNameData", eventNameData);
 
@@ -341,16 +345,16 @@ export const EventOCForm = ({
   // console.log("isValid", isValid);
   // console.log(orgNameValid, orgLocationValid);
   // console.log(newOrgEvent);
-  if (orgData.name !== undefined && orgData.name !== "") {
-    console.log(orgData);
-    console.log("existingOrg", existingOrg);
-  }
-  if (eventData) {
-    console.log(eventData);
-  }
-  if (existingEvent) {
-    console.log(existingEvent);
-  }
+  // if (orgData.name !== undefined && orgData.name !== "") {
+  //   console.log(orgData);
+  //   console.log("existingOrg", existingOrg);
+  // }
+  // if (eventData) {
+  //   console.log(eventData);
+  // }
+  // if (existingEvent) {
+  //   console.log(existingEvent);
+  // }
 
   // console.log(eventsData, "now");
   // console.log("orgValue", orgValue);
@@ -538,6 +542,7 @@ export const EventOCForm = ({
         const { logoUrl, logoId, timezone, timezoneOffset } = result;
 
         try {
+          setPending(true);
           const { org } = await createNewOrg({
             organizationName: orgData.name,
             logoId,
@@ -567,12 +572,13 @@ export const EventOCForm = ({
             },
           });
           orgResult = org;
-          toast.success(
-            existingOrg
-              ? "Organization updated!"
-              : "Organization created! Going to step 2...",
-            {},
-          );
+          setPending(false);
+          // toast.success(
+          //   existingOrg
+          //     ? "Organization updated!"
+          //     : "Organization created! Going to step 2...",
+          //   {},
+          // );
 
           // Updating existingOrg state with new values
           //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
@@ -669,6 +675,7 @@ export const EventOCForm = ({
         let eventResult = null;
         console.log(eventData.dates);
         try {
+          setPending(true);
           const { event } = await createOrUpdateEvent({
             _id: eventData._id || "",
             name: eventData.name,
@@ -709,9 +716,10 @@ export const EventOCForm = ({
               type: event?.eventType || [],
             },
           });
-          toast.success(existingEvent ? "Event updated!" : "Event created!", {
-            onClick: () => toast.dismiss(), // dismisses the current toast
-          });
+          setPending(false);
+          // toast.success(existingEvent ? "Event updated!" : "Event created!", {
+          //   onClick: () => toast.dismiss(), // dismisses the current toast
+          // });
         } catch (error) {
           console.error("Failed to create new event:", error);
           toast.error("Failed to create new event");
@@ -759,23 +767,50 @@ export const EventOCForm = ({
 
   // -------------UseEffects --------------
 
-  //checking if/when the existingOrg changes and loading new info
   useEffect(() => {
-    const orgChanged = existingOrg?._id !== prevOrgRef.current?._id;
+    if (orgData?.name !== undefined && orgData?.name !== "") {
+      console.log(getValues("organization"));
+      console.log(existingOrg);
+    }
+  }, [orgData, existingOrg, getValues]);
+
+  useEffect(() => {
+    if (eventData?.name !== undefined && eventData?.name !== "") {
+      console.log(eventData);
+      console.log(existingEvent);
+    }
+  }, [eventData, existingEvent]);
+
+  useEffect(() => {
+    if (!existingOrg) return;
+    if (existingOrg?._id === prevOrgRef.current?._id) return;
+    const orgReady =
+      existingOrg &&
+      typeof existingOrg._id === "string" &&
+      existingOrg._id.length > 0;
+
+    const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
+
     if (orgChanged) {
       reset({
         organization: {
           ...existingOrg,
+          location: existingOrg?.location,
         },
       });
       prevOrgRef.current = existingOrg;
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, reset]);
+  }, [existingOrg, reset, getValues]);
 
   useEffect(() => {
-    const eventChanged = existingEvent?._id !== prevEventRef.current?._id;
+    const eventReady =
+      existingEvent &&
+      typeof existingEvent._id === "string" &&
+      existingEvent._id.length > 0;
+    const eventChanged =
+      eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged) {
       if (existingEvent?.lastEditedAt) {
         setLastSaved(existingEvent.lastEditedAt);
@@ -793,6 +828,22 @@ export const EventOCForm = ({
       setLastSaved(null);
     }
   }, [existingEvent, reset, currentValues]);
+
+  useEffect(() => {
+    if (savedState.current === false && eventLastEditedAt) {
+      setLastSaved(eventLastEditedAt);
+      savedState.current = true;
+      return;
+    }
+    if (!eventLastEditedAt) {
+      setLastSaved(null);
+      savedState.current = false;
+      return;
+    }
+    if (eventLastEditedAt !== lastSaved) {
+      setLastSaved(eventLastEditedAt);
+    }
+  }, [eventLastEditedAt, lastSaved]);
 
   //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
 
@@ -897,12 +948,12 @@ export const EventOCForm = ({
   }, [eventDatesFormat, setValue, hasNoEventDates]);
 
   useEffect(() => {
-    if (hasUserEditedForm) {
+    if (hasUserEditedForm && !hasErrors) {
       setHasUnsavedChanges(true);
     } else {
       setHasUnsavedChanges(false);
     }
-  }, [setHasUnsavedChanges, hasUserEditedForm]);
+  }, [setHasUnsavedChanges, hasUserEditedForm, hasErrors]);
 
   useEffect(() => {
     if (!orgData?.name && activeStep > 0) {
@@ -913,13 +964,17 @@ export const EventOCForm = ({
   // 1. Create a stable callback that saves and then closes:
   const saveAndClose = useCallback(async () => {
     await handleSave(true);
+    setShouldClose(false);
     setOpen(false);
-  }, [handleSave, setOpen]);
+  }, [handleSave, setOpen, setShouldClose]);
 
   // 2. Fire it only when shouldClose goes true:
   useEffect(() => {
-    if (shouldClose) {
+    if (shouldClose && !hasClosed.current) {
+      hasClosed.current = true;
       saveAndClose();
+    } else if (!shouldClose) {
+      hasClosed.current = false;
     }
   }, [shouldClose, saveAndClose]);
 
@@ -937,7 +992,8 @@ export const EventOCForm = ({
       isDirty={hasUserEditedForm}
       onSave={() => handleSave(true)}
       lastSaved={lastSavedDate}
-      disabled={!isValid || loading}
+      disabled={!isValid || pending}
+      pending={pending}
       cancelButton={
         <DialogClose asChild>
           <Button

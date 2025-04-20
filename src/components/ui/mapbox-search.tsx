@@ -33,9 +33,9 @@ interface MapboxInputProps {
 
 export const MapboxInput = ({
   id,
-  reset,
+  // reset,
   value,
-  onChange,
+  // onChange,
   onSelect,
   placeholder = "Enter a location",
   className,
@@ -93,14 +93,14 @@ export const MapboxInput = ({
     setSuggestions([]);
   };
 
-  useEffect(() => {
-    if (reset) {
-      setSuggestions([]);
-      setInputValue("");
-      setHighlightedIndex(0);
-      onChange("");
-    }
-  }, [reset, onChange]);
+  // useEffect(() => {
+  //   if (reset) {
+  //     setSuggestions([]);
+  //     setInputValue("");
+  //     setHighlightedIndex(0);
+  //     onChange("");
+  //   }
+  // }, [reset, onChange]);
 
   useEffect(() => {
     if (suggestions.length > 0 && listRef.current) {
@@ -219,14 +219,14 @@ interface MapboxInputFullProps {
   className?: string;
   inputClassName?: string;
   tabIndex?: number;
-  reset?: boolean;
+  reset: boolean;
   disabled?: boolean;
   isEvent?: boolean;
 }
 
 export const MapboxInputFull = ({
   id,
-  reset,
+  // reset,
   value,
   onChange,
   // onSelect,
@@ -394,14 +394,14 @@ export const MapboxInputFull = ({
     }, 150);
   };
 
-  useEffect(() => {
-    if (reset) {
-      setInputValue("");
-      setSuggestions([]);
-      setHighlightedIndex(0);
-      onChange(null);
-    }
-  }, [reset, onChange]);
+  // useEffect(() => {
+  //   if (reset) {
+  //     setInputValue("");
+  //     setSuggestions([]);
+  //     setHighlightedIndex(0);
+  //     onChange(null);
+  //   }
+  // }, [reset, onChange]);
 
   useEffect(() => {
     if (suggestions.length > 0 && listRef.current) {

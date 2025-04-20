@@ -17,7 +17,6 @@ export type CombinedEventPreviewCardData = EventData & {
   openCallStatus: OpenCallStatus | null;
   adminNoteOC?: string | null;
   eventId: string;
-  orgName: string;
   slug: string;
 };
 
@@ -64,7 +63,6 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
               hasActiveOpenCall: false,
               openCallStatus: null,
               eventId: event._id,
-              orgName: event.mainOrgName,
               slug: event.slug,
             },
           ];
@@ -121,7 +119,6 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
             hasActiveOpenCall,
             openCallStatus,
             eventId: event._id,
-            orgName: event.mainOrgName,
             slug: event.slug,
           };
         });

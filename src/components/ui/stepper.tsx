@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
-import { Check, CheckCircle2 } from "lucide-react";
+import { Check, CheckCircle2, Loader } from "lucide-react";
 import * as React from "react";
 import { z } from "zod";
 
@@ -34,6 +34,7 @@ interface StepperProps {
   disabled?: boolean;
   lastSaved?: string | null;
   errorMsg?: string;
+  pending?: boolean;
 }
 
 export default function HorizontalLinearStepper({
@@ -54,6 +55,7 @@ export default function HorizontalLinearStepper({
   disabled,
   lastSaved,
   errorMsg,
+  pending,
 }: StepperProps) {
   const stepArray =
     typeof steps === "number"
@@ -190,14 +192,15 @@ export default function HorizontalLinearStepper({
                     <Button
                       variant="salWithShadowHidden"
                       className={cn(
-                        "hidden bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:block",
+                        "hidden items-center gap-2 bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:flex",
                         isDirty && onSave !== undefined && "opacity-100",
                       )}
                       //todo: fix the conditional styling that uses isDirty and onSave
                       disabled={!isDirty}
                       onClick={onSave}
                     >
-                      Save Progress
+                      {pending ? "Saving" : "Save Progress"}
+                      {pending && <Loader className="size-4 animate-spin" />}
                     </Button>
                   </>
                 )}
@@ -246,7 +249,7 @@ export default function HorizontalLinearStepper({
               )}
               <Button
                 variant="salWithShadowHidden"
-                className="min-w-32"
+                className="flex min-w-32 items-center gap-2"
                 disabled={disabled}
                 onClick={
                   activeStep === lastStep
@@ -267,6 +270,7 @@ export default function HorizontalLinearStepper({
                 ) : (
                   "Next"
                 )}
+                {pending && <Loader className="size-4 animate-spin" />}
               </Button>
             </section>
           </div>

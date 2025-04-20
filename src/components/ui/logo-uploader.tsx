@@ -24,7 +24,7 @@ type AvatarUploaderProps = {
 
 export default function AvatarUploader({
   id,
-  reset,
+  // reset,
   onChange,
   onRemove,
   initialImage,
@@ -95,11 +95,11 @@ export default function AvatarUploader({
     }
   }, [initialImage]);
 
-  useEffect(() => {
-    if (reset) {
-      handleReset();
-    }
-  }, [reset]);
+  // useEffect(() => {
+  //   if (reset) {
+  //     handleReset();
+  //   }
+  // }, [reset]);
 
   return (
     <>
@@ -112,7 +112,7 @@ export default function AvatarUploader({
             disabled &&
               "cursor-default text-muted-foreground hover:bg-transparent",
           )}
-          // style={{ height: size, width: size }}
+          style={{ height: size, width: size }}
           onClick={() => fileInputRef.current?.click()}
           tabIndex={tabIndex}
           onKeyDown={(e) => {
@@ -147,7 +147,7 @@ export default function AvatarUploader({
               className="rounded-full object-cover"
             />
           ) : (
-            <span className="text-sm text-gray-400">+ Upload</span>
+            <span className="text-center text-sm text-gray-400">+ Upload</span>
           )}
 
           <div

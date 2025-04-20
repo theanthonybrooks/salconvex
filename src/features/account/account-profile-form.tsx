@@ -65,19 +65,16 @@ export const AccountSubscribeForm = ({
     ? "Exit artist profile form?"
     : "Exit submission form?";
 
-  const handleClose = () => {
+  const handleClose = (withSave = false) => {
     setActiveStep(0);
-    setShouldExit(true);
-    //save changes if necessary (within the form)
-
-    if (!hasUnsavedChanges) {
+    if (withSave) {
+      setShouldExit(true);
+      setTimeout(() => {
+        setShouldExit(false);
+      }, 5000);
+    } else {
       setOpen(false);
     }
-    console.log("clicked exit");
-    setTimeout(() => {
-      setOpen(false);
-      setShouldExit(false);
-    }, 100);
   };
 
   return (
@@ -139,6 +136,7 @@ export const AccountSubscribeForm = ({
             activeStep={activeStep}
             setActiveStep={setActiveStep}
             shouldClose={shouldExit}
+            setShouldClose={setShouldExit}
             setOpen={setOpen}
           />
         )}
@@ -146,9 +144,13 @@ export const AccountSubscribeForm = ({
           <DialogCloseBtn
             title={unsavedAlertTitle}
             description={unsavedAlertDescription}
-            onAction={handleClose}
+            onAction={() => {
+              handleClose(true);
+            }}
             actionTitle="Save Draft & Exit"
-            onPrimaryAction={handleClose}
+            onPrimaryAction={() => {
+              handleClose(false);
+            }}
             primaryActionTitle="Exit"
             className="w-full"
           />
@@ -156,7 +158,9 @@ export const AccountSubscribeForm = ({
           <DialogCloseBtn
             title={AlertTitle}
             description={alertDialogDescription}
-            onAction={handleClose}
+            onAction={() => {
+              handleClose(false);
+            }}
             actionTitle="Exit"
             className="w-full"
           />

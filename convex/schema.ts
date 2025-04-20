@@ -172,7 +172,7 @@ const eventSchema = {
   mainOrgId: v.id("organizations"),
   slug: v.string(),
   // mainOrgName: v.optional(v.string()),
-  mainOrgName: v.string(),
+  // mainOrgName: v.string(),
   // eventId: v.optional(v.string()),
   openCallId: v.array(v.id("openCalls")),
   name: v.string(),
@@ -180,13 +180,13 @@ const eventSchema = {
   eventType: v.array(v.string()),
   eventCategory: v.string(),
   dates: v.object({
-    edition: v.number(), //todo: make required
+    edition: v.number(),
     eventDates: v.array(
       v.object({
         start: v.string(),
         end: v.string(),
       }),
-    ), //todo: make it possible to list multiple sets of dates (for events that take place over multiple weeks/months, but not continuously)
+    ),
     eventStart: v.optional(v.string()),
     eventEnd: v.optional(v.string()),
     prodDates: v.optional(
@@ -433,7 +433,7 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
-    .index("by_mainOrgName", ["mainOrgName"])
+    // .index("by_mainOrgName", ["mainOrgName"])
     .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])
 

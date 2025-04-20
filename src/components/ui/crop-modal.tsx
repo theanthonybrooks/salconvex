@@ -16,6 +16,7 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
   const [paddedImage, setPaddedImage] = useState<string | null>(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [paddingColor, setPaddingColor] = useState("#ffffff");
+  const [paddingSize, setPaddingSize] = useState(100);
 
   const onCropComplete = useCallback((_: Area, croppedArea: Area) => {
     setCroppedAreaPixels(croppedArea);
@@ -29,8 +30,8 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
   };
 
   useEffect(() => {
-    padImageToSquare(imageSrc, paddingColor).then(setPaddedImage);
-  }, [imageSrc, paddingColor]);
+    padImageToSquare(imageSrc, paddingColor, paddingSize).then(setPaddedImage);
+  }, [imageSrc, paddingColor, paddingSize]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -81,7 +82,7 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
         </div>
         <div className="flex items-center justify-center gap-x-3">
           <label htmlFor="color" className="mb-1 text-sm text-foreground">
-            Background Color
+            Border Color:
           </label>
           <input
             id="color"
@@ -89,6 +90,19 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
             value={paddingColor}
             onChange={(e) => setPaddingColor(e.target.value)}
             className="size-10 w-full max-w-40 cursor-pointer rounded-md border border-foreground px-2 py-1 text-sm shadow-sm focus:outline-none"
+          />
+          <label htmlFor="color" className="mb-1 text-sm text-foreground">
+            Padding:
+          </label>
+          <input
+            id="paddingSize"
+            type="number"
+            min={0}
+            max={1000}
+            step={10}
+            value={paddingSize}
+            onChange={(e) => setPaddingSize(Number(e.target.value))}
+            className="h-10 w-15 cursor-pointer rounded-md border border-foreground px-2 py-1 text-center text-sm shadow-sm focus:outline-none"
           />
         </div>
         <div className="mt-4 flex justify-between">

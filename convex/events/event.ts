@@ -393,7 +393,7 @@ export const createOrUpdateEvent = mutation({
       active: args.active || true,
       mainOrgId: args.orgId,
       organizerId: [args.orgId],
-      mainOrgName: "",
+      // mainOrgName: "",
       openCallId: [],
       state: "draft",
       lastEditedAt: Date.now(),

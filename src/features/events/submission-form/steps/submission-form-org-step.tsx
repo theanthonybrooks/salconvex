@@ -9,6 +9,7 @@ import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
 
@@ -65,6 +66,10 @@ const SubmissionFormOrgStep = ({
 
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
+  useEffect(() => {
+    console.log("Organization name:", orgName);
+    console.log("orgData:", orgData);
+  }, [orgName, orgData]);
 
   return (
     //   {activeStep === 0 && ( //pass this from the parent, not here
@@ -167,6 +172,7 @@ const SubmissionFormOrgStep = ({
                   <Controller
                     name="organization.location"
                     control={control}
+                    shouldUnregister={false}
                     render={({ field }) => (
                       <MapboxInputFull
                         id="organization.location"
