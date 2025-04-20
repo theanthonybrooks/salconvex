@@ -316,8 +316,12 @@ export const EventOCForm = ({
   // console.log(validOrgWZod, isStepValidZod);
   // console.log(eventChoiceMade, newOrgEvent, orgHasNoEvents);
   // console.log("eventNameIsDirty", eventNameIsDirty);
-  console.log(hasUserEditedStep0);
-  console.log("hasUserEditedStep1", hasUserEditedStep1);
+  // console.log(hasUserEditedStep0);
+  if (activeStep === 0) {
+    console.log("hasUserEditedStep0", hasUserEditedStep0);
+  } else if (activeStep === 1) {
+    console.log("hasUserEditedStep1", hasUserEditedStep1);
+  }
   console.log("hasUserEditedForm", hasUserEditedForm);
 
   // console.log("eventNameData", eventNameData);
@@ -337,8 +341,9 @@ export const EventOCForm = ({
   // console.log("isValid", isValid);
   // console.log(orgNameValid, orgLocationValid);
   // console.log(newOrgEvent);
-  if (orgData.name !== undefined) {
+  if (orgData.name !== undefined && orgData.name !== "") {
     console.log(orgData);
+    console.log("existingOrg", existingOrg);
   }
   if (eventData) {
     console.log(eventData);
@@ -347,7 +352,6 @@ export const EventOCForm = ({
     console.log(existingEvent);
   }
 
-  // console.log("existingOrg", existingOrg);
   // console.log(eventsData, "now");
   // console.log("orgValue", orgValue);
   // console.log("existing orgs", hasExistingOrg);
@@ -453,91 +457,6 @@ export const EventOCForm = ({
     setErrorMsg("");
     return true;
   }, [schema, currentValues, hasUserEditedForm, setError]);
-
-  // const handleFormValues = useCallback(async () => {
-  //   console.log(activeStep, hasUserEditedStep0, furthestStep);
-  //   if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
-  //     console.log("huh");
-  //     if (existingEvent) {
-  //       console.log("what");
-  //       const eventLinks = existingEvent.links ?? { sameAsOrganizer: true };
-  //       const locationFromEvent = existingEvent.location?.full
-  //         ? existingEvent.location?.sameAsOrganizer
-  //           ? {
-  //               ...currentValues.organization?.location,
-  //               sameAsOrganizer: true,
-  //             }
-  //           : {
-  //               ...existingEvent.location,
-  //             }
-  //         : {
-  //             ...currentValues.organization?.location,
-  //             sameAsOrganizer: true,
-  //           };
-  //       console.log("reset existing event");
-  //       reset({
-  //         ...currentValues,
-  //         event: {
-  //           ...existingEvent,
-  //           category: existingEvent.eventCategory,
-  //           type: existingEvent.eventType ?? [],
-  //           location: locationFromEvent,
-  //           links: {
-  //             ...eventLinks,
-  //           },
-  //         },
-  //       });
-  //     } else {
-  //       reset({
-  //         ...currentValues,
-  //         event: {
-  //           name: "",
-  //           logo: currentValues.organization.logo,
-  //           location: {
-  //             ...currentValues.organization.location,
-  //             sameAsOrganizer: true,
-  //           },
-  //           dates: {
-  //             ongoing: false,
-  //             edition: new Date().getFullYear(),
-  //           },
-  //           links: {
-  //             sameAsOrganizer: true,
-  //           },
-  //         },
-  //       });
-  //     }
-  //   } else if (
-  //     activeStep === 0 &&
-  //     existingEvent &&
-  //     eventData &&
-  //     eventData?._id !== existingEvent?._id
-  //   ) {
-  //     console.log("elsie");
-  //     console.log("unicorns");
-  //     const eventLinks = existingEvent.links ?? { sameAsOrganizer: true };
-  //     reset({
-  //       ...currentValues,
-  //       event: {
-  //         ...existingEvent,
-  //         category: existingEvent.eventCategory,
-  //         type: existingEvent.eventType ?? [],
-  //         location: existingEvent.location,
-  //         links: {
-  //           ...eventLinks,
-  //         },
-  //       },
-  //     });
-  //   }
-  // }, [
-  //   activeStep,
-  //   currentValues,
-  //   existingEvent,
-  //   furthestStep,
-  //   eventData,
-  //   hasUserEditedStep0,
-  //   reset,
-  // ]);
 
   const handleSave = useCallback(
     async (direct = false) => {
@@ -675,13 +594,10 @@ export const EventOCForm = ({
           toast.error("Failed to create new organization");
         }
 
-        //save logic here
-        // get timezone
-        // use existing event as default values for next step if applicable
-        // if past event (or past open call), the event cannot be changed an selecting it will create a new event using the old one as a template.
-
         const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
-
+        const eventFullUrl = eventData?.logo ?? "/1.jpg";
+        console.log(eventFullUrl, orgLogoFullUrl);
+        console.log("frogs");
         if (existingEvent) {
           console.log("existing event");
           const locationFromEvent = existingEvent.location?.full
@@ -703,6 +619,7 @@ export const EventOCForm = ({
             },
             event: {
               ...existingEvent,
+              logo: eventFullUrl,
               links: {
                 ...existingEvent.links,
                 sameAsOrganizer: true,
@@ -720,7 +637,7 @@ export const EventOCForm = ({
             },
             event: {
               name: "",
-              logo: orgLogoFullUrl,
+              logo: orgLogoFullUrl || eventFullUrl,
               links: {
                 sameAsOrganizer: true,
               },
@@ -986,15 +903,6 @@ export const EventOCForm = ({
       setHasUnsavedChanges(false);
     }
   }, [setHasUnsavedChanges, hasUserEditedForm]);
-
-  // useEffect(() => {
-  //   if (!shouldClose) return;
-  //   const saveOnClose = async () => {
-  //     await handleSave(true);
-  //   };
-  //   saveOnClose();
-  //   setOpen(false);
-  // }, [shouldClose, handleSave, setOpen]);
 
   useEffect(() => {
     if (!orgData?.name && activeStep > 0) {

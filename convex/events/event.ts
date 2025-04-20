@@ -313,6 +313,9 @@ export const createOrUpdateEvent = mutation({
     if (args.logoId) {
       fileUrl = await ctx.storage.getUrl(args.logoId);
     }
+    if (args.logo && !args.logoId) {
+      fileUrl = args.logo;
+    }
 
     const user = await ctx.db
       .query("users")
