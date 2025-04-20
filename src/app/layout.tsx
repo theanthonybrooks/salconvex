@@ -99,6 +99,7 @@ export default async function RootLayout({
                   newestOnTop={false}
                   closeOnClick={true}
                   rtl={false}
+                  pauseOnFocusLoss={false}
                   draggable
                   pauseOnHover
                   theme="light"

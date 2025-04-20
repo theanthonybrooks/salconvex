@@ -94,10 +94,6 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  React.useEffect(() => {
-    console.log("Row selection changed:", rowSelection);
-  }, [rowSelection]);
-
   return (
     <div className={cn("w-full space-y-4", containerClassName)}>
       <DataTableToolbar table={table} />

@@ -886,6 +886,10 @@ button:active {
 /* .react-datepicker-popper {
 } */
 
+.react-datepicker-popper {
+  z-index: 9999 !important; /* or higher depending on your layout */
+}
+
 .react-datepicker__day--today,
 .react-datepicker__month-text--today,
 .react-datepicker__year-text--today {

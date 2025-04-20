@@ -46,7 +46,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { ongoing, artistStart, artistEnd } = dates;
+  const { ongoing, prodDates } = dates;
+  const prodStart = prodDates?.[0]?.start;
+  const prodEnd = prodDates?.[0]?.end;
   const tabList = [
     // { id: "application", label: "My Application" },
     { id: "event", label: getEventCategoryLabel(eventCategory) },
@@ -151,16 +153,12 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
             </div>
             {/*//todo: add this part */}
             {eventCategory === "project" ||
-              (eventCategory === "event" && artistStart && artistEnd && (
+              (eventCategory === "event" && prodStart && prodEnd && (
                 <p className="flex flex-col items-start gap-1 text-sm">
                   <span className="space-x-1 font-semibold">
                     Painting/Production Dates:
                   </span>
-                  {formatEventDates(
-                    artistStart || "",
-                    artistEnd || "",
-                    ongoing,
-                  )}
+                  {formatEventDates(prodStart || "", prodEnd || "", ongoing)}
                 </p>
               ))}
             <p className="flex flex-col items-start gap-1 text-sm">

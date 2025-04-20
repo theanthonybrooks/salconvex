@@ -58,73 +58,90 @@ const organizationSchema = z.object({
   location: locationSchema,
 });
 
-const eventSchema = z
-  .object({
-    _id: z.optional(z.string()),
-    name: z
-      .string()
-      .min(3, "Name must be at least 3 characters")
-      .max(35, "Max 35 characters")
-      .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
-    category: z.string().min(3, "Event category is required"),
-    type: z.array(z.string()).optional(),
-    logo: z.union([
-      z
-        .instanceof(Blob)
-        .refine((b) => b.size > 0, { message: "Logo is required" }),
-      z.string().min(1, "Logo is required"),
-    ]),
-    location: locationBase.extend({
-      sameAsOrganizer: z.boolean(),
-    }),
+export const eventBase = z.object({
+  _id: z.optional(z.string()),
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(35, "Max 35 characters")
+    .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+  category: z.string().min(3, "Event category is required"),
+  type: z.array(z.string()).optional(),
+  logo: z.union([
+    z
+      .instanceof(Blob)
+      .refine((b) => b.size > 0, { message: "Logo is required" }),
+    z.string().min(1, "Logo is required"),
+  ]),
+  location: locationBase.extend({
+    sameAsOrganizer: z.boolean(),
+  }),
 
-    dates: z.object({
-      eventFormat: z.string().min(1, "Date format is required"),
-      prodFormat: z.string().min(1, "Date format is required"),
-      edition: z.number(),
-      eventDates: z.array(
+  dates: z.object({
+    eventFormat: z.string().min(1, "Date format is required"),
+    prodFormat: z.string().min(1, "Date format is required"),
+    edition: z.number(),
+    eventDates: z.array(
+      z.object({
+        start: z.string(),
+        end: z.string(),
+      }),
+    ),
+    prodDates: z.optional(
+      z.array(
         z.object({
-          start: z.string({ required_error: "Start date is required" }),
-          end: z.string({ required_error: "End date is required" }),
+          start: z.string(),
+          end: z.string(),
         }),
       ),
-      artistStart: z.string().optional(),
-      artistEnd: z.string().optional(),
-      ongoing: z.boolean(),
-    }),
-    links: z.object({
-      sameAsOrganizer: z.boolean().optional(),
-      website: z.string().optional(),
-      instagram: z.string().optional(),
-      facebook: z.string().optional(),
-      threads: z.string().optional(),
-      email: z.string().optional(),
-      vk: z.string().optional(),
-      phone: z.string().optional(),
-      address: z.string().optional(),
-      linkAggregate: z.string().optional(),
-    }),
-    otherInfo: z.array(z.string()).optional(),
-    about: z.string().optional(),
-    active: z.boolean().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.category === "event") {
-      if (!data.type || data.type.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Event type is required when category is 'event'",
-          path: ["type"],
-        });
-      } else if (data.type.length > 2) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "You can select up to 2 event types",
-          path: ["type"],
-        });
-      }
+    ),
+    ongoing: z.boolean(),
+  }),
+  links: z.object({
+    sameAsOrganizer: z.boolean().optional(),
+    website: z.string().optional(),
+    instagram: z.string().optional(),
+    facebook: z.string().optional(),
+    threads: z.string().optional(),
+    email: z.string().optional(),
+    vk: z.string().optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
+    linkAggregate: z.string().optional(),
+  }),
+  otherInfo: z.array(z.string()).optional(),
+  about: z.string().optional(),
+  active: z.boolean().optional(),
+});
+
+export const eventSchema = eventBase.superRefine((data, ctx) => {
+  if (data.category === "event") {
+    if (!data.type || data.type.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Event type is required when category is 'event'",
+        path: ["type"],
+      });
+    } else if (data.type.length > 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "You can select up to 2 event types",
+        path: ["type"],
+      });
     }
-  });
+  }
+  const datesRequired =
+    data.dates?.eventFormat !== "noEvent" &&
+    data.dates?.eventFormat !== "ongoing";
+
+  if (datesRequired && data.dates?.eventDates?.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Please provide at least one event date",
+      path: ["dates", "eventDates"],
+    });
+  }
+});
 
 const openCallSchema = z.object({
   deadline: z.date().min(new Date(), "Deadline must be after today"),

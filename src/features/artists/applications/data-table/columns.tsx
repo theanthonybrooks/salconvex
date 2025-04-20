@@ -69,7 +69,7 @@ export const columns: ColumnDef<Event>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[20ch] truncate pl-8 font-medium sm:max-w-[500px]">
+          <span className="max-w-[20ch] truncate pl-1 font-medium sm:max-w-[500px] sm:pl-0">
             {row.getValue("name")}
           </span>
         </div>

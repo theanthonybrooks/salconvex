@@ -1,8 +1,9 @@
-{
-  /*import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
+import { columns } from "@/features/artists/applications/data-table/columns";
 import { DataTable } from "@/features/artists/applications/data-table/data-table";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
@@ -12,23 +13,59 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormOrgStepProps {
-  activeStep: number;
   existingOrg: Doc<"organizations"> | null;
+  existingEvent: Doc<"events"> | null;
+  eventsData: Doc<"events">[];
+  existingOrgs: boolean;
+  validOrgWZod: boolean;
+  invalidOrgWZod: boolean;
+  setExistingOrg: React.Dispatch<
+    React.SetStateAction<Doc<"organizations"> | null>
+  >;
+  setExistingEvent: React.Dispatch<React.SetStateAction<Doc<"events"> | null>>;
+  handleReset: () => void;
+  orgValidationError: boolean;
+  orgNameValid: boolean;
+  orgLocationValid: boolean;
+  orgDataValid: boolean;
+  newOrgEvent: boolean;
+  setNewOrgEvent: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedRow: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  selectedRow: Record<string, boolean>;
 }
 
 const SubmissionFormOrgStep = ({
-  activeStep,
+  existingOrgs,
   existingOrg,
+  existingEvent,
+  eventsData,
+  validOrgWZod,
+  invalidOrgWZod,
+  setExistingOrg,
+  handleReset,
+  orgValidationError,
+  orgNameValid,
+  orgLocationValid,
+  orgDataValid,
+  newOrgEvent,
+  setNewOrgEvent,
+  setExistingEvent,
+  setSelectedRow,
+  selectedRow,
 }: SubmissionFormOrgStepProps) => {
   const {
     control,
     watch,
-    setValue,
-    getValues,
-    setError,
-    trigger,
+    // setValue,
+    // getValues,
+    // setError,
+    // trigger,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+
+  const orgData = watch("organization");
+  const orgName = orgData?.name ?? "";
+
   return (
     //   {activeStep === 0 && ( //pass this from the parent, not here
     <>
@@ -166,9 +203,9 @@ const SubmissionFormOrgStep = ({
                 <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="organization.logo" className="sr-only">
                     Organization Logo
-                    /~ <span className="text-xs italic text-muted-foreground">
+                    {/* <span className="text-xs italic text-muted-foreground">
                             {required ? "(required)" : "(optional)"}
-                          </span> ~/
+                          </span> */}
                   </Label>
                   <Controller
                     name="organization.logo"
@@ -191,7 +228,7 @@ const SubmissionFormOrgStep = ({
             )}
           </div>
         </section>
-        /~ second half of first page ~/
+        {/* second half of first page */}
         {orgDataValid && existingOrg && (
           <>
             <Separator thickness={2} className="my-4 xl:hidden" />
@@ -229,7 +266,7 @@ const SubmissionFormOrgStep = ({
                   setSelectedRow(selection);
                 }}
                 selectedRow={selectedRow}
-                className="w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+                className="w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
                 containerClassName={cn(
                   "lg:hidden",
                   newOrgEvent && "opacity-50",
@@ -273,9 +310,9 @@ const SubmissionFormOrgStep = ({
                   newOrgEvent && "opacity-50 pointer-events-none",
                 )}
               />
-              /~ 
-                          <span>or</span> ~/
-              /~ <Button
+              {/* 
+                          <span>or</span> */}
+              {/* <Button
                             variant="outline"
                             size="sm"
                             className="w-full"
@@ -284,7 +321,7 @@ const SubmissionFormOrgStep = ({
                             }}
                           >
                             Create New Event
-                          </Button> ~/
+                          </Button> */}
 
               <label
                 className={cn(
@@ -332,5 +369,3 @@ const SubmissionFormOrgStep = ({
 };
 
 export default SubmissionFormOrgStep;
-*/
-}

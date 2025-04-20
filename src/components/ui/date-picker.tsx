@@ -6,7 +6,7 @@ import { Button } from "./button";
 
 type PickerType = "month" | "year" | "season" | "dates";
 
-interface CustomDatePickerProps {
+export interface CustomDatePickerProps {
   value?: string;
   onChange: (date: Date | null) => void;
   placeholder?: string;
@@ -106,7 +106,6 @@ export const CustomDatePicker = ({
 
   return (
     <DatePicker
-      //   inline
       selected={parsedDate}
       onChange={onChange}
       dateFormat={dateFormat}
@@ -116,6 +115,8 @@ export const CustomDatePicker = ({
       showYearPicker={pickerType === "year"}
       showMonthYearPicker={pickerType === "month"}
       showQuarterYearPicker={pickerType === "season"}
+      //   popperPlacement="bottom"
+      //   portalId="react-datepicker-portal"
       minDate={
         isAdmin
           ? new Date(2010, 0, 1)

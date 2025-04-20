@@ -62,7 +62,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { ongoing, artistStart, artistEnd } = dates;
+  const { ongoing, prodDates } = dates;
+  const prodStart = prodDates?.[0]?.start;
+  const prodEnd = prodDates?.[0]?.end;
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
   const appUrl = requirements?.applicationLink ?? "/thelist"; //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
@@ -207,17 +209,13 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </div>
             {/*//todo: add this part */}
             {eventCategory === "project" ||
-              (eventCategory === "event" && artistStart && artistEnd && (
+              (eventCategory === "event" && prodStart && prodEnd && (
                 <div className="flex flex-col items-start gap-1 text-sm">
                   <span className="space-x-1 font-semibold">
                     Painting/Production Dates:
                   </span>
                   {/* TODO: Add this functionality after there are some artist/painting dates entered */}
-                  {formatEventDates(
-                    artistStart || "",
-                    artistEnd || "",
-                    ongoing,
-                  )}
+                  {formatEventDates(prodStart || "", prodEnd || "", ongoing)}
                 </div>
               ))}
             <p className="flex flex-col items-start gap-1 text-sm">

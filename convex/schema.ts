@@ -189,8 +189,14 @@ const eventSchema = {
     ), //todo: make it possible to list multiple sets of dates (for events that take place over multiple weeks/months, but not continuously)
     eventStart: v.optional(v.string()),
     eventEnd: v.optional(v.string()),
-    artistStart: v.optional(v.string()),
-    artistEnd: v.optional(v.string()),
+    prodDates: v.optional(
+      v.array(
+        v.object({
+          start: v.string(),
+          end: v.string(),
+        }),
+      ),
+    ),
     ongoing: v.boolean(),
     eventFormat: v.optional(v.string()),
     prodFormat: v.optional(v.string()),
