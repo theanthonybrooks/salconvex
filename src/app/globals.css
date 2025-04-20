@@ -892,9 +892,10 @@ button:active {
 
 .react-datepicker__day--today,
 .react-datepicker__month-text--today,
-.react-datepicker__year-text--today {
+.react-datepicker__year-text--today,
+.react-datepicker__quarter-text--today {
   /* background-color: rgba(248, 241, 107, 0.7); */
-  background-color: rgba(244, 169, 246, 0.5);
+  background-color: rgba(244, 169, 246, 0);
   font-weight: bold;
   border-radius: 0.3rem;
 }
@@ -931,9 +932,18 @@ button:active {
   margin: 0.5rem;
 }
 
-.react-datepicker__day--selected,
-.react-datepicker__day--keyboard-selected {
+.react-datepicker__day--selected {
   background-color: #facc15; /* Tailwind yellow-400 */
+  color: black;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: rgba(250, 204, 21, 0) !important;
+  border: none;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: rgba(250, 204, 21, 0);
   color: black;
 }
 
@@ -1025,4 +1035,18 @@ button:active {
 
 .react-datepicker__quarter-wrapper div {
   font-size: 0 !important; /* hide original Q1 text */
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  /* color: #000; */
+  display: inline-block;
+  width: 1.7rem;
+  line-height: unset;
+  text-align: center;
+  margin: 0.166rem;
+  &:hover {
+    cursor: pointer;
+  }
 }

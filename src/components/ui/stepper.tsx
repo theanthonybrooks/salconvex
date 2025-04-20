@@ -105,7 +105,7 @@ export default function HorizontalLinearStepper({
         </p>
 
         {/* Custom Stepper Header with Animated Connectors */}
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-center gap-3 px-4 lg:gap-4">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-center px-4">
           {stepArray.map((step, index) => (
             <div
               key={index}

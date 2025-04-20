@@ -99,6 +99,9 @@ export const AccountSubscribeForm = ({
       </DialogTrigger>
 
       <DialogContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
         showCloseButton={false}
         onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(

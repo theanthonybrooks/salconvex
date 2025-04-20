@@ -19,6 +19,7 @@ import {
   toYear,
   toYearMonth,
 } from "@/lib/dateFns";
+import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { useEffect } from "react";
@@ -95,14 +96,38 @@ export const FormDatePicker = <T extends EventOCFormValues>({
 
   const canAddMore = lastStart !== "" && lastEnd !== "";
 
-  console.log(formatDatesArray);
+  //   console.log(formatDatesArray);
 
-  console.log(formatValue, formatDatesValue);
+  //   console.log(formatValue, formatDatesValue);
 
-  console.log(formatValue);
-  console.log(formatDatesArray?.[0]?.end);
+  //   console.log(formatValue);
+  //   console.log(formatDatesArray?.[0]?.end);
 
   // ...
+
+  function getSequentialMinDate<T>(
+    watch: (name: Path<T>) => unknown,
+    nameBase: Path<T>,
+    formatKey: string,
+    index: number,
+  ): Date | undefined {
+    const getDate = (val?: unknown) =>
+      val && typeof val === "string" ? new Date(val) : undefined;
+
+    const currentStart = getDate(
+      watch(`${nameBase}.${formatKey}.${index}.start` as Path<T>),
+    );
+    const prevEnd =
+      index > 0
+        ? getDate(watch(`${nameBase}.${formatKey}.${index - 1}.end` as Path<T>))
+        : undefined;
+
+    if (currentStart && prevEnd) {
+      return new Date(Math.max(currentStart.getTime(), prevEnd.getTime()));
+    }
+
+    return currentStart || prevEnd;
+  }
 
   useEffect(() => {
     if (type !== "production") return;
@@ -162,7 +187,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                 )}
                 {isProduction && hasEventDates && (
                   <SelectItem fit value="sameAsEvent">
-                    Same as Event
+                    Same as{" "}
+                    {getEventCategoryLabelAbbr(
+                      eventData?.category as EventCategory,
+                    )}
                   </SelectItem>
                 )}
                 <SelectItem fit value="setDates">
@@ -309,11 +337,12 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             }
                             className="w-full rounded border p-2 text-center"
                             inputClassName="h-12"
-                            minDate={
-                              watch(
-                                `${nameBase}.${formatKey}.${index}.start` as Path<T>,
-                              ) as string | undefined
-                            }
+                            minDate={getSequentialMinDate(
+                              watch,
+                              nameBase,
+                              formatKey,
+                              index,
+                            )}
                           />
                         )}
                       />

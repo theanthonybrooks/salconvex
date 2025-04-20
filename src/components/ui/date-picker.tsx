@@ -90,6 +90,17 @@ export const CustomDatePicker = ({
 
   const minToDate = minDate ? toDate(minDate) : null;
   const maxToDate = maxDate ? toDate(maxDate) : null;
+
+  const today = new Date();
+
+  const isValidSelected =
+    parsedDate &&
+    (!minToDate || parsedDate >= minToDate) &&
+    (!maxToDate || parsedDate <= maxToDate);
+
+  const openToDate =
+    isValidSelected && parsedDate ? parsedDate : (minToDate ?? today);
+
   //   console.log(minToDate, maxToDate);
   //   console.log(parsedDate);
 
@@ -109,7 +120,7 @@ export const CustomDatePicker = ({
       selected={parsedDate}
       onChange={onChange}
       dateFormat={dateFormat}
-      openToDate={new Date()}
+      openToDate={openToDate}
       showYearDropdown={pickerType === "dates"}
       showMonthDropdown={pickerType === "dates"}
       showYearPicker={pickerType === "year"}
