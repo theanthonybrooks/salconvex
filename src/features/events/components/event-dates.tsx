@@ -32,7 +32,7 @@ const EventDates = ({
   const forEvent = type === "event";
   const forProd = type === "production";
 
-  if (forEvent && dates?.eventFormat === "ongoing") {
+  if (forEvent && (dates?.eventFormat === "ongoing" || dates?.ongoing)) {
     return <span className="flex flex-col gap-1">Ongoing</span>;
   }
   if (forProd && dates?.prodFormat === "sameAsEvent") {
