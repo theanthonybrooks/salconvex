@@ -24,6 +24,7 @@ import {
 } from "@/lib/eventFns";
 
 import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -56,10 +57,15 @@ import { TbStairs } from "react-icons/tb";
 
 export interface EventCardPreviewProps {
   event: CombinedEventPreviewCardData;
+  user: User | null;
   publicView?: boolean;
 }
 
-const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
+const EventCardPreview = ({
+  event,
+  publicView,
+  user,
+}: EventCardPreviewProps) => {
   const router = useRouter();
   const {
     location,
@@ -214,6 +220,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
                 format="mobile"
                 limit={1}
                 preview={true}
+                type="event"
               />
             </div>
             {isCurrentlyOpen && (
@@ -434,6 +441,7 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             appStatus={appStatus}
             eventCategory={eventCategory}
             openCallStatus={openCallStatus}
+            user={user}
             // setManualApplied={setManualApplied}
             align="start"
           />
@@ -471,7 +479,12 @@ const EventCardPreview = ({ event, publicView }: EventCardPreviewProps) => {
             <div className="flex items-start gap-x-1 text-sm">
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className="font-semibold">Dates:</span>
-              <EventDates event={event} format="desktop" limit={1} />
+              <EventDates
+                event={event}
+                format="desktop"
+                limit={1}
+                type="event"
+              />
             </div>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>

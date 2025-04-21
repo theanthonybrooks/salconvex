@@ -46,7 +46,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { ongoing, prodDates } = dates;
+  const { ongoing, prodDates, prodFormat } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
   const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
   const tabList = [
@@ -149,18 +149,26 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
               <span className="space-x-1 font-semibold">
                 {getEventCategoryLabel(eventCategory)} Dates:
               </span>
-              <EventDates event={event} format="desktop" limit={0} />
+              <EventDates
+                event={event}
+                format="desktop"
+                limit={0}
+                type="event"
+              />
             </div>
             {/*//todo: add this part */}
-            {eventCategory === "project" ||
-              (eventCategory === "event" && prodStart && prodEnd && (
+            {(eventCategory === "project" ||
+              (eventCategory === "event" && prodStart && prodEnd)) &&
+              !ongoing && (
                 <p className="flex flex-col items-start gap-1 text-sm">
                   <span className="space-x-1 font-semibold">
                     Painting/Production Dates:
                   </span>
-                  {formatEventDates(prodStart || "", prodEnd || "", ongoing)}
+                  {prodFormat === "sameAsEvent"
+                    ? "Same as Event Dates"
+                    : formatEventDates(prodStart || "", prodEnd || "", false)}
                 </p>
-              ))}
+              )}
             <p className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}

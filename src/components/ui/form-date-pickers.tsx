@@ -149,6 +149,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       //   shouldDirty: true,
       // });
     }
+    // else {
+    //   setValue("event.dates.prodFormat", )
+    // }
   }, [formatValue, type, eventData?.dates?.eventDates, setValue]);
 
   return (

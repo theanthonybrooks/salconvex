@@ -18,7 +18,7 @@ const TheList = async () => {
       { token },
     );
   }
-
+  const user = userData?.user || null;
   const userPref = userData?.userPref ?? null;
   const publicView = !token || !subStatus?.hasActiveSubscription;
 
@@ -30,6 +30,7 @@ const TheList = async () => {
         // initialEvents={testEventData}
         publicView={publicView}
         userPref={userPref}
+        user={user}
       />
       {/* </main> */}
     </>

@@ -15,7 +15,7 @@ import { useFilteredEvents } from "@/hooks/use-filtered-events";
 import { setParamIfNotDefault } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
-import { UserPref } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 // import { format } from "date-fns"
 
 import { useSearchParams } from "next/navigation";
@@ -25,11 +25,13 @@ interface Props {
   // initialEvents: EventData[]
   publicView: boolean;
   userPref: UserPref | null;
+  user: User | null;
 }
 
 const ClientEventList = ({
   // initialEvents,
   publicView,
+  user,
 }: // userPref,
 
 Props) => {
@@ -216,6 +218,7 @@ Props) => {
                   key={index}
                   event={event}
                   publicView={publicView}
+                  user={user}
                 />
               ))}
             </div>

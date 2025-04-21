@@ -176,7 +176,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           <div className="flex flex-col justify-between gap-y-1">
             <div className="flex items-start gap-x-1 text-sm">
               <span className="font-semibold">Dates:</span>
-              <EventDates event={event} format="mobile" />
+              <EventDates event={event} format="mobile" type="event" />
             </div>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>

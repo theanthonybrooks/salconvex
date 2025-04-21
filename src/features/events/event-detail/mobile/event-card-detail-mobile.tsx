@@ -166,7 +166,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
                     "mobile",
                   )}
                 </span> */}
-                <EventDates event={event} format="mobile" />
+                <EventDates event={event} format="mobile" type="event" />
                 {icsLink && (
                   <a
                     href={icsLink}

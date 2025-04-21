@@ -27,11 +27,7 @@ import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCall
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 
 import EventDates from "@/features/events/components/event-dates";
-import {
-  formatEventDates,
-  formatOpenCallDeadline,
-  formatSingleDate,
-} from "@/lib/dateFns";
+import { formatOpenCallDeadline, formatSingleDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +58,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { ongoing, prodDates } = dates;
+  const { prodDates } = dates;
   const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
   const { basicInfo, requirements, _id: openCallId } = openCall;
@@ -205,19 +201,29 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               <span className="space-x-1 font-semibold">
                 {getEventCategoryLabel(eventCategory)} Dates:
               </span>
-              <EventDates event={event} format="desktop" limit={0} />
+              <EventDates
+                event={event}
+                format="desktop"
+                limit={0}
+                type="event"
+              />
             </div>
             {/*//todo: add this part */}
-            {eventCategory === "project" ||
-              (eventCategory === "event" && prodStart && prodEnd && (
-                <div className="flex flex-col items-start gap-1 text-sm">
-                  <span className="space-x-1 font-semibold">
-                    Painting/Production Dates:
-                  </span>
-                  {/* TODO: Add this functionality after there are some artist/painting dates entered */}
-                  {formatEventDates(prodStart || "", prodEnd || "", ongoing)}
-                </div>
-              ))}
+            {(eventCategory === "project" ||
+              (eventCategory === "event" && prodStart && prodEnd)) && (
+              <div className="flex flex-col items-start gap-1 text-sm">
+                <span className="space-x-1 font-semibold">
+                  Painting/Production Dates:
+                </span>
+                {/* TODO: Add this functionality after there are some artist/painting dates entered */}
+                <EventDates
+                  event={event}
+                  format="desktop"
+                  limit={0}
+                  type="production"
+                />
+              </div>
+            )}
             <p className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}
