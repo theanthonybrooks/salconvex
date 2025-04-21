@@ -53,6 +53,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     control,
     watch,
     setValue,
+    unregister,
     // getValues,
     // setError,
     // trigger,
@@ -129,30 +130,77 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     return currentStart || prevEnd;
   }
 
+  // useEffect(() => {
+  //   if (type !== "production") return;
+
+  //   const isSameAsEvent = formatValue === "sameAsEvent";
+
+  //   if (isSameAsEvent) {
+  //     const eventDates = eventData?.dates?.eventDates ?? [];
+
+  //     // Option 1: Copy eventDates to prodDates
+  //     setValue("event.dates.prodDates", eventDates, {
+  //       shouldValidate: true,
+  //       shouldDirty: true,
+  //     });
+
+  //     // Option 2: If you prefer to clear prodDates instead of copying
+  //     // setValue("event.dates.prodDates", undefined, {
+  //     //   shouldValidate: true,
+  //     //   shouldDirty: true,
+  //     // });
+  //   }
+  //   // else {
+  //   //   setValue("event.dates.prodFormat", )
+  //   // }
+  // }, [formatValue, type, eventData?.dates?.eventDates, setValue]);
   useEffect(() => {
-    if (type !== "production") return;
+    if (type === "production") {
+      const isSameAsEvent = formatValue === "sameAsEvent";
 
-    const isSameAsEvent = formatValue === "sameAsEvent";
+      if (isSameAsEvent) {
+        const eventDates = eventData?.dates?.eventDates ?? [];
 
-    if (isSameAsEvent) {
-      const eventDates = eventData?.dates?.eventDates ?? [];
-
-      // Option 1: Copy eventDates to prodDates
-      setValue("event.dates.prodDates", eventDates, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-
-      // Option 2: If you prefer to clear prodDates instead of copying
-      // setValue("event.dates.prodDates", undefined, {
-      //   shouldValidate: true,
-      //   shouldDirty: true,
-      // });
+        // Option 1: Copy eventDates to prodDates
+        setValue("event.dates.prodDates", eventDates, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      }
+    } else if (type === "event") {
+      const isOngoing = formatValue === "ongoing";
+      if (isOngoing) {
+        // setValue("event.dates.prodFormat", undefined, {
+        //   shouldValidate: true,
+        //   shouldDirty: true,
+        // });
+        // setValue("event.dates.prodDates", undefined, {
+        //   shouldValidate: true,
+        //   shouldDirty: true,
+        // });
+        unregister("event.dates.prodFormat");
+        unregister("event.dates.prodDates");
+        setValue("event.dates.ongoing", true, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      } else {
+        setValue("event.dates.ongoing", false, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      }
     }
-    // else {
-    //   setValue("event.dates.prodFormat", )
-    // }
-  }, [formatValue, type, eventData?.dates?.eventDates, setValue]);
+  }, [formatValue, type, eventData?.dates?.eventDates, setValue, unregister]);
+
+  useEffect(() => {
+    const isSetDates = formatValue === "setDates";
+    const hasNoFields = fields.length === 0;
+
+    if (isSetDates && hasNoFields) {
+      append({ start: "", end: "" });
+    }
+  }, [formatValue, fields.length, append]);
 
   return (
     <div

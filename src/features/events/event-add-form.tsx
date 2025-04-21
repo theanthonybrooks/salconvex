@@ -299,6 +299,7 @@ export const EventOCForm = ({
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
+  const isOngoing = eventData?.dates?.eventFormat === "ongoing";
 
   //
 
@@ -1347,20 +1348,24 @@ export const EventOCForm = ({
                       watchPath="event"
                     />
 
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">
-                        Step {eventCategoryEvent ? 8 : 7}:{" "}
-                      </p>
-                      <p className="lg:text-xs">Production Dates</p>
-                    </div>
+                    {!isOngoing && (
+                      <>
+                        <div className="input-section">
+                          <p className="min-w-max font-bold lg:text-xl">
+                            Step {eventCategoryEvent ? 8 : 7}:{" "}
+                          </p>
+                          <p className="lg:text-xs">Production Dates</p>
+                        </div>
 
-                    <FormDatePicker
-                      isAdmin={isAdmin}
-                      title="Production Dates Format"
-                      nameBase="event.dates"
-                      type="production"
-                      watchPath="event"
-                    />
+                        <FormDatePicker
+                          isAdmin={isAdmin}
+                          title="Production Dates Format"
+                          nameBase="event.dates"
+                          type="production"
+                          watchPath="event"
+                        />
+                      </>
+                    )}
                   </div>
                 </>
               )}

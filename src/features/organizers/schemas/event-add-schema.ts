@@ -79,7 +79,7 @@ export const eventBase = z.object({
 
   dates: z.object({
     eventFormat: z.string().min(1, "Date format is required"),
-    prodFormat: z.string().min(1, "Date format is required"),
+    prodFormat: z.optional(z.string()),
     edition: z.number(),
     eventDates: z.array(
       z.object({
@@ -134,11 +134,35 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     data.dates?.eventFormat !== "noEvent" &&
     data.dates?.eventFormat !== "ongoing";
 
-  if (datesRequired && data.dates?.eventDates?.length === 0) {
+  if (
+    datesRequired &&
+    (data.dates?.eventDates?.[0]?.start === "" ||
+      data.dates?.eventDates?.[0]?.end === "")
+  ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Please provide at least one event date",
+      message: "Please provide at least one set of event dates",
       path: ["dates", "eventDates"],
+    });
+  }
+  if (
+    data.dates?.eventFormat !== "ongoing" &&
+    data.dates?.prodFormat === undefined
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "All projects/events must have a production date format",
+      path: ["dates", "prodFormat"],
+    });
+  }
+  if (
+    data.dates?.eventFormat !== "ongoing" &&
+    data.dates?.prodDates?.length === 0
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "All projects/events must have production dates",
+      path: ["dates", "prodDates"],
     });
   }
 });

@@ -197,7 +197,7 @@ const eventSchema = {
         }),
       ),
     ),
-    ongoing: v.boolean(),
+    ongoing: v.boolean(), //TODO: remove this as eventFormat already handles this
     eventFormat: v.optional(v.string()),
     prodFormat: v.optional(v.string()),
   }),
