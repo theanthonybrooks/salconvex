@@ -22,12 +22,13 @@ import {
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   Controller,
   Path,
   useFieldArray,
   useFormContext,
+  useWatch,
 } from "react-hook-form";
 import { FaTrashCan } from "react-icons/fa6";
 import { z } from "zod";
@@ -60,12 +61,15 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
 
+  const didInitialRun = useRef(false);
+  const initialValue = useRef<string | undefined>(undefined);
+  const prevFormatValue = useRef<string | undefined>(undefined);
+
   const data = watch(watchPath) as z.infer<typeof eventBase.shape.dates>;
   const eventData = watch("event");
+  // const eventDates = eventData?.dates?.eventDates;
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
-  console.log(eventFormat);
-  console.log(data);
   const isEvent = type === "event";
   const isProduction = type === "production";
   //   const isOpenCall = type === "openCall";
@@ -82,6 +86,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     | { start?: string; end?: string }[]
     | undefined;
   const formatValue = watch(`${nameBase}.${formatField}` as Path<T>);
+  // const isSetDates = formatValue === "setDates";
 
   // Inside the component
   const { fields, append, remove } = useFieldArray({
@@ -96,6 +101,8 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const lastEnd = formatDatesArray?.[lastIndex]?.end ?? "";
 
   const canAddMore = lastStart !== "" && lastEnd !== "";
+  const watchedStart = watch(`${nameBase}.${formatKey}.0.start` as Path<T>);
+  const watchedEnd = watch(`${nameBase}.${formatKey}.0.end` as Path<T>);
 
   //   console.log(formatDatesArray);
 
@@ -155,17 +162,77 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   //   // }
   // }, [formatValue, type, eventData?.dates?.eventDates, setValue]);
   useEffect(() => {
+    const isFirstRender = !didInitialRun.current;
+    if (!initialValue.current) {
+      initialValue.current = formatValue as string | undefined;
+    }
+
+    const hasFormatChanged = !!(
+      formatValue &&
+      initialValue.current &&
+      initialValue.current !== formatValue
+    );
+    console.log(
+      isFirstRender,
+      hasFormatChanged,
+      didInitialRun.current,
+      initialValue.current,
+      formatValue,
+      prevFormatValue.current,
+    );
+    // Mark as having rendered at least once
+    didInitialRun.current = true;
+
+    // On first render: only proceed if format is not set
+    if (isFirstRender && formatValue) return;
+    console.log("first render");
+
+    // On later renders: only proceed if format has changed
+    if (!hasFormatChanged && formatValue) return;
+    console.log("format has changed");
+    // Update previous format tracker
+    prevFormatValue.current = formatValue as string;
+
     if (type === "production") {
-      const isSameAsEvent = formatValue === "sameAsEvent";
-
-      if (isSameAsEvent) {
-        const eventDates = eventData?.dates?.eventDates ?? [];
-
-        // Option 1: Copy eventDates to prodDates
-        setValue("event.dates.prodDates", eventDates, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
+      console.log(formatValue);
+      if (formatValue === "monthRange") {
+        console.log("month range");
+        setValue(
+          "event.dates.prodDates",
+          [{ start: toYearMonth(new Date()), end: "" }],
+          {
+            shouldValidate: true,
+            shouldDirty: true,
+          },
+        );
+      } else if (formatValue === "yearRange") {
+        console.log("year range");
+        setValue(
+          "event.dates.prodDates",
+          [{ start: toYear(new Date()), end: "" }],
+          {
+            shouldValidate: true,
+            shouldDirty: true,
+          },
+        );
+      } else if (formatValue === "seasonRange") {
+        setValue(
+          "event.dates.prodDates",
+          [{ start: toSeason(new Date()), end: "" }],
+          {
+            shouldValidate: true,
+            shouldDirty: true,
+          },
+        );
+      } else if (formatValue === "setDates") {
+        setValue(
+          "event.dates.prodDates",
+          [{ start: eventData.dates.eventDates[0].end, end: "" }],
+          {
+            shouldValidate: true,
+            shouldDirty: true,
+          },
+        );
       }
     } else if (type === "event") {
       const isOngoing = formatValue === "ongoing";
@@ -190,6 +257,46 @@ export const FormDatePicker = <T extends EventOCFormValues>({
           shouldDirty: true,
         });
       }
+      // if (formatValue === "monthRange") {
+      //   setValue(
+      //     "event.dates.eventDates",
+      //     [{ start: toYearMonth(new Date()), end: "" }],
+      //     {
+      //       shouldValidate: true,
+      //       shouldDirty: true,
+      //     },
+      //   );
+      // }
+      // if (formatValue === "yearRange") {
+      //   setValue(
+      //     "event.dates.eventDates",
+      //     [{ start: toYear(new Date()), end: "" }],
+      //     {
+      //       shouldValidate: true,
+      //       shouldDirty: true,
+      //     },
+      //   );
+      // }
+      // if (formatValue === "seasonRange") {
+      //   setValue(
+      //     "event.dates.eventDates",
+      //     [{ start: toSeason(new Date()), end: "" }],
+      //     {
+      //       shouldValidate: true,
+      //       shouldDirty: true,
+      //     },
+      //   );
+      // }
+      // if (formatValue === "setDates") {
+      //   setValue(
+      //     "event.dates.eventDates",
+      //     [{ start: new Date().toISOString(), end: "" }],
+      //     {
+      //       shouldValidate: true,
+      //       shouldDirty: true,
+      //     },
+      //   );
+      // }
     }
   }, [formatValue, type, eventData?.dates?.eventDates, setValue, unregister]);
 
@@ -201,6 +308,27 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       append({ start: "", end: "" });
     }
   }, [formatValue, fields.length, append]);
+
+  // useEffect(() => {
+  //   if (formatValue === "sameAsEvent") {
+  //     setValue("event.dates.prodDates", eventDates, {
+  //       shouldValidate: true,
+  //       shouldDirty: true,
+  //     });
+  //   }
+  // }, [formatValue, setValue, eventDates]);
+
+  const prodFormat = useWatch({ name: "event.dates.prodFormat" });
+  const eventDatess = useWatch({ name: "event.dates.eventDates" });
+
+  useEffect(() => {
+    if (prodFormat === "sameAsEvent" && Array.isArray(eventDatess)) {
+      setValue("event.dates.prodDates", [...eventDatess], {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [prodFormat, eventDatess, setValue]);
 
   return (
     <div
@@ -214,6 +342,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       </Label>
       <Controller
         // name="event.dates.eventFormat"
+        key={`${nameBase}.${formatField}` as Path<T>}
         name={`${nameBase}.${formatField}` as Path<T>}
         control={control}
         render={({ field }) => {
@@ -328,6 +457,12 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                           `${nameBase}.${formatKey}.${index - 1}.end` as Path<T>,
                         ) as string | undefined)
                       : undefined;
+                  const watchedSetStart = watch(
+                    `${nameBase}.${formatKey}.${index}.start` as Path<T>,
+                  );
+                  const watchedSetEnd = watch(
+                    `${nameBase}.${formatKey}.${index}.end` as Path<T>,
+                  );
 
                   return (
                     <div
@@ -354,7 +489,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             isAdmin={isAdmin}
                             pickerType="dates"
                             value={
-                              field.value as CustomDatePickerProps["value"]
+                              watchedSetStart as CustomDatePickerProps["value"]
                             }
                             onChange={(date) =>
                               field.onChange(toDateString(date))
@@ -381,7 +516,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             isAdmin={isAdmin}
                             pickerType="dates"
                             value={
-                              field.value as CustomDatePickerProps["value"]
+                              watchedSetEnd as CustomDatePickerProps["value"]
                             }
                             onChange={(date) =>
                               field.onChange(toDateString(date))
@@ -420,7 +555,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
             )}
 
             {formatValue === "monthRange" && (
-              <div className="flex max-w-full items-center gap-x-2">
+              <div
+                className="flex max-w-full items-center gap-x-2"
+                key={`monthRange-${nameBase}-${formatKey}-${type}`}
+              >
                 <Controller
                   name={`${nameBase}.${formatKey}.0.start` as Path<T>}
                   control={control}
@@ -429,7 +567,8 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="month"
-                        value={field.value as CustomDatePickerProps["value"]}
+                        // value={field.value as CustomDatePickerProps["value"]}
+                        value={watchedStart as CustomDatePickerProps["value"]}
                         onChange={(date) => field.onChange(toYearMonth(date))}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"
@@ -447,7 +586,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="month"
-                        value={field.value as CustomDatePickerProps["value"]}
+                        value={watchedEnd as CustomDatePickerProps["value"]}
                         onChange={(date) => field.onChange(toYearMonth(date))}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"
@@ -459,7 +598,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
               </div>
             )}
             {formatValue === "yearRange" && (
-              <div className="flex max-w-full items-center gap-x-2">
+              <div
+                className="flex max-w-full items-center gap-x-2"
+                key={`yearRange-${nameBase}-${formatKey}-${type}`}
+              >
                 <Controller
                   name={`${nameBase}.${formatKey}.0.start` as Path<T>}
                   control={control}
@@ -468,7 +610,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="year"
-                        value={field.value as CustomDatePickerProps["value"]}
+                        value={watchedStart as CustomDatePickerProps["value"]}
                         onChange={(date) => field.onChange(toYear(date))}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"
@@ -486,7 +628,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="year"
-                        value={field.value as CustomDatePickerProps["value"]}
+                        value={watchedEnd as CustomDatePickerProps["value"]}
                         onChange={(date) => field.onChange(toYear(date))}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"
@@ -498,7 +640,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
               </div>
             )}
             {formatValue === "seasonRange" && (
-              <div className="flex max-w-full items-center gap-x-2">
+              <div
+                className="flex max-w-full items-center gap-x-2"
+                key={`seasonRange-${nameBase}-${formatKey}-${type}`}
+              >
                 <Controller
                   name={`${nameBase}.${formatKey}.0.start` as Path<T>}
                   control={control}
@@ -507,7 +652,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="season"
-                        value={field.value as CustomDatePickerProps["value"]}
+                        value={watchedStart as CustomDatePickerProps["value"]}
                         onChange={(date) => {
                           field.onChange(toSeason(date));
                         }}
@@ -530,7 +675,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="season"
-                        value={field.value as CustomDatePickerProps["value"]}
+                        value={watchedEnd as CustomDatePickerProps["value"]}
                         onChange={(date) => field.onChange(toSeason(date))}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"

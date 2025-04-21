@@ -157,7 +157,8 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   }
   if (
     data.dates?.eventFormat !== "ongoing" &&
-    data.dates?.prodDates?.length === 0
+    (data.dates?.prodDates?.[0]?.start === "" ||
+      data.dates?.prodDates?.[0]?.end === "")
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

@@ -4,8 +4,14 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
@@ -30,7 +36,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { EventNameSearch } from "@/features/events/components/event-search";
 import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-step";
-import { toSeason } from "@/lib/dateFns";
+import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { handleFileUrl } from "@/lib/fileUploadFns";
 import { cn } from "@/lib/utils";
@@ -180,16 +186,14 @@ export const EventOCForm = ({
   const eventLastEditedAt =
     (existingEvent && existingEvent?.lastEditedAt) || null;
 
-  // const watchedValues = useWatch({ control });
-  // const currentSchema = steps[activeStep]?.schema;
+  const watchedValues = useWatch({ control });
+  const currentSchema = steps[activeStep]?.schema;
 
-  // const isStepValidZod = useMemo(() => {
-  //   if (!currentSchema) return true;
-  //   const result = currentSchema.safeParse(watchedValues);
-  //   return result.success;
-  // }, [watchedValues, currentSchema]);
-
-  const isStepValidZod = true;
+  const isStepValidZod = useMemo(() => {
+    if (!currentSchema) return true;
+    const result = currentSchema.safeParse(watchedValues);
+    return result.success;
+  }, [watchedValues, currentSchema]);
 
   //
   //
@@ -202,6 +206,7 @@ export const EventOCForm = ({
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
   const eventData = watch("event");
+  console.log(eventData);
   const eventName = eventData?.name ?? "";
   const clearEventDataTrigger =
     newOrgEvent && activeStep === 0 && furthestStep > 0 && eventData;
@@ -226,7 +231,7 @@ export const EventOCForm = ({
   const eventsData = orgEventsData ?? [];
   const orgHasNoEvents =
     orgEventsSuccess && eventsData?.length === 0 && !!existingOrg;
-  const eventChoiceMade = existingEvent || newOrgEvent || !existingOrg;
+  const eventChoiceMade = !!(existingEvent || newOrgEvent || !existingOrg);
 
   const eventCategory = eventData?.category as EventCategory;
   const eventCategoryEvent = eventCategory === "event";
@@ -297,9 +302,14 @@ export const EventOCForm = ({
     (dirtyFields.event?.location || eventData?.location?.full !== undefined) &&
     eventNameValid;
   const eventDates = eventData?.dates?.eventDates;
+
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
+  const blankEventDates =
+    eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
+  const hasEventFormat = !!eventData?.dates?.eventFormat;
+  // const prodDatesFormat = eventData?.dates?.prodFormat || null;
 
   //
 
@@ -677,6 +687,10 @@ export const EventOCForm = ({
         console.log(eventData.dates);
         try {
           setPending(true);
+          const prodDates =
+            eventData.dates.prodFormat === "sameAsEvent"
+              ? eventData.dates.eventDates
+              : eventData.dates.prodDates;
           const { event } = await createOrUpdateEvent({
             _id: eventData._id || "",
             name: eventData.name,
@@ -690,7 +704,7 @@ export const EventOCForm = ({
               eventDates: eventData.dates.eventDates,
               ongoing: eventData.dates.ongoing,
               eventFormat: eventData.dates.eventFormat,
-              prodDates: eventData.dates.prodDates,
+              prodDates,
               prodFormat: eventData.dates.prodFormat,
             },
             location: {
@@ -769,6 +783,10 @@ export const EventOCForm = ({
   // -------------UseEffects --------------
 
   useEffect(() => {
+    console.log(isValid, isStepValidZod);
+  }, [isValid, isStepValidZod]);
+
+  useEffect(() => {
     if (orgData?.name !== undefined && orgData?.name !== "") {
       console.log(getValues("organization"));
       console.log(existingOrg);
@@ -776,10 +794,8 @@ export const EventOCForm = ({
   }, [orgData, existingOrg, getValues]);
 
   useEffect(() => {
-    if (eventData?.name !== undefined && eventData?.name !== "") {
-      console.log(eventData);
-      console.log(existingEvent);
-    }
+    console.log(eventData);
+    console.log(existingEvent);
   }, [eventData, existingEvent]);
 
   useEffect(() => {
@@ -929,7 +945,7 @@ export const EventOCForm = ({
       setValue("event.dates.eventDates", [
         {
           start: new Date().getFullYear().toString(),
-          end: new Date().getFullYear().toString(),
+          end: "",
         },
       ]);
     }
@@ -938,7 +954,16 @@ export const EventOCForm = ({
       setValue("event.dates.eventDates", [
         {
           start: toSeason(new Date()),
-          end: toSeason(new Date()),
+          end: "",
+        },
+      ]);
+    }
+
+    if (eventDatesFormat === "monthRange") {
+      setValue("event.dates.eventDates", [
+        {
+          start: toYearMonth(new Date()),
+          end: "",
         },
       ]);
     }
@@ -1348,7 +1373,7 @@ export const EventOCForm = ({
                       watchPath="event"
                     />
 
-                    {!isOngoing && (
+                    {!isOngoing && hasEventFormat && !blankEventDates && (
                       <>
                         <div className="input-section">
                           <p className="min-w-max font-bold lg:text-xl">

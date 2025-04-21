@@ -353,7 +353,7 @@ export const toDate = (
   }
 
   const date = new Date(value);
-  console.log(date);
+  // console.log(date);
   return isNaN(date.getTime()) ? null : date;
 };
 
@@ -362,8 +362,8 @@ export const toYearMonth = (date: Date | null | undefined): string => {
   // return date.toISOString().slice(0, 7); // "YYYY-MM" but also gave the wrong month sometimes. Need to test this more.
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
-  console.log(year, month);
-  console.log(`${year}-${month}`);
+  // console.log(year, month);
+  // console.log(`${year}-${month}`);
   return `${year}-${month}`; // Local YYYY-MM
 };
 
@@ -380,7 +380,7 @@ export const toSeason = (date: Date | null | undefined): string => {
     3: "Fall",
     4: "Winter",
   };
-  console.log("toSeason", seasonMap[quarter], year);
+  // console.log("toSeason", seasonMap[quarter], year);
   return `${seasonMap[quarter]} ${year}`;
 };
 
@@ -399,8 +399,8 @@ export const toDateString = (date: Date | null | undefined): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-  console.log(year, month, day);
-  console.log(`${year}-${month}-${day}`);
+  // console.log(year, month, day);
+  // console.log(`${year}-${month}-${day}`);
   return `${year}-${month}-${day}`; // Local YYYY-MM-DD
 };
 
