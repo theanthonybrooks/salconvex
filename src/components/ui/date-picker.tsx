@@ -131,7 +131,9 @@ export const CustomDatePicker = ({
       minDate={
         isAdmin
           ? new Date(2010, 0, 1)
-          : (minToDate ?? new Date(new Date().getFullYear(), 0, 1))
+          : pickerType === "season"
+            ? new Date(new Date().getFullYear(), 0, 1)
+            : (minToDate ?? new Date())
       }
       maxDate={maxToDate ?? new Date(2099, 11, 31)}
       placeholderText={

@@ -65,7 +65,7 @@ const steps = [
   },
   {
     id: 3,
-    label: "step 3",
+    label: "Open Call",
   },
   {
     id: 4,
@@ -171,6 +171,9 @@ export const EventOCForm = ({
     null,
   );
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
+  const [skipped, setSkipped] = useState<Set<number>>(new Set());
+
+  // const [hasOpenCall, setHasOpenCall] = useState("true");
   const [lastSaved, setLastSaved] = useState(
     existingEvent ? existingEvent.lastEditedAt : null,
   );
@@ -206,6 +209,7 @@ export const EventOCForm = ({
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
   const eventData = watch("event");
+  const hasOpenCall = eventData?.hasOpenCall ?? "";
   console.log(eventData);
   const eventName = eventData?.name ?? "";
   const clearEventDataTrigger =
@@ -437,7 +441,12 @@ export const EventOCForm = ({
     //   setActiveStep((prev) => prev + 1);
     //   setLoading(false);
     // } else {
-    setActiveStep((prev) => prev + 1);
+    if (activeStep === 1 && hasOpenCall === "false") {
+      setActiveStep((prev) => prev + 2);
+    } else {
+      setActiveStep((prev) => prev + 1);
+    }
+
     // }
   };
 
@@ -445,7 +454,11 @@ export const EventOCForm = ({
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
     await handleSave();
-    setActiveStep((prev) => prev - 1);
+    if (activeStep === 3 && hasOpenCall === "false") {
+      setActiveStep((prev) => prev - 2);
+    } else {
+      setActiveStep((prev) => prev - 1);
+    }
   };
 
   const handleCheckSchema = useCallback((): boolean => {
@@ -485,7 +498,7 @@ export const EventOCForm = ({
         }
       }
       let orgResult = null;
-      if (activeStep === 0 && !hasUserEditedStep0) {
+      if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
         const eventLinks = existingEvent?.links ?? { sameAsOrganizer: true };
         const locationFromEvent = existingEvent?.location?.full
           ? existingEvent?.location?.sameAsOrganizer
@@ -729,6 +742,7 @@ export const EventOCForm = ({
               ...event,
               category: event?.eventCategory || "",
               type: event?.eventType || [],
+              hasOpenCall: currentValues.event?.hasOpenCall || "",
             },
           });
           setPending(false);
@@ -751,6 +765,7 @@ export const EventOCForm = ({
       reset,
 
       activeStep,
+      furthestStep,
       hasUserEditedStep1,
       eventData,
       createOrUpdateEvent,
@@ -1004,6 +1019,14 @@ export const EventOCForm = ({
     }
   }, [shouldClose, saveAndClose]);
 
+  useEffect(() => {
+    if (hasOpenCall === "false") {
+      setSkipped(new Set([2]));
+    } else {
+      setSkipped(new Set());
+    }
+  }, [hasOpenCall]);
+
   return (
     <HorizontalLinearStepper
       errorMsg={errorMsg}
@@ -1012,6 +1035,7 @@ export const EventOCForm = ({
       onNextStep={handleNextStep}
       onBackStep={handleBackStep}
       steps={steps}
+      skipped={skipped}
       className="px-2 xl:px-8"
       finalLabel="Submit"
       onFinalSubmit={handleSubmit(onSubmit)}
@@ -1072,7 +1096,7 @@ export const EventOCForm = ({
                 className={cn(
                   "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
                   "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-                  "py-10",
+                  "spy-10",
                   // "xl:self-center",
                 )}
               >
@@ -1094,7 +1118,7 @@ export const EventOCForm = ({
                           onValueChange={(value: EventCategory) => {
                             field.onChange(value);
                           }}
-                          defaultValue={field.value ?? ""}
+                          value={field.value ?? ""}
                         >
                           <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
                             <SelectValue placeholder="Event/Project Category (select one)" />
@@ -1303,7 +1327,7 @@ export const EventOCForm = ({
                               </p>
                               <p className="lg:text-xs">
                                 {getEventCategoryLabelAbbr(eventCategory)}{" "}
-                                (About)
+                                Details/Notes
                               </p>
                             </div>
 
@@ -1391,6 +1415,47 @@ export const EventOCForm = ({
                         />
                       </>
                     )}
+                    <div className="input-section">
+                      <p className="min-w-max font-bold lg:text-xl">Next: </p>
+                      <p className="lg:text-xs">Open Call</p>
+                    </div>
+                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                      <Label htmlFor="event.hasOpenCall" className="sr-only">
+                        Open Call
+                      </Label>
+                      <Controller
+                        name="event.hasOpenCall"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // setHasOpenCall(value);
+                            }}
+                            value={field.value ?? ""}
+                          >
+                            <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                              <SelectValue
+                                placeholder={`Does your ${getEventCategoryLabelAbbr(eventCategory).toLowerCase()} have an open call?`}
+                              />
+                            </SelectTrigger>
+                            <SelectContent className="min-w-auto">
+                              <SelectItem fit value="true">
+                                Yes, there&apos;s an Open Call
+                              </SelectItem>
+                              <SelectItem fit value="false">
+                                No, there&apos;s not an Open Call
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.event?.hasOpenCall && (
+                        <span className="mt-2 w-full text-center text-sm text-red-600">
+                          {errors.event?.hasOpenCall?.message}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </>
               )}

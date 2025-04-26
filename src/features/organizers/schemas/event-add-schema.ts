@@ -112,6 +112,7 @@ export const eventBase = z.object({
   otherInfo: z.array(z.string()).optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
+  hasOpenCall: z.string(),
 });
 
 export const eventSchema = eventBase.superRefine((data, ctx) => {

@@ -227,7 +227,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       } else if (formatValue === "setDates") {
         setValue(
           "event.dates.prodDates",
-          [{ start: eventData.dates.eventDates[0].end, end: "" }],
+          [{ start: eventData.dates.eventDates[0].start, end: "" }],
           {
             shouldValidate: true,
             shouldDirty: true,

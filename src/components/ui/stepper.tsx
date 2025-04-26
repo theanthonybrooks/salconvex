@@ -57,6 +57,7 @@ export default function HorizontalLinearStepper({
   errorMsg,
   pending,
 }: StepperProps) {
+  console.log(skipped);
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({
@@ -64,6 +65,9 @@ export default function HorizontalLinearStepper({
           optional: false,
         }))
       : steps;
+
+  console.log(skipped?.has(activeStep));
+
   const handleNext = () => {
     if (skipped && setSkipped) {
       if (skipped.has(activeStep)) {
@@ -108,46 +112,61 @@ export default function HorizontalLinearStepper({
 
         {/* Custom Stepper Header with Animated Connectors */}
         <div className="mx-auto flex w-full max-w-3xl items-center justify-center px-4">
-          {stepArray.map((step, index) => (
-            <div
-              key={index}
-              className={cn(
-                "flex w-full items-center",
-                index === lastStep && "w-auto",
-              )}
-            >
-              <div
-                className={cn(
-                  "z-10 flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold",
-                  {
-                    "border-salPinkDark bg-white text-salPinkDark":
-                      activeStep === index,
-                    "border-salPinkDark bg-salPinkDark text-white ring-4 ring-salPinkLtHover ring-offset-2":
-                      activeStep > index,
+          {stepArray.map((step, index) => {
+            if (skipped?.has(index)) {
+              return null;
+            }
+            const skippedBefore = [...(skipped ?? [])].filter(
+              (skippedIndex) => skippedIndex < index,
+            ).length;
+            const displayNumber = index + 1 - skippedBefore;
 
-                    "border-foreground/30 bg-white text-foreground/50":
-                      activeStep < index,
-                  },
+            return (
+              <div
+                key={index}
+                className={cn(
+                  "flex w-full items-center",
+                  index === lastStep && "w-auto",
                 )}
               >
-                {activeStep > index ? <Check className="size-6" /> : index + 1}
-              </div>
+                <div
+                  className={cn(
+                    "z-10 flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold",
+                    {
+                      "border-salPinkDark bg-white text-salPinkDark":
+                        activeStep === index,
+                      "border-salPinkDark bg-salPinkDark text-white ring-4 ring-salPinkLtHover ring-offset-2":
+                        activeStep > index,
 
-              {/* Animated Line */}
-              {index < stepArray.length - 1 && (
-                <motion.div className="relative mx-2 h-1 flex-1 overflow-hidden rounded bg-gray-300">
-                  <motion.div
-                    className="absolute left-0 top-0 h-full bg-salPinkDark"
-                    initial={{ width: 0 }}
-                    animate={{
-                      width: activeStep > index ? "100%" : "0%",
-                    }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </motion.div>
-              )}
-            </div>
-          ))}
+                      "border-foreground/30 bg-white text-foreground/50":
+                        activeStep < index,
+                      "opacity-50": skipped?.has(index),
+                    },
+                  )}
+                >
+                  {activeStep > index && !skipped?.has(index) ? (
+                    <Check className="size-6" />
+                  ) : (
+                    displayNumber
+                  )}
+                </div>
+
+                {/* Animated Line */}
+                {index < stepArray.length - 1 && (
+                  <motion.div className="relative mx-2 h-1 flex-1 overflow-hidden rounded bg-gray-300">
+                    <motion.div
+                      className="absolute left-0 top-0 h-full bg-salPinkDark"
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: activeStep > index ? "100%" : "0%",
+                      }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </motion.div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
