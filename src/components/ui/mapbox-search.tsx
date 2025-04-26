@@ -286,14 +286,32 @@ export const MapboxInputFull = ({
   };
 
   const handleSelect = (s: MapboxSuggestion) => {
+    console.log(s);
     const context = s.context || [];
     const findContext = (type: string) =>
       context.find((c) => c.id.startsWith(type));
     const placeType = s.place_type;
     const placeContext = findContext("place");
+    const localityContext = findContext("locality");
     const stateContext = findContext("region");
     const countryContext = findContext("country");
-    let locale = "";
+    const USAddressFormatCountries = [
+      "United States",
+      "Canada",
+      "Mexico",
+      "United Kingdom",
+      "Australia",
+      "Ireland",
+      "New Zealand",
+      "South Africa",
+      "Philippines",
+      "India",
+      "Israel",
+    ];
+
+    //TODO: Add postal code context for the places that require it in order to know where to go.
+    // const postalContext = findContext("postcode");
+    let locale = localityContext?.text || "";
     let city = s.text;
     let state = stateContext?.text || "";
     let stateAbbr = stateContext?.short_code?.split("-")[1] || "";
@@ -303,6 +321,62 @@ export const MapboxInputFull = ({
     let continent = "";
     let currency = { code: "", name: "", symbol: "" };
     let demonym = "";
+    let full = s.place_name;
+
+    //TODO: Add state context for all places with states/regions that are important for the region. Also postal codes.
+
+    // if (placeType.includes("address")) {
+    //   const parts = [];
+
+    //   if (USAddressFormatCountries.includes(country)) {
+    //     if (s.address) parts.push(s.address);
+    //     parts.push(s.text);
+    //   } else {
+    //     parts.push(s.text);
+    //     if (s.address) parts.push(s.address);
+    //   }
+
+    //   if (locale) parts.push(locale);
+    //   if (placeContext?.text) parts.push(placeContext.text);
+    //   if (stateContext?.text) parts.push(stateAbbr);
+    //   parts.push(countryAbbr === "US" ? countryAbbr : country);
+
+    //   full = parts.join(", ");
+    //   city = placeContext?.text || "";
+    //   locale = localityContext?.text || "";
+    // }
+
+    if (placeType.includes("address")) {
+      let addressStreet = "";
+
+      if (USAddressFormatCountries.includes(country)) {
+        // U.S.-style: number before street
+        if (s.address && s.text) {
+          addressStreet = `${s.address} ${s.text}`;
+        } else {
+          addressStreet = s.text || s.address || "";
+        }
+      } else {
+        // Non-U.S.-style: street before number
+        if (s.text && s.address) {
+          addressStreet = `${s.text} ${s.address}`;
+        } else {
+          addressStreet = s.text || s.address || "";
+        }
+      }
+
+      const parts = [addressStreet];
+
+      if (locale) parts.push(locale);
+      if (placeContext?.text) parts.push(placeContext.text);
+      if (stateContext?.text) parts.push(stateAbbr);
+      parts.push(countryAbbr === "US" ? countryAbbr : country);
+
+      full = parts.filter(Boolean).join(", ");
+      city = placeContext?.text || "";
+      locale = localityContext?.text || "";
+    }
+
     if (placeType.includes("locality") || placeType.includes("neighborhood")) {
       city = placeContext?.text || "";
       locale = s.text;
@@ -335,7 +409,7 @@ export const MapboxInputFull = ({
     demonym = countryToDemonymMap[countryAbbr] ?? "";
 
     const locationData: FullLocation = {
-      full: s.place_name,
+      full,
       locale,
       city,
       state,
@@ -352,7 +426,7 @@ export const MapboxInputFull = ({
       demonym,
     };
     const locationDataEvent: FullLocation = {
-      full: s.place_name,
+      full,
       locale,
       city,
       state,
@@ -422,13 +496,16 @@ export const MapboxInputFull = ({
         return;
       }
 
-      const results = await fetchMapboxSuggestionsFull(inputValue);
+      const results = await fetchMapboxSuggestionsFull(
+        inputValue,
+        isEvent ? true : false,
+      );
       setSuggestions(results);
       setHighlightedIndex(0);
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [inputValue]);
+  }, [inputValue, isEvent]);
 
   useEffect(() => {
     if (fullLocation && newLocation) {

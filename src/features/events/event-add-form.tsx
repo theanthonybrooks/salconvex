@@ -65,19 +65,19 @@ const steps = [
   },
   {
     id: 3,
-    label: "Open Call",
+    label: "Event Details (Cont'd...",
   },
   {
     id: 4,
-    label: "step 4",
+    label: "Open Call",
   },
   {
     id: 5,
-    label: "step 5",
+    label: "Budget & Compensation",
   },
   {
     id: 6,
-    label: "step 6",
+    label: "Organizer Details",
   },
 ];
 
@@ -171,7 +171,7 @@ export const EventOCForm = ({
     null,
   );
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
-  const [skipped, setSkipped] = useState<Set<number>>(new Set());
+  const [skipped, setSkipped] = useState<Set<number>>(new Set([3, 4]));
 
   // const [hasOpenCall, setHasOpenCall] = useState("true");
   const [lastSaved, setLastSaved] = useState(
@@ -441,8 +441,8 @@ export const EventOCForm = ({
     //   setActiveStep((prev) => prev + 1);
     //   setLoading(false);
     // } else {
-    if (activeStep === 1 && hasOpenCall === "false") {
-      setActiveStep((prev) => prev + 2);
+    if (activeStep === 2 && hasOpenCall === "false") {
+      setActiveStep((prev) => prev + 3);
     } else {
       setActiveStep((prev) => prev + 1);
     }
@@ -454,8 +454,8 @@ export const EventOCForm = ({
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
     await handleSave();
-    if (activeStep === 3 && hasOpenCall === "false") {
-      setActiveStep((prev) => prev - 2);
+    if (activeStep === 4 && hasOpenCall === "false") {
+      setActiveStep((prev) => prev - 3);
     } else {
       setActiveStep((prev) => prev - 1);
     }
@@ -1021,8 +1021,9 @@ export const EventOCForm = ({
 
   useEffect(() => {
     if (hasOpenCall === "false") {
-      setSkipped(new Set([2]));
-    } else {
+      setSkipped(new Set([3, 4]));
+      //TODO: add check on whether or not it's a free open call. If so, don't add the extra steps? Or... ? nevermind. Think about me.
+    } else if (hasOpenCall === "true") {
       setSkipped(new Set());
     }
   }, [hasOpenCall]);
@@ -1118,7 +1119,7 @@ export const EventOCForm = ({
                           onValueChange={(value: EventCategory) => {
                             field.onChange(value);
                           }}
-                          value={field.value ?? ""}
+                          defaultValue={field.value ?? ""}
                         >
                           <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
                             <SelectValue placeholder="Event/Project Category (select one)" />
@@ -1432,7 +1433,7 @@ export const EventOCForm = ({
                               field.onChange(value);
                               // setHasOpenCall(value);
                             }}
-                            value={field.value ?? ""}
+                            defaultValue={field.value ?? ""}
                           >
                             <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
                               <SelectValue

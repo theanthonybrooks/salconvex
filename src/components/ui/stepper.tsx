@@ -57,7 +57,6 @@ export default function HorizontalLinearStepper({
   errorMsg,
   pending,
 }: StepperProps) {
-  console.log(skipped);
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({
@@ -65,8 +64,6 @@ export default function HorizontalLinearStepper({
           optional: false,
         }))
       : steps;
-
-  console.log(skipped?.has(activeStep));
 
   const handleNext = () => {
     if (skipped && setSkipped) {
