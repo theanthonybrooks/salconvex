@@ -35,7 +35,7 @@ interface OpenCallCardProps {
 
 const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
   const {
-    eventCategory,
+    category: eventCategory,
 
     location,
     dates,

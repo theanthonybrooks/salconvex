@@ -530,6 +530,7 @@ export const EventOCForm = ({
             };
 
         if (existingEvent) {
+          console.log("prev event", prevEventRef.current);
           reset({
             ...currentValues,
             event: {
@@ -540,6 +541,7 @@ export const EventOCForm = ({
               links: {
                 ...eventLinks,
               },
+              hasOpenCall: currentValues.event?.hasOpenCall || "",
             },
           });
           console.log("resetting w existing event");
@@ -1063,14 +1065,15 @@ export const EventOCForm = ({
   }, [hasOpenCall]);
 
   useEffect(() => {
-    if (openCallSuccess && ocData) {
+    if (!openCallSuccess) return;
+    if (ocData) {
       // setOpenCall(ocData);
       setValue("event.hasOpenCall", "true");
       setValue("openCall", ocData);
-      console.log("setting oc data");
+      // console.log("setting oc data");
     } else if (!ocData) {
       setValue("event.hasOpenCall", "false");
-      console.log("setting oc false");
+      // console.log("setting oc false");
       // reset({
       //   organization: {
       //     ...existingOrg,
@@ -1081,7 +1084,7 @@ export const EventOCForm = ({
       //   },
       // });
     }
-  }, [openCallSuccess, ocData, setValue, existingEvent, reset]);
+  }, [openCallSuccess, ocData, setValue, reset]);
 
   return (
     <HorizontalLinearStepper
