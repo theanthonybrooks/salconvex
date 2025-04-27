@@ -104,6 +104,7 @@ NavBarProps) {
               "absolute bottom-0 left-1/2 z-0 flex -translate-x-1/2 translate-y-[24px] items-center justify-center rounded-full bg-background lg:hidden",
             )}
           />
+          <div className="absolute bottom-0 left-1/2 h-full w-25 -translate-x-1/2 bg-background" />
           <div className="flex items-center gap-2 lg:hidden">
             <motion.div
               id="logo-background-front"
