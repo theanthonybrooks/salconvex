@@ -812,28 +812,28 @@ export const EventOCForm = ({
   // -------------UseEffects --------------
 
   useEffect(() => {
-    console.log(isValid, isStepValidZod);
+    console.log("form valid:", isValid, "step valid:", isStepValidZod);
   }, [isValid, isStepValidZod]);
 
   useEffect(() => {
     if (orgData?.name !== undefined && orgData?.name !== "") {
-      console.log(getValues("organization"));
-      console.log(existingOrg);
+      console.log("orgData", getValues("organization"));
+      console.log("org", existingOrg);
     }
   }, [orgData, existingOrg, getValues]);
 
   useEffect(() => {
-    console.log(eventData);
-    console.log(existingEvent);
+    console.log("eventData", eventData);
+    console.log("existingEvent", existingEvent);
   }, [eventData, existingEvent]);
 
   useEffect(() => {
     if (!eventDatesWatch) return;
-    console.log(eventDatesWatch);
+    console.log("event dates", eventDatesWatch);
   }, [eventDatesWatch]);
 
   useEffect(() => {
-    console.log(openCallData);
+    console.log("oc", openCallData);
   }, [openCallData]);
 
   useEffect(() => {
@@ -1057,7 +1057,6 @@ export const EventOCForm = ({
   useEffect(() => {
     if (openCallSuccess && ocData) {
       // setOpenCall(ocData);
-      console.log(ocData);
       setValue("event.hasOpenCall", "true");
       setValue("openCall", ocData);
     } else if (!ocData) {
