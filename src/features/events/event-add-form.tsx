@@ -121,16 +121,16 @@ export const EventOCForm = ({
   const isAdmin = user?.role?.includes("admin") || false;
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
     resolver: zodResolver(eventWithOCSchema),
-    // defaultValues: {
-    //   organization: {
-    //     name: "cannonfodder",
-    //     logo: undefined,
-    //     location: undefined,
-    //   },
-    //   event: undefined,
-    //   // orgLogo: undefined,
-    //   // eventName: "",
-    // },
+    defaultValues: {
+      organization: {
+        name: "",
+        logo: undefined,
+        location: undefined,
+      },
+      event: undefined,
+      // orgLogo: undefined,
+      // eventName: "",
+    },
     mode: "onChange",
   });
 
@@ -345,11 +345,7 @@ export const EventOCForm = ({
 
   //   // error,
   // );
-  // console.log(
-  //   eventDatesFormat || "no event dates",
-  //   isFirstRun.current,
-  //   hasNoEventDates,
-  // );
+
   // console.log(clearEventDataTrigger);
   // console.log(validOrgWZod, isStepValidZod);
   // console.log(eventChoiceMade, newOrgEvent, orgHasNoEvents);
@@ -546,6 +542,7 @@ export const EventOCForm = ({
               },
             },
           });
+          console.log("resetting w existing event");
         } else {
           reset({
             ...currentValues,
@@ -798,13 +795,20 @@ export const EventOCForm = ({
   const handleReset = () => {
     setActiveStep(0);
     setFurthestStep(0);
-    setExistingOrg(null);
     setSelectedRow({ 0: false });
+    setExistingOrg(null);
     prevOrgRef.current = null;
     isFirstRun.current = true;
     setExistingEvent(null);
     setNewOrgEvent(false);
-    reset();
+    reset({
+      organization: {
+        name: "",
+        logo: undefined,
+        location: undefined,
+      },
+      event: undefined,
+    });
     // setValue("organization.name", "");
   };
 
@@ -820,6 +824,10 @@ export const EventOCForm = ({
       console.log("org", existingOrg);
     }
   }, [orgData, existingOrg, getValues]);
+
+  useEffect(() => {
+    console.log("existingOrg", existingOrg);
+  }, [existingOrg]);
 
   useEffect(() => {
     console.log("eventData", eventData);
@@ -1059,19 +1067,21 @@ export const EventOCForm = ({
       // setOpenCall(ocData);
       setValue("event.hasOpenCall", "true");
       setValue("openCall", ocData);
+      console.log("setting oc data");
     } else if (!ocData) {
       setValue("event.hasOpenCall", "false");
-      reset({
-        organization: {
-          ...existingOrg,
-        },
-        event: {
-          ...existingEvent,
-          hasOpenCall: "false",
-        },
-      });
+      console.log("setting oc false");
+      // reset({
+      //   organization: {
+      //     ...existingOrg,
+      //   },
+      //   event: {
+      //     ...existingEvent,
+      //     hasOpenCall: "false",
+      //   },
+      // });
     }
-  }, [openCallSuccess, ocData, setValue, existingEvent, existingOrg, reset]);
+  }, [openCallSuccess, ocData, setValue, existingEvent, reset]);
 
   return (
     <HorizontalLinearStepper
