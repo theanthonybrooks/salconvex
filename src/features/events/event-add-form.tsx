@@ -210,6 +210,7 @@ export const EventOCForm = ({
   const orgData = watch("organization");
   const eventData = watch("event");
   const openCallData = watch("openCall");
+  const eventDatesWatch = watch("event.dates");
   const orgName = orgData?.name ?? "";
   const hasOpenCall = eventData?.hasOpenCall ?? "";
 
@@ -393,7 +394,6 @@ export const EventOCForm = ({
   // console.log(isValid, "wZod:", validOrgWZod);
 
   // console.log("last saved", lastSavedDate);
-  console.log(eventData);
 
   //
   //
@@ -826,6 +826,11 @@ export const EventOCForm = ({
     console.log(eventData);
     console.log(existingEvent);
   }, [eventData, existingEvent]);
+
+  useEffect(() => {
+    if (!eventDatesWatch) return;
+    console.log(eventDatesWatch);
+  }, [eventDatesWatch]);
 
   useEffect(() => {
     console.log(openCallData);

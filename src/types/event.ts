@@ -35,7 +35,6 @@ export interface EventData {
   adminNote?: string;
   organizerId: string[];
   mainOrgId: string;
-  openCallId: string[]; //list the open call id's that are associated with this event
 
   name: string;
   slug: string;
