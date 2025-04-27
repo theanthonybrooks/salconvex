@@ -19,8 +19,8 @@ export const useFilteredEvents = (
         if (
           filters.eventTypes &&
           filters.eventTypes.length > 0 &&
-          (!event.eventType ||
-            !event.eventType.some((type) => filters.eventTypes!.includes(type)))
+          (!event.type ||
+            !event.type.some((type) => filters.eventTypes!.includes(type)))
         ) {
           return false;
         }
@@ -28,7 +28,7 @@ export const useFilteredEvents = (
         if (
           filters.eventCategories &&
           filters.eventCategories.length > 0 &&
-          !filters.eventCategories.includes(event.eventCategory)
+          !filters.eventCategories.includes(event.category)
         ) {
           return false;
         }
