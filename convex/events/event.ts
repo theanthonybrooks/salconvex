@@ -6,6 +6,7 @@ import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
+import { categoryValidator, typeValidator } from "~/convex/schema";
 
 export const getEventByOrgId = query({
   args: {
@@ -236,8 +237,9 @@ export const createOrUpdateEvent = mutation({
     name: v.string(),
     slug: v.string(),
     logo: v.string(),
-    type: v.array(v.string()),
-    category: v.string(),
+    type: typeValidator,
+    category: categoryValidator,
+
     dates: v.object({
       edition: v.number(),
       eventDates: v.array(

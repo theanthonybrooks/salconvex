@@ -114,6 +114,7 @@ export const MapboxInput = ({
   }, [suggestions]);
 
   useEffect(() => {
+    if (!isFocused) return;
     const timeout = setTimeout(async () => {
       if (!inputValue.trim()) {
         setSuggestions([]);
@@ -126,7 +127,7 @@ export const MapboxInput = ({
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [inputValue]);
+  }, [inputValue, isFocused]);
 
   useEffect(() => {
     if (newValue) {
@@ -286,7 +287,7 @@ export const MapboxInputFull = ({
   };
 
   const handleSelect = (s: MapboxSuggestion) => {
-    console.log(s);
+    // console.log(s);
     const context = s.context || [];
     const findContext = (type: string) =>
       context.find((c) => c.id.startsWith(type));
@@ -444,9 +445,6 @@ export const MapboxInputFull = ({
       sameAsOrganizer: isEvent ? false : true,
     };
 
-    console.log("locationData", locationData);
-    console.log("locationDataEvent", locationDataEvent);
-
     onChange(isEvent ? locationDataEvent : locationData);
     setIsFocused(false);
     setInputValue(locationData.full);
@@ -455,7 +453,7 @@ export const MapboxInputFull = ({
 
   const handleBlur = () => {
     if (inputValue.trim() !== "") {
-      console.log(inputValue.trim(), suggestions.length, isFocused);
+      // console.log(inputValue.trim(), suggestions.length, isFocused);
     }
     if (value?.full !== inputValue.trim() && !clickedSuggestionRef.current) {
       onChange(emptyObject);
@@ -488,8 +486,8 @@ export const MapboxInputFull = ({
     }
   }, [suggestions]);
 
-  //note-to-self:for scrolling into view
   useEffect(() => {
+    if (!isFocused) return;
     const timeout = setTimeout(async () => {
       if (!inputValue.trim()) {
         setSuggestions([]);
@@ -505,7 +503,7 @@ export const MapboxInputFull = ({
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [inputValue, isEvent]);
+  }, [inputValue, isEvent, isFocused]);
 
   useEffect(() => {
     if (fullLocation && newLocation) {

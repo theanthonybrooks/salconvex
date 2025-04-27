@@ -13,6 +13,25 @@ const stripeIntervalPricesValidator = v.object({
   usd: stripePriceValidator,
 });
 
+export const typeValidator = v.array(
+  v.union(
+    v.literal("gjm"),
+    v.literal("mur"),
+    v.literal("pup"),
+    v.literal("saf"),
+    v.literal("mus"),
+    v.literal("oth"),
+  ),
+);
+
+export const categoryValidator = v.union(
+  v.literal("event"),
+  v.literal("project"),
+  v.literal("residency"),
+  v.literal("gfund"),
+  v.literal("roster"),
+);
+
 const customUserSchema = {
   // Include Convex Auth fields you want to use
   name: v.optional(v.string()),
@@ -179,8 +198,8 @@ const eventSchema = {
   // ),
   name: v.string(),
   logo: v.string(),
-  type: v.array(v.string()),
-  category: v.string(),
+  type: typeValidator,
+  category: categoryValidator,
 
   dates: v.object({
     edition: v.number(),

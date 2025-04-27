@@ -393,6 +393,7 @@ export const EventOCForm = ({
   // console.log(isValid, "wZod:", validOrgWZod);
 
   // console.log("last saved", lastSavedDate);
+  console.log(eventData);
 
   //
   //

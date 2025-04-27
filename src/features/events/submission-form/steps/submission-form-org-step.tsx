@@ -260,7 +260,8 @@ const SubmissionFormOrgStep = ({
                 columns={columns}
                 data={eventsData}
                 defaultVisibility={{
-                  eventCategory: false,
+                  type: false,
+                  category: false,
                   lastEditedAt: false,
                 }}
                 onRowSelect={(event, selection) => {
@@ -306,7 +307,8 @@ const SubmissionFormOrgStep = ({
                 }}
                 selectedRow={selectedRow}
                 defaultVisibility={{
-                  eventCategory: false,
+                  category: false,
+                  type: false,
                   // lastEditedAt: false,
                 }}
                 className="flex w-full max-w-[90vw] overflow-x-auto"

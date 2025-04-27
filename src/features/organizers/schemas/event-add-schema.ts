@@ -1,3 +1,4 @@
+import { eventCategoryValues, eventTypeValues } from "@/types/event";
 import { z } from "zod";
 
 const locationBase = z.object({
@@ -65,8 +66,8 @@ export const eventBase = z.object({
     .min(3, "Name must be at least 3 characters")
     .max(35, "Max 35 characters")
     .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
-  category: z.string().min(3, "Event category is required"),
-  type: z.array(z.string()).optional(),
+  category: z.enum(eventCategoryValues), //TODO: Add message for "Event category is required"
+  type: z.array(z.enum(eventTypeValues)).optional(),
   logo: z.union([
     z
       .instanceof(Blob)

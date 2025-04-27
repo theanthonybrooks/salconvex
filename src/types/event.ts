@@ -3,19 +3,32 @@ import { OpenCall } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Id } from "~/convex/_generated/dataModel";
 
-export type EventType = "gjm" | "mur" | "pup" | "saf" | "mus" | "oth";
-export type EventCategory =
-  | "event"
-  | "project"
-  | "residency"
-  | "gfund"
-  | "roster";
+export const eventTypeValues = [
+  "gjm",
+  "mur",
+  "pup",
+  "saf",
+  "mus",
+  "oth",
+] as const;
+export type EventType = (typeof eventTypeValues)[number];
 
-export type SubmissionFormState =
-  | "draft"
-  | "submitted"
-  | "published"
-  | "archived";
+export const eventCategoryValues = [
+  "event",
+  "project",
+  "residency",
+  "gfund",
+  "roster",
+] as const;
+export type EventCategory = (typeof eventCategoryValues)[number];
+
+export const eventStates = [
+  "draft",
+  "submitted",
+  "published",
+  "archived",
+] as const;
+export type SubmissionFormState = (typeof eventStates)[number];
 
 export interface EventData {
   _id: Id<"events">;

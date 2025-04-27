@@ -4,9 +4,9 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/features/artists/applications/data-table/data-table-column-header";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { SubmissionFormState } from "@/types/event";
+import { EventType, SubmissionFormState } from "@/types/event";
 import { CheckCircle2, Circle } from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
@@ -28,6 +28,7 @@ export type Event = {
   };
   state: SubmissionFormState;
   category: string;
+  type: EventType[];
   lastEditedAt?: number;
 };
 
@@ -108,6 +109,28 @@ export const columns: ColumnDef<Event>[] = [
         <div className="flex justify-center space-x-2">
           <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
             {getEventCategoryLabelAbbr(row.getValue("category"))}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "type",
+    size: 120,
+    minSize: 120,
+    maxSize: 240,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Event Type" />
+    ),
+    cell: ({ row }) => {
+      const types = row.getValue("type") as EventType[];
+
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {Array.isArray(types) && types.length > 0
+              ? types.map((type) => getEventTypeLabel(type)).join(", ")
+              : "-"}
           </span>
         </div>
       );

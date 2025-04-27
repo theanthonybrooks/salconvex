@@ -3,36 +3,46 @@ import { EventData, SubmissionFormState } from "@/types/event";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
-export type CallType =
-  | "Fixed"
-  | "Rolling"
-  | "Email"
-  | "Invite"
-  | "Unknown"
-  | null;
+export const callTypeValues = [
+  "Fixed",
+  "Rolling",
+  "Email",
+  "Invite",
+  "Unknown",
+] as const;
 
-export type EligibilityType =
-  | "International"
-  | "National"
-  | "Regional/Local"
-  | "Other"
-  | null;
+export type CallType = (typeof callTypeValues)[number] | null;
 
-export type ApplicationStatus =
-  | "external apply"
-  | "applied"
-  | "considering"
-  | "to next step"
-  | "accepted"
-  | "rejected"
-  | "pending"
-  | "roster"
-  | "shortlisted"
-  | null;
+export const eligibilityTypeValues = [
+  "International",
+  "National",
+  "Regional/Local",
+  "Other",
+] as const;
 
-export type OpenCallStatus = "active" | "ended" | "coming-soon" | null;
+export type EligibilityType = (typeof eligibilityTypeValues)[number] | null;
 
-export type RateUnit = "ft²" | "m²";
+export const applicationStatusValues = [
+  "external apply",
+  "applied",
+  "considering",
+  "to next step",
+  "accepted",
+  "rejected",
+  "pending",
+  "roster",
+  "shortlisted",
+];
+
+export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
+
+export const openCallStatusValues = ["active", "ended", "coming-soon"] as const;
+
+export type OpenCallStatus = (typeof openCallStatusValues)[number] | null;
+
+export const RateUnitValues = ["ft²", "m²"] as const;
+
+export type RateUnit = (typeof RateUnitValues)[number];
 
 export interface OpenCall {
   _id: Id<"openCalls">;
