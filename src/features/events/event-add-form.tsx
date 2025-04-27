@@ -121,16 +121,16 @@ export const EventOCForm = ({
   const isAdmin = user?.role?.includes("admin") || false;
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
     resolver: zodResolver(eventWithOCSchema),
-    defaultValues: {
-      organization: {
-        name: undefined,
-        logo: undefined,
-        location: undefined,
-      },
-      event: undefined,
-      // orgLogo: undefined,
-      // eventName: "",
-    },
+    // defaultValues: {
+    //   organization: {
+    //     name: "cannonfodder",
+    //     logo: undefined,
+    //     location: undefined,
+    //   },
+    //   event: undefined,
+    //   // orgLogo: undefined,
+    //   // eventName: "",
+    // },
     mode: "onChange",
   });
 
@@ -344,6 +344,11 @@ export const EventOCForm = ({
   //   invalidOrgWZod,
 
   //   // error,
+  // );
+  // console.log(
+  //   eventDatesFormat || "no event dates",
+  //   isFirstRun.current,
+  //   hasNoEventDates,
   // );
   // console.log(clearEventDataTrigger);
   // console.log(validOrgWZod, isStepValidZod);
@@ -793,19 +798,13 @@ export const EventOCForm = ({
   const handleReset = () => {
     setActiveStep(0);
     setFurthestStep(0);
-    setSelectedRow({ 0: false });
     setExistingOrg(null);
+    setSelectedRow({ 0: false });
     prevOrgRef.current = null;
+    isFirstRun.current = true;
     setExistingEvent(null);
     setNewOrgEvent(false);
-    reset({
-      organization: {
-        name: "",
-        logo: undefined,
-        location: undefined,
-      },
-      event: undefined,
-    });
+    reset();
     // setValue("organization.name", "");
   };
 
@@ -867,6 +866,7 @@ export const EventOCForm = ({
     const eventChanged =
       eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged) {
+      isFirstRun.current = true;
       if (existingEvent?.lastEditedAt) {
         setLastSaved(existingEvent.lastEditedAt);
       } else if (existingEvent?._creationTime) {

@@ -10,9 +10,9 @@ interface AccordionItem {
 }
 
 export const iconOpenClass =
-  "open transition-all duration-400 absolute right-4 top-4 origin-center";
+  "open transition-all duration-400 absolute right-4 top-5 origin-center";
 export const iconClosedClass =
-  "closed transition-all duration-400 absolute right-4 top-4 origin-center";
+  "closed transition-all duration-400 absolute right-4 top-5 origin-center";
 
 export interface AccordionSection {
   name?: string | null;

@@ -107,7 +107,7 @@ export const getEventBySlug = query({
         ...event,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
-        eventType:
+        type:
           Array.isArray(event.type) && event.type.length <= 2
             ? (event.type as [EventType] | [EventType, EventType])
             : undefined,

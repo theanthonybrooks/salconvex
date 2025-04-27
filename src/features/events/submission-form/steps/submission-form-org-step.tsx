@@ -65,10 +65,6 @@ const SubmissionFormOrgStep = ({
 
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
-  // useEffect(() => {
-  //   console.log("Organization name:", orgName);
-  //   console.log("orgData:", orgData);
-  // }, [orgName, orgData]);
 
   return (
     //   {activeStep === 0 && ( //pass this from the parent, not here
