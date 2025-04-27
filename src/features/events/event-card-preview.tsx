@@ -69,9 +69,9 @@ const EventCardPreview = ({
   const router = useRouter();
   const {
     location,
-    eventCategory,
+    category: eventCategory,
 
-    eventType,
+    type: eventType,
     name,
     logo,
     tabs,
@@ -373,7 +373,7 @@ const EventCardPreview = ({
                     />
                   </TooltipTrigger>
                   <TooltipContent align="start">
-                    <p>Bookmark {getEventCategoryLabel(event.eventCategory)}</p>
+                    <p>Bookmark {getEventCategoryLabel(eventCategory)}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

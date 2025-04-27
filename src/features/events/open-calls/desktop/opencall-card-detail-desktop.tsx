@@ -37,8 +37,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { event, organizer, openCall, application } = data;
   const {
     logo: eventLogo,
-    eventCategory,
-    eventType,
+    category: eventCategory,
+    type: eventType,
     location,
     dates,
     slug,

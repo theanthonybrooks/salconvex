@@ -40,9 +40,9 @@ export function DataTableToolbar<TData>({
             options={eventStates}
           />
         )}
-        {table.getColumn("eventCategory") && (
+        {table.getColumn("category") && (
           <DataTableFacetedFilter
-            column={table.getColumn("eventCategory")}
+            column={table.getColumn("category")}
             title="Category"
             options={eventCategories}
           />

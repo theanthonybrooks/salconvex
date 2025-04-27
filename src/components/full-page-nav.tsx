@@ -679,7 +679,7 @@ const FullPageNav = ({
             >
               {isOpen === "open" && (
                 <>
-                  <div className="row-span-1 grid w-screen grid-cols-1 divide-x-1.5 divide-solid divide-foreground overflow-hidden px-5 md:grid-cols-3">
+                  <div className="row-span-1 grid w-screen grid-cols-1 divide-x-1.5 divide-solid divide-foreground overflow-hidden px-5 md:grid-cols-2">
                     {/* Column 1 - Main Titles */}
                     <motion.div
                       className="scrollable mini darkbar flex items-start justify-center p-4 py-8"
@@ -805,13 +805,13 @@ const FullPageNav = ({
                     </motion.div>
 
                     {/* Column 3 */}
-                    <motion.div
+                    {/*     <motion.div
                       className="flex flex-col items-center justify-end gap-y-4 p-4 pb-8"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1.1, duration: 0.4 }}
                     >
-                      {/* <div className="scrollable mini flex h-[30%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
+                      /~ <div className="scrollable mini flex h-[30%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
                         <p>User Notifications</p>
                         <Separator />
                         <p className="text-sm italic">
@@ -863,8 +863,8 @@ const FullPageNav = ({
                             </span>
                           </li>
                         </ol>
-                      </div> */}
-                    </motion.div>
+                      </div> ~/
+                    </motion.div>*/}
                   </div>
 
                   {/* Fixed Bottom Row */}

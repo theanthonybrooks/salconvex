@@ -174,11 +174,14 @@ const eventSchema = {
   // mainOrgName: v.optional(v.string()),
   // mainOrgName: v.string(),
   // eventId: v.optional(v.string()),
-  openCallId: v.array(v.id("openCalls")),
+  // openCallId: v.optional(
+  //   v.union(v.array(v.id("openCalls")), v.id("openCalls")),
+  // ),
   name: v.string(),
   logo: v.string(),
-  eventType: v.array(v.string()),
-  eventCategory: v.string(),
+  type: v.array(v.string()),
+  category: v.string(),
+
   dates: v.object({
     edition: v.number(),
     eventDates: v.array(
@@ -438,8 +441,8 @@ export default defineSchema({
     .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])
 
     // .index("by_eventId", ["event"])
-    .index("by_eventType", ["eventType"])
-    .index("by_category", ["eventCategory"])
+    .index("by_eventType", ["type"])
+    .index("by_category", ["category"])
     .index("by_state", ["state"])
     .index("by_country", ["location.countryAbbr"]),
   // .index("by_continent", ["location.continent"]), //TODO: add this back once I have the continents mapped properly

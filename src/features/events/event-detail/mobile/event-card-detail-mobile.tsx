@@ -34,8 +34,9 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
 
   const {
     logo: eventLogo,
-    eventCategory,
-    eventType,
+    category: eventCategory,
+    type: eventType,
+
     location,
 
     // hasActiveOpenCall: hasOpenCall,

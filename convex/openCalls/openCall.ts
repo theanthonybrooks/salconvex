@@ -28,3 +28,20 @@ export const getPublishedOpenCalls = query({
     return openCalls;
   },
 });
+
+export const getOpenCallByEventId = query({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
+
+    return openCall;
+  },
+});

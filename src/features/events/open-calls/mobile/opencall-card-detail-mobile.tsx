@@ -34,8 +34,8 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const {
     // id: eventId,
     logo: eventLogo,
-    eventCategory,
-    eventType,
+    category: eventCategory,
+    type: eventType,
     location,
 
     slug,

@@ -36,7 +36,13 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const router = useRouter();
   const { data, artist, className } = props; //note: removed artist from props. Add back when needed
   const { event, organizer } = data;
-  const { logo: eventLogo, eventCategory, eventType, location, dates } = event;
+  const {
+    logo: eventLogo,
+    category: eventCategory,
+    type: eventType,
+    location,
+    dates,
+  } = event;
 
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
@@ -263,7 +269,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       />
                     </TooltipTrigger>
                     <TooltipContent align="end">
-                      <p>Unhide {getEventCategoryLabel(event.eventCategory)}</p>
+                      <p>Unhide {getEventCategoryLabel(eventCategory)}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -274,7 +280,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       <Eye className="size-7 cursor-pointer" onClick={onHide} />
                     </TooltipTrigger>
                     <TooltipContent align="end">
-                      <p>Hide {getEventCategoryLabel(event.eventCategory)}</p>
+                      <p>Hide {getEventCategoryLabel(eventCategory)}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -303,9 +309,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       />{" "}
                     </TooltipTrigger>
                     <TooltipContent align="end">
-                      <p>
-                        Bookmark {getEventCategoryLabel(event.eventCategory)}
-                      </p>
+                      <p>Bookmark {getEventCategoryLabel(eventCategory)}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

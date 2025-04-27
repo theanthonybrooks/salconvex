@@ -50,10 +50,8 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
               tabs: {
                 opencall: null,
               },
-              eventType: event.eventType as
-                | [EventType]
-                | [EventType, EventType],
-              eventCategory: event.eventCategory as EventCategory,
+              type: event.type as [EventType] | [EventType, EventType],
+              category: event.category as EventCategory,
 
               bookmarked: listAction?.bookmarked ?? false,
               hidden: listAction?.hidden ?? false,
@@ -107,8 +105,8 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
           return {
             ...(event as unknown as EventData),
             tabs: { opencall: openCall as unknown as OpenCall },
-            eventType: event.eventType as [EventType] | [EventType, EventType],
-            eventCategory: event.eventCategory as EventCategory,
+            type: event.type as [EventType] | [EventType, EventType],
+            category: event.category as EventCategory,
             bookmarked: listAction?.bookmarked ?? false,
             hidden: listAction?.hidden ?? false,
             status:

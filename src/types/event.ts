@@ -27,9 +27,9 @@ export interface EventData {
   name: string;
   slug: string;
   logo: string;
-  eventType?: [EventType] | [EventType, EventType];
+  type?: [EventType] | [EventType, EventType];
   // eventType?: string[];
-  eventCategory: EventCategory;
+  category: EventCategory;
   dates: {
     edition: number;
     eventDates: { start: string; end: string }[];

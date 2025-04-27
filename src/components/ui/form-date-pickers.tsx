@@ -172,29 +172,29 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       initialValue.current &&
       initialValue.current !== formatValue
     );
-    console.log(
-      isFirstRender,
-      hasFormatChanged,
-      didInitialRun.current,
-      initialValue.current,
-      formatValue,
-      prevFormatValue.current,
-    );
+    // console.log(
+    //   isFirstRender,
+    //   hasFormatChanged,
+    //   didInitialRun.current,
+    //   initialValue.current,
+    //   formatValue,
+    //   prevFormatValue.current,
+    // );
     // Mark as having rendered at least once
     didInitialRun.current = true;
 
     // On first render: only proceed if format is not set
     if (isFirstRender && formatValue) return;
-    console.log("first render");
+    // console.log("first render");
 
     // On later renders: only proceed if format has changed
     if (!hasFormatChanged && formatValue) return;
-    console.log("format has changed");
+    // console.log("format has changed");
     // Update previous format tracker
     prevFormatValue.current = formatValue as string;
 
     if (type === "production") {
-      console.log(formatValue);
+      // console.log(formatValue);
       if (formatValue === "monthRange") {
         console.log("month range");
         setValue(

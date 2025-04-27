@@ -170,6 +170,7 @@ export const EventOCForm = ({
   const [existingEvent, setExistingEvent] = useState<Doc<"events"> | null>(
     null,
   );
+  // const [openCall, setOpenCall] = useState<Doc<"openCalls"> | null>(null);
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [skipped, setSkipped] = useState<Set<number>>(new Set([3, 4]));
 
@@ -207,10 +208,11 @@ export const EventOCForm = ({
   const isFirstRun = useRef(true);
   const savedState = useRef(false);
   const orgData = watch("organization");
-  const orgName = orgData?.name ?? "";
   const eventData = watch("event");
+  const openCallData = watch("openCall");
+  const orgName = orgData?.name ?? "";
   const hasOpenCall = eventData?.hasOpenCall ?? "";
-  console.log(eventData);
+
   const eventName = eventData?.name ?? "";
   const clearEventDataTrigger =
     newOrgEvent && activeStep === 0 && furthestStep > 0 && eventData;
@@ -237,17 +239,16 @@ export const EventOCForm = ({
     orgEventsSuccess && eventsData?.length === 0 && !!existingOrg;
   const eventChoiceMade = !!(existingEvent || newOrgEvent || !existingOrg);
 
-  const eventCategory = eventData?.category as EventCategory;
-  const eventCategoryEvent = eventCategory === "event";
+  const category = eventData?.category as EventCategory;
+  const categoryEvent = category === "event";
 
-  const eventTypeEvent =
+  const typeEvent =
     ((eventData?.type && eventData?.type?.length > 0) ||
-      (existingEvent && existingEvent?.eventType?.length > 0)) &&
-    eventCategoryEvent;
+      (existingEvent && existingEvent?.type?.length > 0)) &&
+    categoryEvent;
 
   const canNameEvent =
-    (eventCategoryEvent && eventTypeEvent) ||
-    (eventCategory && !eventCategoryEvent);
+    (categoryEvent && typeEvent) || (category && !categoryEvent);
 
   // Then use it like:
   const {
@@ -273,6 +274,18 @@ export const EventOCForm = ({
     eventName.trim().length >= 3
       ? { name: eventName, organizationId: existingOrg?._id }
       : "skip",
+  );
+
+  const {
+    data: ocData,
+    // status,
+    // isPending,
+    isSuccess: openCallSuccess,
+    // isError: openCallError,
+    // error,
+  } = useQueryWithStatus(
+    api.openCalls.openCall.getOpenCallByEventId,
+    existingEvent ? { eventId: existingEvent._id } : "skip",
   );
 
   // const hasUserEditedStep0 =
@@ -519,8 +532,8 @@ export const EventOCForm = ({
             ...currentValues,
             event: {
               ...existingEvent,
-              category: existingEvent.eventCategory,
-              type: existingEvent.eventType ?? [],
+              // category: existingEvent.category,
+              // type: existingEvent.type ?? [],
               location: locationFromEvent,
               links: {
                 ...eventLinks,
@@ -654,8 +667,8 @@ export const EventOCForm = ({
                 ...existingEvent.links,
                 sameAsOrganizer: true,
               },
-              category: existingEvent.eventCategory,
-              type: existingEvent.eventType ?? [],
+              // category: existingEvent.category,
+              // type: existingEvent.type ?? [],
               location: locationFromEvent,
             },
           });
@@ -710,8 +723,8 @@ export const EventOCForm = ({
             slug: slugify(eventData.name),
             logoId,
             logo: logoUrl,
-            eventType: eventData.type || [],
-            eventCategory: eventData.category,
+            type: eventData.type || [],
+            category: eventData.category,
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
@@ -740,8 +753,8 @@ export const EventOCForm = ({
             ...currentValues,
             event: {
               ...event,
-              category: event?.eventCategory || "",
-              type: event?.eventType || [],
+              // category: event?.category || "",
+              // type: event?.type || [],
               hasOpenCall: currentValues.event?.hasOpenCall || "",
             },
           });
@@ -814,6 +827,10 @@ export const EventOCForm = ({
   }, [eventData, existingEvent]);
 
   useEffect(() => {
+    console.log(openCallData);
+  }, [openCallData]);
+
+  useEffect(() => {
     if (!existingOrg) return;
     if (existingOrg?._id === prevOrgRef.current?._id) return;
     const orgReady =
@@ -853,6 +870,9 @@ export const EventOCForm = ({
         ...currentValues,
         event: {
           ...existingEvent,
+          // category: existingEvent.category,
+          // type: existingEvent.type ?? [],
+          //TODO: COME BACK TO ME IN A SEC
         },
       });
       prevEventRef.current = existingEvent;
@@ -1028,6 +1048,26 @@ export const EventOCForm = ({
     }
   }, [hasOpenCall]);
 
+  useEffect(() => {
+    if (openCallSuccess && ocData) {
+      // setOpenCall(ocData);
+      console.log(ocData);
+      setValue("event.hasOpenCall", "true");
+      setValue("openCall", ocData);
+    } else if (!ocData) {
+      setValue("event.hasOpenCall", "false");
+      reset({
+        organization: {
+          ...existingOrg,
+        },
+        event: {
+          ...existingEvent,
+          hasOpenCall: "false",
+        },
+      });
+    }
+  }, [openCallSuccess, ocData, setValue, existingEvent, existingOrg, reset]);
+
   return (
     <HorizontalLinearStepper
       errorMsg={errorMsg}
@@ -1119,7 +1159,7 @@ export const EventOCForm = ({
                           onValueChange={(value: EventCategory) => {
                             field.onChange(value);
                           }}
-                          defaultValue={field.value ?? ""}
+                          value={field.value || ""}
                         >
                           <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
                             <SelectValue placeholder="Event/Project Category (select one)" />
@@ -1154,7 +1194,7 @@ export const EventOCForm = ({
                   )}
                 </div>
 
-                {eventCategoryEvent && (
+                {categoryEvent && (
                   <>
                     <div className="input-section">
                       <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
@@ -1208,16 +1248,16 @@ export const EventOCForm = ({
                   <>
                     <div className="input-section">
                       <p className="min-w-max font-bold lg:text-xl">
-                        Step {eventCategoryEvent ? 3 : 2}:{" "}
+                        Step {categoryEvent ? 3 : 2}:{" "}
                       </p>
                       <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(eventCategory)} Name
+                        {getEventCategoryLabelAbbr(category)} Name
                       </p>
                     </div>
 
                     <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabelAbbr(eventCategory)} Name
+                        {getEventCategoryLabelAbbr(category)} Name
                       </Label>
                       <Controller
                         name="event.name"
@@ -1236,9 +1276,9 @@ export const EventOCForm = ({
                           <span className="mt-2 w-full text-center text-sm text-red-600">
                             {errors.event?.name?.message
                               ? errors.event?.name?.message
-                              : eventCategory === "event"
+                              : category === "event"
                                 ? "An event with that name already exists."
-                                : `A ${getEventCategoryLabelAbbr(eventCategory)} with this name already exists.`}
+                                : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
                           </span>
                         )}
                     </div>
@@ -1246,14 +1286,14 @@ export const EventOCForm = ({
                       <>
                         <div className="input-section">
                           <p className="min-w-max font-bold lg:text-xl">
-                            Step {eventCategoryEvent ? 4 : 3}:{" "}
+                            Step {categoryEvent ? 4 : 3}:{" "}
                           </p>
                           <p className="lg:text-xs">Location</p>
                         </div>
 
                         <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                           <Label htmlFor="event.name" className="sr-only">
-                            {getEventCategoryLabelAbbr(eventCategory)} Location
+                            {getEventCategoryLabelAbbr(category)} Location
                           </Label>
 
                           {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
@@ -1286,10 +1326,10 @@ export const EventOCForm = ({
                         </div>
                         <div className="input-section">
                           <p className="min-w-max font-bold lg:text-xl">
-                            Step {eventCategoryEvent ? 5 : 4}:{" "}
+                            Step {categoryEvent ? 5 : 4}:{" "}
                           </p>
                           <p className="lg:text-xs">
-                            {getEventCategoryLabelAbbr(eventCategory)} Logo
+                            {getEventCategoryLabelAbbr(category)} Logo
                           </p>
                         </div>
                         <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
@@ -1324,17 +1364,17 @@ export const EventOCForm = ({
                           <>
                             <div className="input-section h-full">
                               <p className="min-w-max font-bold lg:text-xl">
-                                Step {eventCategoryEvent ? 6 : 5}:{" "}
+                                Step {categoryEvent ? 6 : 5}:{" "}
                               </p>
                               <p className="lg:text-xs">
-                                {getEventCategoryLabelAbbr(eventCategory)}{" "}
+                                {getEventCategoryLabelAbbr(category)}{" "}
                                 Details/Notes
                               </p>
                             </div>
 
                             <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                               <Label htmlFor="event.name" className="sr-only">
-                                {getEventCategoryLabelAbbr(eventCategory)} About
+                                {getEventCategoryLabelAbbr(category)} About
                               </Label>
                               <Controller
                                 name="event.about"
@@ -1353,9 +1393,9 @@ export const EventOCForm = ({
                                   <span className="mt-2 w-full text-center text-sm text-red-600">
                                     {errors.event?.name?.message
                                       ? errors.event?.name?.message
-                                      : eventCategory === "event"
+                                      : category === "event"
                                         ? "An event with that name already exists."
-                                        : `A ${getEventCategoryLabelAbbr(eventCategory)} with this name already exists.`}
+                                        : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
                                   </span>
                                 )}
                             </div>
@@ -1383,10 +1423,10 @@ export const EventOCForm = ({
                   >
                     <div className="input-section">
                       <p className="min-w-max font-bold lg:text-xl">
-                        Step {eventCategoryEvent ? 7 : 6}:{" "}
+                        Step {categoryEvent ? 7 : 6}:{" "}
                       </p>
                       <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(eventCategory)} Dates
+                        {getEventCategoryLabelAbbr(category)} Dates
                       </p>
                     </div>
 
@@ -1402,7 +1442,7 @@ export const EventOCForm = ({
                       <>
                         <div className="input-section">
                           <p className="min-w-max font-bold lg:text-xl">
-                            Step {eventCategoryEvent ? 8 : 7}:{" "}
+                            Step {categoryEvent ? 8 : 7}:{" "}
                           </p>
                           <p className="lg:text-xs">Production Dates</p>
                         </div>
@@ -1433,11 +1473,11 @@ export const EventOCForm = ({
                               field.onChange(value);
                               // setHasOpenCall(value);
                             }}
-                            defaultValue={field.value ?? ""}
+                            value={field.value ?? ""}
                           >
                             <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
                               <SelectValue
-                                placeholder={`Does your ${getEventCategoryLabelAbbr(eventCategory).toLowerCase()} have an open call?`}
+                                placeholder={`Does your ${getEventCategoryLabelAbbr(category).toLowerCase()} have an open call?`}
                               />
                             </SelectTrigger>
                             <SelectContent className="min-w-auto">

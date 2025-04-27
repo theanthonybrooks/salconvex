@@ -170,12 +170,74 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
 });
 
 const openCallSchema = z.object({
-  deadline: z.date().min(new Date(), "Deadline must be after today"),
-  eligibility: z
-    .string()
-    .min(3, "Eligibility criteria must be at least 3 characters"),
-  description: z.string().min(3, "Description must be at least 3 characters"),
-  budget: z.number().min(0, "Budget must be at least 0"),
+  adminNoteOC: z.optional(z.string()),
+  eventId: z.string(),
+  organizerId: z.array(z.string()),
+  mainOrgId: z.string(),
+  basicInfo: z.object({
+    appFee: z.number(),
+    callFormat: z.string(),
+    callType: z.string(),
+    dates: z.object({
+      ocStart: z.optional(z.union([z.string(), z.null()])), //todo: make not optional later
+      ocEnd: z.optional(z.union([z.string(), z.null()])), // todo: make not optional later
+
+      timezone: z.string(),
+      edition: z.number(),
+    }),
+  }),
+  eligibility: z.object({
+    type: z.string(),
+    //todo: later, add some method/additional fields that will enter in codes for country, region, etc. Maybe start small. Could be tables in the db, so they're easy to query and filter from convex. Then, use that to show user calls that they are or aren't eligible for. Could be put in as a systemic check to ensure that organizers aren't getting ineligible applicants.
+    whom: z.array(z.string()),
+    details: z.optional(z.string()),
+  }),
+  compensation: z.object({
+    budget: z.object({
+      min: z.number(),
+      max: z.optional(z.number()),
+      rate: z.number(),
+      unit: z.string(),
+      currency: z.string(),
+      allInclusive: z.boolean(),
+      moreInfo: z.optional(z.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
+    }),
+    categories: z.object({
+      designFee: z.optional(z.string()),
+      accommodation: z.optional(z.string()),
+      food: z.optional(z.string()),
+      travelCosts: z.optional(z.string()),
+      materials: z.optional(z.string()),
+      equipment: z.optional(z.string()),
+      other: z.optional(z.string()),
+    }),
+  }),
+
+  requirements: z.object({
+    requirements: z.array(z.string()),
+    more: z.array(z.string()),
+    destination: z.string(),
+    documents: z.optional(
+      z.array(
+        z.object({
+          title: z.string(), //do I ask for the title or just use the path? Not sure.
+          href: z.string(),
+        }),
+      ),
+    ),
+    links: z.array(
+      z.object({
+        title: z.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
+        href: z.string(),
+      }),
+    ),
+    applicationLink: z.string(),
+    otherInfo: z.optional(z.array(z.string())), //todo: make not optional later
+  }),
+  // state: z.string(), //draft, submitted, published, archived
+  state: z.optional(z.string()), //draft, submitted, published, archived
+  lastUpdatedBy: z.optional(z.string()),
+  lastUpdatedAt: z.optional(z.number()),
 });
 
 export const step1Schema = z.object({

@@ -17,7 +17,7 @@ export const columnLabels: Record<string, string> = {
   state: "State",
   lastEditedAt: "Last Edited",
   category: "Category",
-  eventType: "Event Type",
+  type: "Event Type",
 };
 
 export type Event = {
@@ -27,7 +27,7 @@ export type Event = {
     edition: number;
   };
   state: SubmissionFormState;
-  eventCategory: string;
+  category: string;
   lastEditedAt?: number;
 };
 
@@ -96,7 +96,7 @@ export const columns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: "eventCategory",
+    accessorKey: "category",
     size: 80,
     minSize: 80,
     maxSize: 80,
@@ -107,12 +107,13 @@ export const columns: ColumnDef<Event>[] = [
       return (
         <div className="flex justify-center space-x-2">
           <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
-            {getEventCategoryLabelAbbr(row.getValue("eventCategory"))}
+            {getEventCategoryLabelAbbr(row.getValue("category"))}
           </span>
         </div>
       );
     },
   },
+  //TODO: Make optional column
   //   {
   //     accessorKey: "type",
   //     header: ({ column }) => (

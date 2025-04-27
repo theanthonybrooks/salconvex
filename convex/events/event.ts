@@ -105,10 +105,10 @@ export const getEventBySlug = query({
       event: {
         ...event,
         state: event.state as SubmissionFormState,
-        eventCategory: event.eventCategory as EventCategory,
+        category: event.category as EventCategory,
         eventType:
-          Array.isArray(event.eventType) && event.eventType.length <= 2
-            ? (event.eventType as [EventType] | [EventType, EventType])
+          Array.isArray(event.type) && event.type.length <= 2
+            ? (event.type as [EventType] | [EventType, EventType])
             : undefined,
       },
       // openCall: openCall as OpenCall,
@@ -162,10 +162,10 @@ export const getEventWithDetails = query({
       event: {
         ...event,
         state: event.state as SubmissionFormState,
-        eventCategory: event.eventCategory as EventCategory,
-        eventType:
-          Array.isArray(event.eventType) && event.eventType.length <= 2
-            ? (event.eventType as [EventType] | [EventType, EventType])
+        category: event.category as EventCategory,
+        type:
+          Array.isArray(event.type) && event.type.length <= 2
+            ? (event.type as [EventType] | [EventType, EventType])
             : undefined,
       },
       openCall: openCall as OpenCall,
@@ -215,10 +215,10 @@ export const getEventWithAppDetails = query({
       event: {
         ...event,
         state: event.state as SubmissionFormState,
-        eventCategory: event.eventCategory as EventCategory,
-        eventType:
-          Array.isArray(event.eventType) && event.eventType.length <= 2
-            ? (event.eventType as [EventType] | [EventType, EventType])
+        category: event.category as EventCategory,
+        type:
+          Array.isArray(event.type) && event.type.length <= 2
+            ? (event.type as [EventType] | [EventType, EventType])
             : undefined,
       },
       openCall: openCall as OpenCall,
@@ -236,8 +236,8 @@ export const createOrUpdateEvent = mutation({
     name: v.string(),
     slug: v.string(),
     logo: v.string(),
-    eventType: v.array(v.string()),
-    eventCategory: v.string(),
+    type: v.array(v.string()),
+    category: v.string(),
     dates: v.object({
       edition: v.number(),
       eventDates: v.array(
@@ -344,8 +344,8 @@ export const createOrUpdateEvent = mutation({
       await ctx.db.patch(event._id, {
         name: args.name,
         logo: fileUrl || args.logo,
-        eventType: args.eventType || [],
-        eventCategory: args.eventCategory || "",
+        type: args.type || [],
+        category: args.category || "",
         dates: {
           ...args.dates,
           edition: args.dates.edition || new Date().getFullYear(),
@@ -373,8 +373,8 @@ export const createOrUpdateEvent = mutation({
       name: args.name,
       slug: args.slug,
       logo: fileUrl as string,
-      eventType: args.eventType || [],
-      eventCategory: args.eventCategory || "",
+      type: args.type || [],
+      category: args.category || "",
       dates: {
         ...args.dates,
         edition: args.dates.edition || new Date().getFullYear(),
@@ -394,7 +394,7 @@ export const createOrUpdateEvent = mutation({
       mainOrgId: args.orgId,
       organizerId: [args.orgId],
       // mainOrgName: "",
-      openCallId: [],
+
       state: "draft",
       lastEditedAt: Date.now(),
     });
