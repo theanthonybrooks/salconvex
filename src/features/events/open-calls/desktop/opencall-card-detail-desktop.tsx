@@ -48,8 +48,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const appStatus = application?.applicationStatus ?? null;
   const hasApplied = appStatus !== null;
 
-  console.log(application?.applicationStatus, application?.manualApplied);
-
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
   ) ?? {
@@ -59,7 +57,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
   const { prodDates } = dates;
-  const prodStart = prodDates?.[0]?.start;
+  // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
@@ -210,12 +208,11 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </div>
             {/*//todo: add this part */}
             {(eventCategory === "project" ||
-              (eventCategory === "event" && prodStart && prodEnd)) && (
+              (eventCategory === "event" && prodEnd)) && (
               <div className="flex flex-col items-start gap-1 text-sm">
                 <span className="space-x-1 font-semibold">
                   Painting/Production Dates:
                 </span>
-                {/* TODO: Add this functionality after there are some artist/painting dates entered */}
                 <EventDates
                   event={event}
                   format="desktop"

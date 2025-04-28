@@ -100,9 +100,11 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const lastStart = formatDatesArray?.[lastIndex]?.start ?? "";
   const lastEnd = formatDatesArray?.[lastIndex]?.end ?? "";
 
-  const canAddMore = lastStart !== "" && lastEnd !== "";
   const watchedStart = watch(`${nameBase}.${formatKey}.0.start` as Path<T>);
   const watchedEnd = watch(`${nameBase}.${formatKey}.0.end` as Path<T>);
+  const noProdStart =
+    watch(`${nameBase}.noProdStart` as Path<T>) && type === "production";
+  const canAddMore = lastStart !== "" && lastEnd !== "";
 
   //   console.log(formatDatesArray);
 
@@ -547,9 +549,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       : "cursor-default text-muted-foreground",
                   )}
                 >
-                  {canAddMore
-                    ? "Add New Dates +"
-                    : "(Fill out the previous date range before adding another)"}
+                  {!noProdStart &&
+                    (canAddMore
+                      ? "Add New Dates +"
+                      : "(Fill out the previous date range before adding another)")}
                 </button>
               </>
             )}

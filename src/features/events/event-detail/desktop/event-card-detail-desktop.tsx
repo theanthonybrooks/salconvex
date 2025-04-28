@@ -24,7 +24,6 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
-import { formatEventDates } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { EventCardProps } from "@/types/event";
 import Image from "next/image";
@@ -52,8 +51,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { ongoing, prodDates, prodFormat } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
-  const prodStart = prodDates?.[0]?.start;
+  const { prodDates } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
+  // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
   const tabList = [
     // { id: "application", label: "My Application" },
@@ -164,17 +163,19 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
             </div>
             {/*//todo: add this part */}
             {(eventCategory === "project" ||
-              (eventCategory === "event" && prodStart && prodEnd)) &&
-              !ongoing && (
-                <p className="flex flex-col items-start gap-1 text-sm">
-                  <span className="space-x-1 font-semibold">
-                    Painting/Production Dates:
-                  </span>
-                  {prodFormat === "sameAsEvent"
-                    ? "Same as Event Dates"
-                    : formatEventDates(prodStart || "", prodEnd || "", false)}
-                </p>
-              )}
+              (eventCategory === "event" && prodEnd)) && (
+              <div className="flex flex-col items-start gap-1 text-sm">
+                <span className="space-x-1 font-semibold">
+                  Painting/Production Dates:
+                </span>
+                <EventDates
+                  event={event}
+                  format="desktop"
+                  limit={0}
+                  type="production"
+                />
+              </div>
+            )}
             <p className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}

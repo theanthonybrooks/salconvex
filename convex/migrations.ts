@@ -44,6 +44,18 @@ export const updateIsPublic = migrations.define({
 //   },
 // });
 
+export const addPlaceHolderNoProdStart = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, event) => {
+    await ctx.db.patch(event._id, {
+      dates: {
+        ...event.dates,
+        noProdStart: false,
+      },
+    });
+  },
+});
+
 // Create a runner specifically for this migration
 export const runCopyDates = migrations.runner(
   internal.migrations.copyUpdatedAtToCompletedAt,
@@ -55,6 +67,10 @@ export const runUpdatePublic = migrations.runner(
 
 export const runClearIfUndone = migrations.runner(
   internal.migrations.clearCompletedAtIfUndone,
+);
+
+export const runAddPlaceHolderNoProdStart = migrations.runner(
+  internal.migrations.addPlaceHolderNoProdStart,
 );
 
 // export const runRemoveOrgNames = migrations.runner(

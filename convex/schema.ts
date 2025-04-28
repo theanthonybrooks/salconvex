@@ -222,6 +222,7 @@ const eventSchema = {
     ongoing: v.boolean(), //TODO: remove this as eventFormat already handles this
     eventFormat: v.optional(v.string()),
     prodFormat: v.optional(v.string()),
+    noProdStart: v.boolean(),
   }),
   location: v.object({
     sameAsOrganizer: v.optional(v.boolean()),

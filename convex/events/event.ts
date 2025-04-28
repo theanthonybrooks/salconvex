@@ -260,6 +260,7 @@ export const createOrUpdateEvent = mutation({
       ongoing: v.boolean(),
       eventFormat: v.optional(v.string()),
       prodFormat: v.optional(v.string()),
+      noProdStart: v.boolean(),
     }),
     location: v.object({
       sameAsOrganizer: v.boolean(),
@@ -355,6 +356,7 @@ export const createOrUpdateEvent = mutation({
           ongoing: args.dates.ongoing || false,
           eventFormat: args.dates.eventFormat || "",
           prodFormat: args.dates.prodFormat || "",
+          noProdStart: args.dates.noProdStart || false,
         },
         location: {
           ...args.location,
@@ -385,6 +387,7 @@ export const createOrUpdateEvent = mutation({
         eventFormat: args.dates.eventFormat || "",
         prodDates: args.dates.prodDates || undefined,
         prodFormat: args.dates.prodFormat || "",
+        noProdStart: args.dates.noProdStart || false,
       },
       location: {
         ...args.location,

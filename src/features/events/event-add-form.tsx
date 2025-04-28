@@ -22,6 +22,7 @@ import {
 } from "@/features/organizers/schemas/event-add-schema";
 
 import { MultiSelect } from "@/components/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedTextarea } from "@/components/ui/debounced-textarea";
 import { FormDatePicker } from "@/components/ui/form-date-pickers";
 import AvatarUploader from "@/components/ui/logo-uploader";
@@ -45,6 +46,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
+import { merge } from "lodash";
 import { Path } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
@@ -170,6 +172,7 @@ export const EventOCForm = ({
   const [existingEvent, setExistingEvent] = useState<Doc<"events"> | null>(
     null,
   );
+
   // const [openCall, setOpenCall] = useState<Doc<"openCalls"> | null>(null);
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [skipped, setSkipped] = useState<Set<number>>(new Set([3, 4]));
@@ -323,10 +326,29 @@ export const EventOCForm = ({
 
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
+  const hasEventFormat = !!eventData?.dates?.eventFormat;
+  const eventDateFormatRequired =
+    hasEventFormat &&
+    ["setDates", "monthRange", "yearRange", "seasonRange"].includes(
+      eventDatesFormat,
+    );
+  const eventDateFormatNotRequired =
+    hasEventFormat && ["noEvent"].includes(eventDatesFormat);
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
-  const hasEventFormat = !!eventData?.dates?.eventFormat;
+  // const prodDatesFormat = !!eventData?.dates?.prodFormat;
+  const prodDatesStart = eventData?.dates?.prodDates?.[0]?.start;
+  // const hasProdDateAndFormat = prodDatesFormat && prodDatesStart !== "";
+  // const blankProdStart = eventData?.dates?.prodDates?.[0]?.start === "";
+  const noProdStart =
+    eventData?.dates?.noProdStart ||
+    (existingEvent?.dates?.prodDates?.[0]?.start === "" &&
+      existingEvent?.dates?.prodDates?.[0]?.end !== "") ||
+    false;
+
+  console.log(noProdStart, prodDatesStart);
+
   // const prodDatesFormat = eventData?.dates?.prodFormat || null;
 
   //
@@ -531,19 +553,22 @@ export const EventOCForm = ({
 
         if (existingEvent) {
           console.log("prev event", prevEventRef.current);
-          reset({
-            ...currentValues,
-            event: {
-              ...existingEvent,
-              // category: existingEvent.category,
-              // type: existingEvent.type ?? [],
-              location: locationFromEvent,
-              links: {
-                ...eventLinks,
+          reset(
+            merge({}, currentValues, {
+              event: {
+                // ...existingEvent,
+                ...currentValues.event,
+                location: locationFromEvent,
+                links: {
+                  ...eventLinks,
+                  // category: existingEvent.category,
+                  // type: existingEvent.type ?? [],
+                },
+                // noProdStart: currentValues.event.dates?.noProdStart || false,
+                // hasOpenCall: currentValues.event?.hasOpenCall || "",
               },
-              hasOpenCall: currentValues.event?.hasOpenCall || "",
-            },
-          });
+            }),
+          );
           console.log("resetting w existing event");
         } else {
           reset({
@@ -675,6 +700,9 @@ export const EventOCForm = ({
               // category: existingEvent.category,
               // type: existingEvent.type ?? [],
               location: locationFromEvent,
+              dates: {
+                ...existingEvent.dates,
+              },
             },
           });
         } else {
@@ -715,7 +743,6 @@ export const EventOCForm = ({
         }
         const { logoUrl, logoId, timezone, timezoneOffset } = result;
         let eventResult = null;
-        console.log(eventData.dates);
         try {
           setPending(true);
           const prodDates =
@@ -737,6 +764,7 @@ export const EventOCForm = ({
               eventFormat: eventData.dates.eventFormat,
               prodDates,
               prodFormat: eventData.dates.prodFormat,
+              noProdStart: eventData.dates.noProdStart,
             },
             location: {
               ...eventData.location,
@@ -754,15 +782,26 @@ export const EventOCForm = ({
 
           setExistingEvent(eventResult);
 
-          reset({
-            ...currentValues,
-            event: {
-              ...event,
-              // category: event?.category || "",
-              // type: event?.type || [],
-              hasOpenCall: currentValues.event?.hasOpenCall || "",
-            },
-          });
+          reset(
+            merge({}, currentValues, {
+              event,
+            }),
+          );
+
+          // reset({
+          //   ...currentValues,
+          //   event: {
+          //     ...event,
+          //     // category: event?.category || "",
+          //     // type: event?.type || [],
+          //     hasOpenCall: currentValues.event?.hasOpenCall || "",
+          //     dates: {
+          //       ...eventResult?.dates,
+          //       noProdStart: currentValues.event.dates?.noProdStart || false,
+          //     },
+          //   },
+          // });
+          // setValue("event.dates.noProdStart", prodHasStart);
           setPending(false);
           // toast.success(existingEvent ? "Event updated!" : "Event created!", {
           //   onClick: () => toast.dismiss(), // dismisses the current toast
@@ -859,7 +898,7 @@ export const EventOCForm = ({
       reset({
         organization: {
           ...existingOrg,
-          location: existingOrg?.location,
+          // location: existingOrg?.location,
         },
       });
       prevOrgRef.current = existingOrg;
@@ -876,6 +915,7 @@ export const EventOCForm = ({
     const eventChanged =
       eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged) {
+      console.log("flag me");
       isFirstRun.current = true;
       if (existingEvent?.lastEditedAt) {
         setLastSaved(existingEvent.lastEditedAt);
@@ -892,6 +932,7 @@ export const EventOCForm = ({
         },
       });
       prevEventRef.current = existingEvent;
+      console.log("flagged");
     } else if (!existingEvent) {
       setLastSaved(null);
     }
@@ -1085,6 +1126,14 @@ export const EventOCForm = ({
       // });
     }
   }, [openCallSuccess, ocData, setValue, reset]);
+
+  useEffect(() => {
+    const prodStart = getValues("event.dates.prodDates.0.start");
+    if (!noProdStart || !prodStart) return;
+    if (noProdStart && prodStart) {
+      setValue("event.dates.noProdStart", false);
+    }
+  }, [prodDatesStart, noProdStart, setValue, getValues]);
 
   return (
     <HorizontalLinearStepper
@@ -1456,24 +1505,87 @@ export const EventOCForm = ({
                       watchPath="event"
                     />
 
-                    {!isOngoing && hasEventFormat && !blankEventDates && (
-                      <>
-                        <div className="input-section">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {categoryEvent ? 8 : 7}:{" "}
-                          </p>
-                          <p className="lg:text-xs">Production Dates</p>
-                        </div>
+                    {!isOngoing &&
+                      hasEventFormat &&
+                      (!blankEventDates || eventDateFormatNotRequired) && (
+                        <>
+                          <div className="input-section">
+                            <p className="min-w-max font-bold lg:text-xl">
+                              Step {categoryEvent ? 8 : 7}:{" "}
+                            </p>
+                            <p className="lg:text-xs">Production Dates</p>
+                          </div>
 
-                        <FormDatePicker
-                          isAdmin={isAdmin}
-                          title="Production Dates Format"
-                          nameBase="event.dates"
-                          type="production"
-                          watchPath="event"
-                        />
-                      </>
-                    )}
+                          <FormDatePicker
+                            isAdmin={isAdmin}
+                            title="Production Dates Format"
+                            nameBase="event.dates"
+                            type="production"
+                            watchPath="event"
+                          />
+                          <div />
+                          <label
+                            className={cn(
+                              "mx-auto flex cursor-pointer items-start gap-2 md:items-center",
+                            )}
+                          >
+                            <Controller
+                              name="event.dates.noProdStart"
+                              control={control}
+                              render={({ field }) => {
+                                // const isNoProdStart =
+                                //   field.value || noProdStart;
+                                // console.log(
+                                //   field.value,
+                                //   isNoProdStart,
+                                //   currentValues.event.dates?.prodDates?.[0]
+                                //     ?.start,
+                                //   blankProdStart,
+                                // );
+                                // console.log(noProdStart);
+                                return (
+                                  <Checkbox
+                                    disabled={
+                                      isOngoing ||
+                                      !hasEventFormat ||
+                                      (blankEventDates &&
+                                        eventDateFormatRequired)
+                                    }
+                                    tabIndex={4}
+                                    id="noProdStart"
+                                    className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                                    checked={field.value || false}
+                                    onCheckedChange={(checked) => {
+                                      field.onChange(checked);
+                                      if (checked) {
+                                        setValue("event.dates.prodDates", [
+                                          {
+                                            start: "",
+                                            end: currentValues.event.dates
+                                              ?.prodDates
+                                              ? currentValues.event.dates
+                                                  .prodDates[0]?.end
+                                              : "",
+                                          },
+                                        ]);
+                                      }
+                                      // if (blankProdStart) {
+                                      //   setNoProdStart(true);
+                                      // } else if (hasProdDateAndFormat) {
+                                      //   setNoProdStart(false);
+                                      // }
+                                    }}
+                                  />
+                                );
+                              }}
+                            />
+
+                            <span className={cn("text-sm")}>
+                              The beginning production date is flexible/open
+                            </span>
+                          </label>
+                        </>
+                      )}
                     <div className="input-section">
                       <p className="min-w-max font-bold lg:text-xl">Next: </p>
                       <p className="lg:text-xs">Open Call</p>

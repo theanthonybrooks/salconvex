@@ -96,6 +96,7 @@ export const eventBase = z.object({
         }),
       ),
     ),
+    noProdStart: z.boolean(),
     ongoing: z.boolean(),
   }),
   links: z.object({
@@ -159,12 +160,20 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   }
   if (
     data.dates?.eventFormat !== "ongoing" &&
+    !data.dates?.noProdStart &&
     (data.dates?.prodDates?.[0]?.start === "" ||
       data.dates?.prodDates?.[0]?.end === "")
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "All projects/events must have production dates",
+      path: ["dates", "prodDates"],
+    });
+  }
+  if (data.dates?.noProdStart && data.dates?.prodDates?.[0]?.end === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "All projects/events must have a production end date",
       path: ["dates", "prodDates"],
     });
   }
