@@ -108,13 +108,23 @@ export const eventBase = z.object({
     email: z.string().optional(),
     vk: z.string().optional(),
     phone: z.string().optional(),
-    address: z.string().optional(),
     linkAggregate: z.string().optional(),
   }),
   otherInfo: z.array(z.string()).optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
   hasOpenCall: z.string(),
+});
+
+export const eventDetails = eventBase.superRefine((data, ctx) => {
+  //TODO: Change this to require just one of the inputs if not sameAsOrganizer
+  if (!data.links.sameAsOrganizer) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Link to the organizer must be provided",
+      path: ["links", "website"],
+    });
+  }
 });
 
 export const eventSchema = eventBase.superRefine((data, ctx) => {
@@ -257,6 +267,12 @@ export const step1Schema = z.object({
 export const eventOnlySchema = z.object({
   organization: organizationSchema,
   event: eventSchema,
+});
+
+export const eventDetailsSchema = z.object({
+  organization: organizationSchema,
+  // event: eventDetails,
+  event: eventBase,
 });
 
 export const eventWithOCSchema = z.object({

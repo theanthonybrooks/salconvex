@@ -187,15 +187,10 @@ const organizationSchema = {
 
 const eventSchema = {
   adminNote: v.optional(v.string()),
+  //TODO: use a lookup table for these (I think?)
   organizerId: v.array(v.id("organizations")),
   mainOrgId: v.id("organizations"),
   slug: v.string(),
-  // mainOrgName: v.optional(v.string()),
-  // mainOrgName: v.string(),
-  // eventId: v.optional(v.string()),
-  // openCallId: v.optional(
-  //   v.union(v.array(v.id("openCalls")), v.id("openCalls")),
-  // ),
   name: v.string(),
   logo: v.string(),
   type: typeValidator,
@@ -263,7 +258,6 @@ const eventSchema = {
       email: v.optional(v.string()),
       vk: v.optional(v.string()),
       phone: v.optional(v.string()),
-      address: v.optional(v.string()),
       linkAggregate: v.optional(v.string()),
       other: v.optional(v.string()),
     }),

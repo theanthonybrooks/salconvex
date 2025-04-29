@@ -96,46 +96,7 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
   },
-  {
-    accessorKey: "category",
-    size: 80,
-    minSize: 80,
-    maxSize: 80,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-center space-x-2">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
-            {getEventCategoryLabelAbbr(row.getValue("category"))}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "type",
-    size: 120,
-    minSize: 120,
-    maxSize: 240,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Event Type" />
-    ),
-    cell: ({ row }) => {
-      const types = row.getValue("type") as EventType[];
 
-      return (
-        <div className="flex justify-center space-x-2">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
-            {Array.isArray(types) && types.length > 0
-              ? types.map((type) => getEventTypeLabel(type)).join(", ")
-              : "-"}
-          </span>
-        </div>
-      );
-    },
-  },
   //TODO: Make optional column
   //   {
   //     accessorKey: "type",
@@ -232,6 +193,46 @@ export const columns: ColumnDef<Event>[] = [
           <span className="max-w-[175px] truncate font-medium capitalize">
             {!isNaN(new Date(value).getTime())
               ? new Date(value).toLocaleString()
+              : "-"}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "category",
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {getEventCategoryLabelAbbr(row.getValue("category"))}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "type",
+    size: 120,
+    minSize: 120,
+    maxSize: 240,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Event Type" />
+    ),
+    cell: ({ row }) => {
+      const types = row.getValue("type") as EventType[];
+
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {Array.isArray(types) && types.length > 0
+              ? types.map((type) => getEventTypeLabel(type)).join(", ")
               : "-"}
           </span>
         </div>

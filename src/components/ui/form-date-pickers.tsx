@@ -22,7 +22,8 @@ import {
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
-import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import {
   Controller,
   Path,
@@ -60,6 +61,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     // trigger,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const didInitialRun = useRef(false);
   const initialValue = useRef<string | undefined>(undefined);
@@ -139,30 +141,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     return currentStart || prevEnd;
   }
 
-  // useEffect(() => {
-  //   if (type !== "production") return;
-
-  //   const isSameAsEvent = formatValue === "sameAsEvent";
-
-  //   if (isSameAsEvent) {
-  //     const eventDates = eventData?.dates?.eventDates ?? [];
-
-  //     // Option 1: Copy eventDates to prodDates
-  //     setValue("event.dates.prodDates", eventDates, {
-  //       shouldValidate: true,
-  //       shouldDirty: true,
-  //     });
-
-  //     // Option 2: If you prefer to clear prodDates instead of copying
-  //     // setValue("event.dates.prodDates", undefined, {
-  //     //   shouldValidate: true,
-  //     //   shouldDirty: true,
-  //     // });
-  //   }
-  //   // else {
-  //   //   setValue("event.dates.prodFormat", )
-  //   // }
-  // }, [formatValue, type, eventData?.dates?.eventDates, setValue]);
   useEffect(() => {
     const isFirstRender = !didInitialRun.current;
     if (!initialValue.current) {
@@ -174,15 +152,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       initialValue.current &&
       initialValue.current !== formatValue
     );
-    // console.log(
-    //   isFirstRender,
-    //   hasFormatChanged,
-    //   didInitialRun.current,
-    //   initialValue.current,
-    //   formatValue,
-    //   prevFormatValue.current,
-    // );
-    // Mark as having rendered at least once
+
     didInitialRun.current = true;
 
     // On first render: only proceed if format is not set
@@ -407,9 +377,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         formatValue !== "ongoing" &&
         formatValue !== "sameAsEvent" &&
         formatValue !== "noEvent" && (
-          <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+          <div className="mx-auto flex max-h-52 w-full max-w-sm flex-col gap-2 overflow-y-auto lg:min-w-[300px] lg:max-w-md">
             <Label htmlFor="event.dates.eventDates" className="sr-only">
-              {type.charAt(0).toUpperCase() + type.slice(1)} Dates Format
+              {type.charAt(0).toUpperCase() + type.slice(1)} Dates
             </Label>
             {/* {formatValue === "setDates" && (
               <div className="flex max-w-full items-center gap-x-2">
@@ -465,21 +435,37 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                   const watchedSetEnd = watch(
                     `${nameBase}.${formatKey}.${index}.end` as Path<T>,
                   );
-
                   return (
                     <div
                       key={field.id}
                       className="relative flex max-w-full items-center gap-x-2"
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
                     >
                       {index > 0 && (
-                        <button
+                        <motion.button
                           type="button"
                           onClick={() => remove(index)}
-                          className="absolute -left-6 top-1/2 -translate-y-1/2 text-red-500 hover:scale-110 hover:text-red-700 active:scale-95"
+                          className="absolute left-0 z-top -translate-y-1/2 text-red-500 hover:scale-110 hover:text-red-700 active:scale-95"
+                          animate={hoveredIndex === index ? "hover" : "rest"}
+                          variants={{
+                            rest: { opacity: 0, x: -5, scale: 0.8 },
+                            hover: { opacity: 1, x: 10, scale: 1 },
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 20,
+                          }}
+                          // variants={{
+                          //   rest: { opacity: 0, x: -10 },
+                          //   hover: { opacity: 1, x: 10 },
+                          // }}
+                          // transition={{ duration: 0.2 }}
                           aria-label="Remove date range"
                         >
                           <FaTrashCan className="size-4" />
-                        </button>
+                        </motion.button>
                       )}
                       <Controller
                         name={
@@ -552,7 +538,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                   {!noProdStart &&
                     (canAddMore
                       ? "Add New Dates +"
-                      : "(Fill out the previous date range before adding another)")}
+                      : "(Fill out the current date range before adding another)")}
                 </button>
               </>
             )}

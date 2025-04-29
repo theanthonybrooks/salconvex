@@ -307,7 +307,7 @@ const SubmissionFormOrgStep = ({
                   type: false,
                   // lastEditedAt: false,
                 }}
-                className="flex w-full max-w-[90vw] overflow-x-auto"
+                className="flex w-full max-w-[45vw] overflow-x-auto"
                 containerClassName={cn(
                   "hidden xl:block ",
                   newOrgEvent && "opacity-50 pointer-events-none",

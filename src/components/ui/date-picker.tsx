@@ -126,6 +126,8 @@ export const CustomDatePicker = ({
       showYearPicker={pickerType === "year"}
       showMonthYearPicker={pickerType === "month"}
       showQuarterYearPicker={pickerType === "season"}
+      withPortal={true}
+      // popperContainer={CalendarPortal}
       //   popperPlacement="bottom"
       //   portalId="react-datepicker-portal"
       minDate={

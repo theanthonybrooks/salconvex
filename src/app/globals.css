@@ -914,13 +914,27 @@ button:active {
   }
 }
 
+div:has(> .react-datepicker__input-container) {
+  width: 100%;
+}
+
 .react-datepicker {
+  padding: 1em;
   font-size: 14px;
   background-color: white;
   z-index: 50;
   border: 1px solid black;
   border-radius: 0.25rem;
   min-width: max-content;
+}
+
+.react-datepicker__navigation--previous {
+  left: 0.75em;
+  top: 1em;
+}
+.react-datepicker__navigation--next {
+  right: 0.75em;
+  top: 1em;
 }
 
 .react-datepicker__header {

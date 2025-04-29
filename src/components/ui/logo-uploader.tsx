@@ -106,7 +106,7 @@ export default function AvatarUploader({
       <div className={cn("flex items-center gap-6", className)}>
         <div
           className={cn(
-            "relative flex cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50 focus:bg-salYellow/50 focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1",
+            "relative flex shrink-0 cursor-pointer items-center justify-center rounded-full border-1.5 hover:bg-salYellow/50 focus:bg-salYellow/50 focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1",
             dragActive && "border-emerald-400 bg-emerald-50",
             imageForCropping ? "border-solid" : "border-dashed",
             disabled &&
@@ -185,7 +185,7 @@ export default function AvatarUploader({
               </div>
             )}
             {(imageForCropping || originalImage) && (
-              <div className="flex w-max items-center gap-2">
+              <div className="flex w-full items-center gap-2">
                 <Button
                   type="button"
                   variant="salWithShadowHidden"
@@ -195,7 +195,7 @@ export default function AvatarUploader({
                       setEditMode(true);
                     }
                   }}
-                  className="w-fit lg:w-40"
+                  className="flex-1"
                 >
                   Edit
                 </Button>
