@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { formatHandleInput, PlatformType } from "@/lib/linkFns";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
+import { HiArrowTurnRightDown } from "react-icons/hi2";
+
 import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import {
@@ -13,6 +15,7 @@ import {
   FaInstagram,
   FaLink,
   FaPhone,
+  FaPlus,
   FaThreads,
   FaVk,
 } from "react-icons/fa6";
@@ -25,32 +28,32 @@ type FormLinksInputProps = {
 };
 
 const handleFields: {
-  name: `event.links.${string}`;
+  key: string;
   icon: React.ReactNode;
   platform: PlatformType;
   placeholder: string;
 }[] = [
   {
-    name: "event.links.instagram",
-    icon: <FaInstagram className="size-5" />,
+    key: "instagram",
+    icon: <FaInstagram className={cn("size-5 shrink-0")} />,
     platform: "instagram",
     placeholder: "@eventname",
   },
   {
-    name: "event.links.facebook",
-    icon: <FaFacebook className="size-5" />,
+    key: "facebook",
+    icon: <FaFacebook className={cn("size-5 shrink-0")} />,
     platform: "facebook",
     placeholder: "@eventname",
   },
   {
-    name: "event.links.threads",
-    icon: <FaThreads className="size-5" />,
+    key: "threads",
+    icon: <FaThreads className={cn("size-5 shrink-0")} />,
     platform: "threads",
     placeholder: "@eventname",
   },
   {
-    name: "event.links.vk",
-    icon: <FaVk className="size-5" />,
+    key: "vk",
+    icon: <FaVk className={cn("size-5 shrink-0")} />,
     platform: "vk",
     placeholder: "@eventname",
   },
@@ -62,127 +65,253 @@ export const FormLinksInput = ({
 }: FormLinksInputProps) => {
   const { control, watch, setValue } = useFormContext();
   const isEvent = type === "event";
+  const isOrg = type === "organization";
   const eventData = watch("event");
+  const eventSameAsOrg = eventData?.links?.sameAsOrganizer;
   const eventCountry = eventData?.location?.countryAbbr;
+  const primaryField = watch("organization.links.primaryContact");
+
   return (
-    <div className={cn("flex flex-col gap-y-2")}>
-      {existingOrgHasLinks && isEvent && (
+    <>
+      <div className={cn("flex flex-col gap-y-2")}>
+        {existingOrgHasLinks && isEvent && (
+          <Controller
+            name="event.links.sameAsOrganizer"
+            control={control}
+            render={({ field }) => (
+              <Label className="mx-auto mb-4 flex w-full cursor-pointer items-center justify-center gap-2 border-b-2 border-dashed border-foreground/30 pb-4 pt-2">
+                <Checkbox
+                  id="linksSameAsOrganizer"
+                  checked={field.value || false}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      setValue("event.links.sameAsOrganizer", true);
+                    }
+                  }}
+                />
+                <span className="text-sm">Use same links as organization</span>
+              </Label>
+            )}
+          />
+        )}
+
+        {isOrg && (
+          <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground">
+            Primary Contact - Choose One (required)
+            <HiArrowTurnRightDown className="size-4 shrink-0 translate-y-1.5" />
+          </div>
+        )}
+        {/* Static fields */}
         <Controller
-          name="event.links.sameAsOrganizer"
+          name="organization.links.primaryContact"
           control={control}
-          render={({ field }) => (
-            <Label className="mx-auto flex cursor-pointer items-center gap-2 py-2">
-              <Checkbox
-                id="linksSameAsOrganizer"
-                checked={field.value || false}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked);
-                  if (checked) {
-                    setValue("event.links.sameAsOrganizer", true);
-                  }
-                }}
+          render={({ field: primaryFieldControl }) => (
+            <div className="flex items-center gap-x-2">
+              <FaGlobe
+                className={cn(
+                  "size-5 shrink-0",
+                  isOrg && primaryField === "website" && "text-emerald-600",
+                )}
               />
-              <span className="text-sm">Use same links as organization</span>
-            </Label>
+              <Controller
+                name="event.links.website"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    disabled={eventSameAsOrg}
+                    value={field.value ?? ""}
+                    placeholder="event website"
+                    className="w-full"
+                  />
+                )}
+              />
+              {isOrg && (
+                <Input
+                  type="radio"
+                  name="primaryContact"
+                  value="website"
+                  checked={primaryField === "website"}
+                  onChange={() => primaryFieldControl.onChange("website")}
+                />
+              )}
+            </div>
           )}
         />
-      )}
 
-      {/* Static fields */}
-      <div className="flex items-center gap-x-2">
-        <FaGlobe className="size-5" />
         <Controller
-          name="event.links.website"
+          name="organization.links.primaryContact"
           control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              value={field.value ?? ""}
-              placeholder="event website"
-              className="w-full"
-            />
+          render={({ field: primaryFieldControl }) => (
+            <div className="flex items-center gap-2">
+              <FaEnvelope
+                className={cn(
+                  "size-5 shrink-0",
+                  isOrg && primaryField === "email" && "text-emerald-600",
+                )}
+              />
+              <Controller
+                name="event.links.email"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    disabled={eventSameAsOrg}
+                    value={field.value ?? ""}
+                    placeholder="example@email.com"
+                    className="w-full"
+                  />
+                )}
+              />
+              {isOrg && (
+                <Input
+                  type="radio"
+                  name="primaryContact"
+                  value="email"
+                  checked={primaryField === "email"}
+                  onChange={() => primaryFieldControl.onChange("email")}
+                />
+              )}
+            </div>
           )}
         />
-      </div>
 
-      <div className="flex items-center gap-x-2">
-        <FaEnvelope className="size-5" />
         <Controller
-          name="event.links.email"
+          name="organization.links.primaryContact"
           control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              value={field.value ?? ""}
-              placeholder="example@email.com"
-              className="w-full"
-            />
+          render={({ field: primaryFieldControl }) => (
+            <div className="flex items-center gap-x-2">
+              <FaPhone
+                className={cn(
+                  "size-5 shrink-0",
+                  isOrg && primaryField === "phone" && "text-emerald-600",
+                )}
+              />
+              <Controller
+                name="event.links.phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    {...field}
+                    disabled={eventSameAsOrg}
+                    international
+                    defaultCountry={eventCountry || "US"}
+                    value={field.value ?? ""}
+                    placeholder="+1 (555) 555-5555"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+              {isOrg && (
+                <Input
+                  type="radio"
+                  name="primaryContact"
+                  value="phone"
+                  checked={primaryField === "phone"}
+                  onChange={() => primaryFieldControl.onChange("phone")}
+                />
+              )}
+            </div>
           )}
         />
-      </div>
-
-      <div className="flex items-center gap-x-2">
-        <FaPhone className="size-5" />
+        {isEvent && (
+          <div className="flex items-center gap-x-2">
+            <FaLink className={cn("size-5 shrink-0")} />
+            <Controller
+              name="event.links.linkAggregate"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  disabled={eventSameAsOrg}
+                  value={field.value ?? ""}
+                  placeholder="linktree (or similar)"
+                  className="w-full"
+                />
+              )}
+            />
+          </div>
+        )}
         <Controller
-          name="event.links.phone"
+          name="organization.links.primaryContact"
           control={control}
-          render={({ field }) => (
-            // <Input
-            //   {...field}
-            //   value={field.value ?? ""}
-            //   placeholder="+1 (555) 555-5555"
-            //   className="w-full"
-            // />
-            <PhoneInput
-              {...field}
-              international
-              defaultCountry={eventCountry || "US"}
-              value={field.value ?? ""}
-              placeholder="+1 (555) 555-5555"
-              className="w-full"
-              onChange={field.onChange}
-            />
+          render={({ field: primaryFieldControl }) => (
+            <>
+              {/* Debounced handle fields */}
+              {handleFields.map(({ key, icon, platform, placeholder }) => {
+                const name = `${type}.links.${key}` as
+                  | `event.links.${string}`
+                  | `organization.links.${string}`;
+                return (
+                  <HandleInput
+                    key={name}
+                    control={control}
+                    name={name}
+                    platform={platform}
+                    icon={icon}
+                    placeholder={placeholder}
+                    disabled={eventSameAsOrg}
+                    isOrg={isOrg}
+                    primaryField={primaryField}
+                    onPrimaryChange={primaryFieldControl.onChange}
+                  />
+                );
+              })}
+            </>
           )}
         />
-      </div>
-
-      <div className="flex items-center gap-x-2">
-        <FaLink className="size-5" />
-        <Controller
-          name="event.links.linkAggregate"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              value={field.value ?? ""}
-              placeholder="linktree (or similar)"
-              className="w-full"
+        {isOrg && (
+          <div className="flex items-center gap-x-2">
+            <FaLink className={cn("size-5 shrink-0")} />
+            <Controller
+              name="event.links.linkAggregate"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  disabled={eventSameAsOrg}
+                  value={field.value ?? ""}
+                  placeholder="linktree (or similar)"
+                  className="w-full"
+                />
+              )}
             />
-          )}
-        />
-      </div>
+          </div>
+        )}
 
-      {/* Debounced handle fields */}
-      {handleFields.map(({ name, icon, platform, placeholder }) => (
-        <HandleInput
-          key={name}
-          control={control}
-          name={name}
-          platform={platform}
-          icon={icon}
-          placeholder={placeholder}
-        />
-      ))}
-    </div>
+        <div className="flex items-center gap-x-2">
+          <FaPlus className={cn("size-5 shrink-0")} />
+          <Controller
+            name="event.links.other"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                disabled={eventSameAsOrg}
+                value={field.value ?? ""}
+                placeholder="any other link not listed above"
+                className="w-full"
+              />
+            )}
+          />
+        </div>
+      </div>
+    </>
   );
 };
 
 type HandleInputProps = {
   control: ReturnType<typeof useFormContext>["control"];
-  name: `event.links.${string}`;
+  name: `event.links.${string}` | `organization.links.${string}`;
   platform: PlatformType;
   icon: React.ReactNode;
   placeholder: string;
+  disabled?: boolean;
+  isOrg?: boolean;
+  primaryField?: string;
+  onPrimaryChange?: (value: string) => void;
 };
 
 function HandleInput({
@@ -191,6 +320,10 @@ function HandleInput({
   platform,
   icon,
   placeholder,
+  disabled,
+  isOrg,
+  primaryField,
+  onPrimaryChange,
 }: HandleInputProps) {
   const watched = useWatch({ control, name });
   const [inputVal, setInputVal] = useState(watched ?? "");
@@ -205,6 +338,8 @@ function HandleInput({
     setInputVal(watched ?? "");
   }, [watched]);
 
+  const fieldKey = name.split(".").pop();
+
   return (
     <div className="flex items-center gap-x-2">
       {icon}
@@ -213,6 +348,7 @@ function HandleInput({
         control={control}
         render={({ field }) => (
           <Input
+            disabled={disabled}
             value={inputVal}
             placeholder={placeholder}
             className="w-full"
@@ -231,6 +367,15 @@ function HandleInput({
           />
         )}
       />
+      {isOrg && fieldKey && (
+        <Input
+          type="radio"
+          name="primaryContact"
+          value={fieldKey}
+          checked={primaryField === fieldKey}
+          onChange={() => onPrimaryChange?.(fieldKey)}
+        />
+      )}
     </div>
   );
 }

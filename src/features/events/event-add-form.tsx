@@ -24,11 +24,11 @@ import {
 
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DebouncedTextarea } from "@/components/ui/debounced-textarea";
 import { FormDatePicker } from "@/components/ui/form-date-pickers";
 import { FormLinksInput } from "@/components/ui/form-links-inputs";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
   SelectContent,
@@ -69,7 +69,7 @@ const steps = [
   },
   {
     id: 3,
-    label: "Event Details (Cont'd...",
+    label: "Event/Project Details (Continued)",
     schema: eventDetailsSchema,
   },
   {
@@ -304,10 +304,10 @@ export const EventOCForm = ({
   const hasUserEditedStep0 = JSON.stringify(
     dirtyFields?.organization ?? {},
   ).includes("true");
-  const hasUserEditedStep1 = JSON.stringify(dirtyFields?.event ?? {}).includes(
-    "true",
-  );
-  const hasUserEditedForm = !!(hasUserEditedStep1 || hasUserEditedStep0);
+  const hasUserEditedEventSteps = JSON.stringify(
+    dirtyFields?.event ?? {},
+  ).includes("true");
+  const hasUserEditedForm = !!(hasUserEditedEventSteps || hasUserEditedStep0);
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
 
@@ -377,7 +377,7 @@ export const EventOCForm = ({
   // if (activeStep === 0) {
   //   console.log("hasUserEditedStep0", hasUserEditedStep0);
   // } else if (activeStep === 1) {
-  //   console.log("hasUserEditedStep1", hasUserEditedStep1);
+  //   console.log("hasUserEditedEventSteps", hasUserEditedEventSteps);
   // }
   // console.log("hasUserEditedForm", hasUserEditedForm);
 
@@ -493,6 +493,8 @@ export const EventOCForm = ({
     if (!isStepValid) return;
     await handleSave();
     if (activeStep === 4 && hasOpenCall === "false") {
+      setActiveStep((prev) => prev - 3);
+    } else if (activeStep === 5 && hasOpenCall === "false") {
       setActiveStep((prev) => prev - 3);
     } else {
       setActiveStep((prev) => prev - 1);
@@ -720,7 +722,7 @@ export const EventOCForm = ({
         }
       }
       // await handleFormValues();
-      if (activeStep === 1 && hasUserEditedStep1) {
+      if ((activeStep === 1 || activeStep === 2) && hasUserEditedEventSteps) {
         const result = await handleFileUrl({
           data: eventData,
           generateUploadUrl,
@@ -769,7 +771,7 @@ export const EventOCForm = ({
             },
             about: eventData.about,
             links: eventData.links,
-            otherInfo: eventData.otherInfo || [],
+            otherInfo: eventData.otherInfo || undefined,
             active: eventData.active,
             orgId: orgData._id as Id<"organizations">,
           });
@@ -807,6 +809,9 @@ export const EventOCForm = ({
           toast.error("Failed to create new event");
         }
       }
+      if (activeStep === 2) {
+        console.log("saving step 2");
+      }
     },
     [
       hasUserEditedStep0,
@@ -819,7 +824,7 @@ export const EventOCForm = ({
 
       activeStep,
       furthestStep,
-      hasUserEditedStep1,
+      hasUserEditedEventSteps,
       eventData,
       createOrUpdateEvent,
       existingEvent,
@@ -854,6 +859,10 @@ export const EventOCForm = ({
   useEffect(() => {
     console.log("form valid:", isValid, "step valid:", isStepValidZod);
   }, [isValid, isStepValidZod]);
+
+  useEffect(() => {
+    console.log("active step: ", activeStep);
+  }, [activeStep]);
 
   useEffect(() => {
     if (orgData?.name !== undefined && orgData?.name !== "") {
@@ -1432,16 +1441,11 @@ export const EventOCForm = ({
                                 name="event.about"
                                 control={control}
                                 render={({ field }) => (
-                                  <DebouncedTextarea
+                                  <RichTextEditor
                                     value={field.value ?? ""}
                                     onChange={field.onChange}
-                                    delay={500}
-                                    placeholder="Short blurb about your project/event... (limit 200 characters)"
-                                    className={
-                                      cn()
-
-                                      // "h-44 sm:h-52",
-                                    }
+                                    placeholder="Short blurb about your project/event... (limit 200 characters"
+                                    charLimit={200}
                                   />
                                 )}
                               />
@@ -1566,47 +1570,6 @@ export const EventOCForm = ({
                           </label>
                         </>
                       )}
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">Next: </p>
-                      <p className="lg:text-xs">Open Call</p>
-                    </div>
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                      <Label htmlFor="event.hasOpenCall" className="sr-only">
-                        Open Call
-                      </Label>
-                      <Controller
-                        name="event.hasOpenCall"
-                        control={control}
-                        render={({ field }) => (
-                          <Select
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                              // setHasOpenCall(value);
-                            }}
-                            value={field.value ?? ""}
-                          >
-                            <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                              <SelectValue
-                                placeholder={`Does your ${getEventCategoryLabelAbbr(category).toLowerCase()} have an open call?`}
-                              />
-                            </SelectTrigger>
-                            <SelectContent className="min-w-auto">
-                              <SelectItem fit value="true">
-                                Yes, there&apos;s an Open Call
-                              </SelectItem>
-                              <SelectItem fit value="false">
-                                No, there&apos;s not an Open Call
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
-                      {errors.event?.hasOpenCall && (
-                        <span className="mt-2 w-full text-center text-sm text-red-600">
-                          {errors.event?.hasOpenCall?.message}
-                        </span>
-                      )}
-                    </div>
                   </div>
                 </>
               )}
@@ -1634,140 +1597,16 @@ export const EventOCForm = ({
                   <p className="min-w-max font-bold lg:text-xl">
                     Step {categoryEvent ? 9 : 8}:{" "}
                   </p>
-                  <p className="lg:text-xs">Links</p>
+                  <p className="lg:text-xs">
+                    {getEventCategoryLabelAbbr(category)} Links
+                  </p>
                 </div>
 
                 <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.category" className="sr-only">
                     Event Links
                   </Label>
-                  {/* <Controller
-                    name="event.links"
-                    control={control}
-                    render={({ field }) => {
-                      return (
-                        <Select
-                          onValueChange={(value: EventCategory) => {
-                            field.onChange(value);
-                          }}
-                          value={field.value || ""}
-                        >
-                          <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                            <SelectValue placeholder="Event/Project Category (select one)" />
-                          </SelectTrigger>
-                          <SelectContent className="min-w-auto">
-                            <SelectItem fit value="event">
-                              Event
-                            </SelectItem>
-                            <SelectItem fit value="project">
-                              Project
-                            </SelectItem>
-                            <SelectItem fit value="residency">
-                              Residency
-                            </SelectItem>
-                            <SelectItem fit value="gfund">
-                              Grant/Fund
-                            </SelectItem>
-                            <SelectItem fit value="roster">
-                              Artist Roster
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      );
-                    }}
-                  /> */}
-                  {/* <div className="flex flex-col gap-y-2">
-                    {existingOrg && existingOrg?.links && (
-                      <label
-                        className={cn(
-                          "mx-auto flex cursor-pointer items-center gap-2 py-2",
-                        )}
-                      >
-                        <Controller
-                          name="event.links.sameAsOrganizer"
-                          control={control}
-                          render={({ field }) => {
-                            return (
-                              <Checkbox
-                                // disabled={
-                                //   isOngoing ||
-                                //   !hasEventFormat ||
-                                //   (blankEventDates &&
-                                //     eventDateFormatRequired)
-                                // }
-                                tabIndex={4}
-                                id="linksSameAsOrganizer"
-                                className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                                checked={field.value || false}
-                                onCheckedChange={(checked) => {
-                                  field.onChange(checked);
-                                  if (checked) {
-                                    setValue(
-                                      "event.links.sameAsOrganizer",
-                                      true,
-                                    );
-                                  }
-                                  // if (blankProdStart) {
-                                  //   setNoProdStart(true);
-                                  // } else if (hasProdDateAndFormat) {
-                                  //   setNoProdStart(false);
-                                  // }
-                                }}
-                              />
-                            );
-                          }}
-                        />
-                        <span className={cn("text-sm")}>
-                          Use same links as organization
-                        </span>
-                      </label>
-                    )}
-                    <div className="flex items-center gap-x-2">
-                      <FaGlobe className="size-5" />
-                      <Input placeholder="event website" className="w-full" />
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <FaInstagram className="size-5" />
-                      <Input placeholder="@eventname" className="w-full" />
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <FaFacebook className="size-5" />
-                      <Input placeholder="@eventname" className="w-full" />
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <FaThreads className="size-5" />
-                      <Input placeholder="@eventname" className="w-full" />
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <FaEnvelope className="size-5" />
-                      <Input
-                        placeholder="example@email.com"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <FaPhone className="size-5" />
-                      <Input
-                        placeholder="+1 (555) 555-5555"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <FaVk className="size-5" />
-                      <Input
-                        placeholder="Event VK Profile"
-                        className="w-full"
-                      />
-                    </div>
 
-                    <div className="flex items-center gap-x-2">
-                      <FaLink className="size-5" />
-                      <Input
-                        placeholder="linktree (or similar)"
-                        className="w-full"
-                      />
-                    </div>
-                  </div> */}
                   <FormLinksInput
                     existingOrgHasLinks={!!existingOrg?.links}
                     type="event"
@@ -1800,9 +1639,55 @@ export const EventOCForm = ({
                   >
                     {canNameEvent && (
                       <>
-                        <div className="input-section h-full">
+                        <div className="input-section">
                           <p className="min-w-max font-bold lg:text-xl">
                             Step {categoryEvent ? 10 : 9}:{" "}
+                          </p>
+                          <p className="lg:text-xs">Open Call</p>
+                        </div>
+                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                          <Label
+                            htmlFor="event.hasOpenCall"
+                            className="sr-only"
+                          >
+                            Open Call
+                          </Label>
+                          <Controller
+                            name="event.hasOpenCall"
+                            control={control}
+                            render={({ field }) => (
+                              <Select
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  // setHasOpenCall(value);
+                                }}
+                                value={field.value ?? ""}
+                              >
+                                <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                                  <SelectValue
+                                    placeholder={`Does your ${getEventCategoryLabelAbbr(category).toLowerCase()} have an open call?`}
+                                  />
+                                </SelectTrigger>
+                                <SelectContent className="min-w-auto">
+                                  <SelectItem fit value="true">
+                                    Yes, there&apos;s an Open Call
+                                  </SelectItem>
+                                  <SelectItem fit value="false">
+                                    No, there&apos;s not an Open Call
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                          {errors.event?.hasOpenCall && (
+                            <span className="mt-2 w-full text-center text-sm text-red-600">
+                              {errors.event?.hasOpenCall?.message}
+                            </span>
+                          )}
+                        </div>
+                        <div className="input-section h-full">
+                          <p className="min-w-max font-bold lg:text-xl">
+                            Step {categoryEvent ? 11 : 10}:{" "}
                           </p>
                           <p className="lg:text-xs">Other Info</p>
                         </div>
@@ -1811,7 +1696,7 @@ export const EventOCForm = ({
                           <Label htmlFor="event.name" className="sr-only">
                             {getEventCategoryLabelAbbr(category)} Other Info
                           </Label>
-                          <Controller
+                          {/* <Controller
                             name="event.otherInfo.0"
                             control={control}
                             render={({ field }) => (
@@ -1826,7 +1711,24 @@ export const EventOCForm = ({
                                 //  }
                               />
                             )}
+                          /> */}
+                          <Controller
+                            name="event.otherInfo"
+                            control={control}
+                            render={({ field }) => (
+                              <RichTextEditor
+                                value={field.value ?? ""}
+                                onChange={field.onChange}
+                                placeholder="Add any other info about your project/event... (limit 500 characters)"
+                                charLimit={500}
+                              />
+                            )}
                           />
+                          <span className="w-full text-center text-xs italic text-muted-foreground">
+                            (Formatting is for preview and won&apos;t exactly
+                            match the public version)
+                          </span>
+
                           {(errors.event?.name || eventNameExistsError) &&
                             eventNameIsDirty && (
                               <span className="mt-2 w-full text-center text-sm text-red-600">

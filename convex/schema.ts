@@ -170,7 +170,6 @@ const organizationSchema = {
       email: v.optional(v.string()),
       vk: v.optional(v.string()),
       phone: v.optional(v.string()),
-      address: v.optional(v.string()),
       linkAggregate: v.optional(v.string()),
       other: v.optional(v.string()),
     }),
@@ -250,7 +249,7 @@ const eventSchema = {
   about: v.optional(v.string()),
   links: v.optional(
     v.object({
-      sameAsOrganizer: v.optional(v.boolean()),
+      sameAsOrganizer: v.boolean(),
       website: v.optional(v.string()),
       instagram: v.optional(v.string()),
       facebook: v.optional(v.string()),
@@ -262,7 +261,7 @@ const eventSchema = {
       other: v.optional(v.string()),
     }),
   ),
-  otherInfo: v.array(v.string()),
+  otherInfo: v.optional(v.string()),
   // state: v.string(), //draft, submitted, published, archived
   state: v.union(
     v.literal("draft"),

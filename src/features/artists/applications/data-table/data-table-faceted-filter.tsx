@@ -45,9 +45,9 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className="hidden h-8 items-center border-dashed md:flex"
+          className="hidden h-8 items-center gap-1 border-dashed md:flex"
         >
-          <PlusCircle />
+          <PlusCircle className="size-4" />
           {title}
           {selectedValues?.size > 0 && (
             <>

@@ -10,6 +10,7 @@ import { EventData } from "@/types/event";
 import { MapIcon, Phone } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import { Organizer } from "@/types/organizer";
 import {
   FaEnvelope,
@@ -17,9 +18,11 @@ import {
   FaGlobe,
   FaInstagram,
   FaLink,
+  FaPhone,
   FaThreads,
   FaVk,
 } from "react-icons/fa6";
+import { formatPhoneNumberIntl } from "react-phone-number-input";
 
 interface LinkProps {
   event: EventData;
@@ -44,7 +47,6 @@ export const EventCard = ({ event, organizer, format }: EventCardProps) => {
   const latitude = location.coordinates?.latitude ?? 0;
   const longitude = location.coordinates?.longitude ?? 0;
   const isMobile = format === "mobile";
-  const isHtml = (str: string) => /<\/?[a-z][\s\S]*>/i.test(str);
 
   return (
     <>
@@ -79,24 +81,18 @@ export const EventCard = ({ event, organizer, format }: EventCardProps) => {
 
                 <AccordionContent>
                   <div className="mb-4 flex flex-col space-y-3 pb-3">
-                    {isHtml(event.about) ? (
-                      <div dangerouslySetInnerHTML={{ __html: event.about }} />
-                    ) : (
-                      <p>{event.about}</p>
-                    )}
+                    <RichTextDisplay html={event.about} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
             )}
             {event.links && <LinkList event={event} organizer={organizer} />}
 
-            {event.otherInfo && event.otherInfo.length > 0 && (
+            {event.otherInfo && (
               <AccordionItem value="item-4">
                 <AccordionTrigger title="Other info:" />
                 <AccordionContent>
-                  {event.otherInfo.map((info, index) => (
-                    <p key={index}>{info}</p>
-                  ))}
+                  <p>{event.otherInfo}</p>
                 </AccordionContent>
               </AccordionItem>
             )}
@@ -135,11 +131,7 @@ export const EventCard = ({ event, organizer, format }: EventCardProps) => {
 
               <AccordionContent>
                 <div className="mb-4 flex flex-col space-y-3 pb-3">
-                  {isHtml(event.about) ? (
-                    <div dangerouslySetInnerHTML={{ __html: event.about }} />
-                  ) : (
-                    <p>{event.about}</p>
-                  )}
+                  <RichTextDisplay html={event.about} />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -147,13 +139,11 @@ export const EventCard = ({ event, organizer, format }: EventCardProps) => {
 
           <LinkList event={event} organizer={organizer} />
 
-          {event.otherInfo && event.otherInfo.length > 0 && (
+          {event.otherInfo && (
             <AccordionItem value="item-4">
               <AccordionTrigger title="Other info:" />
               <AccordionContent>
-                {event.otherInfo.map((info, index) => (
-                  <p key={index}>{info}</p>
-                ))}
+                <RichTextDisplay html={event.otherInfo} />
               </AccordionContent>
             </AccordionItem>
           )}
@@ -183,7 +173,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 </a>
               )}
               {event.links?.website && (
-                <a href={event.links.website}>
+                <a href={event.links.website} target="_blank">
                   <div className="flex items-center gap-x-2">
                     <FaGlobe className="size-5" />
                     <span className="underline-offset-2 hover:underline">
@@ -192,10 +182,20 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                   </div>
                 </a>
               )}
+              {event.links?.phone && (
+                <a href={event.links.phone} target="_blank">
+                  <div className="flex items-center gap-x-2">
+                    <FaPhone className="size-5 shrink-0" />
+                    <span className="underline-offset-2 hover:underline">
+                      {formatPhoneNumberIntl(event.links.phone)}
+                    </span>
+                  </div>
+                </a>
+              )}
               {event.links?.linkAggregate && (
                 <a href={event.links.linkAggregate}>
                   <div className="flex items-center gap-x-2">
-                    <FaLink className="size-5" />
+                    <FaLink className="size-5 shrink-0" />
                     <span className="underline-offset-2 hover:underline">
                       {event.links.linkAggregate.split("www.").slice(-1)[0]}
                     </span>
@@ -203,45 +203,57 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 </a>
               )}
               {event.links?.instagram && (
-                <a href={event.links.instagram}>
+                <a
+                  href={`https://www.instagram.com/${event.links.instagram.split("@").slice(-1)[0]}`}
+                  target="_blank"
+                >
                   <div className="flex items-center gap-x-2">
-                    <FaInstagram className="size-5" />
+                    <FaInstagram className="size-5 shrink-0" />
 
                     <span className="underline-offset-2 hover:underline">
-                      @{event.links.instagram.split(".com/").slice(-1)[0]}
+                      {event.links.instagram}
                     </span>
                   </div>
                 </a>
               )}
               {event.links?.facebook && (
-                <a href={event.links.facebook}>
+                <a
+                  href={`https://www.facebook.com/${event.links.facebook.split("@").slice(-1)[0]}`}
+                  target="_blank"
+                >
                   <div className="flex items-center gap-x-2">
-                    <FaFacebook className="size-5" />
+                    <FaFacebook className="size-5 shrink-0" />
 
                     <span className="underline-offset-2 hover:underline">
-                      @{event.links.facebook.split(".com/").slice(-1)[0]}
+                      {event.links.facebook}
                     </span>
                   </div>
                 </a>
               )}
               {event.links?.threads && (
-                <a href={event.links.threads}>
+                <a
+                  href={`https://www.threads.com/@${event.links.threads.split("@").slice(-1)[0]}`}
+                  target="_blank"
+                >
                   <div className="flex items-center gap-x-2">
-                    <FaThreads className="size-5" />
+                    <FaThreads className="size-5 shrink-0" />
 
                     <span className="underline-offset-2 hover:underline">
-                      @{event.links.threads.split(".net/").slice(-1)[0]}
+                      {event.links.threads}
                     </span>
                   </div>
                 </a>
               )}
               {event.links?.vk && (
-                <a href={event.links.vk}>
+                <a
+                  href={`https://www.vk.com/${event.links.vk.split("@").slice(-1)[0]}`}
+                  target="_blank"
+                >
                   <div className="flex items-center gap-x-2">
-                    <FaVk className="size-5" />
+                    <FaVk className="size-5 shrink-0" />
 
                     <span className="underline-offset-2 hover:underline">
-                      @{event.links.vk.split(".com/").slice(-1)[0]}
+                      {event.links.vk}
                     </span>
                   </div>
                 </a>
@@ -263,7 +275,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                     href={`mailto:${organizer.links.email}?subject=${event.name}`}
                   >
                     <div className="flex items-center gap-x-2">
-                      <FaEnvelope className="size-5" />
+                      <FaEnvelope className="size-5 shrink-0" />
                       <span className="underline-offset-2 hover:underline">
                         {organizer.links.email}
                       </span>
@@ -273,7 +285,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 {organizer.links?.website && (
                   <a href={organizer.links.website}>
                     <div className="flex items-center gap-x-2">
-                      <FaGlobe className="size-5" />
+                      <FaGlobe className="size-5 shrink-0" />
                       <span className="underline-offset-2 hover:underline">
                         {organizer.links.website.split("www.").slice(-1)[0]}
                       </span>
@@ -283,7 +295,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 {organizer.links?.linkAggregate && (
                   <a href={organizer.links.linkAggregate}>
                     <div className="flex items-center gap-x-2">
-                      <FaLink className="size-5" />
+                      <FaLink className="size-5 shrink-0" />
                       <span className="underline-offset-2 hover:underline">
                         {
                           organizer.links.linkAggregate
@@ -298,7 +310,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 {organizer.links?.phone && (
                   <a href={`tel:${organizer.links.phone}`}>
                     <div className="flex items-center gap-x-2">
-                      <Phone className="size-5" />
+                      <Phone className="size-5 shrink-0" />
 
                       <span className="underline-offset-2 hover:underline">
                         {organizer.links.phone}
@@ -309,7 +321,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 {organizer.links?.instagram && (
                   <a href={organizer.links.instagram}>
                     <div className="flex items-center gap-x-2">
-                      <FaInstagram className="size-5" />
+                      <FaInstagram className="size-5 shrink-0" />
 
                       <span className="underline-offset-2 hover:underline">
                         @{organizer.links.instagram.split(".com/").slice(-1)[0]}
@@ -320,7 +332,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 {organizer.links?.facebook && (
                   <a href={organizer.links.facebook}>
                     <div className="flex items-center gap-x-2">
-                      <FaFacebook className="size-5" />
+                      <FaFacebook className="size-5 shrink-0" />
 
                       <span className="underline-offset-2 hover:underline">
                         @{organizer.links.facebook.split(".com/").slice(-1)[0]}
@@ -331,7 +343,7 @@ export const LinkList = ({ event, organizer }: LinkProps) => {
                 {organizer.links?.threads && (
                   <a href={organizer.links.threads}>
                     <div className="flex items-center gap-x-2">
-                      <FaThreads className="size-5" />
+                      <FaThreads className="size-5 shrink-0" />
 
                       <span className="underline-offset-2 hover:underline">
                         @{organizer.links.threads.split(".net/").slice(-1)[0]}

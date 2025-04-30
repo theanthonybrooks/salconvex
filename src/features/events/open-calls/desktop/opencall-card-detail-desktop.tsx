@@ -29,6 +29,7 @@ import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import EventDates from "@/features/events/components/event-dates";
 import { formatOpenCallDeadline, formatSingleDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
@@ -112,8 +113,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       router.push("/thelist");
     }
   };
-
-  const isHtml = (str: string) => /<\/?[a-z][\s\S]*>/i.test(str);
 
   return (
     <div
@@ -238,11 +237,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 <AccordionItem value="about">
                   <AccordionTrigger title="About:" className="pb-2" />
                   <AccordionContent className="text-sm">
-                    {isHtml(event.about) ? (
-                      <div dangerouslySetInnerHTML={{ __html: event.about }} />
-                    ) : (
-                      <p>{event.about}</p>
-                    )}
+                    <RichTextDisplay html={event.about} />
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

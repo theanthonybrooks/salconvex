@@ -56,6 +56,11 @@ export const addPlaceHolderNoProdStart = migrations.define({
   },
 });
 
+export const setOtherInfoUndefined = migrations.define({
+  table: "events",
+  migrateOne: () => ({ otherInfo: undefined }),
+});
+
 // Create a runner specifically for this migration
 export const runCopyDates = migrations.runner(
   internal.migrations.copyUpdatedAtToCompletedAt,
@@ -71,6 +76,10 @@ export const runClearIfUndone = migrations.runner(
 
 export const runAddPlaceHolderNoProdStart = migrations.runner(
   internal.migrations.addPlaceHolderNoProdStart,
+);
+
+export const runCOI = migrations.runner(
+  internal.migrations.setOtherInfoUndefined,
 );
 
 // export const runRemoveOrgNames = migrations.runner(

@@ -1064,3 +1064,87 @@ div:has(> .react-datepicker__input-container) {
     cursor: pointer;
   }
 }
+
+.PhoneInputInput {
+  &:focus {
+    outline: none;
+    border: none;
+  }
+}
+
+.PhoneInputCountry {
+  & > select {
+    &:disabled {
+      opacity: 50%;
+      filter: grayscale(1);
+      color: white;
+      cursor: not-allowed;
+    }
+  }
+  &:has(select:disabled) {
+    & * img {
+      filter: grayscale(1);
+    }
+  }
+}
+
+.PhoneInputCountryIcon--border {
+  box-shadow: none;
+}
+
+.rich-text {
+  & * ul,
+  ol {
+    &:not([data-type="taskList"]) {
+      margin-left: 1.25em;
+      padding-left: 1.25em;
+    }
+    /* // reverts to pre-tailwind preflight */
+    list-style: revert;
+    /* margin-left: 1.25em;
+    padding-left: 1.25em; */
+    list-style-position: outside;
+  }
+  & * ul:not([data-type="taskList"]) {
+    list-style-type: disc;
+  }
+  & * ul:is([data-type="taskList"]) {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+
+    & > li {
+      display: flex;
+      column-gap: 0.25rem;
+    }
+    & * input[type="checkbox"] {
+      appearance: auto;
+      transform: translateY(0.1rem);
+    }
+  }
+  & * ol {
+    list-style-type: decimal;
+  }
+  & * ul li,
+  ol li {
+    margin-bottom: 0.25rem;
+  }
+  .rich-check {
+    transform: translateY(0.125rem);
+  }
+  & * li[data-type="taskItem"] {
+    &:first-of-type {
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+/*global.css
+.rich-text ul[data-type="taskList"] {
+  @apply list-none pl-6;
+}
+
+.rich-text li[data-type="taskItem"] {
+  @apply relative mb-2 pl-7;
+}
+*/

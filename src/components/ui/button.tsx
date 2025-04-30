@@ -6,10 +6,12 @@ import * as React from "react";
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 [&_svg]:h-5 [&_svg]:h-5  [&_svg]:pointer-events-none",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-5  [&_svg]:pointer-events-none",
   {
     variants: {
       variant: {
+        richTextButton:
+          "bg-white text-foreground border-foreground/20 hover:bg-salYellow/30 border  [&_svg]:size-4",
         icon: "bg-transparent text-foreground hover:scale-110 [&_svg]:h-auto [&_svg]:h-auto",
         default: "bg-white text-foreground hover:bg-salYellow/30 border",
         destructive:
@@ -56,6 +58,7 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-6 sm:px-8 text-base sm:text-sm",
         icon: "h-10 w-10",
+        richText: "h-auto p-1",
       },
     },
     defaultVariants: {

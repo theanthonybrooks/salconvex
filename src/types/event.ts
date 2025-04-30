@@ -87,7 +87,7 @@ export interface EventData {
     address?: string;
     linkAggregate?: string;
   };
-  otherInfo?: string[];
+  otherInfo?: string;
   state: SubmissionFormState;
   active?: boolean;
   lastEditedAt?: number;

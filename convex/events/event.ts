@@ -301,15 +301,16 @@ export const createOrUpdateEvent = mutation({
         email: v.optional(v.string()),
         vk: v.optional(v.string()),
         phone: v.optional(v.string()),
-        address: v.optional(v.string()),
         linkAggregate: v.optional(v.string()),
       }),
     ),
-    otherInfo: v.array(v.string()),
+    otherInfo: v.optional(v.string()),
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     console.log(args.logoId, args.logo);
+    const linksSameAsOrg = args.links?.sameAsOrganizer;
+    console.log("linksSameAsOrg", linksSameAsOrg);
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     let fileUrl = "/1.jpg" as string | null;
@@ -330,6 +331,12 @@ export const createOrUpdateEvent = mutation({
     }
     const organization = await ctx.db.get(args.orgId);
     console.log("organization", organization);
+    console.log(organization?.links);
+    const links = !args.links
+      ? { sameAsOrganizer: false }
+      : linksSameAsOrg
+        ? { ...organization?.links, sameAsOrganizer: true }
+        : { ...args.links, sameAsOrganizer: false };
 
     function isValidEventId(id: string): id is Id<"events"> {
       return typeof id === "string" && id.trim() !== "";
@@ -362,8 +369,8 @@ export const createOrUpdateEvent = mutation({
           ...args.location,
         },
         about: args.about || "",
-        links: args.links || {},
-        otherInfo: args.otherInfo || [],
+        links,
+        otherInfo: args.otherInfo || undefined,
         active: args.active || true,
         lastEditedAt: Date.now(),
       });
@@ -393,8 +400,8 @@ export const createOrUpdateEvent = mutation({
         ...args.location,
       },
       about: args.about || "",
-      links: args.links || {},
-      otherInfo: args.otherInfo || [],
+      links,
+      otherInfo: args.otherInfo || undefined,
       active: args.active || true,
       mainOrgId: args.orgId,
       organizerId: [args.orgId],
