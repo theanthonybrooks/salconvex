@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatHandleInput, PlatformType } from "@/lib/linkFns";
+import { autoHttps, formatHandleInput, PlatformType } from "@/lib/linkFns";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 import { HiArrowTurnRightDown } from "react-icons/hi2";
@@ -122,6 +122,7 @@ export const FormLinksInput = ({
                     {...field}
                     disabled={eventSameAsOrg}
                     value={field.value ?? ""}
+                    onChange={(e) => field.onChange(autoHttps(e.target.value))}
                     placeholder="event website"
                     className="w-full"
                   />
@@ -229,6 +230,7 @@ export const FormLinksInput = ({
                   value={field.value ?? ""}
                   placeholder="linktree (or similar)"
                   className="w-full"
+                  onChange={(e) => field.onChange(autoHttps(e.target.value))}
                 />
               )}
             />
@@ -293,6 +295,7 @@ export const FormLinksInput = ({
                 value={field.value ?? ""}
                 placeholder="any other link not listed above"
                 className="w-full"
+                onChange={(e) => field.onChange(autoHttps(e.target.value))}
               />
             )}
           />

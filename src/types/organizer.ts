@@ -1,3 +1,5 @@
+import { ArtistFull } from "@/types/artist";
+import { EventData } from "@/types/event";
 import { Id } from "~/convex/_generated/dataModel";
 
 export type Organizer = {
@@ -57,3 +59,9 @@ export type Organizer = {
   updatedAt?: number;
   lastUpdatedBy?: string;
 };
+
+export interface OrganizerCardProps {
+  data: { events: EventData[] | null; organizer: Organizer };
+  artist?: ArtistFull | null; //todo:make this required
+  className?: string;
+}

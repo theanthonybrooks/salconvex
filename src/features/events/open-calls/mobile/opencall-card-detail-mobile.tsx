@@ -268,7 +268,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
             />
           </TabsContent>
           <TabsContent value="event">
-            <EventCard event={event} organizer={organizer} format="mobile" />
+            <EventCard event={event} format="mobile" />
           </TabsContent>
           <TabsContent value="organizer">
             <OrganizerCard organizer={organizer} format="mobile" />

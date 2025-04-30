@@ -17,9 +17,14 @@ import slugify from "slugify";
 interface OrganizerCardProps {
   organizer: Organizer;
   format?: string;
+  srcPage?: string;
 }
 
-export const OrganizerCard = ({ organizer, format }: OrganizerCardProps) => {
+export const OrganizerCard = ({
+  organizer,
+  format,
+  srcPage,
+}: OrganizerCardProps) => {
   const orgLocationString = `${
     organizer.location.locale ? `${organizer.location.locale}, ` : ""
   }${organizer.location.city}, ${
@@ -34,6 +39,7 @@ export const OrganizerCard = ({ organizer, format }: OrganizerCardProps) => {
   const orgHasOtherEvents = organizer?.events?.length > 1;
   const orgSlug = slugify(organizer.name);
   const isMobile = format === "mobile";
+  const orgPage = srcPage === "organizer";
 
   return (
     <>
@@ -166,12 +172,15 @@ export const OrganizerCard = ({ organizer, format }: OrganizerCardProps) => {
                   </a>
                 )}
               </div>
-              <a
-                className="mt-6 line-clamp-4 text-center text-sm underline-offset-2 hover:underline"
-                href={`/organizer/${orgSlug}`}
-              >
-                Check out {organizer.name}&apos;s other events
-              </a>
+              {!orgPage && (
+                <a
+                  className="mt-6 line-clamp-4 text-center text-sm underline-offset-2 hover:underline"
+                  href={`/thelist/organizer/${orgSlug}`}
+                  target="_blank"
+                >
+                  Check out {organizer.name}&apos;s other events
+                </a>
+              )}
             </section>
           </div>
 
@@ -316,10 +325,11 @@ export const OrganizerCard = ({ organizer, format }: OrganizerCardProps) => {
                 <p className="line-clamp-4 text-sm">{organizer.about}</p>
               </span>
             )}
-            {orgHasOtherEvents && (
+            {orgHasOtherEvents && !orgPage && (
               <a
                 className="mt-6 line-clamp-4 flex items-center justify-center gap-1 text-sm underline-offset-2 hover:underline"
-                href={`/organizer/${orgSlug}`}
+                href={`/thelist/organizer/${orgSlug}`}
+                target="_blank"
               >
                 Check out other events by this organizer
                 <TiArrowRight className="inline-block size-6" />

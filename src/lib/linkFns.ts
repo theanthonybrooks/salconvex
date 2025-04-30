@@ -77,3 +77,46 @@ function isValidChar(char: string, platform: PlatformType): boolean {
       return allowedCharacters.test(char);
   }
 }
+
+export function autoHttps(url: string) {
+  const raw = url.trim();
+  return raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
+}
+
+export function formatDisplayUrl(url: string): string {
+  return url.replace(/^https?:\/\//i, "").replace(/^www\./i, "");
+}
+
+export function formatUrlToHandle(url: string, platformDomain: string): string {
+  if (!url) return "";
+
+  const normalized = url.replace(/^https?:\/\//i, "").replace(/^www\./i, "");
+
+  const prefix = `${platformDomain}/`;
+  const index = normalized.indexOf(prefix);
+
+  if (index !== -1) {
+    return "@" + normalized.slice(index + prefix.length).replace(/\/$/, "");
+  }
+
+  return url.startsWith("@") ? url : `@${url}`;
+}
+
+export function normalizeToHandle(value: string, domain: string): string {
+  if (!value) return "";
+  return value
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(new RegExp(`^${domain}/?`, "i"), "")
+    .replace(/\/$/, "")
+    .replace(/^@/, "") // remove existing @ to avoid @@
+    .trim()
+    ? `@${value
+        .replace(/^https?:\/\//i, "")
+        .replace(/^www\./i, "")
+        .replace(new RegExp(`^${domain}/?`, "i"), "")
+        .replace(/\/$/, "")
+        .replace(/^@/, "")
+        .trim()}`
+    : "";
+}

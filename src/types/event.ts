@@ -86,6 +86,7 @@ export interface EventData {
     phone?: string;
     address?: string;
     linkAggregate?: string;
+    other?: string;
   };
   otherInfo?: string;
   state: SubmissionFormState;

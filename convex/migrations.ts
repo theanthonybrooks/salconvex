@@ -1,3 +1,4 @@
+import { normalizeToHandle } from "@/lib/linkFns.js";
 import { Migrations } from "@convex-dev/migrations";
 import { components, internal } from "./_generated/api.js";
 import { DataModel } from "./_generated/dataModel.js";
@@ -56,6 +57,31 @@ export const addPlaceHolderNoProdStart = migrations.define({
   },
 });
 
+export const normalizeSocialLinks = migrations.define({
+  table: "organizations", // or "events"
+  migrateOne: async (ctx, doc) => {
+    const links = doc.links;
+
+    if (!links) return;
+
+    const updatedLinks = {
+      ...links,
+      instagram: links.instagram
+        ? normalizeToHandle(links.instagram, "instagram.com")
+        : undefined,
+      facebook: links.facebook
+        ? normalizeToHandle(links.facebook, "facebook.com")
+        : undefined,
+      threads: links.threads
+        ? normalizeToHandle(links.threads, "threads.net")
+        : undefined,
+      vk: links.vk ? normalizeToHandle(links.vk, "vk.com") : undefined,
+    };
+
+    await ctx.db.patch(doc._id, { links: updatedLinks });
+  },
+});
+
 export const setOtherInfoUndefined = migrations.define({
   table: "events",
   migrateOne: () => ({ otherInfo: undefined }),
@@ -80,6 +106,10 @@ export const runAddPlaceHolderNoProdStart = migrations.runner(
 
 export const runCOI = migrations.runner(
   internal.migrations.setOtherInfoUndefined,
+);
+
+export const runNorm = migrations.runner(
+  internal.migrations.normalizeSocialLinks,
 );
 
 // export const runRemoveOrgNames = migrations.runner(

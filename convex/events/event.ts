@@ -302,6 +302,7 @@ export const createOrUpdateEvent = mutation({
         vk: v.optional(v.string()),
         phone: v.optional(v.string()),
         linkAggregate: v.optional(v.string()),
+        other: v.optional(v.string()),
       }),
     ),
     otherInfo: v.optional(v.string()),

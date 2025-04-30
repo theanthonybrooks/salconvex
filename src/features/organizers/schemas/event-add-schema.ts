@@ -43,6 +43,101 @@ const locationSchema = locationBase.superRefine((data, ctx) => {
   }
 });
 
+const isValidUrl = (value: string) =>
+  /^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i.test(value);
+
+const isValidInstagram = (value: string) => /^@?[\w.]{1,30}$/i.test(value); // Instagram usernames: 1-30 chars, letters, numbers, underscores, periods
+
+const isValidFacebook = (value: string) => /^@?[a-zA-Z0-9.]{5,}$/i.test(value); // Basic heuristic
+
+const isValidEmail = (value: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const isValidPhone = (value: string) => /^\+?[0-9\s\-().]{7,}$/i.test(value);
+
+const isValidThreads = isValidInstagram;
+const isValidVK = (value: string) => /^@?[a-z][a-z0-9._-]{4,31}$/i.test(value);
+
+const linksSchemaLoose = z.object({
+  sameAsOrganizer: z.boolean().optional(),
+  website: z.string().optional(),
+  email: z.string().optional(),
+  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  threads: z.string().optional(),
+  vk: z.string().optional(),
+  phone: z.string().optional(),
+  linkAggregate: z.string().optional(),
+  other: z.string().optional(),
+});
+
+const linksSchemaStrict = z.object({
+  sameAsOrganizer: z.boolean().optional(),
+
+  website: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidUrl(val), {
+      message: "Must be a valid URL (https://...)",
+    }),
+
+  email: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidEmail(val), {
+      message: "Must be a valid email address",
+    }),
+
+  instagram: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidInstagram(val), {
+      message: "Must be a valid Instagram handle (letters, numbers, . or _)",
+    }),
+
+  facebook: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidFacebook(val), {
+      message: "Must be a valid Facebook handle or page name",
+    }),
+
+  threads: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidThreads(val), {
+      message: "Must be a valid Threads handle",
+    }),
+
+  vk: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidVK(val), {
+      message: "Must be a valid VK profile URL (https://vk.com/...)",
+    }),
+
+  phone: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidPhone(val), {
+      message: "Must be a valid phone number",
+    }),
+
+  linkAggregate: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidUrl(val), {
+      message: "Must be a valid URL (ie Linktr.ee, Carrd.co, Lnk.Bio, etc)",
+    }),
+
+  other: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidUrl(val), {
+      message: "Must be a valid URL",
+    }),
+});
+
 const organizationSchema = z.object({
   _id: z.optional(z.string()),
   name: z
@@ -99,18 +194,7 @@ export const eventBase = z.object({
     noProdStart: z.boolean(),
     ongoing: z.boolean(),
   }),
-  links: z.object({
-    sameAsOrganizer: z.boolean().optional(),
-    website: z.string().optional(),
-    instagram: z.string().optional(),
-    facebook: z.string().optional(),
-    threads: z.string().optional(),
-    email: z.string().optional(),
-    vk: z.string().optional(),
-    phone: z.string().optional(),
-    linkAggregate: z.string().optional(),
-    other: z.string().optional(),
-  }),
+  links: linksSchemaLoose,
   otherInfo: z.string().optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
@@ -273,7 +357,9 @@ export const eventOnlySchema = z.object({
 export const eventDetailsSchema = z.object({
   organization: organizationSchema,
   // event: eventDetails,
-  event: eventBase,
+  event: eventBase.extend({
+    links: linksSchemaStrict,
+  }),
 });
 
 export const eventWithOCSchema = z.object({

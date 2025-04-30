@@ -444,7 +444,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </div>
           </div>
           <div id="event">
-            <EventCard event={event} organizer={organizer} format="desktop" />
+            <EventCard event={event} format="desktop" />
           </div>
           <div id="organizer">
             <OrganizerCard organizer={organizer} format="desktop" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { LinkList } from "@/components/ui/link-list";
 import {
   Tooltip,
   TooltipContent,
@@ -36,16 +37,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   FaBookmark,
-  FaEnvelope,
-  FaFacebook,
-  FaGlobe,
-  FaInstagram,
   FaMapLocationDot,
   FaPaintRoller,
   FaRegBookmark,
   FaRegCommentDots,
-  FaThreads,
-  FaVk,
 } from "react-icons/fa6";
 import { IoAirplane } from "react-icons/io5";
 import {
@@ -732,8 +727,8 @@ const EventCardPreview = ({
         ) : (
           <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
             <span className="font-semibold">Event Links:</span>
-            <div className="flex flex-col gap-y-2">
-              {/*TODO: In the future, this should first check if it has sameAsOrganizer checked, and if so, should use the links from the organizer. Otherwise, it should check if there are any links at all. */}
+            {/*     <div className="flex flex-col gap-y-2">
+              /~TODO: In the future, this should first check if it has sameAsOrganizer checked, and if so, should use the links from the organizer. Otherwise, it should check if there are any links at all. ~/
               {(Object.keys(event.links || {}).length === 0 ||
                 (Object.keys(event.links || {}).length === 1 &&
                   event.links?.sameAsOrganizer === true)) && (
@@ -765,7 +760,7 @@ const EventCardPreview = ({
                 </a>
               )}
 
-              {/* {event.links?.phone && (
+              /~ {event.links?.phone && (
                 <a href={`tel:${event.links.phone}`}>
                   <div className="flex items-center gap-x-2">
                     <Phone className="size-5" />
@@ -775,7 +770,7 @@ const EventCardPreview = ({
                     </span>
                   </div>
                 </a>
-              )} */}
+              )} ~/
               {event.links?.instagram && (
                 <a href={event.links.instagram}>
                   <div className="flex items-center gap-x-2">
@@ -820,7 +815,9 @@ const EventCardPreview = ({
                   </div>
                 </a>
               )}
-            </div>
+            </div>*/}
+
+            <LinkList event={event} purpose="preview" />
           </div>
         )}
         <div className="flex flex-col items-center justify-center gap-y-6 py-6 text-sm">

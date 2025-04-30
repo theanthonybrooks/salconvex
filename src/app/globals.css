@@ -1093,6 +1093,10 @@ div:has(> .react-datepicker__input-container) {
 }
 
 .rich-text {
+  & * a {
+    font-weight: 600;
+    text-decoration: underline;
+  }
   & * ul,
   ol {
     &:not([data-type="taskList"]) {

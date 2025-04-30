@@ -1,6 +1,13 @@
 import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 
+import {
+  EventCategory,
+  EventData,
+  EventType,
+  SubmissionFormState,
+} from "@/types/event";
+import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import slugify from "slugify";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -278,5 +285,41 @@ export const getEventsByOrgId = query({
       .collect();
 
     return events;
+  },
+});
+
+export const getOrganizerBySlug = query({
+  args: {
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    let events = null;
+    const organizer = await ctx.db
+      .query("organizations")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first();
+
+    console.log(organizer);
+
+    if (!organizer) throw new ConvexError("No organizer found");
+
+    const rawEvents = await ctx.db
+      .query("events")
+      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", organizer._id))
+      .collect();
+
+    events = rawEvents.map((e) => ({
+      ...e,
+      category: e.category as EventCategory,
+      state: e.state as SubmissionFormState,
+      type:
+        Array.isArray(e.type) && e.type.length > 0 && e.type.length <= 2
+          ? (e.type as [EventType] | [EventType, EventType])
+          : undefined,
+    })) as EventData[];
+
+    console.log(events);
+
+    return { organizer: organizer as Organizer, events };
   },
 });

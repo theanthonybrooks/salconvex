@@ -2,96 +2,67 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Eye, EyeOff, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/state-accordion-test";
-
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-
+import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useToggleListAction } from "@/features/artists/helpers/listActions";
-import EventDates from "@/features/events/components/event-dates";
-import { EventCard } from "@/features/events/components/events-card";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
-import { EventCardProps } from "@/types/event";
+import { OrganizerCardProps } from "@/types/organizer";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 
-export const EventCardDetailDesktop = (props: EventCardProps) => {
+export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const router = useRouter();
-  const { data, artist, className } = props; //note: removed artist from props. Add back when needed
-  const { event, organizer } = data;
+  const { data, className } = props;
+  const { events, organizer } = data;
   const {
-    logo: eventLogo,
-    category: eventCategory,
-    type: eventType,
+    logo: orgLogo,
     location,
-    dates,
-  } = event;
+    //  links
+  } = organizer;
 
-  const { bookmarked, hidden } = artist?.listActions?.find(
-    (la) => la.eventId === event._id,
-  ) ?? {
-    bookmarked: false,
-    hidden: false,
-  };
+  // const { bookmarked, hidden } = artist?.listActions?.find(
+  //   (la) => la.eventId === event._id,
+  // ) ?? {
+  //   bookmarked: false,
+  //   hidden: false,
+  // };
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const { prodDates } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
-  // const prodStart = prodDates?.[0]?.start;
-  const prodEnd = prodDates?.[0]?.end;
+
   const tabList = [
     // { id: "application", label: "My Application" },
-    { id: "event", label: getEventCategoryLabel(eventCategory) },
+    { id: "events", label: "Events/Projects" },
     { id: "organizer", label: "Organizer" },
   ];
-  const [activeTab, setActiveTab] = useState("event");
-  const { toggleListAction } = useToggleListAction(event._id);
+  const [activeTab, setActiveTab] = useState("events");
+  // const { toggleListAction } = useToggleListAction(event._id);
 
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
 
-  const orgLocationString = `${organizer.location.city}, ${
-    organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
-  }${
-    organizer.location.countryAbbr === "UK" ||
-    organizer.location.countryAbbr === "USA" ||
-    organizer.location.country === "United States"
-      ? organizer.location.countryAbbr
-      : organizer.location.country
-  }`;
+  // const orgLocationString = `${organizer.location.city}, ${
+  //   organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
+  // }${
+  //   organizer.location.countryAbbr === "UK" ||
+  //   organizer.location.countryAbbr === "USA" ||
+  //   organizer.location.country === "United States"
+  //     ? organizer.location.countryAbbr
+  //     : organizer.location.country
+  // }`;
 
-  const onBookmark = () => {
-    if (!artist) {
-      router.push("/pricing");
-    } else {
-      toggleListAction({ bookmarked: !bookmarked });
-    }
-  };
-
-  const onHide = () => {
-    if (!artist) {
-      router.push("/pricing");
-    } else {
-      toggleListAction({ hidden: !hidden });
-    }
-  };
+  // const onBookmark = () => {
+  //   if (!artist) {
+  //     router.push("/pricing");
+  //   } else {
+  //     // toggleListAction({ bookmarked: !bookmarked });
+  //     //TODO: bookmark organizer functionality
+  //   }
+  // };
 
   const onBackClick = () => {
     const previous = sessionStorage.getItem("previousSalPage");
@@ -124,8 +95,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
           <div className="col-span-1 flex items-center justify-center">
             <Image
-              src={eventLogo}
-              alt="Event Logo"
+              src={orgLogo}
+              alt="Organizer Logo"
               width={60}
               height={60}
               className={cn("size-[60px] rounded-full border-2")}
@@ -134,7 +105,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
           <div className="col-start-2 row-start-1 flex items-center">
             <p className="mb-1 text-balance pr-1 text-base font-semibold">
-              {event?.name}
+              {organizer?.name}
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
@@ -149,56 +120,16 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 />
               </span>
             </p>
-            <div className="flex flex-col items-start gap-1 text-sm">
-              <span className="space-x-1 font-semibold">
-                {getEventCategoryLabel(eventCategory)} Dates:
-              </span>
-              <EventDates
-                event={event}
-                format="desktop"
-                limit={0}
-                type="event"
-              />
-            </div>
-            {/*//todo: add this part */}
-            {(eventCategory === "project" ||
-              (eventCategory === "event" && prodEnd)) && (
-              <div className="flex flex-col items-start gap-1 text-sm">
-                <span className="space-x-1 font-semibold">
-                  Painting/Production Dates:
-                </span>
-                <EventDates
-                  event={event}
-                  format="desktop"
-                  limit={0}
-                  type="production"
-                />
-              </div>
-            )}
-            <p className="flex flex-col items-start gap-1 text-sm">
-              <span className="font-semibold">Category:</span>
-              {getEventCategoryLabel(eventCategory)}
-            </p>
-            {eventType && eventCategory === "event" && (
-              <p className="flex flex-col items-start gap-1 text-sm">
-                <span className="font-semibold">Type:</span>{" "}
-                {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
-              </p>
-            )}
 
             {/* //todo: ensure that this is required in the submission form */}
-            {event.about && (
-              <Accordion type="multiple" defaultValue={["about"]}>
-                <AccordionItem value="about">
-                  <AccordionTrigger title="About:" className="pb-2" />
-                  <AccordionContent className="text-sm">
-                    <RichTextDisplay html={event.about} />
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+            {organizer.about && (
+              <div className="flex flex-col gap-2 text-sm">
+                <p className="pb-2 font-bold">About:</p>
+                <RichTextDisplay html={organizer.about} />
+              </div>
             )}
 
-            <div className="flex flex-col items-start gap-1 text-sm">
+            {/* <div className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Organized by:</span>
               <Card
                 className="grid w-full grid-cols-[50px_minmax(0,1fr)] items-center rounded-xl border-1.5 border-foreground/30 bg-white/50 p-2 hover:cursor-pointer"
@@ -226,7 +157,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   </p>
                 </div>
               </Card>
-            </div>
+            </div> */}
           </div>
         </div>
       </Card>
@@ -236,14 +167,14 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           <div className="flex w-full items-center justify-between pr-2">
             <div className="flex items-center gap-x-4 px-4">
               <Image
-                src={eventLogo}
+                src={orgLogo}
                 alt="Event Logo"
                 width={60}
                 height={60}
                 className={cn("size-[60px] rounded-full border-2 xl:hidden")}
               />
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{event?.name}</span>
+                <span className="text-xl font-bold">{organizer?.name}</span>
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 
@@ -254,33 +185,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-x-4">
-              {hidden ? (
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <EyeOff
-                        className="size-7 cursor-pointer text-muted-foreground"
-                        onClick={onHide}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent align="end">
-                      <p>Unhide {getEventCategoryLabel(eventCategory)}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : (
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Eye className="size-7 cursor-pointer" onClick={onHide} />
-                    </TooltipTrigger>
-                    <TooltipContent align="end">
-                      <p>Hide {getEventCategoryLabel(eventCategory)}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+            {/* <div className="flex items-center gap-x-4">
               {bookmarked ? (
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
@@ -305,12 +210,12 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       />{" "}
                     </TooltipTrigger>
                     <TooltipContent align="end">
-                      <p>Bookmark {getEventCategoryLabel(eventCategory)}</p>
+                      <p>Bookmark Organization</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
         <NavTabs
@@ -318,11 +223,34 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         >
-          <div id="event">
-            <EventCard event={event} format="desktop" />
+          <div id="events">
+            <ol className="list-outside list-decimal px-2">
+              {events?.map((event) => (
+                <li key={event._id} className="text-sm">
+                  <div className="flex items-center gap-x-2">
+                    <Link
+                      href={`/thelist/event/${event.slug}/${event.dates.edition}`}
+                      target="_blank"
+                    >
+                      <p className="text-sm">
+                        <span className="font-bold">{event.name}</span>
+                        {" - "}
+                        <span className="font-light italic">
+                          {event.dates.edition}
+                        </span>
+                      </p>
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
           <div id="organizer">
-            <OrganizerCard organizer={organizer} format="desktop" />
+            <OrganizerCard
+              organizer={organizer}
+              format="desktop"
+              srcPage="organizer"
+            />
           </div>
           <div id="application">
             <p>Application content</p>
