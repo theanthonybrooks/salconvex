@@ -256,7 +256,7 @@ export const RichTextEditor = ({
         </Button>
       </div>
       {showLinkInput && (
-        <div className="mb-2 flex flex-col gap-2">
+        <div className="mb-2 flex flex-col gap-2 border-b pb-2">
           <div className="grid grid-cols-[30%_70%] gap-2">
             <p>Link:</p>
             <input
@@ -282,6 +282,7 @@ export const RichTextEditor = ({
           <div className="flex gap-2">
             <Button
               size="sm"
+              className="flex-1"
               onClick={() => {
                 const { from, to } = editor.state.selection;
                 const chain = editor.chain().focus();
@@ -320,6 +321,7 @@ export const RichTextEditor = ({
             </Button>
             <Button
               size="sm"
+              className="flex-1"
               variant="ghost"
               onClick={() => setShowLinkInput(false)}
             >
