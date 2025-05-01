@@ -153,12 +153,7 @@ const organizationSchema = {
   contact: v.optional(
     v.object({
       organizer: v.optional(v.string()),
-      primaryContact: v.object({
-        email: v.optional(v.string()),
-        phone: v.optional(v.string()),
-        href: v.optional(v.string()),
-        social: v.optional(v.string()),
-      }),
+      primaryContact: v.string(),
     }),
   ),
   links: v.optional(

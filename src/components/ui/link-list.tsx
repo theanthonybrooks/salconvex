@@ -22,7 +22,6 @@ interface LinkListProps {
 
 export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
   const listPreview = purpose === "preview";
-  console.log(event);
   return (
     <>
       {event && event.links && (

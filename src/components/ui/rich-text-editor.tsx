@@ -110,8 +110,6 @@ export const RichTextEditor = ({
   const [displayText, setDisplayText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
 
-  console.log(editor?.extensionManager.extensions.map((e) => e.name));
-
   useEffect(() => {
     if (editor && editor.getHTML() !== value) {
       editor.commands.setContent(value);

@@ -78,6 +78,8 @@ const AccordionTrigger = React.forwardRef<
       setTriggerProps?.({ hidePreview, hasPreview, title });
     }, [hidePreview, hasPreview, title, setTriggerProps]);
 
+    console.log("hasPreview", hasPreview, title);
+
     return (
       <AccordionPrimitive.Header className="flex">
         <AccordionPrimitive.Trigger

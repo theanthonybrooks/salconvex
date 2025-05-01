@@ -56,7 +56,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     hidden: false,
   };
 
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
+  const { locale, city, stateAbbr, state, country, countryAbbr } = location;
   const { prodDates } = dates;
   // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
@@ -76,12 +76,26 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     basicInfo.callType,
   );
 
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
+  const locationString = `${
+    locale ? `${locale}, ` : ""
+  }${city ? city + "," : ""} ${city && stateAbbr ? stateAbbr + ", " : ""}${
+    !city && state ? state + ", " : ""
+  }${
+    countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
+      ? countryAbbr
+      : country
+  }`;
 
-  const orgLocationString = `${organizer.location.city}, ${
-    organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
+  const orgLocationString = `${
+    organizer.location.locale ? `${organizer.location.locale}, ` : ""
+  }${organizer.location.city ? organizer.location.city + "," : ""} ${
+    organizer.location.city && organizer.location.stateAbbr
+      ? organizer.location.stateAbbr + ", "
+      : ""
+  }${
+    !organizer.location.city && organizer.location.state
+      ? organizer.location.state + ", "
+      : ""
   }${
     organizer.location.countryAbbr === "UK" ||
     organizer.location.countryAbbr === "USA" ||
@@ -179,7 +193,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
           <div className="col-start-2 row-start-1 flex items-center">
             <p className="mb-1 text-balance pr-1 text-base font-semibold">
-              {event?.name}
+              {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
@@ -362,7 +376,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 )}
               />
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{event?.name}</span>
+                <span className="text-xl font-bold">
+                  {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
+                </span>
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 

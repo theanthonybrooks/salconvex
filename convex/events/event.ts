@@ -307,6 +307,15 @@ export const createOrUpdateEvent = mutation({
     ),
     otherInfo: v.optional(v.string()),
     active: v.optional(v.boolean()),
+    state: v.optional(
+      v.union(
+        v.literal("draft"),
+        v.literal("submitted"),
+        v.literal("published"),
+        v.literal("archived"),
+      ),
+    ),
+    finalStep: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     console.log(args.logoId, args.logo);
@@ -330,6 +339,8 @@ export const createOrUpdateEvent = mutation({
     if (!user) {
       throw new ConvexError("User not found");
     }
+    const isAdmin = user?.role.includes("admin");
+    console.log("isAdmin", isAdmin);
     const organization = await ctx.db.get(args.orgId);
     console.log("organization", organization);
     console.log(organization?.links);
@@ -344,9 +355,14 @@ export const createOrUpdateEvent = mutation({
     }
 
     const event = isValidEventId(args._id) ? await ctx.db.get(args._id) : null;
+    const eventState = isAdmin
+      ? /*event?.state ||*/ "published"
+      : args.state || "draft";
+
+    console.log("eventState", eventState);
 
     if (event) {
-      const isOwner = event.mainOrgId === args.orgId;
+      const isOwner = event.mainOrgId === args.orgId || isAdmin;
       console.log("isOwner", isOwner);
       if (!isOwner)
         throw new ConvexError("You don't have permission to update this event");
@@ -374,6 +390,7 @@ export const createOrUpdateEvent = mutation({
         otherInfo: args.otherInfo || undefined,
         active: args.active || true,
         lastEditedAt: Date.now(),
+        state: eventState,
       });
 
       const updatedEvent = await ctx.db.get(event._id);
@@ -408,7 +425,7 @@ export const createOrUpdateEvent = mutation({
       organizerId: [args.orgId],
       // mainOrgName: "",
 
-      state: "draft",
+      state: eventState,
       lastEditedAt: Date.now(),
     });
     const newEvent = await ctx.db.get(eventId);

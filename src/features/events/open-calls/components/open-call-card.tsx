@@ -25,6 +25,7 @@ import { Link } from "@/components/ui/custom-link";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventData } from "@/types/event";
 
 interface OpenCallCardProps {
@@ -130,8 +131,8 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
     <>
       {isMobile ? (
         <Card className="w-full rounded-xl border-foreground/20 bg-white/60 p-5">
-          <Accordion type="multiple" defaultValue={["item-1"]}>
-            <AccordionItem value="item-1">
+          <Accordion type="multiple" defaultValue={["Deadline"]}>
+            <AccordionItem value="Deadline">
               <AccordionTrigger title="Deadline & Eligibility:" />
               <AccordionContent>
                 <div className="space-y-2">
@@ -181,7 +182,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2">
+            <AccordionItem value="BudgetComp">
               <AccordionTrigger
                 title=" Budget & Compensation:"
                 hasPreview
@@ -444,7 +445,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3">
+            <AccordionItem value="AppReqs">
               <AccordionTrigger title="Application Requirements" />
               <AccordionContent>
                 <div className="mb-4 flex flex-col space-y-3 pb-3">
@@ -478,7 +479,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
             </AccordionItem>
 
             {reqsDocs && reqsDocs.length > 0 && (
-              <AccordionItem value="item-4">
+              <AccordionItem value="Docs">
                 <AccordionTrigger title="Documents:" />
                 <AccordionContent>
                   <ol className="list-outside list-decimal px-4 pl-6">
@@ -497,7 +498,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
               </AccordionItem>
             )}
             {reqsLinks && reqsLinks.length > 0 && (
-              <AccordionItem value="item-5">
+              <AccordionItem value="AppLinks">
                 <AccordionTrigger title="Links:" />
                 <AccordionContent>
                   <ol className="list-outside list-decimal px-4 pl-6">
@@ -514,7 +515,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
             )}
 
             {openCall?.requirements?.otherInfo && (
-              <AccordionItem value="item-5">
+              <AccordionItem value="AppOther">
                 <AccordionTrigger title="Other info:" />
                 <AccordionContent>
                   <div className="mb-4 grid grid-cols-[1fr_auto] border-foreground/20 pb-3">
@@ -534,11 +535,11 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
       ) : (
         <Accordion
           type="multiple"
-          defaultValue={["item-1", "item-2", "item-3"]}
+          defaultValue={["deadElig", "budgacomp", "appRequirements"]}
           className="space-y-4"
         >
           <AccordionItem
-            value="item-1"
+            value="deadElig"
             className="rounded-lg border-2 bg-white/30 px-4"
           >
             <AccordionTrigger title="Deadline & Eligibility:" />
@@ -591,7 +592,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
           </AccordionItem>
 
           <AccordionItem
-            value="item-2"
+            value="budgacomp"
             className="rounded-lg border-2 bg-white/30 px-4"
           >
             <AccordionTrigger
@@ -842,13 +843,19 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                 </div>
                 {budget?.moreInfo && (
                   <div className="col-span-full">
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="font-semibold underline underline-offset-2">
-                        More Info:
-                      </span>
-                      {/* TODO: Ensure that this is formatted properly; will require markdown or something like quill as an input for users to format their text properly (though this section should probably be its own internal accordion or expandable item as it could get quite long). Or character limit */}
-                      <p>{budget.moreInfo}</p>
-                    </div>
+                    <Accordion type="multiple">
+                      <AccordionItem value="budgetMoreInfo">
+                        <AccordionTrigger title="More Info:" className="pb-2" />
+                        <AccordionContent>
+                          <div className="mb-4 flex flex-col space-y-3 pb-3">
+                            <RichTextDisplay
+                              html={budget.moreInfo}
+                              className="text-sm"
+                            />
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 )}
               </div>
@@ -856,7 +863,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
           </AccordionItem>
 
           <AccordionItem
-            value="item-3"
+            value="appRequirements"
             className="rounded-lg border-2 bg-white/30 px-4"
           >
             <AccordionTrigger title="Application Requirements" />
@@ -893,7 +900,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
 
           {reqsDocs && reqsDocs.length > 0 && (
             <AccordionItem
-              value="item-4"
+              value="AppDocs"
               className="rounded-lg border-2 bg-white/30 px-4"
             >
               <AccordionTrigger title="Documents:" />
@@ -915,7 +922,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
           )}
           {reqsLinks && reqsLinks.length > 0 && (
             <AccordionItem
-              value="item-5"
+              value="ApplicationLinks"
               className="rounded-lg border-2 bg-white/30 px-4"
             >
               <AccordionTrigger title="Links:" />
@@ -934,7 +941,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
             </AccordionItem>
           )}
           {openCall?.requirements?.otherInfo && (
-            <AccordionItem value="item-5">
+            <AccordionItem value="ApplicationOther">
               <AccordionTrigger title="Other info:" />
               <AccordionContent>
                 <div className="mb-4 grid grid-cols-[1fr_auto] border-foreground/20 pb-3">

@@ -51,7 +51,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     hidden: false,
   };
 
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
+  const { locale, city, stateAbbr, state, country, countryAbbr } = location;
   const { prodDates } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
   // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
@@ -63,12 +63,26 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const [activeTab, setActiveTab] = useState("event");
   const { toggleListAction } = useToggleListAction(event._id);
 
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
+  const locationString = `${
+    locale ? `${locale}, ` : ""
+  }${city ? city + "," : ""} ${city && stateAbbr ? stateAbbr + ", " : ""}${
+    !city && state ? state + ", " : ""
+  }${
+    countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
+      ? countryAbbr
+      : country
+  }`;
 
-  const orgLocationString = `${organizer.location.city}, ${
-    organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
+  const orgLocationString = `${
+    organizer.location.locale ? `${organizer.location.locale}, ` : ""
+  }${organizer.location.city ? organizer.location.city + "," : ""} ${
+    organizer.location.city && organizer.location.stateAbbr
+      ? organizer.location.stateAbbr + ", "
+      : ""
+  }${
+    !organizer.location.city && organizer.location.state
+      ? organizer.location.state + ", "
+      : ""
   }${
     organizer.location.countryAbbr === "UK" ||
     organizer.location.countryAbbr === "USA" ||
@@ -128,13 +142,15 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
               alt="Event Logo"
               width={60}
               height={60}
-              className={cn("size-[60px] rounded-full border-2")}
+              className={cn(
+                "size-[60px] rounded-full border-2 border-foreground",
+              )}
             />
           </div>
 
           <div className="col-start-2 row-start-1 flex items-center">
             <p className="mb-1 text-balance pr-1 text-base font-semibold">
-              {event?.name}
+              {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
@@ -243,7 +259,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 className={cn("size-[60px] rounded-full border-2 xl:hidden")}
               />
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{event?.name}</span>
+                <span className="text-xl font-bold">
+                  {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
+                </span>
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 

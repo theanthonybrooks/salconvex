@@ -18,7 +18,9 @@ import { toast } from "react-toastify";
 import {
   eventDetailsSchema,
   eventOnlySchema,
+  eventSubmitSchema,
   eventWithOCSchema,
+  orgDetailsSchema,
   step1Schema,
 } from "@/features/organizers/schemas/event-add-schema";
 
@@ -26,6 +28,7 @@ import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormDatePicker } from "@/components/ui/form-date-pickers";
 import { FormLinksInput } from "@/components/ui/form-links-inputs";
+import { Input } from "@/components/ui/input";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -83,6 +86,12 @@ const steps = [
   {
     id: 6,
     label: "Organizer Details",
+    schema: orgDetailsSchema,
+  },
+  {
+    id: 7,
+    label: "Recap",
+    schema: eventSubmitSchema,
   },
 ];
 
@@ -148,7 +157,7 @@ export const EventOCForm = ({
     setError,
     // trigger,
     // setValue,
-    handleSubmit: handleSubmit,
+    handleSubmit,
     formState: {
       // isValid,
       dirtyFields,
@@ -161,6 +170,7 @@ export const EventOCForm = ({
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+  const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
   const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
@@ -216,10 +226,10 @@ export const EventOCForm = ({
   const orgData = watch("organization");
   const eventData = watch("event");
   const openCallData = watch("openCall");
-  const eventDatesWatch = watch("event.dates");
+  // const eventDatesWatch = watch("event.dates");
   const orgName = orgData?.name ?? "";
   const hasOpenCall = eventData?.hasOpenCall ?? "";
-
+  const hasOC = eventData?.hasOpenCall === "true";
   const eventName = eventData?.name ?? "";
   const clearEventDataTrigger =
     newOrgEvent && activeStep === 0 && furthestStep > 0 && eventData;
@@ -301,13 +311,20 @@ export const EventOCForm = ({
   //     orgData?.logo !== existingOrg?.logo ||
   //     orgData?.location?.full !== existingOrg?.location?.full);
 
-  const hasUserEditedStep0 = JSON.stringify(
-    dirtyFields?.organization ?? {},
-  ).includes("true");
+  const hasUserEditedStep0 =
+    JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
+    activeStep === 0;
+  const hasUserEditedStep5 =
+    JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
+    activeStep === 5;
   const hasUserEditedEventSteps = JSON.stringify(
     dirtyFields?.event ?? {},
   ).includes("true");
-  const hasUserEditedForm = !!(hasUserEditedEventSteps || hasUserEditedStep0);
+  const hasUserEditedForm = !!(
+    hasUserEditedEventSteps ||
+    hasUserEditedStep0 ||
+    hasUserEditedStep5
+  );
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
 
@@ -435,25 +452,38 @@ export const EventOCForm = ({
     setActiveStep(0);
   };
 
-  const onSubmit = async (data: EventOCFormValues) => {
+  const onSubmit = async (data: EventOCFormValues, paid: boolean) => {
     //todo: insert some validation that checks for blob images (new submissions) or existing images (edits). Edits shouldn't submit anything to the db if the logo is the same. Only blobs, which I'm assuming that I would use typeof to check for.
     // if (typeof data.organization.logo === "string") {
     //   console.log("Logo is an existing image URL:", data.organization.logo);
     // } else {
     //   console.log("Logo is a new Blob upload:", data.organization.logo);
     // }
-
+    console.log(paid);
     console.log("data", data);
     try {
       // console.log("organizer mode)");
-      reset();
-      toast.success("Successfully updated profile! Forwarding to Stripe...", {
-        onClick: () => toast.dismiss(), // dismisses the current toast
-      });
+      setValue("event.state", "submitted");
+      await handleSave(true);
+      toast.success(
+        hasOC
+          ? "Successfully updated profile! Forwarding to Stripe..."
+          : "Successfully submitted event!",
+        {
+          onClick: () => toast.dismiss(), // dismisses the current toast
+        },
+      );
 
-      setTimeout(() => {
-        // onClick()
-      }, 2000);
+      if (paid) {
+        setTimeout(() => {
+          onClick();
+          // onClick()
+        }, 2000);
+      } else {
+        //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
+        // handleReset();
+        setOpen(false);
+      }
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
@@ -481,8 +511,13 @@ export const EventOCForm = ({
     // } else {
     if (activeStep === 2 && hasOpenCall === "false") {
       setActiveStep((prev) => prev + 3);
+      setValue("event.state", "draft");
     } else {
       setActiveStep((prev) => prev + 1);
+    }
+
+    if (activeStep === 5 && hasOpenCall === "false") {
+      console.log("stepping up");
     }
 
     // }
@@ -812,6 +847,86 @@ export const EventOCForm = ({
       if (activeStep === 2) {
         console.log("saving step 2");
       }
+      if (activeStep === steps.length - 2) {
+        console.log("saving org details");
+
+        try {
+          setPending(true);
+          console.log("orgData presave", orgData);
+
+          const result = await updateOrg({
+            orgId: orgData._id as Id<"organizations">,
+            name: orgData.name,
+            slug: slugify(orgData.name),
+            logo: orgData.logo as string,
+            location: {
+              ...orgData.location,
+            },
+            contact: {
+              organizer: orgData.contact?.organizer,
+              primaryContact: orgData.contact?.primaryContact || "",
+            },
+            about: orgData.about,
+            links: orgData.links,
+          });
+
+          //TODO: Add logic to update form data with resulting data (if it's necessary?)
+
+          if (!result) {
+            toast.error("Failed to update organization");
+            setPending(false);
+            return;
+          }
+
+          reset({
+            ...currentValues,
+            organization: {
+              ...result.org,
+            },
+          });
+
+          console.log("result", result);
+
+          setPending(false);
+        } catch (error) {
+          console.error("Failed to submit event:", error);
+          toast.error("Failed to submit event");
+        }
+      }
+      if (activeStep === steps.length - 1) {
+        console.log("saving final step");
+
+        try {
+          setPending(true);
+
+          await createOrUpdateEvent({
+            _id: eventData._id || "",
+            name: eventData.name,
+            slug: slugify(eventData.name),
+            logo: eventData.logo as string,
+            type: eventData.type || [],
+            category: eventData.category,
+            dates: {
+              ...eventData.dates,
+            },
+            location: {
+              ...eventData.location,
+            },
+            about: eventData.about,
+            links: eventData.links,
+            otherInfo: eventData.otherInfo || undefined,
+            active: eventData.active,
+
+            finalStep: true,
+            orgId: orgData._id as Id<"organizations">,
+          });
+
+          setPending(false);
+        } catch (error) {
+          console.error("Failed to submit event:", error);
+          toast.error("Failed to submit event");
+        }
+      }
     },
     [
       hasUserEditedStep0,
@@ -826,6 +941,7 @@ export const EventOCForm = ({
       furthestStep,
       hasUserEditedEventSteps,
       eventData,
+      updateOrg,
       createOrUpdateEvent,
       existingEvent,
       currentValues,
@@ -856,9 +972,9 @@ export const EventOCForm = ({
 
   // -------------UseEffects --------------
 
-  useEffect(() => {
-    console.log("form valid:", isValid, "step valid:", isStepValidZod);
-  }, [isValid, isStepValidZod]);
+  // useEffect(() => {
+  //   console.log("form valid:", isValid, "step valid:", isStepValidZod);
+  // }, [isValid, isStepValidZod]);
 
   useEffect(() => {
     console.log("active step: ", activeStep);
@@ -867,7 +983,7 @@ export const EventOCForm = ({
   useEffect(() => {
     if (orgData?.name !== undefined && orgData?.name !== "") {
       console.log("orgData", getValues("organization"));
-      console.log("org", existingOrg);
+      // console.log("org", existingOrg);
     }
   }, [orgData, existingOrg, getValues]);
 
@@ -877,13 +993,13 @@ export const EventOCForm = ({
 
   useEffect(() => {
     console.log("eventData", eventData);
-    console.log("existingEvent", existingEvent);
+    // console.log("existingEvent", existingEvent);
   }, [eventData, existingEvent]);
 
-  useEffect(() => {
-    if (!eventDatesWatch) return;
-    console.log("event dates", eventDatesWatch);
-  }, [eventDatesWatch]);
+  // useEffect(() => {
+  //   if (!eventDatesWatch) return;
+  //   console.log("event dates", eventDatesWatch);
+  // }, [eventDatesWatch]);
 
   useEffect(() => {
     console.log("oc", openCallData);
@@ -896,10 +1012,12 @@ export const EventOCForm = ({
       existingOrg &&
       typeof existingOrg._id === "string" &&
       existingOrg._id.length > 0;
+    console.log("existingOrg", existingOrg);
 
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
     if (orgChanged) {
+      console.log("resetting");
       reset({
         organization: {
           ...existingOrg,
@@ -929,11 +1047,11 @@ export const EventOCForm = ({
       } else if (existingEvent?._creationTime) {
         setLastSaved(existingEvent._creationTime);
       }
+      console.log("resetting event");
       reset({
         ...currentValues,
         event: {
           ...existingEvent,
-          //TODO: COME BACK TO ME IN A SEC
         },
       });
       prevEventRef.current = existingEvent;
@@ -1138,7 +1256,7 @@ export const EventOCForm = ({
       skipped={skipped}
       className="px-2 xl:px-8"
       finalLabel="Submit"
-      onFinalSubmit={handleSubmit(onSubmit)}
+      onFinalSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
       isDirty={hasUserEditedForm}
       onSave={() => handleSave(true)}
       lastSaved={lastSavedDate}
@@ -1159,7 +1277,7 @@ export const EventOCForm = ({
     >
       <FormProvider {...form}>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
           className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px]"
         >
           {activeStep === 0 && (
@@ -1748,8 +1866,163 @@ export const EventOCForm = ({
             </div>
           )}
           {activeStep === 3 && (
-            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Final Step</p>
+            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Open Call</p>
           )}
+          {activeStep === 4 && (
+            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Budget</p>
+          )}
+          {activeStep === steps.length - 2 && (
+            <>
+              <div
+                id="step-2-container"
+                className={cn(
+                  "flex h-full flex-col gap-4 xl:justify-center",
+                  "mx-auto max-w-max",
+                  "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
+                )}
+              >
+                <div
+                  className={cn(
+                    "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                    "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                    "lg:pb-10 xl:py-10 4xl:my-auto",
+
+                    // "xl:self-center",
+                  )}
+                >
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">Step 1:</p>
+                    <p className="lg:text-xs">Organizer Links</p>
+                  </div>
+
+                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <Label htmlFor="event.category" className="sr-only">
+                      Organizer Links
+                    </Label>
+
+                    <FormLinksInput type="organization" />
+
+                    {errors.event?.category && eventData?.category && (
+                      <span className="mt-2 w-full text-center text-sm text-red-600">
+                        {errors.event?.category?.message
+                          ? errors.event?.category?.message
+                          : "Please select a category from the dropdown"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {hasEventLocation && (
+                  <>
+                    <Separator
+                      thickness={2}
+                      className="mx-auto hidden xl:block"
+                      orientation="vertical"
+                    />
+
+                    <div
+                      className={cn(
+                        "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                        "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                        "lg:pt-10 xl:py-10 4xl:my-auto",
+                        // "xl:self-center",
+                      )}
+                    >
+                      {canNameEvent && (
+                        <>
+                          <div className="input-section">
+                            <p className="min-w-max font-bold lg:text-xl">
+                              Step 2
+                            </p>
+                            <p className="lg:text-xs">Change Me</p>
+                          </div>
+                          <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                            <Label
+                              htmlFor="event.hasOpenCall"
+                              className="sr-only"
+                            >
+                              Change Me //TODO: change this
+                            </Label>
+                            <Controller
+                              name="organization.contact.organizer"
+                              control={control}
+                              render={({ field }) => (
+                                <Input
+                                  id="event.location"
+                                  value={field.value || ""}
+                                  onChange={field.onChange}
+                                  tabIndex={2}
+                                  placeholder="Organizer (Name - Optional)"
+                                  className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
+                                />
+                              )}
+                            />
+                            {errors.event?.hasOpenCall && (
+                              <span className="mt-2 w-full text-center text-sm text-red-600">
+                                {errors.event?.hasOpenCall?.message}
+                              </span>
+                            )}
+                          </div>
+                          <div className="input-section h-full">
+                            <p className="min-w-max font-bold lg:text-xl">
+                              Step 3:
+                            </p>
+                            <p className="lg:text-xs">About</p>
+                          </div>
+
+                          <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                            <Label
+                              htmlFor="organization.about"
+                              className="sr-only"
+                            >
+                              Organizer - About
+                            </Label>
+
+                            <Controller
+                              name="organization.about"
+                              control={control}
+                              render={({ field }) => (
+                                <RichTextEditor
+                                  value={field.value ?? ""}
+                                  onChange={field.onChange}
+                                  placeholder="Add any other info about your project/event... (limit 500 characters)"
+                                  charLimit={500}
+                                />
+                              )}
+                            />
+                            <span className="w-full text-center text-xs italic text-muted-foreground">
+                              (Formatting is for preview and won&apos;t exactly
+                              match the public version)
+                            </span>
+
+                            {(errors.event?.name || eventNameExistsError) &&
+                              eventNameIsDirty && (
+                                <span className="mt-2 w-full text-center text-sm text-red-600">
+                                  {errors.event?.name?.message
+                                    ? errors.event?.name?.message
+                                    : category === "event"
+                                      ? "An event with that name already exists."
+                                      : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                                </span>
+                              )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+          {activeStep === steps.length - 1 && (
+            <>
+              <pre className="whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm">
+                {JSON.stringify(getValues(), null, 2)}
+              </pre>
+            </>
+          )}
+          {/* {activeStep === 6 && (
+            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Recap</p>
+          )} */}
         </form>
       </FormProvider>
     </HorizontalLinearStepper>

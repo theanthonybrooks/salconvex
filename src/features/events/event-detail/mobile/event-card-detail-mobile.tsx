@@ -145,7 +145,10 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
 
         <div className="flex flex-col justify-between gap-y-3 pb-3 pr-3 pt-3">
           <div className="flex flex-col gap-y-1">
-            <p className="mb-1 text-base font-semibold">{event?.name}</p>
+            <p className="mb-1 text-base font-semibold">
+              {" "}
+              {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
+            </p>
 
             <p className="inline-flex items-end gap-x-1 text-sm">
               {locationString}

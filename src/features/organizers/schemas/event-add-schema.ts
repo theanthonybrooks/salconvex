@@ -1,4 +1,8 @@
-import { eventCategoryValues, eventTypeValues } from "@/types/event";
+import {
+  eventCategoryValues,
+  eventStates,
+  eventTypeValues,
+} from "@/types/event";
 import { z } from "zod";
 
 const locationBase = z.object({
@@ -138,6 +142,11 @@ const linksSchemaStrict = z.object({
     }),
 });
 
+const contactSchema = z.object({
+  organizer: z.optional(z.string()),
+  primaryContact: z.string(),
+});
+
 const organizationSchema = z.object({
   _id: z.optional(z.string()),
   name: z
@@ -152,6 +161,9 @@ const organizationSchema = z.object({
     z.string().min(1, "Logo is required"),
   ]),
   location: locationSchema,
+  about: z.optional(z.string()),
+  contact: contactSchema.optional(),
+  links: linksSchemaStrict.optional(),
 });
 
 export const eventBase = z.object({
@@ -349,6 +361,29 @@ export const step1Schema = z.object({
   organization: organizationSchema,
 });
 
+export const orgDetailsSchema = z
+  .object({
+    organization: organizationSchema.extend({
+      contact: z.object({
+        organizer: z.optional(z.string()),
+        primaryContact: z.string().min(3, "Primary Contact is required"),
+      }),
+      links: linksSchemaStrict,
+      about: z.optional(z.string()),
+    }),
+  })
+  .superRefine((data, ctx) => {
+    const email = data.organization.links?.email;
+
+    if (!email || email.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Email is required",
+        path: ["organization", "links", "email"],
+      });
+    }
+  });
+
 export const eventOnlySchema = z.object({
   organization: organizationSchema,
   event: eventSchema,
@@ -362,8 +397,28 @@ export const eventDetailsSchema = z.object({
   }),
 });
 
-export const eventWithOCSchema = z.object({
+export const eventWithOCSchema = z
+  .object({
+    organization: organizationSchema,
+    event: eventBase.extend({
+      state: z.enum(eventStates),
+    }),
+    openCall: openCallSchema.optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.event.hasOpenCall === "true" && !data.openCall) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Open Call details are required when 'hasOpenCall' is true.",
+        path: ["openCall"],
+      });
+    }
+  });
+
+export const eventSubmitSchema = z.object({
   organization: organizationSchema,
-  event: eventSchema,
-  openCall: openCallSchema,
+  event: eventBase.extend({
+    links: linksSchemaStrict,
+    state: z.enum(eventStates),
+  }),
 });

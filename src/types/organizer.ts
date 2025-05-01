@@ -36,12 +36,7 @@ export type Organizer = {
   about?: string;
   contact: {
     organizer?: string;
-    primaryContact: {
-      email?: string;
-      phone?: string;
-      href?: string;
-      social?: string;
-    };
+    primaryContact: string;
   };
   links: {
     website?: string;

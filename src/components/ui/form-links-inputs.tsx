@@ -67,14 +67,15 @@ export const FormLinksInput = ({
   const isEvent = type === "event";
   const isOrg = type === "organization";
   const eventData = watch("event");
+  const organization = watch("organization");
+  const primaryField = watch("organization.contact.primaryContact");
   const eventSameAsOrg = eventData?.links?.sameAsOrganizer;
   const eventCountry = eventData?.location?.countryAbbr;
-  const primaryField = watch("organization.links.primaryContact");
 
   return (
     <>
       <div className={cn("flex flex-col gap-y-2")}>
-        {existingOrgHasLinks && isEvent && (
+        {(existingOrgHasLinks || eventSameAsOrg) && isEvent && (
           <Controller
             name="event.links.sameAsOrganizer"
             control={control}
@@ -104,7 +105,7 @@ export const FormLinksInput = ({
         )}
         {/* Static fields */}
         <Controller
-          name="organization.links.primaryContact"
+          name="organization.contact.primaryContact"
           control={control}
           render={({ field: primaryFieldControl }) => (
             <div className="flex items-center gap-x-2">
@@ -115,15 +116,17 @@ export const FormLinksInput = ({
                 )}
               />
               <Controller
-                name="event.links.website"
+                name={`${type}.links.website`}
                 control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
-                    disabled={eventSameAsOrg}
+                    disabled={eventSameAsOrg && isEvent}
                     value={field.value ?? ""}
                     onChange={(e) => field.onChange(autoHttps(e.target.value))}
-                    placeholder="event website"
+                    placeholder={
+                      isEvent ? "event website" : "organization website"
+                    }
                     className="w-full"
                   />
                 )}
@@ -131,6 +134,7 @@ export const FormLinksInput = ({
               {isOrg && (
                 <Input
                   type="radio"
+                  disabled={!organization?.links?.website}
                   name="primaryContact"
                   value="website"
                   checked={primaryField === "website"}
@@ -142,7 +146,7 @@ export const FormLinksInput = ({
         />
 
         <Controller
-          name="organization.links.primaryContact"
+          name="organization.contact.primaryContact"
           control={control}
           render={({ field: primaryFieldControl }) => (
             <div className="flex items-center gap-2">
@@ -153,12 +157,12 @@ export const FormLinksInput = ({
                 )}
               />
               <Controller
-                name="event.links.email"
+                name={`${type}.links.email`}
                 control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
-                    disabled={eventSameAsOrg}
+                    disabled={eventSameAsOrg && isEvent}
                     value={field.value ?? ""}
                     placeholder="example@email.com"
                     className="w-full"
@@ -168,6 +172,7 @@ export const FormLinksInput = ({
               {isOrg && (
                 <Input
                   type="radio"
+                  disabled={!organization?.links?.email}
                   name="primaryContact"
                   value="email"
                   checked={primaryField === "email"}
@@ -179,7 +184,7 @@ export const FormLinksInput = ({
         />
 
         <Controller
-          name="organization.links.primaryContact"
+          name="organization.contact.primaryContact"
           control={control}
           render={({ field: primaryFieldControl }) => (
             <div className="flex items-center gap-x-2">
@@ -190,12 +195,12 @@ export const FormLinksInput = ({
                 )}
               />
               <Controller
-                name="event.links.phone"
+                name={`${type}.links.phone`}
                 control={control}
                 render={({ field }) => (
                   <PhoneInput
                     {...field}
-                    disabled={eventSameAsOrg}
+                    disabled={eventSameAsOrg && isEvent}
                     international
                     defaultCountry={eventCountry || "US"}
                     value={field.value ?? ""}
@@ -208,6 +213,7 @@ export const FormLinksInput = ({
               {isOrg && (
                 <Input
                   type="radio"
+                  disabled={!organization?.links?.phone}
                   name="primaryContact"
                   value="phone"
                   checked={primaryField === "phone"}
@@ -226,7 +232,7 @@ export const FormLinksInput = ({
               render={({ field }) => (
                 <Input
                   {...field}
-                  disabled={eventSameAsOrg}
+                  disabled={eventSameAsOrg && isEvent}
                   value={field.value ?? ""}
                   placeholder="linktree (or similar)"
                   className="w-full"
@@ -237,7 +243,7 @@ export const FormLinksInput = ({
           </div>
         )}
         <Controller
-          name="organization.links.primaryContact"
+          name="organization.contact.primaryContact"
           control={control}
           render={({ field: primaryFieldControl }) => (
             <>
@@ -254,7 +260,7 @@ export const FormLinksInput = ({
                     platform={platform}
                     icon={icon}
                     placeholder={placeholder}
-                    disabled={eventSameAsOrg}
+                    disabled={eventSameAsOrg && isEvent}
                     isOrg={isOrg}
                     primaryField={primaryField}
                     onPrimaryChange={primaryFieldControl.onChange}
@@ -268,12 +274,12 @@ export const FormLinksInput = ({
           <div className="flex items-center gap-x-2">
             <FaLink className={cn("size-5 shrink-0")} />
             <Controller
-              name="event.links.linkAggregate"
+              name="organization.links.linkAggregate"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  disabled={eventSameAsOrg}
+                  disabled={eventSameAsOrg && isEvent}
                   value={field.value ?? ""}
                   placeholder="linktree (or similar)"
                   className="w-full"
@@ -286,12 +292,12 @@ export const FormLinksInput = ({
         <div className="flex items-center gap-x-2">
           <FaPlus className={cn("size-5 shrink-0")} />
           <Controller
-            name="event.links.other"
+            name={`${type}.links.other`}
             control={control}
             render={({ field }) => (
               <Input
                 {...field}
-                disabled={eventSameAsOrg}
+                disabled={eventSameAsOrg && isEvent}
                 value={field.value ?? ""}
                 placeholder="any other link not listed above"
                 className="w-full"
@@ -373,6 +379,7 @@ function HandleInput({
       {isOrg && fieldKey && (
         <Input
           type="radio"
+          disabled={!watched?.trim()}
           name="primaryContact"
           value={fieldKey}
           checked={primaryField === fieldKey}

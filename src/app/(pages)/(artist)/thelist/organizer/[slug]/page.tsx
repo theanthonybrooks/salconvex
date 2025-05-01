@@ -18,8 +18,6 @@ const Event = () => {
     slugValue ? { slug: slugValue } : "skip",
   );
 
-  console.log(data);
-
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
   const artist = artistData?.artist;

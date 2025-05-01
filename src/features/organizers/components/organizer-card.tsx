@@ -1,4 +1,6 @@
 import { Card } from "@/components/ui/card";
+import { formatDisplayUrl } from "@/lib/linkFns";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import { Organizer } from "@/types/organizer";
 import { Globe, Phone } from "lucide-react";
@@ -6,12 +8,14 @@ import Image from "next/image";
 import {
   FaEnvelope,
   FaFacebook,
+  FaFacebookF,
   FaInstagram,
   FaLink,
   FaThreads,
   FaVk,
 } from "react-icons/fa6";
 import { TiArrowRight } from "react-icons/ti";
+import { formatPhoneNumberIntl } from "react-phone-number-input";
 import slugify from "slugify";
 
 interface OrganizerCardProps {
@@ -27,8 +31,14 @@ export const OrganizerCard = ({
 }: OrganizerCardProps) => {
   const orgLocationString = `${
     organizer.location.locale ? `${organizer.location.locale}, ` : ""
-  }${organizer.location.city}, ${
-    organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
+  }${organizer.location.city ? organizer.location.city + "," : ""} ${
+    organizer.location.city && organizer.location.stateAbbr
+      ? organizer.location.stateAbbr + ", "
+      : ""
+  }${
+    !organizer.location.city && organizer.location.state
+      ? organizer.location.state + ", "
+      : ""
   }${
     organizer.location.countryAbbr === "UK" ||
     organizer.location.countryAbbr === "USA" ||
@@ -40,6 +50,8 @@ export const OrganizerCard = ({
   const orgSlug = slugify(organizer.name);
   const isMobile = format === "mobile";
   const orgPage = srcPage === "organizer";
+
+  const primaryContact = organizer?.contact?.primaryContact;
 
   return (
     <>
@@ -62,7 +74,10 @@ export const OrganizerCard = ({
             {organizer.about && (
               <section>
                 <p className="text-sm font-semibold">About the Organization:</p>
-                <p className="line-clamp-4 text-sm">{organizer.about}</p>
+                <RichTextDisplay
+                  html={organizer.about}
+                  className="line-clamp-4 text-sm"
+                />
               </section>
             )}
             <section className="flex flex-col gap-y-2">
@@ -77,29 +92,53 @@ export const OrganizerCard = ({
               <span>
                 <p className="text-sm font-semibold">Main Contact:</p>
                 <div className="flex items-center gap-x-2">
-                  {organizer.contact.primaryContact.email ? (
+                  {primaryContact === "email" ? (
                     <FaEnvelope />
-                  ) : organizer.contact.primaryContact.phone ? (
+                  ) : primaryContact === "phone" ? (
                     <Phone />
+                  ) : primaryContact === "facebook" ? (
+                    <FaFacebookF />
+                  ) : primaryContact === "instagram" ? (
+                    <FaInstagram />
+                  ) : primaryContact === "threads" ? (
+                    <FaThreads />
+                  ) : primaryContact === "vk" ? (
+                    <FaVk />
                   ) : (
                     <Globe />
                   )}
 
                   <a
                     href={
-                      organizer.contact.primaryContact.email
-                        ? `mailto:${organizer.contact.primaryContact.email}`
-                        : organizer.contact.primaryContact.href
-                          ? organizer.contact.primaryContact.href
-                          : `tel:${organizer.contact.primaryContact.phone}`
+                      primaryContact === "email"
+                        ? `mailto:${organizer.links.email}`
+                        : primaryContact === "website"
+                          ? organizer.links.website
+                          : primaryContact === "phone"
+                            ? `tel:${organizer.links.phone}`
+                            : primaryContact === "facebook"
+                              ? organizer.links.facebook
+                              : primaryContact === "instagram"
+                                ? organizer.links.instagram
+                                : primaryContact === "threads"
+                                  ? organizer.links.threads
+                                  : organizer.links.vk
                     }
                     className="line-clamp-4 text-sm underline-offset-2 hover:underline"
                   >
-                    {organizer.contact.primaryContact.phone
-                      ? organizer.contact.primaryContact.phone
-                      : organizer.contact.primaryContact.href
-                        ? organizer.contact.primaryContact.href
-                        : organizer.contact.primaryContact.email}
+                    {primaryContact === "phone"
+                      ? formatPhoneNumberIntl(organizer.links.phone as string)
+                      : primaryContact === "website"
+                        ? formatDisplayUrl(organizer.links.website as string)
+                        : primaryContact === "email"
+                          ? organizer.links.email
+                          : primaryContact === "facebook"
+                            ? organizer.links.facebook
+                            : primaryContact === "instagram"
+                              ? organizer.links.instagram
+                              : primaryContact === "threads"
+                                ? organizer.links.threads
+                                : organizer.links.vk}
                   </a>
                 </div>
               </span>
@@ -227,7 +266,7 @@ export const OrganizerCard = ({
                 )}
                 <span>
                   <p className="text-sm font-semibold">Main Contact:</p>
-                  <div className="flex items-center gap-x-2">
+                  {/* <div className="flex items-center gap-x-2">
                     {organizer.contact.primaryContact.email ? (
                       <FaEnvelope />
                     ) : organizer.contact.primaryContact.phone ? (
@@ -251,6 +290,56 @@ export const OrganizerCard = ({
                         : organizer.contact.primaryContact.href
                           ? organizer.contact.primaryContact.href
                           : organizer.contact.primaryContact.email}
+                    </a>
+                  </div> */}
+                  <div className="flex items-center gap-x-2">
+                    {primaryContact === "email" ? (
+                      <FaEnvelope />
+                    ) : primaryContact === "phone" ? (
+                      <Phone />
+                    ) : primaryContact === "facebook" ? (
+                      <FaFacebookF />
+                    ) : primaryContact === "instagram" ? (
+                      <FaInstagram />
+                    ) : primaryContact === "threads" ? (
+                      <FaThreads />
+                    ) : primaryContact === "vk" ? (
+                      <FaVk />
+                    ) : (
+                      <Globe />
+                    )}
+
+                    <a
+                      href={
+                        primaryContact === "email"
+                          ? `mailto:${organizer.links.email}`
+                          : primaryContact === "website"
+                            ? organizer.links.website
+                            : primaryContact === "phone"
+                              ? `tel:${organizer.links.phone}`
+                              : primaryContact === "facebook"
+                                ? organizer.links.facebook
+                                : primaryContact === "instagram"
+                                  ? organizer.links.instagram
+                                  : primaryContact === "threads"
+                                    ? organizer.links.threads
+                                    : organizer.links.vk
+                      }
+                      className="line-clamp-4 text-sm underline-offset-2 hover:underline"
+                    >
+                      {primaryContact === "phone"
+                        ? formatPhoneNumberIntl(organizer.links.phone as string)
+                        : primaryContact === "website"
+                          ? formatDisplayUrl(organizer.links.website as string)
+                          : primaryContact === "email"
+                            ? organizer.links.email
+                            : primaryContact === "facebook"
+                              ? organizer.links.facebook
+                              : primaryContact === "instagram"
+                                ? organizer.links.instagram
+                                : primaryContact === "threads"
+                                  ? organizer.links.threads
+                                  : organizer.links.vk}
                     </a>
                   </div>
                 </span>
@@ -322,7 +411,8 @@ export const OrganizerCard = ({
             {organizer.about && (
               <span>
                 <p className="text-sm font-semibold">About the Organization:</p>
-                <p className="line-clamp-4 text-sm">{organizer.about}</p>
+
+                <RichTextDisplay html={organizer.about} className="text-sm" />
               </span>
             )}
             {orgHasOtherEvents && !orgPage && (

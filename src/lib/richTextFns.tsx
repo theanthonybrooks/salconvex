@@ -1,13 +1,15 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ALLOWED_ATTR, ALLOWED_TAGS } from "@/components/ui/rich-text-editor";
+import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import parse, { DOMNode, domToReact, Element } from "html-react-parser";
 
 interface RichTextDisplayProps {
   html: string;
+  className?: string;
 }
 
-export const RichTextDisplay = ({ html }: RichTextDisplayProps) => {
+export const RichTextDisplay = ({ html, className }: RichTextDisplayProps) => {
   const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [...ALLOWED_TAGS, "input"],
     ALLOWED_ATTR: [
@@ -22,7 +24,7 @@ export const RichTextDisplay = ({ html }: RichTextDisplayProps) => {
   const normalized = clean.replace(/<p>\s*<\/p>/g, "<br>");
 
   return (
-    <span className="rich-text">
+    <span className={cn("rich-text", className)}>
       {parse(normalized, {
         replace: (domNode: DOMNode) => {
           if (
