@@ -210,7 +210,7 @@ export const eventBase = z.object({
   otherInfo: z.string().optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
-  hasOpenCall: z.string(),
+  hasOpenCall: z.string().optional(),
 });
 
 export const eventDetails = eventBase.superRefine((data, ctx) => {
@@ -220,6 +220,13 @@ export const eventDetails = eventBase.superRefine((data, ctx) => {
       code: z.ZodIssueCode.custom,
       message: "Link to the organizer must be provided",
       path: ["links", "website"],
+    });
+  }
+  if (!data.hasOpenCall) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Must answer if there's an open call",
+      path: ["hasOpenCall"],
     });
   }
 });
