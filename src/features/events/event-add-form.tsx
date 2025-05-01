@@ -622,6 +622,7 @@ export const EventOCForm = ({
               links: {
                 sameAsOrganizer: true,
               },
+              hasOpenCall: "false",
             },
           });
           console.log("waffles");
