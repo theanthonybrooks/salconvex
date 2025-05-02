@@ -24,6 +24,7 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
+import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
@@ -71,24 +72,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
       ? countryAbbr
       : country
-  }`;
-
-  const orgLocationString = `${
-    organizer.location.locale ? `${organizer.location.locale}, ` : ""
-  }${organizer.location.city ? organizer.location.city + "," : ""} ${
-    organizer.location.city && organizer.location.stateAbbr
-      ? organizer.location.stateAbbr + ", "
-      : ""
-  }${
-    !organizer.location.city && organizer.location.state
-      ? organizer.location.state + ", "
-      : ""
-  }${
-    organizer.location.countryAbbr === "UK" ||
-    organizer.location.countryAbbr === "USA" ||
-    organizer.location.country === "United States"
-      ? organizer.location.countryAbbr
-      : organizer.location.country
   }`;
 
   const onBookmark = () => {
@@ -216,32 +199,11 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
             <div className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Organized by:</span>
-              <Card
-                className="grid w-full grid-cols-[50px_minmax(0,1fr)] items-center rounded-xl border-1.5 border-foreground/30 bg-white/50 p-2 hover:cursor-pointer"
-                onClick={() => {
-                  window.scrollTo({
-                    top: document.body.scrollHeight * 0.1,
-                    behavior: "smooth",
-                  });
-                  setActiveTab("organizer");
-                }}
-              >
-                <Image
-                  src={organizer.logo}
-                  alt="Event Logo"
-                  width={50}
-                  height={50}
-                  className={cn("size-[40px] rounded-full border-2")}
-                />
-                <div className="col-span-1">
-                  <p className="max-w-[18ch] truncate text-sm font-bold">
-                    {organizer.name}
-                  </p>
-                  <p className="max-w-[18ch] truncate text-xs">
-                    {orgLocationString}
-                  </p>
-                </div>
-              </Card>
+              <OrganizerLogoNameCard
+                setActiveTab={setActiveTab}
+                organizer={organizer}
+                abbr={true}
+              />
             </div>
           </div>
         </div>

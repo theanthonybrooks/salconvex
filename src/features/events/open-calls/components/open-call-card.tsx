@@ -8,20 +8,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 
-import { FaPaintRoller, FaRegCommentDots } from "react-icons/fa6";
-import { IoAirplane } from "react-icons/io5";
-import {
-  PiForkKnifeFill,
-  PiHouseLineFill,
-  PiPencilLineFill,
-} from "react-icons/pi";
-
-import { TbStairs } from "react-icons/tb";
-
 import { OpenCall } from "@/types/openCall";
 
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
+import {
+  OpenCallProvided,
+  OpenCallProvidedPreview,
+} from "@/features/events/open-calls/components/open-call-provided";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
@@ -35,12 +29,7 @@ interface OpenCallCardProps {
 }
 
 const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
-  const {
-    category: eventCategory,
-
-    location,
-    dates,
-  } = event;
+  const { category: eventCategory, _id: id, location, dates } = event;
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
   const { eventDates } = dates;
@@ -58,29 +47,20 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
     details: eligibilityDetails,
   } = eligibility;
   const { budget, categories } = compensation;
-  const {
-    designFee,
-    accommodation,
-    food,
-    travelCosts,
-    materials,
-    equipment,
-    other: otherCat,
-  } = categories;
 
   const {
     min: budgetMin,
     max: budgetMax,
     currency,
     rate: budgetRate,
-
+    moreInfo: budgetMoreInfo,
     allInclusive: allInclusiveBudget,
   } = budget;
 
   const {
     requirements: reqs,
     more: reqsMore,
-    destination: reqsDestination,
+    // destination: reqsDestination, //for email submissions?
     documents: reqsDocs,
     links: reqsLinks,
   } = requirements;
@@ -215,81 +195,12 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     {noBudgetInfo && <p className="text-sm">No Info</p>}
                   </div>
 
-                  <div
-                    id="budget-icons-${id}"
-                    className="col-span-2 flex max-w-full items-center justify-center gap-x-3"
-                  >
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        designFee
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <PiPencilLineFill size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        accommodation
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <PiHouseLineFill size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        food
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <PiForkKnifeFill size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        materials
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <FaPaintRoller size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        travelCosts
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <IoAirplane size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        equipment
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <TbStairs size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        otherCat
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <FaRegCommentDots size={18} />
-                    </span>
-                  </div>
+                  <OpenCallProvidedPreview
+                    id={id}
+                    categories={categories}
+                    noBudgetInfo={noBudgetInfo}
+                    format="mobile"
+                  />
                 </section>
               </AccordionTrigger>
               <AccordionContent>
@@ -325,122 +236,16 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                   <p className="font-semibold underline underline-offset-2">
                     Compensation Includes:
                   </p>
-                  {/* NOTE: How to better display this? It's a bit jarring at the moment
-            when viewing it. */}
-                  <div className="flex flex-col justify-between gap-y-3 pr-[1px]">
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Design Fee:</p>
-                      <p className="text-right">
-                        {designFee && !allInclusive ? (
-                          //todo: format the currency and possibly allow a union of either number or string for these. Then use typeof to determine which display method is used
-                          // formatCurrency(designFee, null, currency)
-                          designFee
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "No Info"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
 
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Accommodation:</p>
-                      <p className="text-right">
-                        {accommodation && !allInclusive ? (
-                          accommodation
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Food:</p>
-                      <p className="text-right">
-                        {food && !allInclusive ? (
-                          food
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Travel Costs:</p>
-                      <p className="text-right">
-                        {travelCosts && !allInclusive ? (
-                          travelCosts
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Materials:</p>
-                      {materials && !allInclusive ? (
-                        materials
-                      ) : (
-                        <span
-                          className={cn(
-                            "italic text-red-500",
-                            noBudgetInfo && "text-muted-foreground",
-                          )}
-                        >
-                          {!allInclusive ? "(not provided)" : "-"}
-                        </span>
-                      )}
-                    </div>
-                    {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Equipment:</p>
-                      <p className="text-right">
-                        {equipment && !allInclusive ? (
-                          equipment
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    {categories && otherCat && (
-                      <div className="flex flex-col items-start justify-between gap-y-2">
-                        <p className="font-medium">Other:</p>
-                        <p>{otherCat && !allInclusive && otherCat}</p>
-                      </div>
-                    )}
-                    {/* <li>Must have liability insurance</li> */
-                    /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
-                  </div>
+                  {/*/~ <li>Must have liability insurance</li> */
+                  /* Note-to-self: this is something that coold/should be later. These sort of requirements~/
+                  </div>*/}
+                  <OpenCallProvided
+                    categories={categories}
+                    allInclusive={allInclusive}
+                    noBudgetInfo={noBudgetInfo}
+                    currency={currency}
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -448,33 +253,26 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
             <AccordionItem value="AppReqs">
               <AccordionTrigger title="Application Requirements" />
               <AccordionContent>
-                <div className="mb-4 flex flex-col space-y-3 pb-3">
-                  <ol className="list-inside list-decimal px-4">
-                    {reqs.map((requirement, index) => (
-                      <li key={index}>{requirement}</li>
-                    ))}
-
-                    {/* <li>Must have liability insurance</li> */
-                    /* TODO: this is something that could/should be later. These sort of requirements*/}
-                  </ol>
-                  <p className="text-sm">
-                    {reqsMore.map((requirement, index) => (
-                      <span key={index} className="mr-1 py-1">
-                        {requirement}
-                      </span>
-                    ))}
-                  </p>
-                  <p className="">
-                    Send applications to
-                    <a
-                      href={`mailto:${reqsDestination}?subject=${event.name} Open Call`}
-                      className="mx-1 underline"
-                    >
-                      {reqsDestination}
-                    </a>
-                    and feel free to reach out with any questions
-                  </p>
+                <div className="flex flex-col space-y-3 p-3">
+                  <RichTextDisplay html={reqs} className="text-sm" />
                 </div>
+                {reqsMore && (
+                  <div className="col-span-full">
+                    <Accordion type="multiple">
+                      <AccordionItem value="reqsMoreInfo">
+                        <AccordionTrigger title="More Info:" className="pb-2" />
+                        <AccordionContent>
+                          <div className="mb-4 flex flex-col space-y-3 pb-3">
+                            <RichTextDisplay
+                              html={reqsMore}
+                              className="text-sm"
+                            />
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                )}
               </AccordionContent>
             </AccordionItem>
 
@@ -644,204 +442,26 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                       All-inclusive budget (no additional compensation)
                     </span>
                   )}
-                  <div
-                    id="budget-icons-${id}"
-                    className="mt-2 flex max-w-full items-center gap-x-3"
-                  >
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        designFee
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <PiPencilLineFill size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        accommodation
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <PiHouseLineFill size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        food
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <PiForkKnifeFill size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        materials
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <FaPaintRoller size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        travelCosts
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <IoAirplane size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        equipment
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <TbStairs size={18} />
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded-full border-1.5 p-1",
-                        otherCat
-                          ? "border-emerald-500 text-emerald-500"
-                          : "border-foreground/20 text-foreground/20",
-                      )}
-                    >
-                      <FaRegCommentDots size={18} />
-                    </span>
-                  </div>
+                  <OpenCallProvidedPreview
+                    id={id}
+                    categories={categories}
+                    noBudgetInfo={noBudgetInfo}
+                  />
                 </div>
                 <div className="flex flex-col gap-y-2">
                   <p className="font-semibold underline underline-offset-2">
                     Compensation Includes:
                   </p>
-                  {/* NOTE: How to better display this? It's a bit jarring at the moment
-              when viewing it. */}
-                  <div className="flex flex-col justify-between gap-y-3 pr-[1px]">
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Design Fee:</p>
-                      <p className="text-right">
-                        {designFee && !allInclusive ? (
-                          //todo: format the currency and possibly allow a union of either number or string for these. Then use typeof to determine which display method is used
-                          // formatCurrency(designFee, null, currency)
-                          designFee
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
 
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Accommodation:</p>
-                      <p className="text-right">
-                        {accommodation && !allInclusive ? (
-                          accommodation
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Food:</p>
-                      <p className="text-right">
-                        {food && !allInclusive ? (
-                          food
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Travel Costs:</p>
-                      <p className="text-right">
-                        {travelCosts && !allInclusive ? (
-                          travelCosts
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Materials:</p>
-                      {materials && !allInclusive ? (
-                        materials
-                      ) : (
-                        <span
-                          className={cn(
-                            "italic text-red-500",
-                            noBudgetInfo && "text-muted-foreground",
-                          )}
-                        >
-                          {!allInclusive ? "(not provided)" : "-"}
-                        </span>
-                      )}
-                    </div>
-                    {/* NOTE: this is a good thought. To add the ability for organizers to just check that it's included in the overall budget so artists don't think it's an additional amount.  */}
-                    <div className="flex items-center justify-between border-b border-dashed border-foreground/20">
-                      <p className="font-medium">Equipment:</p>
-                      <p className="text-right">
-                        {equipment && !allInclusive ? (
-                          equipment
-                        ) : (
-                          <span
-                            className={cn(
-                              "italic text-red-500",
-                              noBudgetInfo && "text-muted-foreground",
-                            )}
-                          >
-                            {!allInclusive ? "(not provided)" : "-"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    {hasCategories && otherCat && (
-                      <div className="flex flex-col items-start justify-between gap-y-2">
-                        <p className="font-medium">Other:</p>
-                        <p>{otherCat && !allInclusive && otherCat}</p>
-                      </div>
-                    )}
-                    {/* <li>Must have liability insurance</li> */
-                    /* Note-to-self: this is something that coold/should be later. These sort of requirements*/}
-                  </div>
+                  <OpenCallProvided
+                    categories={categories}
+                    allInclusive={allInclusive}
+                    noBudgetInfo={noBudgetInfo}
+                    currency={currency}
+                  />
                 </div>
-                {budget?.moreInfo && (
+
+                {budgetMoreInfo && (
                   <div className="col-span-full">
                     <Accordion type="multiple">
                       <AccordionItem value="budgetMoreInfo">
@@ -849,7 +469,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                         <AccordionContent>
                           <div className="mb-4 flex flex-col space-y-3 pb-3">
                             <RichTextDisplay
-                              html={budget.moreInfo}
+                              html={budgetMoreInfo}
                               className="text-sm"
                             />
                           </div>
@@ -868,33 +488,26 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
           >
             <AccordionTrigger title="Application Requirements" />
             <AccordionContent>
-              <div className="mb-4 flex flex-col space-y-3 p-3">
-                <ol className="list-inside list-decimal px-4">
-                  {reqs.map((requirement, index) => (
-                    <li key={index}>{requirement}</li>
-                  ))}
-
-                  {/* <li>Must have liability insurance</li> */
-                  /* TODO: this is something that could/should be later. These sort of requirements*/}
-                </ol>
-                <p className="text-sm">
-                  {reqsMore.map((requirement, index) => (
-                    <span key={index} className="mr-1 py-1">
-                      {requirement}
-                    </span>
-                  ))}
-                </p>
-                <p className="">
-                  Send applications to
-                  <a
-                    href={`mailto:${reqsDestination}?subject=${event.name} Open Call`}
-                    className="mx-1 underline"
-                  >
-                    {reqsDestination}
-                  </a>
-                  and feel free to reach out with any questions
-                </p>
+              <div className="flex flex-col space-y-3 p-3">
+                <RichTextDisplay html={reqs} className="text-sm" />
               </div>
+              {reqsMore && (
+                <div className="col-span-full">
+                  <Accordion type="multiple">
+                    <AccordionItem value="reqsMoreInfo">
+                      <AccordionTrigger title="More Info:" className="pb-2" />
+                      <AccordionContent>
+                        <div className="mb-4 flex flex-col space-y-3 pb-3">
+                          <RichTextDisplay
+                            html={reqsMore}
+                            className="text-sm"
+                          />
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              )}
             </AccordionContent>
           </AccordionItem>
 

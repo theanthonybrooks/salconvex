@@ -7,11 +7,10 @@ import {
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { EventData } from "@/types/event";
 
-import { MapIcon } from "lucide-react";
-
 import { Card } from "@/components/ui/card";
 import { LinkList } from "@/components/ui/link-list";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { FaMapLocationDot } from "react-icons/fa6";
 
 interface LinkProps {
   event: EventData;
@@ -57,7 +56,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
                     className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
                   >
                     Get directions
-                    <MapIcon className="size-5 md:size-4" />
+                    <FaMapLocationDot className="size-5 md:size-4" />
                   </a>
                 </AccordionContent>
               </AccordionItem>
@@ -88,7 +87,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
               <AccordionItem value="item-4">
                 <AccordionTrigger title="Other info:" />
                 <AccordionContent>
-                  <p>{event.otherInfo}</p>
+                  <RichTextDisplay html={event.otherInfo} />
                 </AccordionContent>
               </AccordionItem>
             )}
@@ -115,7 +114,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
                   className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
                 >
                   Get directions
-                  <MapIcon className="size-5 md:size-4" />
+                  <FaMapLocationDot className="size-5 md:size-4" />
                 </a>
               </AccordionContent>
             </AccordionItem>

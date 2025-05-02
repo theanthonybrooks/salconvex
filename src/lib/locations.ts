@@ -1,3 +1,4 @@
+import { Organizer } from "@/types/organizer";
 import rawCountries, { Country } from "world-countries";
 
 export interface MapboxContextItem {
@@ -235,4 +236,26 @@ export async function fetchMapboxSuggestionsFull(
 
   const data = await res.json();
   return data.features as MapboxSuggestion[];
+}
+
+export function getOrganizerLocationString(
+  organizer: Organizer,
+  abbreviated: boolean,
+): string {
+  const { location } = organizer;
+
+  const parts = [
+    !abbreviated && location.locale && `${location.locale}`,
+    location.city && `${location.city}`,
+    location.city && location.stateAbbr && `${location.stateAbbr}`,
+    !location.city && location.state && `${location.state}`,
+
+    location.countryAbbr === "UK" ||
+    location.countryAbbr === "USA" ||
+    location.country === "United States"
+      ? location.countryAbbr
+      : location.country,
+  ];
+
+  return parts.filter(Boolean).join(", ");
 }

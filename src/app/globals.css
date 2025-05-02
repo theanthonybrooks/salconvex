@@ -56,6 +56,8 @@ body,
     --card: 0 0% 100%;
 
     --card-foreground: 222.2 84% 4.9%;
+    --card-secondary: 51, 94%, 90%;
+    --toucan-color: hsl(22, 88%, 54%);
 
     --popover: 0 0% 100%;
 
@@ -535,11 +537,11 @@ a {
   user-select: none;
 } */
 
-button:focus-visible,
+/* button:focus-visible,
 button:focus-within,
 button:active {
   outline: var(--sal-pink) solid 2px;
-}
+} */
 /* 
 :focus-visible {
   &:not(button) {
@@ -705,7 +707,7 @@ button:active {
     border-width: 1.5px 0 0;
     &:before,
     &:after {
-      top: -1px;
+      top: -1.2px;
       border-top: 1.5px solid rgba(0, 0, 0, 0.15);
     }
     &:before {
@@ -717,8 +719,9 @@ button:active {
 
     &:not(.active) {
       & > div {
-        background: var(--background);
+        background: hsl(var(--background));
       }
+
       border-bottom: 1.5px solid rgba(0, 0, 0, 0.15);
       /* &:before,
       &:after {
@@ -736,7 +739,7 @@ button:active {
 /* FullCalendar */
 
 .fc-toolbar {
-  background-color: var(--background);
+  background-color: hsl(var(--background));
   border-bottom: 1px solid var(--border);
   padding-block: 0.5rem;
 }
@@ -1097,7 +1100,7 @@ div:has(> .react-datepicker__input-container) {
     font-weight: 600;
     text-decoration: underline;
   }
-  & * ul,
+  & ul,
   ol {
     &:not([data-type="taskList"]) {
       margin-left: 1.25em;
@@ -1109,10 +1112,10 @@ div:has(> .react-datepicker__input-container) {
     padding-left: 1.25em; */
     list-style-position: outside;
   }
-  & * ul:not([data-type="taskList"]) {
+  & > ul:not([data-type="taskList"]) {
     list-style-type: disc;
   }
-  & * ul:is([data-type="taskList"]) {
+  & > ul:is([data-type="taskList"]) {
     list-style-type: none;
     display: flex;
     flex-direction: column;
@@ -1126,10 +1129,10 @@ div:has(> .react-datepicker__input-container) {
       transform: translateY(0.1rem);
     }
   }
-  & * ol {
+  & ol {
     list-style-type: decimal;
   }
-  & * ul li,
+  & ul li,
   ol li {
     margin-bottom: 0.25rem;
   }
@@ -1140,6 +1143,22 @@ div:has(> .react-datepicker__input-container) {
     &:first-of-type {
       margin-top: 0.25rem;
     }
+  }
+
+  & ul ul {
+    list-style-type: circle;
+  }
+
+  & ul ul ul {
+    list-style-type: square;
+  }
+
+  & ol ol {
+    list-style-type: lower-alpha;
+  }
+
+  & ol ol ol {
+    list-style-type: lower-roman;
   }
 }
 

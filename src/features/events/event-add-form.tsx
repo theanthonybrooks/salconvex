@@ -327,6 +327,7 @@ export const EventOCForm = ({
   );
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
+  console.log(hasUserEditedStep0);
 
   // const orgValidation = useQuery(
   //   api.organizer.organizations.isOwnerOrIsNewOrg,
@@ -335,6 +336,17 @@ export const EventOCForm = ({
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
+
+  console.log(
+    isValid,
+    validOrgWZod,
+    isStepValidZod,
+    eventChoiceMade,
+    hasUserEditedForm,
+    hasUserEditedStep0,
+    hasUserEditedEventSteps,
+    hasUserEditedStep5,
+  );
   const hasErrors = !!errors && Object.keys(errors).length > 0;
   // const existingOrgUpdateTrigger =
   //   hasExistingOrg && validOrgWZod && hasUserEditedStep0;
@@ -758,7 +770,7 @@ export const EventOCForm = ({
         }
       }
       // await handleFormValues();
-      if ((activeStep === 1 || activeStep === 2) && hasUserEditedEventSteps) {
+      if (activeStep === 1 && hasUserEditedEventSteps) {
         const result = await handleFileUrl({
           data: eventData,
           generateUploadUrl,
@@ -845,8 +857,44 @@ export const EventOCForm = ({
           toast.error("Failed to create new event");
         }
       }
-      if (activeStep === 2) {
-        console.log("saving step 2");
+      if (activeStep === 2 && hasUserEditedEventSteps) {
+        try {
+          setPending(true);
+
+          await createOrUpdateEvent({
+            _id: eventData._id || "",
+            name: eventData.name,
+            slug: slugify(eventData.name),
+
+            logo: eventData.logo as string | "1.jpg",
+            type: eventData.type || [],
+            category: eventData.category,
+            dates: {
+              ...eventData.dates,
+            },
+            location: {
+              ...eventData.location,
+            },
+            about: eventData.about,
+            links: eventData.links,
+            otherInfo: eventData.otherInfo || undefined,
+            active: eventData.active,
+            orgId: orgData._id as Id<"organizations">,
+          });
+
+          reset(
+            merge({}, currentValues, {
+              event: {
+                ...eventData,
+              },
+            }),
+          );
+
+          setPending(false);
+        } catch (error) {
+          console.error("Failed to create new event:", error);
+          toast.error("Failed to create new event");
+        }
       }
       if (activeStep === steps.length - 2) {
         console.log("saving org details");
@@ -976,6 +1024,29 @@ export const EventOCForm = ({
   // useEffect(() => {
   //   console.log("form valid:", isValid, "step valid:", isStepValidZod);
   // }, [isValid, isStepValidZod]);
+
+  useEffect(() => {
+    if (!isValid || !hasUserEditedForm || pending) return;
+    console.log("triggered");
+    const interval = setInterval(() => {
+      console.log("checking");
+      const now = Date.now();
+
+      const last =
+        typeof lastSaved === "number"
+          ? lastSaved
+          : new Date(lastSaved ?? 0).getTime();
+      const diffInMs = now - last;
+      console.log(now, last, diffInMs);
+      if (diffInMs >= 60000) {
+        handleSave().then(() => {
+          console.log("Autosaved at", new Date().toLocaleTimeString());
+        });
+      }
+    }, 15000); // check every 15 seconds (adjustable)
+
+    return () => clearInterval(interval);
+  }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave]);
 
   useEffect(() => {
     console.log("active step: ", activeStep);
@@ -1525,7 +1596,9 @@ export const EventOCForm = ({
                               <AvatarUploader
                                 id="event.logo"
                                 onChange={(file) => field.onChange(file)}
-                                onRemove={() => field.onChange(undefined)}
+                                onRemove={() =>
+                                  field.onChange(orgData?.logo ?? "1.jpg")
+                                }
                                 reset={!validOrgWZod}
                                 disabled={!orgNameValid}
                                 initialImage={

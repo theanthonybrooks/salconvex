@@ -327,19 +327,18 @@ const openCallSchema = z.object({
       moreInfo: z.optional(z.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
     }),
     categories: z.object({
-      designFee: z.optional(z.string()),
-      accommodation: z.optional(z.string()),
-      food: z.optional(z.string()),
-      travelCosts: z.optional(z.string()),
-      materials: z.optional(z.string()),
-      equipment: z.optional(z.string()),
-      other: z.optional(z.string()),
+      designFee: z.union([z.number(), z.boolean()]).optional(),
+      accommodation: z.union([z.number(), z.boolean()]).optional(),
+      food: z.union([z.number(), z.boolean()]).optional(),
+      travelCosts: z.union([z.number(), z.boolean()]).optional(),
+      materials: z.union([z.number(), z.boolean()]).optional(),
+      equipment: z.union([z.number(), z.boolean()]).optional(),
     }),
   }),
 
   requirements: z.object({
-    requirements: z.array(z.string()),
-    more: z.array(z.string()),
+    requirements: z.string(),
+    more: z.string(),
     destination: z.string(),
     documents: z.optional(
       z.array(

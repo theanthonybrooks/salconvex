@@ -283,6 +283,7 @@ export const FormLinksInput = ({
                   value={field.value ?? ""}
                   placeholder="linktree (or similar)"
                   className="w-full"
+                  onChange={(e) => field.onChange(autoHttps(e.target.value))}
                 />
               )}
             />

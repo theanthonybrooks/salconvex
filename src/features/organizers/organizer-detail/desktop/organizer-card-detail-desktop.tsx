@@ -45,25 +45,6 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
 
-  // const orgLocationString = `${organizer.location.city}, ${
-  //   organizer.location.stateAbbr ? organizer.location.stateAbbr + ", " : ""
-  // }${
-  //   organizer.location.countryAbbr === "UK" ||
-  //   organizer.location.countryAbbr === "USA" ||
-  //   organizer.location.country === "United States"
-  //     ? organizer.location.countryAbbr
-  //     : organizer.location.country
-  // }`;
-
-  // const onBookmark = () => {
-  //   if (!artist) {
-  //     router.push("/pricing");
-  //   } else {
-  //     // toggleListAction({ bookmarked: !bookmarked });
-  //     //TODO: bookmark organizer functionality
-  //   }
-  // };
-
   const onBackClick = () => {
     const previous = sessionStorage.getItem("previousSalPage");
     if (previous && previous.startsWith("/")) {
@@ -128,36 +109,6 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                 <RichTextDisplay html={organizer.about} />
               </div>
             )}
-
-            {/* <div className="flex flex-col items-start gap-1 text-sm">
-              <span className="font-semibold">Organized by:</span>
-              <Card
-                className="grid w-full grid-cols-[50px_minmax(0,1fr)] items-center rounded-xl border-1.5 border-foreground/30 bg-white/50 p-2 hover:cursor-pointer"
-                onClick={() => {
-                  window.scrollTo({
-                    top: document.body.scrollHeight * 0.1,
-                    behavior: "smooth",
-                  });
-                  setActiveTab("organizer");
-                }}
-              >
-                <Image
-                  src={organizer.logo}
-                  alt="Event Logo"
-                  width={50}
-                  height={50}
-                  className={cn("size-[40px] rounded-full border-2")}
-                />
-                <div className="col-span-1">
-                  <p className="max-w-[18ch] truncate text-sm font-bold">
-                    {organizer.name}
-                  </p>
-                  <p className="max-w-[18ch] truncate text-xs">
-                    {orgLocationString}
-                  </p>
-                </div>
-              </Card>
-            </div> */}
           </div>
         </div>
       </Card>
@@ -185,37 +136,6 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                 </span>
               </div>
             </div>
-            {/* <div className="flex items-center gap-x-4">
-              {bookmarked ? (
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <FaBookmark
-                        className="size-7 cursor-pointer text-red-500"
-                        onClick={onBookmark}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent align="end">
-                      <p>Remove Bookmark</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : (
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <FaRegBookmark
-                        className="size-7 cursor-pointer"
-                        onClick={onBookmark}
-                      />{" "}
-                    </TooltipTrigger>
-                    <TooltipContent align="end">
-                      <p>Bookmark Organization</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div> */}
           </div>
         </div>
         <NavTabs

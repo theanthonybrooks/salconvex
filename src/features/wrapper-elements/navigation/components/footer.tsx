@@ -1,7 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FOOTER_LINKS as footerLinks } from "@/constants/links";
+import {
+  FOOTER_LINKS as footerLinks,
+  SOCIAL_MEDIA_LINKS,
+} from "@/constants/links";
 import { footerCRText } from "@/constants/text";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
@@ -9,8 +12,7 @@ import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaInstagram, FaRegEnvelope } from "react-icons/fa";
-import { FaFacebookF, FaThreads } from "react-icons/fa6";
+import { FaRegEnvelope } from "react-icons/fa";
 import { PiHeartBold } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
 
@@ -140,34 +142,18 @@ export default function Footer({ className }: { className?: string }) {
         <div className="mt-12 border-t border-border pt-4 dark:border-gray-800">
           <div className="flex flex-col items-center justify-between gap-y-2 px-12 md:flex-row">
             <div className="mb-2 flex space-x-6 md:mb-0 md:space-x-3">
-              <Link
-                href="https://facebook.com/thestreetartlist"
-                target="_blank"
-              >
-                <Button variant="icon" size="icon">
-                  <FaFacebookF className="size-7 md:size-5" />
-                </Button>
-              </Link>
-              <Link
-                href="https://instagram.com/thestreetartlist"
-                target="_blank"
-              >
-                <Button variant="icon" size="icon">
-                  <FaInstagram className="size-7 md:size-5" />
-                </Button>
-              </Link>
-              <Link href="https://threads.net/thestreetartlist" target="_blank">
-                <Button variant="icon" size="icon">
-                  <FaThreads className="size-7 md:size-5" />
-                </Button>
-              </Link>
-              {/* <Link href='https://patreon.com/thestreetartlist' target='_blank'>
-                <Button variant='icon' size='icon'>
-                  <FaPatreon className='size-7 md:size-5' />
-                </Button>
-              </Link> */}
+              {SOCIAL_MEDIA_LINKS.filter(
+                ({ label }) => label !== "Patreon",
+              ).map(({ label, icon: Icon, path }) => (
+                <Link href={path} key={label} target="_blank">
+                  <Button variant="icon" size="icon" aria-label={label}>
+                    <Icon className="size-7 md:size-5" />
+                  </Button>
+                </Link>
+              ))}
+
               <Link href="mailto:info@thestreetartlist.com" target="_blank">
-                <Button variant="icon" size="icon">
+                <Button variant="icon" size="icon" aria-label="Email">
                   <FaRegEnvelope className="size-7 md:size-5" />
                 </Button>
               </Link>

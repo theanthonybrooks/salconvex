@@ -27,6 +27,7 @@ import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCall
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 
 import EventDates from "@/features/events/components/event-dates";
+import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { formatOpenCallDeadline, formatSingleDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
@@ -86,7 +87,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       : country
   }`;
 
-  const orgLocationString = `${
+  {
+    /*  const orgLocationString = `${
     organizer.location.locale ? `${organizer.location.locale}, ` : ""
   }${organizer.location.city ? organizer.location.city + "," : ""} ${
     organizer.location.city && organizer.location.stateAbbr
@@ -102,7 +104,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     organizer.location.country === "United States"
       ? organizer.location.countryAbbr
       : organizer.location.country
-  }`;
+  }`;*/
+  }
 
   const onBookmark = () => {
     toggleListAction({ bookmarked: !bookmarked });
@@ -178,7 +181,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               width={60}
               height={60}
               className={cn(
-                "size-[60px] rounded-full border-2",
+                "size-[60px] rounded-full border-2 border-foreground",
 
                 appStatus === "accepted"
                   ? "ring-4 ring-emerald-500 ring-offset-1"
@@ -258,32 +261,11 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             )}
             <div className="flex flex-col items-start gap-1 text-sm">
               <span className="font-semibold">Organized by:</span>
-              <Card
-                className="grid w-full grid-cols-[50px_minmax(0,1fr)] items-center rounded-xl border-1.5 border-foreground/30 bg-white/50 p-2 hover:cursor-pointer"
-                onClick={() => {
-                  window.scrollTo({
-                    top: document.body.scrollHeight * 0.1,
-                    behavior: "smooth",
-                  });
-                  setActiveTab("organizer");
-                }}
-              >
-                <Image
-                  src={organizer.logo}
-                  alt="Event Logo"
-                  width={50}
-                  height={50}
-                  className={cn("size-[40px] rounded-full border-2")}
-                />
-                <div className="col-span-1">
-                  <p className="max-w-[18ch] truncate text-sm font-bold">
-                    {organizer.name}
-                  </p>
-                  <p className="max-w-[18ch] truncate text-xs">
-                    {orgLocationString}
-                  </p>
-                </div>
-              </Card>
+              <OrganizerLogoNameCard
+                setActiveTab={setActiveTab}
+                organizer={organizer}
+                abbr={true}
+              />
             </div>
             <p className="flex items-center gap-1 text-xs">
               Open call posted: {formatSingleDate(openCall._creationTime)}

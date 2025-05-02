@@ -874,9 +874,8 @@ const FullPageNav = ({
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9, duration: 0.4 }}
                   >
-                    <div className="flex items-center space-x-2">
-                      <SocialsRow size={7} />
-                    </div>
+                    <SocialsRow className="size-6" contClassName="gap-8" />
+
                     <div className="flex items-center space-x-1 text-sm">
                       <p className="inline-flex items-center gap-x-1">
                         Made with <PiHeartBold className="size-4" /> by

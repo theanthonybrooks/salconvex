@@ -14,6 +14,7 @@ import {
   ApplyButton,
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn";
+import { OpenCallProvidedPreview } from "@/features/events/open-calls/components/open-call-provided";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
@@ -35,20 +36,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  FaBookmark,
-  FaMapLocationDot,
-  FaPaintRoller,
-  FaRegBookmark,
-  FaRegCommentDots,
-} from "react-icons/fa6";
-import { IoAirplane } from "react-icons/io5";
-import {
-  PiForkKnifeFill,
-  PiHouseLineFill,
-  PiPencilLineFill,
-} from "react-icons/pi";
-import { TbStairs } from "react-icons/tb";
+import { FaBookmark, FaMapLocationDot, FaRegBookmark } from "react-icons/fa6";
 
 export interface EventCardPreviewProps {
   event: CombinedEventPreviewCardData;
@@ -92,6 +80,15 @@ const EventCardPreview = ({
     ? opencall?.eligibility
     : undefined;
   const budget = compensation?.budget;
+  const {
+    min: budgetMin,
+    max: budgetMax,
+    rate: budgetRate,
+  } = budget || {
+    min: 0,
+    max: 0,
+    rate: 0,
+  };
   const categories = compensation?.categories ?? {};
   const noCategories =
     categories === null || Object.keys(categories).length === 0;
@@ -123,11 +120,10 @@ const EventCardPreview = ({
   // console.log("appStatus", appStatus);
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
 
-  const hasBudget = !!(
-    budget &&
-    (budget.min > 0 || (budget.max && budget.max > 0))
-  );
-  const hasRate = !!(budget && budget.rate && budget.rate > 0);
+  const hasBudgetRange = budgetMax && budgetMax > 0;
+  const hasBudget = !!(budgetMin > 0 || hasBudgetRange);
+  const hasRate = !!budgetRate && budgetRate > 0;
+  const noBudgetInfo = !hasBudget && !hasRate;
 
   const isCurrentlyOpen =
     basicInfo && budget && eligibility && event.hasActiveOpenCall;
@@ -425,19 +421,16 @@ const EventCardPreview = ({
                 </Tooltip>
               </TooltipProvider>
             )}
-            {/* TODO: Add publicView check to this as well (when the state is set up) */}
           </div>
           <EventContextMenu
             eventId={event._id}
             openCallId={opencall ? opencall._id : ""}
             isHidden={hidden}
-            // sethidden={sethidden}
             publicView={publicView}
             appStatus={appStatus}
             eventCategory={eventCategory}
             openCallStatus={openCallStatus}
             user={user}
-            // setManualApplied={setManualApplied}
             align="start"
           />
         </div>
@@ -646,176 +639,19 @@ const EventCardPreview = ({
                 )}
               </div>
               {!publicView && (
-                <div
-                  id="budget-icons-${id}"
+                <OpenCallProvidedPreview
+                  id={event._id}
+                  categories={categories}
+                  noBudgetInfo={noBudgetInfo}
+                  format="desktop"
                   className="col-span-2 mt-1 hidden max-w-full items-center justify-start gap-x-3 xl:flex"
-                >
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.designFee && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <PiPencilLineFill size={18} />
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.accommodation && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <PiHouseLineFill size={18} />
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.food && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <PiForkKnifeFill size={18} />
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.materials && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <FaPaintRoller size={18} />
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.travelCosts && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <IoAirplane size={18} />
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.equipment && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <TbStairs size={18} />
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full border-1.5 p-1",
-                      categories.other && !budget.allInclusive
-                        ? "border-emerald-500 text-emerald-500"
-                        : "border-foreground/20 text-foreground/20",
-                    )}
-                  >
-                    <FaRegCommentDots size={18} />
-                  </span>
-                </div>
+                />
               )}
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
             <span className="font-semibold">Event Links:</span>
-            {/*     <div className="flex flex-col gap-y-2">
-              /~TODO: In the future, this should first check if it has sameAsOrganizer checked, and if so, should use the links from the organizer. Otherwise, it should check if there are any links at all. ~/
-              {(Object.keys(event.links || {}).length === 0 ||
-                (Object.keys(event.links || {}).length === 1 &&
-                  event.links?.sameAsOrganizer === true)) && (
-                <div className="flex items-center gap-x-2">
-                  <Info className="size-5" />
-                  <span className="underline-offset-2 hover:underline">
-                    No links found
-                  </span>
-                </div>
-              )}
-              {event.links?.email && (
-                <a href={`mailto:${event.links.email}?subject=${event.name}`}>
-                  <div className="flex items-center gap-x-2">
-                    <FaEnvelope className="size-5" />
-                    <span className="underline-offset-2 hover:underline">
-                      {event.links.email}
-                    </span>
-                  </div>
-                </a>
-              )}
-              {event.links?.website && (
-                <a href={event.links.website}>
-                  <div className="flex items-center gap-x-2">
-                    <FaGlobe className="size-5" />
-                    <span className="underline-offset-2 hover:underline">
-                      {event.links.website.split("www.").slice(-1)[0]}
-                    </span>
-                  </div>
-                </a>
-              )}
-
-              /~ {event.links?.phone && (
-                <a href={`tel:${event.links.phone}`}>
-                  <div className="flex items-center gap-x-2">
-                    <Phone className="size-5" />
-
-                    <span className="underline-offset-2 hover:underline">
-                      {event.links.phone}
-                    </span>
-                  </div>
-                </a>
-              )} ~/
-              {event.links?.instagram && (
-                <a href={event.links.instagram}>
-                  <div className="flex items-center gap-x-2">
-                    <FaInstagram className="size-5" />
-
-                    <span className="underline-offset-2 hover:underline">
-                      @{event.links.instagram.split(".com/").slice(-1)[0]}
-                    </span>
-                  </div>
-                </a>
-              )}
-              {event.links?.facebook && (
-                <a href={event.links.facebook}>
-                  <div className="flex items-center gap-x-2">
-                    <FaFacebook className="size-5" />
-
-                    <span className="underline-offset-2 hover:underline">
-                      @{event.links.facebook.split(".com/").slice(-1)[0]}
-                    </span>
-                  </div>
-                </a>
-              )}
-              {event.links?.threads && (
-                <a href={event.links.threads}>
-                  <div className="flex items-center gap-x-2">
-                    <FaThreads className="size-5" />
-
-                    <span className="underline-offset-2 hover:underline">
-                      @{event.links.threads.split(".net/").slice(-1)[0]}
-                    </span>
-                  </div>
-                </a>
-              )}
-              {event.links?.vk && (
-                <a href={event.links.vk}>
-                  <div className="flex items-center gap-x-2">
-                    <FaVk className="size-5" />
-
-                    <span className="underline-offset-2 hover:underline">
-                      @{event.links.vk.split(".com/").slice(-1)[0]}
-                    </span>
-                  </div>
-                </a>
-              )}
-            </div>*/}
 
             <LinkList event={event} purpose="preview" />
           </div>

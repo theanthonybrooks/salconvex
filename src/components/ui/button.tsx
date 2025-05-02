@@ -4,54 +4,38 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
+const defaultSvg = "[&_svg]:size-5 [&_svg]:pointer-events-none";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-5  [&_svg]:pointer-events-none",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 ",
   {
     variants: {
       variant: {
         richTextButton:
-          "bg-white text-foreground border-foreground/20 hover:bg-salYellow/30 border  [&_svg]:size-4",
-        icon: "bg-transparent text-foreground hover:scale-110 [&_svg]:h-auto [&_svg]:h-auto",
-        default: "bg-white text-foreground hover:bg-salYellow/30 border",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border-1.5 border-foreground bg-background hover:bg-white/30",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:scale-110 active:scale-95 border border-transparent",
-        ghost2: "hover:bg-none hover:text-accent-foreground hover:scale-105",
-        link: "text-primary underline-offset-4 hover:underline",
-        expandIcon:
-          "group relative text-primary-foreground bg-primary hover:bg-primary/90",
-        ringHover:
-          "bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:ring-2 hover:ring-primary/90 hover:ring-offset-2",
-        shine:
-          "text-primary-foreground animate-shine bg-linear-to-r from-primary via-primary/75 to-primary bg-[length:400%_100%] ",
-        gooeyRight:
-          "text-primary-foreground relative bg-primary z-0 overflow-hidden transition-all duration-500 before:absolute before:inset-0 before:-z-10 before:translate-x-[150%] before:translate-y-[150%] before:scale-[2.5] before:rounded-[100%] before:bg-linear-to-r from-zinc-400 before:transition-transform before:duration-1000  hover:before:translate-x-[0%] hover:before:translate-y-[0%] ",
-        gooeyLeft:
-          "text-primary-foreground relative bg-primary z-0 overflow-hidden transition-all duration-500 after:absolute after:inset-0 after:-z-10 after:translate-x-[-150%] after:translate-y-[150%] after:scale-[2.5] after:rounded-[100%] after:bg-linear-to-l from-zinc-400 after:transition-transform after:duration-1000  hover:after:translate-x-[0%] hover:after:translate-y-[0%] ",
-        linkHover1:
-          "relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-left after:scale-x-100 hover:after:origin-bottom-right hover:after:scale-x-0 after:transition-transform after:ease-in-out after:duration-300",
-        linkHover2:
-          "relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:ease-in-out after:duration-300",
-        salWithShadow:
-          "bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  hover:bg-stone-100 dark:border-primary-foreground dark:text-primary-foreground",
-        salWithShadowHidden:
-          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground",
-        salWithShadowHiddenLeft:
-          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-llg hover:-translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground",
-        salWithShadowHiddenVert:
-          "bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-vlg  hover:translate-y-[-3px] active:shadow-none  active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground",
-        salWithoutShadow:
-          "bg-white text-foreground  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-foreground focus:bg-salyellow/70 dark:border-primary-foreground dark:text-primary-foreground",
-        salWithShadowYlw:
-          "bg-salyellow text-foreground border-2 hover:bg-salYellowLt border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px] dark:border-primary-foreground dark:text-primary-foreground",
-        salWithShadowHiddenYlw:
-          "bg-salYellow  text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0  dark:border-primary-foreground dark:text-primary-foreground",
-        salWithShadowPink:
-          "bg-salPink hover:bg-salPinkLt text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  dark:border-primary-foreground dark:text-primary-foreground",
+          "bg-white text-foreground border-foreground/20 hover:bg-salYellow/30 border [&_svg]:size-4 [&_svg]:pointer-events-none",
+        icon: "bg-transparent text-foreground hover:scale-110  [&_svg]:shrink-0 ",
+        default: `bg-white text-foreground hover:bg-salYellow/30 border ${defaultSvg}`,
+        destructive: `bg-destructive text-destructive-foreground hover:bg-destructive/90 ${defaultSvg}`,
+        outline: `border-1.5 border-foreground bg-background hover:bg-white/30 ${defaultSvg}`,
+        secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80 ${defaultSvg}`,
+        ghost: `hover:scale-110 active:scale-95 border border-transparent ${defaultSvg}`,
+        ghost2: `hover:bg-none hover:text-accent-foreground hover:scale-105 ${defaultSvg}`,
+        link: `text-primary underline-offset-4 hover:underline ${defaultSvg}`,
+        expandIcon: `group relative text-primary-foreground bg-primary hover:bg-primary/90 ${defaultSvg}`,
+        ringHover: `bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:ring-2 hover:ring-primary/90 hover:ring-offset-2 ${defaultSvg}`,
+        shine: `text-primary-foreground animate-shine bg-linear-to-r from-primary via-primary/75 to-primary bg-[length:400%_100%]  ${defaultSvg}`,
+        gooeyRight: `text-primary-foreground relative bg-primary z-0 overflow-hidden transition-all duration-500 before:absolute before:inset-0 before:-z-10 before:translate-x-[150%] before:translate-y-[150%] before:scale-[2.5] before:rounded-[100%] before:bg-linear-to-r from-zinc-400 before:transition-transform before:duration-1000  hover:before:translate-x-[0%] hover:before:translate-y-[0%]  ${defaultSvg}`,
+        gooeyLeft: `text-primary-foreground relative bg-primary z-0 overflow-hidden transition-all duration-500 after:absolute after:inset-0 after:-z-10 after:translate-x-[-150%] after:translate-y-[150%] after:scale-[2.5] after:rounded-[100%] after:bg-linear-to-l from-zinc-400 after:transition-transform after:duration-1000  hover:after:translate-x-[0%] hover:after:translate-y-[0%]  ${defaultSvg}`,
+        linkHover1: `relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-left after:scale-x-100 hover:after:origin-bottom-right hover:after:scale-x-0 after:transition-transform after:ease-in-out after:duration-300 ${defaultSvg}`,
+        linkHover2: `relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:ease-in-out after:duration-300 ${defaultSvg}`,
+        salWithShadow: `bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  hover:bg-stone-100 dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithShadowHidden: `bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithShadowHiddenLeft: `bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-llg hover:-translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithShadowHiddenVert: `bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-vlg  hover:translate-y-[-3px] active:shadow-none  active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithoutShadow: `bg-white text-foreground  hover:bg-salYellow/80 active:bg-salYellow/70 border-2 border-foreground focus:bg-salyellow/70 dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithShadowYlw: `bg-salyellow text-foreground border-2 hover:bg-salYellowLt border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px] dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithShadowHiddenYlw: `bg-salYellow  text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0  dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
+        salWithShadowPink: `bg-salPink hover:bg-salPinkLt text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]  dark:border-primary-foreground dark:text-primary-foreground ${defaultSvg}`,
       },
       size: {
         default: "h-10 px-4 py-2",

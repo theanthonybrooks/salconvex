@@ -82,6 +82,20 @@ export const normalizeSocialLinks = migrations.define({
   },
 });
 
+export const updateReqs = migrations.define({
+  table: "openCalls",
+  migrateOne: async (ctx, doc) => {
+    await ctx.db.patch(doc._id, {
+      requirements: {
+        ...doc.requirements,
+        requirements:
+          "<ul><li>Must have liability insurance</li><li>Must have a minimum of 10 years of experience</li></ul>",
+        more: "Must have liability insurance",
+      },
+    });
+  },
+});
+
 export const clearContactPrimaryContact = migrations.define({
   table: "organizations",
   migrateOne: async (ctx, doc) => {
@@ -122,6 +136,8 @@ export const runNorm = migrations.runner(
 export const runCP = migrations.runner(
   internal.migrations.clearContactPrimaryContact,
 );
+
+export const runUR = migrations.runner(internal.migrations.updateReqs);
 
 // export const runRemoveOrgNames = migrations.runner(
 //   internal.migrations.removeMainOrgName,

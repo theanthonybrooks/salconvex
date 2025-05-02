@@ -1,31 +1,46 @@
+import { Button } from "@/components/ui/button";
+import { SOCIAL_MEDIA_LINKS } from "@/constants/links";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { FaInstagram, FaRegEnvelope, FaThreads } from "react-icons/fa6";
-import { FiFacebook } from "react-icons/fi";
-import { PiPatreonLogoBold } from "react-icons/pi";
+import { FaRegEnvelope } from "react-icons/fa6";
 
 interface SocialsRowProps {
   size?: number;
   className?: string;
+  contClassName?: string;
 }
 
-export default function SocialsRow({ size = 7, className }: SocialsRowProps) {
+export default function SocialsRow({
+  size = 7,
+  className,
+  contClassName,
+}: SocialsRowProps) {
   return (
-    <div className="flex items-center justify-center gap-6">
-      <Link href="https://instagram.com/thestreetartlist">
-        <FaInstagram className={cn(`h-${size} w-${size}`, className)} />
-      </Link>
-      <Link href="https://facebook.com/thestreetartlist">
-        <FiFacebook className={cn(`h-${size} w-${size}`, className)} />
-      </Link>
-      <Link href="https://threads.net/thestreetartlist">
-        <FaThreads className={cn(`h-${size} w-${size}`, className)} />
-      </Link>
+    <div
+      className={cn("flex items-center justify-center gap-6", contClassName)}
+    >
+      {SOCIAL_MEDIA_LINKS.map(({ label, icon: Icon, path }) => (
+        <Link href={path} key={label} target="_blank">
+          <Button
+            variant="icon"
+            size="icon"
+            aria-label={label}
+            className="h-auto w-auto"
+          >
+            <Icon className={cn(`size-${size}`, className)} />
+          </Button>
+        </Link>
+      ))}
+
       <Link href="mailto:info@thestreetartlist.com">
-        <FaRegEnvelope className={cn(`h-${size} w-${size}`, className)} />
-      </Link>
-      <Link href="https://patreon.com/thestreetartlist">
-        <PiPatreonLogoBold className={cn(`h-${size} w-${size}`, className)} />
+        <Button
+          variant="icon"
+          size="icon"
+          aria-label="email link"
+          className="h-auto w-auto"
+        >
+          <FaRegEnvelope className={cn(`size-${size}`, className)} />
+        </Button>
       </Link>
     </div>
   );

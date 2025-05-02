@@ -38,7 +38,7 @@ export type MenuProps = {
 };
 export type SocialProps = {
   label: string;
-  icon: JSX.Element;
+  icon: IconType;
   path: string;
 };
 
@@ -52,6 +52,29 @@ export interface FooterSection {
   section: string;
   items: LinkItem[];
 }
+
+export const SOCIAL_MEDIA_LINKS: SocialProps[] = [
+  {
+    label: "Instagram",
+    icon: FaInstagram,
+    path: "https://www.instagram.com/thestreetartlist",
+  },
+  {
+    label: "Threads",
+    icon: FaThreads,
+    path: "https://threads.com/@thestreetartlist",
+  },
+  {
+    label: "Facebook",
+    icon: FaFacebookF,
+    path: "https://facebook.com/thestreetartlist",
+  },
+  {
+    label: "Patreon",
+    icon: TbBrandPatreon,
+    path: "https://www.patreon.com/thestreetartlist",
+  },
+];
 
 export const LANDING_PAGE_MENU: MenuProps[] = [
   {
@@ -110,13 +133,13 @@ export const FOOTER_LINKS: FooterSection[] = [
   },
   {
     section: "social",
-    items: [
-      { name: "Instagram", href: "https://www.instagram.com/thestreetartlist" },
-      { name: "Threads", href: "https://threads.net/thestreetartlist" },
-      { name: "Facebook", href: "https://facebook.com/thestreetartlist" },
-      // { name: "LinkedIn", href: "https://www.linkedin.com/in/thestreetartlist" },
-      // { name: "GitHub", href: "https://github.com/thestreetartlist" },
-    ],
+
+    items: SOCIAL_MEDIA_LINKS.filter(({ label }) => label !== "Patreon").map(
+      ({ label, path }) => ({
+        name: label,
+        href: path,
+      }),
+    ),
   },
 ];
 
@@ -138,28 +161,6 @@ export const getGridColsClass = (numColumns: number): string => {
 
 //TODO: Make a specific social media component that has props for the class and icon (and... else?)
 
-export const SOCIAL_MEDIA_LINKS: SocialProps[] = [
-  {
-    label: "Threads",
-    icon: <FaThreads className="h-5 w-5" />,
-    path: "https://threads.net/thestreetartlist",
-  },
-  {
-    label: "Instagram",
-    icon: <FaInstagram className="h-5 w-5" />,
-    path: "https://www.instagram.com/thestreetartlist",
-  },
-  {
-    label: "Facebook",
-    icon: <FaFacebookF className="h-5 w-5" />,
-    path: "https://facebook.com/thestreetartlist",
-  },
-  {
-    label: "Patreon",
-    icon: <TbBrandPatreon className="h-5 w-5" />,
-    path: "https://www.patreon.com/thestreetartlist",
-  },
-];
 interface DashNavItem {
   label: string;
   href: string;

@@ -51,9 +51,11 @@ export default {
         userIcon: "hsl(var(--user-icon))",
         txtMutedForeground: "hsl(var(--txt-muted-foreground))",
         customPurple: "#5C3B58",
+        toucanColor: "var(--toucan-color)",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+          secondary: "hsl(var(--card-secondary))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

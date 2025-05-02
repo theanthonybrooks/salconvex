@@ -2,6 +2,17 @@ import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/event";
 import { Id } from "~/convex/_generated/dataModel";
 
+export const primaryContacts = [
+  "email",
+  "phone",
+  "website",
+  "facebook",
+  "instagram",
+  "threads",
+  "vk",
+] as const;
+export type PrimaryContact = (typeof primaryContacts)[number];
+
 export type Organizer = {
   _id: Id<"organizations">;
   ownerId: string;
@@ -36,7 +47,7 @@ export type Organizer = {
   about?: string;
   contact: {
     organizer?: string;
-    primaryContact: string;
+    primaryContact: PrimaryContact;
   };
   links: {
     website?: string;

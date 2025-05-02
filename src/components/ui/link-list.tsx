@@ -1,14 +1,13 @@
 import { formatDisplayUrl } from "@/lib/linkFns";
 import { EventData } from "@/types/event";
 import { Organizer } from "@/types/organizer";
+import { Globe, Phone } from "lucide-react";
 import {
-  FaEnvelope,
-  FaFacebook,
-  FaGlobe,
+  FaFacebookF,
   FaInstagram,
   FaLink,
-  FaPhone,
   FaPlus,
+  FaRegEnvelope,
   FaThreads,
   FaVk,
 } from "react-icons/fa6";
@@ -29,7 +28,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
           {event.links?.email && !listPreview && (
             <a href={`mailto:${event.links.email}?subject=${event.name}`}>
               <div className="flex items-center gap-x-2">
-                <FaEnvelope className="size-5" />
+                <FaRegEnvelope className="size-5" />
                 <span className="underline-offset-2 hover:underline">
                   {event.links.email}
                 </span>
@@ -39,7 +38,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
           {event.links?.website && (
             <a href={event.links.website} target="_blank">
               <div className="flex items-center gap-x-2">
-                <FaGlobe className="size-5" />
+                <Globe className="size-5" />
                 <span className="underline-offset-2 hover:underline">
                   {formatDisplayUrl(event.links.website)}
                 </span>
@@ -49,7 +48,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
           {event.links?.phone && !listPreview && (
             <a href={`tel:${event.links.phone}`} target="_blank">
               <div className="flex items-center gap-x-2">
-                <FaPhone className="size-5 shrink-0" />
+                <Phone className="size-5 shrink-0" />
                 <span className="underline-offset-2 hover:underline">
                   {formatPhoneNumberIntl(event.links.phone)}
                 </span>
@@ -86,7 +85,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
               target="_blank"
             >
               <div className="flex items-center gap-x-2">
-                <FaFacebook className="size-5 shrink-0" />
+                <FaFacebookF className="size-5 shrink-0" />
 
                 <span className="underline-offset-2 hover:underline">
                   {event.links.facebook}
@@ -144,7 +143,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 href={`mailto:${organizer.links.email}?subject=${organizer.name}`}
               >
                 <div className="flex items-center gap-x-2">
-                  <FaEnvelope className="size-5 shrink-0" />
+                  <FaRegEnvelope className="size-5 shrink-0" />
                   <span className="underline-offset-2 hover:underline">
                     {organizer.links.email}
                   </span>
@@ -154,7 +153,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
             {organizer.links?.website && (
               <a href={organizer.links.website}>
                 <div className="flex items-center gap-x-2">
-                  <FaGlobe className="size-5 shrink-0" />
+                  <Globe className="size-5 shrink-0" />
                   <span className="underline-offset-2 hover:underline">
                     {organizer.links.website.split("www.").slice(-1)[0]}
                   </span>
@@ -175,7 +174,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
             {organizer.links?.phone && (
               <a href={`tel:${organizer.links.phone}`}>
                 <div className="flex items-center gap-x-2">
-                  <FaPhone className="size-5 shrink-0" />
+                  <Phone className="size-5 shrink-0" />
 
                   <span className="underline-offset-2 hover:underline">
                     {organizer.links.phone}
@@ -197,7 +196,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
             {organizer.links?.facebook && (
               <a href={organizer.links.facebook}>
                 <div className="flex items-center gap-x-2">
-                  <FaFacebook className="size-5 shrink-0" />
+                  <FaFacebookF className="size-5 shrink-0" />
 
                   <span className="underline-offset-2 hover:underline">
                     @{organizer.links.facebook.split(".com/").slice(-1)[0]}

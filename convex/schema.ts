@@ -311,22 +311,22 @@ const openCallSchema = {
       unit: v.string(),
       currency: v.string(),
       allInclusive: v.boolean(),
-      moreInfo: v.optional(v.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
+      moreInfo: v.optional(v.string()),
     }),
+
     categories: v.object({
-      designFee: v.optional(v.string()),
-      accommodation: v.optional(v.string()),
-      food: v.optional(v.string()),
-      travelCosts: v.optional(v.string()),
-      materials: v.optional(v.string()),
-      equipment: v.optional(v.string()),
-      other: v.optional(v.string()),
+      designFee: v.optional(v.union(v.number(), v.boolean())),
+      accommodation: v.optional(v.union(v.number(), v.boolean())),
+      food: v.optional(v.union(v.number(), v.boolean())),
+      travelCosts: v.optional(v.union(v.number(), v.boolean())),
+      materials: v.optional(v.union(v.number(), v.boolean())),
+      equipment: v.optional(v.union(v.number(), v.boolean())),
     }),
   }),
 
   requirements: v.object({
-    requirements: v.array(v.string()),
-    more: v.array(v.string()),
+    requirements: v.string(),
+    more: v.string(),
     destination: v.string(),
     documents: v.optional(
       v.array(

@@ -34,6 +34,18 @@ export const applicationStatusValues = [
   "shortlisted",
 ];
 
+export const openCallCategoryFields = [
+  { label: "Design Fee", key: "designFee" },
+  { label: "Accommodation", key: "accommodation" },
+  { label: "Food", key: "food" },
+  { label: "Travel Costs", key: "travelCosts" },
+  { label: "Materials", key: "materials" },
+  { label: "Equipment", key: "equipment" },
+] as const;
+
+export type OpenCallCategoryKey =
+  (typeof openCallCategoryFields)[number]["key"];
+
 export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
 
 export const openCallStatusValues = ["active", "ended", "coming-soon"] as const;
@@ -78,19 +90,14 @@ export interface OpenCall {
       allInclusive: boolean;
       moreInfo?: string;
     };
+
     categories: {
-      designFee?: string;
-      accommodation?: string;
-      food?: string;
-      travelCosts?: string;
-      materials?: string;
-      equipment?: string;
-      other?: string;
+      [K in OpenCallCategoryKey]?: number | boolean;
     };
   };
   requirements: {
-    requirements: string[];
-    more: string[];
+    requirements: string;
+    more: string;
     destination: string;
     documents?: {
       title: string;
