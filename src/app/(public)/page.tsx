@@ -16,6 +16,7 @@ import {
 import { Link } from "@/components/ui/custom-link";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
@@ -77,10 +78,10 @@ export default function Home() {
         <Carousel className="h-full w-full">
           <CarouselContent>
             <CarouselItem className="relative w-full">
-              <motion.img
+              <Image
                 src="/artist-highlight/chus3.jpg"
                 alt="The Street Art List"
-                loading="lazy"
+                loading="eager"
                 width={1920}
                 height={1080}
                 className="h-full w-full object-cover object-[50%_42%]"
@@ -93,10 +94,10 @@ export default function Home() {
             </CarouselItem>
 
             <CarouselItem className="relative w-full">
-              <motion.img
+              <Image
                 src="/artist-highlight/chus2.jpg"
                 alt="The Street Art List"
-                loading="lazy"
+                loading="eager"
                 width={1920}
                 height={1080}
                 className="h-full w-full object-cover object-[50%_90%]"
@@ -108,10 +109,10 @@ export default function Home() {
               />
             </CarouselItem>
             <CarouselItem className="relative w-full">
-              <motion.img
+              <Image
                 src="/artist-highlight/chus.jpg"
                 alt="The Street Art List"
-                loading="lazy"
+                loading="eager"
                 width={1920}
                 height={1080}
                 className="h-full w-full object-cover object-[50%_13%]"

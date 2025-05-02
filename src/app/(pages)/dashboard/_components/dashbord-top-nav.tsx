@@ -105,7 +105,8 @@ export default function NavBar({
 
               {/* Right Side */}
               <div className="hidden items-center gap-x-4 lg:flex">
-                <Bell className="size-6 w-full" />
+                {/* //TODO: Add notifications */}
+                {/* <Bell className="size-6 w-full" /> */}
 
                 <Unauthenticated>
                   <Link href="/auth/sign-in" prefetch={true}>
