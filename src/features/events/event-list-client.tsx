@@ -1,7 +1,7 @@
 "use client";
 
 import { BasicPagination } from "@/components/ui/pagination2";
-import Loader from "@/components/ui/washing-loader";
+import { Skeleton } from "@/components/ui/skeleton";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
@@ -12,7 +12,7 @@ import {
 } from "@/hooks/use-combined-events";
 import { useFilteredEvents } from "@/hooks/use-filtered-events";
 // import { getFourCharMonth } from "@/lib/dateFns"
-import { setParamIfNotDefault } from "@/lib/utils";
+import { cn, setParamIfNotDefault } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
 import { User, UserPref } from "@/types/user";
@@ -168,6 +168,22 @@ Props) => {
     setPage(1);
   };
 
+  const generateSkeletonGroups = (
+    groupCount = 3,
+    minItems = 2,
+    maxItems = 5,
+  ) => {
+    return Array.from({ length: groupCount }, (_, i) => ({
+      id: i,
+      results: Array.from({
+        length:
+          Math.floor(Math.random() * (maxItems - minItems + 1)) + minItems,
+      }),
+    }));
+  };
+
+  const skeletonGroups = generateSkeletonGroups();
+
   return (
     <>
       {!publicView && (
@@ -180,18 +196,41 @@ Props) => {
             onResetFilters={handleResetFilters}
           />
 
-          <BasicPagination
-            page={page}
-            totalPages={totalPages}
-            totalResults={totalResults}
-            onPageChange={setPage}
-          />
+          {!isLoading && (
+            <BasicPagination
+              page={page}
+              totalPages={totalPages}
+              totalResults={totalResults}
+              onPageChange={setPage}
+            />
+          )}
         </>
       )}
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-center text-lg">Loading results...</p> <Loader />
+        <div className="mb-6 w-full max-w-[90vw] space-y-4 sm:space-y-6">
+          <div className="mx-auto grid w-full max-w-[60vw] grid-cols-3 items-center gap-4">
+            <Skeleton className="h-10 w-40 rounded-xl bg-black/20" />
+            <div className="mx-auto mb-2 flex items-center gap-x-2">
+              <Skeleton className="h-10 w-14 rounded-xl bg-black/20" />
+              <Skeleton className="h-10 w-20 rounded-xl bg-black/20" />
+              <Skeleton className="ml-8 h-10 w-8 rounded-xl bg-black/20" />
+            </div>
+
+            <div />
+          </div>
+          {skeletonGroups.map((group) => (
+            <div key={group.id} className="space-y-4">
+              <Skeleton className="mx-auto h-10 w-64 rounded-xl bg-black/20" />
+
+              {group.results.map((_, idx) => (
+                <Skeleton
+                  key={idx}
+                  className="min-h-[200px] w-full rounded-3xl bg-black/20 sm:min-h-[250px]"
+                />
+              ))}
+            </div>
+          ))}
         </div>
       ) : (
         groupedEvents.map((group) => (
@@ -232,8 +271,22 @@ Props) => {
         totalResults={totalResults}
         onPageChange={setPage}
         bottomPag
-        className="mb-6"
+        className={cn("mb-6", !publicView && "mb-12")}
       />
+      {isLoading && (
+        <div
+          className={cn(
+            "mb-6 flex w-full items-center justify-center",
+            !publicView && "mb-12",
+          )}
+        >
+          <div className="mx-auto mb-2 flex items-center gap-x-2">
+            <Skeleton className="h-10 w-14 rounded-xl bg-black/20" />
+            <Skeleton className="h-10 w-20 rounded-xl bg-black/20" />
+            <Skeleton className="ml-8 h-10 w-8 rounded-xl bg-black/20" />
+          </div>
+        </div>
+      )}
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
         <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
