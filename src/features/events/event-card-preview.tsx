@@ -94,6 +94,9 @@ const EventCardPreview = ({
     categories === null || Object.keys(categories).length === 0;
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
+  const hasCoordinates = !!location.coordinates;
+  const coordinates = location.coordinates || { latitude: 0, longitude: 0 };
+  const { latitude, longitude } = coordinates;
 
   const locationParts: string[] = [];
   const hasOpenCall = openCallStatus === "active";
@@ -504,12 +507,15 @@ const EventCardPreview = ({
               ))}
             </div>
             {/* TODO: Add a link to the map */}
-            <span
-              className="inline-flex items-center gap-x-1 font-semibold hover:cursor-pointer [&>svg]:hover:scale-110"
-              onClick={() => console.log("map clicked")}
-            >
-              <FaMapLocationDot className="size-4" /> View on Map
-            </span>
+
+            {hasCoordinates && (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+                className="flex items-center gap-x-1 text-sm font-semibold underline-offset-2 hover:underline [&>svg]:hover:scale-110"
+              >
+                <FaMapLocationDot className="size-4" /> View on Map
+              </a>
+            )}
           </div>
         </div>
         {isCurrentlyOpen ? (

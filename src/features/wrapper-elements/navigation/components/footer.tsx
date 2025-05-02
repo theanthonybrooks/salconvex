@@ -74,7 +74,7 @@ export default function Footer({ className }: { className?: string }) {
             >
               {filteredLinks.map(({ section, items }) => (
                 <div key={section}>
-                  <h3 className="text-sm font-semibold text-foreground">
+                  <h3 className="text-sm font-semibold capitalize text-foreground">
                     {section.charAt(0).toUpperCase() + section.slice(1)}
                   </h3>
                   <ul className="mt-4 space-y-4">
@@ -128,11 +128,11 @@ export default function Footer({ className }: { className?: string }) {
                         ? "Subscribing..."
                         : "Subscribed"}
                     {subAction === "cta" ? (
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <ArrowRight className="ml-2 size-4" />
                     ) : subAction === "subbing" ? (
-                      <LoaderPinwheel className="h-4 w-4 animate-spin" />
+                      <LoaderPinwheel className="size-4 animate-spin" />
                     ) : (
-                      <CheckCircle className="h-4 w-4" />
+                      <CheckCircle className="size-4" />
                     )}
                   </Button>
                 </div>

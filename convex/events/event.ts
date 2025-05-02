@@ -1,4 +1,10 @@
-import { EventCategory, EventType, SubmissionFormState } from "@/types/event";
+import {
+  EventCategory,
+  EventFormat,
+  EventType,
+  ProdFormat,
+  SubmissionFormState,
+} from "@/types/event";
 import { OpenCall, OpenCallApplication } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -257,7 +263,6 @@ export const createOrUpdateEvent = mutation({
         ),
       ),
 
-      ongoing: v.boolean(),
       eventFormat: v.optional(v.string()),
       prodFormat: v.optional(v.string()),
       noProdStart: v.boolean(),
@@ -377,9 +382,11 @@ export const createOrUpdateEvent = mutation({
           ...args.dates,
           edition: args.dates.edition || new Date().getFullYear(),
           eventDates: args.dates.eventDates || [{ start: "", end: "" }],
-          ongoing: args.dates.ongoing || false,
-          eventFormat: args.dates.eventFormat || "",
-          prodFormat: args.dates.prodFormat || "",
+          eventFormat:
+            (args.dates.eventFormat as EventFormat) || ("" as EventFormat),
+          prodFormat:
+            (args.dates.prodFormat as ProdFormat) || ("" as ProdFormat),
+
           noProdStart: args.dates.noProdStart || false,
         },
         location: {
@@ -408,10 +415,10 @@ export const createOrUpdateEvent = mutation({
         ...args.dates,
         edition: args.dates.edition || new Date().getFullYear(),
         eventDates: args.dates.eventDates || [{ start: "", end: "" }],
-        ongoing: args.dates.ongoing || false,
-        eventFormat: args.dates.eventFormat || "",
+        eventFormat:
+          (args.dates.eventFormat as EventFormat) || ("" as EventFormat),
+        prodFormat: (args.dates.prodFormat as ProdFormat) || ("" as ProdFormat),
         prodDates: args.dates.prodDates || undefined,
-        prodFormat: args.dates.prodFormat || "",
         noProdStart: args.dates.noProdStart || false,
       },
       location: {

@@ -45,3 +45,23 @@ export const getOpenCallByEventId = query({
     return openCall;
   },
 });
+//note-to-self: At the moment, the events aren't grouped by id as the id is specific to each edition. Rather, they are grouped by slug, since that's also unique and then I can gather the id's/editions for that specific slug.
+
+// export const getOpenCallByEventIdAndEdition = query({
+//   args: {
+//     eventId: v.id("events"),
+//     edition: v.number(),
+//   },
+//   handler: async (ctx, args) => {
+//     const event = await ctx.db.get(args.eventId);
+//     if (!event) return null;
+
+//     const openCall = await ctx.db
+//       .query("openCalls")
+//       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+//       .filter((q) => q.eq(q.field("basicInfo.dates.edition"), args.edition))
+//       .first();
+
+//     return openCall;
+//   },
+// });

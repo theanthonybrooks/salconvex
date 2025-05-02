@@ -7,6 +7,7 @@ import { MapPin } from "lucide-react";
 import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
+import { formatEventDates } from "@/lib/dateFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { OrganizerCardProps } from "@/types/organizer";
 import Image from "next/image";
@@ -30,6 +31,16 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   //   bookmarked: false,
   //   hidden: false,
   // };
+
+  const groupedEvents = events?.reduce(
+    (acc, event) => {
+      const edition = event.dates.edition;
+      if (!acc[edition]) acc[edition] = [];
+      acc[edition].push(event);
+      return acc;
+    },
+    {} as Record<string, typeof events>,
+  );
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
 
@@ -85,7 +96,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
           </div>
 
           <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 text-balance pr-1 text-base font-semibold">
+            <p className="mb-1 text-balance pr-1 text-base font-semibold capitalize">
               {organizer?.name}
             </p>
           </div>
@@ -125,7 +136,9 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                 className={cn("size-[60px] rounded-full border-2 xl:hidden")}
               />
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{organizer?.name}</span>
+                <span className="text-xl font-bold capitalize">
+                  {organizer?.name}
+                </span>
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 
@@ -143,7 +156,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         >
-          <div id="events">
+          {/* <div id="events">
             <ol className="list-outside list-decimal px-2">
               {events?.map((event) => (
                 <li key={event._id} className="text-sm">
@@ -164,6 +177,59 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                 </li>
               ))}
             </ol>
+          </div> */}
+          <div id="events" className="px-4">
+            {groupedEvents &&
+              Object.entries(groupedEvents)
+                .sort((a, b) => b[0].localeCompare(a[0])) // Optional: sort editions descending
+                .map(([edition, editionEvents]) => (
+                  <div key={edition} className="mb-4">
+                    <h3 className="text-md mb-2 font-semibold underline underline-offset-2">
+                      {edition}
+                    </h3>
+                    <ul className="list-outside list-none px-2">
+                      {editionEvents.map((event) => (
+                        <li key={event._id} className="text-sm">
+                          <div className="flex items-center gap-x-2">
+                            <Link
+                              href={`/thelist/event/${event.slug}/${event.dates.edition}`}
+                              target="_blank"
+                            >
+                              <p className="text-sm">
+                                <span className="font-bold capitalize">
+                                  {event.name}
+                                </span>
+
+                                {" - "}
+                                <span className="font-light italic">
+                                  {event.dates.eventFormat !== "noEvent"
+                                    ? formatEventDates(
+                                        event.dates.eventDates[0].start,
+                                        event.dates.eventDates[
+                                          event.dates.eventDates.length - 1
+                                        ].end,
+                                        event.dates.eventFormat === "ongoing",
+                                        "desktop",
+                                      )
+                                    : event.dates.prodDates
+                                      ? formatEventDates(
+                                          event.dates.prodDates[0].start,
+                                          event.dates.prodDates[
+                                            event.dates.prodDates.length - 1
+                                          ].end,
+                                          false,
+                                          "desktop",
+                                        )
+                                      : event.dates.edition}
+                                </span>
+                              </p>
+                            </Link>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
           </div>
           <div id="organizer">
             <OrganizerCard

@@ -31,8 +31,9 @@ const EventDates = ({
   const eventSliceLimit = limit === 0 ? mappedEventDates.length : (limit ?? 3);
   const forEvent = type === "event";
   const forProd = type === "production";
+  const isOngoing = dates?.eventFormat === "ongoing";
 
-  if (forEvent && (dates?.eventFormat === "ongoing" || dates?.ongoing)) {
+  if (forEvent && isOngoing) {
     return <span className="flex flex-col gap-1">Ongoing</span>;
   }
   if (forProd && dates?.prodFormat === "sameAsEvent") {
@@ -64,7 +65,7 @@ const EventDates = ({
                   {formatEventDates(
                     start || "",
                     end || "",
-                    dates.ongoing,
+                    isOngoing,
                     format,
                     preview,
                   )}

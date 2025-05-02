@@ -190,7 +190,6 @@ export const EventOCForm = ({
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [skipped, setSkipped] = useState<Set<number>>(new Set([3, 4]));
 
-  // const [hasOpenCall, setHasOpenCall] = useState("true");
   const [lastSaved, setLastSaved] = useState(
     existingEvent ? existingEvent.lastEditedAt : null,
   );
@@ -327,7 +326,6 @@ export const EventOCForm = ({
   );
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
-  console.log(hasUserEditedStep0);
 
   // const orgValidation = useQuery(
   //   api.organizer.organizations.isOwnerOrIsNewOrg,
@@ -337,16 +335,6 @@ export const EventOCForm = ({
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
 
-  console.log(
-    isValid,
-    validOrgWZod,
-    isStepValidZod,
-    eventChoiceMade,
-    hasUserEditedForm,
-    hasUserEditedStep0,
-    hasUserEditedEventSteps,
-    hasUserEditedStep5,
-  );
   const hasErrors = !!errors && Object.keys(errors).length > 0;
   // const existingOrgUpdateTrigger =
   //   hasExistingOrg && validOrgWZod && hasUserEditedStep0;
@@ -528,9 +516,9 @@ export const EventOCForm = ({
       setActiveStep((prev) => prev + 1);
     }
 
-    if (activeStep === 5 && hasOpenCall === "false") {
-      console.log("stepping up");
-    }
+    // if (activeStep === 5 && hasOpenCall === "false") {
+    //   console.log("stepping up");
+    // }
 
     // }
   };
@@ -806,7 +794,6 @@ export const EventOCForm = ({
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
-              ongoing: eventData.dates.ongoing,
               eventFormat: eventData.dates.eventFormat,
               prodDates,
               prodFormat: eventData.dates.prodFormat,

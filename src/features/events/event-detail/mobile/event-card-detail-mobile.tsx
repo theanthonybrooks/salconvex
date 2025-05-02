@@ -145,9 +145,8 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
 
         <div className="flex flex-col justify-between gap-y-3 pb-3 pr-3 pt-3">
           <div className="flex flex-col gap-y-1">
-            <p className="mb-1 text-base font-semibold">
-              {" "}
-              {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
+            <p className="mb-1 text-base font-semibold capitalize">
+              {event?.name}
             </p>
 
             <p className="inline-flex items-end gap-x-1 text-sm">
@@ -162,14 +161,6 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
             <div className="flex items-start gap-x-1 text-sm">
               <span className="font-semibold">Dates:</span>
               <span className="inline-grid auto-cols-max grid-flow-col gap-x-2 align-top text-sm">
-                {/* <span className="max-w-prose text-balance break-words">
-                  {formatEventDates(
-                    dates?.eventStart || "",
-                    dates?.eventEnd || "",
-                    isOngoing,
-                    "mobile",
-                  )}
-                </span> */}
                 <EventDates event={event} format="mobile" type="event" />
                 {icsLink && (
                   <a
@@ -223,7 +214,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
                   <motion.div
                     exit={{ opacity: 0 }}
                     layoutId="tab-bg"
-                    className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
+                    className="absolute inset-0 z-0 rounded-md border-2 border-foreground bg-background shadow-sm"
                     transition={{
                       type: "spring",
                       stiffness: 400,

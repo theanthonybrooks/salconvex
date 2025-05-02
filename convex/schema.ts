@@ -32,6 +32,23 @@ export const categoryValidator = v.union(
   v.literal("roster"),
 );
 
+export const prodFormatValidator = v.union(
+  v.literal("sameAsEvent"),
+  v.literal("setDates"),
+  v.literal("monthRange"),
+  v.literal("yearRange"),
+  v.literal("seasonRange"),
+);
+
+export const eventFormatValidator = v.union(
+  v.literal("noEvent"),
+  v.literal("setDates"),
+  v.literal("monthRange"),
+  v.literal("yearRange"),
+  v.literal("seasonRange"),
+  v.literal("ongoing"),
+);
+
 const customUserSchema = {
   // Include Convex Auth fields you want to use
   name: v.optional(v.string()),
@@ -208,9 +225,9 @@ const eventSchema = {
         }),
       ),
     ),
-    ongoing: v.boolean(), //TODO: remove this as eventFormat already handles this
-    eventFormat: v.optional(v.string()),
-    prodFormat: v.optional(v.string()),
+
+    eventFormat: v.optional(eventFormatValidator),
+    prodFormat: v.optional(prodFormatValidator),
     noProdStart: v.boolean(),
   }),
   location: v.object({

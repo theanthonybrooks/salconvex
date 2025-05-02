@@ -148,3 +148,4 @@ export const runUR = migrations.runner(internal.migrations.updateReqs);
 //  npx convex run migrations:runUpdatePublic --prod
 // FOR DEVELOPMENT:
 //  npx convex run migrations:runUpdatePublic
+//  npx convex run migrations:

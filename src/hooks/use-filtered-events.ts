@@ -54,7 +54,7 @@ export const useFilteredEvents = (
             const startDate = item.dates.eventDates[0].start;
             const isValid = startDate && isValidIsoDate(startDate);
             const validStartDate = isValid ? new Date(startDate) : null;
-            const isOngoing = item.dates.ongoing;
+            const isOngoing = item.dates.eventFormat === "ongoing";
             const eventStartDate = new Date(startDate ?? Infinity);
             const isPast = eventStartDate < now; //is technically handled by the combiner, but I'm keeping it here for now
 

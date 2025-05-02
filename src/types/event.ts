@@ -30,6 +30,24 @@ export const eventStates = [
 ] as const;
 export type SubmissionFormState = (typeof eventStates)[number];
 
+export const prodFormatValues = [
+  "sameAsEvent",
+  "setDates",
+  "monthRange",
+  "yearRange",
+  "seasonRange",
+] as const;
+export type ProdFormat = (typeof prodFormatValues)[number];
+export const eventFormatValues = [
+  "noEvent",
+  "setDates",
+  "monthRange",
+  "yearRange",
+  "seasonRange",
+  "ongoing",
+] as const;
+export type EventFormat = (typeof eventFormatValues)[number];
+
 export interface EventData {
   _id: Id<"events">;
   adminNote?: string;
@@ -46,9 +64,9 @@ export interface EventData {
     edition: number;
     eventDates: { start: string; end: string }[];
     prodDates?: { start: string; end: string }[];
-    ongoing: boolean;
-    eventFormat?: string;
-    prodFormat?: string;
+    eventFormat?: EventFormat;
+    prodFormat?: ProdFormat;
+
     // eventFormat?:
     //   | "noEvent"
     //   | "setDates"

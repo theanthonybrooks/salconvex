@@ -107,16 +107,16 @@ const EventContextMenu = ({
             )}
           >
             {isHidden ? (
-              <span className="flex items-center gap-x-1">
+              <span className="flex items-center gap-x-1 capitalize">
                 <EyeOff className="size-4" />
-                Unhide{" "}
+                Unhide
                 {openCallId !== ""
                   ? "Open Call"
                   : eventCategory.slice(0, 1).toUpperCase() +
                     eventCategory.slice(1)}
               </span>
             ) : (
-              <span className="flex items-center gap-x-1">
+              <span className="flex items-center gap-x-1 capitalize">
                 <Eye className="size-4" />
                 Hide{" "}
                 {openCallId !== ""

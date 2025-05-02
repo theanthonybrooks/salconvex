@@ -66,7 +66,7 @@ export function getGroupKeyFromEvent(
       return { raw: `${eventStart}` };
     }
   } else if (sortBy === "eventStart" && !eventStart) {
-    const ongoing = event.dates.ongoing;
+    const ongoing = event.dates.eventFormat === "ongoing";
     return {
       raw: ongoing ? "Ongoing" : "No Event Date",
     };

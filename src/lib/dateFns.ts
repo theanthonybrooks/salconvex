@@ -1,3 +1,4 @@
+import { EventFormat } from "@/types/event";
 import { CallType } from "@/types/openCall";
 import { DateTime } from "luxon";
 
@@ -7,9 +8,13 @@ export const formatEventDates = (
   ongoing: boolean,
   mode: "desktop" | "mobile" = "desktop",
   preview?: boolean,
+  eventFormat?: EventFormat,
 ) => {
   const isMobile = mode === "mobile";
   if (ongoing) return "Ongoing";
+  if (eventFormat === "noEvent") {
+    return "No Event Dates";
+  }
 
   const seasonalTerms = ["spring", "summer", "fall", "winter"];
 

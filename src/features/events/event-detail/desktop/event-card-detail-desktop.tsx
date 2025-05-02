@@ -132,8 +132,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           </div>
 
           <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 text-balance pr-1 text-base font-semibold">
-              {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
+            <p className="mb-1 text-balance pr-1 text-base font-semibold capitalize">
+              {event?.name}
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
@@ -221,8 +221,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 className={cn("size-[60px] rounded-full border-2 xl:hidden")}
               />
               <div className="flex flex-col">
-                <span className="text-xl font-bold">
-                  {event?.name.slice(0, 1).toUpperCase() + event?.name.slice(1)}
+                <span className="text-xl font-bold capitalize">
+                  {event?.name}
                 </span>
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
