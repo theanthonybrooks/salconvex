@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
 import { Input } from "@/components/ui/input";
 import {
   FOOTER_LINKS as footerLinks,
@@ -9,7 +10,7 @@ import { footerCRText } from "@/constants/text";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
 import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
-import Link from "next/link";
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEnvelope } from "react-icons/fa";
@@ -162,11 +163,7 @@ export default function Footer({ className }: { className?: string }) {
               <p className="inline-flex items-center gap-x-1">
                 Made with <PiHeartBold className="size-4" /> by
               </p>
-              <Link
-                href="https://theanthonybrooks.com"
-                target="_blank"
-                className="cursor-pointer decoration-foreground hover:underline hover:underline-offset-2 focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline-offset-2"
-              >
+              <Link href="https://theanthonybrooks.com" target="_blank">
                 Anthony Brooks
               </Link>
             </div>

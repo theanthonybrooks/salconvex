@@ -208,8 +208,8 @@ Props) => {
       )}
 
       {isLoading ? (
-        <div className="mb-6 w-full max-w-[90vw] space-y-4 sm:space-y-6">
-          <div className="mx-auto grid w-full max-w-[60vw] grid-cols-3 items-center gap-4">
+        <div className="mb-10 w-full max-w-[90vw] space-y-4 sm:space-y-6">
+          <div className="mx-auto mb-10 mt-6 flex w-full max-w-[min(70vw,1200px)] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0">
             <Skeleton className="h-10 w-40 rounded-xl bg-black/20" />
             <div className="mx-auto mb-2 flex items-center gap-x-2">
               <Skeleton className="h-10 w-14 rounded-xl bg-black/20" />
@@ -220,8 +220,8 @@ Props) => {
             <div />
           </div>
           {skeletonGroups.map((group) => (
-            <div key={group.id} className="space-y-4">
-              <Skeleton className="mx-auto h-10 w-64 rounded-xl bg-black/20" />
+            <div key={group.id} className="flex flex-col items-center gap-6">
+              <Skeleton className="mx-auto mt-3 h-10 w-64 rounded-xl bg-black/20" />
 
               {group.results.map((_, idx) => (
                 <Skeleton
@@ -280,7 +280,7 @@ Props) => {
             !publicView && "mb-12",
           )}
         >
-          <div className="mx-auto mb-2 flex items-center gap-x-2">
+          <div className="mx-auto flex items-center gap-x-2">
             <Skeleton className="h-10 w-14 rounded-xl bg-black/20" />
             <Skeleton className="h-10 w-20 rounded-xl bg-black/20" />
             <Skeleton className="ml-8 h-10 w-8 rounded-xl bg-black/20" />
