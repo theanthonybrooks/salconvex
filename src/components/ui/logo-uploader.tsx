@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CropModal } from "@/components/ui/crop-modal";
 import { cn } from "@/lib/utils";
-import { PlusIcon } from "lucide-react";
+import { LoaderPinwheel, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -13,13 +13,13 @@ type AvatarUploaderProps = {
   onChange: (imageBlob: Blob) => void;
   onRemove?: () => void;
   initialImage?: string;
-
   imageOnly?: boolean;
   className?: string;
   reset?: boolean;
   size?: number;
   disabled?: boolean;
   tabIndex?: number;
+  loading?: boolean;
 };
 
 export default function AvatarUploader({
@@ -33,6 +33,7 @@ export default function AvatarUploader({
   disabled,
   size = 80,
   imageOnly = false,
+  loading = false,
 }: AvatarUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageForCropping, setImageForCropping] = useState<string | null>(null);
@@ -197,7 +198,14 @@ export default function AvatarUploader({
                   }}
                   className="flex-1"
                 >
-                  Edit
+                  {loading ? (
+                    <div className="flex flex-row items-center gap-2">
+                      <LoaderPinwheel className="h-4 w-4 animate-spin" />
+                      Uploading...
+                    </div>
+                  ) : (
+                    `Edit`
+                  )}
                 </Button>
                 <Button
                   type="button"

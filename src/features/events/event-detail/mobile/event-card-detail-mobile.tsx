@@ -122,7 +122,9 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
             alt="Event Logo"
             width={60}
             height={60}
-            className={cn("size-[60px] rounded-full border-2")}
+            className={cn(
+              "size-[60px] rounded-full border-2 border-foreground",
+            )}
           />
 
           <div className="flex flex-col items-center space-y-4">
@@ -214,7 +216,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
                   <motion.div
                     exit={{ opacity: 0 }}
                     layoutId="tab-bg"
-                    className="absolute inset-0 z-0 rounded-md border-2 border-foreground bg-background shadow-sm"
+                    className="absolute inset-0 z-0 rounded-md border-1.5 border-foreground bg-background shadow-sm"
                     transition={{
                       type: "spring",
                       stiffness: 400,

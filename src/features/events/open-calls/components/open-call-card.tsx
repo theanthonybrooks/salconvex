@@ -233,7 +233,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
 
                     {noBudgetInfo && <p className="text-sm">No Info</p>}
                   </p>
-                  <p className="font-semibold underline underline-offset-2">
+                  <p className="mx-auto font-semibold underline underline-offset-2">
                     Compensation Includes:
                   </p>
 
@@ -246,6 +246,9 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     noBudgetInfo={noBudgetInfo}
                     currency={currency}
                   />
+                  <p className="text-xs italic text-muted-foreground">
+                    (Items listed above are in addition to the main budget)
+                  </p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -459,6 +462,9 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     noBudgetInfo={noBudgetInfo}
                     currency={currency}
                   />
+                  <p className="text-xs italic text-muted-foreground">
+                    (Items listed above are in addition to the main budget)
+                  </p>
                 </div>
 
                 {budgetMoreInfo && (

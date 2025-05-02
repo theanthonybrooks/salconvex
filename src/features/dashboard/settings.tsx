@@ -1,7 +1,6 @@
 "use client";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -60,7 +59,6 @@ import {
   Mail,
   Palette,
   Shield,
-  Upload,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -68,11 +66,11 @@ import { z } from "zod";
 
 import { currencies, Currency } from "@/app/data/currencies";
 import { Timezone, timezones } from "@/app/data/timezones";
+import AvatarUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
-import { FaUserNinja } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
@@ -80,6 +78,7 @@ export default function SettingsPage() {
   const { signOut } = useAuthActions();
   const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
+
   const userPrefs = userData?.userPref;
   const sessionCount = useQuery(api.users.countSessions, {
     userId: user?.userId ?? "guest",
@@ -89,6 +88,7 @@ export default function SettingsPage() {
   const deleteSessions = useMutation(api.users.deleteSessions);
   const updateUser = useMutation(api.users.updateUser);
   const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage);
+  const removeProfileImage = useMutation(api.uploads.user.removeProfileImage);
   const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const [selectedTimezone, setTimezone] = useState<string | undefined>(
     undefined,
@@ -106,11 +106,9 @@ export default function SettingsPage() {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [uploading, setUploading] = useState(false);
-  const [firstName, setFirstName] = useState<string | undefined>(undefined);
-  const [lastName, setLastName] = useState<string | undefined>(undefined);
-  const [email, setEmail] = useState<string | undefined>(undefined);
-  const [name, setName] = useState<string | undefined>(undefined);
+
   const [isSaving, setIsSaving] = useState(false);
+  const [hoverSave, setHoverSave] = useState(false);
 
   const prevPrefs = useRef({
     timezone: selectedTimezone,
@@ -145,20 +143,59 @@ export default function SettingsPage() {
   });
 
   const {
-    // register: updateRegister,
+    register: updateRegister,
     handleSubmit: updateHandleSubmit,
-    // reset: updateReset,
+    reset: updateReset,
     // formState: { errors: updateErrors },
-    setValue: updateSetValue,
+    // setValue: updateSetValue,
+    formState: { isDirty: unsavedChanges },
   } = useForm<z.infer<typeof UpdateUserSchema>>({
     resolver: zodResolver(UpdateUserSchema),
+    defaultValues: {
+      firstName: user?.firstName ?? "",
+      lastName: user?.lastName ?? "",
+      email: user?.email ?? "",
+      name: user?.name ?? "",
+    },
   });
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (!event.target.files || event.target.files.length === 0) return;
 
-    const file = event.target.files[0];
+  const handleOnHoverSave = () => {
+    if (hoverSave) return;
+    setHoverSave(true);
+  };
+  const handleOnHoverSaveEnd = () => {
+    setTimeout(() => setHoverSave(false), 250);
+  };
+
+  const handleImgRemoval = async () => {
+    if (!user) return;
+    if (!user.imageStorageId) return;
+    try {
+      setUploading(true);
+      await removeProfileImage({ storageId: user.imageStorageId });
+      setUploading(false);
+      toast.success("Profile image removed successfully!", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove profile image", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+    }
+  };
+
+  const handleFileChange = async (
+    // event: React.ChangeEvent<HTMLInputElement>,
+    file: Blob,
+  ) => {
+    // if (!event.target.files || event.target.files.length === 0) return;
+
+    // const file = event.target.files[0];
 
     setUploading(true);
 
@@ -188,6 +225,7 @@ export default function SettingsPage() {
       autoClose: 2000,
       pauseOnHover: false,
       hideProgressBar: true,
+      closeButton: false,
     });
   };
 
@@ -217,7 +255,7 @@ export default function SettingsPage() {
         pauseOnHover: false,
         hideProgressBar: true,
       });
-      reset();
+      updateReset();
     } catch (err: unknown) {
       // Type assertion: Explicitly check if it's a ConvexError
       if (err instanceof ConvexError) {
@@ -350,20 +388,6 @@ export default function SettingsPage() {
   }, [userPrefs]);
 
   useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName ?? "");
-      setLastName(user.lastName ?? "");
-      setEmail(user.email ?? "");
-      setName(user.name ?? "");
-
-      updateSetValue("firstName", user.firstName ?? "");
-      updateSetValue("lastName", user.lastName ?? "");
-      updateSetValue("email", user.email ?? "");
-      updateSetValue("name", user.name ?? "");
-    }
-  }, [user, updateSetValue]);
-
-  useEffect(() => {
     const handler = setTimeout(() => {
       const hasChanged =
         prevPrefs.current.timezone !== selectedTimezone ||
@@ -430,58 +454,28 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center gap-6">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage
-                      src={user?.image || "/avatars/default.jpg"}
-                      alt="User"
-                    />
-                    <AvatarFallback>
-                      <FaUserNinja />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-center">
-                    {/* Hidden File Input */}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="file-upload"
-                    />
-
-                    <label
-                      htmlFor="file-upload"
-                      className="shadow-xs cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
-                    >
-                      {uploading ? (
-                        <div className="flex flex-row items-center gap-2">
-                          <LoaderPinwheel className="h-4 w-4 animate-spin" />
-                          Uploading...
-                        </div>
-                      ) : (
-                        <div className="flex flex-row items-center gap-2 dark:text-foreground">
-                          <Upload className="h-4 w-4" />
-                          Change Avatar
-                        </div>
-                      )}
-                    </label>
-                  </div>
+                <div className="flex items-center">
+                  <AvatarUploader
+                    id="logo-upload"
+                    onChange={handleFileChange}
+                    onRemove={handleImgRemoval}
+                    initialImage={user?.image}
+                    // imageOnly
+                    className="gap-4 pr-8"
+                    loading={uploading}
+                  />
                 </div>
+
                 <Separator />
                 <form onSubmit={updateHandleSubmit(handleUpdateUserSubmit)}>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name</Label>
                       <Input
+                        {...updateRegister("firstName")}
                         disabled={pending}
                         id="firstName"
                         placeholder="Your first name/given name"
-                        defaultValue={firstName ?? ""}
-                        onChange={(e) => {
-                          setFirstName(e.target.value);
-                          updateSetValue("firstName", e.target.value);
-                        }}
                         className="dark:text-primary-foreground"
                       />
                     </div>
@@ -489,13 +483,9 @@ export default function SettingsPage() {
                       <Label htmlFor="lastName">Last Name</Label>
                       <Input
                         disabled={pending}
+                        {...updateRegister("lastName")}
                         id="lastName"
                         placeholder="Your last name/family name"
-                        defaultValue={lastName ?? ""}
-                        onChange={(e) => {
-                          setLastName(e.target.value);
-                          updateSetValue("lastName", e.target.value);
-                        }}
                         className="dark:text-primary-foreground"
                       />
                     </div>
@@ -507,16 +497,11 @@ export default function SettingsPage() {
                         </i>
                       </Label>
                       <Input
+                        {...updateRegister("email")}
                         disabled={pending}
                         id="email"
                         type="email"
-                        // readOnly
                         placeholder="Your email"
-                        defaultValue={email ?? ""}
-                        onChange={(e) => {
-                          setEmail(e.target.value);
-                          updateSetValue("email", e.target.value);
-                        }}
                         className="dark:text-primary-foreground"
                       />
                     </div>
@@ -526,28 +511,30 @@ export default function SettingsPage() {
                         <p className="text-sm font-light italic">(Optional)</p>
                       </div>
                       <Input
+                        {...updateRegister("name")}
                         id="name"
                         placeholder="Artist Name/Preferred Name"
-                        defaultValue={name ?? ""}
-                        onChange={(e) => {
-                          updateSetValue("name", e.target.value);
-                          setName(e.target.value);
-                        }}
                         className="dark:text-primary-foreground"
                       />
                     </div>
                   </div>
                   <Button
-                    disabled={isSaving}
+                    disabled={isSaving || !unsavedChanges}
                     type="submit"
-                    variant="salWithShadow"
+                    variant={
+                      unsavedChanges ? "salWithShadow" : "salWithoutShadow"
+                    }
+                    onMouseEnter={handleOnHoverSave}
+                    onMouseLeave={handleOnHoverSaveEnd}
                     className="mt-4 w-full dark:text-primary-foreground sm:w-auto"
                   >
                     {isSaving ? (
                       <span className="flex items-center gap-2">
-                        <LoaderPinwheel className="h-4 w-4 animate-spin" />
+                        <LoaderPinwheel className="size-4 animate-spin" />
                         Saving...
                       </span>
+                    ) : hoverSave ? (
+                      "Save Changes?"
                     ) : (
                       "Save Changes"
                     )}

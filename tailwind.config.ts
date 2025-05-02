@@ -118,6 +118,7 @@ export default {
       },
       boxShadow: {
         sxl: "-7px 7px 0 0 #000000",
+        slgHover: "-4px 4px 0 0 #000000",
         slg: "-5px 5px 0 0 #000000",
         slga: "-5px 5px 0 0 rgba(0, 0, 0, 0.7)",
         llg: "5px 5px 0 0 #000000",

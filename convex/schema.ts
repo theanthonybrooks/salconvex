@@ -69,6 +69,8 @@ const customUserSchema = {
   subscription: v.optional(v.string()),
   tokenIdentifier: v.string(),
   image: v.optional(v.string()),
+  imageStorageId: v.optional(v.id("_storage")),
+
   emailVerified: v.optional(v.boolean()),
 };
 
@@ -137,6 +139,8 @@ const organizationSchema = {
   // events: v.optional(v.array(v.id("events"))),
   events: v.array(v.id("events")),
   logo: v.string(), //will default to /1.jpg as always
+  logoStorageId: v.optional(v.id("_storage")),
+
   location: v.optional(
     v.object({
       full: v.optional(v.string()),
@@ -204,6 +208,7 @@ const eventSchema = {
   slug: v.string(),
   name: v.string(),
   logo: v.string(),
+  logoStorageId: v.optional(v.id("_storage")),
   type: typeValidator,
   category: categoryValidator,
 

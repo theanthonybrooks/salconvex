@@ -131,7 +131,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
             width={60}
             height={60}
             className={cn(
-              "size-[60px] rounded-full border-2",
+              "size-[60px] rounded-full border-2 border-foreground",
 
               appStatus === "accepted"
                 ? "ring-4 ring-emerald-500 ring-offset-1"

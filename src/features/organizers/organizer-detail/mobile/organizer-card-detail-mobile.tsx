@@ -104,7 +104,9 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
             alt="Organizer Logo"
             width={60}
             height={60}
-            className={cn("size-[60px] rounded-full border-2")}
+            className={cn(
+              "size-[60px] rounded-full border-2 border-foreground",
+            )}
           />
 
           <div className="flex flex-col items-center space-y-4">
