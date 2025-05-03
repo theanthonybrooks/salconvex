@@ -115,7 +115,7 @@ export function UserProfile({
           </Link> */}
 
               <Link
-                href="/dashboard/account"
+                href="/dashboard/account/billing"
                 className="underline-offset-2 hover:cursor-pointer hover:underline"
               >
                 <DropdownMenuItem className="focus:bg-salYellow/50">

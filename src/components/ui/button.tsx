@@ -20,7 +20,7 @@ const buttonVariants = cva(
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80 ${defaultSvg}`,
         ghost: `hover:scale-110 active:scale-95 border border-transparent ${defaultSvg}`,
         ghost2: `hover:bg-none hover:text-accent-foreground hover:scale-105 ${defaultSvg}`,
-        link: `text-primary underline-offset-4 hover:underline ${defaultSvg}`,
+        link: `text-primary underline-offset-2 hover:underline ${defaultSvg}`,
         expandIcon: `group relative text-primary-foreground bg-primary hover:bg-primary/90 ${defaultSvg}`,
         ringHover: `bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:ring-2 hover:ring-primary/90 hover:ring-offset-2 ${defaultSvg}`,
         shine: `text-primary-foreground animate-shine bg-linear-to-r from-primary via-primary/75 to-primary bg-[length:400%_100%]  ${defaultSvg}`,
@@ -43,6 +43,7 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-6 sm:px-8 text-base sm:text-sm",
         icon: "h-10 w-10",
         richText: "h-auto p-1",
+        link: "h-auto p-0",
       },
     },
     defaultVariants: {
