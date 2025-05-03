@@ -94,7 +94,10 @@ const PricingHeader = ({
   title: string;
   subtitle: string;
 }) => (
-  <div className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8">
+  <div
+    id="pricing-header"
+    className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8"
+  >
     <h2 className="cursor-pointer font-tanker text-4h lowercase tracking-wide text-foreground md:text-[4em]">
       {title}
     </h2>
@@ -196,6 +199,14 @@ export const AccountTypeSwitch = ({
               selectedAccountType === "artist" ? "organizer" : "artist",
             );
             setIsYearly(false);
+            // window.scrollTo({ top: 0, behavior: "smooth" });
+            const el = document.getElementById("pricing-header");
+            if (el) {
+              const yOffset = -100; // adjust to match your navbar height
+              const y =
+                el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: "auto" });
+            }
           }}
           className="w-fit"
         >
@@ -534,7 +545,7 @@ export default function Pricing() {
           <>
             <PricingHeader
               title="Choose Your Plan"
-              subtitle="Select the perfect plan for your needs. All plans include a 14-day free trial."
+              subtitle="All plans include a 14-day free trial."
             />
             <PricingSwitch onSwitch={togglePricingPeriod} />
           </>

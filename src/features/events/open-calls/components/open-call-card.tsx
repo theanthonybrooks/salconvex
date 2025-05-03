@@ -12,6 +12,7 @@ import { OpenCall } from "@/types/openCall";
 
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
+import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
 import {
   OpenCallProvided,
   OpenCallProvidedPreview,
@@ -128,7 +129,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                           href={icsLink}
                           download={`${event.name.replace(/\s+/g, "_")}.ics`}
                         >
-                          <CalendarClockIcon className="size-7 md:size-4" />
+                          <CalendarClockIcon className="size-5 md:size-4" />
                         </a>
                       )}
                     </span>
@@ -143,11 +144,11 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                         eligibilityType !== "International" && "text-red-600",
                       )}
                     >
-                      {eligibilityType !== "International"
-                        ? `${eligibilityType}: ${eligibilityWhom
-                            .map((whom) => whom)
-                            .join("/ ")} Artists*`
-                        : "International (all)"}
+                      <EligibilityLabel
+                        type={eligibilityType}
+                        whom={eligibilityWhom}
+                        format="mobile"
+                      />
                     </span>
                   </p>
                   {eligibilityDetails && (
@@ -246,8 +247,8 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     noBudgetInfo={noBudgetInfo}
                     currency={currency}
                   />
-                  <p className="text-xs italic text-muted-foreground">
-                    (Items listed above are in addition to the main budget)
+                  <p className="text-center text-xs italic text-muted-foreground">
+                    (Items listed are in addition to the main budget)
                   </p>
                 </div>
               </AccordionContent>
@@ -373,11 +374,11 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                       eligibilityType !== "International" && "text-red-600",
                     )}
                   >
-                    {eligibilityType !== "International"
-                      ? `${eligibilityType}: ${eligibilityWhom
-                          .map((whom) => whom)
-                          .join("/ ")} Artists*`
-                      : "International (all)"}
+                    <EligibilityLabel
+                      type={eligibilityType}
+                      whom={eligibilityWhom}
+                      format="desktop"
+                    />
                   </span>
                 </p>
                 {eligibilityDetails && (
@@ -462,7 +463,7 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     noBudgetInfo={noBudgetInfo}
                     currency={currency}
                   />
-                  <p className="text-xs italic text-muted-foreground">
+                  <p className="mt-2 text-center text-xs italic text-muted-foreground">
                     (Items listed above are in addition to the main budget)
                   </p>
                 </div>

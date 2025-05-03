@@ -14,6 +14,7 @@ import {
   ApplyButton,
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn";
+import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
 import { OpenCallProvidedPreview } from "@/features/events/open-calls/components/open-call-provided";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
@@ -283,12 +284,12 @@ const EventCardPreview = ({
                       eligibility.type !== "International" && "text-red-600",
                     )}
                   >
-                    {eligibility.whom.length > 1
-                      ? "See details"
-                      : eligibility.whom[0]}
-                    {eligibility.type !== "International" &&
-                      eligibility.whom.length === 1 &&
-                      " Artists*"}
+                    <EligibilityLabel
+                      type={eligibility.type}
+                      whom={eligibility.whom}
+                      format="mobile"
+                      preview={true}
+                    />
                   </span>
                 )}
               </p>
@@ -571,10 +572,12 @@ const EventCardPreview = ({
                         eligibility.type !== "International" && "text-red-600",
                       )}
                     >
-                      {eligibility.type !== "International" &&
-                        `${eligibility.type}: `}
-                      {eligibility.whom.map((whom) => whom).join(" & ")}
-                      {eligibility.type !== "International" && " Artists*"}
+                      <EligibilityLabel
+                        type={eligibility.type}
+                        whom={eligibility.whom}
+                        format="desktop"
+                        preview={true}
+                      />
                     </span>
                     <span
                       className={cn(
@@ -582,12 +585,12 @@ const EventCardPreview = ({
                         eligibility.type !== "International" && "text-red-600",
                       )}
                     >
-                      {eligibility.whom.length > 1
-                        ? "See app details"
-                        : eligibility.whom[0]}
-                      {eligibility.type !== "International" &&
-                        eligibility.whom.length === 1 &&
-                        " Artists*"}
+                      <EligibilityLabel
+                        type={eligibility.type}
+                        whom={eligibility.whom}
+                        format="mobile"
+                        preview={true}
+                      />
                     </span>
                   </>
                 )}

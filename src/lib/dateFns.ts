@@ -153,7 +153,7 @@ export const formatEventDates = (
       return `${startMonthShort?.slice(0, 3)} ${startDay}, ${startYearShort} - ${endMonthShort?.slice(0, 3)} ${endDay}, ${endYearShort}`;
     }
   } else if (startMonthFull !== endMonthFull) {
-    return `${startMonthShort} ${startDay} - ${endMonthShort} ${endDay} (${startYear})`;
+    return `${startMonthShort} ${startDay} - ${endMonthShort} ${endDay}, ${startYear}`;
   } else if (start === end) {
     return `${getFourCharMonth(startDate)} ${startDay} (${startYear})`;
   } else {

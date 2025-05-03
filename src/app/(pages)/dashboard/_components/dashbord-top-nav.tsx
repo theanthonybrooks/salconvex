@@ -9,7 +9,6 @@ import { User } from "@/types/user";
 import { Unauthenticated } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
-import { Bell } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -145,7 +144,7 @@ export default function NavBar({
               </Link>
             </Unauthenticated> */}
             <>
-              <Bell className="size-7 w-fit" />
+              {/* <Bell className="size-7 w-fit" /> */}
 
               <FullPageNav
                 // userId={userId}
