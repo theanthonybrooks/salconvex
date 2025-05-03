@@ -101,16 +101,13 @@ export const CustomDatePicker = ({
   const openToDate =
     isValidSelected && parsedDate ? parsedDate : (minToDate ?? today);
 
-  //   console.log(minToDate, maxToDate);
-  //   console.log(parsedDate);
-
   const dateFormat =
     pickerType === "year"
       ? "yyyy"
       : pickerType === "season"
         ? "QQQ yyyy"
         : pickerType === "dates"
-          ? "MMMM d, yyyy"
+          ? "MMM d, yyyy"
           : "MMMM yyyy";
 
   //   console.log(parsedDate, value);

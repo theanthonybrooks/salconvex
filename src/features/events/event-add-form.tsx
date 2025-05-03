@@ -15,6 +15,17 @@ import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   eventDetailsSchema,
   eventOnlySchema,
@@ -176,6 +187,8 @@ export const EventOCForm = ({
 
   const [isMobile, setIsMobile] = useState(false);
   const [furthestStep, setFurthestStep] = useState(0);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+
   const [errorMsg, setErrorMsg] = useState("");
 
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
@@ -213,8 +226,6 @@ export const EventOCForm = ({
     const result = currentSchema.safeParse(watchedValues);
     return result.success;
   }, [watchedValues, currentSchema]);
-
-  console.log(isStepValidZod);
 
   //
   //
@@ -497,45 +508,99 @@ export const EventOCForm = ({
   const handleNextStep = async () => {
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
-
-    await handleSave();
-
-    // setLoading(true);
-    // handleFormValues();
-
-    // if (activeStep === 0) {
-
-    //   // setTimeout(() => {
-    //   //   setActiveStep((prev) => prev + 1);
-    //   //   setLoading(false);
-    //   // }, 1000);
-    //   setActiveStep((prev) => prev + 1);
-    //   setLoading(false);
-    // } else {
+    if (hasUserEditedForm) {
+      await handleSave();
+    }
+    handleFirstStep();
     if (activeStep === 2 && hasOpenCall === "false") {
       setActiveStep((prev) => prev + 3);
       setValue("event.state", "draft");
     } else {
       setActiveStep((prev) => prev + 1);
     }
-
-    // if (activeStep === 5 && hasOpenCall === "false") {
-    //   console.log("stepping up");
-    // }
-
-    // }
   };
 
   const handleBackStep = async () => {
-    const isStepValid = handleCheckSchema();
-    if (!isStepValid) return;
-    await handleSave();
+    const isStepValid = handleCheckSchema(false);
+    if (!isStepValid) {
+      setShowBackConfirm(true);
+      return;
+    }
+    if (hasUserEditedForm) {
+      await handleSave();
+    }
+    proceedBackStep();
+  };
+
+  const proceedBackStep = () => {
     if (activeStep === 4 && hasOpenCall === "false") {
       setActiveStep((prev) => prev - 3);
     } else if (activeStep === 5 && hasOpenCall === "false") {
       setActiveStep((prev) => prev - 3);
     } else {
       setActiveStep((prev) => prev - 1);
+    }
+  };
+
+  const handleFirstStep = () => {
+    if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
+      const eventLinks = existingEvent?.links ?? { sameAsOrganizer: true };
+      const locationFromEvent = existingEvent?.location?.full
+        ? existingEvent?.location?.sameAsOrganizer
+          ? {
+              ...currentValues.organization?.location,
+              sameAsOrganizer: true,
+            }
+          : {
+              ...existingEvent.location,
+            }
+        : {
+            ...currentValues.organization?.location,
+            sameAsOrganizer: true,
+          };
+
+      if (existingEvent) {
+        reset(
+          merge({}, currentValues, {
+            event: {
+              // ...existingEvent,
+              ...currentValues.event,
+              location: locationFromEvent,
+              links: {
+                ...eventLinks,
+              },
+
+              // hasOpenCall: currentValues.event?.hasOpenCall || "",
+            },
+          }),
+        );
+      } else {
+        reset({
+          ...currentValues,
+          event: {
+            name: "",
+            logo: currentValues.organization.logo,
+            location: {
+              ...currentValues.organization.location,
+              sameAsOrganizer: true,
+            },
+            dates: {
+              edition: new Date().getFullYear(),
+              eventFormat: "",
+              prodFormat: undefined,
+              eventDates: [{ start: "", end: "" }],
+              prodDates: [{ start: "", end: "" }],
+              noProdStart: false,
+            },
+            links: {
+              sameAsOrganizer: true,
+            },
+            hasOpenCall: "false",
+          },
+        });
+        console.log("waffles");
+        console.log(currentValues, eventData);
+      }
     }
   };
 
@@ -581,60 +646,7 @@ export const EventOCForm = ({
         }
       }
       let orgResult = null;
-      if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
-        const eventLinks = existingEvent?.links ?? { sameAsOrganizer: true };
-        const locationFromEvent = existingEvent?.location?.full
-          ? existingEvent?.location?.sameAsOrganizer
-            ? {
-                ...currentValues.organization?.location,
-                sameAsOrganizer: true,
-              }
-            : {
-                ...existingEvent.location,
-              }
-          : {
-              ...currentValues.organization?.location,
-              sameAsOrganizer: true,
-            };
 
-        if (existingEvent) {
-          reset(
-            merge({}, currentValues, {
-              event: {
-                // ...existingEvent,
-                ...currentValues.event,
-                location: locationFromEvent,
-                links: {
-                  ...eventLinks,
-                },
-
-                // hasOpenCall: currentValues.event?.hasOpenCall || "",
-              },
-            }),
-          );
-        } else {
-          reset({
-            ...currentValues,
-            event: {
-              name: "",
-              logo: currentValues.organization.logo,
-              location: {
-                ...currentValues.organization.location,
-                sameAsOrganizer: true,
-              },
-              dates: {
-                edition: new Date().getFullYear(),
-                noProdStart: false,
-              },
-              links: {
-                sameAsOrganizer: true,
-              },
-              hasOpenCall: "false",
-            },
-          });
-          console.log("waffles");
-        }
-      }
       if (hasUserEditedStep0) {
         const result = await handleFileUrl({
           data: orgData,
@@ -979,9 +991,7 @@ export const EventOCForm = ({
       createNewOrg,
       existingOrg,
       reset,
-
       activeStep,
-      furthestStep,
       hasUserEditedEventSteps,
       eventData,
       updateOrg,
@@ -1322,636 +1332,460 @@ export const EventOCForm = ({
   }, [prodDatesStart, noProdStart, setValue, getValues]);
 
   return (
-    <HorizontalLinearStepper
-      errorMsg={errorMsg}
-      activeStep={activeStep}
-      setActiveStep={setActiveStep}
-      onNextStep={handleNextStep}
-      onBackStep={handleBackStep}
-      steps={steps}
-      skipped={skipped}
-      className="px-2 xl:px-8"
-      finalLabel="Submit"
-      onFinalSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
-      isDirty={hasUserEditedForm}
-      onSave={() => handleSave(true)}
-      lastSaved={lastSavedDate}
-      disabled={!isValid || pending}
-      pending={pending}
-      cancelButton={
-        <DialogClose asChild>
-          <Button
-            type="button"
-            variant="salWithShadowHiddenYlw"
-            className="hidden lg:min-w-24"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-        </DialogClose>
-      }
-    >
-      <FormProvider {...form}>
-        <form
-          onSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
-          className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px]"
-        >
-          {activeStep === 0 && (
-            <SubmissionFormOrgStep
-              existingOrg={existingOrg}
-              existingEvent={existingEvent}
-              eventsData={eventsData}
-              existingOrgs={hasExistingOrg}
-              validOrgWZod={validOrgWZod}
-              invalidOrgWZod={invalidOrgWZod}
-              setExistingOrg={setExistingOrg}
-              setExistingEvent={setExistingEvent}
-              handleReset={handleReset}
-              orgValidationError={orgValidationError}
-              orgNameValid={orgNameValid}
-              orgLocationValid={orgLocationValid}
-              orgDataValid={orgDataValid}
-              newOrgEvent={newOrgEvent}
-              setNewOrgEvent={setNewOrgEvent}
-              setSelectedRow={setSelectedRow}
-              selectedRow={selectedRow}
-            />
-          )}
-          {activeStep === 1 && (
-            <div
-              id="step-1-container"
-              className={cn(
-                "flex h-full flex-col gap-4 xl:justify-center",
-                "mx-auto max-w-max",
-                "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
-              )}
+    <>
+      <HorizontalLinearStepper
+        errorMsg={errorMsg}
+        activeStep={activeStep}
+        setActiveStep={setActiveStep}
+        onNextStep={handleNextStep}
+        onBackStep={handleBackStep}
+        steps={steps}
+        skipped={skipped}
+        className="px-2 xl:px-8"
+        finalLabel="Submit"
+        onFinalSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
+        isDirty={hasUserEditedForm}
+        onSave={() => handleSave(true)}
+        lastSaved={lastSavedDate}
+        disabled={!isValid || pending}
+        pending={pending}
+        cancelButton={
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="salWithShadowHiddenYlw"
+              className="hidden lg:min-w-24"
+              onClick={onCancel}
             >
+              Cancel
+            </Button>
+          </DialogClose>
+        }
+      >
+        <FormProvider {...form}>
+          <form
+            onSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
+            className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px]"
+          >
+            {activeStep === 0 && (
+              <SubmissionFormOrgStep
+                existingOrg={existingOrg}
+                existingEvent={existingEvent}
+                eventsData={eventsData}
+                existingOrgs={hasExistingOrg}
+                validOrgWZod={validOrgWZod}
+                invalidOrgWZod={invalidOrgWZod}
+                setExistingOrg={setExistingOrg}
+                setExistingEvent={setExistingEvent}
+                handleReset={handleReset}
+                orgValidationError={orgValidationError}
+                orgNameValid={orgNameValid}
+                orgLocationValid={orgLocationValid}
+                orgDataValid={orgDataValid}
+                newOrgEvent={newOrgEvent}
+                setNewOrgEvent={setNewOrgEvent}
+                setSelectedRow={setSelectedRow}
+                selectedRow={selectedRow}
+              />
+            )}
+            {activeStep === 1 && (
               <div
+                id="step-1-container"
                 className={cn(
-                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-                  "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-                  "lg:pb-10 xl:py-10 4xl:my-auto",
-
-                  // "xl:self-center",
+                  "flex h-full flex-col gap-4 xl:justify-center",
+                  "mx-auto max-w-max",
+                  "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
                 )}
               >
-                <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
-                  <p className="lg:text-xs">Category</p>
-                </div>
+                <div
+                  className={cn(
+                    "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                    "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                    "lg:pb-10 xl:py-10 4xl:my-auto",
 
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="event.category" className="sr-only">
-                    Event Category
-                  </Label>
-                  <Controller
-                    name="event.category"
-                    control={control}
-                    render={({ field }) => {
-                      return (
-                        <Select
-                          onValueChange={(value: EventCategory) => {
-                            field.onChange(value);
-                          }}
-                          value={field.value || ""}
-                        >
-                          <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                            <SelectValue placeholder="Event/Project Category (select one)" />
-                          </SelectTrigger>
-                          <SelectContent className="min-w-auto">
-                            <SelectItem fit value="event">
-                              Event
-                            </SelectItem>
-                            <SelectItem fit value="project">
-                              Project
-                            </SelectItem>
-                            <SelectItem fit value="residency">
-                              Residency
-                            </SelectItem>
-                            <SelectItem fit value="gfund">
-                              Grant/Fund
-                            </SelectItem>
-                            <SelectItem fit value="roster">
-                              Artist Roster
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      );
-                    }}
-                  />
-                  {errors.event?.category && eventData?.category && (
-                    <span className="mt-2 w-full text-center text-sm text-red-600">
-                      {errors.event?.category?.message
-                        ? errors.event?.category?.message
-                        : "Please select a category from the dropdown"}
-                    </span>
+                    // "xl:self-center",
                   )}
-                </div>
+                >
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
+                    <p className="lg:text-xs">Category</p>
+                  </div>
 
-                {categoryEvent && (
-                  <>
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
-                      <p className="lg:text-xs">Event Type</p>
-                    </div>
-
-                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                      <Label htmlFor="event.type" className="sr-only">
-                        Event Type
-                      </Label>
-                      <Controller
-                        name="event.type"
-                        control={control}
-                        render={({ field }) => (
-                          <MultiSelect
-                            id="event.type"
-                            className="h-12 border sm:h-[50px]"
-                            badgeClassName="py-2 lg:py-2 lg:text-sm "
-                            textClassName="text-base"
-                            options={options}
-                            onValueChange={(value) => {
+                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <Label htmlFor="event.category" className="sr-only">
+                      Event Category
+                    </Label>
+                    <Controller
+                      name="event.category"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <Select
+                            onValueChange={(value: EventCategory) => {
                               field.onChange(value);
                             }}
-                            defaultValue={field.value ?? []}
-                            shortResults={isMobile}
-                            placeholder="Select up to 2 event types"
-                            variant="basic"
-                            maxCount={1}
-                            limit={2}
-                            height={10}
-                            shiftOffset={-10}
-                            hasSearch={false}
-                            selectAll={false}
-                            tabIndex={4}
-                          />
-                        )}
-                      />
-                      {errors.organization?.location && orgData?.location && (
-                        <span className="mt-2 w-full text-center text-sm text-red-600">
-                          {errors.organization?.location?.country?.message
-                            ? errors.organization?.location?.country?.message
-                            : errors.organization?.location?.full?.message
-                              ? errors.organization?.location?.full?.message
-                              : "Please select a location from the dropdown"}
-                        </span>
-                      )}
-                    </div>
-                  </>
-                )}
-                {canNameEvent && (
-                  <>
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">
-                        Step {categoryEvent ? 3 : 2}:{" "}
-                      </p>
-                      <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(category)} Name
-                      </p>
-                    </div>
+                            value={field.value || ""}
+                          >
+                            <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                              <SelectValue placeholder="Event/Project Category (select one)" />
+                            </SelectTrigger>
+                            <SelectContent className="min-w-auto">
+                              <SelectItem fit value="event">
+                                Event
+                              </SelectItem>
+                              <SelectItem fit value="project">
+                                Project
+                              </SelectItem>
+                              <SelectItem fit value="residency">
+                                Residency
+                              </SelectItem>
+                              <SelectItem fit value="gfund">
+                                Grant/Fund
+                              </SelectItem>
+                              <SelectItem fit value="roster">
+                                Artist Roster
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        );
+                      }}
+                    />
+                    {errors.event?.category && eventData?.category && (
+                      <span className="mt-2 w-full text-center text-sm text-red-600">
+                        {errors.event?.category?.message
+                          ? errors.event?.category?.message
+                          : "Please select a category from the dropdown"}
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                      <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabelAbbr(category)} Name
-                      </Label>
-                      <Controller
-                        name="event.name"
-                        control={control}
-                        render={({ field }) => (
-                          <EventNameSearch
-                            value={field.value ?? ""}
-                            isExisting={eventNameExistsError}
-                            onChange={field.onChange}
-                            className="border !text-base sm:h-[50px]"
-                          />
-                        )}
-                      />
-                      {(errors.event?.name || eventNameExistsError) &&
-                        eventNameIsDirty && (
+                  {categoryEvent && (
+                    <>
+                      <div className="input-section">
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step 2:{" "}
+                        </p>
+                        <p className="lg:text-xs">Event Type</p>
+                      </div>
+
+                      <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                        <Label htmlFor="event.type" className="sr-only">
+                          Event Type
+                        </Label>
+                        <Controller
+                          name="event.type"
+                          control={control}
+                          render={({ field }) => (
+                            <MultiSelect
+                              id="event.type"
+                              className="h-12 border sm:h-[50px]"
+                              badgeClassName="py-2 lg:py-2 lg:text-sm "
+                              textClassName="text-base"
+                              options={options}
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                              }}
+                              defaultValue={field.value ?? []}
+                              shortResults={isMobile}
+                              placeholder="Select up to 2 event types"
+                              variant="basic"
+                              maxCount={1}
+                              limit={2}
+                              height={10}
+                              shiftOffset={-10}
+                              hasSearch={false}
+                              selectAll={false}
+                              tabIndex={4}
+                            />
+                          )}
+                        />
+                        {errors.organization?.location && orgData?.location && (
                           <span className="mt-2 w-full text-center text-sm text-red-600">
-                            {errors.event?.name?.message
-                              ? errors.event?.name?.message
-                              : category === "event"
-                                ? "An event with that name already exists."
-                                : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                            {errors.organization?.location?.country?.message
+                              ? errors.organization?.location?.country?.message
+                              : errors.organization?.location?.full?.message
+                                ? errors.organization?.location?.full?.message
+                                : "Please select a location from the dropdown"}
                           </span>
                         )}
-                    </div>
-                    {eventNameValid && (
-                      <>
-                        <div className="input-section">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {categoryEvent ? 4 : 3}:{" "}
-                          </p>
-                          <p className="lg:text-xs">Location</p>
-                        </div>
+                      </div>
+                    </>
+                  )}
+                  {canNameEvent && (
+                    <>
+                      <div className="input-section">
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step {categoryEvent ? 3 : 2}:{" "}
+                        </p>
+                        <p className="lg:text-xs">
+                          {getEventCategoryLabelAbbr(category)} Name
+                        </p>
+                      </div>
 
-                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                          <Label htmlFor="event.name" className="sr-only">
-                            {getEventCategoryLabelAbbr(category)} Location
-                          </Label>
-
-                          {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
-                          <Controller
-                            name="event.location"
-                            control={control}
-                            render={({ field }) => (
-                              <MapboxInputFull
-                                id="event.location"
-                                isEvent
-                                value={field.value}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
-                                reset={!validOrgWZod}
-                                tabIndex={2}
-                                placeholder="Event Location (if different from organization)..."
-                                className="mb-3 w-full lg:mb-0"
-                                inputClassName="rounded-lg border-foreground disabled:opacity-50"
-                              />
-                            )}
-                          />
-                          {errors.event?.location && eventData?.location && (
+                      <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                        <Label htmlFor="event.name" className="sr-only">
+                          {getEventCategoryLabelAbbr(category)} Name
+                        </Label>
+                        <Controller
+                          name="event.name"
+                          control={control}
+                          render={({ field }) => (
+                            <EventNameSearch
+                              value={field.value ?? ""}
+                              isExisting={eventNameExistsError}
+                              onChange={field.onChange}
+                              className="border !text-base sm:h-[50px]"
+                            />
+                          )}
+                        />
+                        {(errors.event?.name || eventNameExistsError) &&
+                          eventNameIsDirty && (
                             <span className="mt-2 w-full text-center text-sm text-red-600">
-                              {errors.event?.location?.country?.message
-                                ? errors.event?.location?.country?.message
-                                : errors.event?.location?.full?.message
-                                  ? errors.event?.location?.full?.message
-                                  : "Please select a location from the dropdown"}
+                              {errors.event?.name?.message
+                                ? errors.event?.name?.message
+                                : category === "event"
+                                  ? "An event with that name already exists."
+                                  : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
                             </span>
                           )}
-                        </div>
-                        <div className="input-section">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {categoryEvent ? 5 : 4}:{" "}
-                          </p>
-                          <p className="lg:text-xs">
-                            {getEventCategoryLabelAbbr(category)} Logo
-                          </p>
-                        </div>
-                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                          <Label
-                            htmlFor="organization.logo"
-                            className="sr-only"
-                          >
-                            Event/Project Logo
-                          </Label>
-                          <Controller
-                            name="event.logo"
-                            control={control}
-                            render={({ field }) => (
-                              <AvatarUploader
-                                id="event.logo"
-                                onChange={(file) => field.onChange(file)}
-                                onRemove={() =>
-                                  field.onChange(orgData?.logo ?? "1.jpg")
-                                }
-                                reset={!validOrgWZod}
-                                disabled={!orgNameValid}
-                                initialImage={
-                                  typeof field.value === "string"
-                                    ? field.value
-                                    : undefined
-                                }
-                                size={72}
-                                tabIndex={3}
-                                className={cn("pb-3")}
-                              />
-                            )}
-                          />
-                        </div>
-                        {canNameEvent && (
-                          <>
-                            <div className="input-section h-full">
-                              <p className="min-w-max font-bold lg:text-xl">
-                                Step {categoryEvent ? 6 : 5}:{" "}
-                              </p>
-                              <p className="lg:text-xs">
-                                {getEventCategoryLabelAbbr(category)}{" "}
-                                Details/Notes
-                              </p>
-                            </div>
-
-                            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                              <Label htmlFor="event.name" className="sr-only">
-                                {getEventCategoryLabelAbbr(category)} About
-                              </Label>
-                              <Controller
-                                name="event.about"
-                                control={control}
-                                render={({ field }) => (
-                                  <RichTextEditor
-                                    value={field.value ?? ""}
-                                    onChange={field.onChange}
-                                    placeholder="Short blurb about your project/event... (limit 200 characters)"
-                                    charLimit={200}
-                                  />
-                                )}
-                              />
-                              {(errors.event?.name || eventNameExistsError) &&
-                                eventNameIsDirty && (
-                                  <span className="mt-2 w-full text-center text-sm text-red-600">
-                                    {errors.event?.name?.message
-                                      ? errors.event?.name?.message
-                                      : category === "event"
-                                        ? "An event with that name already exists."
-                                        : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
-                                  </span>
-                                )}
-                            </div>
-                          </>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-              {hasEventLocation && (
-                <>
-                  <Separator
-                    thickness={2}
-                    className="mx-auto hidden xl:block"
-                    orientation="vertical"
-                  />
-                  <div
-                    className={cn(
-                      "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-                      "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-                      "lg:pt-10 xl:py-10 4xl:my-auto",
-                      // "xl:self-center",
-                    )}
-                  >
-                    <div className="input-section">
-                      <p className="min-w-max font-bold lg:text-xl">
-                        Step {categoryEvent ? 7 : 6}:{" "}
-                      </p>
-                      <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(category)} Dates
-                      </p>
-                    </div>
-
-                    <FormDatePicker
-                      isAdmin={isAdmin}
-                      title="Event Dates Format"
-                      nameBase="event.dates"
-                      type="event"
-                      watchPath="event"
-                    />
-
-                    {!isOngoing &&
-                      hasEventFormat &&
-                      (!blankEventDates || eventDateFormatNotRequired) && (
+                      </div>
+                      {eventNameValid && (
                         <>
                           <div className="input-section">
                             <p className="min-w-max font-bold lg:text-xl">
-                              Step {categoryEvent ? 8 : 7}:{" "}
+                              Step {categoryEvent ? 4 : 3}:{" "}
                             </p>
-                            <p className="lg:text-xs">Production Dates</p>
+                            <p className="lg:text-xs">Location</p>
                           </div>
 
-                          <FormDatePicker
-                            isAdmin={isAdmin}
-                            title="Production Dates Format"
-                            nameBase="event.dates"
-                            type="production"
-                            watchPath="event"
-                          />
-                          <div />
-                          <label
-                            className={cn(
-                              "mx-auto flex cursor-pointer items-center gap-2 py-2",
-                            )}
-                          >
+                          <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                            <Label htmlFor="event.name" className="sr-only">
+                              {getEventCategoryLabelAbbr(category)} Location
+                            </Label>
+
+                            {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
                             <Controller
-                              name="event.dates.noProdStart"
+                              name="event.location"
                               control={control}
-                              render={({ field }) => {
-                                return (
-                                  <Checkbox
-                                    disabled={
-                                      isOngoing ||
-                                      !hasEventFormat ||
-                                      (blankEventDates &&
-                                        eventDateFormatRequired)
-                                    }
-                                    tabIndex={4}
-                                    id="noProdStart"
-                                    className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                                    checked={field.value || false}
-                                    onCheckedChange={(checked) => {
-                                      field.onChange(checked);
-                                      if (checked) {
-                                        setValue("event.dates.prodDates", [
-                                          {
-                                            start: "",
-                                            end: currentValues.event.dates
-                                              ?.prodDates
-                                              ? currentValues.event.dates
-                                                  .prodDates[0]?.end
-                                              : "",
-                                          },
-                                        ]);
-                                      }
-                                      // if (blankProdStart) {
-                                      //   setNoProdStart(true);
-                                      // } else if (hasProdDateAndFormat) {
-                                      //   setNoProdStart(false);
-                                      // }
-                                    }}
-                                  />
-                                );
-                              }}
+                              render={({ field }) => (
+                                <MapboxInputFull
+                                  id="event.location"
+                                  isEvent
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  onBlur={field.onBlur}
+                                  reset={!validOrgWZod}
+                                  tabIndex={2}
+                                  placeholder="Event Location (if different from organization)..."
+                                  className="mb-3 w-full lg:mb-0"
+                                  inputClassName="rounded-lg border-foreground disabled:opacity-50"
+                                />
+                              )}
                             />
-
-                            <span className={cn("text-sm")}>
-                              The beginning production date is flexible/open
-                            </span>
-                          </label>
-                        </>
-                      )}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          {activeStep === 2 && (
-            <div
-              id="step-2-container"
-              className={cn(
-                "flex h-full flex-col gap-4 xl:justify-center",
-                "mx-auto max-w-max",
-                "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
-              )}
-            >
-              <div
-                className={cn(
-                  "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-                  "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-                  "lg:pb-10 xl:py-10 4xl:my-auto",
-
-                  // "xl:self-center",
-                )}
-              >
-                <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">
-                    Step {categoryEvent ? 9 : 8}:{" "}
-                  </p>
-                  <p className="lg:text-xs">
-                    {getEventCategoryLabelAbbr(category)} Links
-                  </p>
-                </div>
-
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="event.category" className="sr-only">
-                    Event Links
-                  </Label>
-
-                  <FormLinksInput
-                    existingOrgHasLinks={!!existingOrg?.links}
-                    type="event"
-                  />
-
-                  {errors.event?.category && eventData?.category && (
-                    <span className="mt-2 w-full text-center text-sm text-red-600">
-                      {errors.event?.category?.message
-                        ? errors.event?.category?.message
-                        : "Please select a category from the dropdown"}
-                    </span>
-                  )}
-                </div>
-              </div>
-              {hasEventLocation && (
-                <>
-                  <Separator
-                    thickness={2}
-                    className="mx-auto hidden xl:block"
-                    orientation="vertical"
-                  />
-
-                  <div
-                    className={cn(
-                      "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-                      "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-                      "lg:pt-10 xl:py-10 4xl:my-auto",
-                      // "xl:self-center",
-                    )}
-                  >
-                    {canNameEvent && (
-                      <>
-                        <div className="input-section">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {categoryEvent ? 10 : 9}:{" "}
-                          </p>
-                          <p className="lg:text-xs">Open Call</p>
-                        </div>
-                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                          <Label
-                            htmlFor="event.hasOpenCall"
-                            className="sr-only"
-                          >
-                            Open Call
-                          </Label>
-                          <Controller
-                            name="event.hasOpenCall"
-                            control={control}
-                            render={({ field }) => (
-                              <Select
-                                onValueChange={(value) => {
-                                  field.onChange(value);
-                                  // setHasOpenCall(value);
-                                }}
-                                value={field.value ?? ""}
-                              >
-                                <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                                  <SelectValue
-                                    placeholder={`Does your ${getEventCategoryLabelAbbr(category).toLowerCase()} have an open call?`}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent className="min-w-auto">
-                                  <SelectItem fit value="true">
-                                    Yes, there&apos;s an Open Call
-                                  </SelectItem>
-                                  <SelectItem fit value="false">
-                                    No, there&apos;s not an Open Call
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            )}
-                          />
-                          {errors.event?.hasOpenCall && (
-                            <span className="mt-2 w-full text-center text-sm text-red-600">
-                              {errors.event?.hasOpenCall?.message}
-                            </span>
-                          )}
-                        </div>
-                        <div className="input-section h-full">
-                          <p className="min-w-max font-bold lg:text-xl">
-                            Step {categoryEvent ? 11 : 10}:{" "}
-                          </p>
-                          <p className="lg:text-xs">Other Info</p>
-                        </div>
-
-                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                          <Label htmlFor="event.name" className="sr-only">
-                            {getEventCategoryLabelAbbr(category)} Other Info
-                          </Label>
-                          {/* <Controller
-                            name="event.otherInfo.0"
-                            control={control}
-                            render={({ field }) => (
-                              <DebouncedTextarea
-                                value={field.value ?? ""}
-                                onChange={field.onChange}
-                                delay={500}
-                                placeholder="Short blurb about your project/event... (limit 200 characters)"
-                                //  className={
-                                //    cn()
-
-                                //  }
-                              />
-                            )}
-                          /> */}
-                          <Controller
-                            name="event.otherInfo"
-                            control={control}
-                            render={({ field }) => (
-                              <RichTextEditor
-                                value={field.value ?? ""}
-                                onChange={field.onChange}
-                                placeholder="Add any other info about your project/event... (limit 500 characters)"
-                                charLimit={500}
-                              />
-                            )}
-                          />
-                          <span className="w-full text-center text-xs italic text-muted-foreground">
-                            (Formatting is for preview and won&apos;t exactly
-                            match the public version)
-                          </span>
-
-                          {(errors.event?.name || eventNameExistsError) &&
-                            eventNameIsDirty && (
+                            {errors.event?.location && eventData?.location && (
                               <span className="mt-2 w-full text-center text-sm text-red-600">
-                                {errors.event?.name?.message
-                                  ? errors.event?.name?.message
-                                  : category === "event"
-                                    ? "An event with that name already exists."
-                                    : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                                {errors.event?.location?.country?.message
+                                  ? errors.event?.location?.country?.message
+                                  : errors.event?.location?.full?.message
+                                    ? errors.event?.location?.full?.message
+                                    : "Please select a location from the dropdown"}
                               </span>
                             )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          {activeStep === 3 && (
-            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Open Call</p>
-          )}
-          {activeStep === 4 && (
-            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Budget</p>
-          )}
-          {activeStep === steps.length - 2 && (
-            <>
+                          </div>
+                          <div className="input-section">
+                            <p className="min-w-max font-bold lg:text-xl">
+                              Step {categoryEvent ? 5 : 4}:{" "}
+                            </p>
+                            <p className="lg:text-xs">
+                              {getEventCategoryLabelAbbr(category)} Logo
+                            </p>
+                          </div>
+                          <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                            <Label
+                              htmlFor="organization.logo"
+                              className="sr-only"
+                            >
+                              Event/Project Logo
+                            </Label>
+                            <Controller
+                              name="event.logo"
+                              control={control}
+                              render={({ field }) => (
+                                <AvatarUploader
+                                  id="event.logo"
+                                  onChange={(file) => field.onChange(file)}
+                                  onRemove={() =>
+                                    field.onChange(orgData?.logo ?? "1.jpg")
+                                  }
+                                  reset={!validOrgWZod}
+                                  disabled={!orgNameValid}
+                                  initialImage={
+                                    typeof field.value === "string"
+                                      ? field.value
+                                      : undefined
+                                  }
+                                  size={72}
+                                  tabIndex={3}
+                                  className={cn("pb-3")}
+                                />
+                              )}
+                            />
+                          </div>
+                          {canNameEvent && (
+                            <>
+                              <div className="input-section h-full">
+                                <p className="min-w-max font-bold lg:text-xl">
+                                  Step {categoryEvent ? 6 : 5}:{" "}
+                                </p>
+                                <p className="lg:text-xs">
+                                  {getEventCategoryLabelAbbr(category)}{" "}
+                                  Details/Notes
+                                </p>
+                              </div>
+
+                              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                                <Label htmlFor="event.name" className="sr-only">
+                                  {getEventCategoryLabelAbbr(category)} About
+                                </Label>
+                                <Controller
+                                  name="event.about"
+                                  control={control}
+                                  render={({ field }) => (
+                                    <RichTextEditor
+                                      value={field.value ?? ""}
+                                      onChange={field.onChange}
+                                      placeholder="Short blurb about your project/event... (limit 200 characters)"
+                                      charLimit={200}
+                                    />
+                                  )}
+                                />
+                                {(errors.event?.name || eventNameExistsError) &&
+                                  eventNameIsDirty && (
+                                    <span className="mt-2 w-full text-center text-sm text-red-600">
+                                      {errors.event?.name?.message
+                                        ? errors.event?.name?.message
+                                        : category === "event"
+                                          ? "An event with that name already exists."
+                                          : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                                    </span>
+                                  )}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+                {hasEventLocation && (
+                  <>
+                    <Separator
+                      thickness={2}
+                      className="mx-auto hidden xl:block"
+                      orientation="vertical"
+                    />
+                    <div
+                      className={cn(
+                        "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                        "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                        "lg:pt-10 xl:py-10 4xl:my-auto",
+                        // "xl:self-center",
+                      )}
+                    >
+                      <div className="input-section">
+                        <p className="min-w-max font-bold lg:text-xl">
+                          Step {categoryEvent ? 7 : 6}:{" "}
+                        </p>
+                        <p className="lg:text-xs">
+                          {getEventCategoryLabelAbbr(category)} Dates
+                        </p>
+                      </div>
+
+                      <FormDatePicker
+                        isAdmin={isAdmin}
+                        title="Event Dates Format"
+                        nameBase="event.dates"
+                        type="event"
+                        watchPath="event"
+                      />
+
+                      {!isOngoing &&
+                        hasEventFormat &&
+                        (!blankEventDates || eventDateFormatNotRequired) && (
+                          <>
+                            <div className="input-section">
+                              <p className="min-w-max font-bold lg:text-xl">
+                                Step {categoryEvent ? 8 : 7}:{" "}
+                              </p>
+                              <p className="lg:text-xs">Production Dates</p>
+                            </div>
+
+                            <FormDatePicker
+                              isAdmin={isAdmin}
+                              title="Production Dates Format"
+                              nameBase="event.dates"
+                              type="production"
+                              watchPath="event"
+                            />
+                            <div />
+                            <label
+                              className={cn(
+                                "mx-auto flex cursor-pointer items-center gap-2 py-2",
+                              )}
+                            >
+                              <Controller
+                                name="event.dates.noProdStart"
+                                control={control}
+                                render={({ field }) => {
+                                  return (
+                                    <Checkbox
+                                      disabled={
+                                        isOngoing ||
+                                        !hasEventFormat ||
+                                        (blankEventDates &&
+                                          eventDateFormatRequired)
+                                      }
+                                      tabIndex={4}
+                                      id="noProdStart"
+                                      className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                                      checked={field.value || false}
+                                      onCheckedChange={(checked) => {
+                                        field.onChange(checked);
+                                        if (checked) {
+                                          setValue("event.dates.prodDates", [
+                                            {
+                                              start: "",
+                                              end: currentValues.event.dates
+                                                ?.prodDates
+                                                ? currentValues.event.dates
+                                                    .prodDates[0]?.end
+                                                : "",
+                                            },
+                                          ]);
+                                        }
+                                        // if (blankProdStart) {
+                                        //   setNoProdStart(true);
+                                        // } else if (hasProdDateAndFormat) {
+                                        //   setNoProdStart(false);
+                                        // }
+                                      }}
+                                    />
+                                  );
+                                }}
+                              />
+
+                              <span className={cn("text-sm")}>
+                                The beginning production date is flexible/open
+                              </span>
+                            </label>
+                          </>
+                        )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+            {activeStep === 2 && (
               <div
                 id="step-2-container"
                 className={cn(
@@ -1970,16 +1804,23 @@ export const EventOCForm = ({
                   )}
                 >
                   <div className="input-section">
-                    <p className="min-w-max font-bold lg:text-xl">Step 1:</p>
-                    <p className="lg:text-xs">Organizer Links</p>
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {categoryEvent ? 9 : 8}:{" "}
+                    </p>
+                    <p className="lg:text-xs">
+                      {getEventCategoryLabelAbbr(category)} Links
+                    </p>
                   </div>
 
                   <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.category" className="sr-only">
-                      Organizer Links
+                      Event Links
                     </Label>
 
-                    <FormLinksInput type="organization" />
+                    <FormLinksInput
+                      existingOrgHasLinks={!!existingOrg?.links}
+                      type="event"
+                    />
 
                     {errors.event?.category && eventData?.category && (
                       <span className="mt-2 w-full text-center text-sm text-red-600">
@@ -2010,29 +1851,42 @@ export const EventOCForm = ({
                         <>
                           <div className="input-section">
                             <p className="min-w-max font-bold lg:text-xl">
-                              Step 2
+                              Step {categoryEvent ? 10 : 9}:{" "}
                             </p>
-                            <p className="lg:text-xs">Primary Contact</p>
+                            <p className="lg:text-xs">Open Call</p>
                           </div>
                           <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                             <Label
                               htmlFor="event.hasOpenCall"
                               className="sr-only"
                             >
-                              Change Me //TODO: change this
+                              Open Call
                             </Label>
                             <Controller
-                              name="organization.contact.organizer"
+                              name="event.hasOpenCall"
                               control={control}
                               render={({ field }) => (
-                                <Input
-                                  id="event.location"
-                                  value={field.value || ""}
-                                  onChange={field.onChange}
-                                  tabIndex={2}
-                                  placeholder="Name of primary contact"
-                                  className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
-                                />
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    // setHasOpenCall(value);
+                                  }}
+                                  value={field.value ?? ""}
+                                >
+                                  <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                                    <SelectValue
+                                      placeholder={`Does your ${getEventCategoryLabelAbbr(category).toLowerCase()} have an open call?`}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent className="min-w-auto">
+                                    <SelectItem fit value="true">
+                                      Yes, there&apos;s an Open Call
+                                    </SelectItem>
+                                    <SelectItem fit value="false">
+                                      No, there&apos;s not an Open Call
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
                               )}
                             />
                             {errors.event?.hasOpenCall && (
@@ -2043,29 +1897,40 @@ export const EventOCForm = ({
                           </div>
                           <div className="input-section h-full">
                             <p className="min-w-max font-bold lg:text-xl">
-                              Step 3:
+                              Step {categoryEvent ? 11 : 10}:{" "}
                             </p>
-                            <p className="lg:text-xs">Organizer - About</p>
+                            <p className="lg:text-xs">Other Info</p>
                           </div>
 
                           <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                            <Label
-                              htmlFor="organization.about"
-                              className="sr-only"
-                            >
-                              Organizer - About
+                            <Label htmlFor="event.name" className="sr-only">
+                              {getEventCategoryLabelAbbr(category)} Other Info
                             </Label>
-
+                            {/* <Controller
+                              name="event.otherInfo.0"
+                              control={control}
+                              render={({ field }) => (
+                                <DebouncedTextarea
+                                  value={field.value ?? ""}
+                                  onChange={field.onChange}
+                                  delay={500}
+                                  placeholder="Short blurb about your project/event... (limit 200 characters)"
+                                  //  className={
+                                  //    cn()
+  
+                                  //  }
+                                />
+                              )}
+                            /> */}
                             <Controller
-                              name="organization.about"
+                              name="event.otherInfo"
                               control={control}
                               render={({ field }) => (
                                 <RichTextEditor
                                   value={field.value ?? ""}
                                   onChange={field.onChange}
-                                  placeholder="Add any info about your organization... (limit 750 characters)"
-                                  charLimit={750}
-                                  purpose="organizerAbout"
+                                  placeholder="Add any other info about your project/event... (limit 500 characters)"
+                                  charLimit={500}
                                 />
                               )}
                             />
@@ -2091,20 +1956,191 @@ export const EventOCForm = ({
                   </>
                 )}
               </div>
-            </>
-          )}
-          {activeStep === steps.length - 1 && (
-            <>
-              <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
-                {JSON.stringify(getValues(), null, 2)}
-              </pre>
-            </>
-          )}
-          {/* {activeStep === 6 && (
-            <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Recap</p>
-          )} */}
-        </form>
-      </FormProvider>
-    </HorizontalLinearStepper>
+            )}
+            {activeStep === 3 && (
+              <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Open Call</p>
+            )}
+            {activeStep === 4 && (
+              <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Budget</p>
+            )}
+            {activeStep === steps.length - 2 && (
+              <>
+                <div
+                  id="step-2-container"
+                  className={cn(
+                    "flex h-full flex-col gap-4 xl:justify-center",
+                    "mx-auto max-w-max",
+                    "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                      "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                      "lg:pb-10 xl:py-10 4xl:my-auto",
+
+                      // "xl:self-center",
+                    )}
+                  >
+                    <div className="input-section">
+                      <p className="min-w-max font-bold lg:text-xl">Step 1:</p>
+                      <p className="lg:text-xs">Organizer Links</p>
+                    </div>
+
+                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                      <Label htmlFor="event.category" className="sr-only">
+                        Organizer Links
+                      </Label>
+
+                      <FormLinksInput type="organization" />
+
+                      {errors.event?.category && eventData?.category && (
+                        <span className="mt-2 w-full text-center text-sm text-red-600">
+                          {errors.event?.category?.message
+                            ? errors.event?.category?.message
+                            : "Please select a category from the dropdown"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {hasEventLocation && (
+                    <>
+                      <Separator
+                        thickness={2}
+                        className="mx-auto hidden xl:block"
+                        orientation="vertical"
+                      />
+
+                      <div
+                        className={cn(
+                          "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+                          "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+                          "lg:pt-10 xl:py-10 4xl:my-auto",
+                          // "xl:self-center",
+                        )}
+                      >
+                        {canNameEvent && (
+                          <>
+                            <div className="input-section">
+                              <p className="min-w-max font-bold lg:text-xl">
+                                Step 2
+                              </p>
+                              <p className="lg:text-xs">Primary Contact</p>
+                            </div>
+                            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                              <Label
+                                htmlFor="event.hasOpenCall"
+                                className="sr-only"
+                              >
+                                Change Me //TODO: change this
+                              </Label>
+                              <Controller
+                                name="organization.contact.organizer"
+                                control={control}
+                                render={({ field }) => (
+                                  <Input
+                                    id="event.location"
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    tabIndex={2}
+                                    placeholder="Name of primary contact"
+                                    className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
+                                  />
+                                )}
+                              />
+                              {errors.event?.hasOpenCall && (
+                                <span className="mt-2 w-full text-center text-sm text-red-600">
+                                  {errors.event?.hasOpenCall?.message}
+                                </span>
+                              )}
+                            </div>
+                            <div className="input-section h-full">
+                              <p className="min-w-max font-bold lg:text-xl">
+                                Step 3:
+                              </p>
+                              <p className="lg:text-xs">Organizer - About</p>
+                            </div>
+
+                            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                              <Label
+                                htmlFor="organization.about"
+                                className="sr-only"
+                              >
+                                Organizer - About
+                              </Label>
+
+                              <Controller
+                                name="organization.about"
+                                control={control}
+                                render={({ field }) => (
+                                  <RichTextEditor
+                                    value={field.value ?? ""}
+                                    onChange={field.onChange}
+                                    placeholder="Add any info about your organization... (limit 750 characters)"
+                                    charLimit={750}
+                                    purpose="organizerAbout"
+                                  />
+                                )}
+                              />
+                              <span className="w-full text-center text-xs italic text-muted-foreground">
+                                (Formatting is for preview and won&apos;t
+                                exactly match the public version)
+                              </span>
+
+                              {(errors.event?.name || eventNameExistsError) &&
+                                eventNameIsDirty && (
+                                  <span className="mt-2 w-full text-center text-sm text-red-600">
+                                    {errors.event?.name?.message
+                                      ? errors.event?.name?.message
+                                      : category === "event"
+                                        ? "An event with that name already exists."
+                                        : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                                  </span>
+                                )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+            {activeStep === steps.length - 1 && (
+              <>
+                <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
+                  {JSON.stringify(getValues(), null, 2)}
+                </pre>
+              </>
+            )}
+            {/* {activeStep === 6 && (
+              <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Recap</p>
+            )} */}
+          </form>
+        </FormProvider>
+      </HorizontalLinearStepper>
+      <AlertDialog open={showBackConfirm} onOpenChange={setShowBackConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved or invalid fields</AlertDialogTitle>
+            <AlertDialogDescription>
+              This step contains invalid or incomplete fields. Are you sure you
+              want to go back? You may lose changes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowBackConfirm(false);
+                proceedBackStep();
+              }}
+            >
+              Go back anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

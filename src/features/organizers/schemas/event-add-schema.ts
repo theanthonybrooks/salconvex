@@ -280,11 +280,14 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       path: ["dates", "prodFormat"],
     });
   }
+
   if (
     data.dates?.eventFormat !== "ongoing" &&
     !data.dates?.noProdStart &&
-    (data.dates?.prodDates?.[0]?.start === "" ||
-      data.dates?.prodDates?.[0]?.end === "")
+    (!Array.isArray(data.dates?.prodDates) ||
+      data.dates.prodDates.length === 0 ||
+      !data.dates.prodDates[0].start ||
+      !data.dates.prodDates[0].end)
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -292,7 +295,13 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       path: ["dates", "prodDates"],
     });
   }
-  if (data.dates?.noProdStart && data.dates?.prodDates?.[0]?.end === "") {
+
+  if (
+    data.dates?.noProdStart &&
+    (!Array.isArray(data.dates?.prodDates) ||
+      data.dates.prodDates.length === 0 ||
+      !data.dates.prodDates[0].end)
+  ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "All projects/events must have a production end date",

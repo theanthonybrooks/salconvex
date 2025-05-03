@@ -264,7 +264,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               // setIsHidden={setIsHidden}
               eventCategory={eventCategory}
               appFee={basicInfo?.appFee ?? 0}
-              className="w-full"
+              className="mx-auto mb-3 w-full max-w-[80dvw]"
               detailCard
               finalButton
             />
