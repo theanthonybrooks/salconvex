@@ -219,15 +219,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         // });
         unregister("event.dates.prodFormat");
         unregister("event.dates.prodDates");
-        setValue("event.dates.ongoing", true, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-      } else {
-        setValue("event.dates.ongoing", false, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
       }
       // if (formatValue === "monthRange") {
       //   setValue(
