@@ -68,6 +68,7 @@ export const formatEventDates = (
     const startMonth = isMobile
       ? startDate.toLocaleString("en-US", { month: "short" })
       : getFourCharMonth(startDate);
+
     const endMonth = isMobile
       ? endDate.toLocaleString("en-US", { month: "short" })
       : getFourCharMonth(endDate);
@@ -105,6 +106,7 @@ export const formatEventDates = (
 
   let startMonthShort = "by";
   let startMonthFull = "by";
+
   let startDay: number | null = null;
   let endDay: number | null = null;
   let startYear: number | null = null;
@@ -148,7 +150,7 @@ export const formatEventDates = (
     if (preview) {
       return `${startMonthShort} ${startYear} - ${endMonthShort} ${endYear}`;
     } else {
-      return `${startMonthShort} ${startDay}, ${startYearShort} - ${endMonthShort} ${endDay}, ${endYearShort}`;
+      return `${startMonthShort?.slice(0, 3)} ${startDay}, ${startYearShort} - ${endMonthShort?.slice(0, 3)} ${endDay}, ${endYearShort}`;
     }
   } else if (startMonthFull !== endMonthFull) {
     return `${startMonthShort} ${startDay} - ${endMonthShort} ${endDay} (${startYear})`;

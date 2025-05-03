@@ -66,6 +66,7 @@ export function UserProfile({
             <Avatar className="size-9 rounded-full border border-border">
               <AvatarImage
                 src={user?.image}
+                // src="/1.jpg"
                 alt={user?.name || "User Profile"}
               />
 

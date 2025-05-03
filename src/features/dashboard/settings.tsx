@@ -101,7 +101,6 @@ export default function SettingsPage() {
   // const [selectedLanguage, setLanguage] = useState("en")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  // TODO: ensure that pending state isn't being misused
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
