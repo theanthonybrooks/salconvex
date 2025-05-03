@@ -184,6 +184,11 @@ export default function HorizontalLinearStepper({
         </>
       ) : (
         <>
+          {errorMsg && (
+            <p className="py-4 text-center text-sm italic text-red-600 lg:hidden">
+              {errorMsg}
+            </p>
+          )}
           <div className={cn("flex items-center justify-between gap-x-4")}>
             <section className="flex items-center gap-x-2">
               <div>
@@ -199,7 +204,7 @@ export default function HorizontalLinearStepper({
                           "opacity-100",
                       )}
                       //todo: fix the conditional styling that uses isDirty and onSave
-                      disabled={!isDirty}
+                      disabled={!isDirty || disabled}
                       onClick={onSave}
                     >
                       Save
@@ -212,7 +217,7 @@ export default function HorizontalLinearStepper({
                         isDirty && onSave !== undefined && "opacity-100",
                       )}
                       //todo: fix the conditional styling that uses isDirty and onSave
-                      disabled={!isDirty}
+                      disabled={!isDirty || disabled}
                       onClick={onSave}
                     >
                       {pending ? "Saving" : "Save Progress"}
@@ -290,6 +295,7 @@ export default function HorizontalLinearStepper({
               </Button>
             </section>
           </div>
+
           <div className="mt-4 hidden gap-2 text-center lg:hidden">
             {lastSaved && (
               <p className="text-xs italic text-muted-foreground">

@@ -56,7 +56,7 @@ export const RichTextEditor = ({
       StarterKit.configure({
         bold: {}, //can omit this (supposedly) and it will default to true
         italic: {},
-
+        paragraph: {},
         strike: false,
         code: false,
         heading: false,
@@ -68,19 +68,11 @@ export const RichTextEditor = ({
         orderedList: {},
       }),
       Underline,
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      //note-to-self: replaced this with a simple replace() in the parser as this was breaking lists.
-      //   HardBreak.extend({
-      //     addKeyboardShortcuts() {
-      //       return {
-      //         Enter: () => this.editor.commands.setHardBreak(),
-      //       };
-      //     },
-      //   }),
       Placeholder.configure({
         placeholder,
       }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
       CharacterCount.configure({
         limit: charLimit,
       }),
@@ -95,7 +87,8 @@ export const RichTextEditor = ({
         },
       }),
     ],
-    content: value,
+    content: value || "<p></p>",
+
     onBlur: ({ editor }) => {
       const dirty = editor.getHTML();
       const clean = DOMPurify.sanitize(dirty, {
@@ -105,6 +98,7 @@ export const RichTextEditor = ({
       onChange(clean);
     },
   });
+  console.log(editor?.isEmpty);
 
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [displayText, setDisplayText] = useState("");

@@ -173,6 +173,7 @@ const SubmissionFormOrgStep = ({
                         id="organization.location"
                         value={field.value}
                         onChange={field.onChange}
+                        onBlur={field.onBlur}
                         reset={!validOrgWZod}
                         tabIndex={2}
                         disabled={!orgNameValid}

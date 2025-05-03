@@ -223,6 +223,7 @@ interface MapboxInputFullProps {
   reset: boolean;
   disabled?: boolean;
   isEvent?: boolean;
+  onBlur?: () => void;
 }
 
 export const MapboxInputFull = ({
@@ -237,6 +238,7 @@ export const MapboxInputFull = ({
   tabIndex,
   disabled,
   isEvent,
+  onBlur,
 }: MapboxInputFullProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState(value?.full ?? "");
@@ -462,6 +464,7 @@ export const MapboxInputFull = ({
     clickedSuggestionRef.current = false;
 
     setTimeout(() => {
+      onBlur?.();
       setIsFocused(false);
     }, 150);
   };

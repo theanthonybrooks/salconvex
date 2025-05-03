@@ -103,7 +103,8 @@ const linksSchemaStrict = z.object({
     .string()
     .optional()
     .refine((val) => !val || isValidFacebook(val), {
-      message: "Must be a valid Facebook handle or page name",
+      message:
+        "Must be a valid Facebook handle or page name (min 5 characters)",
     }),
 
   threads: z
@@ -204,7 +205,6 @@ export const eventBase = z.object({
       ),
     ),
     noProdStart: z.boolean(),
-    ongoing: z.boolean(),
   }),
   links: linksSchemaLoose,
   otherInfo: z.string().optional(),
@@ -247,6 +247,14 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       });
     }
   }
+  if (!data.location.city || data.location.city.trim() === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "City is required for events",
+      path: ["location", "city"],
+    });
+  }
+
   const datesRequired =
     data.dates?.eventFormat !== "noEvent" &&
     data.dates?.eventFormat !== "ongoing";

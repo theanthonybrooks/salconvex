@@ -98,7 +98,7 @@ const PricingHeader = ({
     id="pricing-header"
     className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8"
   >
-    <h2 className="cursor-pointer font-tanker text-4h lowercase tracking-wide text-foreground md:text-[4em]">
+    <h2 className="cursor-pointer text-pretty font-tanker text-4h lowercase tracking-wide text-foreground md:text-wrap md:text-[4em]">
       {title}
     </h2>
     <p className="max-w-2xl text-balance text-foreground">{subtitle}</p>
@@ -200,12 +200,31 @@ export const AccountTypeSwitch = ({
             );
             setIsYearly(false);
             // window.scrollTo({ top: 0, behavior: "smooth" });
-            const el = document.getElementById("pricing-header");
-            if (el) {
-              const yOffset = -100; // adjust to match your navbar height
-              const y =
-                el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-              window.scrollTo({ top: y, behavior: "auto" });
+            // const firstCard = document.querySelector(".pricing-card");
+            // if (firstCard) {
+            //   const yOffset = -100;
+            //   const y =
+            //     firstCard.getBoundingClientRect().top +
+            //     window.pageYOffset +
+            //     yOffset;
+            //   window.scrollTo({ top: y, behavior: "auto" });
+            // }
+            const target = document.querySelector(".pricing-card");
+            if (target) {
+              const rect = target.getBoundingClientRect();
+              const scrollTop =
+                window.pageYOffset || document.documentElement.scrollTop;
+              const elementTop = rect.top + scrollTop;
+              const elementHeight = rect.height;
+              const viewportHeight = window.innerHeight;
+
+              const scrollTo =
+                elementTop - viewportHeight / 2 + elementHeight / 2;
+
+              window.scrollTo({
+                top: scrollTo,
+                behavior: "auto",
+              });
             }
           }}
           className="w-fit"
@@ -304,8 +323,9 @@ const PricingCard = ({
 
   return (
     <Card
+      id={`pricing-card-${title}`}
       className={cn(
-        "mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 lg:mx-0",
+        "pricing-card mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 lg:mx-0",
         {
           relative: popular || isFree,
         },

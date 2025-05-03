@@ -1162,6 +1162,44 @@ div:has(> .react-datepicker__input-container) {
   }
 }
 
+/* required for @tiptap/extension-placeholder to work */
+/* Placeholder support for Tiptap */
+.ProseMirror {
+  /* min-height: 100px; */
+  padding: 0.5rem;
+  cursor: text;
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0;
+
+  p.is-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #999;
+    pointer-events: none;
+    height: 0;
+  }
+}
+
+.editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* or a defined max height */
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+.ProseMirror {
+  flex: 1;
+  min-height: 100px; /* still needed for empty state */
+  max-height: 300px; /* optional */
+  overflow-y: auto;
+}
+
 /*global.css
 .rich-text ul[data-type="taskList"] {
   @apply list-none pl-6;

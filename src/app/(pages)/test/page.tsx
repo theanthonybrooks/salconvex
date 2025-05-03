@@ -1,18 +1,17 @@
 "use client";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { useState } from "react";
 
-import { columns } from "@/features/artists/applications/data-table/columns";
-import { DataTable } from "@/features/artists/applications/data-table/data-table";
 // import { columns } from "@/features/events/components/events-data-table/columns";
-import { useQuery } from "convex-helpers/react/cache/hooks";
-import { api } from "~/convex/_generated/api";
 
 export default function DemoPage() {
-  const data = useQuery(api.events.event.getAllEvents, {});
-  const events = data ?? [];
+  // const data = useQuery(api.events.event.getAllEvents, {});
+  // const events = data ?? [];
+  const [content, setContent] = useState("");
 
   return (
     <>
-      <div className="mx-auto hidden max-w-7xl py-10 lg:block">
+      {/* <div className="mx-auto hidden max-w-7xl py-10 lg:block">
         <DataTable
           columns={columns}
           data={events}
@@ -31,7 +30,17 @@ export default function DemoPage() {
             console.log(row);
           }}
         />
-      </div>
+      </div> */}
+      <RichTextEditor
+        value={content}
+        onChange={(value) => {
+          console.log(value);
+          setContent(value);
+        }}
+        placeholder="Short blurb about your project/event... (limit 200 characters)"
+        charLimit={200}
+      />
+      {/* <FormLinksInput type="organization" /> */}
     </>
   );
 }

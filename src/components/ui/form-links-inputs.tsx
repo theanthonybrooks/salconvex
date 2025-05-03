@@ -74,7 +74,7 @@ export const FormLinksInput = ({
 
   return (
     <>
-      <div className={cn("flex flex-col gap-y-2")}>
+      <div className={cn("flex max-w-[80dvw] flex-col gap-y-2")}>
         {(existingOrgHasLinks || eventSameAsOrg) && isEvent && (
           <Controller
             name="event.links.sameAsOrganizer"
@@ -127,7 +127,7 @@ export const FormLinksInput = ({
                     placeholder={
                       isEvent ? "event website" : "organization website"
                     }
-                    className="w-full"
+                    className="flex-1"
                   />
                 )}
               />
@@ -165,7 +165,7 @@ export const FormLinksInput = ({
                     disabled={eventSameAsOrg && isEvent}
                     value={field.value ?? ""}
                     placeholder="example@email.com"
-                    className="w-full"
+                    className="flex-1"
                   />
                 )}
               />
@@ -205,7 +205,7 @@ export const FormLinksInput = ({
                     defaultCountry={eventCountry || "US"}
                     value={field.value ?? ""}
                     placeholder="+1 (555) 555-5555"
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
+                    className="flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
                     onChange={field.onChange}
                   />
                 )}
@@ -235,7 +235,7 @@ export const FormLinksInput = ({
                   disabled={eventSameAsOrg && isEvent}
                   value={field.value ?? ""}
                   placeholder="linktree (or similar)"
-                  className="w-full"
+                  className="flex-1"
                   onChange={(e) => field.onChange(autoHttps(e.target.value))}
                 />
               )}
@@ -282,7 +282,7 @@ export const FormLinksInput = ({
                   disabled={eventSameAsOrg && isEvent}
                   value={field.value ?? ""}
                   placeholder="linktree (or similar)"
-                  className="w-full"
+                  className="flex-1"
                   onChange={(e) => field.onChange(autoHttps(e.target.value))}
                 />
               )}
@@ -301,7 +301,7 @@ export const FormLinksInput = ({
                 disabled={eventSameAsOrg && isEvent}
                 value={field.value ?? ""}
                 placeholder="any other link not listed above"
-                className="w-full"
+                className="flex-1"
                 onChange={(e) => field.onChange(autoHttps(e.target.value))}
               />
             )}
@@ -361,7 +361,7 @@ function HandleInput({
             disabled={disabled}
             value={inputVal}
             placeholder={placeholder}
-            className="w-full"
+            className="flex-1"
             onChange={(e) => {
               const raw = e.target.value;
               setInputVal(raw);

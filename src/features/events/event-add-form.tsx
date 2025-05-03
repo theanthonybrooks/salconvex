@@ -214,11 +214,14 @@ export const EventOCForm = ({
     return result.success;
   }, [watchedValues, currentSchema]);
 
+  console.log(isStepValidZod);
+
   //
   //
   // ------------- Step 1 - Organization & Event --------------
   //
   //
+  const canCheckSchema = useRef(false);
   const hasClosed = useRef(false);
   const isFirstRun = useRef(true);
   const savedState = useRef(false);
@@ -232,7 +235,7 @@ export const EventOCForm = ({
   const eventName = eventData?.name ?? "";
   const clearEventDataTrigger =
     newOrgEvent && activeStep === 0 && furthestStep > 0 && eventData;
-
+  console.log(isStepValidZod);
   const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
   const orgLocationValid =
     !errors.organization?.location?.country && Boolean(orgData?.location?.full);
@@ -536,30 +539,35 @@ export const EventOCForm = ({
     }
   };
 
-  const handleCheckSchema = useCallback((): boolean => {
-    if (!schema) return true;
-    if (!hasUserEditedForm) return true;
+  const handleCheckSchema = useCallback(
+    (shouldToast: boolean = true): boolean => {
+      if (!schema) return true;
+      if (!hasUserEditedForm) return true;
 
-    const result = schema.safeParse(currentValues);
+      const result = schema.safeParse(currentValues);
 
-    if (!result.success) {
-      result.error.issues.forEach((issue) => {
-        const path = issue.path.join(".") as Path<EventOCFormValues>;
-        setError(path, { type: "manual", message: issue.message });
-        setErrorMsg(issue.message);
-      });
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          const path = issue.path.join(".") as Path<EventOCFormValues>;
+          setError(path, { type: "manual", message: issue.message });
+          setErrorMsg(issue.message);
+        });
 
-      toast.dismiss("form-validation-error");
-      toast.error("Please fix errors before continuing.", {
-        toastId: "form-validation-error",
-      });
+        if (shouldToast) {
+          toast.dismiss("form-validation-error");
+          toast.error("Please fix errors before continuing.", {
+            toastId: "form-validation-error",
+          });
+        }
 
-      return false;
-    }
+        return false;
+      }
 
-    setErrorMsg("");
-    return true;
-  }, [schema, currentValues, hasUserEditedForm, setError]);
+      setErrorMsg("");
+      return true;
+    },
+    [schema, currentValues, hasUserEditedForm, setError],
+  );
 
   const handleSave = useCallback(
     async (direct = false) => {
@@ -615,7 +623,6 @@ export const EventOCForm = ({
                 sameAsOrganizer: true,
               },
               dates: {
-                ongoing: false,
                 edition: new Date().getFullYear(),
                 noProdStart: false,
               },
@@ -1013,8 +1020,23 @@ export const EventOCForm = ({
   // }, [isValid, isStepValidZod]);
 
   useEffect(() => {
+    if (!canCheckSchema.current) {
+      if (isStepValidZod) {
+        canCheckSchema.current = true;
+        setErrorMsg("");
+      }
+      return;
+    }
+
+    if (!isStepValidZod && hasUserEditedForm) {
+      console.log("step invalid");
+      handleCheckSchema(false);
+      canCheckSchema.current = false;
+    }
+  }, [isStepValidZod, hasUserEditedForm, handleCheckSchema]);
+
+  useEffect(() => {
     if (!isValid || !hasUserEditedForm || pending) return;
-    console.log("triggered");
     const interval = setInterval(() => {
       console.log("checking");
       const now = Date.now();
@@ -1030,7 +1052,7 @@ export const EventOCForm = ({
           console.log("Autosaved at", new Date().toLocaleTimeString());
         });
       }
-    }, 15000); // check every 15 seconds (adjustable)
+    }, 5000); // check every 5 seconds (adjustable)
 
     return () => clearInterval(interval);
   }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave]);
@@ -1202,10 +1224,6 @@ export const EventOCForm = ({
     if (!eventDatesFormat) return;
     // if (!hasNoEventDatesEdition) return;
 
-    if (eventDatesFormat === "ongoing") {
-      setValue("event.dates.ongoing", true);
-    }
-
     if (
       eventDatesFormat === "noEvent" ||
       eventDatesFormat === "setDates" ||
@@ -1241,7 +1259,6 @@ export const EventOCForm = ({
       ]);
     }
     if (otherFormats.includes(eventDatesFormat)) {
-      setValue("event.dates.ongoing", false);
       setValue("event.dates.edition", new Date().getFullYear());
     }
   }, [eventDatesFormat, setValue, hasNoEventDates]);
@@ -1383,7 +1400,7 @@ export const EventOCForm = ({
                   <p className="lg:text-xs">Category</p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.category" className="sr-only">
                     Event Category
                   </Label>
@@ -1438,7 +1455,7 @@ export const EventOCForm = ({
                       <p className="lg:text-xs">Event Type</p>
                     </div>
 
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.type" className="sr-only">
                         Event Type
                       </Label>
@@ -1492,7 +1509,7 @@ export const EventOCForm = ({
                       </p>
                     </div>
 
-                    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
                         {getEventCategoryLabelAbbr(category)} Name
                       </Label>
@@ -1528,7 +1545,7 @@ export const EventOCForm = ({
                           <p className="lg:text-xs">Location</p>
                         </div>
 
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                           <Label htmlFor="event.name" className="sr-only">
                             {getEventCategoryLabelAbbr(category)} Location
                           </Label>
@@ -1543,6 +1560,7 @@ export const EventOCForm = ({
                                 isEvent
                                 value={field.value}
                                 onChange={field.onChange}
+                                onBlur={field.onBlur}
                                 reset={!validOrgWZod}
                                 tabIndex={2}
                                 placeholder="Event Location (if different from organization)..."
@@ -1569,7 +1587,7 @@ export const EventOCForm = ({
                             {getEventCategoryLabelAbbr(category)} Logo
                           </p>
                         </div>
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                           <Label
                             htmlFor="organization.logo"
                             className="sr-only"
@@ -1612,7 +1630,7 @@ export const EventOCForm = ({
                               </p>
                             </div>
 
-                            <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                               <Label htmlFor="event.name" className="sr-only">
                                 {getEventCategoryLabelAbbr(category)} About
                               </Label>
@@ -1623,7 +1641,7 @@ export const EventOCForm = ({
                                   <RichTextEditor
                                     value={field.value ?? ""}
                                     onChange={field.onChange}
-                                    placeholder="Short blurb about your project/event... (limit 200 characters"
+                                    placeholder="Short blurb about your project/event... (limit 200 characters)"
                                     charLimit={200}
                                   />
                                 )}
@@ -1781,7 +1799,7 @@ export const EventOCForm = ({
                   </p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.category" className="sr-only">
                     Event Links
                   </Label>
@@ -1824,7 +1842,7 @@ export const EventOCForm = ({
                           </p>
                           <p className="lg:text-xs">Open Call</p>
                         </div>
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                           <Label
                             htmlFor="event.hasOpenCall"
                             className="sr-only"
@@ -1871,7 +1889,7 @@ export const EventOCForm = ({
                           <p className="lg:text-xs">Other Info</p>
                         </div>
 
-                        <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                           <Label htmlFor="event.name" className="sr-only">
                             {getEventCategoryLabelAbbr(category)} Other Info
                           </Label>
@@ -1956,7 +1974,7 @@ export const EventOCForm = ({
                     <p className="lg:text-xs">Organizer Links</p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.category" className="sr-only">
                       Organizer Links
                     </Label>
@@ -1994,9 +2012,9 @@ export const EventOCForm = ({
                             <p className="min-w-max font-bold lg:text-xl">
                               Step 2
                             </p>
-                            <p className="lg:text-xs">Change Me</p>
+                            <p className="lg:text-xs">Primary Contact</p>
                           </div>
-                          <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                          <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                             <Label
                               htmlFor="event.hasOpenCall"
                               className="sr-only"
@@ -2012,7 +2030,7 @@ export const EventOCForm = ({
                                   value={field.value || ""}
                                   onChange={field.onChange}
                                   tabIndex={2}
-                                  placeholder="Organizer (Name - Optional)"
+                                  placeholder="Name of primary contact"
                                   className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
                                 />
                               )}
@@ -2027,10 +2045,10 @@ export const EventOCForm = ({
                             <p className="min-w-max font-bold lg:text-xl">
                               Step 3:
                             </p>
-                            <p className="lg:text-xs">About</p>
+                            <p className="lg:text-xs">Organizer - About</p>
                           </div>
 
-                          <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                          <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                             <Label
                               htmlFor="organization.about"
                               className="sr-only"
@@ -2045,8 +2063,9 @@ export const EventOCForm = ({
                                 <RichTextEditor
                                   value={field.value ?? ""}
                                   onChange={field.onChange}
-                                  placeholder="Add any other info about your project/event... (limit 500 characters)"
-                                  charLimit={500}
+                                  placeholder="Add any info about your organization... (limit 750 characters)"
+                                  charLimit={750}
+                                  purpose="organizerAbout"
                                 />
                               )}
                             />
@@ -2076,7 +2095,7 @@ export const EventOCForm = ({
           )}
           {activeStep === steps.length - 1 && (
             <>
-              <pre className="whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm">
+              <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
                 {JSON.stringify(getValues(), null, 2)}
               </pre>
             </>
