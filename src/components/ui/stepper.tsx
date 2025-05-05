@@ -238,14 +238,14 @@ export default function HorizontalLinearStepper({
               )} */}
             </section>
             {onSave !== undefined &&
-              !errorMsg &&
+              (!errorMsg || errorMsg === "Required") &&
               !lastSaved &&
               activeStep >= 1 && (
                 <p className="hidden text-balance text-sm italic lg:block">
                   You can save at any time and come back to it later.
                 </p>
               )}
-            {errorMsg && (
+            {errorMsg && errorMsg !== "Required" && (
               <p className="hidden text-sm italic text-red-600 lg:block">
                 {errorMsg}
               </p>
