@@ -57,7 +57,7 @@ import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { handleFileUrl } from "@/lib/fileUploadFns";
 import { cn } from "@/lib/utils";
-import { EventCategory, EventType } from "@/types/event";
+import { EnrichedEvent, EventCategory, EventType } from "@/types/event";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
@@ -73,35 +73,42 @@ const steps = [
   {
     id: 1,
     label: "Organization Info",
+    mobileLabel: "Organization Info",
 
     schema: step1Schema,
   },
   {
     id: 2,
     label: "Event, Project, Fund, etc",
+    mobileLabel: "Event, Project, Fund, etc",
     schema: eventOnlySchema,
   },
   {
     id: 3,
     label: "Event/Project Details (Continued)",
+    mobileLabel: "Event/Project Details",
     schema: eventDetailsSchema,
   },
   {
     id: 4,
     label: "Open Call",
+    mobileLabel: "Open Call",
   },
   {
     id: 5,
     label: "Budget & Compensation",
+    mobileLabel: "Budget/Compensation",
   },
   {
     id: 6,
     label: "Organizer Details",
+    mobileLabel: "Organizer Details",
     schema: orgDetailsSchema,
   },
   {
     id: 7,
     label: "Recap",
+    mobileLabel: "Recap",
     schema: eventSubmitSchema,
   },
 ];
@@ -195,7 +202,7 @@ export const EventOCForm = ({
     null,
   );
   const [newOrgEvent, setNewOrgEvent] = useState(false);
-  const [existingEvent, setExistingEvent] = useState<Doc<"events"> | null>(
+  const [existingEvent, setExistingEvent] = useState<EnrichedEvent | null>(
     null,
   );
 
@@ -361,13 +368,18 @@ export const EventOCForm = ({
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
   const hasEventFormat = !!eventData?.dates?.eventFormat;
-  const eventDateFormatRequired =
+  const eventDateFormatRequired = !!(
     hasEventFormat &&
+    eventDatesFormat &&
     ["setDates", "monthRange", "yearRange", "seasonRange"].includes(
       eventDatesFormat,
-    );
-  const eventDateFormatNotRequired =
-    hasEventFormat && ["noEvent"].includes(eventDatesFormat);
+    )
+  );
+  const eventDateFormatNotRequired = !!(
+    hasEventFormat &&
+    eventDatesFormat &&
+    ["noEvent"].includes(eventDatesFormat)
+  );
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
@@ -578,18 +590,19 @@ export const EventOCForm = ({
         reset({
           ...currentValues,
           event: {
-            name: "",
+            // name: "",
             logo: currentValues.organization.logo,
+            logoStorageId: currentValues.organization.logoStorageId,
             location: {
               ...currentValues.organization.location,
               sameAsOrganizer: true,
             },
             dates: {
               edition: new Date().getFullYear(),
-              eventFormat: "",
+              eventFormat: undefined,
               prodFormat: undefined,
-              eventDates: [{ start: "", end: "" }],
-              prodDates: [{ start: "", end: "" }],
+              // eventDates: [{ start: "", end: "" }],
+              // prodDates: [{ start: "", end: "" }],
               noProdStart: false,
             },
             links: {
@@ -661,13 +674,13 @@ export const EventOCForm = ({
           });
           return;
         }
-        const { logoUrl, logoId, timezone, timezoneOffset } = result;
+        const { logoUrl, logoStorageId, timezone, timezoneOffset } = result;
 
         try {
           setPending(true);
           const { org } = await createNewOrg({
             organizationName: orgData.name,
-            logoId,
+            logoStorageId,
             logo: logoUrl,
             location: {
               full: orgData.location.full,
@@ -720,6 +733,7 @@ export const EventOCForm = ({
         } catch (error) {
           console.error("Failed to create new organization:", error);
           toast.error("Failed to create new organization");
+          setPending(false);
         }
 
         const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
@@ -794,7 +808,7 @@ export const EventOCForm = ({
           });
           return;
         }
-        const { logoUrl, logoId, timezone, timezoneOffset } = result;
+        const { logoUrl, logoStorageId, timezone, timezoneOffset } = result;
         let eventResult = null;
         try {
           setPending(true);
@@ -806,7 +820,7 @@ export const EventOCForm = ({
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name),
-            logoId,
+            logoStorageId,
             logo: logoUrl,
             type: eventData.type || [],
             category: eventData.category,
@@ -839,28 +853,10 @@ export const EventOCForm = ({
               event,
             }),
           );
-
-          // reset({
-          //   ...currentValues,
-          //   event: {
-          //     ...event,
-          //     // category: event?.category || "",
-          //     // type: event?.type || [],
-          //     hasOpenCall: currentValues.event?.hasOpenCall || "",
-          //     dates: {
-          //       ...eventResult?.dates,
-          //       noProdStart: currentValues.event.dates?.noProdStart || false,
-          //     },
-          //   },
-          // });
-          // setValue("event.dates.noProdStart", prodHasStart);
-          setPending(false);
-          // toast.success(existingEvent ? "Event updated!" : "Event created!", {
-          //   onClick: () => toast.dismiss(), // dismisses the current toast
-          // });
         } catch (error) {
           console.error("Failed to create new event:", error);
           toast.error("Failed to create new event");
+          setPending(false);
         }
       }
       if (activeStep === 2 && hasUserEditedEventSteps) {
@@ -1060,6 +1056,7 @@ export const EventOCForm = ({
       if (diffInMs >= 60000) {
         handleSave().then(() => {
           console.log("Autosaved at", new Date().toLocaleTimeString());
+          setPending(false);
         });
       }
     }, 5000); // check every 5 seconds (adjustable)
@@ -1538,16 +1535,13 @@ export const EventOCForm = ({
                             />
                           )}
                         />
-                        {(errors.event?.name || eventNameExistsError) &&
-                          eventNameIsDirty && (
-                            <span className="mt-2 w-full text-center text-sm text-red-600">
-                              {errors.event?.name?.message
-                                ? errors.event?.name?.message
-                                : category === "event"
-                                  ? "An event with that name already exists."
-                                  : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
-                            </span>
-                          )}
+                        {eventNameExistsError && eventNameIsDirty && (
+                          <span className="mt-2 w-full text-center text-sm text-red-600">
+                            {category === "event"
+                              ? "An event with that name already exists."
+                              : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                          </span>
+                        )}
                       </div>
                       {eventNameValid && (
                         <>

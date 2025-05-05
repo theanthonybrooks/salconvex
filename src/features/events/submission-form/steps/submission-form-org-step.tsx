@@ -8,6 +8,7 @@ import { DataTable } from "@/features/artists/applications/data-table/data-table
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/lib/utils";
+import { EnrichedEvent } from "@/types/event";
 import { AnimatePresence, motion } from "framer-motion";
 import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -15,7 +16,7 @@ import { Doc } from "~/convex/_generated/dataModel";
 interface SubmissionFormOrgStepProps {
   existingOrg: Doc<"organizations"> | null;
   existingEvent: Doc<"events"> | null;
-  eventsData: Doc<"events">[];
+  eventsData: EnrichedEvent[];
   existingOrgs: boolean;
   validOrgWZod: boolean;
   invalidOrgWZod: boolean;
@@ -265,7 +266,7 @@ const SubmissionFormOrgStep = ({
                   if (newOrgEvent) {
                     setNewOrgEvent(false);
                   }
-                  setExistingEvent(event as Doc<"events">);
+                  setExistingEvent(event as EnrichedEvent);
                   setSelectedRow(selection);
                 }}
                 selectedRow={selectedRow}
@@ -282,7 +283,7 @@ const SubmissionFormOrgStep = ({
                   if (newOrgEvent) {
                     setNewOrgEvent(false);
                   }
-                  setExistingEvent(event as Doc<"events">);
+                  setExistingEvent(event as EnrichedEvent);
                   setSelectedRow(selection);
                 }}
                 selectedRow={selectedRow}
@@ -299,7 +300,7 @@ const SubmissionFormOrgStep = ({
                   if (newOrgEvent) {
                     setNewOrgEvent(false);
                   }
-                  setExistingEvent(event as Doc<"events">);
+                  setExistingEvent(event as EnrichedEvent);
                   setSelectedRow(selection);
                 }}
                 selectedRow={selectedRow}

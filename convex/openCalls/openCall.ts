@@ -1,5 +1,6 @@
-import { v } from "convex/values";
-import { query } from "~/convex/_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { ConvexError, v } from "convex/values";
+import { mutation, query } from "~/convex/_generated/server";
 
 export const getOpenCallByOrgId = query({
   args: {
@@ -45,6 +46,7 @@ export const getOpenCallByEventId = query({
     return openCall;
   },
 });
+
 //note-to-self: At the moment, the events aren't grouped by id as the id is specific to each edition. Rather, they are grouped by slug, since that's also unique and then I can gather the id's/editions for that specific slug.
 
 // export const getOpenCallByEventIdAndEdition = query({
@@ -65,3 +67,62 @@ export const getOpenCallByEventId = query({
 //     return openCall;
 //   },
 // });
+
+export const deleteOC = mutation({
+  args: {
+    openCallId: v.id("openCalls"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const openCall = await ctx.db.get(args.openCallId);
+    if (!openCall) return null;
+    if (openCall.state !== "draft")
+      throw new ConvexError("Active open calls cannot be deleted");
+    const organization = await ctx.db.get(openCall.mainOrgId);
+    if (!organization) throw new ConvexError("Organization not found");
+    const orgLogoStorageId = organization.logoStorageId;
+
+    await ctx.db.delete(openCall._id);
+
+    return { openCall };
+  },
+});
+
+export const changeOCStatus = mutation({
+  args: {
+    openCallId: v.id("openCalls"),
+    newStatus: v.union(
+      v.literal("published"),
+      v.literal("draft"),
+      v.literal("submitted"),
+      v.literal("archived"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+    const isAdmin = user.role.includes("admin");
+    if (args.newStatus === "published" && !isAdmin)
+      throw new ConvexError("You don't have permission to approve events");
+    // if (!isAdmin)
+    //   throw new Error("You don't have permission to approve events");
+    const oc = await ctx.db.get(args.openCallId);
+    if (!oc) throw new ConvexError("Open call not found");
+    const ocState = args.newStatus || "submitted";
+    const approvedBy = isAdmin ? userId : undefined;
+
+    await ctx.db.patch(oc._id, {
+      state: ocState,
+      lastUpdatedAt: Date.now(),
+      approvedBy: approvedBy,
+    });
+
+    return { oc };
+  },
+});

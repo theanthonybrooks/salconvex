@@ -54,7 +54,7 @@ export const RichTextEditor = ({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        bold: {}, //can omit this (supposedly) and it will default to true
+        bold: {},
         italic: {},
         paragraph: {},
         strike: false,
@@ -70,6 +70,8 @@ export const RichTextEditor = ({
       Underline,
       Placeholder.configure({
         placeholder,
+        showOnlyWhenEditable: true,
+        showOnlyCurrent: true,
       }),
       TaskList,
       TaskItem.configure({ nested: true }),
@@ -87,7 +89,6 @@ export const RichTextEditor = ({
         },
       }),
     ],
-    content: value || "<p></p>",
 
     onBlur: ({ editor }) => {
       const dirty = editor.getHTML();
@@ -98,7 +99,6 @@ export const RichTextEditor = ({
       onChange(clean);
     },
   });
-  console.log(editor?.isEmpty);
 
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [displayText, setDisplayText] = useState("");

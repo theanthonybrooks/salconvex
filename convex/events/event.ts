@@ -19,6 +19,16 @@ export const getEventByOrgId = query({
     orgId: v.id("organizations"),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) return null;
+
+    const isAdmin = user.role.includes("admin");
     const org = await ctx.db.get(args.orgId);
     if (!org) return null;
 
@@ -28,14 +38,133 @@ export const getEventByOrgId = query({
       .order("desc")
       .collect();
 
-    return events;
+    const openCalls = await ctx.db
+      .query("openCalls")
+      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", org._id))
+      .collect();
+
+    const openCallMap = new Map(
+      openCalls.map((oc) => [oc.eventId.toString(), oc]),
+    );
+
+    const enrichedEvents = events.map((event) => {
+      const openCall = openCallMap.get(event._id.toString());
+
+      return {
+        ...event,
+        openCallStatus: openCall?.state ?? null,
+        openCallId: openCall?._id ?? null,
+      };
+    });
+
+    return enrichedEvents;
+  },
+});
+
+// export const getAllEvents = query({
+//   handler: async (ctx) => {
+//     const allEvents = await ctx.db.query("events").collect();
+//     return allEvents;
+//   },
+// });
+
+export const getSubmittedEvents = query({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    const isAdmin = user.role.includes("admin");
+    if (!isAdmin)
+      throw new ConvexError("You don't have permission to view this");
+
+    // Fetch events where state === "submitted" or "published"
+    const [submittedEvents, publishedEvents, submittedOCs] = await Promise.all([
+      ctx.db
+        .query("events")
+        .withIndex("by_state", (q) => q.eq("state", "submitted"))
+        .collect(),
+      ctx.db
+        .query("events")
+        .withIndex("by_state", (q) => q.eq("state", "published"))
+        .collect(),
+      ctx.db
+        .query("openCalls")
+        .withIndex("by_state", (q) => q.eq("state", "submitted"))
+        .collect(),
+    ]);
+
+    const submittedOCEventIds = new Set(
+      submittedOCs.map((oc) => oc.eventId.toString()),
+    );
+
+    // Combine:
+    // - all submitted events
+    // - published events that have a submitted open call
+    const eligibleEvents = [
+      ...submittedEvents,
+      ...publishedEvents.filter((event) =>
+        submittedOCEventIds.has(event._id.toString()),
+      ),
+    ];
+
+    // Build map of submitted open calls for enrichment
+    const ocMap = new Map(
+      submittedOCs.map((oc) => [oc.eventId.toString(), oc]),
+    );
+
+    const enrichedEvents = eligibleEvents.map((event) => {
+      const openCall = ocMap.get(event._id.toString());
+      return {
+        ...event,
+        openCallStatus: openCall?.state ?? null,
+        openCallId: openCall?._id ?? null,
+      };
+    });
+
+    return enrichedEvents;
   },
 });
 
 export const getAllEvents = query({
   handler: async (ctx) => {
-    const allEvents = await ctx.db.query("events").collect();
-    return allEvents;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) return null;
+
+    const isAdmin = user.role.includes("admin");
+
+    const events = await ctx.db.query("events").collect();
+
+    // Get all open calls to match with events
+    const openCalls = await ctx.db.query("openCalls").collect();
+
+    // Create a map of openCalls by eventId for fast lookup
+    const openCallMap = new Map(
+      openCalls.map((oc) => [oc.eventId.toString(), oc]),
+    );
+
+    // Enrich events with open call status
+    const enrichedEvents = events.map((event) => {
+      const openCall = openCallMap.get(event._id.toString());
+      return {
+        ...event,
+        openCallStatus: openCall?.state ?? null,
+        openCallId: openCall?._id ?? null,
+      };
+    });
+
+    return enrichedEvents;
   },
 });
 
@@ -239,7 +368,7 @@ export const createOrUpdateEvent = mutation({
   args: {
     orgId: v.id("organizations"),
     _id: v.union(v.id("events"), v.string()),
-    logoId: v.optional(v.id("_storage")),
+    logoStorageId: v.optional(v.id("_storage")),
     name: v.string(),
     slug: v.string(),
     logo: v.string(),
@@ -248,11 +377,13 @@ export const createOrUpdateEvent = mutation({
 
     dates: v.object({
       edition: v.number(),
-      eventDates: v.array(
-        v.object({
-          start: v.string(),
-          end: v.string(),
-        }),
+      eventDates: v.optional(
+        v.array(
+          v.object({
+            start: v.string(),
+            end: v.string(),
+          }),
+        ),
       ),
       prodDates: v.optional(
         v.array(
@@ -323,16 +454,16 @@ export const createOrUpdateEvent = mutation({
     finalStep: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    console.log(args.logoId, args.logo);
+    console.log(args.logoStorageId, args.logo);
     const linksSameAsOrg = args.links?.sameAsOrganizer;
     console.log("linksSameAsOrg", linksSameAsOrg);
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     let fileUrl = "/1.jpg" as string | null;
-    if (args.logoId) {
-      fileUrl = await ctx.storage.getUrl(args.logoId);
+    if (args.logoStorageId) {
+      fileUrl = await ctx.storage.getUrl(args.logoStorageId);
     }
-    if (args.logo && !args.logoId) {
+    if (args.logo && !args.logoStorageId) {
       fileUrl = args.logo;
     }
 
@@ -360,9 +491,12 @@ export const createOrUpdateEvent = mutation({
     }
 
     const event = isValidEventId(args._id) ? await ctx.db.get(args._id) : null;
-    const eventState = isAdmin
-      ? /*event?.state ||*/ "published"
-      : args.state || "draft";
+
+    const eventState = args.finalStep
+      ? isAdmin
+        ? "published"
+        : "submitted"
+      : "draft";
 
     console.log("eventState", eventState);
 
@@ -376,25 +510,24 @@ export const createOrUpdateEvent = mutation({
       await ctx.db.patch(event._id, {
         name: args.name,
         logo: fileUrl || args.logo,
+        logoStorageId: args.logoStorageId,
         type: args.type || [],
         category: args.category || "",
         dates: {
           ...args.dates,
           edition: args.dates.edition || new Date().getFullYear(),
           eventDates: args.dates.eventDates || [{ start: "", end: "" }],
-          eventFormat:
-            (args.dates.eventFormat as EventFormat) || ("" as EventFormat),
-          prodFormat:
-            (args.dates.prodFormat as ProdFormat) || ("" as ProdFormat),
+          eventFormat: (args.dates.eventFormat as EventFormat) || undefined,
+          prodFormat: (args.dates.prodFormat as ProdFormat) || undefined,
 
           noProdStart: args.dates.noProdStart || false,
         },
         location: {
           ...args.location,
         },
-        about: args.about || "",
+        about: args.about,
         links,
-        otherInfo: args.otherInfo || undefined,
+        otherInfo: args.otherInfo,
         active: args.active || true,
         lastEditedAt: Date.now(),
         state: eventState,
@@ -409,24 +542,24 @@ export const createOrUpdateEvent = mutation({
       name: args.name,
       slug: args.slug,
       logo: fileUrl as string,
+      logoStorageId: args.logoStorageId,
       type: args.type || [],
       category: args.category || "",
       dates: {
         ...args.dates,
         edition: args.dates.edition || new Date().getFullYear(),
         eventDates: args.dates.eventDates || [{ start: "", end: "" }],
-        eventFormat:
-          (args.dates.eventFormat as EventFormat) || ("" as EventFormat),
-        prodFormat: (args.dates.prodFormat as ProdFormat) || ("" as ProdFormat),
+        eventFormat: (args.dates.eventFormat as EventFormat) || undefined,
+        prodFormat: (args.dates.prodFormat as ProdFormat) || undefined,
         prodDates: args.dates.prodDates || undefined,
         noProdStart: args.dates.noProdStart || false,
       },
       location: {
         ...args.location,
       },
-      about: args.about || "",
+      about: args.about,
       links,
-      otherInfo: args.otherInfo || undefined,
+      otherInfo: args.otherInfo,
       active: args.active || true,
       mainOrgId: args.orgId,
       organizerId: [args.orgId],
@@ -437,5 +570,110 @@ export const createOrUpdateEvent = mutation({
     });
     const newEvent = await ctx.db.get(eventId);
     return { event: newEvent };
+  },
+});
+
+export const approveEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new Error("User not found");
+    const isAdmin = user.role.includes("admin");
+    if (!isAdmin)
+      throw new Error("You don't have permission to approve events");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const eventState = event.state === "submitted" ? "published" : "published";
+
+    await ctx.db.patch(event._id, {
+      state: eventState,
+      lastEditedAt: Date.now(),
+      approvedBy: userId,
+    });
+
+    return { event };
+  },
+});
+
+export const reactivateEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new Error("User not found");
+    const isAdmin = user.role.includes("admin");
+
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const eventState = event.state === "archived" && isAdmin && "published";
+
+    await ctx.db.patch(event._id, {
+      state: eventState || "submitted",
+      lastEditedAt: Date.now(),
+      approvedBy: undefined,
+    });
+
+    return { event };
+  },
+});
+
+export const archiveEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const eventState = event.state === "submitted" ? "archived" : "archived";
+
+    await ctx.db.patch(event._id, {
+      state: eventState,
+      lastEditedAt: Date.now(),
+    });
+
+    return { event };
+  },
+});
+
+export const deleteEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    if (event.state !== "draft")
+      throw new ConvexError("Active events cannot be deleted, only archived");
+    const organization = await ctx.db.get(event.mainOrgId);
+    if (!organization) throw new ConvexError("Organization not found");
+    const orgLogoStorageId = organization.logoStorageId;
+
+    if (event.logoStorageId && event.logoStorageId !== orgLogoStorageId) {
+      await ctx.storage.delete(event.logoStorageId);
+    }
+
+    await ctx.db.delete(event._id);
+
+    return { event };
   },
 });

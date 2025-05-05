@@ -11,6 +11,26 @@ import {
   query,
 } from "./_generated/server";
 
+export const isAdmin = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    if (user.role.includes("admin")) {
+      return true;
+    }
+
+    return false;
+  },
+});
+
 export const currentUser = query({
   args: {},
   handler: async (ctx) => {

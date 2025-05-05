@@ -50,6 +50,7 @@ export const removeProfileImage = mutation({
     if (!user) {
       throw new Error("User not found");
     }
+    await ctx.storage.delete(args.storageId);
 
     await ctx.db.patch(user._id, { image: undefined });
     return { success: true };

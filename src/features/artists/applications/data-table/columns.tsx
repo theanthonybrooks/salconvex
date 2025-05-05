@@ -2,12 +2,32 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ApproveEvent,
+  ArchiveEvent,
+  DeleteEvent,
+  ReactivateEvent,
+} from "@/features/artists/applications/data-table/actions/data-table-event-actions";
+import {
+  ApproveOC,
+  ArchiveOC,
+  DeleteOC,
+  ReactivateOC,
+} from "@/features/artists/applications/data-table/actions/data-table-oc-actions";
 import { DataTableColumnHeader } from "@/features/artists/applications/data-table/data-table-column-header";
 import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventType, SubmissionFormState } from "@/types/event";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, MoreHorizontal } from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -15,6 +35,7 @@ export const columnLabels: Record<string, string> = {
   name: "Name",
   dates_edition: "Edition",
   state: "State",
+  openCallStatus: "Open Call",
   lastEditedAt: "Last Edited",
   category: "Category",
   type: "Event Type",
@@ -30,6 +51,8 @@ export type Event = {
   category: string;
   type: EventType[];
   lastEditedAt?: number;
+  openCallStatus?: string | null;
+  openCallId?: Id<"openCalls"> | null;
 };
 
 export const columns: ColumnDef<Event>[] = [
@@ -149,35 +172,58 @@ export const columns: ColumnDef<Event>[] = [
         </div>
       );
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+  },
+  {
+    accessorKey: "openCallStatus",
+    size: 130,
+    minSize: 130,
+    maxSize: 130,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Open Call" />
+    ),
+
+    cell: ({ row }) => {
+      const ocState =
+        (row.getValue("openCallStatus") as SubmissionFormState) || null;
+      return (
+        <div className="flex justify-center">
+          <div
+            className={cn(
+              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
+              !ocState && "border-transparent",
+              ocState === "draft" && "bg-orange-200",
+              ocState === "submitted" && "bg-blue-200",
+              ocState === "published" && "bg-green-200",
+            )}
+          >
+            {ocState ? (
+              ocState === "draft" ? (
+                <FaRegFloppyDisk className="size-4 shrink-0" />
+              ) : ocState === "submitted" ? (
+                <Circle className="size-4 shrink-0" />
+              ) : ocState === "published" ? (
+                <CheckCircle2 className="size-4 shrink-0" />
+              ) : (
+                <CheckCircle2 className="size-4 shrink-0" />
+              )
+            ) : (
+              ""
+            )}
+            <span className="capitalize">{ocState || "-"}</span>
+          </div>
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
   },
 
-  //   {
-  //     accessorKey: "priority",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Priority" />
-  //     ),
-  //     cell: ({ row }) => {
-  //       const priority = priorities.find(
-  //         (priority) => priority.value === row.getValue("priority"),
-  //       );
-
-  //       if (!priority) {
-  //         return null;
-  //       }
-
-  //       return (
-  //         <div className="flex items-center">
-  //           {priority.icon && (
-  //             <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-  //           )}
-  //           <span>{priority.label}</span>
-  //         </div>
-  //       );
-  //     },
-  //     filterFn: (row, id, value) => {
-  //       return value.includes(row.getValue(id));
-  //     },
-  //   },
   {
     accessorKey: "lastEditedAt",
     size: 180,
@@ -216,6 +262,10 @@ export const columns: ColumnDef<Event>[] = [
         </div>
       );
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
   },
   {
     accessorKey: "type",
@@ -239,41 +289,75 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
   },
-  // {
-  //   id: "actions",
-  //   size: 32,
-  //   maxSize: 32,
-  //   minSize: 32,
-  //   enableResizing: false,
-  //   cell: ({ row }) => {
-  //     const payment = row.original;
+  {
+    id: "actions",
+    size: 48,
+    maxSize: 48,
+    minSize: 48,
+    enableResizing: false,
+    cell: ({ row, table }) => {
+      const event = row.original as Event;
+      const state = event.state as SubmissionFormState;
+      const isAdmin = table.options.meta?.isAdmin;
+      const ocState = event.openCallStatus;
+      const openCallId = event.openCallId;
+      const hasOC = !!openCallId;
+      // const openCallStatus = event.openCallStatus;
+      // const openCallId = event.openCallId;
+      // const dumbFuck = row.table.fuckoff
+      // console.log(table.options)
 
-  //     return (
-  //       <div className="hidden justify-end md:flex">
-  //         <DropdownMenu>
-  //           <DropdownMenuTrigger asChild>
-  //             <Button
-  //               variant="outline"
-  //               className="ml-auto size-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70"
-  //             >
-  //               <span className="sr-only">Open menu</span>
-  //               <MoreHorizontal className="size-4" />
-  //             </Button>
-  //           </DropdownMenuTrigger>
-  //           <DropdownMenuContent align="end">
-  //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //             <DropdownMenuItem
-  //               onClick={() => navigator.clipboard.writeText(payment._id)}
-  //             >
-  //               Copy Event ID
-  //             </DropdownMenuItem>
-  //             <DropdownMenuSeparator />
-  //             <DropdownMenuItem>Duplicate</DropdownMenuItem>
-  //             {/* <DropdownMenuItem>View payment details</DropdownMenuItem> */}
-  //           </DropdownMenuContent>
-  //         </DropdownMenu>
-  //       </div>
-  //     );
-  //   },
-  // },
+      return (
+        <div className="hidden justify-end md:flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="ml-auto size-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70"
+              >
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+              <DropdownMenuSeparator />
+              {state === "draft" && <DeleteEvent eventId={event._id} />}
+              {state === "submitted" && isAdmin && (
+                <ApproveEvent eventId={event._id} />
+              )}
+
+              {state === "published" && <ArchiveEvent eventId={event._id} />}
+              {state === "archived" && <ReactivateEvent eventId={event._id} />}
+              {/* <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(payment._id)}
+              >
+                Copy Event ID
+              </DropdownMenuItem> */}
+              {hasOC && (
+                <>
+                  <DropdownMenuLabel className="mt-2 border-t-1.5 border-foreground/20">
+                    Open Call
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {ocState === "draft" && <DeleteOC openCallId={openCallId} />}
+                  {ocState === "submitted" && (
+                    <ApproveOC openCallId={openCallId} />
+                  )}
+
+                  {ocState === "published" && (
+                    <ArchiveOC openCallId={openCallId} />
+                  )}
+                  {ocState === "archived" && (
+                    <ReactivateOC openCallId={openCallId} />
+                  )}
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
+    },
+  },
 ];

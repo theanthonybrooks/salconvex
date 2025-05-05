@@ -17,7 +17,7 @@ export async function handleFileUrl({
   }>;
 }) {
   let logoUrl = "/1.jpg";
-  let logoId: Id<"_storage"> | undefined;
+  let logoStorageId: Id<"_storage"> | undefined;
   let timezone: string | undefined;
   let timezoneOffset: number | undefined;
 
@@ -48,10 +48,10 @@ export async function handleFileUrl({
     }
 
     const { storageId } = await uploadRes.json();
-    logoId = storageId;
+    logoStorageId = storageId;
   } else if (data.logo && typeof data.logo === "string") {
     logoUrl = data.logo;
   }
 
-  return { logoUrl, logoId, timezone, timezoneOffset };
+  return { logoUrl, logoStorageId, timezone, timezoneOffset };
 }

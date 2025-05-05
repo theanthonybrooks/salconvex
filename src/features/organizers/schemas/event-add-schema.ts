@@ -161,6 +161,7 @@ const organizationSchema = z.object({
       .refine((b) => b.size > 0, { message: "Logo is required" }),
     z.string().min(1, "Logo is required"),
   ]),
+  logoStorageId: z.optional(z.string()),
   location: locationSchema,
   about: z.optional(z.string()),
   contact: contactSchema.optional(),
@@ -174,6 +175,7 @@ export const eventBase = z.object({
     .min(3, "Name must be at least 3 characters")
     .max(35, "Max 35 characters")
     .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+
   category: z.enum(eventCategoryValues), //TODO: Add message for "Event category is required"
   type: z.array(z.enum(eventTypeValues)).optional(),
   logo: z.union([
@@ -182,12 +184,13 @@ export const eventBase = z.object({
       .refine((b) => b.size > 0, { message: "Logo is required" }),
     z.string().min(1, "Logo is required"),
   ]),
+  logoStorageId: z.optional(z.string()),
   location: locationBase.extend({
     sameAsOrganizer: z.boolean(),
   }),
 
   dates: z.object({
-    eventFormat: z.string().min(1, "Date format is required"),
+    eventFormat: z.optional(z.string()),
     prodFormat: z.optional(z.string()),
     edition: z.number(),
     eventDates: z.array(
@@ -196,6 +199,7 @@ export const eventBase = z.object({
         end: z.string(),
       }),
     ),
+
     prodDates: z.optional(
       z.array(
         z.object({
@@ -246,19 +250,27 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
         path: ["type"],
       });
     }
-  }
-  if (!data.location.city || data.location.city.trim() === "") {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "City is required for events",
-      path: ["location", "city"],
-    });
+    if (!data.location.city || data.location.city.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "City is required for events",
+        path: ["location", "city"],
+      });
+    }
+    // if (data.name.trim().length > 3 && !data.dates?.eventFormat) {
+    //   ctx.addIssue({
+    //     code: z.ZodIssueCode.custom,
+    //     message: "An event format is required",
+    //     path: ["dates", "eventFormat"],
+    //   });
+    // }
   }
 
   const datesRequired =
     data.dates?.eventFormat !== "noEvent" &&
-    data.dates?.eventFormat !== "ongoing";
-
+    data.dates?.eventFormat !== "ongoing" &&
+    data.dates?.eventFormat !== "" &&
+    data.dates?.eventFormat;
   if (
     datesRequired &&
     (data.dates?.eventDates?.[0]?.start === "" ||
@@ -271,6 +283,8 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     });
   }
   if (
+    data.dates?.eventFormat &&
+    data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&
     data.dates?.prodFormat === undefined
   ) {
@@ -282,6 +296,8 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   }
 
   if (
+    data.dates?.eventFormat &&
+    data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&
     !data.dates?.noProdStart &&
     (!Array.isArray(data.dates?.prodDates) ||

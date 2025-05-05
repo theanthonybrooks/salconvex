@@ -1,7 +1,7 @@
 import { ArtistFull } from "@/types/artist";
 import { OpenCall } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
-import { Id } from "~/convex/_generated/dataModel";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export const eventTypeValues = [
   "gjm",
@@ -121,4 +121,9 @@ export interface EventCardProps {
   data: { event: EventData; organizer: Organizer };
   artist?: ArtistFull | null; //todo:make this required
   className?: string;
+}
+
+export interface EnrichedEvent extends Doc<"events"> {
+  openCallStatus?: string | null;
+  openCallId?: Id<"openCalls"> | null;
 }

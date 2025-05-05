@@ -21,6 +21,7 @@ export type Organizer = {
   events: string[];
 
   logo: string;
+  logoStorageId: Id<"_storage"> | undefined;
   location: {
     full?: string;
     locale?: string;

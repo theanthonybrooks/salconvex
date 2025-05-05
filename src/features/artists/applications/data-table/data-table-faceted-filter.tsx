@@ -101,11 +101,27 @@ export function DataTableFacetedFilter<TData, TValue>({
                       } else {
                         selectedValues.add(option.value);
                       }
+                      console.log(selectedValues);
                       const filterValues = Array.from(selectedValues);
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined,
                       );
+                      console.log(filterValues);
                     }}
+                    // onSelect={() => {
+                    //   const newSelectedValues = new Set(selectedValues);
+                    //   console.log(newSelectedValues);
+                    //   if (newSelectedValues.has(option.value)) {
+                    //     newSelectedValues.delete(option.value);
+                    //   } else {
+                    //     newSelectedValues.add(option.value);
+                    //   }
+                    //   const filterValues = Array.from(newSelectedValues);
+                    //   column?.setFilterValue(
+                    //     filterValues.length ? filterValues : undefined,
+                    //   );
+                    //   console.log(filterValues);
+                    // }}
                   >
                     <div
                       className={cn(

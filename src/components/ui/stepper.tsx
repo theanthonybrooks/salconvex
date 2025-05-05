@@ -19,6 +19,7 @@ interface StepperProps {
     | {
         id: number;
         label: string;
+        mobileLabel: string;
         fields?: string[];
         optional?: boolean;
         schema?: z.ZodTypeAny;
@@ -61,6 +62,7 @@ export default function HorizontalLinearStepper({
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({
           label: `${i + 1}`,
+          mobileLabel: `${i + 1}`,
           optional: false,
         }))
       : steps;
@@ -102,8 +104,11 @@ export default function HorizontalLinearStepper({
         className="-mt-[20px] flex flex-col gap-4 lg:mt-auto lg:grid lg:grid-cols-[20%_60%_1fr]"
       >
         <p className="mx-auto flex items-center text-lg lg:text-sm">
-          <span className="rounded-full text-center lg:min-w-40 lg:border-1.5 lg:bg-salYellow/30 lg:p-2 lg:px-4 lg:font-bold">
+          <span className="hidden rounded-full text-center sm:block lg:min-w-40 lg:border-1.5 lg:bg-salYellow/30 lg:p-2 lg:px-4 lg:font-bold">
             {stepArray[activeStep].label}
+          </span>
+          <span className="rounded-full text-center text-sm sm:hidden">
+            {stepArray[activeStep].mobileLabel}
           </span>
         </p>
 

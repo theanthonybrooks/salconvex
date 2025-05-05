@@ -21,7 +21,9 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
-
+  const isAdmin = table.options.meta?.isAdmin;
+  const viewAll = table.options.meta?.viewAll;
+  const setViewAll = table.options.meta?.setViewAll;
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -40,6 +42,13 @@ export function DataTableToolbar<TData>({
             options={eventStates}
           />
         )}
+        {table.getColumn("openCallStatus") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("openCallStatus")}
+            title="Open Call"
+            options={eventStates}
+          />
+        )}
         {table.getColumn("category") && (
           <DataTableFacetedFilter
             column={table.getColumn("category")}
@@ -47,11 +56,18 @@ export function DataTableToolbar<TData>({
             options={eventCategories}
           />
         )}
+
+        {isAdmin && setViewAll && (
+          <Button variant="ghost" onClick={() => setViewAll(!viewAll)}>
+            {viewAll ? "View Submissions" : "View  All"}
+          </Button>
+        )}
+
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
-            className="hidden h-8 px-2 sm:block lg:px-3"
+            className="hidden h-8 px-2 sm:inline-flex sm:gap-1 lg:px-3"
           >
             Reset
             <X />

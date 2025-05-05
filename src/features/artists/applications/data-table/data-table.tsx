@@ -37,6 +37,11 @@ interface DataTableProps<TData, TValue> {
   className?: string;
   containerClassName?: string;
   selectedRow?: Record<string, boolean>;
+  adminActions?: {
+    isAdmin: boolean;
+    viewAll: boolean;
+    setViewAll: React.Dispatch<React.SetStateAction<boolean>>;
+  };
 }
 
 export function DataTable<TData, TValue>({
@@ -47,7 +52,9 @@ export function DataTable<TData, TValue>({
   className,
   containerClassName,
   selectedRow,
+  adminActions,
 }: DataTableProps<TData, TValue>) {
+  const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(defaultVisibility ?? {});
@@ -59,6 +66,13 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     columnResizeMode: "onChange",
+
+    meta: {
+      isAdmin,
+      viewAll,
+      setViewAll,
+      cuck: true,
+    },
 
     state: {
       sorting,

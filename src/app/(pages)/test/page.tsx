@@ -1,27 +1,56 @@
 "use client";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { useState } from "react";
 
+import { columns } from "@/features/artists/applications/data-table/columns";
+import { DataTable } from "@/features/artists/applications/data-table/data-table";
 // import { columns } from "@/features/events/components/events-data-table/columns";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
+import { useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 export default function DemoPage() {
-  // const data = useQuery(api.events.event.getAllEvents, {});
-  // const events = data ?? [];
-  const [content, setContent] = useState("");
+  const isAdmin = useQuery(api.users.isAdmin, {}) ?? false;
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const [viewAll, setViewAll] = useState(true);
+  const { data: subEventsData, isPending: subEventsPending } =
+    useQueryWithStatus(
+      api.events.event.getSubmittedEvents,
+      !viewAll ? {} : "skip",
+    );
+  const { data: allEventsData, isPending: allEventsPending } =
+    useQueryWithStatus(api.events.event.getAllEvents, viewAll ? {} : "skip");
 
+  const eventsData = (viewAll ? allEventsData : subEventsData) ?? [];
+
+  console.log(subEventsPending, allEventsPending);
+
+  if (
+    !subEventsPending &&
+    !allEventsPending &&
+    ((!viewAll && !subEventsData) || (viewAll && !allEventsData))
+  ) {
+    return <p>No events found</p>;
+  }
+
+  const adminActions = {
+    isAdmin,
+    viewAll,
+    setViewAll,
+  };
   return (
     <>
-      {/* <div className="mx-auto hidden max-w-7xl py-10 lg:block">
+      <div className="mx-auto hidden max-w-7xl py-10 lg:block">
         <DataTable
           columns={columns}
-          data={events}
+          data={eventsData}
           defaultVisibility={{ eventCategory: false }}
+          adminActions={adminActions}
         />
       </div>
       <div className="mx-auto max-w-7xl py-10 lg:hidden">
         <DataTable
           columns={columns}
-          data={events}
+          data={eventsData}
           defaultVisibility={{
             eventCategory: false,
             lastEditedAt: false,
@@ -30,17 +59,7 @@ export default function DemoPage() {
             console.log(row);
           }}
         />
-      </div> */}
-      <RichTextEditor
-        value={content}
-        onChange={(value) => {
-          console.log(value);
-          setContent(value);
-        }}
-        placeholder="Short blurb about your project/event... (limit 200 characters)"
-        charLimit={200}
-      />
-      {/* <FormLinksInput type="organization" /> */}
+      </div>
     </>
   );
 }

@@ -29,7 +29,7 @@ export const isNewOrg = query({
 export const createNewOrg = mutation({
   args: {
     organizationName: v.string(),
-    logoId: v.optional(v.id("_storage")),
+    logoStorageId: v.optional(v.id("_storage")),
     logo: v.optional(v.string()),
     location: v.optional(
       v.object({
@@ -65,8 +65,8 @@ export const createNewOrg = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     let fileUrl = null;
-    if (args.logoId) {
-      fileUrl = await ctx.storage.getUrl(args.logoId);
+    if (args.logoStorageId) {
+      fileUrl = await ctx.storage.getUrl(args.logoStorageId);
     }
 
     const user = await ctx.db
@@ -120,6 +120,7 @@ export const createNewOrg = mutation({
         name: args.organizationName,
         slug: slugify(args.organizationName),
         logo: fileUrl || args.logo,
+        logoStorageId: args.logoStorageId,
         location: args.location,
         updatedAt: Date.now(),
         lastUpdatedBy: userId,
@@ -144,6 +145,7 @@ export const createNewOrg = mutation({
       slug: slugify(args.organizationName),
       events: [],
       logo: fileUrl || "/1.jpg",
+      logoStorageId: args.logoStorageId,
       location: args.location,
       hadFreeCall: false,
       updatedAt: Date.now(),

@@ -288,6 +288,7 @@ const eventSchema = {
   ),
   active: v.optional(v.boolean()),
   lastEditedAt: v.optional(v.number()),
+  approvedBy: v.optional(v.id("users")),
 };
 
 const eventOrganizerSchema = {
@@ -301,6 +302,7 @@ const eventOpenCallSchema = {
   eventId: v.id("events"),
   openCallId: v.id("openCalls"),
   edition: v.number(),
+  state: v.optional(v.string()), //draft, submitted, published, archived
 };
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
 const openCallSchema = {
@@ -371,6 +373,7 @@ const openCallSchema = {
   state: v.optional(v.string()), //draft, submitted, published, archived
   lastUpdatedBy: v.optional(v.id("users")),
   lastUpdatedAt: v.optional(v.number()),
+  approvedBy: v.optional(v.id("users")),
 };
 
 const openCallOrganizerSchema = {
@@ -480,6 +483,10 @@ export default defineSchema({
   eventOrganizers: defineTable(eventOrganizerSchema)
     .index("by_eventId", ["eventId"])
     .index("by_organizerId", ["organizerId"]),
+
+  eventOpenCalls: defineTable(eventOpenCallSchema)
+    .index("by_eventId", ["eventId"])
+    .index("by_openCallId", ["openCallId"]),
 
   openCalls: defineTable(openCallSchema)
     .index("by_eventId", ["eventId"])
