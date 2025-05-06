@@ -181,7 +181,6 @@ export const ApplyButton = ({
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
         : "Apply"
       : "View More";
-  console.log("appStatus", appStatus);
   const hasApplied = appStatus !== null;
   return (
     <div

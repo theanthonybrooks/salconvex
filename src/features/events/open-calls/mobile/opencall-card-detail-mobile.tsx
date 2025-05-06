@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { EyeOff, MapPin } from "lucide-react";
+import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
 
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
@@ -144,7 +144,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           />
 
           <div className="flex flex-col items-center space-y-4">
-            {bookmarked ? (
+            {appStatus !== null ? (
+              <CheckCircleIcon className="mt-3 size-8 text-emerald-600" />
+            ) : bookmarked ? (
               <FaBookmark
                 className="mt-3 size-8 cursor-pointer text-red-500"
                 onClick={onBookmark}
