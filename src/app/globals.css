@@ -1069,6 +1069,9 @@ div:has(> .react-datepicker__input-container) {
 }
 
 .PhoneInputInput {
+  @media (width < 768px) {
+    width: 100%;
+  }
   &:focus {
     outline: none;
     border: none;
@@ -1209,3 +1212,13 @@ div:has(> .react-datepicker__input-container) {
   @apply relative mb-2 pl-7;
 }
 */
+
+/* -------------- Event/Org link component -------------- */
+
+.links-hidden {
+  @media (max-width: 640px) {
+    transform: translateY(-100%);
+    opacity: 0;
+    height: 0;
+  }
+}

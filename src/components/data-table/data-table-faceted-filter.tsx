@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
+  className?: string;
   column?: Column<TData, TValue>;
   title?: string;
   options: {
@@ -35,6 +36,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  className,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
@@ -45,7 +47,10 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className="hidden h-8 items-center gap-1 border-dashed md:flex"
+          className={cn(
+            "hidden h-8 items-center gap-1 border-dashed md:flex",
+            className,
+          )}
         >
           <PlusCircle className="size-4" />
           {title}

@@ -77,12 +77,50 @@ export const createNewOrg = mutation({
     if (!user) {
       throw new ConvexError("User not found");
     }
+    const userAccountTypes = user?.accountType ?? [];
 
-    // const org = await ctx.db
-    //   .query("organizations")
-    //   .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
-    //   .filter((q) => q.eq(q.field("name"), args.organizationName))
-    //   .unique();
+    if (!userAccountTypes.includes("organizer")) {
+      const userSub = await ctx.db
+        .query("userSubscriptions")
+        .withIndex("userId", (q) => q.eq("userId", user._id))
+        .first();
+
+      const userHadTrial = userSub?.hadTrial || false;
+
+      const userLog = await ctx.db
+        .query("userLog")
+        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .unique();
+
+      await ctx.db.patch(user._id, {
+        accountType: [...user.accountType, "organizer"],
+        updatedAt: Date.now(),
+      });
+      if (!userLog) {
+        await ctx.db.insert("userLog", {
+          userId: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          active: true,
+          banned: false,
+          hadTrial: userHadTrial,
+          bannedReason: undefined,
+          bannedTimestamp: undefined,
+          banningAuthority: undefined,
+          deleted: false,
+          deletedReason: undefined,
+          deletedTimestamp: undefined,
+          deletedBy: undefined,
+          accountTypes: ["organizer"],
+          userEmail: user.email,
+        });
+      } else {
+        await ctx.db.patch(userLog._id, {
+          accountTypes: [...userLog.accountTypes, "organizer"],
+        });
+      }
+    }
+
     const org = await ctx.db
       .query("organizations")
       .withIndex("by_name", (q) => q.eq("name", args.organizationName))
@@ -269,6 +307,49 @@ export const updateOrganization = mutation({
       throw new ConvexError("Organization not found");
     }
     return { orgId: updatedOrg._id, org: updatedOrg };
+  },
+});
+
+export const deleteOrganization = mutation({
+  args: {
+    orgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+
+    const isAdmin = user?.role?.includes("admin");
+
+    const org = await ctx.db.get(args.orgId);
+    if (!org) return null;
+
+    if (!isAdmin) {
+      throw new ConvexError(
+        "You don't have permission to delete this organization",
+      );
+    }
+
+    await ctx.db.delete(args.orgId);
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", org._id))
+      .collect();
+
+    for (const event of events) {
+      await ctx.db.patch(event._id, {
+        state: "archived",
+        lastEditedAt: Date.now(),
+        approvedBy: userId,
+      });
+    }
   },
 });
 

@@ -1,27 +1,47 @@
 "use client";
 
+import { ColumnDef } from "@tanstack/react-table";
+
+import {
+  ApproveEvent,
+  ArchiveEvent,
+  DeleteEvent,
+  ReactivateEvent,
+} from "@/components/data-table/actions/data-table-event-actions";
+import {
+  ApproveOC,
+  ArchiveOC,
+  DeleteOC,
+  ReactivateOC,
+} from "@/components/data-table/actions/data-table-oc-actions";
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SubmissionFormState } from "@/types/event";
-import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  CheckCircle2,
-  MoreHorizontal,
-  Pencil,
-} from "lucide-react";
+import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
+import { cn } from "@/lib/utils";
+import { EventType, SubmissionFormState } from "@/types/event";
+import { CheckCircle2, Circle, MoreHorizontal } from "lucide-react";
+import { FaRegFloppyDisk } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+export const columnLabels: Record<string, string> = {
+  name: "Name",
+  dates_edition: "Edition",
+  state: "State",
+  openCallStatus: "Open Call",
+  lastEditedAt: "Last Edited",
+  category: "Category",
+  type: "Event Type",
+};
+
 export type Event = {
   _id: Id<"events">;
   name: string;
@@ -29,135 +49,326 @@ export type Event = {
     edition: number;
   };
   state: SubmissionFormState;
+  category: string;
+  type: EventType[];
   lastEditedAt?: number;
+  openCallStatus?: string | null;
+  openCallId?: Id<"openCalls"> | null;
 };
 
 export const columns: ColumnDef<Event>[] = [
-  //   {
-  //     id: "select",
-  //     header: ({ table }) => (
-  //       <Checkbox
-  //         checked={
-  //           table.getIsAllPageRowsSelected() ||
-  //           (table.getIsSomePageRowsSelected() && "indeterminate")
-  //         }
-  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //         aria-label="Select all"
-  //       />
-  //     ),
-  //     cell: ({ row }) => (
-  //       <Checkbox
-  //         checked={row.getIsSelected()}
-  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //         aria-label="Select row"
-  //       />
-  //     ),
-  //     enableSorting: false,
-  //     enableHiding: false,
-  //   },
   {
-    accessorKey: "dates.edition",
-
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="link"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Edition
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    id: "select",
+    size: 30,
+    minSize: 30,
+    maxSize: 30,
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={() => table.toggleAllRowsSelected(false)}
+        aria-label="Deselect all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
   },
+
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="link"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "state",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="link"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          State
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    size: 120,
+    minSize: 120,
+    maxSize: 300,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
     cell: ({ row }) => {
-      const state = row.getValue("state") as SubmissionFormState;
       return (
-        <div className="flex w-[100px] items-center gap-1">
-          {state === "draft" ? (
-            <Pencil className="size-4" />
-          ) : state === "submitted" ? (
-            <QuestionMarkCircledIcon className="size-4" />
-          ) : state === "published" ? (
-            <CheckCircle2 className="size-4" />
-          ) : (
-            <CheckCircle2 className="size-4" />
-          )}
-          <span className="capitalize">{state}</span>
+        <div className="flex space-x-2">
+          <span className="max-w-[20ch] truncate pl-1 font-medium sm:max-w-[500px] sm:pl-0">
+            {row.getValue("name")}
+          </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "lastEditedAt",
-    header: ({ column }) => {
+    accessorKey: "dates.edition",
+    size: 60,
+    minSize: 60,
+    maxSize: 60,
+
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Edition" />
+    ),
+    cell: ({ row }) => {
       return (
-        <Button
-          variant="link"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Last Edited
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex justify-center space-x-2">
+          <span className="max-w-[60px] truncate font-medium">
+            {row.getValue("dates_edition")}
+          </span>
+        </div>
       );
     },
+  },
+
+  //TODO: Make optional column
+  //   {
+  //     accessorKey: "type",
+  //     header: ({ column }) => (
+  //       <DataTableColumnHeader column={column} title="Type" />
+  //     ),
+  //     cell: ({ row }) => {
+  //       return (
+  //         <div className="flex space-x-2">
+  //           <span className="max-w-[500px] truncate font-medium">
+  //             {row.getValue("eventType")}
+  //           </span>
+  //         </div>
+  //       );
+  //     },
+  //   },
+
+  {
+    accessorKey: "state",
+    size: 130,
+    minSize: 130,
+    maxSize: 130,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="State" />
+    ),
+
+    cell: ({ row }) => {
+      const state = row.getValue("state") as SubmissionFormState;
+      return (
+        <div className="flex justify-center">
+          <div
+            className={cn(
+              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
+              state === "draft" && "bg-orange-200",
+              state === "submitted" && "bg-blue-200",
+              state === "published" && "bg-green-200",
+            )}
+          >
+            {state === "draft" ? (
+              <FaRegFloppyDisk className="size-4 shrink-0" />
+            ) : state === "submitted" ? (
+              <Circle className="size-4 shrink-0" />
+            ) : state === "published" ? (
+              <CheckCircle2 className="size-4 shrink-0" />
+            ) : (
+              <CheckCircle2 className="size-4 shrink-0" />
+            )}
+            <span className="capitalize">{state}</span>
+          </div>
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+  },
+  {
+    accessorKey: "openCallStatus",
+    size: 130,
+    minSize: 130,
+    maxSize: 130,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Open Call" />
+    ),
+
+    cell: ({ row }) => {
+      const ocState =
+        (row.getValue("openCallStatus") as SubmissionFormState) || null;
+      return (
+        <div className="flex justify-center">
+          <div
+            className={cn(
+              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
+              !ocState && "border-transparent",
+              ocState === "draft" && "bg-orange-200",
+              ocState === "submitted" && "bg-blue-200",
+              ocState === "published" && "bg-green-200",
+            )}
+          >
+            {ocState ? (
+              ocState === "draft" ? (
+                <FaRegFloppyDisk className="size-4 shrink-0" />
+              ) : ocState === "submitted" ? (
+                <Circle className="size-4 shrink-0" />
+              ) : ocState === "published" ? (
+                <CheckCircle2 className="size-4 shrink-0" />
+              ) : (
+                <CheckCircle2 className="size-4 shrink-0" />
+              )
+            ) : (
+              ""
+            )}
+            <span className="capitalize">{ocState || "-"}</span>
+          </div>
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+  },
+
+  {
+    accessorKey: "lastEditedAt",
+    size: 180,
+    minSize: 180,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Edited" />
+    ),
     cell: ({ getValue }) => {
       const value = getValue() as string;
-      return new Date(value).toLocaleString();
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="max-w-[175px] truncate font-medium capitalize">
+            {!isNaN(new Date(value).getTime())
+              ? new Date(value).toLocaleString()
+              : "-"}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "category",
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {getEventCategoryLabelAbbr(row.getValue("category"))}
+          </span>
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+  },
+  {
+    accessorKey: "type",
+    size: 120,
+    minSize: 120,
+    maxSize: 240,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Event Type" />
+    ),
+    cell: ({ row }) => {
+      const types = row.getValue("type") as EventType[];
+
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {Array.isArray(types) && types.length > 0
+              ? types.map((type) => getEventTypeLabel(type)).join(", ")
+              : "-"}
+          </span>
+        </div>
+      );
     },
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const payment = row.original;
+    size: 48,
+    maxSize: 48,
+    minSize: 48,
+    enableResizing: false,
+    cell: ({ row, table }) => {
+      const event = row.original as Event;
+      const state = event.state as SubmissionFormState;
+      const isAdmin = table.options.meta?.isAdmin;
+      const ocState = event.openCallStatus;
+      const openCallId = event.openCallId;
+      const hasOC = !!openCallId;
+      // const openCallStatus = event.openCallStatus;
+      // const openCallId = event.openCallId;
+      // const dumbFuck = row.table.fuckoff
+      // console.log(table.options)
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="link" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment._id)}
-            >
-              Copy Event ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Duplicate</DropdownMenuItem>
-            {/* <DropdownMenuItem>View payment details</DropdownMenuItem> */}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="hidden justify-end md:flex">
+          <ConfirmingDropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="ml-auto size-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70"
+                >
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  {isAdmin ? "Event" : "Actions"}
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator />
+                {(state === "draft" || isAdmin) && (
+                  <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
+                )}
+                {state === "submitted" && isAdmin && (
+                  <ApproveEvent eventId={event._id} />
+                )}
+
+                {state === "published" && <ArchiveEvent eventId={event._id} />}
+                {(state === "archived" ||
+                  (state === "published" && isAdmin)) && (
+                  <ReactivateEvent eventId={event._id} state={state} />
+                )}
+                {/* <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(payment._id)}
+                >
+                  Copy Event ID
+                </DropdownMenuItem> */}
+                {hasOC && (
+                  <>
+                    <DropdownMenuLabel className="mt-2 border-t-1.5 border-foreground/20">
+                      Open Call
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {(ocState === "draft" || isAdmin) && (
+                      <DeleteOC openCallId={openCallId} isAdmin={isAdmin} />
+                    )}
+                    {ocState === "submitted" && (
+                      <ApproveOC openCallId={openCallId} />
+                    )}
+
+                    {ocState === "published" && (
+                      <ArchiveOC openCallId={openCallId} />
+                    )}
+                    {(ocState === "archived" || ocState === "published") && (
+                      <ReactivateOC openCallId={openCallId} state={ocState} />
+                    )}
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </ConfirmingDropdown>
+        </div>
       );
     },
   },

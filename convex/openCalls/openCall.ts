@@ -71,13 +71,14 @@ export const getOpenCallByEventId = query({
 export const deleteOC = mutation({
   args: {
     openCallId: v.id("openCalls"),
+    isAdmin: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
     const openCall = await ctx.db.get(args.openCallId);
     if (!openCall) return null;
-    if (openCall.state !== "draft")
+    if (openCall.state !== "draft" && !args.isAdmin)
       throw new ConvexError("Active open calls cannot be deleted");
     const organization = await ctx.db.get(openCall.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");

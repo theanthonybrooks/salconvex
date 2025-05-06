@@ -1,15 +1,16 @@
+import { DataTable } from "@/components/data-table/data-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
-import { columns } from "@/features/artists/applications/data-table/columns";
-import { DataTable } from "@/features/artists/applications/data-table/data-table";
+import { columns } from "@/features/events/components/events-data-table/columns";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/lib/utils";
 import { EnrichedEvent } from "@/types/event";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
 
@@ -33,12 +34,13 @@ interface SubmissionFormOrgStepProps {
   setNewOrgEvent: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedRow: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   selectedRow: Record<string, boolean>;
+  furthestStep: number;
 }
 
 const SubmissionFormOrgStep = ({
   existingOrgs,
   existingOrg,
-  existingEvent,
+  // existingEvent,
   eventsData,
   validOrgWZod,
   invalidOrgWZod,
@@ -53,19 +55,58 @@ const SubmissionFormOrgStep = ({
   setExistingEvent,
   setSelectedRow,
   selectedRow,
+  furthestStep,
 }: SubmissionFormOrgStepProps) => {
   const {
     control,
     watch,
+    // reset,
     // setValue,
     // getValues,
     // setError,
     // trigger,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-
+  // const currentValues = getValues();
   const orgData = watch("organization");
   const orgName = orgData?.name ?? "";
+  const bottomRef = useRef<HTMLParagraphElement | null>(null);
+  const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
+
+  // useEffect(() => {
+  //   if (newOrgEvent) {
+  //     reset({
+  //       ...currentValues,
+  //       event: {
+  //         // name: "",
+  //         logo: currentValues.organization.logo,
+  //         logoStorageId: currentValues.organization.logoStorageId,
+  //         location: {
+  //           ...currentValues.organization.location,
+  //           sameAsOrganizer: true,
+  //         },
+  //         dates: {
+  //           edition: new Date().getFullYear(),
+  //           eventFormat: undefined,
+  //           prodFormat: undefined,
+  //           noProdStart: false,
+  //         },
+  //         links: {
+  //           sameAsOrganizer: true,
+  //         },
+  //         hasOpenCall: "false",
+  //       },
+  //     });
+  //   }
+  // }, [newOrgEvent, reset, currentValues]);
+
+  useEffect(() => {
+    if (scrollTrigger) {
+      if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [scrollTrigger]);
 
   return (
     //   {activeStep === 0 && ( //pass this from the parent, not here
@@ -263,8 +304,14 @@ const SubmissionFormOrgStep = ({
                   lastEditedAt: false,
                 }}
                 onRowSelect={(event, selection) => {
-                  if (newOrgEvent) {
+                  if (newOrgEvent && Object.keys(selectedRow).length > 0) {
+                    console.log("falsito");
                     setNewOrgEvent(false);
+                  } else if (
+                    !newOrgEvent &&
+                    Object.keys(selectedRow).length === 0
+                  ) {
+                    setNewOrgEvent(true);
                   }
                   setExistingEvent(event as EnrichedEvent);
                   setSelectedRow(selection);
@@ -273,15 +320,22 @@ const SubmissionFormOrgStep = ({
                 className="w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
                 containerClassName={cn(
                   "lg:hidden",
-                  newOrgEvent && "opacity-50",
+                  newOrgEvent && "opacity-80",
                 )}
+                tableType="events"
               />
               <DataTable
                 columns={columns}
                 data={eventsData}
                 onRowSelect={(event, selection) => {
-                  if (newOrgEvent) {
+                  if (newOrgEvent && Object.keys(selectedRow).length > 0) {
+                    console.log("falsito");
                     setNewOrgEvent(false);
+                  } else if (
+                    !newOrgEvent &&
+                    Object.keys(selectedRow).length === 0
+                  ) {
+                    setNewOrgEvent(true);
                   }
                   setExistingEvent(event as EnrichedEvent);
                   setSelectedRow(selection);
@@ -290,15 +344,22 @@ const SubmissionFormOrgStep = ({
                 className="flex w-full max-w-[90vw] overflow-x-auto"
                 containerClassName={cn(
                   "hidden lg:block xl:hidden  ",
-                  newOrgEvent && "opacity-50",
+                  newOrgEvent && "opacity-80",
                 )}
+                tableType="events"
               />
               <DataTable
                 columns={columns}
                 data={eventsData}
                 onRowSelect={(event, selection) => {
-                  if (newOrgEvent) {
+                  if (newOrgEvent && Object.keys(selectedRow).length > 0) {
+                    console.log("falsito");
                     setNewOrgEvent(false);
+                  } else if (
+                    !newOrgEvent &&
+                    Object.keys(selectedRow).length === 0
+                  ) {
+                    setNewOrgEvent(true);
                   }
                   setExistingEvent(event as EnrichedEvent);
                   setSelectedRow(selection);
@@ -312,8 +373,9 @@ const SubmissionFormOrgStep = ({
                 className="flex w-full max-w-[45vw] overflow-x-auto"
                 containerClassName={cn(
                   "hidden xl:block ",
-                  newOrgEvent && "opacity-50 pointer-events-none",
+                  newOrgEvent && "opacity-80",
                 )}
+                tableType="events"
               />
               {/* 
                           <span>or</span> */}
@@ -331,12 +393,12 @@ const SubmissionFormOrgStep = ({
               <label
                 className={cn(
                   "flex cursor-pointer items-start gap-2 md:items-center",
-                  existingEvent !== null &&
-                    "pointer-events-none opacity-50 hover:cursor-default",
+                  // existingEvent !== null &&
+                  //   "pointer-events-none opacity-50 hover:cursor-default",
                 )}
               >
                 <Checkbox
-                  disabled={existingEvent !== null}
+                  // disabled={existingEvent !== null}
                   tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
                   id="newEvent"
                   className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
@@ -360,7 +422,10 @@ const SubmissionFormOrgStep = ({
                   </span>
                 )}
               </label>
-              <p className="mt-2 text-center text-xs italic text-muted-foreground">
+              <p
+                ref={bottomRef}
+                className="mt-2 text-pretty text-center text-xs italic text-muted-foreground"
+              >
                 Past events are no longer editable but are still viewable and
                 able to be used as a template for new events.
               </p>

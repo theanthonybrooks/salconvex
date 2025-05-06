@@ -656,17 +656,35 @@ export const archiveEvent = mutation({
 export const deleteEvent = mutation({
   args: {
     eventId: v.id("events"),
+    isAdmin: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    if (event.state !== "draft")
+    if (event.state !== "draft" && !args.isAdmin)
       throw new ConvexError("Active events cannot be deleted, only archived");
     const organization = await ctx.db.get(event.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
     const orgLogoStorageId = organization.logoStorageId;
+    const openCalls = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect();
+
+    for (const openCall of openCalls) {
+      await ctx.db.delete(openCall._id);
+    }
 
     if (event.logoStorageId && event.logoStorageId !== orgLogoStorageId) {
       await ctx.storage.delete(event.logoStorageId);

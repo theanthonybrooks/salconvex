@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { columnLabels } from "@/features/artists/applications/data-table/columns";
+import { columnLabels } from "@/features/events/components/events-data-table/columns";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;

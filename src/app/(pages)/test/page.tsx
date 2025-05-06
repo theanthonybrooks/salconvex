@@ -1,7 +1,8 @@
 "use client";
 
-import { columns } from "@/features/artists/applications/data-table/columns";
-import { DataTable } from "@/features/artists/applications/data-table/data-table";
+import { DataTable } from "@/components/data-table/data-table";
+import { columns } from "@/features/events/components/events-data-table/columns";
+import { cn } from "@/lib/utils";
 // import { columns } from "@/features/events/components/events-data-table/columns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
@@ -43,21 +44,27 @@ export default function DemoPage() {
         <DataTable
           columns={columns}
           data={eventsData}
-          defaultVisibility={{ eventCategory: false }}
+          defaultVisibility={{ category: false }}
           adminActions={adminActions}
+          tableType="events"
         />
       </div>
-      <div className="mx-auto max-w-7xl py-10 lg:hidden">
+      <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
         <DataTable
           columns={columns}
           data={eventsData}
           defaultVisibility={{
-            eventCategory: false,
+            type: false,
+            category: false,
             lastEditedAt: false,
           }}
           onRowSelect={(row) => {
             console.log(row);
           }}
+          adminActions={adminActions}
+          tableType="events"
+          className="mx-auto w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
+          containerClassName={cn("lg:hidden")}
         />
       </div>
     </>

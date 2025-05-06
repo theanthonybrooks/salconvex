@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
+import { TableTypes } from "@/types/tanstack-table";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -42,6 +43,7 @@ interface DataTableProps<TData, TValue> {
     viewAll: boolean;
     setViewAll: React.Dispatch<React.SetStateAction<boolean>>;
   };
+  tableType?: TableTypes;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,7 +54,9 @@ export function DataTable<TData, TValue>({
   className,
   containerClassName,
   selectedRow,
+
   adminActions,
+  tableType,
 }: DataTableProps<TData, TValue>) {
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
@@ -71,7 +75,7 @@ export function DataTable<TData, TValue>({
       isAdmin,
       viewAll,
       setViewAll,
-      cuck: true,
+      tableType,
     },
 
     state: {
@@ -107,6 +111,10 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
+  React.useEffect(() => {
+    setRowSelection(selectedRow ?? {});
+  }, [selectedRow]);
 
   return (
     <div className={cn("w-full space-y-4", containerClassName)}>
