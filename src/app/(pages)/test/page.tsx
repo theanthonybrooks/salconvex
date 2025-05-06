@@ -23,8 +23,6 @@ export default function DemoPage() {
 
   const eventsData = (viewAll ? allEventsData : subEventsData) ?? [];
 
-  console.log(subEventsPending, allEventsPending);
-
   if (
     !subEventsPending &&
     !allEventsPending &&

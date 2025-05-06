@@ -353,16 +353,17 @@ export const columns: ColumnDef<Event>[] = [
                     {(ocState === "draft" || isAdmin) && (
                       <DeleteOC openCallId={openCallId} isAdmin={isAdmin} />
                     )}
-                    {ocState === "submitted" && (
+                    {ocState === "submitted" && isAdmin && (
                       <ApproveOC openCallId={openCallId} />
                     )}
 
                     {ocState === "published" && (
                       <ArchiveOC openCallId={openCallId} />
                     )}
-                    {(ocState === "archived" || ocState === "published") && (
-                      <ReactivateOC openCallId={openCallId} state={ocState} />
-                    )}
+                    {(ocState === "archived" || ocState === "published") &&
+                      isAdmin && (
+                        <ReactivateOC openCallId={openCallId} state={ocState} />
+                      )}
                   </>
                 )}
               </DropdownMenuContent>

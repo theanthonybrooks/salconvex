@@ -16,7 +16,7 @@ import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
-import { CircleDollarSignIcon, X } from "lucide-react";
+import { CheckCircleIcon, CircleDollarSignIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
@@ -181,11 +181,12 @@ export const ApplyButton = ({
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
         : "Apply"
       : "View More";
-
+  console.log("appStatus", appStatus);
+  const hasApplied = appStatus !== null;
   return (
     <div
       className={cn(
-        "col-span-full mt-4 flex items-center justify-center lg:mt-0 lg:px-4",
+        "col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 sm:max-w-[300px] lg:mt-0 lg:px-4",
         !detailCard && "lg:w-[250px]",
         detailCard && "lg:mt-2 lg:w-full",
         className,
@@ -243,13 +244,13 @@ export const ApplyButton = ({
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
-                "relative z-[1] w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
+                "relative z-[1] h-14 w-full cursor-pointer rounded-r-none border-r sm:h-11 xl:min-w-[150px]",
                 appStatus !== null &&
                   !publicView &&
-                  "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
+                  "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",
               )}
             >
-              <span className="flex items-center gap-x-1">
+              <span className="flex items-center gap-x-1 text-base">
                 {buttonText}
                 {appFee > 0 && !publicView && (
                   <CircleDollarSignIcon
@@ -314,23 +315,36 @@ export const ApplyButton = ({
         </AlertDialog>
       )}
 
-      <Button
-        variant="salWithShadowHiddenVert"
-        size="lg"
-        className={cn(
-          "relative z-[2] w-fit rounded-none border-x px-3 sm:px-3",
-          appStatus !== null &&
-            !publicView &&
-            "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
-        )}
-        onClick={onBookmark}
-      >
-        {isBookmarked ? (
-          <FaBookmark className="size-6 text-red-500" />
-        ) : (
-          <FaRegBookmark className="size-6" />
-        )}
-      </Button>
+      {!hasApplied && (
+        <Button
+          variant="salWithShadowHiddenVert"
+          size="lg"
+          className={cn(
+            "relative z-[2] h-14 w-fit rounded-none border-x px-4 sm:h-11 sm:px-3 [&_svg]:size-6",
+            appStatus !== null &&
+              !publicView &&
+              "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
+          )}
+          onClick={onBookmark}
+        >
+          {isBookmarked ? (
+            <FaBookmark className="size-7 text-red-500" />
+          ) : (
+            <FaRegBookmark className="size-7" />
+          )}
+        </Button>
+      )}
+      {hasApplied && (
+        <Button
+          variant="salWithoutShadow"
+          size="lg"
+          className={cn(
+            "pointer-events-none relative z-[2] h-14 w-fit rounded-none border-x border-foreground/50 bg-background px-4 text-foreground/50 hover:bg-background sm:h-11 sm:px-3 [&_svg]:size-7",
+          )}
+        >
+          <CheckCircleIcon className="text-emerald-600 sm:size-5" />
+        </Button>
+      )}
       {/* <Button
       variant='salWithShadowHidden'
       size='lg'
@@ -355,6 +369,7 @@ export const ApplyButton = ({
         // setManualApplied={setManualApplied}
         buttonTrigger={true}
         align="end"
+        isBookmarked={isBookmarked}
       />
     </div>
   );

@@ -90,7 +90,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const formatValue = watch(`${nameBase}.${formatField}` as Path<T>);
   // const isSetDates = formatValue === "setDates";
 
-  // Inside the component
   const { fields, append, remove } = useFieldArray({
     control,
     name: `${nameBase}.${formatKey}` as
@@ -372,45 +371,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
             <Label htmlFor="event.dates.eventDates" className="sr-only">
               {type.charAt(0).toUpperCase() + type.slice(1)} Dates
             </Label>
-            {/* {formatValue === "setDates" && (
-              <div className="flex max-w-full items-center gap-x-2">
-                <Controller
-                  name={`${nameBase}.${formatKey}.0.start` as Path<T>}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <CustomDatePicker
-                        isAdmin={isAdmin}
-                        pickerType="dates"
-                        value={field.value as CustomDatePickerProps["value"]}
-                        onChange={(date) => field.onChange(toDateString(date))}
-                        className="w-full rounded border p-2 text-center"
-                        inputClassName="h-12"
-                        maxDate={formatDatesArray?.[0]?.end}
-                      />
-                    );
-                  }}
-                />
-                -
-                <Controller
-                  name={`${nameBase}.${formatKey}.0.end` as Path<T>}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <CustomDatePicker
-                        isAdmin={isAdmin}
-                        pickerType="dates"
-                        value={field.value as CustomDatePickerProps["value"]}
-                        onChange={(date) => field.onChange(toDateString(date))}
-                        className="w-full rounded border p-2 text-center"
-                        inputClassName="h-12"
-                        minDate={formatDatesArray?.[0]?.start}
-                      />
-                    );
-                  }}
-                />
-              </div>
-            )} */}
+
             {formatValue === "setDates" && (
               <>
                 {fields.map((field, index) => {

@@ -122,9 +122,9 @@ TheListNavBarProps) {
       {canGoToTop && (
         <div
           onClick={onGoToTop}
-          className="fixed bottom-7 right-7 rounded-full border-2 bg-background p-1 hover:scale-110 hover:cursor-pointer active:scale-95"
+          className="fixed bottom-7 right-7 z-20 rounded-full border-2 bg-background p-1 hover:scale-110 hover:cursor-pointer active:scale-95"
         >
-          <ArrowUpIcon className="size-6" />
+          <ArrowUpIcon className="size-8 sm:size-6" />
         </div>
       )}
       <motion.div

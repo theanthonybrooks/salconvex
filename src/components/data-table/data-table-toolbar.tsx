@@ -60,7 +60,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("openCallStatus")}
                 title="Open Call"
                 options={eventStates}
-                className="md:hidden xl:flex"
+                className="not-ipad md:hidden 2xl:flex"
               />
             )}
             {table.getColumn("category") && (

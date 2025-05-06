@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { User } from "@/types/user";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface EventContextMenuProps {
@@ -39,6 +40,7 @@ interface EventContextMenuProps {
   buttonTrigger?: boolean;
   align?: "center" | "start" | "end" | undefined;
   user?: User | null;
+  isBookmarked?: boolean;
 }
 
 const EventContextMenu = ({
@@ -55,12 +57,17 @@ const EventContextMenu = ({
   buttonTrigger,
   align,
   user,
+  isBookmarked,
 }: EventContextMenuProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
+  const hasApplied = appStatus !== null;
   const onHide = () => {
     toggleListAction({ hidden: !isHidden });
+  };
+  const onBookmark = () => {
+    toggleListAction({ bookmarked: !isBookmarked || false });
   };
   const onApply = () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
@@ -70,6 +77,7 @@ const EventContextMenu = ({
     });
   };
 
+  console.log(isBookmarked);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -78,17 +86,17 @@ const EventContextMenu = ({
             variant="salWithShadowHidden"
             size="lg"
             className={cn(
-              "relative z-[1] w-fit rounded-l-none border-l px-2 sm:px-2",
+              "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 sm:h-11 sm:px-3 [&_svg]:size-6",
 
               appStatus !== null &&
                 !publicView &&
                 "border-foreground/50 bg-background text-foreground/50 hover:shadow-slga",
             )}
           >
-            <Ellipsis className="size-8" />
+            <Ellipsis className="size-6" />
           </Button>
         ) : (
-          <Ellipsis className="size-7 cursor-pointer" />
+          <Ellipsis className="size-6 cursor-pointer" />
         )}
       </PopoverTrigger>
       <PopoverContent
@@ -146,6 +154,27 @@ const EventContextMenu = ({
                 <span className="flex items-center gap-x-1 text-sm">
                   <CheckCircle className="size-4" />
                   Mark as Applied
+                </span>
+              )}
+            </div>
+          )}
+          {hasApplied && isBookmarked !== undefined && (
+            <div
+              onClick={onBookmark}
+              className={cn(
+                "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                publicView && "hidden",
+              )}
+            >
+              {isBookmarked ? (
+                <span className="flex items-center gap-x-1 text-sm">
+                  <FaBookmark className="size-4 text-red-500" />
+                  Remove Bookmark
+                </span>
+              ) : (
+                <span className="flex items-center gap-x-1 text-sm">
+                  <FaRegBookmark className="size-4" />
+                  Bookmark Event
                 </span>
               )}
             </div>

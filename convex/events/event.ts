@@ -140,21 +140,28 @@ export const getAllEvents = query({
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
-    if (!user) return null;
+    if (!user) throw new ConvexError("User not found");
 
     const isAdmin = user.role.includes("admin");
 
-    const events = await ctx.db.query("events").collect();
+    let events = await ctx.db.query("events").collect();
 
-    // Get all open calls to match with events
+    if (!isAdmin) {
+      const organizations = await ctx.db
+        .query("organizations")
+        .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
+        .collect();
+      if (!organizations.length)
+        throw new ConvexError("Must be organizer to view event submissions");
+      const orgIds = new Set(organizations.map((org) => org._id));
+      events = events.filter((event) => orgIds.has(event.mainOrgId));
+    }
     const openCalls = await ctx.db.query("openCalls").collect();
 
-    // Create a map of openCalls by eventId for fast lookup
     const openCallMap = new Map(
       openCalls.map((oc) => [oc.eventId.toString(), oc]),
     );
 
-    // Enrich events with open call status
     const enrichedEvents = events.map((event) => {
       const openCall = openCallMap.get(event._id.toString());
       return {

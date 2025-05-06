@@ -15,7 +15,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { CircleCheck, EyeOff, Info, MapPin } from "lucide-react";
+import { CheckCircleIcon, EyeOff, Info, MapPin } from "lucide-react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { IoIosArrowRoundBack } from "react-icons/io";
 
@@ -395,7 +395,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 )}
               </div>
               {appStatus ? (
-                <CircleCheck className="size-7 text-emerald-600" />
+                <CheckCircleIcon className="size-7 text-emerald-600" />
               ) : hidden ? (
                 <EyeOff
                   className="size-7 cursor-pointer text-muted-foreground"

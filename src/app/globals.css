@@ -339,6 +339,12 @@ body,
   }
 }
 
+.not-ipad {
+  @media (1024px > width > 1400px) {
+    display: none;
+  }
+}
+
 /* ----------- Components ------------ */
 
 .search {

@@ -492,12 +492,15 @@ export default function SettingsPage() {
                       <Label htmlFor="email">
                         Email{" "}
                         <i className="text-xs font-light">
-                          (update to send new verification email when updated)
+                          (Updating will send a new verification email*)
+                          {/* TODO: Add some logic that checks if the email was changed and if so, toasts a message to the user that a new verification email will be sent */}
                         </i>
                       </Label>
                       <Input
                         {...updateRegister("email")}
-                        disabled={pending}
+                        // disabled={pending}
+                        //TODO: Add this back in when I implement the email verification system
+                        disabled={true || pending}
                         id="email"
                         type="email"
                         placeholder="Your email"
