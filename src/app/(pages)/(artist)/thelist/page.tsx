@@ -19,8 +19,12 @@ const TheList = async () => {
     );
   }
   const user = userData?.user || null;
+  const accountType = user?.accountType ?? [];
+  const isArtist = accountType?.includes("artist");
+  const isAdmin = user?.role?.includes("admin");
   const userPref = userData?.userPref ?? null;
-  const publicView = !token || !subStatus?.hasActiveSubscription;
+  const publicView =
+    (!token || !subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
 
   return (
     <>
