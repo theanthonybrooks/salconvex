@@ -27,7 +27,7 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const subStatus = subData?.subStatus ?? "none";
   return (
-    <div className="h-screen w-full">
+    <div className="h-dvh w-full">
       <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />
 
       <div className="flex flex-1">
