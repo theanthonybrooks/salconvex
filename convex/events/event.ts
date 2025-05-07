@@ -139,7 +139,7 @@ export const getSubmittedEvents = query({
       submittedOCs.map((oc) => oc.eventId.toString()),
     );
 
-    // Combine:
+    // Combining
     // - all submitted events
     // - published events that have a submitted open call
     const eligibleEvents = [
@@ -149,7 +149,7 @@ export const getSubmittedEvents = query({
       ),
     ];
 
-    // Build map of submitted open calls for enrichment
+    // And... building a map of submitted open calls for enrichment
     const ocMap = new Map(
       submittedOCs.map((oc) => [oc.eventId.toString(), oc]),
     );

@@ -13,8 +13,8 @@ import { Link } from "@/components/ui/custom-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/lib/applicationFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries, useQuery } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery, useQuery } from "convex/react";
 import {
   EyeOff,
   LucideCircleCheck,
@@ -47,11 +47,17 @@ export default function Dashboard() {
     api.events.event.getTotalNumberOfEvents,
     isAdmin ? {} : "skip",
   );
+
+  const { data: submittedEventsData } = useQueryWithStatus(
+    api.events.event.getSubmittedEvents,
+    isAdmin ? {} : "skip",
+  );
+
   const totalEvents = allEventsData?.totalEvents ?? 0;
   const activeEvents = allEventsData?.activeEvents ?? 0;
   const archivedEvents = allEventsData?.archivedEvents ?? 0;
   // const draftEvents = allEventsData?.draftEvents ?? 0;
-  const pendingEvents = allEventsData?.pendingEvents ?? 0;
+  const pendingEvents = submittedEventsData?.length ?? 0;
 
   const artistData = useQuery(api.artists.applications.getArtistApplications);
   const { applications, listActions } = artistData ?? {};
@@ -71,7 +77,6 @@ export default function Dashboard() {
   // const pendingApps = applications?.filter(
   //   (app) => app.applicationStatus === "pending",
   // );
-  console.log(lastMonthCount);
 
   return (
     <div className="flex flex-col gap-6 p-6">
