@@ -8,26 +8,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery } from "convex/nextjs";
+// import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useQuery } from "convex-helpers/react/cache";
+// import { usePreloadedQuery } from "convex/react";
 import { Activity, Code, Star, TrendingUp, Users, Zap } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 
-export default async function Dashboard() {
-  const token = await convexAuthNextjsToken();
+export default function Dashboard() {
+  // const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  // const userData = usePreloadedQuery(preloadedUserData);
+  // const subData = usePreloadedQuery(preloadedSubStatus);
+  // const userId = userData?.userId ?? "guest";
+  // const user = userData?.user || null;
+  // const role = user?.role;
+  // const subStatus = subData?.subStatus ?? "none";
 
-  const subStatus = await fetchQuery(
-    api.subscriptions.getUserSubscriptionStatus,
-    {},
-    { token },
-  );
-  const userSub = subStatus?.subStatus;
+  const artistData = useQuery(api.artists.applications.getArtistApplications);
+  const { applications, listActions } = artistData ?? {};
 
-  if (!userSub || userSub === "cancelled") {
-    redirect("/dashboard/account/settings");
-  }
+  console.log(applications, listActions);
 
   return (
     <div className="flex flex-col gap-6 p-6">

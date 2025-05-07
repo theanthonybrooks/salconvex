@@ -34,6 +34,7 @@ export function UserProfile({
   const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
   // console.log("User subscription:", subscription)
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

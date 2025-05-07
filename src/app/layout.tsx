@@ -6,6 +6,7 @@ import {
   tankerReg,
 } from "@/assets/fonts";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { PostHogProvider } from "@/providers/posthog-provider";
 import { ThemedProvider } from "@/providers/themed-provider";
@@ -15,7 +16,7 @@ import {
 } from "@convex-dev/auth/nextjs/server";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
-import { fetchQuery } from "convex/nextjs";
+import { preloadQuery } from "convex/nextjs";
 import { GeistSans } from "geist/font/sans";
 import "leaflet/dist/leaflet.css";
 import type { Metadata } from "next";
@@ -61,13 +62,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const token = await convexAuthNextjsToken();
-  let userData = null;
-
-  if (token) {
-    userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
-  }
-
-  const userPref = userData?.userPref ?? undefined;
+  const preloadedUserData = await preloadQuery(
+    api.users.getCurrentUser,
+    {},
+    { token },
+  );
+  const preloadedSubStatus = await preloadQuery(
+    api.subscriptions.getUserSubscriptionStatus,
+    {},
+    { token },
+  );
 
   return (
     <ConvexAuthNextjsServerProvider>
@@ -88,25 +92,30 @@ export default async function RootLayout({
           )}
         >
           <ConvexClientProvider>
-            <ConvexQueryCacheProvider>
-              <ThemedProvider userPref={userPref}>
-                <PostHogProvider> {children}</PostHogProvider>
-                <SpeedInsights />
-                <ToastContainer
-                  position="top-right"
-                  autoClose={5000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick={true}
-                  rtl={false}
-                  pauseOnFocusLoss={false}
-                  draggable
-                  pauseOnHover
-                  theme="light"
-                  toastClassName="pointer-events-auto z-[9999] rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] border-2 z-top"
-                />
-              </ThemedProvider>
-            </ConvexQueryCacheProvider>
+            <ConvexPreloadContextProvider
+              preloadedUserData={preloadedUserData}
+              preloadedSubStatus={preloadedSubStatus}
+            >
+              <ConvexQueryCacheProvider>
+                <ThemedProvider>
+                  <PostHogProvider> {children}</PostHogProvider>
+                  <SpeedInsights />
+                  <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick={true}
+                    rtl={false}
+                    pauseOnFocusLoss={false}
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    toastClassName="pointer-events-auto z-[9999] rounded  mx-auto md:top-2 md:right-1  max-w-[90dvw] border-2 z-top"
+                  />
+                </ThemedProvider>
+              </ConvexQueryCacheProvider>
+            </ConvexPreloadContextProvider>
           </ConvexClientProvider>
         </body>
       </html>

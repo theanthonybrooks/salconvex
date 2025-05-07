@@ -48,7 +48,7 @@ const sectionVariants = {
 interface DashboardSideBarProps {
   subStatus: string | undefined;
   role: string[] | undefined;
-  user: User | undefined;
+  user: User | null;
 }
 
 export default function DashboardSideBar({

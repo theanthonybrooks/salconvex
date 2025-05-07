@@ -1,10 +1,9 @@
+import { DashboardWrapper } from "@/app/(pages)/dashboard/_components/dashboard-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { api } from "~/convex/_generated/api";
-import DashboardSideBar from "./_components/dashboard-sidebar";
-import DashboardTopNav from "./_components/dashbord-top-nav";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -21,32 +20,14 @@ export default async function DashboardLayout({
     { token },
   );
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
-  const role = user?.user?.role;
   // const userSub = subStatus?.subStatus;
   // const userType = user?.user?.accountType;
 
-  if (!user || !subStatus) redirect("/auth/sign-in");
+  if (!user) redirect("/auth/sign-in");
+  if (!subStatus) redirect("/pricing#plans");
   // if (subStatus?.subStatus === "cancelled") {
   //   redirect("/pricing#plans")
   // }
 
-  return (
-    <>
-      <DashboardTopNav
-        user={user?.user}
-        subStatus={subStatus?.subStatus}
-        userId={user?.userId}
-      />
-      <div className="flex flex-1 pt-20">
-        <DashboardSideBar
-          user={user?.user}
-          subStatus={subStatus?.subStatus}
-          role={role}
-        />
-        <main className="scrollable max-h-[calc(100dvh-80px)] flex-1 bg-dashboardBgLt white:bg-stone-200">
-          {children}
-        </main>
-      </div>
-    </>
-  );
+  return <DashboardWrapper>{children}</DashboardWrapper>;
 }

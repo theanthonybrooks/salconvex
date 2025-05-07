@@ -10,6 +10,7 @@
 
 import type * as actions_getTimezone from "../actions/getTimezone.js";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
+import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
@@ -48,6 +49,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   "actions/getTimezone": typeof actions_getTimezone;
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
+  "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
   auth: typeof auth;
   crons: typeof crons;

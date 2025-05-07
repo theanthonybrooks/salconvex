@@ -23,7 +23,7 @@ export type CombinedEventPreviewCardData = EventData & {
 export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
   const events = useQuery(api.events.event.getPublishedEvents);
   const openCalls = useQuery(api.openCalls.openCall.getPublishedOpenCalls);
-  const artistData = useQuery(api.artists.artistActions.getArtistApplications);
+  const artistData = useQuery(api.artists.applications.getArtistApplications);
   const { applications, listActions } = artistData ?? {};
 
   // if (!events) return [];

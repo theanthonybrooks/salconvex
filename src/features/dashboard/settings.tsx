@@ -173,11 +173,11 @@ export default function SettingsPage() {
       setUploading(true);
       await removeProfileImage({ storageId: user.imageStorageId });
       setUploading(false);
-      toast.success("Profile image removed successfully!", {
-        autoClose: 2000,
-        pauseOnHover: false,
-        hideProgressBar: true,
-      });
+      // toast.success("Profile image removed successfully!", {
+      //   autoClose: 2000,
+      //   pauseOnHover: false,
+      //   hideProgressBar: true,
+      // });
     } catch (err) {
       console.error(err);
       toast.error("Failed to remove profile image", {
@@ -220,12 +220,12 @@ export default function SettingsPage() {
     await uploadProfileImage({ storageId });
 
     setUploading(false);
-    toast.success("Profile image updated successfully!", {
-      autoClose: 2000,
-      pauseOnHover: false,
-      hideProgressBar: true,
-      closeButton: false,
-    });
+    // toast.success("Profile image updated successfully!", {
+    //   autoClose: 2000,
+    //   pauseOnHover: false,
+    //   hideProgressBar: true,
+    //   closeButton: false,
+    // });
   };
 
   const handleUpdateUserSubmit = async (

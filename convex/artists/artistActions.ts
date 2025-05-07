@@ -4,76 +4,6 @@ import { ConvexError, v } from "convex/values";
 import { Doc } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
 
-export const getArtist = query({
-  args: {
-    artistId: v.optional(v.id("artists")),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-    const artist = await ctx.db
-      .query("artists")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .unique();
-    if (!artist) return null;
-    return artist;
-  },
-});
-
-export const getArtistApplication = query({
-  args: {
-    eventId: v.id("events"),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-    const artist = await ctx.db
-      .query("artists")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .unique();
-    if (!artist) return null;
-
-    const applications = await ctx.db
-      .query("applications")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .collect();
-
-    return applications;
-  },
-});
-
-export const getArtistFull = query({
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-    const artist = await ctx.db
-      .query("artists")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .unique();
-    if (!artist) return null;
-
-    const applications = await ctx.db
-      .query("applications")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .collect();
-
-    const listActions = await ctx.db
-      .query("listActions")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .collect();
-
-    const joinedArtist = {
-      ...artist,
-      applications,
-      listActions,
-    };
-
-    return {
-      artist: joinedArtist as ArtistFull,
-    };
-  },
-});
-
 export const updateOrCreateArtist = mutation({
   args: {
     artistName: v.optional(v.string()),
@@ -147,10 +77,23 @@ export const updateOrCreateArtist = mutation({
   },
 });
 
-export const getArtistApplications = query({
-  // args: {
-  //   artistId: v.optional(v.id("artists")),
-  // },
+export const getArtist = query({
+  args: {
+    artistId: v.optional(v.id("artists")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const artist = await ctx.db
+      .query("artists")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .unique();
+    if (!artist) return null;
+    return artist;
+  },
+});
+
+export const getArtistFull = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
@@ -170,7 +113,15 @@ export const getArtistApplications = query({
       .withIndex("by_artistId", (q) => q.eq("artistId", userId))
       .collect();
 
-    return { applications, listActions, artist };
+    const joinedArtist = {
+      ...artist,
+      applications,
+      listActions,
+    };
+
+    return {
+      artist: joinedArtist as ArtistFull,
+    };
   },
 });
 
