@@ -15,6 +15,7 @@ export const tableTypes = [
   "organizations",
   "applications",
   "openCalls",
+  "users",
 ] as const;
 
 export type TableTypes = (typeof tableTypes)[number];

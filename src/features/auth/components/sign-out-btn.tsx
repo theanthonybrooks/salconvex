@@ -13,9 +13,9 @@ const SignOutBtn: React.FC<SignOutBtnProps> = ({ children }) => {
   return (
     <span
       className="underline-offset-2 hover:cursor-pointer hover:underline"
-      onClick={() => {
+      onClick={async () => {
         sessionStorage.clear();
-        signOut();
+        await signOut();
         router.push("/auth/sign-in");
       }}
     >

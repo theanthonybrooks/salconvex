@@ -11,6 +11,7 @@ import {
   useEventPreviewCards,
 } from "@/hooks/use-combined-events";
 import { useFilteredEvents } from "@/hooks/use-filtered-events";
+import { generateSkeletonGroups } from "@/lib/skeletonFns";
 // import { getFourCharMonth } from "@/lib/dateFns"
 import { cn, setParamIfNotDefault } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
@@ -168,21 +169,7 @@ Props) => {
     setPage(1);
   };
 
-  const generateSkeletonGroups = (
-    groupCount = 3,
-    minItems = 2,
-    maxItems = 5,
-  ) => {
-    return Array.from({ length: groupCount }, (_, i) => ({
-      id: i,
-      results: Array.from({
-        length:
-          Math.floor(Math.random() * (maxItems - minItems + 1)) + minItems,
-      }),
-    }));
-  };
-
-  const skeletonGroups = generateSkeletonGroups();
+  const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
 
   return (
     <>
