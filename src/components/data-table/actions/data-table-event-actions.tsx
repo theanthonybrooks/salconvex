@@ -6,7 +6,7 @@ import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
-interface EventActionProps {
+export interface EventActionProps {
   eventId: string;
 }
 interface DeleteEventActionProps extends EventActionProps {

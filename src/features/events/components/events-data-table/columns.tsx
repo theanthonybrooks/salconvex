@@ -9,6 +9,7 @@ import {
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
 import {
+  ApproveBoth,
   ApproveOC,
   ArchiveOC,
   DeleteOC,
@@ -362,6 +363,14 @@ export const columns: ColumnDef<Event>[] = [
                     {(ocState === "archived" || ocState === "published") &&
                       isAdmin && (
                         <ReactivateOC openCallId={openCallId} state={ocState} />
+                      )}
+                    {ocState === "submitted" &&
+                      state === "submitted" &&
+                      isAdmin && (
+                        <ApproveBoth
+                          openCallId={openCallId}
+                          eventId={event._id}
+                        />
                       )}
                   </>
                 )}
