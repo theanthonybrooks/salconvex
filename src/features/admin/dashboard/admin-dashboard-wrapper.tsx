@@ -30,8 +30,7 @@ export function AdminDashboardWrapper() {
     viewAll,
     setViewAll,
   };
-  //   console.log(allEventsData);
-  //   console.log(subEventsData);
+
   return (
     <>
       <div className="hidden max-h-full w-full px-10 py-10 lg:block">
