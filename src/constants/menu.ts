@@ -155,24 +155,24 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
   {
     title: "Admin",
     items: [
-      {
-        title: "Dashboard",
-        path: "/dashboard/admin",
-        category: "admin",
-        public: false,
-        view: "dashboard",
-        userType: ["admin"],
-      },
+      // {
+      //   title: "Dashboard",
+      //   path: "/dashboard/admin",
+      //   category: "admin",
+      //   public: false,
+      //   view: "dashboard",
+      //   userType: ["admin"],
+      // },
       {
         title: "Submissions",
-        path: "/admin/submissions",
+        path: "/dashboard/admin/submissions",
         category: "admin",
         public: false,
         userType: ["admin"],
       },
       {
         title: "Todos",
-        path: "/dashboard/admin",
+        path: "/dashboard/admin/todos",
         category: "admin",
         public: false,
         userType: ["admin"],
