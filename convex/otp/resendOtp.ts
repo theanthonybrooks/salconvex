@@ -74,7 +74,7 @@ export const ResendOTP = Resend({
       <body>
           <div class="container">
           
-              <img src="https://salconvex.vercel.app/saltext.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
+              <img src="https://streetartlist.com/saltext.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
               <div class="text-sm">Please enter the following code to finish signing up.</div>
               <div class="section">
                   <div class="subtext">Verification code</div>

@@ -77,7 +77,6 @@ const EventContextMenu = ({
     });
   };
 
-  console.log(isBookmarked);
   return (
     <Popover>
       <PopoverTrigger asChild>

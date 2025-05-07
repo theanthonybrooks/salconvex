@@ -73,7 +73,7 @@ export const ResetOTP = Resend({
       </head>
       <body>
           <div class="container">
-              <img src="https://salconvex.vercel.app/forgot-pw.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
+              <img src="https://streetartlist.com/forgot-pw.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
               <div class="text-sm">Please enter the following code to proceed to password reset.</div>
               <div class="section">
                   <div class="subtext">Password reset code</div>

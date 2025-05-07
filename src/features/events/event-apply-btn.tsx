@@ -338,7 +338,7 @@ export const ApplyButton = ({
           variant="salWithoutShadow"
           size="lg"
           className={cn(
-            "pointer-events-none relative z-[2] h-14 w-fit rounded-none border-x border-foreground/50 bg-background px-4 text-foreground/50 hover:bg-background sm:h-11 sm:px-3 [&_svg]:size-7",
+            "pointer-events-none relative z-[2] h-14 w-fit rounded-none border-x border-foreground/50 bg-background px-4 text-foreground/50 hover:bg-background sm:h-11 sm:px-3 [&_svg]:size-6",
           )}
         >
           <CheckCircleIcon className="text-emerald-600 sm:size-5" />
