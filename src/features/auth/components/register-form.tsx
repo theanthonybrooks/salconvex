@@ -78,8 +78,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [email, setEmail] = useState<string>("");
   const [obsEmail, setObsEmail] = useState("");
   const [otp, setOtp] = useState<string>("");
-  const callBackSrc = sessionStorage.getItem("src");
-  const prevSalPage = sessionStorage.getItem("previousSalPage");
+  // const callBackSrc = sessionStorage.getItem("src");
+  // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -238,7 +238,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         setIsLoading(false);
         setSuccess("Successfully signed up and verified!");
         form.reset();
-        if (callBackSrc && callBackSrc === "newUser") {
+        let callBackSrc: string | null = null;
+        let prevSalPage: string | null = null;
+
+        if (typeof window !== "undefined") {
+          callBackSrc = sessionStorage.getItem("src");
+          prevSalPage = sessionStorage.getItem("previousSalPage");
+        }
+
+        if (callBackSrc === "newUser") {
           sessionStorage.removeItem("src");
           router.replace("/pricing");
         } else if (prevSalPage) {
