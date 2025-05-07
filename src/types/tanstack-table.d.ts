@@ -18,6 +18,9 @@ export const tableTypes = [
   "users",
 ] as const;
 
+export const pageTypes = ["form", "dashboard"] as const;
+export type PageTypes = (typeof pageTypes)[number];
+
 export type TableTypes = (typeof tableTypes)[number];
 
 declare module "@tanstack/react-table" {
@@ -26,6 +29,7 @@ declare module "@tanstack/react-table" {
     viewAll: boolean | undefined;
     setViewAll: React.Dispatch<React.SetStateAction<boolean>> | undefined;
     tableType: TableTypes | undefined;
+    pageType?: PageTypes;
     getRowData?: (row: TData) => void;
   }
 }

@@ -340,7 +340,7 @@ body,
 }
 
 .not-ipad {
-  @media (1024px > width > 1400px) {
+  @media (1023px > width > 1400px) {
     display: none;
   }
 }

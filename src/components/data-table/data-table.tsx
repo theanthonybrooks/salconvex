@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
-import { TableTypes } from "@/types/tanstack-table";
+import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -44,6 +44,7 @@ interface DataTableProps<TData, TValue> {
     setViewAll: React.Dispatch<React.SetStateAction<boolean>>;
   };
   tableType?: TableTypes;
+  pageType?: PageTypes;
 }
 
 export function DataTable<TData, TValue>({
@@ -57,6 +58,7 @@ export function DataTable<TData, TValue>({
 
   adminActions,
   tableType,
+  pageType,
 }: DataTableProps<TData, TValue>) {
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
@@ -76,6 +78,7 @@ export function DataTable<TData, TValue>({
       viewAll,
       setViewAll,
       tableType,
+      pageType,
     },
 
     state: {

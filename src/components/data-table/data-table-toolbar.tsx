@@ -11,6 +11,7 @@ import {
   eventStates,
 } from "@/components/data-table/data-table-row-actions";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import { cn } from "@/lib/utils";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
@@ -25,6 +26,8 @@ export function DataTableToolbar<TData>({
   const viewAll = table.options.meta?.viewAll;
   const setViewAll = table.options.meta?.setViewAll;
   const tableType = table.options.meta?.tableType;
+  const pageType = table.options.meta?.pageType;
+  const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
   return (
     <div className="flex max-w-[90vw] items-center justify-between">
@@ -60,7 +63,11 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("openCallStatus")}
                 title="Open Call"
                 options={eventStates}
-                className="not-ipad md:hidden 2xl:flex"
+                className={cn(
+                  "2xl:flex",
+                  forDashboard && "flex",
+                  !forDashboard && "not-ipad md:hidden",
+                )}
               />
             )}
             {table.getColumn("category") && (

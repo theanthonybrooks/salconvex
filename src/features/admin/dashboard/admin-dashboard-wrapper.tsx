@@ -44,6 +44,7 @@ export function AdminDashboardWrapper() {
           }}
           adminActions={adminActions}
           tableType="events"
+          pageType="dashboard"
         />
       </div>
       <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
