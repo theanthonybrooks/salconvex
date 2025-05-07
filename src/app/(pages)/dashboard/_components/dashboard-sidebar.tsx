@@ -9,11 +9,14 @@ import { Search } from "@/features/Sidebar/Search";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import clsx from "clsx";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 // const sectionVariants = {
 //   hidden: { opacity: 0, y: -15 }, // starts slightly to the left
@@ -61,7 +64,13 @@ export default function DashboardSideBar({
 
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
-
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const { data: submittedEventsData } = useQueryWithStatus(
+    api.events.event.getSubmittedEvents,
+    hasAdminRole ? {} : "skip",
+  );
+  const pendingEvents = submittedEventsData?.length ?? 0;
+  console.log(pendingEvents);
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"));
   const filteredNavItems = useMemo(() => {
     return navItems.filter((item) => {
@@ -188,12 +197,20 @@ export default function DashboardSideBar({
                     }
                   >
                     <div className="space-between flex justify-between gap-2">
-                      <div className="inline-flex gap-2">
-                        {section?.sectionIcon && (
-                          <section.sectionIcon className="h-4 w-4" />
-                        )}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="flex items-center gap-2">
+                          {section?.sectionIcon && (
+                            <section.sectionIcon className="h-4 w-4" />
+                          )}
 
-                        {section.heading}
+                          {section.heading}
+                        </span>
+
+                        {section.heading === "Admin" && pendingEvents > 0 && (
+                          <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
+                            {pendingEvents}
+                          </span>
+                        )}
                       </div>
 
                       {openSection === section.sectionCat ? (
@@ -227,14 +244,22 @@ export default function DashboardSideBar({
                               prefetch={true}
                               href={sectionItem.href}
                               className={clsx(
-                                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                                "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                                 pathname === sectionItem.href
                                   ? "bg-primary/10 pl-3 text-primary hover:bg-primary/20"
                                   : "pl-3 text-primary hover:bg-primary/10 hover:text-foreground",
                               )}
                             >
-                              <sectionItem.icon className="h-4 w-4" />
-                              {sectionItem.label}
+                              <span className="flex items-center gap-2">
+                                <sectionItem.icon className="size-4" />
+                                {sectionItem.label}
+                              </span>
+                              {sectionItem.label === "Submissions" &&
+                                pendingEvents > 0 && (
+                                  <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
+                                    {pendingEvents}
+                                  </span>
+                                )}
                             </Link>
                             {/* TODO: ensure that this is the correct separator to be checking the length on.  */}
                             {index === arr.length - 1 &&

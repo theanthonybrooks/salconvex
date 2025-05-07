@@ -1,4 +1,5 @@
 import { KanbanBoard } from "@/components/ui/kanban-board";
+import { AdminDashboardWrapper } from "@/features/admin/dashboard/admin-dashboard-wrapper";
 import AnalyticsPage from "@/features/dashboard/posthog-analytics";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
@@ -39,7 +40,9 @@ export default async function AdminPage({
       return <AnalyticsPage />;
     case "todos":
       return <KanbanBoard userRole={user.role?.[0]} />;
+    case "submissions":
+      return <AdminDashboardWrapper />;
     default:
-      redirect("/dashboard/admin/todos");
+      redirect("/dashboard/admin");
   }
 }

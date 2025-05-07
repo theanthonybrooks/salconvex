@@ -104,7 +104,7 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{pendingEvents ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/applications"
+                    href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
@@ -121,7 +121,7 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{totalEvents ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/applications"
+                    href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
@@ -138,7 +138,7 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{activeEvents ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/applications"
+                    href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
@@ -157,7 +157,7 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/applications"
+                    href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
