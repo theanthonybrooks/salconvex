@@ -9,10 +9,6 @@ interface OCActionProps {
   openCallId: string;
 }
 
-interface OCEventActionProps extends OCActionProps {
-  eventId: string;
-}
-
 interface SubmittedOCProps extends OCActionProps {
   state: SubmissionFormState;
 }
@@ -88,9 +84,7 @@ export const ApproveOC = ({ openCallId }: OCActionProps) => {
     </DropdownMenuItem>
   );
 };
-export const ApproveBoth = ({ openCallId, eventId }: OCEventActionProps) => {
-  const approveEvent = useMutation(api.events.event.approveEvent);
-
+export const ApproveBoth = ({ openCallId }: OCActionProps) => {
   const approveOC = useMutation(api.openCalls.openCall.changeOCStatus);
   return (
     <DropdownMenuItem
@@ -98,8 +92,8 @@ export const ApproveBoth = ({ openCallId, eventId }: OCEventActionProps) => {
         approveOC({
           openCallId: openCallId as Id<"openCalls">,
           newStatus: "published",
+          target: "both",
         });
-        approveEvent({ eventId: eventId as Id<"events"> });
       }}
     >
       Approve Both

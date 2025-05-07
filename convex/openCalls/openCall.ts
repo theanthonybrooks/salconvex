@@ -82,7 +82,6 @@ export const deleteOC = mutation({
       throw new ConvexError("Active open calls cannot be deleted");
     const organization = await ctx.db.get(openCall.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
-    const orgLogoStorageId = organization.logoStorageId;
 
     await ctx.db.delete(openCall._id);
 
@@ -99,8 +98,12 @@ export const changeOCStatus = mutation({
       v.literal("submitted"),
       v.literal("archived"),
     ),
+    target: v.optional(
+      v.union(v.literal("event"), v.literal("oc"), v.literal("both")),
+    ),
   },
   handler: async (ctx, args) => {
+    const targetBoth = args.target === "both";
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     const user = await ctx.db
@@ -115,9 +118,21 @@ export const changeOCStatus = mutation({
     //   throw new Error("You don't have permission to approve events");
     const oc = await ctx.db.get(args.openCallId);
     if (!oc) throw new ConvexError("Open call not found");
+    const eventId = oc.eventId;
     const ocState = args.newStatus || "submitted";
     const approvedBy = isAdmin ? userId : undefined;
 
+    if (targetBoth) {
+      await ctx.db.patch(eventId, {
+        state: ocState,
+        lastEditedAt: Date.now(),
+        approvedBy: approvedBy,
+      });
+    } else {
+      await ctx.db.patch(eventId, {
+        lastEditedAt: Date.now(),
+      });
+    }
     await ctx.db.patch(oc._id, {
       state: ocState,
       lastUpdatedAt: Date.now(),

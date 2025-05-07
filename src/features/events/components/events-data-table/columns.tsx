@@ -366,12 +366,7 @@ export const columns: ColumnDef<Event>[] = [
                       )}
                     {ocState === "submitted" &&
                       state === "submitted" &&
-                      isAdmin && (
-                        <ApproveBoth
-                          openCallId={openCallId}
-                          eventId={event._id}
-                        />
-                      )}
+                      isAdmin && <ApproveBoth openCallId={openCallId} />}
                   </>
                 )}
               </DropdownMenuContent>
