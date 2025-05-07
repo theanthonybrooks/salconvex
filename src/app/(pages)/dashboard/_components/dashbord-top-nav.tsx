@@ -58,8 +58,8 @@ export default function NavBar({
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <div className="fixed left-0 right-0 top-0 z-20 h-20 border-b border-foreground bg-background">
-        <div className="relative mx-auto flex h-full w-screen items-center justify-between pl-6 pr-8 lg:py-4">
+      <div className="h-20 border-b border-foreground bg-background">
+        <div className="relative z-20 mx-auto flex h-full w-screen items-center justify-between pl-6 pr-8 lg:py-4">
           <Search
             iconOnly
             isMobile={isMobile}

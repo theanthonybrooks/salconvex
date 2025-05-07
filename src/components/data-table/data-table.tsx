@@ -116,12 +116,28 @@ export function DataTable<TData, TValue>({
     setRowSelection(selectedRow ?? {});
   }, [selectedRow]);
 
+  React.useEffect(() => {
+    if (defaultVisibility) {
+      setColumnVisibility(defaultVisibility);
+    }
+  }, [defaultVisibility]);
+
+  // console.log(
+  //   table
+  //     .getAllLeafColumns()
+  //     .filter((col) => col.getIsVisible())
+  //     .map((col) => col.id),
+  // );
+
   return (
     <div className={cn("w-full space-y-4", containerClassName)}>
       <DataTableToolbar table={table} />
       <div className={cn("rounded-md border", className)}>
-        <Table>
-          <TableHeader>
+        <Table
+          containerClassname="rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)]
+  3xl:max-h-[calc(85dvh-7rem)] scrollable"
+        >
+          <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_0.5px_0_0_rgba(0,0,0,1)]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -129,7 +145,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className={cn("bg-white/20 px-3 hover:bg-white/50")}
+                      className={cn("px-3 hover:bg-white/50")}
                     >
                       {header.isPlaceholder
                         ? null
@@ -151,7 +167,7 @@ export function DataTable<TData, TValue>({
                   onClick={row.getToggleSelectedHandler()}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    "bg-white/50 hover:cursor-pointer hover:bg-white/70 data-[state=selected]:bg-salYellow/30",
+                    "bg-white/50 hover:cursor-pointer hover:bg-salYellow/10 data-[state=selected]:bg-salPink/30",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (

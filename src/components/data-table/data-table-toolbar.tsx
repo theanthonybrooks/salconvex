@@ -28,7 +28,7 @@ export function DataTableToolbar<TData>({
   const eventAndOC = tableType === "events" || tableType === "openCalls";
   return (
     <div className="flex max-w-[90vw] items-center justify-between">
-      <div className="flex flex-col items-center gap-3 sm:flex-row">
+      <div className="mx-auto flex flex-col items-center gap-3 sm:mx-0 sm:flex-row">
         {isAdmin && setViewAll && (
           <Button
             variant="ghost"

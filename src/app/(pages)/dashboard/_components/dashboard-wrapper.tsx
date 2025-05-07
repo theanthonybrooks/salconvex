@@ -19,15 +19,15 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
   const role = user?.role;
   const subStatus = subData?.subStatus ?? "none";
   return (
-    <>
+    <div className="h-screen w-full">
       <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />
 
-      <div className="flex flex-1 pt-20">
+      <div className="flex flex-1">
         <DashboardSideBar user={user} subStatus={subStatus} role={role} />
-        <main className="scrollable max-h-[calc(100dvh-80px)] flex-1 bg-dashboardBgLt white:bg-stone-200">
+        <main className="scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-200">
           {children}
         </main>
       </div>
-    </>
+    </div>
   );
 }

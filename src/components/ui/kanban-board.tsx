@@ -170,7 +170,7 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
     : baseColumns;
 
   return (
-    <div className="scrollable mini flex h-full max-h-[80vh] w-full gap-3 overflow-hidden overflow-x-auto p-6">
+    <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto p-6">
       {orderedColumns.map((column) => (
         <Column
           key={column}

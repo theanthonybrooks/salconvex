@@ -85,9 +85,10 @@ export const columns: ColumnDef<Event>[] = [
 
   {
     accessorKey: "name",
-    size: 120,
+    // size: "100%",
     minSize: 120,
     maxSize: 300,
+
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -102,23 +103,21 @@ export const columns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: "dates.edition",
+    id: "dates_edition", // used in row.getValue()
+    accessorFn: (row) => row.dates.edition,
     size: 60,
     minSize: 60,
     maxSize: 60,
-
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-center space-x-2">
-          <span className="max-w-[60px] truncate font-medium">
-            {row.getValue("dates_edition")}
-          </span>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex justify-center space-x-2">
+        <span className="max-w-[60px] truncate font-medium">
+          {row.getValue("dates_edition")}
+        </span>
+      </div>
+    ),
   },
 
   //TODO: Make optional column
@@ -309,7 +308,7 @@ export const columns: ColumnDef<Event>[] = [
       // console.log(table.options)
 
       return (
-        <div className="hidden justify-end md:flex">
+        <div className={cn("hidden justify-end md:flex", isAdmin && "flex")}>
           <ConfirmingDropdown>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

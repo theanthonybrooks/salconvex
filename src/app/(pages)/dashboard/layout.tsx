@@ -12,6 +12,9 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
+
+
+
   const token = await convexAuthNextjsToken();
 
   const subStatus = await fetchQuery(
@@ -20,6 +23,7 @@ export default async function DashboardLayout({
     { token },
   );
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
+  
   // const userSub = subStatus?.subStatus;
   // const userType = user?.user?.accountType;
 

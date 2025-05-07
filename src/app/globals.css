@@ -590,6 +590,17 @@ button:active {
   }
 }
 
+/* Data Table */
+
+/* .data-table-container {
+  @media (max-width: 1500px) {
+    max-height: calc(85dvh - 10rem);
+  }
+  @media (width > 1500px) {
+    max-height: calc(85dvh - 7rem);
+  }
+} */
+
 /* Leaflet */
 
 .leaflet-custom-marker-wrapper {

@@ -16,7 +16,6 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries, useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import {
-  Code,
   EyeOff,
   LucideCircleCheck,
   LucideCircleCheckBig,
@@ -24,11 +23,12 @@ import {
   LucideCircleFadingPlus,
   LucideCircleOff,
   LucideClipboardList,
-  LucideFileHeart,
+  LucideFolderHeart,
+  LucideScrollText,
   TrendingUp,
-  Users,
 } from "lucide-react";
-import { FaRegBookmark } from "react-icons/fa6";
+import { FaGear, FaRegBookmark } from "react-icons/fa6";
+import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
 
 export default function Dashboard() {
@@ -41,7 +41,7 @@ export default function Dashboard() {
   const role = user?.role;
   const isAdmin = role?.includes("admin");
   const isArtist = accountType?.includes("artist");
-  const isOrganizer = accountType?.includes("organizer");
+  // const isOrganizer = accountType?.includes("organizer");
 
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
@@ -58,10 +58,6 @@ export default function Dashboard() {
   const bookmarkedEvents = listActions?.filter((la) => la.bookmarked === true);
   const hiddenEvents = listActions?.filter((la) => la.hidden === true);
 
-  console.log(applications, listActions);
-  // const lastMonthCount = applications
-  //   ? countApplicationsByTimeRange(applications, "month")
-  //   : 0;
   const lastMonthCount = countApplicationsByTimeRange(
     applications ?? [],
     "month",
@@ -377,8 +373,18 @@ export default function Dashboard() {
               variant="outline"
               className="w-full justify-start gap-2"
             >
+              <Link variant="standard" href="/thelist">
+                <LucideScrollText className="size-4" />
+                Go to The List
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="w-full justify-start gap-2"
+            >
               <Link variant="standard" href="/dashboard/account/billing">
-                <Users className="size-4" />
+                <PiPiggyBank className="size-4" />
                 Manage Billing
               </Link>
             </Button>
@@ -387,11 +393,12 @@ export default function Dashboard() {
               variant="outline"
               className="w-full justify-start gap-2"
             >
-              <Link variant="standard" href="/dashboard/projects">
-                <Code className="size-4" />
-                New Project
+              <Link variant="standard" href="/dashboard/account/settings">
+                <FaGear className="size-4" />
+                Account Settings
               </Link>
             </Button>
+
             {/* TODO: add this logic once I've gotten the application system up and there's a reason for users to upload a portfolio and related files */}
             {isAdmin && isArtist && (
               <Button
@@ -400,7 +407,7 @@ export default function Dashboard() {
                 className="w-full justify-start gap-2"
               >
                 <Link variant="standard" href="/dashboard/projects">
-                  <LucideFileHeart className="size-4" />
+                  <LucideFolderHeart className="size-4" />
                   Manage Portfolio
                 </Link>
               </Button>
@@ -417,7 +424,7 @@ export default function Dashboard() {
                 </Link>
               </Button>
             )}
-
+            {/* 
             {isOrganizer && (
               <Button
                 asChild
@@ -426,10 +433,10 @@ export default function Dashboard() {
               >
                 <Link variant="standard" href="/dashboard/account/settings">
                   <Users className="size-4" />
-                  Invite Team
+                  Invite Judges
                 </Link>
               </Button>
-            )}
+            )} */}
           </CardContent>
         </Card>
 
