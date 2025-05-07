@@ -165,13 +165,15 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
 export const AccountTypeSwitch = ({
   isArtist,
   setSelectedAccountType,
-  selectedAccountType,
+  orgAccount,
+  // selectedAccountType,
   setIsYearly,
   hasSub,
 }: {
   isArtist: boolean;
   setSelectedAccountType: (value: string) => void;
   selectedAccountType: string;
+  orgAccount: boolean;
   setIsYearly: (value: boolean) => void;
   hasSub: boolean;
 }) => {
@@ -195,9 +197,7 @@ export const AccountTypeSwitch = ({
           variant="salWithShadowHidden"
           size="lg"
           onClick={() => {
-            setSelectedAccountType(
-              selectedAccountType === "artist" ? "organizer" : "artist",
-            );
+            setSelectedAccountType(isArtist ? "organizer" : "artist");
             setIsYearly(false);
             // window.scrollTo({ top: 0, behavior: "smooth" });
             // const firstCard = document.querySelector(".pricing-card");
@@ -229,11 +229,11 @@ export const AccountTypeSwitch = ({
           }}
           className="w-fit"
         >
-          {selectedAccountType === "artist"
+          {isArtist
             ? "Switch to Organizer Options"
-            : hasSub
-              ? "View your current plan"
-              : "Switch to Artist Options"}
+            : hasSub && orgAccount
+              ? "Switch to Artist Options"
+              : "View your current plan"}
         </Button>
       </div>
     </div>
@@ -491,7 +491,7 @@ export default function Pricing() {
 
   // const isPublic = !isAuthenticated
   const user = userData?.user;
-  // const userAccountTypes = user?.accountType ?? []
+  const userAccountTypes = user?.accountType ?? [];
   // const multiType = userAccountTypes.length > 1
   const accountType = user?.accountType[0] ?? "artist";
   const isAdmin = user?.role?.includes("admin");
@@ -506,6 +506,7 @@ export default function Pricing() {
   // const userIsArtist = userAccountTypes.includes("artist")
   const isArtist = selectedAccountType === "artist";
   const isOrganizer = selectedAccountType === "organizer";
+  const orgAccountType = userAccountTypes.includes("organizer");
 
   const handleManageSubscription = async () => {
     if (!subscription?.customerId) {
@@ -557,6 +558,8 @@ export default function Pricing() {
   if (!plans || !orgPlans)
     return <div className="h-screen w-screen bg-background" />;
 
+  console.log(isArtist, hasSub, isOrganizer, orgAccountType);
+
   return (
     <section id="plans" className="price-card-cont px-4 pt-6">
       <div className="mx-auto max-w-7xl">
@@ -580,7 +583,7 @@ export default function Pricing() {
 
         {(isArtist && !hasSub) ||
         (isAdmin && !isOrganizer) ||
-        (!isArtist && isOrganizer) ? (
+        (isArtist && hasSub && orgAccountType) ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -613,7 +616,7 @@ export default function Pricing() {
                 );
               })}
           </motion.div>
-        ) : isArtist && hasSub ? (
+        ) : isArtist && hasSub && !orgAccountType ? (
           <ExistingSubscription onClick={handleManageSubscription} />
         ) : (
           <motion.div
@@ -650,6 +653,7 @@ export default function Pricing() {
           isArtist={isArtist}
           setSelectedAccountType={setSelectedAccountType}
           selectedAccountType={selectedAccountType}
+          orgAccount={orgAccountType}
           setIsYearly={setIsYearly}
           hasSub={hasSub}
         />
