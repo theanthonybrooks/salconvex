@@ -3,6 +3,7 @@
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
 
+import { useRouter } from "next/navigation";
 import DashboardSideBar from "./dashboard-sidebar";
 import DashboardTopNav from "./dashbord-top-nav";
 
@@ -11,12 +12,19 @@ interface DashboardWrapperProps {
 }
 
 export function DashboardWrapper({ children }: DashboardWrapperProps) {
+  const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+
   const userData = usePreloadedQuery(preloadedUserData);
-  const subData = usePreloadedQuery(preloadedSubStatus);
+
   const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
   const role = user?.role;
+
+  if (!userData) {
+    router.replace("/pricing");
+  }
+  const subData = usePreloadedQuery(preloadedSubStatus);
   const subStatus = subData?.subStatus ?? "none";
   return (
     <div className="h-screen w-full">

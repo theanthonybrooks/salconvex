@@ -23,8 +23,9 @@ export default async function DashboardLayout({
 
   const user = userData?.user;
   const subStatus = subscription?.status;
+  const isAdmin = user?.role.includes("admin");
 
-  if (!user?.role.includes("admin")) {
+  if (!isAdmin) {
     if (!subStatus || subStatus === "cancelled") {
       redirect("/dashboard/account/settings");
     }
@@ -43,6 +44,11 @@ export default async function DashboardLayout({
     {},
     { token },
   );
+  // const preloadedSubmissionData = isAdmin ? await preloadQuery(
+  //   api.events.event.getSubmittedEvents,
+  //   {},
+  //   { token },
+  // ) : null;
 
   // const userSub = subStatus?.subStatus;
   // const userType = user?.user?.accountType;

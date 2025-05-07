@@ -8,7 +8,6 @@ import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-
 // interface AdminDashboardWrapperProps {
 
 // }
@@ -17,11 +16,12 @@ export function AdminDashboardWrapper() {
   const { preloadedEventData, preloadedSubmissionData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
+  const userRole = userData?.user?.role;
+  const isAdmin = userRole?.includes("admin") ?? false;
 
   const allEventsData = usePreloadedQuery(preloadedEventData);
   const subEventsData = usePreloadedQuery(preloadedSubmissionData);
-  const userRole = userData?.user?.role;
-  const isAdmin = userRole?.includes("admin") ?? false;
+
   const [viewAll, setViewAll] = useState(true);
 
   const eventsData = (viewAll ? allEventsData : subEventsData) ?? [];
