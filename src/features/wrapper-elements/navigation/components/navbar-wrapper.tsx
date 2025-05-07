@@ -25,9 +25,9 @@ export function NavbarWrapper({ type }: NavBarWrapperProps) {
       {type === "thelist" && (
         <TheListNavBar userId={userId} user={user} subStatus={subStatus} />
       )}
-      {type === "dashboard" && (
+      {/* {type === "dashboard" && (
         <TheListNavBar userId={userId} user={user} subStatus={subStatus} />
-      )}
+      )} */}
     </>
   );
 }
