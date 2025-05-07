@@ -17,6 +17,7 @@ import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery, useQuery } from "convex/react";
 import {
   EyeOff,
+  LucideCalendarPlus2,
   LucideCircleCheck,
   LucideCircleCheckBig,
   LucideCircleEqual,
@@ -41,7 +42,7 @@ export default function Dashboard() {
   const role = user?.role;
   const isAdmin = role?.includes("admin");
   const isArtist = accountType?.includes("artist");
-  // const isOrganizer = accountType?.includes("organizer");
+  const isOrganizer = accountType?.includes("organizer");
 
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
@@ -429,8 +430,20 @@ export default function Dashboard() {
                 </Link>
               </Button>
             )}
-            {/* 
+
             {isOrganizer && (
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-start gap-2"
+              >
+                <Link variant="standard" href="/pricing#plans">
+                  <LucideCalendarPlus2 className="size-4" />
+                  Submit Event/Open Call
+                </Link>
+              </Button>
+            )}
+            {/* {isOrganizer && (
               <Button
                 asChild
                 variant="outline"

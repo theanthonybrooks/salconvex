@@ -180,7 +180,11 @@ export const getAllEvents = query({
 
     const isAdmin = user.role.includes("admin");
 
-    let events = await ctx.db.query("events").collect();
+    let events = await ctx.db
+      .query("events")
+      .withIndex("by_lastEditedAt")
+      .order("desc")
+      .collect();
 
     if (!isAdmin) {
       const organizations = await ctx.db
