@@ -22,7 +22,7 @@ export function AdminDashboardWrapper() {
   const allEventsData = usePreloadedQuery(preloadedEventData);
   const subEventsData = usePreloadedQuery(preloadedSubmissionData);
 
-  const [viewAll, setViewAll] = useState(true);
+  const [viewAll, setViewAll] = useState(false);
 
   const eventsData = (viewAll ? allEventsData : subEventsData) ?? [];
   const adminActions = {
@@ -38,8 +38,9 @@ export function AdminDashboardWrapper() {
           columns={columns}
           data={eventsData}
           defaultVisibility={{
-            category: false,
+            category: viewAll ? true : false,
             dates_edition: viewAll ? true : false,
+            type: false,
           }}
           adminActions={adminActions}
           tableType="events"
