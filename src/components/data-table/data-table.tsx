@@ -117,6 +117,10 @@ export function DataTable<TData, TValue>({
   }, [selectedRow]);
 
   React.useEffect(() => {
+    setRowSelection({});
+  }, [viewAll]);
+
+  React.useEffect(() => {
     if (defaultVisibility) {
       setColumnVisibility(defaultVisibility);
     }
