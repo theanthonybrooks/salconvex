@@ -116,9 +116,9 @@ export default function Footer({ className }: { className?: string }) {
             >
               {filteredLinks.map(({ section, items }) => (
                 <div key={section}>
-                  <h3 className="text-sm font-semibold capitalize text-foreground">
+                  <p className="text-sm font-semibold capitalize text-foreground">
                     {section.charAt(0).toUpperCase() + section.slice(1)}
-                  </h3>
+                  </p>
                   <ul className="mt-4 space-y-4">
                     {items.map((item) => (
                       <li key={item.name}>
@@ -151,9 +151,9 @@ export default function Footer({ className }: { className?: string }) {
               className="width-full mx-auto flex flex-col justify-center border-border md:border-l-[1px] md:pl-[5rem]"
             >
               <div>
-                <h3 className="text-sm font-semibold text-foreground">
+                <p className="text-sm font-semibold text-foreground">
                   Stay Updated
-                </h3>
+                </p>
                 <p className="mb-4 mt-4 text-sm text-foreground md:mb-8">
                   Subscribe to the newsletter for regular updates
                 </p>

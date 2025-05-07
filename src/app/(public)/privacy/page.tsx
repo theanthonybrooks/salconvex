@@ -28,14 +28,14 @@ const PrivacyPage = () => {
         <h2 className="text-center text-lg font-bold">
           Interpretation and Definitions
         </h2>
-        <h3 className="mt-5 text-base font-medium">Interpretation</h3>
+        <h3 className="privacy mt-5">Interpretation</h3>
         <p className="text-sm">
           The words of which the initial letter is capitalized have meanings
           defined under the following conditions. The following definitions
           shall have the same meaning regardless of whether they appear in
           singular or in plural.
         </p>
-        <h3 className="mt-5 text-base font-medium">Definitions</h3>
+        <h3 className="privacy mt-5">Definitions</h3>
         <p className="text-sm">For the purposes of this Privacy Policy:</p>
         <ul className="list-disc text-sm [&>li:not(:last-of-type)]:pb-3 [&>li]:ml-8">
           <li>
@@ -141,7 +141,7 @@ const PrivacyPage = () => {
         <h2 className="text-center text-lg font-bold">
           Collecting and Using Your Personal Data
         </h2>
-        <h3 className="mt-5 text-base font-medium">Types of Data Collected</h3>
+        <h3 className="privacy mt-5">Types of Data Collected</h3>
         <h4 className="font-medium">Personal Data</h4>
         <p className="text-sm">
           While using Our Service, We may ask You to provide Us with certain
@@ -301,9 +301,7 @@ const PrivacyPage = () => {
           regarding cookies, please visit our Cookies Policy or the Cookies
           section of our Privacy Policy.
         </p>
-        <h3 className="mt-5 text-base font-medium">
-          Use of Your Personal Data
-        </h3>
+        <h3 className="privacy mt-5">Use of Your Personal Data</h3>
         <p className="text-sm">
           The Company may use Personal Data for the following purposes:
         </p>
@@ -407,9 +405,7 @@ const PrivacyPage = () => {
             information for any other purpose with Your consent.
           </li>
         </ul>
-        <h3 className="mt-5 text-base font-medium">
-          Retention of Your Personal Data
-        </h3>
+        <h3 className="privacy mt-5">Retention of Your Personal Data</h3>
         <p className="text-sm">
           The Company will retain Your Personal Data only for as long as is
           necessary for the purposes set out in this Privacy Policy. We will
@@ -425,9 +421,7 @@ const PrivacyPage = () => {
           improve the functionality of Our Service, or We are legally obligated
           to retain this data for longer time periods.
         </p>
-        <h3 className="mt-5 text-base font-medium">
-          Transfer of Your Personal Data
-        </h3>
+        <h3 className="privacy mt-5">Transfer of Your Personal Data</h3>
         <p className="text-sm">
           Your information, including Personal Data, is processed at the
           Company&apos;s operating offices and in any other places where the
@@ -448,9 +442,7 @@ const PrivacyPage = () => {
           organization or a country unless there are adequate controls in place
           including the security of Your data and other personal information.
         </p>
-        <h3 className="mt-5 text-base font-medium">
-          Delete Your Personal Data
-        </h3>
+        <h3 className="privacy mt-5">Delete Your Personal Data</h3>
         <p className="text-sm">
           You have the right to delete or request that We assist in deleting the
           Personal Data that We have collected about You.
@@ -470,9 +462,7 @@ const PrivacyPage = () => {
           Please note, however, that We may need to retain certain information
           when we have a legal obligation or lawful basis to do so.
         </p>
-        <h3 className="mt-5 text-base font-medium">
-          Disclosure of Your Personal Data
-        </h3>
+        <h3 className="privacy mt-5">Disclosure of Your Personal Data</h3>
 
         <p className="mt-2 text-sm">
           The Company may disclose Your Personal Data in the good faith belief
@@ -490,9 +480,7 @@ const PrivacyPage = () => {
           </li>
           <li>Protect against legal liability</li>
         </ul>
-        <h3 className="mt-5 text-base font-medium">
-          Security of Your Personal Data
-        </h3>
+        <h3 className="privacy mt-5">Security of Your Personal Data</h3>
         <p className="text-sm">
           The security of Your Personal Data is important to Us, but remember
           that no method of transmission over the Internet, or method of

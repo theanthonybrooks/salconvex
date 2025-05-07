@@ -9,6 +9,8 @@ const linkVariants = cva(
       variant: {
         default: "hover:underline underline-offset-2",
         subtle: "text-muted-foreground hover:text-foreground",
+        subtleUnderline:
+          "text-muted-foreground hover:underline hover:text-foreground underline-offset-2 decoration-foreground",
         bold: "font-semibold underline",
         standard: "",
       },

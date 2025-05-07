@@ -9,27 +9,73 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-// import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { useQuery } from "convex-helpers/react/cache";
-// import { usePreloadedQuery } from "convex/react";
-import { Activity, Code, Star, TrendingUp, Users, Zap } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/components/ui/custom-link";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { countApplicationsByTimeRange } from "@/lib/applicationFns";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
+import {
+  Code,
+  EyeOff,
+  LucideCircleCheck,
+  LucideCircleCheckBig,
+  LucideCircleEqual,
+  LucideCircleFadingPlus,
+  LucideCircleOff,
+  LucideClipboardList,
+  LucideFileHeart,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { FaRegBookmark } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
 
 export default function Dashboard() {
-  // const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
-  // const userData = usePreloadedQuery(preloadedUserData);
-  // const subData = usePreloadedQuery(preloadedSubStatus);
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userId = userData?.userId ?? "guest";
-  // const user = userData?.user || null;
-  // const role = user?.role;
-  // const subStatus = subData?.subStatus ?? "none";
+  const user = userData?.user || null;
+  const accountType = user?.accountType;
+  const role = user?.role;
+  const isAdmin = role?.includes("admin");
+  const isArtist = accountType?.includes("artist");
+  const isOrganizer = accountType?.includes("organizer");
+
+  const { data: allEventsData } = useQueryWithStatus(
+    api.events.event.getTotalNumberOfEvents,
+    isAdmin ? {} : "skip",
+  );
+  const totalEvents = allEventsData?.totalEvents ?? 0;
+  const activeEvents = allEventsData?.activeEvents ?? 0;
+  const archivedEvents = allEventsData?.archivedEvents ?? 0;
+  // const draftEvents = allEventsData?.draftEvents ?? 0;
+  const pendingEvents = allEventsData?.pendingEvents ?? 0;
 
   const artistData = useQuery(api.artists.applications.getArtistApplications);
   const { applications, listActions } = artistData ?? {};
+  const bookmarkedEvents = listActions?.filter((la) => la.bookmarked === true);
+  const hiddenEvents = listActions?.filter((la) => la.hidden === true);
 
   console.log(applications, listActions);
+  // const lastMonthCount = applications
+  //   ? countApplicationsByTimeRange(applications, "month")
+  //   : 0;
+  const lastMonthCount = countApplicationsByTimeRange(
+    applications ?? [],
+    "month",
+  );
+  const acceptedApps = applications?.filter(
+    (app) => app.applicationStatus === "accepted",
+  );
+  // const rejectedApps = applications?.filter(
+  //   (app) => app.applicationStatus === "rejected",
+  // );
+  // const pendingApps = applications?.filter(
+  //   (app) => app.applicationStatus === "pending",
+  // );
+  console.log(lastMonthCount);
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -42,56 +88,207 @@ export default function Dashboard() {
 
       {/* Quick Stats Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Applications
-            </CardTitle>
-            <Code className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              +2 from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
-            <p className="mt-1 text-xs text-muted-foreground">+15% increase</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Performance</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">98.2%</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              +2.1% from average
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
+        {isAdmin && (
+          <div className="col-span-full flex flex-col gap-4">
+            <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    New Submissions
+                  </CardTitle>
+                  <LucideCircleFadingPlus className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{pendingEvents ?? 0}</div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/applications"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Events (incl. pending/drafts)
+                  </CardTitle>
+                  <LucideCircleEqual className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{totalEvents ?? 0}</div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/applications"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Active Events
+                  </CardTitle>
+                  <LucideCircleCheck className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{activeEvents ?? 0}</div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/applications"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Archived Events
+                  </CardTitle>
+                  <LucideCircleOff className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {archivedEvents ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/applications"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+        {isArtist && (
+          <div className="col-span-full flex flex-col gap-4">
+            <h3 className="underline underline-offset-2">Artist Dashboard:</h3>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Applications
+                  </CardTitle>
+                  <LucideClipboardList className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {applications?.length ?? 0}
+                  </div>
+                  <div className="inline-flex items-center gap-2">
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {lastMonthCount > 0
+                        ? `+${lastMonthCount} from last month`
+                        : "0 in the last month"}
+                    </p>
+                    {" - "}
+                    <Link
+                      variant="subtleUnderline"
+                      href="/dashboard/admin/applications"
+                    >
+                      <p className="mt-1 text-xs">View all</p>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Accepted Applications
+                  </CardTitle>
+                  <LucideCircleCheckBig className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {acceptedApps?.length ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/apps/accepted"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              {/* <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Pending Applications
+                  </CardTitle>
+                  <Zap className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {pendingApps?.length ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/apps/pending"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card> */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Bookmarked Events
+                  </CardTitle>
+                  <FaRegBookmark className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {bookmarkedEvents?.length ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/apps/bookmarked"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Hidden Events
+                  </CardTitle>
+                  <EyeOff className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {hiddenEvents?.length ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/apps/rejected"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+        {/* <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Engagement</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <Activity className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">89%</div>
-            <p className="mt-1 text-xs text-muted-foreground">+5% this week</p>
+            <p className="mt-1 text-xs">+5% this week</p>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Featured Section */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Project Growth</CardTitle>
@@ -137,7 +334,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="rounded-full bg-primary/10 p-2">
-                  <Star className="h-4 w-4 text-primary" />
+                  <Star className="size-4 text-primary" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">First 1000 Users</p>
@@ -146,7 +343,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="rounded-full bg-primary/10 p-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <TrendingUp className="size-4 text-primary" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">50 Projects Created</p>
@@ -155,7 +352,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="rounded-full bg-primary/10 p-2">
-                  <Zap className="h-4 w-4 text-primary" />
+                  <Zap className="size-4 text-primary" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">Premium Features</p>
@@ -165,7 +362,7 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -180,31 +377,59 @@ export default function Dashboard() {
               variant="outline"
               className="w-full justify-start gap-2"
             >
-              <Link href="/dashboard/projects">
-                <Code className="h-4 w-4" />
+              <Link variant="standard" href="/dashboard/account/billing">
+                <Users className="size-4" />
+                Manage Billing
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="w-full justify-start gap-2"
+            >
+              <Link variant="standard" href="/dashboard/projects">
+                <Code className="size-4" />
                 New Project
               </Link>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="w-full justify-start gap-2"
-            >
-              <Link href="/dashboard/account">
-                <TrendingUp className="h-4 w-4" />
-                View Analytics
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="w-full justify-start gap-2"
-            >
-              <Link href="/dashboard/account/settings">
-                <Users className="h-4 w-4" />
-                Invite Team
-              </Link>
-            </Button>
+            {/* TODO: add this logic once I've gotten the application system up and there's a reason for users to upload a portfolio and related files */}
+            {isAdmin && isArtist && (
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-start gap-2"
+              >
+                <Link variant="standard" href="/dashboard/projects">
+                  <LucideFileHeart className="size-4" />
+                  Manage Portfolio
+                </Link>
+              </Button>
+            )}
+            {isAdmin && (
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-start gap-2"
+              >
+                <Link variant="standard" href="/dashboard/admin/analytics">
+                  <TrendingUp className="size-4" />
+                  View Analytics
+                </Link>
+              </Button>
+            )}
+
+            {isOrganizer && (
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-start gap-2"
+              >
+                <Link variant="standard" href="/dashboard/account/settings">
+                  <Users className="size-4" />
+                  Invite Team
+                </Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
 

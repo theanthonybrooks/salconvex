@@ -151,7 +151,7 @@ export default function Home() {
           <PopoverContent className="w-80 border-1.5" align="center">
             <div className="grid gap-4">
               <div className="space-y-2">
-                <h3 className="font-bold italic">Marching Band Mural</h3>
+                <h3 className="italic">Marching Band Mural</h3>
                 <p className="text-sm text-muted-foreground">
                   Pieve Santo Stefano, Tuscany (IT)
                 </p>

@@ -187,7 +187,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                   .sort((a, b) => b[0].localeCompare(a[0])) // Optional: sort editions descending
                   .map(([edition, editionEvents]) => (
                     <div key={edition} className="mb-4">
-                      <h3 className="text-md mb-2 font-semibold underline underline-offset-2">
+                      <h3 className="mb-2 font-semibold underline underline-offset-2">
                         {edition}
                       </h3>
                       <ul className="list-outside list-none px-2">

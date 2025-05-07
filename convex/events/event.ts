@@ -14,6 +14,42 @@ import { Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
+export const getTotalNumberOfEvents = query({
+  handler: async (ctx) => {
+    const events = await ctx.db.query("events").collect();
+
+    let active = 0,
+      archived = 0,
+      draft = 0,
+      pending = 0;
+
+    for (const event of events) {
+      switch (event.state) {
+        case "published":
+          active++;
+          break;
+        case "archived":
+          archived++;
+          break;
+        case "draft":
+          draft++;
+          break;
+        case "submitted":
+          pending++;
+          break;
+      }
+    }
+
+    return {
+      totalEvents: events.length,
+      activeEvents: active,
+      archivedEvents: archived,
+      draftEvents: draft,
+      pendingEvents: pending,
+    };
+  },
+});
+
 export const getEventByOrgId = query({
   args: {
     orgId: v.id("organizations"),
