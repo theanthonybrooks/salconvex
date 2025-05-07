@@ -578,7 +578,9 @@ export default function Pricing() {
           />
         )}
 
-        {(isArtist && !hasSub) || (isAdmin && !isOrganizer) ? (
+        {(isArtist && !hasSub) ||
+        (isAdmin && !isOrganizer) ||
+        (!isArtist && isOrganizer) ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
