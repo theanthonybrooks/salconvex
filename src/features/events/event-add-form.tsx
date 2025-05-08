@@ -156,10 +156,12 @@ export const EventOCForm = ({
     defaultValues: {
       organization: {
         name: "",
-        logo: undefined,
+        logo: "",
         location: undefined,
       },
-      event: undefined,
+      event: {
+        name: "",
+      },
       // orgLogo: undefined,
       // eventName: "",
     },
@@ -201,14 +203,15 @@ export const EventOCForm = ({
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
     null,
   );
-  const [newOrgEvent, setNewOrgEvent] = useState(false);
+  const [newOrgEvent, setNewOrgEvent] = useState(true);
   const [existingEvent, setExistingEvent] = useState<EnrichedEvent | null>(
     null,
   );
 
   // const [openCall, setOpenCall] = useState<Doc<"openCalls"> | null>(null);
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
-
+  const isSelectedRowEmpty =
+    selectedRow && Object.keys(selectedRow).length === 0;
   const [skipped, setSkipped] = useState<Set<number>>(new Set([3, 4]));
 
   const [lastSaved, setLastSaved] = useState(
@@ -241,34 +244,39 @@ export const EventOCForm = ({
   // ------------- Step 1 - Organization & Event --------------
   //
   //
+  const prevErrorJson = useRef<string>("");
   const topRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const canCheckSchema = useRef(false);
+  const canClearEventData = useRef(true);
   const hasClosed = useRef(false);
   const isFirstRun = useRef(true);
   const savedState = useRef(false);
   const orgData = watch("organization");
   const eventData = watch("event");
+  const hasEventId = !!eventData?._id;
   const openCallData = watch("openCall");
   // const eventDatesWatch = watch("event.dates");
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
   const hasOpenCall = eventData?.hasOpenCall ?? "";
   const hasOC = eventData?.hasOpenCall === "true";
-  const eventName = eventData?.name ?? "";
+  const eventName = eventData?.name;
+  const eventLogo = eventData?.logo;
+
   const clearEventDataTrigger =
-    newOrgEvent && activeStep === 0 && eventData && eventName !== "";
-  console.log(clearEventDataTrigger);
-  console.log(isStepValidZod);
+    (newOrgEvent &&
+      activeStep === 0 &&
+      eventData &&
+      canClearEventData.current) ||
+    (isSelectedRowEmpty && hasEventId && activeStep === 0);
+
   const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
   const orgLocationValid =
     !errors.organization?.location?.country && Boolean(orgData?.location?.full);
   const orgLogoValid = !errors.organization?.logo && Boolean(orgData?.logo);
   const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
-  // const data = useQuery(
-  //   api.events.event.getEventByOrgId,
-  //   existingOrg ? { orgId: existingOrg?._id } : "skip",
-  // );
+
   const {
     data: orgEventsData,
     // isPending: orgEventsPending, //use this later for some loading state for the events table. Use skeleton loaders
@@ -294,48 +302,23 @@ export const EventOCForm = ({
     (categoryEvent && typeEvent) || (category && !categoryEvent);
 
   // Then use it like:
-  const {
-    // data: orgValidation,
-    // status,
-    // isPending,
-    isSuccess: orgValidationSuccess,
-    isError: orgValidationError,
-    // error,
-  } = useQueryWithStatus(
-    api.organizer.organizations.isOwnerOrIsNewOrg,
-    orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
-  );
-  const {
-    // data: eventNameData,
-    // status,
-    // isPending,
-    isSuccess: eventNameValid,
-    isError: eventNameExistsError,
-    // error,
-  } = useQueryWithStatus(
-    api.events.event.checkEventNameExists,
-    eventName.trim().length >= 3
-      ? { name: eventName, organizationId: existingOrg?._id }
-      : "skip",
-  );
+  const { isSuccess: orgValidationSuccess, isError: orgValidationError } =
+    useQueryWithStatus(
+      api.organizer.organizations.isOwnerOrIsNewOrg,
+      orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
+    );
+  const { isSuccess: eventNameValid, isError: eventNameExistsError } =
+    useQueryWithStatus(
+      api.events.event.checkEventNameExists,
+      eventName && eventName.trim().length >= 3
+        ? { name: eventName, organizationId: existingOrg?._id }
+        : "skip",
+    );
 
-  const {
-    data: ocData,
-    // status,
-    // isPending,
-    isSuccess: openCallSuccess,
-    // isError: openCallError,
-    // error,
-  } = useQueryWithStatus(
+  const { data: ocData, isSuccess: openCallSuccess } = useQueryWithStatus(
     api.openCalls.openCall.getOpenCallByEventId,
     existingEvent ? { eventId: existingEvent._id } : "skip",
   );
-
-  // const hasUserEditedStep0 =
-  //   activeStep === 0 &&
-  //   (orgData?.name?.trim() !== existingOrg?.name?.trim() ||
-  //     orgData?.logo !== existingOrg?.logo ||
-  //     orgData?.location?.full !== existingOrg?.location?.full);
 
   const hasUserEditedStep0 =
     JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
@@ -354,17 +337,11 @@ export const EventOCForm = ({
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
 
-  // const orgValidation = useQuery(
-  //   api.organizer.organizations.isOwnerOrIsNewOrg,
-  //   orgName.trim().length >= 3 ? { organizationName: orgName } : "skip",
-  // );
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid = validOrgWZod && isStepValidZod && eventChoiceMade;
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
-  // const existingOrgUpdateTrigger =
-  //   hasExistingOrg && validOrgWZod && hasUserEditedStep0;
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
   const hasEventLocation =
     (dirtyFields.event?.location || eventData?.location?.full !== undefined) &&
@@ -389,17 +366,12 @@ export const EventOCForm = ({
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
-  // const prodDatesFormat = !!eventData?.dates?.prodFormat;
   const prodDatesStart = eventData?.dates?.prodDates?.[0]?.start;
-  // const hasProdDateAndFormat = prodDatesFormat && prodDatesStart !== "";
-  // const blankProdStart = eventData?.dates?.prodDates?.[0]?.start === "";
   const noProdStart =
     eventData?.dates?.noProdStart ||
     (existingEvent?.dates?.prodDates?.[0]?.start === "" &&
       existingEvent?.dates?.prodDates?.[0]?.end !== "") ||
     false;
-
-  // const prodDatesFormat = eventData?.dates?.prodFormat || null;
 
   //
 
@@ -530,7 +502,7 @@ export const EventOCForm = ({
         reset({
           ...currentValues,
           event: {
-            // name: "",
+            name: "",
             logo: currentValues.organization.logo,
             logoStorageId: currentValues.organization.logoStorageId,
             location: {
@@ -565,11 +537,23 @@ export const EventOCForm = ({
       const result = schema.safeParse(currentValues);
 
       if (!result.success) {
-        result.error.issues.forEach((issue) => {
+        const issues = result.error.issues;
+
+        issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
           setError(path, { type: "manual", message: issue.message });
-          setErrorMsg(issue.message);
         });
+
+        // Prefer first user-meaningful message
+        const firstMessage =
+          issues.find(
+            (i) =>
+              i.message &&
+              i.message !== "Required" &&
+              i.message !== "Invalid input",
+          )?.message ?? issues[0]?.message;
+
+        setErrorMsg(firstMessage || "Please fix errors before continuing.");
 
         if (shouldToast) {
           toast.dismiss("form-validation-error");
@@ -589,6 +573,7 @@ export const EventOCForm = ({
 
   const handleSave = useCallback(
     async (direct = false) => {
+      if (pending) return;
       if (direct) {
         const isStepValid = handleCheckSchema();
         if (!isStepValid) {
@@ -701,6 +686,7 @@ export const EventOCForm = ({
             event: {
               ...existingEvent,
               logo: eventFullUrl,
+              logoStorageId: existingEvent?.logoStorageId ?? logoStorageId,
               links: {
                 ...existingEvent.links,
                 sameAsOrganizer: true,
@@ -721,11 +707,15 @@ export const EventOCForm = ({
             event: {
               name: "",
               logo: orgLogoFullUrl || eventFullUrl,
+              logoStorageId,
               links: {
                 sameAsOrganizer: true,
               },
-              location:
-                orgResult?.location ?? currentValues.organization.location,
+              location: {
+                ...(orgResult?.location ||
+                  currentValues.organization?.location),
+                sameAsOrganizer: true,
+              },
             },
           });
         }
@@ -836,6 +826,7 @@ export const EventOCForm = ({
         } catch (error) {
           console.error("Failed to create new event:", error);
           toast.error("Failed to create new event");
+          setPending(false);
         }
       }
       if (activeStep === steps.length - 2) {
@@ -882,6 +873,7 @@ export const EventOCForm = ({
         } catch (error) {
           console.error("Failed to submit event:", error);
           toast.error("Failed to submit event");
+          setPending(false);
         }
       }
       if (activeStep === steps.length - 1) {
@@ -916,6 +908,7 @@ export const EventOCForm = ({
         } catch (error) {
           console.error("Failed to submit event:", error);
           toast.error("Failed to submit event");
+          setPending(false);
         }
       }
     },
@@ -936,6 +929,7 @@ export const EventOCForm = ({
       currentValues,
       setExistingEvent,
       handleCheckSchema,
+      pending,
     ],
   );
 
@@ -947,7 +941,7 @@ export const EventOCForm = ({
     prevOrgRef.current = null;
     isFirstRun.current = true;
     setExistingEvent(null);
-    setNewOrgEvent(false);
+    setNewOrgEvent(true);
     reset({
       organization: {
         name: "",
@@ -961,24 +955,23 @@ export const EventOCForm = ({
 
   // -------------UseEffects --------------
 
-  // useEffect(() => {
-  //   console.log("form valid:", isValid, "step valid:", isStepValidZod);
-  // }, [isValid, isStepValidZod]);
+  useEffect(() => {
+    console.log(orgData);
+  }, [orgData]);
+  useEffect(() => {
+    console.log("eventLogo", eventLogo);
+    console.log("eventName", eventName);
+  }, [eventLogo, eventName]);
 
-  // useEffect(() => {
-  //   console.log(selectedRow);
-  //   if (!selectedRow || Object.keys(selectedRow).length === 0) return;
-  //   const [[key, value]] = Object.entries(selectedRow);
-  //   const isDefault = key === "0" && value === false;
-  //   console.log(selectedRow);
+  useEffect(() => {
+    console.log("form valid:", isValid, "step valid:", isStepValidZod);
+  }, [isValid, isStepValidZod]);
 
-  //   if (newOrgEvent && !isDefault) {
-  //     console.log("resetting");
-  //     // setSelectedRow({ 0: false });
-  //     setSelectedRow({});
-  //     setExistingEvent(null);
-  //   }
-  // }, [newOrgEvent, selectedRow, setSelectedRow]);
+  useEffect(() => {
+    if (dirtyFields) {
+      console.log(dirtyFields);
+    }
+  }, [dirtyFields]);
 
   useEffect(() => {
     if (scrollTrigger) {
@@ -991,16 +984,24 @@ export const EventOCForm = ({
   }, [scrollTrigger]);
 
   useEffect(() => {
-    console.log("scroll trigger:", scrollTrigger);
-    console.log("just to be sure");
-    console.log(!!bottomRef.current);
     if (!firstTimeOnStep || bottomRef.current === null) return;
-    console.log("hmph");
     if (canNameEvent && activeStep === 1 && !existingEvent) {
       setScrollTrigger(true);
-      console.log("step 1 set true");
     }
   }, [scrollTrigger, canNameEvent, activeStep, firstTimeOnStep, existingEvent]);
+
+  useEffect(() => {
+    if (!schema || !hasUserEditedForm) return;
+    const serialized = JSON.stringify(errors);
+    console.log("errors changed", serialized);
+
+    // Only run handleCheckSchema if error content has changed
+    if (serialized !== prevErrorJson.current) {
+      console.log("error changed");
+      prevErrorJson.current = serialized;
+      canCheckSchema.current = true;
+    }
+  }, [currentValues, schema, hasUserEditedForm, errors]);
 
   useEffect(() => {
     if (!canCheckSchema.current) {
@@ -1015,6 +1016,10 @@ export const EventOCForm = ({
       console.log("step invalid");
       handleCheckSchema(false);
       canCheckSchema.current = false;
+    } else if (isStepValidZod && hasUserEditedForm) {
+      console.log("step valid");
+      canCheckSchema.current = false;
+      setErrorMsg("");
     }
   }, [isStepValidZod, hasUserEditedForm, handleCheckSchema]);
 
@@ -1061,11 +1066,6 @@ export const EventOCForm = ({
     // console.log("existingEvent", existingEvent);
   }, [eventData, existingEvent]);
 
-  // useEffect(() => {
-  //   if (!eventDatesWatch) return;
-  //   console.log("event dates", eventDatesWatch);
-  // }, [eventDatesWatch]);
-
   useEffect(() => {
     console.log("oc", openCallData);
   }, [openCallData]);
@@ -1086,7 +1086,9 @@ export const EventOCForm = ({
       reset({
         organization: {
           ...existingOrg,
-          // location: existingOrg?.location,
+        },
+        event: {
+          name: "",
         },
       });
       prevOrgRef.current = existingOrg;
@@ -1171,12 +1173,18 @@ export const EventOCForm = ({
   }, [activeStep, furthestStep]);
 
   useEffect(() => {
+    console.log("selected row", selectedRow);
+  }, [selectedRow]);
+
+  useEffect(() => {
     if (clearEventDataTrigger) {
       setFurthestStep(0);
       setSelectedRow({});
+      console.log("clearing event data", eventData);
       reset({
         organization: {
           ...existingOrg,
+          logo: existingOrg?.logo || "/1.jpg",
         },
 
         event: {
@@ -1188,8 +1196,9 @@ export const EventOCForm = ({
           },
         },
       });
+      canClearEventData.current = false;
     }
-  }, [clearEventDataTrigger, reset, existingOrg]);
+  }, [clearEventDataTrigger, reset, existingOrg, eventData]);
 
   useEffect(() => {
     if (!eventDatesFormat) return;
@@ -1403,7 +1412,12 @@ export const EventOCForm = ({
                             }}
                             value={field.value || ""}
                           >
-                            <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                            <SelectTrigger
+                              className={cn(
+                                "h-12 w-full border text-center text-base sm:h-[50px]",
+                                errors.event?.category && "invalid-field",
+                              )}
+                            >
                               <SelectValue placeholder="Event/Project Category (select one)" />
                             </SelectTrigger>
                             <SelectContent className="min-w-auto">
@@ -1427,13 +1441,6 @@ export const EventOCForm = ({
                         );
                       }}
                     />
-                    {errors.event?.category && eventData?.category && (
-                      <span className="mt-2 w-full text-center text-sm text-red-600">
-                        {errors.event?.category?.message
-                          ? errors.event?.category?.message
-                          : "Please select a category from the dropdown"}
-                      </span>
-                    )}
                   </div>
 
                   {categoryEvent && (
@@ -1455,7 +1462,10 @@ export const EventOCForm = ({
                           render={({ field }) => (
                             <MultiSelect
                               id="event.type"
-                              className="h-12 border sm:h-[50px]"
+                              className={cn(
+                                "h-12 border sm:h-[50px]",
+                                errors.event?.type && "invalid-field",
+                              )}
                               badgeClassName="py-2 lg:py-2 lg:text-sm "
                               textClassName="text-base"
                               options={options}
@@ -1476,15 +1486,6 @@ export const EventOCForm = ({
                             />
                           )}
                         />
-                        {errors.organization?.location && orgData?.location && (
-                          <span className="mt-2 w-full text-center text-sm text-red-600">
-                            {errors.organization?.location?.country?.message
-                              ? errors.organization?.location?.country?.message
-                              : errors.organization?.location?.full?.message
-                                ? errors.organization?.location?.full?.message
-                                : "Please select a location from the dropdown"}
-                          </span>
-                        )}
                       </div>
                     </>
                   )}
@@ -1508,10 +1509,15 @@ export const EventOCForm = ({
                           control={control}
                           render={({ field }) => (
                             <EventNameSearch
-                              value={field.value ?? ""}
+                              value={field.value}
                               isExisting={eventNameExistsError}
                               onChange={field.onChange}
-                              className="border !text-base sm:h-[50px]"
+                              className={cn(
+                                "border !text-base sm:h-[50px]",
+                                errors.event?.name &&
+                                  dirtyFields.event?.name &&
+                                  "invalid-field",
+                              )}
                             />
                           )}
                         />
@@ -1537,7 +1543,6 @@ export const EventOCForm = ({
                               {getEventCategoryLabelAbbr(category)} Location
                             </Label>
 
-                            {/*TODO: Add ability to enter in address for this part, since it's the event itself. The organization may actually benefit from this as well? Not that I'm thinking about it */}
                             <Controller
                               name="event.location"
                               control={control}
@@ -1552,19 +1557,13 @@ export const EventOCForm = ({
                                   tabIndex={2}
                                   placeholder="Event Location (if different from organization)..."
                                   className="mb-3 w-full lg:mb-0"
-                                  inputClassName="rounded-lg border-foreground disabled:opacity-50"
+                                  inputClassName={cn(
+                                    "rounded-lg border-foreground disabled:opacity-50",
+                                    errors.event?.location && "invalid-field",
+                                  )}
                                 />
                               )}
                             />
-                            {/* {errors.event?.location && eventData?.location && (
-                              <span className="mt-2 w-full text-center text-sm text-red-600">
-                                {errors.event?.location?.country?.message
-                                  ? errors.event?.location?.country?.message
-                                  : errors.event?.location?.full?.message
-                                    ? errors.event?.location?.full?.message
-                                    : "Please select a location from the dropdown"}
-                              </span>
-                            )} */}
                           </div>
                           <div className="input-section">
                             <p className="min-w-max font-bold lg:text-xl">

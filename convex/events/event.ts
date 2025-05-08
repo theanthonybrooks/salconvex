@@ -513,6 +513,9 @@ export const createOrUpdateEvent = mutation({
     if (args.logo && !args.logoStorageId) {
       fileUrl = args.logo;
     }
+    if (args.name === "") {
+      throw new ConvexError("Event name is required");
+    }
 
     const user = await ctx.db
       .query("users")

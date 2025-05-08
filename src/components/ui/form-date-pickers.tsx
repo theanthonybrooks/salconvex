@@ -26,6 +26,7 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
   Controller,
+  get,
   Path,
   useFieldArray,
   useFormContext,
@@ -59,8 +60,12 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     // getValues,
     // setError,
     // trigger,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useFormContext<EventOCFormValues>();
+  const isFieldInvalid = (path: keyof EventOCFormValues | string) => {
+    return get(errors, path)?.message && get(dirtyFields, path);
+  };
+
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const didInitialRun = useRef(false);
@@ -435,7 +440,12 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                               field.onChange(toDateString(date))
                             }
                             className="w-full rounded border p-2 text-center"
-                            inputClassName="h-12"
+                            inputClassName={cn(
+                              "h-12",
+                              isFieldInvalid(
+                                `${nameBase}.${formatKey}.${index}.start`,
+                              ) && "invalid-field",
+                            )}
                             minDate={prevEndDate}
                             maxDate={
                               watch(
@@ -462,7 +472,12 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                               field.onChange(toDateString(date))
                             }
                             className="w-full rounded border p-2 text-center"
-                            inputClassName="h-12"
+                            inputClassName={cn(
+                              "h-12",
+                              isFieldInvalid(
+                                `${nameBase}.${formatKey}.${index}.end`,
+                              ) && "invalid-field",
+                            )}
                             minDate={getSequentialMinDate(
                               watch,
                               nameBase,

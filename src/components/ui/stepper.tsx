@@ -58,6 +58,7 @@ export default function HorizontalLinearStepper({
   errorMsg,
   pending,
 }: StepperProps) {
+  // console.log(errorMsg);
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({

@@ -333,6 +333,10 @@ body,
   }
 }
 
+.invalid-field {
+  @apply border-red-600 ring-1 ring-red-600;
+}
+
 .mt-mobile {
   @media (max-width: 768px) {
     margin-top: 2em;

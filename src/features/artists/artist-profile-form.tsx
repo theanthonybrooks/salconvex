@@ -53,8 +53,6 @@ export const ArtistProfileForm = ({
   // hasUnsavedChanges,
   // setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
-  console.log(subData);
-
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
   const userName = user?.name ? user.name : userFullName;
   const subscription = subData?.subscription;
@@ -150,7 +148,7 @@ export const ArtistProfileForm = ({
       timezoneOffset = timezoneData?.gmtOffset;
       //could also get dst, abbreviation (CEST, CET, etc)
     }
-    console.log(data?.logo);
+    // console.log(data?.logo);
     //NOTE: Upload the image to Convex's storage and get the url in the convex mutation.
     if (data.logo && typeof data.logo !== "string" && isDirty) {
       const uploadUrl = await generateUploadUrl();

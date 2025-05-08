@@ -76,7 +76,7 @@ export const FormLinksInput = ({
   return (
     <>
       <div className={cn("flex max-w-[80dvw] flex-col gap-y-2")}>
-        {(existingOrgHasLinks || eventSameAsOrg) && isEvent && (
+        {existingOrgHasLinks && eventSameAsOrg && isEvent && (
           <Controller
             name="event.links.sameAsOrganizer"
             control={control}

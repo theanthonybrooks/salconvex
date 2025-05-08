@@ -120,7 +120,7 @@ const SubmissionFormOrgStep = ({
       >
         <section
           id="first-section"
-          className="mx-auto flex flex-col items-center gap-y-6 self-start xl:justify-center xl:self-center"
+          className="mx-auto flex flex-col items-center gap-y-6 self-start xl:justify-center 3xl:self-center"
         >
           <section className="flex flex-col items-center justify-center">
             <div
@@ -295,6 +295,35 @@ const SubmissionFormOrgStep = ({
                   (or continue a draft)
                 </p>
               </div>
+              <div className="w-full rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-5">
+                <label
+                  className={cn(
+                    "flex cursor-pointer items-start gap-2 md:items-center",
+                    // existingEvent !== null &&
+                    //   "pointer-events-none opacity-50 hover:cursor-default",
+                  )}
+                >
+                  <Checkbox
+                    // disabled={existingEvent !== null}
+                    tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
+                    id="newEvent"
+                    className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                    checked={eventsData?.length === 0 ? true : newOrgEvent}
+                    onCheckedChange={(checked) => {
+                      setExistingEvent(null);
+                      if (eventsData?.length === 0) {
+                        setNewOrgEvent(true);
+                      } else {
+                        setNewOrgEvent(!!checked);
+                      }
+                    }}
+                  />
+
+                  <span className="text-sm">
+                    I&apos;d like to create a new event/project
+                  </span>
+                </label>
+              </div>
               <DataTable
                 columns={columns}
                 data={eventsData}
@@ -390,38 +419,6 @@ const SubmissionFormOrgStep = ({
                             Create New Event
                           </Button> */}
 
-              <label
-                className={cn(
-                  "flex cursor-pointer items-start gap-2 md:items-center",
-                  // existingEvent !== null &&
-                  //   "pointer-events-none opacity-50 hover:cursor-default",
-                )}
-              >
-                <Checkbox
-                  // disabled={existingEvent !== null}
-                  tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
-                  id="newEvent"
-                  className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                  checked={eventsData?.length === 0 ? true : newOrgEvent}
-                  onCheckedChange={(checked) => {
-                    setExistingEvent(null);
-                    if (eventsData?.length === 0) {
-                      setNewOrgEvent(true);
-                    } else {
-                      setNewOrgEvent(!!checked);
-                    }
-                  }}
-                />
-                {eventsData?.length > 0 ? (
-                  <span className={cn("text-sm")}>
-                    No thanks, I&apos;d like to create a new event/project
-                  </span>
-                ) : (
-                  <span className="text-sm">
-                    I&apos;d like to create a new event/project
-                  </span>
-                )}
-              </label>
               <p
                 ref={bottomRef}
                 className="mt-2 text-pretty text-center text-xs italic text-muted-foreground"

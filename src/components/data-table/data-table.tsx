@@ -27,6 +27,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
+import { useEffect } from "react";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -115,19 +116,32 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  React.useEffect(() => {
-    setRowSelection(selectedRow ?? {});
-  }, [selectedRow]);
+  useEffect(() => {
+    if (isAdmin) {
+      setRowSelection(selectedRow ?? {});
+    }
+  }, [selectedRow, isAdmin]);
 
-  React.useEffect(() => {
-    setRowSelection({});
-  }, [viewAll]);
+  useEffect(() => {
+    if (isAdmin) {
+      setRowSelection({});
+    }
+  }, [viewAll, isAdmin]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (defaultVisibility) {
       setColumnVisibility(defaultVisibility);
     }
   }, [defaultVisibility]);
+
+  useEffect(() => {
+    const selectedKey = Object.keys(rowSelection)[0];
+
+    if (selectedKey !== undefined && !data[Number(selectedKey)]) {
+      setRowSelection({});
+      onRowSelect?.(null, {});
+    }
+  }, [data, rowSelection, onRowSelect]);
 
   // console.log(
   //   table

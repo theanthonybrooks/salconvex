@@ -172,9 +172,9 @@ export const eventBase = z.object({
   _id: z.optional(z.string()),
   name: z
     .string()
-    .min(3, "Name must be at least 3 characters")
+    .min(3, "Name must be at least 3 characters with no quotes or semicolons")
     .max(35, "Max 35 characters")
-    .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+    .regex(/^[^"';]*$/, "No quotes or semicolons allowed in name"),
 
   category: z.enum(eventCategoryValues), //TODO: Add message for "Event category is required"
   type: z.array(z.enum(eventTypeValues)).optional(),
