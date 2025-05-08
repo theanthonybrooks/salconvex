@@ -245,6 +245,7 @@ export const EventOCForm = ({
   //
   //
   const prevErrorJson = useRef<string>("");
+  const lastChangedRef = useRef<number | null>(null);
   const topRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const canCheckSchema = useRef(false);
@@ -954,6 +955,11 @@ export const EventOCForm = ({
   };
 
   // -------------UseEffects --------------
+  useEffect(() => {
+    if (hasUserEditedForm) {
+      lastChangedRef.current = Date.now();
+    }
+  }, [watchedValues, hasUserEditedForm]);
 
   useEffect(() => {
     console.log(orgData);
@@ -1033,9 +1039,11 @@ export const EventOCForm = ({
         typeof lastSaved === "number"
           ? lastSaved
           : new Date(lastSaved ?? 0).getTime();
-      const diffInMs = now - last;
-      console.log(now, last, diffInMs);
-      if (diffInMs >= 60000) {
+      const lastChanged = lastChangedRef.current ?? 0;
+      const shouldSave = now - lastChanged >= 60000 && lastChanged > last;
+      console.log(now, last);
+
+      if (shouldSave) {
         handleSave().then(() => {
           console.log("Autosaved at", new Date().toLocaleTimeString());
           setPending(false);
