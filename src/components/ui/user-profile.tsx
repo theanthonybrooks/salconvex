@@ -15,9 +15,10 @@ import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
 // import { SignOutButton, useUser } from "@clerk/nextjs";
-import { LogOut, Settings, Sparkles } from "lucide-react";
+import { LogOut, LucideLayoutDashboard, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { FaUserNinja } from "react-icons/fa6";
+import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
 
 interface UserProfileProps {
@@ -33,6 +34,8 @@ export function UserProfile({
 }: UserProfileProps) {
   const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
+  const userRole = user?.role;
+  const isAdmin = userRole?.includes("admin");
   // console.log("User subscription:", subscription)
 
   return (
@@ -95,15 +98,18 @@ export function UserProfile({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link
-            href="/dashboard/account/settings"
-            className="underline-offset-2 hover:cursor-pointer hover:underline"
-          >
-            <DropdownMenuItem className="focus:bg-salYellow/50">
-              <Settings className="mr-2 size-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/dashboard/admin/submissions"
+              className="underline-offset-2 hover:cursor-pointer hover:underline"
+            >
+              <DropdownMenuItem className="focus:bg-salYellow/50">
+                <Users className="mr-2 size-4" />
+                <span>Admin Dashboard</span>
+              </DropdownMenuItem>
+            </Link>
+          )}
+
           {subscription !== "none" && subscription !== "cancelled" && (
             <>
               {/* <Link
@@ -116,11 +122,20 @@ export function UserProfile({
           </Link> */}
 
               <Link
+                href="/dashboard/"
+                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              >
+                <DropdownMenuItem className="focus:bg-salYellow/50">
+                  <LucideLayoutDashboard className="mr-2 size-4" />
+                  <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
+                </DropdownMenuItem>
+              </Link>
+              <Link
                 href="/dashboard/account/billing"
                 className="underline-offset-2 hover:cursor-pointer hover:underline"
               >
                 <DropdownMenuItem className="focus:bg-salYellow/50">
-                  <Sparkles className="mr-2 size-4" />
+                  <PiPiggyBank className="mr-2 size-4" />
                   <span>Manage Subscription</span>
                 </DropdownMenuItem>
               </Link>
@@ -132,11 +147,20 @@ export function UserProfile({
               className="underline-offset-2 hover:cursor-pointer hover:underline"
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">
-                <Sparkles className="mr-2 size-4" />
+                <PiPiggyBank className="mr-2 size-4" />
                 <span>Renew Subscription</span>
               </DropdownMenuItem>
             </Link>
           )}
+          <Link
+            href="/dashboard/account/settings"
+            className="underline-offset-2 hover:cursor-pointer hover:underline"
+          >
+            <DropdownMenuItem className="focus:bg-salYellow/50">
+              <Settings className="mr-2 size-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <SignOutBtn>

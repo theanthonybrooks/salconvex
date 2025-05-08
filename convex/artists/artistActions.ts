@@ -45,6 +45,7 @@ export const updateOrCreateArtist = mutation({
     if (fileUrl) {
       await ctx.db.patch(user._id, {
         image: fileUrl,
+        imageStorageId: args.artistLogoStorageId,
       });
     }
 

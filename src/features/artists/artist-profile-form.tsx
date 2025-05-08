@@ -3,14 +3,19 @@ import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 
 import { Label } from "@/components/ui/label";
 import AvatarUploader from "@/components/ui/logo-uploader";
-import { MapboxInput } from "@/components/ui/mapbox-search";
+import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
+import { ArtistResidency } from "@/types/artist";
 import { User } from "@/types/user";
 import { useAction, useMutation, useQuery } from "convex/react";
+import { FunctionReturnType } from "convex/server";
+import { formatDate, isBefore } from "date-fns";
 import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { IoMdArrowRoundForward } from "react-icons/io";
 import { toast } from "react-toastify";
 import { Country } from "world-countries";
 import { api } from "~/convex/_generated/api";
@@ -20,44 +25,60 @@ interface ArtistProfileFormProps {
   className?: string;
 
   user: User | undefined;
+  subData: FunctionReturnType<
+    typeof api.subscriptions.getUserSubscriptionStatus
+  >;
   onClick: () => void;
   children?: React.ReactNode;
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: (value: boolean) => void;
 }
 
+type ArtistResValues = Omit<ArtistResidency, "full"> & {
+  full: string;
+};
+
 type ArtistFormValues = {
   artistName: string;
   logo: Blob | string | undefined;
-  residence: string;
-  nationalities: string[]; // cca2 codes for now
-
-  locationCity?: string;
-  locationState?: string;
-  locationStateAbbr?: string;
-  locationCountry?: string;
-  locationCountryAbbr?: string;
-  locationCoordinates?: number[];
+  artistResidency: ArtistResValues;
+  artistNationality: string[]; // cca2 codes for now
 };
 
 export const ArtistProfileForm = ({
   className,
   onClick,
   user,
+  subData,
   // hasUnsavedChanges,
   // setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
+  console.log(subData);
+
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
   const userName = user?.name ? user.name : userFullName;
+  const subscription = subData?.subscription;
+  const subStatus = subData?.subStatus;
+  const hadTrial = subData?.hadTrial;
+  const activeSub = subStatus === "active";
+  const trialingSub = subStatus === "trialing";
+  const trialEndsAt = subData?.trialEndsAt;
+  const trialEnded = trialEndsAt && isBefore(new Date(trialEndsAt), new Date());
+  // const activeTrial = trialingSub && !trialEnded;
+  const subAmount = subData?.subAmount
+    ? (subData.subAmount / 100).toFixed(0)
+    : 0;
+  const subInterval = subData?.subInterval !== "none" && subData?.subInterval;
 
   const {
     register,
     control,
-    setValue,
+    // setValue,
     // watch,
+    // getValues,
     handleSubmit: handleSubmit,
     formState: {
-      // isDirty,
+      isDirty,
       // errors,
       isValid,
     },
@@ -65,13 +86,28 @@ export const ArtistProfileForm = ({
   } = useForm<ArtistFormValues>({
     defaultValues: {
       artistName: userName,
-      nationalities: [],
-      residence: "",
+      artistNationality: [],
+      artistResidency: {
+        full: "",
+        city: "",
+        state: "",
+        stateAbbr: "",
+        country: "",
+        countryAbbr: "",
+        location: [],
+        timezone: "",
+        timezoneOffset: 0,
+      },
+
       logo: undefined,
     },
     mode: "onChange",
   });
+  const existingUser = isValid && !activeSub;
+  // const currentValues = getValues();
+  // const userNationality = currentValues.artistNationality;
   // NOTE: Generate the upload url to use Convex's storage
+  const handleManageSubscription = useManageSubscription(subscription ?? {});
   const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const artistInfo = useQuery(api.artists.artistActions.getArtist, {});
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
@@ -79,22 +115,24 @@ export const ArtistProfileForm = ({
     api.artists.artistActions.updateOrCreateArtist,
   );
 
-  console.log(artistInfo, userName, user);
-
   useEffect(() => {
     if (!artistInfo) return;
 
     reset({
       artistName: artistInfo.artistName ?? userName,
       logo: user?.image ?? undefined,
-      nationalities: artistInfo.artistNationality ?? [],
-      residence: artistInfo.artistResidency?.full ?? "",
-      locationCity: artistInfo.artistResidency?.city ?? "",
-      locationState: artistInfo.artistResidency?.state ?? "",
-      locationStateAbbr: artistInfo.artistResidency?.stateAbbr ?? "",
-      locationCountry: artistInfo.artistResidency?.country ?? "",
-      locationCountryAbbr: artistInfo.artistResidency?.countryAbbr ?? "",
-      locationCoordinates: artistInfo.artistResidency?.location ?? [],
+      artistNationality: artistInfo.artistNationality ?? [],
+      artistResidency: {
+        full: artistInfo.artistResidency?.full ?? "",
+        city: artistInfo.artistResidency?.city ?? "",
+        state: artistInfo.artistResidency?.state ?? "",
+        stateAbbr: artistInfo.artistResidency?.stateAbbr ?? "",
+        country: artistInfo.artistResidency?.country ?? "",
+        countryAbbr: artistInfo.artistResidency?.countryAbbr ?? "",
+        location: artistInfo.artistResidency?.location ?? [],
+        timezone: artistInfo.artistResidency?.timezone ?? "",
+        timezoneOffset: artistInfo.artistResidency?.timezoneOffset ?? 0,
+      },
     });
   }, [artistInfo, reset, userName, user]);
 
@@ -102,10 +140,11 @@ export const ArtistProfileForm = ({
     let timezone: string | undefined;
     let timezoneOffset: number | undefined;
     let artistLogoStorageId: Id<"_storage"> | undefined;
-    if (data.locationCoordinates?.length === 2) {
+    const artistLocation = data?.artistResidency?.location;
+    if (artistLocation?.length === 2) {
       const timezoneData = await getTimezone({
-        latitude: data.locationCoordinates[1],
-        longitude: data.locationCoordinates[0],
+        latitude: artistLocation[1],
+        longitude: artistLocation[0],
       });
       timezone = timezoneData?.zoneName;
       timezoneOffset = timezoneData?.gmtOffset;
@@ -113,7 +152,7 @@ export const ArtistProfileForm = ({
     }
     console.log(data?.logo);
     //NOTE: Upload the image to Convex's storage and get the url in the convex mutation.
-    if (data.logo && typeof data.logo !== "string") {
+    if (data.logo && typeof data.logo !== "string" && isDirty) {
       const uploadUrl = await generateUploadUrl();
       const uploadRes = await fetch(uploadUrl, {
         method: "POST",
@@ -133,28 +172,38 @@ export const ArtistProfileForm = ({
     }
 
     try {
-      await updateArtist({
-        artistName: data.artistName,
-        artistLogoStorageId,
-        artistNationality: data.nationalities,
-        artistResidency: {
-          full: data.residence,
-          city: data.locationCity,
-          state: data.locationState,
-          stateAbbr: data.locationStateAbbr,
-          country: data.locationCountry ?? "",
-          countryAbbr: data.locationCountryAbbr ?? "",
-          location: data.locationCoordinates ?? [],
-          timezone: timezone ?? "",
-          timezoneOffset,
-        },
-      });
+      if (isDirty) {
+        await updateArtist({
+          artistName: data.artistName,
+          artistLogoStorageId,
+          artistNationality: data.artistNationality,
+          artistResidency: {
+            // full: data.residence,
+            // city: data.locationCity,
+            // state: data.locationState,
+            // stateAbbr: data.locationStateAbbr,
+            // country: data.locationCountry ?? "",
+            // countryAbbr: data.locationCountryAbbr ?? "",
+            // location: data.locationCoordinates ?? [],
+            // timezone: timezone ?? "",
+            // timezoneOffset,
+            ...data.artistResidency,
+            location: data.artistResidency?.location ?? [],
+            timezone: timezone ?? "",
+            timezoneOffset,
+          },
+        });
+      }
 
       reset();
 
       toast.success("Successfully updated profile! Forwarding to Stripe...");
       setTimeout(() => {
-        onClick();
+        if (!activeSub && !hadTrial) {
+          onClick();
+        } else {
+          handleManageSubscription();
+        }
       }, 2000);
     } catch (error) {
       console.error("Failed to submit form:", error);
@@ -206,7 +255,7 @@ export const ArtistProfileForm = ({
         <div className="flex flex-col gap-2">
           <Label>Nationality (max 3)</Label>
           <Controller
-            name="nationalities"
+            name="artistNationality"
             control={control}
             render={({ field }) => (
               <SearchMappedMultiSelect<Country>
@@ -231,49 +280,91 @@ export const ArtistProfileForm = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="residence">Residence/Location (optional)</Label>
+          <Label htmlFor="artistResidency">Residence/Location (optional)</Label>
           <Controller
-            name="residence"
+            name="artistResidency"
             control={control}
             render={({ field }) => (
-              <MapboxInput
-                id="residence"
+              // <MapboxInput
+              //   id="residence"
+              //   value={field.value}
+              //   onChange={field.onChange}
+              //   onSelect={(location) => {
+              //     setValue("residence", location.full);
+              //     setValue("locationCity", location.city);
+              //     setValue("locationState", location.state);
+              //     setValue("locationStateAbbr", location.stateAbbr);
+              //     setValue("locationCountry", location.country);
+              //     setValue("locationCountryAbbr", location.countryAbbr);
+              //     setValue("locationCoordinates", location.coordinates);
+              //   }}
+              //   tabIndex={3}
+              //   placeholder="Place of residence (city, state, country, etc)..."
+              // />
+              <MapboxInputFull
+                id="artistResidency"
                 value={field.value}
                 onChange={field.onChange}
-                onSelect={(location) => {
-                  setValue("residence", location.full);
-                  setValue("locationCity", location.city);
-                  setValue("locationState", location.state);
-                  setValue("locationStateAbbr", location.stateAbbr);
-                  setValue("locationCountry", location.country);
-                  setValue("locationCountryAbbr", location.countryAbbr);
-                  setValue("locationCoordinates", location.coordinates);
-                }}
-                tabIndex={3}
-                placeholder="Place of residence (city, state, country, etc)..."
+                onBlur={field.onBlur}
+                reset={false}
+                tabIndex={2}
+                placeholder="Place of residence (city, state, country, etc).."
+                className="mb-3 w-full lg:mb-0"
+                inputClassName="rounded-lg border-foreground "
+                isArtist={true}
               />
             )}
           />
         </div>
       </div>
+      <div className="mt-4 flex items-center justify-between">
+        {activeSub ? (
+          <span className="flex-col gap-1 text-foreground/70">
+            <p className="text-sm">Your Plan:</p>{" "}
+            <p>
+              ${subAmount}/{subInterval}
+            </p>
+          </span>
+        ) : trialingSub ? (
+          <span className="flex-col gap-1 text-foreground/70">
+            <p className="text-sm">
+              {trialEnded ? "Trial Ended:" : "Trial Ends:"}
+            </p>
+            <p className={cn("text-sm", trialEnded && "italic text-red-600")}>
+              {trialEndsAt ? formatDate(new Date(trialEndsAt), "PPP") : "N/A"}
+            </p>
+          </span>
+        ) : (
+          <div />
+        )}
 
-      <DialogFooter className="mt-4 flex justify-end gap-4 lg:gap-2">
-        <DialogClose asChild>
-          <Button type="button" size="lg" variant="salWithShadowHiddenYlw">
-            Cancel
-          </Button>
-        </DialogClose>
-        <DialogClose asChild>
-          <Button
-            type="submit"
-            size="lg"
-            variant="salWithShadowHidden"
-            disabled={!isValid}
-          >
-            Save Changes
-          </Button>
-        </DialogClose>
-      </DialogFooter>
+        <DialogFooter className="flex justify-end gap-4 lg:gap-2">
+          <DialogClose asChild>
+            <Button type="button" size="lg" variant="salWithShadowHiddenYlw">
+              Cancel
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button
+              type="submit"
+              size="lg"
+              variant="salWithShadowHidden"
+              disabled={!isValid || (!isDirty && !existingUser)}
+            >
+              {!hadTrial ? (
+                "Start Trial"
+              ) : !activeSub && (!trialingSub || trialEnded) ? (
+                <span className="flex items-center gap-x-1">
+                  Continue to Stripe
+                  <IoMdArrowRoundForward className="size-4" />
+                </span>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </div>
     </form>
   );
 };

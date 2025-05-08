@@ -12,8 +12,11 @@ import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 
 import { ArtistProfileForm } from "@/features/artists/artist-profile-form";
 import { EventOCForm } from "@/features/events/event-add-form";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
+import { usePreloadedQuery } from "convex/react";
+import { isBefore } from "date-fns";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -40,6 +43,11 @@ export const AccountSubscribeForm = ({
   children,
   onClick,
 }: AccountSubscribeFormProps) => {
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const trialEndsAt = subData?.trialEndsAt;
+  const trialEnded = trialEndsAt && isBefore(new Date(trialEndsAt), new Date());
+  const activeSub = subData?.subStatus === "active";
   const router = useRouter();
   const isArtist = mode === "artist";
   const [open, setOpen] = useState(false);
@@ -110,7 +118,13 @@ export const AccountSubscribeForm = ({
       >
         <>
           <DialogTitle className={cn(!isArtist && "sr-only")}>
-            {isArtist ? "Create Artist Profile" : "Add New Call"}
+            {isArtist
+              ? activeSub
+                ? "Update Artist Profile"
+                : trialEnded
+                  ? "Update Artist Plan"
+                  : "Create Artist Profile"
+              : "Add New Call"}
           </DialogTitle>
           {isArtist && (
             <DialogDescription>
@@ -123,6 +137,7 @@ export const AccountSubscribeForm = ({
         {isArtist ? (
           <ArtistProfileForm
             user={user}
+            subData={subData}
             onClick={onClick}
             hasUnsavedChanges={hasUnsavedChanges}
             setHasUnsavedChanges={setHasUnsavedChanges}

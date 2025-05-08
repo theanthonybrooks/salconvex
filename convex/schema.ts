@@ -54,8 +54,6 @@ const customUserSchema = {
   name: v.optional(v.string()),
   email: v.string(),
   emailVerificationTime: v.optional(v.number()),
-
-  // Your custom fields
   createdAt: v.number(),
   updatedAt: v.optional(v.number()),
   password: v.string(),

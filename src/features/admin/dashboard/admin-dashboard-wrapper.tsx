@@ -22,7 +22,7 @@ export function AdminDashboardWrapper() {
   const allEventsData = usePreloadedQuery(preloadedEventData);
   const subEventsData = usePreloadedQuery(preloadedSubmissionData);
 
-  const [viewAll, setViewAll] = useState(false);
+  const [viewAll, setViewAll] = useState(true);
 
   const eventsData = (viewAll ? allEventsData : subEventsData) ?? [];
   const adminActions = {

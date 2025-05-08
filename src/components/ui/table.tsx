@@ -8,7 +8,12 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, containerClassname, ...props }, ref) => (
-    <div className={cn("relative w-full", containerClassname)}>
+    <div
+      className={cn(
+        "scrollable mini darkbar relative w-full",
+        containerClassname,
+      )}
+    >
       <table
         ref={ref}
         className={cn("w-full caption-bottom text-sm", className)}

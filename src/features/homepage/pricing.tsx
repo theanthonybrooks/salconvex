@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { useAction, useConvexAuth } from "convex/react";
+import { useAction, usePreloadedQuery } from "convex/react";
 
 import { Separator } from "@/components/ui/separator";
 import DiscreteSlider from "@/components/ui/slider";
@@ -19,14 +19,14 @@ import {
   AccountSubscribeForm,
   ModeType,
 } from "@/features/account/account-profile-form";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
-import { ConvexError } from "convex/values";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
 type PricingSwitchProps = {
@@ -451,7 +451,7 @@ const PricingCard = ({
             variant={
               popular || isFree ? "salWithShadowPink" : "salWithShadowHiddenYlw"
             }
-            className={cn("w-full")}
+            className={cn("h-14 w-full text-lg sm:h-11 sm:text-base")}
           >
             {isArtist ? "Get" : "List"} {title}
           </Button>
@@ -466,30 +466,14 @@ const PricingCard = ({
 export default function Pricing() {
   const [isYearly, setIsYearly] = useState<boolean>(false);
 
-  const { isAuthenticated } = useConvexAuth();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
 
-  const userData = useQuery(
-    api.users.getCurrentUser,
-    isAuthenticated ? {} : "skip",
-  );
-  const subStatus = useQuery(
-    api.subscriptions.getUserSubscriptionStatus,
-    isAuthenticated ? {} : "skip",
-  );
+  const hasSub = subData?.hasActiveSubscription;
+  const subscription = subData?.subscription;
+  const handleManageSubscription = useManageSubscription(subscription ?? {});
 
-  const hasSub = subStatus?.hasActiveSubscription ?? false;
-  const subscription = useQuery(
-    api.subscriptions.getUserSubscription,
-    hasSub ? {} : "skip",
-  );
-  const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
-
-  // console.log(subscription)
-
-  // console.log("subStatus", subStatus)
-  // console.log("hasSub", hasSub)
-
-  // const isPublic = !isAuthenticated
   const user = userData?.user;
   const userAccountTypes = user?.accountType ?? [];
   // const multiType = userAccountTypes.length > 1
@@ -508,43 +492,6 @@ export default function Pricing() {
   const isOrganizer = selectedAccountType === "organizer";
   const orgAccountType = userAccountTypes.includes("organizer");
 
-  const handleManageSubscription = async () => {
-    if (!subscription?.customerId) {
-      toast.error(
-        "No subscription found. Please contact support if this is incorrect.",
-      );
-      return;
-    }
-
-    try {
-      const result = await getDashboardUrl({
-        customerId: subscription.customerId,
-      });
-      if (result?.url) {
-        window.location.href = result.url;
-      }
-    } catch (err: unknown) {
-      if (err instanceof ConvexError) {
-        toast.error(
-          typeof err.data === "string" &&
-            err.data.toLowerCase().includes("no such customer")
-            ? "Your account was cancelled. Contact support for assistance."
-            : err.data || "An unexpected error occurred.",
-        );
-      } else if (err instanceof Error) {
-        toast.error(
-          typeof err.message === "string" &&
-            err.message.toLowerCase().includes("no such customer")
-            ? "Your account was cancelled. Contact support for assistance."
-            : err.message || "An unexpected error occurred.",
-        );
-      } else {
-        toast.error("An unknown error occurred.");
-      }
-      return;
-    }
-  };
-
   useEffect(() => {
     setSelectedAccountType(accountType);
   }, [accountType]);
@@ -558,7 +505,7 @@ export default function Pricing() {
   if (!plans || !orgPlans)
     return <div className="h-screen w-screen bg-background" />;
 
-  console.log(isArtist, hasSub, isOrganizer, orgAccountType);
+  // console.log(isArtist, hasSub, isOrganizer, orgAccountType);
 
   return (
     <section id="plans" className="price-card-cont px-4 pt-6">

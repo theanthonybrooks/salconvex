@@ -8,7 +8,6 @@ import {
   NavigationMenuContent,
   // NavigationMenuIndicator,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
@@ -16,6 +15,7 @@ import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbars";
 import { Search } from "@/features/Sidebar/Search";
+import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { Unauthenticated } from "convex/react";
@@ -25,7 +25,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { ArrowUpIcon } from "lucide-react";
 
 import { usePathname } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface TheListNavBarProps {
   userId: string | undefined;
@@ -352,35 +352,3 @@ TheListNavBarProps) {
     </>
   );
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { href: string }
->(({ className, title, children, href, ...props }, ref) => {
-  return (
-    <li
-      className={cn(
-        "rounded-md transition-colors hover:bg-salPink/50",
-        className,
-      )}
-    >
-      <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          ref={ref}
-          variant="standard"
-          className={cn(
-            "outline-hidden block select-none space-y-1 p-3 leading-none no-underline",
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-foreground">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
