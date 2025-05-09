@@ -6,6 +6,13 @@ import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
+import {
+  LucideFolderCheck,
+  LucideFolderClock,
+  LucideFolderInput,
+} from "lucide-react";
+import { FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
+
 export interface EventActionProps {
   eventId: string;
 }
@@ -24,7 +31,9 @@ export const DuplicateEvent = ({ eventId }: EventActionProps) => {
       onClick={() => {
         duplicateEvent({ eventId: eventId as Id<"events"> });
       }}
+      className="flex items-center gap-x-1"
     >
+      <FaRegCopy className="size-4" />
       Duplicate
     </DropdownMenuItem>
   );
@@ -46,7 +55,9 @@ export const DeleteEvent = ({ eventId, isAdmin }: DeleteEventActionProps) => {
           },
         });
       }}
+      className="flex items-center gap-x-1"
     >
+      <FaRegTrashCan className="size-4" />
       Delete
     </DropdownMenuItem>
   );
@@ -59,7 +70,9 @@ export const ArchiveEvent = ({ eventId }: EventActionProps) => {
       onClick={() => {
         archiveEvent({ eventId: eventId as Id<"events"> });
       }}
+      className="flex items-center gap-x-1"
     >
+      <LucideFolderClock className="size-4" />
       Archive
     </DropdownMenuItem>
   );
@@ -72,7 +85,9 @@ export const ReactivateEvent = ({ eventId, state }: SubmittedActionProps) => {
       onClick={() => {
         activateEvent({ eventId: eventId as Id<"events"> });
       }}
+      className="flex items-center gap-x-1"
     >
+      <LucideFolderInput className="size-4" />
       {state === "archived" ? "Activate" : "Change to Submitted"}
     </DropdownMenuItem>
   );
@@ -85,7 +100,9 @@ export const ApproveEvent = ({ eventId }: EventActionProps) => {
       onClick={() => {
         approveEvent({ eventId: eventId as Id<"events"> });
       }}
+      className="flex items-center gap-x-1"
     >
+      <LucideFolderCheck className="size-4" />
       Approve
     </DropdownMenuItem>
   );

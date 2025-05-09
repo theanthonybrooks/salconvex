@@ -14,11 +14,11 @@ import { DataTableEventName } from "@/components/data-table/actions/data-table-e
 import {
   ApproveBoth,
   ApproveOC,
-  ArchiveOC,
   DeleteOC,
   DuplicateOC,
   ReactivateOC,
 } from "@/components/data-table/actions/data-table-oc-actions";
+import { DataTableOrgInfo } from "@/components/data-table/actions/data-table-org-info";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,7 +34,12 @@ import {
 import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventType, SubmissionFormState } from "@/types/event";
-import { CheckCircle2, Circle, MoreHorizontal } from "lucide-react";
+import {
+  CheckCircle2,
+  Circle,
+  LucideClipboardCopy,
+  MoreHorizontal,
+} from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -114,7 +119,7 @@ export const columns: ColumnDef<Event>[] = [
     },
   },
   {
-    id: "dates_edition", 
+    id: "dates_edition",
     accessorFn: (row) => row.dates.edition,
     size: 60,
     minSize: 60,
@@ -340,7 +345,10 @@ export const columns: ColumnDef<Event>[] = [
                   <MoreHorizontal className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent
+                align="end"
+                className="scrollable mini darkbar max-h-56"
+              >
                 <DropdownMenuLabel>
                   {isAdmin ? "Event" : "Actions"}
                 </DropdownMenuLabel>
@@ -376,9 +384,6 @@ export const columns: ColumnDef<Event>[] = [
                       <ApproveOC openCallId={openCallId} />
                     )}
 
-                    {ocState === "published" && (
-                      <ArchiveOC openCallId={openCallId} />
-                    )}
                     {(ocState === "archived" || ocState === "published") &&
                       isAdmin && (
                         <ReactivateOC openCallId={openCallId} state={ocState} />
@@ -388,20 +393,14 @@ export const columns: ColumnDef<Event>[] = [
                       isAdmin && <ApproveBoth openCallId={openCallId} />}
                   </>
                 )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}
+                  className="flex items-center gap-x-2"
                 >
-                  Copy Event ID
+                  <LucideClipboardCopy className="size-4" /> Event ID
                 </DropdownMenuItem>
-                {isAdmin && (
-                  <DropdownMenuItem
-                    onClick={() =>
-                      navigator.clipboard.writeText(event.mainOrgId)
-                    }
-                  >
-                    Copy Org ID
-                  </DropdownMenuItem>
-                )}
+                {isAdmin && <DataTableOrgInfo orgId={event.mainOrgId} />}
               </DropdownMenuContent>
             </DropdownMenu>
           </ConfirmingDropdown>

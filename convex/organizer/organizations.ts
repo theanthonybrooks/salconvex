@@ -195,6 +195,17 @@ export const createNewOrg = mutation({
   },
 });
 
+export const getOrgById = query({
+  args: {
+    orgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const org = await ctx.db.get(args.orgId);
+    if (!org) return null;
+    return org;
+  },
+});
+
 export const updateOrganization = mutation({
   args: {
     orgId: v.id("organizations"),

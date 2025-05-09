@@ -25,13 +25,9 @@ export function DataTableEventName({ event, dashboard }: Props) {
   const updateName = useMutation(api.events.event.updateEventName);
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-  const {
-    status,
-    isError,
-    error: errorMessage,
-  } = useQueryWithStatus(
+  const { isError, error: errorMessage } = useQueryWithStatus(
     api.events.event.checkEventNameExists,
-    localValue.trim().length >= 3
+    editMode && localValue.trim().length >= 3
       ? {
           name: localValue,
           organizationId: event.mainOrgId,
@@ -40,7 +36,6 @@ export function DataTableEventName({ event, dashboard }: Props) {
         }
       : "skip",
   );
-  console.log(status, isError, errorMessage);
 
   useEffect(() => {
     setLocalValue(event.name);
@@ -55,8 +50,30 @@ export function DataTableEventName({ event, dashboard }: Props) {
 
   const handleBlur = async () => {
     setEditMode(false);
+    // if (isError && errorMessage) {
+    //   toast.error(errorMessage.message ?? "Failed to update name.");
+    //   setLocalValue(eventName);
+    //   return;
+    // }
+
     if (isError && errorMessage) {
-      toast.error(errorMessage.message ?? "Failed to update name.");
+      // Extract just the message part from the ConvexError
+      let cleanMessage = "Failed to update name.";
+
+      if (errorMessage instanceof ConvexError && errorMessage.data) {
+        cleanMessage =
+          typeof errorMessage.data === "string"
+            ? errorMessage.data
+            : (errorMessage.data as { message?: string })?.message ||
+              cleanMessage;
+      } else if (typeof errorMessage.message === "string") {
+        const match = errorMessage.message.match(
+          /Uncaught ConvexError: (.*?)(?:\. Called by client|$)/,
+        );
+        cleanMessage = match ? match[1] : errorMessage.message;
+      }
+
+      toast.error(cleanMessage);
       setLocalValue(eventName);
       return;
     }
@@ -102,7 +119,7 @@ export function DataTableEventName({ event, dashboard }: Props) {
           onKeyDown={handleKeyDown}
           className={cn(
             "w-full rounded-md border px-2 text-base sm:text-sm",
-            isError && "border-red-600 ring-red-600",
+            isError && "border border-red-600 bg-red-200 ring-2 ring-red-600",
           )}
         />
       ) : (

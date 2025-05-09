@@ -396,7 +396,7 @@ export const updateEventName = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
-    const slug = slugify(args.name);
+    const slug = slugify(args.name, { lower: true });
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
     await ctx.db.patch(event._id, {
@@ -423,16 +423,39 @@ export const checkEventNameExists = query({
 
     for (const event of existingEvents) {
       const sameEvent = !!(args.eventId && args.eventId === event._id);
+
       const sameOrg =
         args.organizationId && args.organizationId === event.mainOrgId;
-      const diffEdition =
-        args.edition && args.edition === event.dates.edition && !!sameOrg;
-      console.log(sameEvent, sameOrg, diffEdition);
-      if (sameEvent || diffEdition) continue;
+      const sameEdition = args.edition && args.edition === event.dates.edition;
+      // console.log(
+      //   "Same Event: ",
+      //   sameEvent,
+      //   "Same Org: ",
+      //   sameOrg,
+      //   "Same Edition: ",
+      //   sameEdition,
+      // );
+      // console.log(
+      //   "Event Edition: ",
+      //   event.dates.edition,
+      //   "vs Args Edition: ",
+      //   args.edition,
+      // );
+      // console.log(
+      //   "Event Org: ",
+      //   event.mainOrgId,
+      //   "vs Args Org: ",
+      //   args.organizationId,
+      // );
+
+      if (sameEvent || (!sameEdition && !!sameOrg)) continue;
 
       throw new ConvexError(
-        "An event with that name already exists for this edition.",
+        `An event with the name ${args.name} already exists.`,
       );
+      // throw new ConvexError(
+      //   `An event with this name and edition (${args.name} - ${args.edition}) already exists.`,
+      // );
     }
 
     return true;

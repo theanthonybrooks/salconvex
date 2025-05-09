@@ -511,7 +511,7 @@ const FullPageNav = ({
                           );
                         }}
                         className={cn(
-                          "flex cursor-pointer justify-start px-9 py-4",
+                          "flex cursor-pointer justify-start px-9 py-4 active:scale-95",
                           activeCategory === section.title &&
                             "bg-foreground text-background unstroked",
                           // activeCategory === section.title &&
@@ -554,7 +554,7 @@ const FullPageNav = ({
                                       href={item.path}
                                       onClick={onHandleLinkClick}
                                       className={cn(
-                                        "block cursor-pointer py-2 transition-all duration-200 ease-in-out focus:underline focus:decoration-[5px] focus:underline-offset-4",
+                                        "block cursor-pointer py-2 transition-all duration-200 ease-in-out focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95",
                                         pathname === item.path &&
                                           "text-foreground underline decoration-[6px] underline-offset-4",
                                         // item.path.includes("dashboard") &&
@@ -721,7 +721,7 @@ const FullPageNav = ({
                               <div
                                 onClick={() => setActiveCategory(section.title)}
                                 className={cn(
-                                  "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3",
+                                  "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
                                   activeCategory === section.title &&
                                     "text-white stroked wshadow",
                                   // activeCategory === section.title &&
@@ -791,7 +791,7 @@ const FullPageNav = ({
                                   className={cn(
                                     "cursor-pointer",
                                     pathname === item.path &&
-                                      "decoration-6 translate-x-2 text-foreground underline underline-offset-4",
+                                      "decoration-6 translate-x-2 text-foreground underline underline-offset-4 active:scale-95",
                                     // item.path.includes("dashboard") &&
                                     //   "text-salPink"
                                   )}

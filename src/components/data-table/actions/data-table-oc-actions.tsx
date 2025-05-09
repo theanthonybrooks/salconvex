@@ -3,6 +3,8 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { SubmissionFormState } from "@/types/event";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
+import { LucideFolderCheck, LucideFolderInput } from "lucide-react";
+import { FaCheckDouble, FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -40,7 +42,11 @@ export const DuplicateOC = ({ openCallId }: OCActionProps) => {
     }
   };
   return (
-    <DropdownMenuItem onClick={handleOpenCallDuplicate}>
+    <DropdownMenuItem
+      onClick={handleOpenCallDuplicate}
+      className="flex items-center gap-x-1"
+    >
+      <FaRegCopy className="size-4" />
       Duplicate
     </DropdownMenuItem>
   );
@@ -60,24 +66,10 @@ export const DeleteOC = ({ openCallId, isAdmin }: DeleteOCActionProps) => {
           },
         });
       }}
+      className="flex items-center gap-x-1"
     >
+      <FaRegTrashCan className="size-4" />
       Delete
-    </DropdownMenuItem>
-  );
-};
-
-export const ArchiveOC = ({ openCallId }: OCActionProps) => {
-  const archiveOC = useMutation(api.openCalls.openCall.changeOCStatus);
-  return (
-    <DropdownMenuItem
-      onClick={() => {
-        archiveOC({
-          openCallId: openCallId as Id<"openCalls">,
-          newStatus: "archived",
-        });
-      }}
-    >
-      Archive
     </DropdownMenuItem>
   );
 };
@@ -92,7 +84,9 @@ export const ReactivateOC = ({ openCallId, state }: SubmittedOCProps) => {
           newStatus: "submitted",
         });
       }}
+      className="flex items-center gap-x-1"
     >
+      <LucideFolderInput className="size-4" />
       {state === "archived" ? "Activate" : "Change to Submitted"}
     </DropdownMenuItem>
   );
@@ -108,7 +102,9 @@ export const ApproveOC = ({ openCallId }: OCActionProps) => {
           newStatus: "published",
         });
       }}
+      className="flex items-center gap-x-1"
     >
+      <LucideFolderCheck className="size-4" />
       Approve
     </DropdownMenuItem>
   );
@@ -124,7 +120,9 @@ export const ApproveBoth = ({ openCallId }: OCActionProps) => {
           target: "both",
         });
       }}
+      className="flex items-center gap-x-1"
     >
+      <FaCheckDouble className="size-4" />
       Approve Both
     </DropdownMenuItem>
   );
