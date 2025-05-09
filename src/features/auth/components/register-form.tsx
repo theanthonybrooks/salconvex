@@ -609,7 +609,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               </AnimatePresence>
               <Button
                 disabled={isPending}
-                className="mt-6 w-full bg-white md:bg-salYellow"
+                className="mt-6 w-full bg-white text-base sm:text-base md:bg-salYellow"
                 size="lg"
                 type="submit"
                 variant="salWithShadowYlw"
@@ -702,7 +702,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 disabled={isPending || otp.length !== 6}
                 size="lg"
                 type="submit"
-                className="w-full bg-white text-base sm:bg-salYellow"
+                className="w-full bg-white text-base sm:bg-salYellow sm:text-base"
               >
                 {isLoading ? (
                   <LoaderCircle className="animate-spin" />

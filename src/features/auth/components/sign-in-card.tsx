@@ -270,7 +270,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
             </div>
           </div>
           <Button
-            className="mt-8 w-full bg-white py-6 text-base sm:mt-6 sm:py-0 md:bg-salYellow"
+            className="mt-8 w-full bg-white py-6 text-base sm:mt-6 sm:py-0 sm:text-base md:bg-salYellow"
             size="lg"
             type="submit"
             variant="salWithShadowYlw"

@@ -56,7 +56,9 @@ export const AccountSubscribeForm = ({
   const [activeStep, setActiveStep] = useState(0);
 
   const alertDialogDescription = isArtist
-    ? "You can always continue the subscription process later."
+    ? hasUnsavedChanges
+      ? "You have unsaved changes. Please save first to ensure that your changes are saved."
+      : "You can always continue the subscription process later."
     : activeStep > 0
       ? "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
       : "Sure? You can always start the submission process at a later time.";

@@ -50,8 +50,8 @@ export const ArtistProfileForm = ({
   onClick,
   user,
   subData,
-  // hasUnsavedChanges,
-  // setHasUnsavedChanges,
+  hasUnsavedChanges,
+  setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
   const userName = user?.name ? user.name : userFullName;
@@ -112,6 +112,14 @@ export const ArtistProfileForm = ({
   const updateArtist = useMutation(
     api.artists.artistActions.updateOrCreateArtist,
   );
+
+  useEffect(() => {
+    if (hasUnsavedChanges) return;
+    if (!hasUnsavedChanges && isDirty) {
+      console.log("hasUnsavedChanges", isDirty);
+      setHasUnsavedChanges(true);
+    }
+  }, [hasUnsavedChanges, isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
     if (!artistInfo) return;
