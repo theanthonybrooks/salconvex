@@ -511,7 +511,7 @@ const FullPageNav = ({
                           );
                         }}
                         className={cn(
-                          "flex cursor-pointer justify-start px-9 py-4 active:scale-95",
+                          "group flex cursor-pointer justify-start px-9 py-4",
                           activeCategory === section.title &&
                             "bg-foreground text-background unstroked",
                           // activeCategory === section.title &&
@@ -522,7 +522,9 @@ const FullPageNav = ({
                           //   "text-salYellow"
                         )}
                       >
-                        {section.title}
+                        <p className="transition-all group-active:scale-95">
+                          {section.title}
+                        </p>
                       </div>
 
                       {/* Animate the dropdown items */}
