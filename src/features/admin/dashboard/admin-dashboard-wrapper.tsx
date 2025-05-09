@@ -64,7 +64,7 @@ export function AdminDashboardWrapper() {
           adminActions={adminActions}
           tableType="events"
           className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-          containerClassName={cn("lg:hidden")}
+          outerContainerClassName={cn("lg:hidden")}
         />
       </div>
     </>

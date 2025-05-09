@@ -10,9 +10,50 @@ import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
+import slugify from "slugify";
 import { Id } from "~/convex/_generated/dataModel";
-import { mutation, query } from "~/convex/_generated/server";
+import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
+
+export async function generateUniqueNameAndSlug(
+  ctx: MutationCtx,
+  baseName: string,
+): Promise<{ name: string; slug: string }> {
+  let name = baseName;
+  let suffix = 1;
+
+  while (true) {
+    const existing = await ctx.db
+      .query("events")
+      .withIndex("by_name", (q) => q.eq("name", name))
+      .unique();
+
+    if (!existing) break;
+
+    name = `${baseName}-${suffix}`;
+    suffix++;
+  }
+
+  const slug = slugify(name);
+  return { name, slug };
+}
+
+export const updateEventLastEditedAt = mutation({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const lastEditedAt = Date.now();
+
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    await ctx.db.patch(event._id, {
+      lastEditedAt,
+    });
+
+    return { event, lastEditedAt };
+  },
+});
 
 export const getTotalNumberOfEvents = query({
   handler: async (ctx) => {
@@ -219,19 +260,26 @@ export const checkEventNameExists = query({
   args: {
     name: v.string(),
     organizationId: v.optional(v.id("organizations")),
+    eventId: v.optional(v.id("events")),
   },
   handler: async (ctx, args) => {
     const inputName = args.name.trim().toLowerCase();
 
+    console.log("inputName", inputName);
+
     const existingEvent = await filter(
       ctx.db.query("events"),
       (event) => event.name.toLowerCase() === inputName,
-    ).first();
+    ).unique();
 
-    const orgIsOwner =
-      args.organizationId && args.organizationId === existingEvent?.mainOrgId;
+    console.log("existingEvent", existingEvent);
+    console.log("inputName", inputName);
 
-    if (orgIsOwner) return true;
+
+
+    const sameEvent = args.eventId && args.eventId === existingEvent?._id;
+
+    if (sameEvent) return true;
 
     // const existing = await ctx.db
     //   .query("events")
@@ -501,9 +549,9 @@ export const createOrUpdateEvent = mutation({
     finalStep: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    console.log(args.logoStorageId, args.logo);
+    // console.log(args.logoStorageId, args.logo);
     const linksSameAsOrg = args.links?.sameAsOrganizer;
-    console.log("linksSameAsOrg", linksSameAsOrg);
+    // console.log("linksSameAsOrg", linksSameAsOrg);
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     let fileUrl = "/1.jpg" as string | null;
@@ -526,10 +574,10 @@ export const createOrUpdateEvent = mutation({
       throw new ConvexError("User not found");
     }
     const isAdmin = user?.role.includes("admin");
-    console.log("isAdmin", isAdmin);
+    // console.log("isAdmin", isAdmin);
     const organization = await ctx.db.get(args.orgId);
-    console.log("organization", organization);
-    console.log(organization?.links);
+    // console.log("organization", organization);
+    // console.log(organization?.links);
     const links = !args.links
       ? { sameAsOrganizer: false }
       : linksSameAsOrg
@@ -552,7 +600,7 @@ export const createOrUpdateEvent = mutation({
 
     if (event) {
       const isOwner = event.mainOrgId === args.orgId || isAdmin;
-      console.log("isOwner", isOwner);
+      // console.log("isOwner", isOwner);
       if (!isOwner)
         throw new ConvexError("You don't have permission to update this event");
       console.log("patching");
@@ -584,6 +632,7 @@ export const createOrUpdateEvent = mutation({
       });
 
       const updatedEvent = await ctx.db.get(event._id);
+      console.log("updatedEvent", updatedEvent);
       return { event: updatedEvent };
     }
 
@@ -700,6 +749,51 @@ export const archiveEvent = mutation({
     });
 
     return { event };
+  },
+});
+export const duplicateEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new Error("User not found");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const { name, slug } = await generateUniqueNameAndSlug(ctx, event.name);
+    const eventState = "draft";
+    const newEvent = await ctx.db.insert("events", {
+      name,
+      slug,
+      logo: event.logo,
+      logoStorageId: event.logoStorageId,
+      type: event.type,
+      category: event.category,
+      dates: {
+        ...event.dates,
+      },
+      location: {
+        ...event.location,
+      },
+      about: event.about,
+      links: event.links,
+      otherInfo: event.otherInfo,
+      active: event.active,
+      mainOrgId: event.mainOrgId,
+      organizerId: event.organizerId,
+      // mainOrgName: "",
+
+      state: eventState,
+      lastEditedAt: Date.now(),
+    });
+
+    return { event: newEvent };
   },
 });
 

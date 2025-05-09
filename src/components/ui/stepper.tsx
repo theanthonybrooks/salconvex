@@ -261,7 +261,7 @@ export default function HorizontalLinearStepper({
               {activeStep !== 0 && (
                 <Button
                   variant="salWithShadowHiddenYlw"
-                  disabled={activeStep === 0}
+                  disabled={activeStep === 0 || pending}
                   // onClick={handleBack}
                   onClick={onBackStep ?? handleBack}
                 >
@@ -277,7 +277,7 @@ export default function HorizontalLinearStepper({
               <Button
                 variant="salWithShadowHidden"
                 className="flex min-w-32 items-center gap-2"
-                disabled={disabled}
+                disabled={disabled || pending}
                 onClick={
                   activeStep === lastStep
                     ? onFinalSubmit

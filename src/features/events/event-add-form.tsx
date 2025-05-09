@@ -62,7 +62,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
-import { merge } from "lodash";
+import { debounce, merge } from "lodash";
 import { Path } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
@@ -190,6 +190,9 @@ export const EventOCForm = ({
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+  const updateEventLastEditedAt = useMutation(
+    api.events.event.updateEventLastEditedAt,
+  );
   const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
   const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -281,14 +284,14 @@ export const EventOCForm = ({
   const {
     data: orgEventsData,
     // isPending: orgEventsPending, //use this later for some loading state for the events table. Use skeleton loaders
-    isSuccess: orgEventsSuccess,
+    // isSuccess: orgEventsSuccess,
   } = useQueryWithStatus(
     api.events.event.getEventByOrgId,
     existingOrg ? { orgId: existingOrg?._id } : "skip",
   );
   const eventsData = orgEventsData ?? [];
-  const orgHasNoEvents =
-    orgEventsSuccess && eventsData?.length === 0 && !!existingOrg;
+  // const orgHasNoEvents =
+  //   orgEventsSuccess && eventsData?.length === 0 && !!existingOrg;
   const eventChoiceMade = !!(existingEvent || newOrgEvent || !existingOrg);
 
   const category = eventData?.category as EventCategory;
@@ -312,7 +315,11 @@ export const EventOCForm = ({
     useQueryWithStatus(
       api.events.event.checkEventNameExists,
       eventName && eventName.trim().length >= 3
-        ? { name: eventName, organizationId: existingOrg?._id }
+        ? {
+            name: eventName,
+            organizationId: existingOrg?._id,
+            eventId: existingEvent?._id,
+          }
         : "skip",
     );
 
@@ -469,7 +476,12 @@ export const EventOCForm = ({
 
   const handleFirstStep = () => {
     if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
-      const eventLinks = existingEvent?.links ?? { sameAsOrganizer: true };
+      const eventLinks = existingEvent?.links
+        ? existingEvent.links
+        : existingOrg?.links
+          ? { ...existingOrg.links, sameAsOrganizer: true }
+          : { sameAsOrganizer: false };
+
       const locationFromEvent = existingEvent?.location?.full
         ? existingEvent?.location?.sameAsOrganizer
           ? {
@@ -519,7 +531,7 @@ export const EventOCForm = ({
               noProdStart: false,
             },
             links: {
-              sameAsOrganizer: true,
+              ...eventLinks,
             },
             hasOpenCall: "false",
           },
@@ -527,6 +539,7 @@ export const EventOCForm = ({
         console.log("waffles");
         console.log(currentValues, eventData);
       }
+      canClearEventData.current = true;
     }
   };
 
@@ -587,6 +600,7 @@ export const EventOCForm = ({
       let orgResult = null;
 
       if (hasUserEditedStep0) {
+        console.log("user edited step 0");
         const result = await handleFileUrl({
           data: orgData,
           generateUploadUrl,
@@ -723,24 +737,46 @@ export const EventOCForm = ({
       }
       // await handleFormValues();
       if (activeStep === 1 && hasUserEditedEventSteps) {
-        const result = await handleFileUrl({
-          data: eventData,
-          generateUploadUrl,
-          getTimezone,
-        });
+        let result = {
+          logoUrl: eventData?.logo as string,
+          logoStorageId: eventData?.logoStorageId as Id<"_storage"> | undefined,
+          timezone: existingEvent?.location?.timezone,
+          timezoneOffset: existingEvent?.location?.timezoneOffset,
+        };
 
-        console.log(result);
+        const needsUpload =
+          (eventData?.logo && typeof eventData.logo !== "string") ||
+          !eventData?.logoStorageId;
 
-        if (!result) {
-          toast.error("Failed to upload logo", {
-            autoClose: 2000,
-            pauseOnHover: false,
-            hideProgressBar: true,
+        if (needsUpload) {
+          console.log("needs upload");
+          const uploadResult = await handleFileUrl({
+            data: eventData,
+            generateUploadUrl,
+            getTimezone,
           });
-          return;
+
+          if (!uploadResult) {
+            toast.error("Failed to upload logo", {
+              autoClose: 2000,
+              pauseOnHover: false,
+              hideProgressBar: true,
+            });
+            return;
+          }
+          result = uploadResult;
+          console.log(result);
         }
+        console.log("doesnt need upload");
         const { logoUrl, logoStorageId, timezone, timezoneOffset } = result;
+        console.log(logoUrl, logoStorageId, timezone, timezoneOffset);
         let eventResult = null;
+        let eventLogo = "1.jpg";
+
+        if (typeof logoUrl === "string") {
+          eventLogo = logoUrl;
+        }
+
         try {
           setPending(true);
           const prodDates =
@@ -752,7 +788,7 @@ export const EventOCForm = ({
             name: eventData.name,
             slug: slugify(eventData.name),
             logoStorageId,
-            logo: logoUrl,
+            logo: eventLogo,
             type: eventData.type || [],
             category: eventData.category,
             dates: {
@@ -784,6 +820,7 @@ export const EventOCForm = ({
               event,
             }),
           );
+          setPending(false);
         } catch (error) {
           console.error("Failed to create new event:", error);
           toast.error("Failed to create new event");
@@ -791,10 +828,12 @@ export const EventOCForm = ({
         }
       }
       if (activeStep === 2 && hasUserEditedEventSteps) {
+        let eventResult = null;
+
         try {
           setPending(true);
 
-          await createOrUpdateEvent({
+          const { event } = await createOrUpdateEvent({
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name),
@@ -814,6 +853,10 @@ export const EventOCForm = ({
             active: eventData.active,
             orgId: orgData._id as Id<"organizations">,
           });
+
+          eventResult = event;
+
+          setExistingEvent(eventResult);
 
           reset(
             merge({}, currentValues, {
@@ -853,12 +896,26 @@ export const EventOCForm = ({
             links: orgData.links,
           });
 
-          //TODO: Add logic to update form data with resulting data (if it's necessary?)
-
           if (!result) {
             toast.error("Failed to update organization");
             setPending(false);
             return;
+          }
+          let lastEditedResult = null;
+          if (existingEvent?._id) {
+            lastEditedResult = await updateEventLastEditedAt({
+              eventId: existingEvent._id,
+            });
+          }
+          if (lastEditedResult) {
+            const lastEditedAt = lastEditedResult.lastEditedAt;
+            setLastSaved(lastEditedAt);
+            if (existingEvent) {
+              setExistingEvent({
+                ...existingEvent,
+                lastEditedAt,
+              });
+            }
           }
 
           reset({
@@ -879,11 +936,12 @@ export const EventOCForm = ({
       }
       if (activeStep === steps.length - 1) {
         console.log("saving final step");
+        let eventResult = null;
 
         try {
           setPending(true);
 
-          await createOrUpdateEvent({
+          const { event } = await createOrUpdateEvent({
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name),
@@ -904,6 +962,8 @@ export const EventOCForm = ({
             finalStep: true,
             orgId: orgData._id as Id<"organizations">,
           });
+          eventResult = event;
+          setExistingEvent(eventResult);
 
           setPending(false);
         } catch (error) {
@@ -925,6 +985,7 @@ export const EventOCForm = ({
       hasUserEditedEventSteps,
       eventData,
       updateOrg,
+      updateEventLastEditedAt,
       createOrUpdateEvent,
       existingEvent,
       currentValues,
@@ -954,12 +1015,20 @@ export const EventOCForm = ({
     // setValue("organization.name", "");
   };
 
+  const updateLastChanged = useMemo(
+    () =>
+      debounce(() => {
+        lastChangedRef.current = Date.now();
+      }, 500),
+    [],
+  );
+
   // -------------UseEffects --------------
   useEffect(() => {
     if (hasUserEditedForm) {
-      lastChangedRef.current = Date.now();
+      updateLastChanged();
     }
-  }, [watchedValues, hasUserEditedForm]);
+  }, [watchedValues, updateLastChanged, hasUserEditedForm]);
 
   useEffect(() => {
     console.log(orgData);
@@ -996,18 +1065,36 @@ export const EventOCForm = ({
     }
   }, [scrollTrigger, canNameEvent, activeStep, firstTimeOnStep, existingEvent]);
 
+  // useEffect(() => {
+  //   if (!schema || !hasUserEditedForm) return;
+  //   const serialized = JSON.stringify(errors);
+
+  //   // Only run handleCheckSchema if error content has changed
+  //   if (serialized !== prevErrorJson.current) {
+  //     prevErrorJson.current = serialized;
+  //     canCheckSchema.current = true;
+  //   }
+  // }, [schema, hasUserEditedForm, errors]);
+
   useEffect(() => {
     if (!schema || !hasUserEditedForm) return;
-    const serialized = JSON.stringify(errors);
-    console.log("errors changed", serialized);
 
-    // Only run handleCheckSchema if error content has changed
-    if (serialized !== prevErrorJson.current) {
-      console.log("error changed");
-      prevErrorJson.current = serialized;
-      canCheckSchema.current = true;
-    }
-  }, [currentValues, schema, hasUserEditedForm, errors]);
+    const debouncedCheck = debounce(() => {
+      const serialized = JSON.stringify(errors);
+      console.log("errors changed", serialized);
+      if (serialized !== prevErrorJson.current) {
+        console.log("error changed");
+        prevErrorJson.current = serialized;
+        canCheckSchema.current = true;
+      }
+    }, 300);
+
+    debouncedCheck();
+
+    return () => {
+      debouncedCheck.cancel();
+    };
+  }, [errors, schema, hasUserEditedForm]);
 
   useEffect(() => {
     if (!canCheckSchema.current) {
@@ -1019,11 +1106,11 @@ export const EventOCForm = ({
     }
 
     if (!isStepValidZod && hasUserEditedForm) {
-      console.log("step invalid");
+      // console.log("step invalid");
       handleCheckSchema(false);
       canCheckSchema.current = false;
     } else if (isStepValidZod && hasUserEditedForm) {
-      console.log("step valid");
+      // console.log("step valid");
       canCheckSchema.current = false;
       setErrorMsg("");
     }
@@ -1032,7 +1119,7 @@ export const EventOCForm = ({
   useEffect(() => {
     if (!isValid || !hasUserEditedForm || pending) return;
     const interval = setInterval(() => {
-      console.log("checking");
+      // console.log("checking");
       const now = Date.now();
 
       const last =
@@ -1040,7 +1127,7 @@ export const EventOCForm = ({
           ? lastSaved
           : new Date(lastSaved ?? 0).getTime();
       const lastChanged = lastChangedRef.current ?? 0;
-      const shouldSave = now - lastChanged >= 60000 && lastChanged > last;
+      const shouldSave = now - last >= 60000 && now - lastChanged >= 15000;
       console.log(now, last);
 
       if (shouldSave) {
@@ -1130,6 +1217,7 @@ export const EventOCForm = ({
         },
       });
       prevEventRef.current = existingEvent;
+      canClearEventData.current = true;
     } else if (!existingEvent) {
       setLastSaved(null);
     }
@@ -1151,8 +1239,6 @@ export const EventOCForm = ({
     }
   }, [eventLastEditedAt, lastSaved]);
 
-  //todo: add logic to autosave every... X minutes? but only save if changes have been made since last save
-
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)");
     setIsMobile(mediaQuery.matches);
@@ -1170,22 +1256,38 @@ export const EventOCForm = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (orgHasNoEvents && activeStep === 0) {
-      setNewOrgEvent(true);
-    }
-  }, [orgHasNoEvents, activeStep]);
+  // useEffect(() => {
+  //   if (orgHasNoEvents && activeStep === 0) {
+  //     setNewOrgEvent(true);
+  //   }
+  // }, [orgHasNoEvents, activeStep]);
 
   useEffect(() => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
   }, [activeStep, furthestStep]);
 
   useEffect(() => {
+    if (newOrgEvent) return;
+    if (!newOrgEvent && isSelectedRowEmpty) {
+      setSelectedRow({ 0: true });
+    }
+  }, [newOrgEvent, isSelectedRowEmpty]);
+
+  useEffect(() => {
+    if (selectedRow && Object.keys(selectedRow).length > 0) {
+      canClearEventData.current = true;
+    } else if (isSelectedRowEmpty) {
+      console.log("empty row");
+      // canClearEventData.current = false;
+      setNewOrgEvent(true);
+    }
+    console.log(isSelectedRowEmpty);
     console.log("selected row", selectedRow);
-  }, [selectedRow]);
+  }, [selectedRow, isSelectedRowEmpty]);
 
   useEffect(() => {
     if (clearEventDataTrigger) {
+      console.log("hmm");
       setFurthestStep(0);
       setSelectedRow({});
       console.log("clearing event data", eventData);
@@ -1358,7 +1460,7 @@ export const EventOCForm = ({
         <FormProvider {...form}>
           <form
             onSubmit={handleSubmit((data) => onSubmit(data, hasOC))}
-            className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px]"
+            className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px] 3xl:max-w-[2000px]"
           >
             {activeStep === 0 && (
               <SubmissionFormOrgStep

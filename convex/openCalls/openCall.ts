@@ -68,6 +68,44 @@ export const getOpenCallByEventId = query({
 //   },
 // });
 
+export const duplicateOC = mutation({
+  args: {
+    openCallId: v.id("openCalls"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const openCall = await ctx.db.get(args.openCallId);
+    if (!openCall) return null;
+
+    const newOpenCall = await ctx.db.insert("openCalls", {
+      adminNoteOC: openCall.adminNoteOC,
+      eventId: openCall.eventId,
+      organizerId: openCall.organizerId,
+      mainOrgId: openCall.mainOrgId,
+      basicInfo: {
+        ...openCall.basicInfo,
+      },
+      eligibility: {
+        ...openCall.eligibility,
+        type: openCall.eligibility.type,
+        whom: openCall.eligibility.whom,
+      },
+      compensation: {
+        ...openCall.compensation,
+      },
+      requirements: {
+        ...openCall.requirements,
+      },
+      state: "draft",
+      lastUpdatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
+
+    return { openCall: newOpenCall };
+  },
+});
+
 export const deleteOC = mutation({
   args: {
     openCallId: v.id("openCalls"),

@@ -60,11 +60,6 @@ const SubmissionFormOrgStep = ({
   const {
     control,
     watch,
-    // reset,
-    // setValue,
-    // getValues,
-    // setError,
-    // trigger,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
@@ -72,33 +67,6 @@ const SubmissionFormOrgStep = ({
   const orgName = orgData?.name ?? "";
   const bottomRef = useRef<HTMLParagraphElement | null>(null);
   const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
-
-  // useEffect(() => {
-  //   if (newOrgEvent) {
-  //     reset({
-  //       ...currentValues,
-  //       event: {
-  //         // name: "",
-  //         logo: currentValues.organization.logo,
-  //         logoStorageId: currentValues.organization.logoStorageId,
-  //         location: {
-  //           ...currentValues.organization.location,
-  //           sameAsOrganizer: true,
-  //         },
-  //         dates: {
-  //           edition: new Date().getFullYear(),
-  //           eventFormat: undefined,
-  //           prodFormat: undefined,
-  //           noProdStart: false,
-  //         },
-  //         links: {
-  //           sameAsOrganizer: true,
-  //         },
-  //         hasOpenCall: "false",
-  //       },
-  //     });
-  //   }
-  // }, [newOrgEvent, reset, currentValues]);
 
   useEffect(() => {
     if (scrollTrigger) {
@@ -109,306 +77,305 @@ const SubmissionFormOrgStep = ({
   }, [scrollTrigger]);
 
   return (
-    //   {activeStep === 0 && ( //pass this from the parent, not here
-    <>
-      <div
-        id="step-1-container"
-        className={cn(
-          "flex h-full flex-col gap-4 xl:justify-center",
-          existingOrg && "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
-        )}
+    <div
+      id="step-1-container"
+      className={cn(
+        "flex h-full flex-col gap-4 xl:justify-center",
+        existingOrg && "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
+      )}
+    >
+      <section
+        id="first-section"
+        className="mx-auto flex flex-col items-center gap-y-6 self-start lg:self-center xl:justify-center"
       >
-        <section
-          id="first-section"
-          className="mx-auto flex flex-col items-center gap-y-6 self-start xl:justify-center 3xl:self-center"
-        >
-          <section className="flex flex-col items-center justify-center">
-            <div
-              id="welcome-text"
-              className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]"
-            >
-              Welcome{" "}
-              <AnimatePresence>
-                {existingOrgs && validOrgWZod && (
-                  <motion.span
-                    key="back-text"
-                    initial={{ opacity: 0, rotate: -10 }}
-                    animate={{
-                      opacity: 1,
-                      rotate: [0, -10, 10, -8, 8, -5, 5, 0],
-                    }}
-                    exit={{ opacity: 0 }}
-                    transition={{
-                      duration: 0.6,
-                      ease: "easeOut",
-                    }}
-                    className="inline-block"
-                  >
-                    Back
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
-            <p className="hidden text-balance text-center text-xl lg:block lg:text-base">
-              To start, select from an existing organization or create a new
-              one!
-            </p>
-          </section>
+        <section className="flex flex-col items-center justify-center">
           <div
-            className={cn(
-              "flex w-full grid-cols-[20%_auto] flex-col items-center lg:mx-auto lg:grid lg:max-w-[500px] lg:gap-6 lg:gap-x-4",
-              "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-            )}
+            id="welcome-text"
+            className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]"
           >
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
-              <p className="lg:text-xs">Organization</p>
-            </div>
-            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="organization.name" className="sr-only">
-                Organization Name
-              </Label>
-              <Controller
-                name="organization.name"
-                control={control}
-                render={({ field }) => (
-                  <OrgSearch
-                    id="organization.name"
-                    value={field.value}
-                    onChange={field.onChange}
-                    isValid={validOrgWZod}
-                    validationError={invalidOrgWZod}
-                    onLoadClick={setExistingOrg}
-                    onReset={handleReset}
-                    placeholder="Search or enter new name"
-                    className="mb-3 h-12 lg:mb-0 lg:h-20"
-                    inputClassName="rounded-lg py-2 text-base lg:text-xl"
-                    tabIndex={1}
-                  />
-                )}
-              />
-              {(orgValidationError ||
-                (errors.organization?.name && orgName.length > 3)) && (
-                <span className="mt-2 w-full text-center text-sm text-red-600">
-                  {errors.organization?.name?.message ||
-                    "Organization already exists. Contact support for assistance"}
-                </span>
+            Welcome{" "}
+            <AnimatePresence>
+              {existingOrgs && validOrgWZod && (
+                <motion.span
+                  key="back-text"
+                  initial={{ opacity: 0, rotate: -10 }}
+                  animate={{
+                    opacity: 1,
+                    rotate: [0, -10, 10, -8, 8, -5, 5, 0],
+                  }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeOut",
+                  }}
+                  className="inline-block"
+                >
+                  Back
+                </motion.span>
               )}
-            </div>
-
-            {orgNameValid && (
-              <>
-                <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
-                  <p className="lg:text-xs">Location</p>
-                </div>
-                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="organization.location" className="sr-only">
-                    Organization Location
-                  </Label>
-                  <Controller
-                    name="organization.location"
-                    control={control}
-                    shouldUnregister={false}
-                    render={({ field }) => (
-                      <MapboxInputFull
-                        id="organization.location"
-                        value={field.value}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        reset={!validOrgWZod}
-                        tabIndex={2}
-                        disabled={!orgNameValid}
-                        placeholder="Organization Location (city, state, country, etc)..."
-                        className="mb-3 w-full lg:mb-0"
-                        inputClassName="rounded-lg border-foreground "
-                      />
-                    )}
-                  />
-                  {errors.organization?.location && orgData?.location && (
-                    <span className="mt-2 w-full text-center text-sm text-red-600">
-                      {errors.organization?.location?.country?.message
-                        ? errors.organization?.location?.country?.message
-                        : errors.organization?.location?.full?.message
-                          ? errors.organization?.location?.full?.message
-                          : "Please select a location from the dropdown"}
-                    </span>
-                  )}
-                </div>
-              </>
-            )}
-
-            {orgLocationValid && (
-              <>
-                <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
-                  <p className="lg:text-xs">Logo</p>
-                </div>
-                <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="organization.logo" className="sr-only">
-                    Organization Logo
-                    {/* <span className="text-xs italic text-muted-foreground">
-                            {required ? "(required)" : "(optional)"}
-                          </span> */}
-                  </Label>
-                  <Controller
-                    name="organization.logo"
-                    control={control}
-                    render={({ field }) => (
-                      <AvatarUploader
-                        id="organization.logo"
-                        onChange={(file) => field.onChange(file)}
-                        onRemove={() => field.onChange(undefined)}
-                        reset={!validOrgWZod}
-                        disabled={!orgNameValid}
-                        initialImage={existingOrg?.logo}
-                        size={72}
-                        tabIndex={3}
-                      />
-                    )}
-                  />
-                </div>
-              </>
+            </AnimatePresence>
+          </div>
+          <p className="hidden text-balance text-center text-xl lg:block lg:text-base">
+            To start, select from an existing organization or create a new one!
+          </p>
+        </section>
+        <div
+          className={cn(
+            "flex w-full grid-cols-[20%_auto] flex-col items-center lg:mx-auto lg:grid lg:max-w-[500px] lg:gap-6 lg:gap-x-4",
+            "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+          )}
+        >
+          <div className="input-section">
+            <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
+            <p className="lg:text-xs">Organization</p>
+          </div>
+          <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <Label htmlFor="organization.name" className="sr-only">
+              Organization Name
+            </Label>
+            <Controller
+              name="organization.name"
+              control={control}
+              render={({ field }) => (
+                <OrgSearch
+                  id="organization.name"
+                  value={field.value}
+                  onChange={field.onChange}
+                  isValid={validOrgWZod}
+                  validationError={invalidOrgWZod}
+                  onLoadClick={setExistingOrg}
+                  onReset={handleReset}
+                  placeholder="Search or enter new name"
+                  className="mb-3 h-12 lg:mb-0 lg:h-20"
+                  inputClassName="rounded-lg py-2 text-base lg:text-xl"
+                  tabIndex={1}
+                />
+              )}
+            />
+            {(orgValidationError ||
+              (errors.organization?.name && orgName.length > 3)) && (
+              <span className="mt-2 w-full text-center text-sm text-red-600">
+                {errors.organization?.name?.message ||
+                  "Organization already exists. Contact support for assistance"}
+              </span>
             )}
           </div>
-        </section>
-        {/* second half of first page */}
-        {orgDataValid && existingOrg && (
-          <>
-            <Separator thickness={2} className="my-4 xl:hidden" />
-            {existingOrg && (
-              <Separator
-                thickness={2}
-                className="mx-auto hidden xl:block"
-                orientation="vertical"
-              />
-            )}
-            <section className="flex flex-col items-center justify-center gap-4">
-              <div
-                id="event-header"
-                className="mb-2 flex w-full flex-col items-center justify-center gap-2 sm:flex-row"
-              >
-                <p className="font-tanker text-xl lowercase tracking-wide text-foreground sm:text-2xl">
-                  Select an existing Event/Project
-                </p>
-                <p className="text-sm italic text-muted-foreground">
-                  (or continue a draft)
-                </p>
-              </div>
-              <div className="w-full rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-5">
-                <label
-                  className={cn(
-                    "flex cursor-pointer items-start gap-2 md:items-center",
-                    // existingEvent !== null &&
-                    //   "pointer-events-none opacity-50 hover:cursor-default",
-                  )}
-                >
-                  <Checkbox
-                    // disabled={existingEvent !== null}
-                    tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
-                    id="newEvent"
-                    className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                    checked={eventsData?.length === 0 ? true : newOrgEvent}
-                    onCheckedChange={(checked) => {
-                      setExistingEvent(null);
-                      if (eventsData?.length === 0) {
-                        setNewOrgEvent(true);
-                      } else {
-                        setNewOrgEvent(!!checked);
-                      }
-                    }}
-                  />
 
-                  <span className="text-sm">
-                    I&apos;d like to create a new event/project
-                  </span>
-                </label>
+          {orgNameValid && (
+            <>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
+                <p className="lg:text-xs">Location</p>
               </div>
-              <DataTable
-                columns={columns}
-                data={eventsData}
-                defaultVisibility={{
-                  type: false,
-                  category: false,
-                  lastEditedAt: false,
-                }}
-                onRowSelect={(event, selection) => {
-                  if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                    console.log("falsito");
-                    setNewOrgEvent(false);
-                  } else if (
-                    !newOrgEvent &&
-                    Object.keys(selectedRow).length === 0
-                  ) {
-                    setNewOrgEvent(true);
-                  }
-                  setExistingEvent(event as EnrichedEvent);
-                  setSelectedRow(selection);
-                }}
-                selectedRow={selectedRow}
-                className="w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
-                containerClassName={cn(
-                  "lg:hidden",
-                  newOrgEvent && "opacity-80",
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="organization.location" className="sr-only">
+                  Organization Location
+                </Label>
+                <Controller
+                  name="organization.location"
+                  control={control}
+                  shouldUnregister={false}
+                  render={({ field }) => (
+                    <MapboxInputFull
+                      id="organization.location"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      reset={!validOrgWZod}
+                      tabIndex={2}
+                      disabled={!orgNameValid}
+                      placeholder="Organization Location (city, state, country, etc)..."
+                      className="mb-3 w-full lg:mb-0"
+                      inputClassName="rounded-lg border-foreground "
+                    />
+                  )}
+                />
+                {errors.organization?.location && orgData?.location && (
+                  <span className="mt-2 w-full text-center text-sm text-red-600">
+                    {errors.organization?.location?.country?.message
+                      ? errors.organization?.location?.country?.message
+                      : errors.organization?.location?.full?.message
+                        ? errors.organization?.location?.full?.message
+                        : "Please select a location from the dropdown"}
+                  </span>
                 )}
-                tableType="events"
-              />
-              <DataTable
-                columns={columns}
-                data={eventsData}
-                onRowSelect={(event, selection) => {
-                  if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                    console.log("falsito");
-                    setNewOrgEvent(false);
-                  } else if (
-                    !newOrgEvent &&
-                    Object.keys(selectedRow).length === 0
-                  ) {
-                    setNewOrgEvent(true);
-                  }
-                  setExistingEvent(event as EnrichedEvent);
-                  setSelectedRow(selection);
-                }}
-                selectedRow={selectedRow}
-                className="flex w-full max-w-[90vw] overflow-x-auto"
-                containerClassName={cn(
-                  "hidden lg:block xl:hidden  ",
-                  newOrgEvent && "opacity-80",
+              </div>
+            </>
+          )}
+
+          {orgLocationValid && (
+            <>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
+                <p className="lg:text-xs">Logo</p>
+              </div>
+              <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="organization.logo" className="sr-only">
+                  Organization Logo
+                  {/* <span className="text-xs italic text-muted-foreground">
+                            {required ? "(required)" : "(optional)"}
+                          </span> */}
+                </Label>
+                <Controller
+                  name="organization.logo"
+                  control={control}
+                  render={({ field }) => (
+                    <AvatarUploader
+                      id="organization.logo"
+                      onChange={(file) => field.onChange(file)}
+                      onRemove={() => field.onChange(undefined)}
+                      reset={!validOrgWZod}
+                      disabled={!orgNameValid}
+                      initialImage={existingOrg?.logo}
+                      size={72}
+                      tabIndex={3}
+                    />
+                  )}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+      {/* second half of first page */}
+      {orgDataValid && existingOrg && (
+        <>
+          <Separator thickness={2} className="my-4 xl:hidden" />
+          {existingOrg && (
+            <Separator
+              thickness={2}
+              className="mx-auto hidden xl:block"
+              orientation="vertical"
+            />
+          )}
+          <section className="flex flex-col items-center justify-center gap-4">
+            <div
+              id="event-header"
+              className="mb-2 flex w-full flex-col items-center justify-center gap-2 sm:flex-row"
+            >
+              <p className="font-tanker text-xl lowercase tracking-wide text-foreground sm:text-2xl">
+                Select an existing Event/Project
+              </p>
+              <p className="text-sm italic text-muted-foreground">
+                (or continue a draft)
+              </p>
+            </div>
+            <div className="w-full rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-5">
+              <label
+                className={cn(
+                  "flex cursor-pointer items-start gap-2 md:items-center",
+                  // existingEvent !== null &&
+                  //   "pointer-events-none opacity-50 hover:cursor-default",
                 )}
-                tableType="events"
-              />
-              <DataTable
-                columns={columns}
-                data={eventsData}
-                onRowSelect={(event, selection) => {
-                  if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                    console.log("falsito");
-                    setNewOrgEvent(false);
-                  } else if (
-                    !newOrgEvent &&
-                    Object.keys(selectedRow).length === 0
-                  ) {
-                    setNewOrgEvent(true);
-                  }
-                  setExistingEvent(event as EnrichedEvent);
-                  setSelectedRow(selection);
-                }}
-                selectedRow={selectedRow}
-                defaultVisibility={{
-                  category: false,
-                  type: false,
-                  // lastEditedAt: false,
-                }}
-                className="flex w-full max-w-[45vw] overflow-x-auto"
-                containerClassName={cn(
-                  "hidden xl:block ",
-                  newOrgEvent && "opacity-80",
-                )}
-                tableType="events"
-              />
-              {/* 
+              >
+                <Checkbox
+                  // disabled={existingEvent !== null}
+                  tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
+                  id="newEvent"
+                  className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                  checked={eventsData?.length === 0 ? true : newOrgEvent}
+                  onCheckedChange={(checked) => {
+                    setExistingEvent(null);
+                    if (eventsData?.length === 0) {
+                      setNewOrgEvent(true);
+                    } else {
+                      setNewOrgEvent(!!checked);
+                    }
+                  }}
+                />
+
+                <span className="text-sm">
+                  I&apos;d like to create a new event/project
+                </span>
+              </label>
+            </div>
+            <DataTable
+              columns={columns}
+              data={eventsData}
+              defaultVisibility={{
+                type: false,
+                category: false,
+                lastEditedAt: false,
+              }}
+              onRowSelect={(event, selection) => {
+                if (newOrgEvent && Object.keys(selectedRow).length > 0) {
+                  console.log("falsito");
+                  setNewOrgEvent(false);
+                } else if (
+                  !newOrgEvent &&
+                  Object.keys(selectedRow).length === 0
+                ) {
+                  setNewOrgEvent(true);
+                }
+                setExistingEvent(event as EnrichedEvent);
+                setSelectedRow(selection);
+              }}
+              selectedRow={selectedRow}
+              className="w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn(
+                "lg:hidden",
+                newOrgEvent && "opacity-80",
+              )}
+              tableType="events"
+            />
+            <DataTable
+              columns={columns}
+              data={eventsData}
+              onRowSelect={(event, selection) => {
+                if (newOrgEvent && Object.keys(selectedRow).length > 0) {
+                  console.log("falsito");
+                  setNewOrgEvent(false);
+                } else if (
+                  !newOrgEvent &&
+                  Object.keys(selectedRow).length === 0
+                ) {
+                  setNewOrgEvent(true);
+                }
+                setExistingEvent(event as EnrichedEvent);
+                setSelectedRow(selection);
+              }}
+              selectedRow={selectedRow}
+              className="flex w-full max-w-[90vw] overflow-x-auto"
+              tableClassName="sm:max-h-52"
+              outerContainerClassName={cn(
+                "hidden lg:block xl:hidden  ",
+                newOrgEvent && "opacity-80",
+              )}
+              tableType="events"
+            />
+            <DataTable
+              columns={columns}
+              data={eventsData}
+              onRowSelect={(event, selection) => {
+                if (newOrgEvent && Object.keys(selectedRow).length > 0) {
+                  console.log("falsito");
+                  setNewOrgEvent(false);
+                } else if (
+                  !newOrgEvent &&
+                  Object.keys(selectedRow).length === 0
+                ) {
+                  setNewOrgEvent(true);
+                }
+                setExistingEvent(event as EnrichedEvent);
+                setSelectedRow(selection);
+              }}
+              selectedRow={selectedRow}
+              defaultVisibility={{
+                category: false,
+                type: false,
+                // lastEditedAt: false,
+              }}
+              className="flex w-full max-w-[45vw] overflow-x-auto"
+              tableClassName="sm:max-h-52"
+              outerContainerClassName={cn(
+                "hidden xl:block ",
+                newOrgEvent && "opacity-80",
+              )}
+              tableType="events"
+            />
+            {/* 
                           <span>or</span> */}
-              {/* <Button
+            {/* <Button
                             variant="outline"
                             size="sm"
                             className="w-full"
@@ -419,18 +386,18 @@ const SubmissionFormOrgStep = ({
                             Create New Event
                           </Button> */}
 
-              <p
-                ref={bottomRef}
-                className="mt-2 text-pretty text-center text-xs italic text-muted-foreground"
-              >
-                Past events are no longer editable but are still viewable and
-                able to be used as a template for new events.
-              </p>
-            </section>
-          </>
-        )}
-      </div>
-    </>
+            <p
+              ref={bottomRef}
+              className="mt-2 text-pretty text-center text-xs italic text-muted-foreground"
+            >
+              Past events are no longer editable but are still viewable and able
+              to be used as a template for new events.
+            </p>
+          </section>
+        </>
+      )}
+    </div>
+
     //   )}
   );
 };

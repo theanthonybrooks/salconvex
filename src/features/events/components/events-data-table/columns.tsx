@@ -6,6 +6,7 @@ import {
   ApproveEvent,
   ArchiveEvent,
   DeleteEvent,
+  DuplicateEvent,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
 import {
@@ -13,6 +14,7 @@ import {
   ApproveOC,
   ArchiveOC,
   DeleteOC,
+  DuplicateOC,
   ReactivateOC,
 } from "@/components/data-table/actions/data-table-oc-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -327,6 +329,9 @@ export const columns: ColumnDef<Event>[] = [
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
+
+                <DuplicateEvent eventId={event._id} />
+
                 {(state === "draft" || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
@@ -350,6 +355,7 @@ export const columns: ColumnDef<Event>[] = [
                       Open Call
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DuplicateOC openCallId={openCallId} />
                     {(ocState === "draft" || isAdmin) && (
                       <DeleteOC openCallId={openCallId} isAdmin={isAdmin} />
                     )}

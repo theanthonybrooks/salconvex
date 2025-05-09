@@ -17,6 +17,19 @@ interface DeleteOCActionProps extends OCActionProps {
   isAdmin: boolean | undefined;
 }
 
+export const DuplicateOC = ({ openCallId }: OCActionProps) => {
+  const duplicateOC = useMutation(api.openCalls.openCall.duplicateOC);
+  return (
+    <DropdownMenuItem
+      onClick={() => {
+        duplicateOC({ openCallId: openCallId as Id<"openCalls"> });
+      }}
+    >
+      Duplicate
+    </DropdownMenuItem>
+  );
+};
+
 export const DeleteOC = ({ openCallId, isAdmin }: DeleteOCActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteOC = useMutation(api.openCalls.openCall.deleteOC);

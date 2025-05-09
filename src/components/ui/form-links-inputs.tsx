@@ -3,10 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { autoHttps, formatHandleInput, PlatformType } from "@/lib/linkFns";
 import { cn } from "@/lib/utils";
-import { debounce } from "lodash";
 import { HiArrowTurnRightDown } from "react-icons/hi2";
 
-import { useEffect, useRef, useState } from "react";
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   FaEnvelope,
@@ -76,7 +75,7 @@ export const FormLinksInput = ({
   return (
     <>
       <div className={cn("flex max-w-[80dvw] flex-col gap-y-2")}>
-        {existingOrgHasLinks && eventSameAsOrg && isEvent && (
+        {existingOrgHasLinks && isEvent && (
           <Controller
             name="event.links.sameAsOrganizer"
             control={control}
@@ -105,7 +104,12 @@ export const FormLinksInput = ({
           </div>
         )}
         {/* Static fields */}
-        <div className={cn(isEvent && "overflow-hidden", !hideLinks && "mb-2")}>
+        <div
+          className={cn(
+            isEvent && "overflow-hidden p-0.5",
+            !hideLinks && "mb-2",
+          )}
+        >
           <div
             key="input-fields"
             className={cn(
@@ -113,36 +117,32 @@ export const FormLinksInput = ({
               hideLinks && "links-hidden",
             )}
           >
-            <Controller
-              name="organization.contact.primaryContact"
-              control={control}
-              render={({ field: primaryFieldControl }) => (
-                <div className="flex items-center gap-x-2">
-                  <FaGlobe
-                    className={cn(
-                      "size-5 shrink-0",
-                      isOrg && primaryField === "website" && "text-emerald-600",
-                    )}
-                  />
-                  <Controller
-                    name={`${type}.links.website`}
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        disabled={eventSameAsOrg && isEvent}
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(autoHttps(e.target.value))
-                        }
-                        placeholder={
-                          isEvent ? "event website" : "organization website"
-                        }
-                        className="flex-1"
-                      />
-                    )}
-                  />
-                  {isOrg && (
+            {isOrg ? (
+              <Controller
+                name="organization.contact.primaryContact"
+                control={control}
+                render={({ field: primaryFieldControl }) => (
+                  <div className="flex items-center gap-x-2">
+                    <FaGlobe
+                      className={cn(
+                        "size-5 shrink-0",
+
+                        primaryField === "website" && "text-emerald-600",
+                      )}
+                    />
+                    <Controller
+                      name={`${type}.links.website`}
+                      control={control}
+                      render={({ field }) => (
+                        <DebouncedControllerInput
+                          field={field}
+                          placeholder="organization website"
+                          className="flex-1"
+                          transform={autoHttps}
+                        />
+                      )}
+                    />
+
                     <Input
                       type="radio"
                       disabled={!organization?.links?.website}
@@ -151,77 +151,110 @@ export const FormLinksInput = ({
                       checked={primaryField === "website"}
                       onChange={() => primaryFieldControl.onChange("website")}
                     />
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="organization.contact.primaryContact"
-              control={control}
-              render={({ field: primaryFieldControl }) => (
-                <div className="flex items-center gap-2">
-                  <FaEnvelope
-                    className={cn(
-                      "size-5 shrink-0",
-                      isOrg && primaryField === "email" && "text-emerald-600",
-                    )}
-                  />
-                  <Controller
-                    name={`${type}.links.email`}
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        disabled={eventSameAsOrg && isEvent}
-                        value={field.value ?? ""}
-                        placeholder="example@email.com"
-                        className="flex-1"
-                      />
-                    )}
-                  />
-                  {isOrg && (
-                    <Input
-                      type="radio"
-                      disabled={!organization?.links?.email}
-                      name="primaryContact"
-                      value="email"
-                      checked={primaryField === "email"}
-                      onChange={() => primaryFieldControl.onChange("email")}
+                  </div>
+                )}
+              />
+            ) : (
+              <div className="flex items-center gap-x-2">
+                <FaGlobe className={cn("size-5 shrink-0")} />
+                <Controller
+                  name={`${type}.links.website`}
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerInput
+                      disabled={eventSameAsOrg && isEvent}
+                      field={field}
+                      placeholder="event website"
+                      className="flex-1"
+                      transform={autoHttps}
                     />
                   )}
-                </div>
-              )}
-            />
+                />
+              </div>
+            )}
 
-            <Controller
-              name="organization.contact.primaryContact"
-              control={control}
-              render={({ field: primaryFieldControl }) => (
-                <div className="flex items-center gap-x-2">
-                  <FaPhone
-                    className={cn(
-                      "size-5 shrink-0",
-                      isOrg && primaryField === "phone" && "text-emerald-600",
-                    )}
-                  />
-                  <Controller
-                    name={`${type}.links.phone`}
-                    control={control}
-                    render={({ field }) => (
-                      <PhoneInput
-                        {...field}
-                        disabled={eventSameAsOrg && isEvent}
-                        international
-                        defaultCountry={eventCountry || "US"}
-                        value={field.value ?? ""}
-                        placeholder="+1 (555) 555-5555"
-                        className="flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
-                        onChange={field.onChange}
+            {isOrg ? (
+              <Controller
+                name="organization.contact.primaryContact"
+                control={control}
+                render={({ field: primaryFieldControl }) => (
+                  <div className="flex items-center gap-2">
+                    <FaEnvelope
+                      className={cn(
+                        "size-5 shrink-0",
+                        primaryField === "email" && "text-emerald-600",
+                      )}
+                    />
+                    <Controller
+                      name={`${type}.links.email`}
+                      control={control}
+                      render={({ field }) => (
+                        <DebouncedControllerInput
+                          field={field}
+                          placeholder="example@email.com"
+                          className="flex-1"
+                        />
+                      )}
+                    />
+                    {isOrg && (
+                      <Input
+                        type="radio"
+                        disabled={!organization?.links?.email}
+                        name="primaryContact"
+                        value="email"
+                        checked={primaryField === "email"}
+                        onChange={() => primaryFieldControl.onChange("email")}
                       />
                     )}
-                  />
-                  {isOrg && (
+                  </div>
+                )}
+              />
+            ) : (
+              <div className="flex items-center gap-2">
+                <FaEnvelope className={cn("size-5 shrink-0")} />
+                <Controller
+                  name={`${type}.links.email`}
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerInput
+                      disabled={eventSameAsOrg && isEvent}
+                      field={field}
+                      placeholder="example@email.com"
+                      className="flex-1"
+                    />
+                  )}
+                />
+              </div>
+            )}
+
+            {isOrg ? (
+              <Controller
+                name="organization.contact.primaryContact"
+                control={control}
+                render={({ field: primaryFieldControl }) => (
+                  <div className="flex items-center gap-x-2">
+                    <FaPhone
+                      className={cn(
+                        "size-5 shrink-0",
+                        primaryField === "phone" && "text-emerald-600",
+                      )}
+                    />
+                    <Controller
+                      name={`${type}.links.phone`}
+                      control={control}
+                      render={({ field }) => (
+                        <PhoneInput
+                          {...field}
+                          international
+                          defaultCountry={eventCountry || "US"}
+                          value={field.value ?? ""}
+                          placeholder="+1 (555) 555-5555"
+                          className="flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+
                     <Input
                       type="radio"
                       disabled={!organization?.links?.phone}
@@ -230,10 +263,31 @@ export const FormLinksInput = ({
                       checked={primaryField === "phone"}
                       onChange={() => primaryFieldControl.onChange("phone")}
                     />
+                  </div>
+                )}
+              />
+            ) : (
+              <div className="flex items-center gap-x-2">
+                <FaPhone className={cn("size-5 shrink-0")} />
+                <Controller
+                  name={`${type}.links.phone`}
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      {...field}
+                      disabled={eventSameAsOrg && isEvent}
+                      international
+                      defaultCountry={eventCountry || "US"}
+                      value={field.value ?? ""}
+                      placeholder="+1 (555) 555-5555"
+                      className="flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
+                      onChange={field.onChange}
+                    />
                   )}
-                </div>
-              )}
-            />
+                />
+              </div>
+            )}
+
             {isEvent && (
               <div className="flex items-center gap-x-2">
                 <FaLink className={cn("size-5 shrink-0")} />
@@ -241,48 +295,67 @@ export const FormLinksInput = ({
                   name="event.links.linkAggregate"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
+                    <DebouncedControllerInput
                       disabled={eventSameAsOrg && isEvent}
-                      value={field.value ?? ""}
+                      field={field}
                       placeholder="linktree (or similar)"
                       className="flex-1"
-                      onChange={(e) =>
-                        field.onChange(autoHttps(e.target.value))
-                      }
+                      transform={autoHttps}
                     />
                   )}
                 />
               </div>
             )}
-            <Controller
-              name="organization.contact.primaryContact"
-              control={control}
-              render={({ field: primaryFieldControl }) => (
-                <>
-                  {/* Debounced handle fields */}
-                  {handleFields.map(({ key, icon, platform, placeholder }) => {
-                    const name = `${type}.links.${key}` as
-                      | `event.links.${string}`
-                      | `organization.links.${string}`;
-                    return (
-                      <HandleInput
-                        key={name}
-                        control={control}
-                        name={name}
-                        platform={platform}
-                        icon={icon}
-                        placeholder={placeholder}
-                        disabled={eventSameAsOrg && isEvent}
-                        isOrg={isOrg}
-                        primaryField={primaryField}
-                        onPrimaryChange={primaryFieldControl.onChange}
-                      />
-                    );
-                  })}
-                </>
-              )}
-            />
+            {isOrg ? (
+              <Controller
+                name="organization.contact.primaryContact"
+                control={control}
+                render={({ field: primaryFieldControl }) => (
+                  <>
+                    {/* Debounced handle fields */}
+                    {handleFields.map(
+                      ({ key, icon, platform, placeholder }) => {
+                        const name =
+                          `${type}.links.${key}` as `organization.links.${string}`;
+                        return (
+                          <HandleInput
+                            key={name}
+                            control={control}
+                            name={name}
+                            platform={platform}
+                            icon={icon}
+                            placeholder={placeholder}
+                            isOrg={true}
+                            primaryField={primaryField}
+                            onPrimaryChange={primaryFieldControl.onChange}
+                          />
+                        );
+                      },
+                    )}
+                  </>
+                )}
+              />
+            ) : (
+              <>
+                {/* Debounced handle fields */}
+                {handleFields.map(({ key, icon, platform, placeholder }) => {
+                  const name =
+                    `${type}.links.${key}` as `event.links.${string}`;
+                  return (
+                    <HandleInput
+                      key={name}
+                      control={control}
+                      name={name}
+                      platform={platform}
+                      icon={icon}
+                      placeholder={placeholder}
+                      disabled={eventSameAsOrg && isEvent}
+                      primaryField={primaryField}
+                    />
+                  );
+                })}
+              </>
+            )}
             {isOrg && (
               <div className="flex items-center gap-x-2">
                 <FaLink className={cn("size-5 shrink-0")} />
@@ -290,15 +363,12 @@ export const FormLinksInput = ({
                   name="organization.links.linkAggregate"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
+                    <DebouncedControllerInput
                       disabled={eventSameAsOrg && isEvent}
-                      value={field.value ?? ""}
+                      field={field}
                       placeholder="linktree (or similar)"
                       className="flex-1"
-                      onChange={(e) =>
-                        field.onChange(autoHttps(e.target.value))
-                      }
+                      transform={autoHttps}
                     />
                   )}
                 />
@@ -311,13 +381,12 @@ export const FormLinksInput = ({
                 name={`${type}.links.other`}
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    {...field}
+                  <DebouncedControllerInput
                     disabled={eventSameAsOrg && isEvent}
-                    value={field.value ?? ""}
+                    field={field}
                     placeholder="any other link not listed above"
                     className="flex-1"
-                    onChange={(e) => field.onChange(autoHttps(e.target.value))}
+                    transform={autoHttps}
                   />
                 )}
               />
@@ -353,17 +422,17 @@ function HandleInput({
   onPrimaryChange,
 }: HandleInputProps) {
   const watched = useWatch({ control, name });
-  const [inputVal, setInputVal] = useState(watched ?? "");
+  // const [inputVal, setInputVal] = useState(watched ?? "");
 
-  const debounced = useRef(
-    debounce((raw: string, onChange: (val: string) => void) => {
-      onChange(formatHandleInput(raw, platform));
-    }, 500),
-  ).current;
+  // const debounced = useRef(
+  //   debounce((raw: string, onChange: (val: string) => void) => {
+  //     onChange(formatHandleInput(raw, platform));
+  //   }, 500),
+  // ).current;
 
-  useEffect(() => {
-    setInputVal(watched ?? "");
-  }, [watched]);
+  // useEffect(() => {
+  //   setInputVal(watched ?? "");
+  // }, [watched]);
 
   const fieldKey = name.split(".").pop();
 
@@ -374,23 +443,30 @@ function HandleInput({
         name={name}
         control={control}
         render={({ field }) => (
-          <Input
+          // <Input
+          //   disabled={disabled}
+          //   value={inputVal}
+          //   placeholder={placeholder}
+          //   className="flex-1"
+          //   onChange={(e) => {
+          //     const raw = e.target.value;
+          //     setInputVal(raw);
+          //     debounced(raw, field.onChange);
+          //   }}
+          //   onPaste={(e) => {
+          //     e.preventDefault();
+          //     const pasted = e.clipboardData.getData("text");
+          //     const formatted = formatHandleInput(pasted, platform);
+          //     setInputVal(formatted);
+          //     field.onChange(formatted);
+          //   }}
+          // />
+          <DebouncedControllerInput
+            field={field}
             disabled={disabled}
-            value={inputVal}
             placeholder={placeholder}
             className="flex-1"
-            onChange={(e) => {
-              const raw = e.target.value;
-              setInputVal(raw);
-              debounced(raw, field.onChange);
-            }}
-            onPaste={(e) => {
-              e.preventDefault();
-              const pasted = e.clipboardData.getData("text");
-              const formatted = formatHandleInput(pasted, platform);
-              setInputVal(formatted);
-              field.onChange(formatted);
-            }}
+            transform={(val) => formatHandleInput(val, platform)}
           />
         )}
       />

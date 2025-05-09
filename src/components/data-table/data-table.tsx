@@ -37,7 +37,8 @@ interface DataTableProps<TData, TValue> {
   defaultVisibility?: VisibilityState;
   onRowSelect?: (row: TData | null, selection: Record<string, boolean>) => void;
   className?: string;
-  containerClassName?: string;
+  tableClassName?: string;
+  outerContainerClassName?: string;
   selectedRow?: Record<string, boolean>;
   adminActions?: {
     isAdmin: boolean;
@@ -54,7 +55,8 @@ export function DataTable<TData, TValue>({
   onRowSelect,
   defaultVisibility,
   className,
-  containerClassName,
+  tableClassName,
+  outerContainerClassName,
   selectedRow,
 
   adminActions,
@@ -117,10 +119,15 @@ export function DataTable<TData, TValue>({
   });
 
   useEffect(() => {
-    if (isAdmin) {
-      setRowSelection(selectedRow ?? {});
+    if (selectedRow && Object.keys(selectedRow).length > 0) {
+      // setRowSelection(selectedRow);
+      console.log("dogs");
+    } else {
+      setRowSelection({});
     }
-  }, [selectedRow, isAdmin]);
+
+    console.log("selected row", selectedRow);
+  }, [selectedRow]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -151,12 +158,14 @@ export function DataTable<TData, TValue>({
   // );
 
   return (
-    <div className={cn("w-full space-y-4", containerClassName)}>
+    <div className={cn("w-full space-y-4", outerContainerClassName)}>
       <DataTableToolbar table={table} />
       <div className={cn("rounded-md border", className)}>
         <Table
-          containerClassname="rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)]
-  3xl:max-h-[calc(85dvh-7rem)] scrollable"
+          containerClassname={cn(
+            "rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)] scrollable,",
+            tableClassName,
+          )}
         >
           <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_0.5px_0_0_rgba(0,0,0,1)]">
             {table.getHeaderGroups().map((headerGroup) => (

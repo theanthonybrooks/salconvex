@@ -17,6 +17,19 @@ interface SubmittedActionProps extends EventActionProps {
   state: SubmissionFormState;
 }
 
+export const DuplicateEvent = ({ eventId }: EventActionProps) => {
+  const duplicateEvent = useMutation(api.events.event.duplicateEvent);
+  return (
+    <DropdownMenuItem
+      onClick={() => {
+        duplicateEvent({ eventId: eventId as Id<"events"> });
+      }}
+    >
+      Duplicate
+    </DropdownMenuItem>
+  );
+};
+
 export const DeleteEvent = ({ eventId, isAdmin }: DeleteEventActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteEvent = useMutation(api.events.event.deleteEvent);
