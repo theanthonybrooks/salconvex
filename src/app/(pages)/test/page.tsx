@@ -62,7 +62,7 @@ export default function DemoPage() {
           adminActions={adminActions}
           tableType="events"
           className="mx-auto w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
-          containerClassName={cn("lg:hidden")}
+          outerContainerClassName={cn("lg:hidden")}
         />
       </div>
     </>
