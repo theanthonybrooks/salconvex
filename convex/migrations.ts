@@ -1,5 +1,6 @@
 import { normalizeToHandle } from "@/lib/linkFns.js";
 import { Migrations } from "@convex-dev/migrations";
+import slugify from "slugify";
 import { components, internal } from "./_generated/api.js";
 import { DataModel } from "./_generated/dataModel.js";
 
@@ -107,6 +108,26 @@ export const setOtherInfoUndefined = migrations.define({
   table: "events",
   migrateOne: () => ({ otherInfo: undefined }),
 });
+
+export const updateSlugs = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, doc) => {
+    await ctx.db.patch(doc._id, { slug: slugify(doc.name, { lower: true }) });
+  },
+});
+
+export const runSlugs = migrations.runner(internal.migrations.updateSlugs);
+
+export const updateAllSlugsToLowerCase = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, doc) => {
+    await ctx.db.patch(doc._id, { slug: slugify(doc.name, { lower: true }) });
+  },
+});
+
+export const runOrgSlugs = migrations.runner(
+  internal.migrations.updateAllSlugsToLowerCase,
+);
 
 // Create a runner specifically for this migration
 export const runCopyDates = migrations.runner(

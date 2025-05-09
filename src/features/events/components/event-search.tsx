@@ -44,12 +44,6 @@ export function EventNameSearch({
         placeholder={placeholder}
         tabIndex={tabIndex}
       />
-      {/* {isExisting && (
-        <p className="space-x-1 text-center text-sm text-red-600">
-          {isEvent ? "An" : "A"} {getEventCategoryLabel(category)} with this
-          name already exists.
-        </p>
-      )} */}
     </div>
   );
 }

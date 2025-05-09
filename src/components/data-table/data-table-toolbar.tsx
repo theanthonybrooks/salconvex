@@ -12,15 +12,24 @@ import {
 } from "@/components/data-table/data-table-row-actions";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { cn } from "@/lib/utils";
+import { useMutation } from "convex/react";
+import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  setRowSelection: (row: Record<string, boolean>) => void;
 }
 
 export function DataTableToolbar<TData>({
   table,
+  setRowSelection,
 }: DataTableToolbarProps<TData>) {
+  const deleteMultipleEvents = useMutation(
+    api.events.event.deleteMultipleEvents,
+  );
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
   const viewAll = table.options.meta?.viewAll;
@@ -29,6 +38,39 @@ export function DataTableToolbar<TData>({
   const pageType = table.options.meta?.pageType;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
+  const selectedRowCount = Object.keys(table.getState().rowSelection).length;
+  const handleDeleteSelected = async () => {
+    const selectedRows = table.getSelectedRowModel().rows;
+    const items = selectedRows.map((row) => {
+      const { _id, state } = row.original as {
+        _id: Id<"events">;
+        state: string;
+      };
+      return { eventId: _id, state };
+    });
+
+    try {
+      const result = await deleteMultipleEvents({ items, isAdmin });
+
+      const deletedCount = result.deletedEventIds.length;
+      const skippedCount = result.skippedEventIds.length;
+
+      if (deletedCount > 0) {
+        toast.success(
+          `${deletedCount} event${deletedCount > 1 ? "s" : ""} deleted.`,
+        );
+      }
+
+      if (skippedCount > 0) {
+        toast.warning(`${skippedCount} could not be deleted.`);
+      }
+      setRowSelection({});
+    } catch (error) {
+      console.error("Failed to delete selected events:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
   return (
     <div className="flex max-w-[90vw] items-center justify-between">
       <div className="mx-auto flex flex-col items-center gap-3 sm:mx-0 sm:flex-row">
@@ -41,6 +83,7 @@ export function DataTableToolbar<TData>({
             {viewAll ? "View Submissions" : "View  All"}
           </Button>
         )}
+
         <Input
           placeholder="Search..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -101,7 +144,18 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex items-center gap-3">
+        {isAdmin && pageType === "dashboard" && selectedRowCount > 0 && (
+          <Button
+            variant="ghost"
+            onClick={() => handleDeleteSelected()}
+            className="hidden hover:scale-105 sm:inline-flex"
+          >
+            Delete Selection
+          </Button>
+        )}
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   );
 }

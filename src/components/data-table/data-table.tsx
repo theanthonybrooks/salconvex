@@ -91,7 +91,6 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
     enableRowSelection: true,
-    // onRowSelectionChange: setRowSelection,
     onRowSelectionChange: (updater) => {
       const newSelection =
         typeof updater === "function" ? updater(rowSelection) : updater;
@@ -108,7 +107,7 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    enableMultiRowSelection: false,
+    enableMultiRowSelection: pageType === "dashboard",
     enableColumnResizing: true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -159,7 +158,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className={cn("w-full space-y-4", outerContainerClassName)}>
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} setRowSelection={setRowSelection} />
       <div className={cn("rounded-md border", className)}>
         <Table
           containerClassname={cn(

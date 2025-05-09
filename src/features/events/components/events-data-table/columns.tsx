@@ -9,6 +9,8 @@ import {
   DuplicateEvent,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
+import { DataTableEventEdition } from "@/components/data-table/actions/data-table-event-edition";
+import { DataTableEventName } from "@/components/data-table/actions/data-table-event-name";
 import {
   ApproveBoth,
   ApproveOC,
@@ -24,6 +26,7 @@ import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -47,6 +50,7 @@ export const columnLabels: Record<string, string> = {
 
 export type Event = {
   _id: Id<"events">;
+  mainOrgId: Id<"organizations">;
   name: string;
   dates: {
     edition: number;
@@ -95,18 +99,22 @@ export const columns: ColumnDef<Event>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      // const isAdmin = table.options.meta?.isAdmin;
+      const pageType = table.options.meta?.pageType;
+      const isDashboard = pageType === "dashboard";
       return (
         <div className="flex space-x-2">
           <span className="max-w-[20ch] truncate pl-1 font-medium sm:max-w-[500px] sm:pl-0">
-            {row.getValue("name")}
+            {/* {row.getValue("name")} */}
+            <DataTableEventName event={row.original} dashboard={isDashboard} />
           </span>
         </div>
       );
     },
   },
   {
-    id: "dates_edition", // used in row.getValue()
+    id: "dates_edition", 
     accessorFn: (row) => row.dates.edition,
     size: 60,
     minSize: 60,
@@ -114,13 +122,21 @@ export const columns: ColumnDef<Event>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
-    cell: ({ row }) => (
-      <div className="flex justify-center space-x-2">
-        <span className="max-w-[60px] truncate font-medium">
-          {row.getValue("dates_edition")}
-        </span>
-      </div>
-    ),
+    cell: ({ row, table }) => {
+      // const isAdmin = table.options.meta?.isAdmin;
+      const event = row.original as Event;
+      const pageType = table.options.meta?.pageType;
+      const isDashboard = pageType === "dashboard";
+
+      return (
+        //   <div className="flex justify-center space-x-2">
+        //   <span className="max-w-[60px] truncate font-medium">
+        //     {row.getValue("dates_edition")}
+        //   </span>
+        // </div>
+        <DataTableEventEdition event={event} dashboard={isDashboard} />
+      );
+    },
   },
 
   //TODO: Make optional column
@@ -305,6 +321,7 @@ export const columns: ColumnDef<Event>[] = [
       const ocState = event.openCallStatus;
       const openCallId = event.openCallId;
       const hasOC = !!openCallId;
+
       // const openCallStatus = event.openCallStatus;
       // const openCallId = event.openCallId;
       // const dumbFuck = row.table.fuckoff
@@ -344,11 +361,7 @@ export const columns: ColumnDef<Event>[] = [
                   (state === "published" && isAdmin)) && (
                   <ReactivateEvent eventId={event._id} state={state} />
                 )}
-                {/* <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(payment._id)}
-                >
-                  Copy Event ID
-                </DropdownMenuItem> */}
+
                 {hasOC && (
                   <>
                     <DropdownMenuLabel className="mt-2 border-t-1.5 border-foreground/20">
@@ -374,6 +387,20 @@ export const columns: ColumnDef<Event>[] = [
                       state === "submitted" &&
                       isAdmin && <ApproveBoth openCallId={openCallId} />}
                   </>
+                )}
+                <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(event._id)}
+                >
+                  Copy Event ID
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      navigator.clipboard.writeText(event.mainOrgId)
+                    }
+                  >
+                    Copy Org ID
+                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

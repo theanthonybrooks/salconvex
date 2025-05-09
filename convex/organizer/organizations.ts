@@ -156,7 +156,7 @@ export const createNewOrg = mutation({
 
       await ctx.db.patch(org._id, {
         name: args.organizationName,
-        slug: slugify(args.organizationName),
+        slug: slugify(args.organizationName, { lower: true }),
         logo: fileUrl || args.logo,
         logoStorageId: args.logoStorageId,
         location: args.location,
@@ -180,7 +180,7 @@ export const createNewOrg = mutation({
     const orgId = await ctx.db.insert("organizations", {
       ownerId: user._id,
       name: args.organizationName,
-      slug: slugify(args.organizationName),
+      slug: slugify(args.organizationName, { lower: true }),
       events: [],
       logo: fileUrl || "/1.jpg",
       logoStorageId: args.logoStorageId,

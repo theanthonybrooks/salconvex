@@ -8,43 +8,90 @@ import {
 import { OpenCall, OpenCallApplication } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 import slugify from "slugify";
 import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
+// export async function generateUniqueNameAndSlug(
+//   ctx: MutationCtx,
+//   baseName: string,
+//   baseEdition: number,
+// ): Promise<{ name: string; slug: string; baseEdition: number }> {
+//   let name = baseName;
+//   let edition = baseEdition;
+//   let suffix = 1;
+
+//   // Check if the exact name is available
+//   const existing = await ctx.db
+//     .query("events")
+//     .withIndex("by_name_and_edition", (q) =>
+//       q.eq("name", name).eq("dates.edition", edition),
+//     )
+//     .unique();
+
+//   if (!existing) {
+//     return { name, slug: slugify(name), baseEdition };
+//   }
+
+//   // Try incrementing numeric suffixes
+//   const base = baseName.replace(/(?:[-\s])(\d+)$/, "");
+//   while (true) {
+//     name = `${base}-${suffix}`;
+//     const exists = await ctx.db
+//       .query("events")
+//       .withIndex("by_name", (q) => q.eq("name", name))
+//       .first();
+//     if (!exists) break;
+//     suffix++;
+//   }
+
+//   return { name, slug: slugify(name), baseEdition };
+// }
+
 export async function generateUniqueNameAndSlug(
   ctx: MutationCtx,
   baseName: string,
+  baseEdition: number,
 ): Promise<{ name: string; slug: string }> {
-  let name = baseName;
+  let base = baseName;
   let suffix = 1;
 
-  // Check if the exact name is available
-  const existing = await ctx.db
+  // Regex to check for trailing number with space or hyphen
+  const match = baseName.match(/^(.*?)(?:[-\s])(\d+)$/);
+
+  if (match) {
+    base = match[1];
+    suffix = parseInt(match[2], 10) + 1;
+  }
+
+  const existingExact = await ctx.db
     .query("events")
-    .withIndex("by_name", (q) => q.eq("name", name))
+    .withIndex("by_name_and_edition", (q) =>
+      q.eq("name", baseName).eq("dates.edition", baseEdition),
+    )
     .unique();
 
-  if (!existing) {
-    return { name, slug: slugify(name) };
+  if (!existingExact) {
+    return { name: baseName, slug: slugify(baseName) };
   }
 
-  // Try incrementing numeric suffixes
-  const base = baseName.replace(/-\d+$/, ""); // Remove existing -number if present
   while (true) {
-    name = `${base}-${suffix}`;
+    const tryName = match ? `${base} ${suffix}` : `${base}-${suffix}`;
     const exists = await ctx.db
       .query("events")
-      .withIndex("by_name", (q) => q.eq("name", name))
+      .withIndex("by_name_and_edition", (q) =>
+        q.eq("name", tryName).eq("dates.edition", baseEdition),
+      )
       .unique();
-    if (!exists) break;
+
+    if (!exists) {
+      return { name: tryName, slug: slugify(tryName) };
+    }
+
     suffix++;
   }
-
-  return { name, slug: slugify(name) };
 }
 
 export const updateEventLastEditedAt = mutation({
@@ -265,36 +312,129 @@ export const getAllEvents = query({
   },
 });
 
+// export const checkEventNameExists = query({
+//   args: {
+//     name: v.string(),
+//     organizationId: v.optional(v.id("organizations")),
+//     eventId: v.optional(v.id("events")),
+//   },
+//   handler: async (ctx, args) => {
+//     const inputName = args.name.trim().toLowerCase();
+//     const edition = new Date().getFullYear();
+
+//     console.log("inputName", inputName);
+
+//     const existingEvent = await filter(
+//       ctx.db.query("events"),
+//       (event) => event.name.toLowerCase() === inputName,
+//     ).unique();
+
+//     console.log("existingEvent", existingEvent);
+//     console.log("inputName", inputName);
+
+//     const sameEvent = args.eventId && args.eventId === existingEvent?._id
+
+//     if (sameEvent) return true;
+
+//     // const existing = await ctx.db
+//     //   .query("events")
+//     //   .filter((q) => q.eq(q.field("name"), args.name.toLowerCase()))
+//     //   .first();
+
+//     if (existingEvent)
+//       throw new ConvexError("An event with that name already exists.");
+//     return true;
+//   },
+// });
+
+export const updateEdition = mutation({
+  args: {
+    eventId: v.id("events"),
+    edition: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    console.log(event?.dates?.edition, args.edition);
+
+    // Skip if edition hasn't changed
+    if (event.dates.edition === args.edition) return null;
+
+    // Check for duplicate (same name + same edition, different _id)
+    const duplicate = await ctx.db
+      .query("events")
+      .withIndex("by_name_and_edition", (q) =>
+        q.eq("name", event.name).eq("dates.edition", args.edition),
+      )
+      .collect();
+
+    console.log("duplicate", duplicate);
+
+    const conflict = duplicate.find((e) => e._id !== event._id);
+    if (conflict) {
+      throw new ConvexError(
+        `An event named "${event.name}" already exists for ${args.edition}.`,
+      );
+    }
+
+    console.log("conflict", conflict);
+
+    // Update edition
+    await ctx.db.patch(event._id, {
+      lastEditedAt: Date.now(),
+      dates: {
+        ...event.dates,
+        edition: args.edition,
+      },
+    });
+  },
+});
+
+export const updateEventName = mutation({
+  args: {
+    eventId: v.id("events"),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const slug = slugify(args.name);
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    await ctx.db.patch(event._id, {
+      name: args.name,
+      slug,
+      lastEditedAt: Date.now(),
+    });
+  },
+});
+
 export const checkEventNameExists = query({
   args: {
     name: v.string(),
     organizationId: v.optional(v.id("organizations")),
     eventId: v.optional(v.id("events")),
+    edition: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const inputName = args.name.trim().toLowerCase();
+    const eventSlug = slugify(args.name, { lower: true });
+    const existingEvents = await ctx.db
+      .query("events")
+      .withIndex("by_slug", (q) => q.eq("slug", eventSlug))
+      .collect();
 
-    console.log("inputName", inputName);
+    for (const event of existingEvents) {
+      const sameEvent = !!(args.eventId && args.eventId === event._id);
+      const sameOrg =
+        args.organizationId && args.organizationId === event.mainOrgId;
+      const diffEdition =
+        args.edition && args.edition === event.dates.edition && !!sameOrg;
+      console.log(sameEvent, sameOrg, diffEdition);
+      if (sameEvent || diffEdition) continue;
 
-    const existingEvent = await filter(
-      ctx.db.query("events"),
-      (event) => event.name.toLowerCase() === inputName,
-    ).unique();
+      throw new ConvexError(
+        "An event with that name already exists for this edition.",
+      );
+    }
 
-    console.log("existingEvent", existingEvent);
-    console.log("inputName", inputName);
-
-    const sameEvent = args.eventId && args.eventId === existingEvent?._id;
-
-    if (sameEvent) return true;
-
-    // const existing = await ctx.db
-    //   .query("events")
-    //   .filter((q) => q.eq(q.field("name"), args.name.toLowerCase()))
-    //   .first();
-
-    if (existingEvent)
-      throw new ConvexError("An event with that name already exists.");
     return true;
   },
 });
@@ -772,18 +912,33 @@ export const duplicateEvent = mutation({
     if (!user) throw new Error("User not found");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
+    const existingEventEdition = event.dates.edition;
+    let eventEdition = existingEventEdition;
+    let eventName = event.name;
+    let eventSlug = event.slug;
 
-    const { name, slug } = await generateUniqueNameAndSlug(ctx, event.name);
+    if (eventEdition !== new Date().getFullYear()) {
+      eventEdition = new Date().getFullYear();
+    }
+    const { name, slug } = await generateUniqueNameAndSlug(
+      ctx,
+      event.name,
+      eventEdition,
+    );
+    eventName = name;
+    eventSlug = slug;
+
     const eventState = "draft";
     const newEvent = await ctx.db.insert("events", {
-      name,
-      slug,
+      name: eventName,
+      slug: eventSlug,
       logo: event.logo,
       logoStorageId: event.logoStorageId,
       type: event.type,
       category: event.category,
       dates: {
         ...event.dates,
+        edition: eventEdition,
       },
       location: {
         ...event.location,
@@ -844,5 +999,67 @@ export const deleteEvent = mutation({
     await ctx.db.delete(event._id);
 
     return { event };
+  },
+});
+
+export const deleteMultipleEvents = mutation({
+  args: {
+    items: v.array(
+      v.object({
+        eventId: v.id("events"),
+        state: v.string(),
+      }),
+    ),
+    isAdmin: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!user) throw new ConvexError("User not found");
+
+    const deletedEventIds: string[] = [];
+
+    for (const { eventId, state } of args.items) {
+      const event = await ctx.db.get(eventId);
+      if (!event) continue;
+
+      if (event.state !== "draft" && !args.isAdmin) {
+        continue;
+      }
+
+      const organization = await ctx.db.get(event.mainOrgId);
+      if (!organization) continue;
+
+      const orgLogoStorageId = organization.logoStorageId;
+
+      const openCalls = await ctx.db
+        .query("openCalls")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .collect();
+
+      for (const openCall of openCalls) {
+        await ctx.db.delete(openCall._id);
+      }
+
+      if (event.logoStorageId && event.logoStorageId !== orgLogoStorageId) {
+        await ctx.storage.delete(event.logoStorageId);
+      }
+
+      await ctx.db.delete(event._id);
+      deletedEventIds.push(event._id);
+    }
+
+    return {
+      deletedEventIds,
+      skippedEventIds: args.items
+        .map((item) => item.eventId)
+        .filter((id) => !deletedEventIds.includes(id)),
+    };
   },
 });

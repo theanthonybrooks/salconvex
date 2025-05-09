@@ -467,6 +467,7 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
+    .index("by_name_and_edition", ["name", "dates.edition"])
     // .index("by_mainOrgName", ["mainOrgName"])
     .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])

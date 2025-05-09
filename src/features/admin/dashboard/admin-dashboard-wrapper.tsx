@@ -42,6 +42,9 @@ export function AdminDashboardWrapper() {
             dates_edition: viewAll ? true : false,
             type: false,
           }}
+          onRowSelect={(row) => {
+            console.log(row);
+          }}
           adminActions={adminActions}
           tableType="events"
           pageType="dashboard"
@@ -63,6 +66,7 @@ export function AdminDashboardWrapper() {
           }}
           adminActions={adminActions}
           tableType="events"
+          pageType="dashboard"
           className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
           outerContainerClassName={cn("lg:hidden")}
         />
