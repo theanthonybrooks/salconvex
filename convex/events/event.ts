@@ -22,20 +22,29 @@ export async function generateUniqueNameAndSlug(
   let name = baseName;
   let suffix = 1;
 
+  // Check if the exact name is available
+  const existing = await ctx.db
+    .query("events")
+    .withIndex("by_name", (q) => q.eq("name", name))
+    .unique();
+
+  if (!existing) {
+    return { name, slug: slugify(name) };
+  }
+
+  // Try incrementing numeric suffixes
+  const base = baseName.replace(/-\d+$/, ""); // Remove existing -number if present
   while (true) {
-    const existing = await ctx.db
+    name = `${base}-${suffix}`;
+    const exists = await ctx.db
       .query("events")
       .withIndex("by_name", (q) => q.eq("name", name))
       .unique();
-
-    if (!existing) break;
-
-    name = `${baseName}-${suffix}`;
+    if (!exists) break;
     suffix++;
   }
 
-  const slug = slugify(name);
-  return { name, slug };
+  return { name, slug: slugify(name) };
 }
 
 export const updateEventLastEditedAt = mutation({
@@ -274,8 +283,6 @@ export const checkEventNameExists = query({
 
     console.log("existingEvent", existingEvent);
     console.log("inputName", inputName);
-
-
 
     const sameEvent = args.eventId && args.eventId === existingEvent?._id;
 

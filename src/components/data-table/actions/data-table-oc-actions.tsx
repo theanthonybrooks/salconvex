@@ -2,6 +2,8 @@ import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { SubmissionFormState } from "@/types/event";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
+import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -19,12 +21,26 @@ interface DeleteOCActionProps extends OCActionProps {
 
 export const DuplicateOC = ({ openCallId }: OCActionProps) => {
   const duplicateOC = useMutation(api.openCalls.openCall.duplicateOC);
+
+  const handleOpenCallDuplicate = async () => {
+    try {
+      await duplicateOC({ openCallId: openCallId as Id<"openCalls"> });
+      toast.success("Open call duplicated successfully!", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        // console.error(error.data);
+        toast.error(error.data ?? "Failed to duplicate open call");
+        return;
+      }
+      console.error("Failed to duplicate open call:", error);
+    }
+  };
   return (
-    <DropdownMenuItem
-      onClick={() => {
-        duplicateOC({ openCallId: openCallId as Id<"openCalls"> });
-      }}
-    >
+    <DropdownMenuItem onClick={handleOpenCallDuplicate}>
       Duplicate
     </DropdownMenuItem>
   );

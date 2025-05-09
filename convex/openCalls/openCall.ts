@@ -78,6 +78,13 @@ export const duplicateOC = mutation({
     const openCall = await ctx.db.get(args.openCallId);
     if (!openCall) return null;
 
+    //TODO: Is this the best way to handle this? Should there be only one open call per edition/event? Or should there be multiple open calls per edition/event?
+    const edition = openCall.basicInfo.dates.edition;
+    if (edition === new Date().getFullYear())
+      throw new ConvexError(
+        "You can't duplicate an open call for the current year",
+      );
+
     const newOpenCall = await ctx.db.insert("openCalls", {
       adminNoteOC: openCall.adminNoteOC,
       eventId: openCall.eventId,
@@ -85,6 +92,10 @@ export const duplicateOC = mutation({
       mainOrgId: openCall.mainOrgId,
       basicInfo: {
         ...openCall.basicInfo,
+        dates: {
+          ...openCall.basicInfo.dates,
+          edition: new Date().getFullYear(),
+        },
       },
       eligibility: {
         ...openCall.eligibility,
