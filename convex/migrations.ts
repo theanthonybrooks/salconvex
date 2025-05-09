@@ -109,14 +109,14 @@ export const setOtherInfoUndefined = migrations.define({
   migrateOne: () => ({ otherInfo: undefined }),
 });
 
-export const updateSlugs = migrations.define({
-  table: "events",
+export const updateOrgSlugs = migrations.define({
+  table: "organizations",
   migrateOne: async (ctx, doc) => {
     await ctx.db.patch(doc._id, { slug: slugify(doc.name, { lower: true }) });
   },
 });
 
-export const runSlugs = migrations.runner(internal.migrations.updateSlugs);
+export const runSlugs = migrations.runner(internal.migrations.updateOrgSlugs);
 
 export const updateAllSlugsToLowerCase = migrations.define({
   table: "events",

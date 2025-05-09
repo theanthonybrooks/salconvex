@@ -101,7 +101,6 @@ const EventCardPreview = ({
 
   const locationParts: string[] = [];
   const hasOpenCall = openCallStatus === "active";
-  const eventNameUrl = event.name.split(" ").join("-");
 
   if (locale) locationParts.push(locale);
 
@@ -297,7 +296,7 @@ const EventCardPreview = ({
           </div>
 
           <ApplyButtonShort
-            slug={eventNameUrl}
+            slug={slug}
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
@@ -703,7 +702,7 @@ const EventCardPreview = ({
           )}
 
           <ApplyButtonShort
-            slug={eventNameUrl}
+            slug={slug}
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
@@ -715,7 +714,7 @@ const EventCardPreview = ({
           <ApplyButton
             id={event._id}
             openCallId={opencall ? opencall._id : ""}
-            slug={eventNameUrl}
+            slug={slug}
             edition={event.dates.edition}
             // status={status}
             openCall={event.openCallStatus}
