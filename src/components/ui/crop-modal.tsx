@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import DiscreteSlider from "@/components/ui/slider";
-import { getCroppedImg, padImageToSquare } from "@/lib/imageFns";
-import { useCallback, useEffect, useState } from "react";
+import { createImage, getCroppedImg, padImageToSquare } from "@/lib/imageFns";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 
 type CropModalProps = {
@@ -11,6 +11,7 @@ type CropModalProps = {
 };
 
 export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
+  const setInitialZoom = useRef(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [paddedImage, setPaddedImage] = useState<string | null>(null);
@@ -32,6 +33,27 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
   useEffect(() => {
     padImageToSquare(imageSrc, paddingColor, paddingSize).then(setPaddedImage);
   }, [imageSrc, paddingColor, paddingSize]);
+
+  useEffect(() => {
+    const calculateInitialZoom = async () => {
+      if (!paddedImage || setInitialZoom.current) return;
+
+      const original = await createImage(imageSrc);
+      const padded = await createImage(paddedImage);
+      if (!original || !padded) return;
+
+      const scaleX = padded.width / original.width;
+      const scaleY = padded.height / original.height;
+      const scale = Math.max(scaleX, scaleY);
+
+      setZoom(scale);
+      setInitialZoom.current = true;
+    };
+
+    if (paddedImage) {
+      calculateInitialZoom();
+    }
+  }, [imageSrc, paddedImage]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">

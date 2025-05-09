@@ -68,15 +68,18 @@ import { currencies, Currency } from "@/app/data/currencies";
 import { Timezone, timezones } from "@/app/data/timezones";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
+import { usePreloadedQuery } from "convex/react";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
 export default function SettingsPage() {
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
   const { signOut } = useAuthActions();
-  const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
 
   const userPrefs = userData?.userPref;
@@ -157,6 +160,16 @@ export default function SettingsPage() {
       name: user?.name ?? "",
     },
   });
+
+  useEffect(() => {
+    if (!user) return;
+    updateReset({
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      email: user.email ?? "",
+      name: user.name ?? "",
+    });
+  }, [user, updateReset]);
 
   const handleOnHoverSave = () => {
     if (hoverSave) return;
@@ -942,7 +955,7 @@ export default function SettingsPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full min-w-[150px] text-destructive sm:w-auto"
+                      className="w-full min-w-[150px] font-bold text-red-600 sm:w-auto"
                       onClick={signOut}
                     >
                       Sign Out
@@ -963,7 +976,7 @@ export default function SettingsPage() {
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full min-w-[150px] text-destructive sm:w-auto"
+                          className="w-full min-w-[150px] font-bold text-red-600 sm:w-auto"
                         >
                           Sign Out All
                         </Button>
@@ -1004,7 +1017,7 @@ export default function SettingsPage() {
                         <Button
                           type="button"
                           variant="destructive"
-                          className="w-full min-w-[150px] sm:w-auto"
+                          className="w-full min-w-[150px] font-bold sm:w-auto"
                         >
                           Delete Account
                         </Button>
