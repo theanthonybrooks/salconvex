@@ -185,7 +185,7 @@ export const getEventByOrgId = query({
 
       return {
         ...event,
-        openCallStatus: openCall?.state ?? null,
+        openCallState: openCall?.state ?? null,
         openCallId: openCall?._id ?? null,
       };
     });
@@ -255,7 +255,7 @@ export const getSubmittedEvents = query({
       const openCall = ocMap.get(event._id.toString());
       return {
         ...event,
-        openCallStatus: openCall?.state ?? null,
+        openCallState: openCall?.state ?? null,
         openCallId: openCall?._id ?? null,
       };
     });
@@ -303,7 +303,7 @@ export const getAllEvents = query({
       const openCall = openCallMap.get(event._id.toString());
       return {
         ...event,
-        openCallStatus: openCall?.state ?? null,
+        openCallState: openCall?.state ?? null,
         openCallId: openCall?._id ?? null,
       };
     });
@@ -717,6 +717,7 @@ export const createOrUpdateEvent = mutation({
       ),
     ),
     finalStep: v.optional(v.boolean()),
+    adminNote: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // console.log(args.logoStorageId, args.logo);
@@ -765,6 +766,9 @@ export const createOrUpdateEvent = mutation({
         ? "published"
         : "submitted"
       : "draft";
+    const eventCategory = args.category || "";
+    const isEvent = eventCategory === "event";
+    const eventType = isEvent ? args.type || [] : [];
 
     console.log("eventState", eventState);
 
@@ -779,8 +783,8 @@ export const createOrUpdateEvent = mutation({
         name: args.name,
         logo: fileUrl || args.logo,
         logoStorageId: args.logoStorageId,
-        type: args.type || [],
-        category: args.category || "",
+        type: eventType,
+        category: eventCategory,
         dates: {
           ...args.dates,
           edition: args.dates.edition || new Date().getFullYear(),
@@ -799,6 +803,7 @@ export const createOrUpdateEvent = mutation({
         active: args.active || true,
         lastEditedAt: Date.now(),
         state: eventState,
+        adminNote: args.adminNote,
       });
 
       const updatedEvent = await ctx.db.get(event._id);
@@ -812,8 +817,8 @@ export const createOrUpdateEvent = mutation({
       slug: args.slug,
       logo: fileUrl as string,
       logoStorageId: args.logoStorageId,
-      type: args.type || [],
-      category: args.category || "",
+      type: eventType,
+      category: eventCategory,
       dates: {
         ...args.dates,
         edition: args.dates.edition || new Date().getFullYear(),
@@ -832,6 +837,7 @@ export const createOrUpdateEvent = mutation({
       active: args.active || true,
       mainOrgId: args.orgId,
       organizerId: [args.orgId],
+      adminNote: args.adminNote,
       // mainOrgName: "",
 
       state: eventState,

@@ -3,6 +3,13 @@ import { EventData, SubmissionFormState } from "@/types/event";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
+export const callFormatValues = ["RFP", "RFQ"] as const;
+
+export type CallFormat = (typeof callFormatValues)[number];
+
+export const validOCVals = ["Fixed", "Rolling", "Email"];
+export const invalidOCVals = ["Invite", "Unknown", "False"];
+
 export const callTypeValues = [
   "Fixed",
   "Rolling",
@@ -11,7 +18,7 @@ export const callTypeValues = [
   "Unknown",
 ] as const;
 
-export type CallType = (typeof callTypeValues)[number] | null;
+export type CallType = (typeof callTypeValues)[number];
 
 export const eligibilityTypeValues = [
   "International",
@@ -20,7 +27,7 @@ export const eligibilityTypeValues = [
   "Other",
 ] as const;
 
-export type EligibilityType = (typeof eligibilityTypeValues)[number] | null;
+export type EligibilityType = (typeof eligibilityTypeValues)[number];
 
 export const applicationStatusValues = [
   "external apply",
@@ -67,7 +74,7 @@ export interface OpenCall {
 
   basicInfo: {
     appFee: number;
-    callFormat: "RFP" | "RFQ";
+    callFormat: CallFormat;
     callType: CallType;
     dates: {
       ocStart: string | null; //null for rolling, email, etc or just open calls without dates. Set to null if the call is rolling. Requires type of "Rolling" and will otherwise be invalid/ignored.

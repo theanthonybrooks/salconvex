@@ -1,8 +1,10 @@
+import { toMutableEnum } from "@/lib/zodFns";
 import {
   eventCategoryValues,
   eventStates,
   eventTypeValues,
 } from "@/types/event";
+import { callTypeValues, validOCVals } from "@/types/openCall";
 import { z } from "zod";
 
 const locationBase = z.object({
@@ -176,8 +178,9 @@ export const eventBase = z.object({
     .max(35, "Max 35 characters")
     .regex(/^[^"';]*$/, "No quotes or semicolons allowed in name"),
 
-  category: z.enum(eventCategoryValues), //TODO: Add message for "Event category is required"
-  type: z.array(z.enum(eventTypeValues)).optional(),
+  //TODO: Add message for "Event category is required"
+  category: z.enum(toMutableEnum(eventCategoryValues)),
+  type: z.array(z.enum(toMutableEnum(eventTypeValues))).optional(),
   logo: z.union([
     z
       .instanceof(Blob)
@@ -214,26 +217,26 @@ export const eventBase = z.object({
   otherInfo: z.string().optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
-  hasOpenCall: z.string().optional(),
+  adminNote: z.string().optional(),
 });
 
-export const eventDetails = eventBase.superRefine((data, ctx) => {
-  //TODO: Change this to require just one of the inputs if not sameAsOrganizer
-  if (!data.links.sameAsOrganizer) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Link to the organizer must be provided",
-      path: ["links", "website"],
-    });
-  }
-  if (!data.hasOpenCall) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Must answer if there's an open call",
-      path: ["hasOpenCall"],
-    });
-  }
-});
+// export const eventDetails = eventBase.superRefine((data, ctx) => {
+//   //TODO: Change this to require just one of the inputs if not sameAsOrganizer
+//   if (!data.links.sameAsOrganizer) {
+//     ctx.addIssue({
+//       code: z.ZodIssueCode.custom,
+//       message: "Link to the organizer must be provided",
+//       path: ["links", "website"],
+//     });
+//   }
+//   if (!data.hasOpenCall) {
+//     ctx.addIssue({
+//       code: z.ZodIssueCode.custom,
+//       message: "Must answer if there's an open call",
+//       path: ["hasOpenCall"],
+//     });
+//   }
+// });
 
 export const eventSchema = eventBase.superRefine((data, ctx) => {
   if (data.category === "event") {
@@ -324,6 +327,10 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       path: ["dates", "prodDates"],
     });
   }
+});
+
+const openCallCheckSchema = z.object({
+  callType: z.union([z.enum(callTypeValues), z.literal("False")]),
 });
 
 const openCallSchema = z.object({
@@ -434,6 +441,9 @@ export const eventDetailsSchema = z.object({
   event: eventBase.extend({
     links: linksSchemaStrict,
   }),
+  openCall: z.object({
+    basicInfo: openCallCheckSchema,
+  }),
 });
 
 export const eventWithOCSchema = z
@@ -445,7 +455,10 @@ export const eventWithOCSchema = z
     openCall: openCallSchema.optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.event.hasOpenCall === "true" && !data.openCall) {
+    if (
+      validOCVals.includes(data.openCall?.basicInfo?.callType ?? "") &&
+      !data.openCall
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Open Call details are required when 'hasOpenCall' is true.",

@@ -87,26 +87,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       : country
   }`;
 
-  {
-    /*  const orgLocationString = `${
-    organizer.location.locale ? `${organizer.location.locale}, ` : ""
-  }${organizer.location.city ? organizer.location.city + "," : ""} ${
-    organizer.location.city && organizer.location.stateAbbr
-      ? organizer.location.stateAbbr + ", "
-      : ""
-  }${
-    !organizer.location.city && organizer.location.state
-      ? organizer.location.state + ", "
-      : ""
-  }${
-    organizer.location.countryAbbr === "UK" ||
-    organizer.location.countryAbbr === "USA" ||
-    organizer.location.country === "United States"
-      ? organizer.location.countryAbbr
-      : organizer.location.country
-  }`;*/
-  }
-
   const onBookmark = () => {
     toggleListAction({ bookmarked: !bookmarked });
   };

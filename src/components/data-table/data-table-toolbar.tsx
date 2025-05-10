@@ -101,9 +101,9 @@ export function DataTableToolbar<TData>({
                 options={eventStates}
               />
             )}
-            {table.getColumn("openCallStatus") && (
+            {table.getColumn("openCallState") && (
               <DataTableFacetedFilter
-                column={table.getColumn("openCallStatus")}
+                column={table.getColumn("openCallState")}
                 title="Open Call"
                 options={eventStates}
                 className={cn(

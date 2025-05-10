@@ -3,23 +3,51 @@ import { OpenCall } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
-export const eventTypeValues = [
-  "gjm",
-  "mur",
-  "pup",
-  "saf",
-  "mus",
-  "oth",
+export const eventTypeOptions = [
+  { value: "gjm", label: "Graffiti Jam" },
+  { value: "mur", label: "Mural Festival" },
+  { value: "saf", label: "Street Art Festival" },
+  { value: "pup", label: "Paste Up/Sticker" },
+  { value: "mus", label: "At music festival" },
+  { value: "oth", label: "Other" },
 ] as const;
+
+// export const eventTypeValues = [
+//   "gjm",
+//   "mur",
+//   "pup",
+//   "saf",
+//   "mus",
+//   "oth",
+// ] as const;
+
+export const eventTypeValues = eventTypeOptions.map(
+  (o) => o.value,
+) as readonly [...(typeof eventTypeOptions)[number]["value"][]];
 export type EventType = (typeof eventTypeValues)[number];
 
-export const eventCategoryValues = [
-  "event",
-  "project",
-  "residency",
-  "gfund",
-  "roster",
+// export const eventCategoryValues = [
+//   "event",
+//   "project",
+//   "residency",
+//   "gfund",
+//   "roster",
+// ] as const;
+// export type EventCategory = (typeof eventCategoryValues)[number];
+
+export const eventCategoryOptions = [
+  { value: "event", label: "Event", abbr: "Event" },
+  { value: "project", label: "Mural Project", abbr: "Project" },
+  { value: "residency", label: "Residency", abbr: "Residency" },
+  { value: "gfund", label: "Grant/Funding", abbr: "Grant/Fund" },
+  { value: "roster", label: "Roster", abbr: "Roster" },
+  
 ] as const;
+
+export const eventCategoryValues = eventCategoryOptions.map(
+  (o) => o.value,
+) as readonly [...(typeof eventCategoryOptions)[number]["value"][]];
+
 export type EventCategory = (typeof eventCategoryValues)[number];
 
 export const eventStates = [

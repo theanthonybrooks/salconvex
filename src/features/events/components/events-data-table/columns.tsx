@@ -47,7 +47,7 @@ export const columnLabels: Record<string, string> = {
   name: "Name",
   dates_edition: "Edition",
   state: "State",
-  openCallStatus: "Open Call",
+  openCallState: "Open Call",
   lastEditedAt: "Last Edited",
   category: "Category",
   type: "Event Type",
@@ -64,7 +64,7 @@ export type Event = {
   category: string;
   type: EventType[];
   lastEditedAt?: number;
-  openCallStatus?: string | null;
+  openCallState?: string | null;
   openCallId?: Id<"openCalls"> | null;
 };
 
@@ -202,7 +202,7 @@ export const columns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: "openCallStatus",
+    accessorKey: "openCallState",
     size: 130,
     minSize: 130,
     maxSize: 130,
@@ -212,7 +212,7 @@ export const columns: ColumnDef<Event>[] = [
 
     cell: ({ row }) => {
       const ocState =
-        (row.getValue("openCallStatus") as SubmissionFormState) || null;
+        (row.getValue("openCallState") as SubmissionFormState) || null;
       return (
         <div className="flex justify-center">
           <div
@@ -323,23 +323,23 @@ export const columns: ColumnDef<Event>[] = [
       const event = row.original as Event;
       const state = event.state as SubmissionFormState;
       const isAdmin = table.options.meta?.isAdmin;
-      const ocState = event.openCallStatus;
+      const ocState = event.openCallState;
       const openCallId = event.openCallId;
       const hasOC = !!openCallId;
 
-      // const openCallStatus = event.openCallStatus;
+      // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
       // const dumbFuck = row.table.fuckoff
       // console.log(table.options)
 
       return (
-        <div className={cn("hidden justify-end md:flex", isAdmin && "flex")}>
+        <div className={cn("hidden justify-center md:flex", isAdmin && "flex")}>
           <ConfirmingDropdown>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="ml-auto size-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70"
+                  className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
                 >
                   <span className="sr-only">Open menu</span>
                   <MoreHorizontal className="size-4" />
