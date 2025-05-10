@@ -499,7 +499,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                           placeholder="Select account type(s)"
                           variant="basic"
                           maxCount={3}
-                          height={8}
+                          height={9}
                           hasSearch={false}
                           selectAll={false}
                           tabIndex={step === "signUp" ? 5 : -1}
@@ -609,7 +609,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               </AnimatePresence>
               <Button
                 disabled={isPending}
-                className="mt-6 w-full bg-white text-base sm:text-base md:bg-salYellow"
+                className="mt-6 w-full bg-white text-base md:bg-salYellow"
                 size="lg"
                 type="submit"
                 variant="salWithShadowYlw"

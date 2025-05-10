@@ -261,7 +261,7 @@ export const MultiSelect = React.forwardRef<
             onClick={handleTogglePopover}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-[40px] w-full items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-[32px] [&_svg]:pointer-events-auto",
+              "flex h-[40px] w-full items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-[36px] [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
               className,
               variant === "basic" ? "border-foreground" : "",

@@ -473,7 +473,7 @@ const FullPageNav = ({
             >
               <ul
                 className={cn(
-                  "font-foreground m-x-auto w-full font-tanker text-[4rem] lowercase",
+                  "font-foreground m-x-auto w-full select-none font-tanker text-[4rem] lowercase",
                 )}
               >
                 {mainMenuItems.map((section) => {
@@ -540,7 +540,7 @@ const FullPageNav = ({
                             }}
                             className="overflow-hidden pl-6 text-[2.5rem]"
                           >
-                            <ul>
+                            <ul className="select-none">
                               {filteredItems
                                 .filter(
                                   (item) =>
@@ -585,7 +585,7 @@ const FullPageNav = ({
                     <Link
                       onClick={onHandleLinkClick}
                       href={"/pricing"}
-                      className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:underline active:decoration-[5px] active:underline-offset-4"
+                      className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4"
                     >
                       Pricing
                     </Link>

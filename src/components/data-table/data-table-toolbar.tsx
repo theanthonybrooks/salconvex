@@ -73,7 +73,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex max-w-[90vw] items-center justify-between">
-      <div className="mx-auto flex flex-col items-center gap-3 sm:mx-0 sm:flex-row">
+      <div className="mx-auto flex w-full flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
         {isAdmin && setViewAll && (
           <Button
             variant="ghost"

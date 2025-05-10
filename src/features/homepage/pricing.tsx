@@ -54,10 +54,10 @@ type PricingCardProps = {
 };
 
 const pricingRange = [
-  { value: 1, label: "Up to $5,000" },
-  { value: 33, label: "$10,000" },
-  { value: 66, label: "$20,000" },
-  { value: 100, label: "$25,000+" },
+  { value: 1, label: "Up to $5K" },
+  { value: 33, label: "$10K" },
+  { value: 66, label: "$20K" },
+  { value: 100, label: "$25K+" },
 ];
 
 const pricingIntervals = [

@@ -123,7 +123,7 @@ export function DataTableEventName({ event, dashboard }: Props) {
           )}
         />
       ) : (
-        <span>{event.name || "-"}</span>
+        <span className="select-none truncate">{event.name || "-"}</span>
       )}
     </div>
   );

@@ -167,7 +167,7 @@ export default function Footer({ className }: { className?: string }) {
                     {...register("email", { required: true })}
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full min-w-0 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
+                    className="h-11 w-full min-w-0 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
                   />
                 </div>
                 <div className="mt-3 sm:ml-3 sm:mt-0">

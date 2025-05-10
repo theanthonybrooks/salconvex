@@ -322,7 +322,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
             >
               <SelectTrigger className="h-12 w-full border text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
                 <SelectValue
-                  placeholder="Event Date Format (select one)"
+                  placeholder={`${getEventCategoryLabelAbbr(
+                      eventData?.category as EventCategory,
+                    )} Date Format (select one)`}
                   className="placeholder:text-muted-foreground/70"
                 />
               </SelectTrigger>

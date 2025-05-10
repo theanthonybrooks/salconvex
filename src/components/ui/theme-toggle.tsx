@@ -74,7 +74,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <div className="flex items-center justify-center">
       <div
-        className={cn(className, "cursor-pointer")}
+        className={cn(className, "cursor-pointer active:scale-90")}
         onClick={() =>
           theme === "default"
             ? setTheme("light")

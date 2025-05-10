@@ -284,8 +284,11 @@ const SubmissionFormOrgStep = ({
                   }}
                 />
 
-                <span className="text-sm">
+                <span className="hidden text-sm sm:block">
                   I&apos;d like to create a new event/project
+                </span>
+                <span className="text-sm sm:hidden">
+                  Add a new event/project
                 </span>
               </label>
             </div>
@@ -373,18 +376,6 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
             />
-            {/* 
-                          <span>or</span> */}
-            {/* <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            onClick={() => {
-                              setExistingEvent(null);
-                            }}
-                          >
-                            Create New Event
-                          </Button> */}
 
             <p
               ref={bottomRef}

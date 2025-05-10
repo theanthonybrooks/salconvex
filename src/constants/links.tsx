@@ -104,6 +104,7 @@ export const FOOTER_LINKS: FooterSection[] = [
   {
     section: "The List",
     items: [
+      { name: "The List", href: "/thelist" },
       { name: "About", href: "/about" },
       { name: "Changelog", href: "/changelog" },
       { name: "Collaborations", href: "/collabs" },

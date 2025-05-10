@@ -69,11 +69,11 @@ export const BasicPagination = ({
                   setPage(page - 1);
                 }}
                 className={cn(
-                  "cursor-pointer px-3 py-1",
+                  "-translate-y-0.5 cursor-pointer",
                   firstPage && "pointer-events-none opacity-0",
                 )}
               >
-                <TiArrowLeftOutline className="size-6 text-foreground hover:scale-110" />
+                <TiArrowLeftOutline className="size-9 text-foreground hover:scale-110 sm:size-6" />
               </span>
 
               <span className="flex flex-row items-center gap-2">
@@ -106,7 +106,7 @@ export const BasicPagination = ({
                     )}
                   </SelectContent>
                 </Select>
-                of {totalPages}
+                <span className="text-nowrap">of {totalPages}</span>
               </span>
 
               <span
@@ -114,11 +114,11 @@ export const BasicPagination = ({
                   setPage(page + 1);
                 }}
                 className={cn(
-                  "cursor-pointer px-3 py-1",
+                  "-translate-y-0.5 cursor-pointer",
                   (lastPage || singlePage) && "pointer-events-none opacity-0",
                 )}
               >
-                <TiArrowRightOutline className="size-6 text-foreground hover:scale-110" />
+                <TiArrowRightOutline className="size-9 text-foreground hover:scale-110 sm:size-6" />
               </span>
             </div>
           ) : (

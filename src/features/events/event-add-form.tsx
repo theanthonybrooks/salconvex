@@ -175,6 +175,7 @@ export const EventOCForm = ({
     setValue,
     getValues,
     setError,
+    unregister,
     // trigger,
     // setValue,
     handleSubmit,
@@ -467,8 +468,16 @@ export const EventOCForm = ({
   const proceedBackStep = () => {
     if (activeStep === 4 && hasOpenCall === "false") {
       setActiveStep((prev) => prev - 3);
-    } else if (activeStep === 5 && hasOpenCall === "false") {
-      setActiveStep((prev) => prev - 3);
+    } else if (activeStep === 5) {
+      if (!orgData?.contact?.primaryContact) {
+        console.log("weiners");
+        unregister("organization.contact");
+        unregister("organization.links");
+        console.log(getValues("organization"));
+      }
+      if (hasOpenCall === "false") {
+        setActiveStep((prev) => prev - 3);
+      }
     } else {
       setActiveStep((prev) => prev - 1);
     }

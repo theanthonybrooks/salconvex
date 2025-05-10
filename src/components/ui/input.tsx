@@ -17,8 +17,8 @@ const inputVariants = cva(
         destructive: "border-red-500 text-red-600 bg-red-100",
       },
       inputHeight: {
-        sm: "h-10 sm:h-8",
-        default: "h-10 ",
+        sm: "h-10 sm:h-9",
+        default: "h-11 ",
         lg: "h-12  text-base",
       },
     },
@@ -43,7 +43,7 @@ const radioVariants = cva(
       },
       inputHeight: {
         sm: "size-3",
-        default: "size-4 ",
+        default: "size-6 sm:size-5 ",
         lg: "size-6",
       },
     },
@@ -54,7 +54,7 @@ const radioVariants = cva(
   },
 );
 const radioInnerVariants = cva(
-  "size-2 scale-0 rounded-full bg-blue-500 transition-transform duration-200",
+  "scale-0 rounded-full bg-blue-500 transition-transform duration-200",
 
   {
     variants: {
@@ -68,7 +68,7 @@ const radioInnerVariants = cva(
       },
       inputHeight: {
         sm: "size-2",
-        default: "size-2 ",
+        default: "size-3 ",
         lg: "size-3",
       },
     },
@@ -99,7 +99,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={cn("peer", baseClasses, className)}
             {...props}
           />
-          <span className="pointer-events-none absolute left-0 top-0 flex size-4 items-center justify-center rounded-full peer-checked:[&>*]:scale-100">
+          <span className="pointer-events-none absolute left-0 top-0 flex size-6 items-center justify-center rounded-full sm:size-5 peer-checked:[&>*]:scale-100">
             <span
               className={cn(
                 radioInnerVariants({ variant, inputHeight }),

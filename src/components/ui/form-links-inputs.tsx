@@ -98,8 +98,8 @@ export const FormLinksInput = ({
         )}
 
         {isOrg && (
-          <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground">
-            Primary Contact - Choose One (required)
+          <div className="mb-1 flex items-center justify-end gap-2 text-base text-muted-foreground">
+            Primary Contact - Choose One(*)
             <HiArrowTurnRightDown className="size-4 shrink-0 translate-y-1.5" />
           </div>
         )}
@@ -384,7 +384,7 @@ export const FormLinksInput = ({
                   <DebouncedControllerInput
                     disabled={eventSameAsOrg && isEvent}
                     field={field}
-                    placeholder="any other link not listed above"
+                    placeholder="other links..."
                     className="flex-1"
                     transform={autoHttps}
                   />

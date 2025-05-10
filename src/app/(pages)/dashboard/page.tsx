@@ -368,7 +368,7 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="lg:col-span-2 min-[1400px]:col-span-1 2xl:col-span-1">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common tasks and shortcuts</CardDescription>
@@ -376,31 +376,31 @@ export default function Dashboard() {
           <CardContent className="space-y-2">
             <Button
               asChild
-              variant="outline"
+              variant="salWithShadowHiddenYlw"
               className="w-full justify-start gap-2"
             >
               <Link variant="standard" href="/thelist">
-                <LucideScrollText className="size-4" />
+                <LucideScrollText className="size-5" />
                 Go to The List
               </Link>
             </Button>
             <Button
               asChild
-              variant="outline"
+              variant="salWithShadowHiddenYlw"
               className="w-full justify-start gap-2"
             >
               <Link variant="standard" href="/dashboard/account/billing">
-                <PiPiggyBank className="size-4" />
+                <PiPiggyBank className="size-5" />
                 Manage Billing
               </Link>
             </Button>
             <Button
               asChild
-              variant="outline"
+              variant="salWithShadowHiddenYlw"
               className="w-full justify-start gap-2"
             >
               <Link variant="standard" href="/dashboard/account/settings">
-                <FaGear className="size-4" />
+                <FaGear className="size-5" />
                 Account Settings
               </Link>
             </Button>
@@ -409,11 +409,11 @@ export default function Dashboard() {
             {isAdmin && isArtist && (
               <Button
                 asChild
-                variant="outline"
+                variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
                 <Link variant="standard" href="/dashboard/projects">
-                  <LucideFolderHeart className="size-4" />
+                  <LucideFolderHeart className="size-5" />
                   Manage Portfolio
                 </Link>
               </Button>
@@ -421,11 +421,11 @@ export default function Dashboard() {
             {isAdmin && (
               <Button
                 asChild
-                variant="outline"
+                variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
                 <Link variant="standard" href="/dashboard/admin/analytics">
-                  <TrendingUp className="size-4" />
+                  <TrendingUp className="size-5" />
                   View Analytics
                 </Link>
               </Button>
@@ -434,11 +434,11 @@ export default function Dashboard() {
             {isOrganizer && (
               <Button
                 asChild
-                variant="outline"
+                variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
                 <Link variant="standard" href="/pricing#plans">
-                  <LucideCalendarPlus2 className="size-4" />
+                  <LucideCalendarPlus2 className="size-5" />
                   Submit Event/Open Call
                 </Link>
               </Button>
@@ -446,11 +446,11 @@ export default function Dashboard() {
             {/* {isOrganizer && (
               <Button
                 asChild
-                variant="outline"
+                variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
                 <Link variant="standard" href="/dashboard/account/settings">
-                  <Users className="size-4" />
+                  <Users className="size-5" />
                   Invite Judges
                 </Link>
               </Button>
@@ -458,7 +458,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-2 min-[1400px]:col-span-3">
           <CardHeader>
             <CardTitle>Latest Updates</CardTitle>
             <CardDescription>Recent changes and notifications</CardDescription>

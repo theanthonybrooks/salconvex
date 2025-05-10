@@ -26,6 +26,7 @@ export default {
       },
       screens: {
         lg: "1025px",
+
         "2xl": "1536px",
         "3xl": "1920px",
         "4xl": "2560px",
@@ -165,6 +166,7 @@ export default {
         "50": "200px",
       },
       height: {
+        "13": "52px",
         "15": "60px",
         "25": "100px",
       },

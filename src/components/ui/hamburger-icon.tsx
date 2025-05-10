@@ -11,7 +11,12 @@ const MenuToggle = ({ className, menuState, setState }: MenuToggleProps) => {
   const isActive = menuState === "open";
   return (
     <button
-      className={cn(styles.hamburger, isActive && styles.active, className)}
+      className={cn(
+        styles.hamburger,
+        isActive && styles.active,
+        className,
+        "active:scale-90",
+      )}
       onClick={() => setState(isActive ? "closed" : "open")}
       aria-label="Toggle menu"
     >
