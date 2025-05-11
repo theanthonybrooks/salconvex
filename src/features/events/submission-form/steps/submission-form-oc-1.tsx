@@ -4,6 +4,7 @@ import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { Label } from "@/components/ui/label";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
+import { OcCustomDatePicker } from "@/components/ui/oc-date-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
@@ -78,7 +79,10 @@ const SubmissionFormOC1 = ({
   // const blankEventDates =
   //   eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   // const isAdmin = user?.role?.includes("admin") || false;
+
   const ocEligiblityType = openCall?.eligibility?.type;
+  const isNational = ocEligiblityType === "National";
+
   const hasAppFee = openCall?.basicInfo?.hasAppFee;
   const showAppFeeInput = hasAppFee?.trim() === "true";
   const appFee = openCall?.basicInfo?.appFee;
@@ -99,6 +103,13 @@ const SubmissionFormOC1 = ({
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
+
+  useEffect(() => {
+    if (!ocEligiblityType) return;
+    if (!isNational) {
+      setValue("openCall.eligibility.whom", []);
+    }
+  }, [ocEligiblityType, isNational, setValue]);
 
   // #endregion
 
@@ -162,7 +173,7 @@ const SubmissionFormOC1 = ({
           />
         </div>
         <div />
-        {/* TODO: Add a link to the FAQ page for more information on call formats */}
+        {/* TODO: Add a popover modal or link to the FAQ page for more information on call formats */}
         <span className="flex items-center justify-center gap-1 text-xs italic">
           For more information on Open Call Formats, check out the
           <Link
@@ -293,7 +304,7 @@ const SubmissionFormOC1 = ({
             </div>
 
             <div className="mx-auto flex w-full max-w-[74dvw] gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="event.name" className="sr-only">
+              <Label htmlFor="openCall.basicInfo.hasAppFee" className="sr-only">
                 Application Fee
               </Label>
               <Controller
@@ -308,7 +319,7 @@ const SubmissionFormOC1 = ({
                   >
                     <SelectTrigger
                       className={cn(
-                        "h-12 w-full flex-1 border text-center text-base sm:h-[50px]",
+                        "h-12 w-fit min-w-44 border text-center text-base sm:h-[50px]",
                       )}
                     >
                       <SelectValue placeholder="Is there an application fee?" />
@@ -347,7 +358,7 @@ const SubmissionFormOC1 = ({
                     // />
                     <SearchMappedSelect<Currency>
                       searchFields={["name", "symbol", "code"]}
-                      className="max-w-28 border-none py-0 py-2 sm:h-fit"
+                      className="max-w-28 border-none py-2 sm:h-fit"
                       value={field.value?.code ?? "USD"}
                       onChange={(code) => {
                         const selected = Object.values(currencies[0])
@@ -382,43 +393,56 @@ const SubmissionFormOC1 = ({
                         },
                       }}
                       placeholder="Enter Amount"
-                      className="h-fit border-none py-2 text-center focus:border-none focus:outline-none"
+                      className="h-fit border-none py-2 text-center focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
               </div>
             </div>
+            <div className="input-section">
+              <p className="min-w-max font-bold lg:text-xl">Step 4:</p>
+              <p className="lg:text-xs">Open Call Dates</p>
+            </div>
 
-            {/*           {canNameEvent && (
-              <>
-                <div className="input-section h-full">
-                  <p className="min-w-max font-bold lg:text-xl">
-                    Step {categoryEvent ? 6 : 5}:{" "}
-                  </p>
-                  <p className="lg:text-xs">
-                    {getEventCategoryLabelAbbr(category)} Details/Notes
-                  </p>
-                </div>
-
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="event.name" className="sr-only">
-                    {getEventCategoryLabelAbbr(category)} About
-                  </Label>
-                  <Controller
-                    name="event.about"
-                    control={control}
-                    render={({ field }) => (
-                      <RichTextEditor
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        placeholder="Short blurb about your project/event... (limit 200 characters)"
-                        charLimit={200}
-                      />
-                    )}
+            <div className="mx-auto flex w-full max-w-[74dvw] gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="openCall.basicInfo.dates" className="sr-only">
+                Open Call Dates
+              </Label>
+              <Controller
+                name="openCall.basicInfo.dates.ocStart"
+                control={control}
+                render={({ field }) => (
+                  <OcCustomDatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    pickerType="start"
+                    className="h-12"
                   />
-                </div>
-              </>
-            )}*/}
+                )}
+              />
+
+              <div className="flex items-center justify-center px-2">
+                <ArrowRight
+                  className={cn(
+                    "invisible size-4 shrink-0 text-foreground/50",
+                    showAppFeeInput && "visible",
+                  )}
+                />
+              </div>
+
+              <Controller
+                name="openCall.basicInfo.dates.ocEnd"
+                control={control}
+                render={({ field }) => (
+                  <OcCustomDatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    pickerType="end"
+                    className="h-12"
+                  />
+                )}
+              />
+            </div>
           </>
         )}
       </div>

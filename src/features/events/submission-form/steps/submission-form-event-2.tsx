@@ -155,10 +155,10 @@ const SubmissionFormEventStep2 = ({
                         </span>
 
                         <SelectItem fit value="Fixed">
-                          Fixed dates
+                          Fixed Deadline
                         </SelectItem>
                         <SelectItem fit value="Rolling">
-                          Rolling dates
+                          Rolling Open Call
                         </SelectItem>
                         <SelectItem fit value="Email">
                           Open email submissions

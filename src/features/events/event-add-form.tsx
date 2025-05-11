@@ -163,6 +163,7 @@ export const EventOCForm = ({
     getValues,
     setError,
     unregister,
+    // resetField,
     // trigger,
     // setValue,
     handleSubmit,
@@ -482,6 +483,8 @@ export const EventOCForm = ({
       }
       if (!hasOpenCall) {
         setActiveStep((prev) => prev - 3);
+      } else {
+        setActiveStep((prev) => prev - 1);
       }
     } else {
       setActiveStep((prev) => prev - 1);
@@ -897,8 +900,8 @@ export const EventOCForm = ({
               callFormat: openCallData.basicInfo.callFormat,
               callType: openCallData.basicInfo.callType,
               dates: {
-                ocStart: "",
-                ocEnd: "",
+                ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
+                ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
                 timezone: orgData.location?.timezone ?? "",
                 edition: eventData.dates.edition,
               },
@@ -942,6 +945,13 @@ export const EventOCForm = ({
               otherInfo: undefined,
             },
             state: activeStep === 3 ? "draft" : "submitted",
+          });
+
+          reset({
+            ...currentValues,
+            openCall: {
+              ...currentValues.openCall,
+            },
           });
           console.log("openCallResult", openCallResult);
         } catch (error) {
@@ -1105,6 +1115,9 @@ export const EventOCForm = ({
         basicInfo: {
           appFee: 0,
           callType: "Unknown",
+        },
+        eligibility: {
+          whom: [],
         },
       },
     });
