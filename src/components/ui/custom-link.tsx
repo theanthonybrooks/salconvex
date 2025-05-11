@@ -33,10 +33,7 @@ const CustomLink = ({
   ...props
 }: CustomLinkProps) => {
   return (
-    <Link
-      className={cn(linkVariants({ variant }), className, "truncate")}
-      {...props}
-    />
+    <Link className={cn(linkVariants({ variant }), className)} {...props} />
   );
 };
 

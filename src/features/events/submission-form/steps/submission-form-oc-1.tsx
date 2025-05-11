@@ -1,9 +1,9 @@
-import { MultiSelect } from "@/components/multi-select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FormDatePicker } from "@/components/ui/form-date-pickers";
+import { currencies, Currency } from "@/app/data/currencies";
+import { Link } from "@/components/ui/custom-link";
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { Label } from "@/components/ui/label";
-import AvatarUploader from "@/components/ui/logo-uploader";
-import { MapboxInputFull } from "@/components/ui/mapbox-search";
+import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
@@ -12,92 +12,95 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { EventNameSearch } from "@/features/events/components/event-search";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { EventCategory, eventTypeOptions } from "@/types/event";
-import { CallFormat } from "@/types/openCall";
+import { CallFormat, EligibilityType } from "@/types/openCall";
 import { User } from "@/types/user";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
+import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
+import { Country } from "world-countries";
 
 interface SubmissionFormOC1Props {
   user: User | undefined;
   isAdmin: boolean;
   isMobile: boolean;
-  existingOrg: Doc<"organizations"> | null;
-  existingEvent: Doc<"events"> | null;
   categoryEvent: boolean;
   canNameEvent: boolean;
 }
 
 const SubmissionFormOC1 = ({
-  user,
+  // user,
   // isAdmin,
   isMobile,
-  existingOrg,
-  existingEvent,
-  categoryEvent,
+
+  // categoryEvent,
   canNameEvent,
 }: SubmissionFormOC1Props) => {
   const {
     control,
     watch,
     setValue,
-    getValues,
-    formState: { errors, dirtyFields },
+    // getValues,
+    formState: { errors },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
-  const currentValues = getValues();
-  const eventData = watch("event");
-  const eventName = eventData?.name;
-  const eventDates = eventData?.dates?.eventDates;
+  // const currentValues = getValues();
+  // const eventData = watch("event");
+  const openCall = watch("openCall");
+  // const eventDates = eventData?.dates?.eventDates;
+  // const appFee = openCall?.basicInfo?.appFee;
 
-  const category = eventData?.category as EventCategory;
+  // const category = eventData?.category as EventCategory;
 
   // #region ------------- Queries, Actions, and Mutations --------------
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
-  const { isSuccess: eventNameValid, isError: eventNameExistsError } =
-    useQueryWithStatus(
-      api.events.event.checkEventNameExists,
-      eventName && eventName.trim().length >= 3
-        ? {
-            name: eventName,
-            organizationId: existingOrg?._id,
-            eventId: existingEvent?._id,
-          }
-        : "skip",
-    );
   // #endregion
 
-  const eventNameIsDirty = dirtyFields.event?.name ?? false;
-  const hasEventLocation =
-    dirtyFields.event?.location || eventData?.location?.full !== undefined; // removed && eventNameValid
-  const isOngoing = eventData?.dates?.eventFormat === "ongoing";
-  const eventDatesFormat = eventData?.dates?.eventFormat;
-  const hasEventFormat = !!eventData?.dates?.eventFormat;
-  const eventDateFormatRequired = !!(
-    hasEventFormat &&
-    eventDatesFormat &&
-    ["setDates", "monthRange", "yearRange", "seasonRange"].includes(
-      eventDatesFormat,
-    )
-  );
-  const eventDateFormatNotRequired = !!(
-    hasEventFormat &&
-    eventDatesFormat &&
-    ["noEvent"].includes(eventDatesFormat)
-  );
-  const blankEventDates =
-    eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
-  const orgData = watch("organization");
-  const isAdmin = user?.role?.includes("admin") || false;
+  // const hasEventLocation =
+  //   dirtyFields.event?.location || eventData?.location?.full !== undefined; // removed && eventNameValid
+  // const isOngoing = eventData?.dates?.eventFormat === "ongoing";
+  // const eventDatesFormat = eventData?.dates?.eventFormat;
+  // const hasEventFormat = !!eventData?.dates?.eventFormat;
+  // const eventDateFormatRequired = !!(
+  //   hasEventFormat &&
+  //   eventDatesFormat &&
+  //   ["setDates", "monthRange", "yearRange", "seasonRange"].includes(
+  //     eventDatesFormat,
+  //   )
+  // );
+  // const eventDateFormatNotRequired = !!(
+  //   hasEventFormat &&
+  //   eventDatesFormat &&
+  //   ["noEvent"].includes(eventDatesFormat)
+  // );
+  // const blankEventDates =
+  //   eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
+  // const isAdmin = user?.role?.includes("admin") || false;
+  const ocEligiblityType = openCall?.eligibility?.type;
+  const hasAppFee = openCall?.basicInfo?.hasAppFee;
+  const showAppFeeInput = hasAppFee?.trim() === "true";
+  const appFee = openCall?.basicInfo?.appFee;
+  const validAppFeeAmount = !!appFee && appFee > 0;
+  const noAppFeeAmount = !!appFee && appFee === 0;
+
+  // #region -------------- UseEffect ---------------
+  useEffect(() => {
+    const formValue = hasAppFee?.trim();
+    const shouldBe = validAppFeeAmount ? "true" : "";
+    if (!formValue) {
+      if (validAppFeeAmount) {
+        setValue("openCall.basicInfo.hasAppFee", shouldBe);
+      } else {
+        setValue("openCall.basicInfo.hasAppFee", "false");
+      }
+    } else if (formValue === "false" && validAppFeeAmount) {
+      setValue("openCall.basicInfo.appFee", 0);
+    }
+  }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
+
+  // #endregion
 
   return (
     <div
@@ -143,7 +146,7 @@ const SubmissionFormOC1 = ({
                       errors.event?.category && "invalid-field",
                     )}
                   >
-                    <SelectValue placeholder="Event/Project Category (select one)" />
+                    <SelectValue placeholder="Call Format (select one)" />
                   </SelectTrigger>
                   <SelectContent className="min-w-auto">
                     <SelectItem fit value="RFQ">
@@ -158,196 +161,268 @@ const SubmissionFormOC1 = ({
             }}
           />
         </div>
-
+        <div />
+        {/* TODO: Add a link to the FAQ page for more information on call formats */}
+        <span className="flex items-center justify-center gap-1 text-xs italic">
+          For more information on Open Call Formats, check out the
+          <Link
+            href="https://www.thestreetartlist.com/faq#call-formats"
+            target="_blank"
+            className="font-bold"
+          >
+            FAQ
+          </Link>
+        </span>
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
-          <p className="lg:text-xs">Event Type</p>
+          <p className="lg:text-xs">Eligibility</p>
         </div>
 
         <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-          <Label htmlFor="event.type" className="sr-only">
-            Event Type
+          <Label htmlFor="event.category" className="sr-only">
+            Open Call Eligibility
           </Label>
           <Controller
-            name="event.type"
+            name="openCall.eligibility.type"
             control={control}
-            render={({ field }) => (
-              <MultiSelect
-                id="event.type"
-                className={cn(
-                  "h-12 border sm:h-[50px]",
-                  errors.event?.type && "invalid-field",
-                )}
-                badgeClassName="py-2 lg:py-2 lg:text-sm "
-                textClassName="text-base"
-                options={[...eventTypeOptions]}
-                onValueChange={(value) => {
-                  field.onChange(value);
-                }}
-                defaultValue={field.value ?? []}
-                shortResults={isMobile}
-                placeholder="Select up to 2 event types"
-                variant="basic"
-                maxCount={1}
-                limit={2}
-                height={10}
-                shiftOffset={-10}
-                hasSearch={false}
-                selectAll={false}
-                tabIndex={4}
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <Select
+                  onValueChange={(value: EligibilityType) => {
+                    field.onChange(value);
+                  }}
+                  value={field.value || ""}
+                >
+                  <SelectTrigger
+                    className={cn(
+                      "h-12 w-full border text-center text-base sm:h-[50px]",
+                      errors.event?.category && "invalid-field",
+                    )}
+                  >
+                    <SelectValue placeholder="Eligiblity type (select one)" />
+                  </SelectTrigger>
+                  <SelectContent className="min-w-auto">
+                    <SelectItem fit value="International">
+                      International Artists (All)
+                    </SelectItem>
+                    <SelectItem fit value="National">
+                      National Artists
+                    </SelectItem>
+                    <SelectItem fit value="Regional/Local">
+                      Regional/Local Artists
+                    </SelectItem>
+                    <SelectItem fit value="Other">
+                      Other (specify below)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              );
+            }}
           />
         </div>
+        {ocEligiblityType === "National" && (
+          <>
+            <div className="input-section self-start">
+              <p className="lg:text-xs">Eligible Nationalities</p>
+            </div>
+
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.category" className="sr-only">
+                Open Call Eligibility
+              </Label>
+
+              <Controller
+                name="openCall.eligibility.whom"
+                control={control}
+                render={({ field }) => (
+                  <SearchMappedMultiSelect<Country>
+                    values={field.value}
+                    onChange={field.onChange}
+                    data={sortedGroupedCountries}
+                    placeholder="Select eligible nationalities"
+                    getItemLabel={(country) => country.name.common}
+                    getItemValue={(country) => country.name.common}
+                    displayLimit={isMobile ? 1 : 2}
+                    // getItemValue={(country) => country.name.common}
+                    searchFields={[
+                      "name.common",
+                      "name.official",
+                      "cca3",
+                      "altSpellings",
+                    ]}
+                    tabIndex={2}
+                    className="h-12 min-h-12 border border-foreground bg-card text-base hover:bg-card"
+                  />
+                )}
+              />
+            </div>
+          </>
+        )}
+
+        {ocEligiblityType && (
+          <>
+            <div className="input-section self-start">
+              <p className="lg:text-xs">More Info</p>
+            </div>
+
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.type" className="sr-only">
+                Eligibility Continued... (if not &quot;International&quot;)
+              </Label>
+              <Controller
+                name="openCall.eligibility.details"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Please be as specific as possible (limit 750 characters)"
+                    charLimit={750}
+                  />
+                )}
+              />
+            </div>
+          </>
+        )}
 
         {canNameEvent && (
           <>
             <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">
-                Step {categoryEvent ? 3 : 2}:{" "}
-              </p>
-              <p className="lg:text-xs">
-                {getEventCategoryLabelAbbr(category)} Name
-              </p>
+              <p className="min-w-max font-bold lg:text-xl">Step 3:</p>
+              <p className="lg:text-xs">App Fee</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full max-w-[74dvw] gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.name" className="sr-only">
-                {getEventCategoryLabelAbbr(category)} Name
+                Application Fee
               </Label>
               <Controller
-                name="event.name"
+                name="openCall.basicInfo.hasAppFee"
                 control={control}
                 render={({ field }) => (
-                  <EventNameSearch
-                    value={field.value}
-                    isExisting={eventNameExistsError}
-                    onChange={field.onChange}
-                    className={cn(
-                      "border !text-base sm:h-[50px]",
-                      errors.event?.name &&
-                        dirtyFields.event?.name &&
-                        "invalid-field",
-                    )}
-                  />
+                  <Select
+                    onValueChange={(value: "true" | "false" | "") => {
+                      field.onChange(value);
+                    }}
+                    value={field.value || ""}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        "h-12 w-full flex-1 border text-center text-base sm:h-[50px]",
+                      )}
+                    >
+                      <SelectValue placeholder="Is there an application fee?" />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-auto">
+                      <SelectItem fit value="true">
+                        Yes
+                      </SelectItem>
+                      <SelectItem fit value="false">
+                        No
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
               />
-              {eventNameExistsError && eventNameIsDirty && (
-                <span className="mt-2 w-full text-center text-sm text-red-600">
-                  {category === "event"
-                    ? "An event with that name already exists."
-                    : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
-                </span>
-              )}
+
+              <div className="flex items-center justify-center px-2">
+                <ArrowRight
+                  className={cn(
+                    "invisible size-4 shrink-0 text-foreground/50",
+                    showAppFeeInput && "visible",
+                  )}
+                />
+              </div>
+
+              <div className="min-w-50 flex flex-1 items-center justify-between rounded border border-foreground px-3">
+                <Controller
+                  name="organization.location.currency"
+                  control={control}
+                  render={({ field }) => (
+                    // <DebouncedControllerInput
+                    //   disabled={!showAppFeeInput}
+                    //   field={field}
+                    //   placeholder="$"
+                    //   className="h-12 border border-foreground"
+                    // />
+                    <SearchMappedSelect<Currency>
+                      searchFields={["name", "symbol", "code"]}
+                      className="max-w-28 border-none py-0 py-2 sm:h-fit"
+                      value={field.value?.code ?? "USD"}
+                      onChange={(code) => {
+                        const selected = Object.values(currencies[0])
+                          .flat()
+                          .find((cur) => cur.code === code);
+
+                        if (selected) field.onChange(selected);
+                      }}
+                      data={currencies[0]}
+                      getItemLabel={(c) =>
+                        `${c.symbol} (${c.code}) - ${c.name}`
+                      }
+                      getItemDisplay={(c) => `(${c.code}) ${c.symbol} `}
+                      getItemValue={(c) => c.code}
+                      disabled={!showAppFeeInput}
+                    />
+                  )}
+                />
+                <Controller
+                  name="openCall.basicInfo.appFee"
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerInput
+                      type="number"
+                      disabled={!showAppFeeInput}
+                      // field={field}
+                      field={{
+                        ...field,
+                        onChange: (val: string) => {
+                          const num = parseFloat(val);
+                          field.onChange(isNaN(num) ? 0 : num);
+                        },
+                      }}
+                      placeholder="Enter Amount"
+                      className="h-fit border-none py-2 text-center focus:border-none focus:outline-none"
+                    />
+                  )}
+                />
+              </div>
             </div>
-            {eventNameValid && (
+
+            {/*           {canNameEvent && (
               <>
-                <div className="input-section">
+                <div className="input-section h-full">
                   <p className="min-w-max font-bold lg:text-xl">
-                    Step {categoryEvent ? 4 : 3}:{" "}
+                    Step {categoryEvent ? 6 : 5}:{" "}
                   </p>
-                  <p className="lg:text-xs">Location</p>
+                  <p className="lg:text-xs">
+                    {getEventCategoryLabelAbbr(category)} Details/Notes
+                  </p>
                 </div>
 
                 <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.name" className="sr-only">
-                    {getEventCategoryLabelAbbr(category)} Location
+                    {getEventCategoryLabelAbbr(category)} About
                   </Label>
-
                   <Controller
-                    name="event.location"
+                    name="event.about"
                     control={control}
                     render={({ field }) => (
-                      <MapboxInputFull
-                        id="event.location"
-                        isEvent
-                        value={field.value}
+                      <RichTextEditor
+                        value={field.value ?? ""}
                         onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        reset={eventNameExistsError}
-                        tabIndex={2}
-                        placeholder="Event Location (if different from organization)..."
-                        className="mb-3 w-full lg:mb-0"
-                        inputClassName={cn(
-                          "rounded-lg border-foreground disabled:opacity-50",
-                          errors.event?.location && "invalid-field",
-                        )}
+                        placeholder="Short blurb about your project/event... (limit 200 characters)"
+                        charLimit={200}
                       />
                     )}
                   />
                 </div>
-                <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">
-                    Step {categoryEvent ? 5 : 4}:{" "}
-                  </p>
-                  <p className="lg:text-xs">
-                    {getEventCategoryLabelAbbr(category)} Logo
-                  </p>
-                </div>
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="organization.logo" className="sr-only">
-                    Event/Project Logo
-                  </Label>
-                  <Controller
-                    name="event.logo"
-                    control={control}
-                    render={({ field }) => (
-                      <AvatarUploader
-                        id="event.logo"
-                        onChange={(file) => field.onChange(file)}
-                        onRemove={() =>
-                          field.onChange(orgData?.logo ?? "1.jpg")
-                        }
-                        reset={eventNameExistsError}
-                        disabled={eventNameExistsError}
-                        initialImage={
-                          typeof field.value === "string"
-                            ? field.value
-                            : undefined
-                        }
-                        size={72}
-                        tabIndex={3}
-                        className={cn("pb-3")}
-                      />
-                    )}
-                  />
-                </div>
-                {canNameEvent && (
-                  <>
-                    <div className="input-section h-full">
-                      <p className="min-w-max font-bold lg:text-xl">
-                        Step {categoryEvent ? 6 : 5}:{" "}
-                      </p>
-                      <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(category)} Details/Notes
-                      </p>
-                    </div>
-
-                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                      <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabelAbbr(category)} About
-                      </Label>
-                      <Controller
-                        name="event.about"
-                        control={control}
-                        render={({ field }) => (
-                          <RichTextEditor
-                            value={field.value ?? ""}
-                            onChange={field.onChange}
-                            placeholder="Short blurb about your project/event... (limit 200 characters)"
-                            charLimit={200}
-                          />
-                        )}
-                      />
-                    </div>
-                  </>
-                )}
               </>
-            )}
+            )}*/}
           </>
         )}
       </div>
-      {hasEventLocation && (
+      {/* {hasEventLocation && (
         <>
           <Separator
             thickness={2}
@@ -379,78 +454,10 @@ const SubmissionFormOC1 = ({
               watchPath="event"
             />
 
-            {!isOngoing &&
-              hasEventFormat &&
-              (!blankEventDates || eventDateFormatNotRequired) && (
-                <>
-                  <div className="input-section">
-                    <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent ? 8 : 7}:{" "}
-                    </p>
-                    <p className="lg:text-xs">Production Dates</p>
-                  </div>
-
-                  <FormDatePicker
-                    isAdmin={isAdmin}
-                    title="Production Dates Format"
-                    nameBase="event.dates"
-                    type="production"
-                    watchPath="event"
-                  />
-                  <div />
-                  <label
-                    className={cn(
-                      "mx-auto flex cursor-pointer items-center gap-2 py-2",
-                    )}
-                  >
-                    <Controller
-                      name="event.dates.noProdStart"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <Checkbox
-                            disabled={
-                              isOngoing ||
-                              !hasEventFormat ||
-                              (blankEventDates && eventDateFormatRequired)
-                            }
-                            tabIndex={4}
-                            id="noProdStart"
-                            className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                            checked={field.value || false}
-                            onCheckedChange={(checked) => {
-                              field.onChange(checked);
-                              if (checked) {
-                                setValue("event.dates.prodDates", [
-                                  {
-                                    start: "",
-                                    end: currentValues.event.dates?.prodDates
-                                      ? currentValues.event.dates.prodDates[0]
-                                          ?.end
-                                      : "",
-                                  },
-                                ]);
-                              }
-                              // if (blankProdStart) {
-                              //   setNoProdStart(true);
-                              // } else if (hasProdDateAndFormat) {
-                              //   setNoProdStart(false);
-                              // }
-                            }}
-                          />
-                        );
-                      }}
-                    />
-
-                    <span className={cn("text-sm")}>
-                      The beginning production date is flexible/open
-                    </span>
-                  </label>
-                </>
-              )}
+          
           </div>
         </>
-      )}
+      )}*/}
     </div>
 
     //   )}

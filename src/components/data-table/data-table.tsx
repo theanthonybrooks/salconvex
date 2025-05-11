@@ -120,7 +120,7 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {
       // setRowSelection(selectedRow);
-      console.log("dogs");
+      // console.log("dogs");
     } else {
       setRowSelection({});
     }

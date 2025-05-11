@@ -6,7 +6,9 @@ import { cn } from "@/lib/utils";
 import { HiArrowTurnRightDown } from "react-icons/hi2";
 
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { EventOCFormValues } from "@/features/events/event-add-form";
+import { ValidLinkPath } from "@/features/organizers/schemas/event-add-schema";
+import { Control, Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   FaEnvelope,
   FaFacebook,
@@ -18,12 +20,13 @@ import {
   FaThreads,
   FaVk,
 } from "react-icons/fa6";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { Country } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
 type FormLinksInputProps = {
   existingOrgHasLinks?: boolean;
   type: "event" | "organization";
+  handleCheckSchema?: () => void;
 };
 
 const handleFields: {
@@ -61,8 +64,14 @@ const handleFields: {
 export const FormLinksInput = ({
   existingOrgHasLinks,
   type,
+  handleCheckSchema,
 }: FormLinksInputProps) => {
-  const { control, watch, setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext<EventOCFormValues>();
   const isEvent = type === "event";
   const isOrg = type === "organization";
   const eventData = watch("event");
@@ -122,7 +131,7 @@ export const FormLinksInput = ({
                 name="organization.contact.primaryContact"
                 control={control}
                 render={({ field: primaryFieldControl }) => (
-                  <div className="flex items-center gap-x-2">
+                  <div className="flex items-center gap-x-4">
                     <FaGlobe
                       className={cn(
                         "size-5 shrink-0",
@@ -137,8 +146,16 @@ export const FormLinksInput = ({
                         <DebouncedControllerInput
                           field={field}
                           placeholder="organization website"
-                          className="flex-1"
+                          className={cn(
+                            "flex-1",
+                            errors?.[type]?.links?.website && "invalid-field",
+                          )}
                           transform={autoHttps}
+                          onBlur={() => {
+                            field.onBlur?.();
+                            handleCheckSchema?.();
+                            // console.log("Blur me", field + type)
+                          }}
                         />
                       )}
                     />
@@ -155,7 +172,7 @@ export const FormLinksInput = ({
                 )}
               />
             ) : (
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-4">
                 <FaGlobe className={cn("size-5 shrink-0")} />
                 <Controller
                   name={`${type}.links.website`}
@@ -165,8 +182,15 @@ export const FormLinksInput = ({
                       disabled={eventSameAsOrg && isEvent}
                       field={field}
                       placeholder="event website"
-                      className="flex-1"
+                      className={cn(
+                        "flex-1",
+                        errors?.[type]?.links?.website && "invalid-field",
+                      )}
                       transform={autoHttps}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
                     />
                   )}
                 />
@@ -178,7 +202,7 @@ export const FormLinksInput = ({
                 name="organization.contact.primaryContact"
                 control={control}
                 render={({ field: primaryFieldControl }) => (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-x-4">
                     <FaEnvelope
                       className={cn(
                         "size-5 shrink-0",
@@ -191,8 +215,16 @@ export const FormLinksInput = ({
                       render={({ field }) => (
                         <DebouncedControllerInput
                           field={field}
-                          placeholder="example@email.com"
-                          className="flex-1"
+                          placeholder="example@email.com (*required)"
+                          className={cn(
+                            "flex-1",
+                            errors?.[type]?.links?.email && "invalid-field",
+                          )}
+                          onBlur={() => {
+                            field.onBlur?.();
+                            handleCheckSchema?.();
+                            // console.log("Blur me", field + type)
+                          }}
                         />
                       )}
                     />
@@ -220,7 +252,14 @@ export const FormLinksInput = ({
                       disabled={eventSameAsOrg && isEvent}
                       field={field}
                       placeholder="example@email.com"
-                      className="flex-1"
+                      className={cn(
+                        "flex-1",
+                        errors?.[type]?.links?.email && "invalid-field",
+                      )}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
                     />
                   )}
                 />
@@ -232,7 +271,7 @@ export const FormLinksInput = ({
                 name="organization.contact.primaryContact"
                 control={control}
                 render={({ field: primaryFieldControl }) => (
-                  <div className="flex items-center gap-x-2">
+                  <div className="flex items-center gap-x-4">
                     <FaPhone
                       className={cn(
                         "size-5 shrink-0",
@@ -246,11 +285,19 @@ export const FormLinksInput = ({
                         <PhoneInput
                           {...field}
                           international
-                          defaultCountry={eventCountry || "US"}
+                          defaultCountry={(eventCountry as Country) || "US"}
                           value={field.value ?? ""}
                           placeholder="+1 (555) 555-5555"
-                          className="flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
+                          className={cn(
+                            "flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                            errors?.[type]?.links?.phone && "invalid-field",
+                          )}
                           onChange={field.onChange}
+                          onBlur={() => {
+                            field.onBlur?.();
+                            handleCheckSchema?.();
+                            // console.log("Blur me", field + type)
+                          }}
                         />
                       )}
                     />
@@ -267,7 +314,7 @@ export const FormLinksInput = ({
                 )}
               />
             ) : (
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-4">
                 <FaPhone className={cn("size-5 shrink-0")} />
                 <Controller
                   name={`${type}.links.phone`}
@@ -277,11 +324,18 @@ export const FormLinksInput = ({
                       {...field}
                       disabled={eventSameAsOrg && isEvent}
                       international
-                      defaultCountry={eventCountry || "US"}
+                      defaultCountry={(eventCountry as Country) || "US"}
                       value={field.value ?? ""}
                       placeholder="+1 (555) 555-5555"
-                      className="flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50"
+                      className={cn(
+                        "flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                        errors?.[type]?.links?.phone && "invalid-field",
+                      )}
                       onChange={field.onChange}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
                     />
                   )}
                 />
@@ -289,7 +343,7 @@ export const FormLinksInput = ({
             )}
 
             {isEvent && (
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-4">
                 <FaLink className={cn("size-5 shrink-0")} />
                 <Controller
                   name="event.links.linkAggregate"
@@ -299,8 +353,15 @@ export const FormLinksInput = ({
                       disabled={eventSameAsOrg && isEvent}
                       field={field}
                       placeholder="linktree (or similar)"
-                      className="flex-1"
+                      className={cn(
+                        "flex-1",
+                        errors?.[type]?.links?.linkAggregate && "invalid-field",
+                      )}
                       transform={autoHttps}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
                     />
                   )}
                 />
@@ -316,7 +377,8 @@ export const FormLinksInput = ({
                     {handleFields.map(
                       ({ key, icon, platform, placeholder }) => {
                         const name =
-                          `${type}.links.${key}` as `organization.links.${string}`;
+                          `organization.links.${key}` as ValidLinkPath;
+
                         return (
                           <HandleInput
                             key={name}
@@ -339,8 +401,8 @@ export const FormLinksInput = ({
               <>
                 {/* Debounced handle fields */}
                 {handleFields.map(({ key, icon, platform, placeholder }) => {
-                  const name =
-                    `${type}.links.${key}` as `event.links.${string}`;
+                  const name = `event.links.${key}` as ValidLinkPath;
+
                   return (
                     <HandleInput
                       key={name}
@@ -351,13 +413,14 @@ export const FormLinksInput = ({
                       placeholder={placeholder}
                       disabled={eventSameAsOrg && isEvent}
                       primaryField={primaryField}
+                      handleCheckSchema={handleCheckSchema}
                     />
                   );
                 })}
               </>
             )}
             {isOrg && (
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-4">
                 <FaLink className={cn("size-5 shrink-0")} />
                 <Controller
                   name="organization.links.linkAggregate"
@@ -367,15 +430,22 @@ export const FormLinksInput = ({
                       disabled={eventSameAsOrg && isEvent}
                       field={field}
                       placeholder="linktree (or similar)"
-                      className="flex-1"
+                      className={cn(
+                        "flex-1",
+                        errors?.[type]?.links?.linkAggregate && "invalid-field",
+                      )}
                       transform={autoHttps}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
                     />
                   )}
                 />
               </div>
             )}
 
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-4">
               <FaPlus className={cn("size-5 shrink-0")} />
               <Controller
                 name={`${type}.links.other`}
@@ -387,6 +457,10 @@ export const FormLinksInput = ({
                     placeholder="other links..."
                     className="flex-1"
                     transform={autoHttps}
+                    onBlur={() => {
+                      field.onBlur?.();
+                      handleCheckSchema?.();
+                    }}
                   />
                 )}
               />
@@ -399,8 +473,8 @@ export const FormLinksInput = ({
 };
 
 type HandleInputProps = {
-  control: ReturnType<typeof useFormContext>["control"];
-  name: `event.links.${string}` | `organization.links.${string}`;
+  control: Control<EventOCFormValues>;
+  name: ValidLinkPath;
   platform: PlatformType;
   icon: React.ReactNode;
   placeholder: string;
@@ -408,6 +482,7 @@ type HandleInputProps = {
   isOrg?: boolean;
   primaryField?: string;
   onPrimaryChange?: (value: string) => void;
+  handleCheckSchema?: () => void;
 };
 
 function HandleInput({
@@ -420,60 +495,57 @@ function HandleInput({
   isOrg,
   primaryField,
   onPrimaryChange,
+  handleCheckSchema,
 }: HandleInputProps) {
-  const watched = useWatch({ control, name });
-  // const [inputVal, setInputVal] = useState(watched ?? "");
-
-  // const debounced = useRef(
-  //   debounce((raw: string, onChange: (val: string) => void) => {
-  //     onChange(formatHandleInput(raw, platform));
-  //   }, 500),
-  // ).current;
-
-  // useEffect(() => {
-  //   setInputVal(watched ?? "");
-  // }, [watched]);
-
   const fieldKey = name.split(".").pop();
+  const watched = useWatch({ control, name });
+  const { getFieldState } = useFormContext<EventOCFormValues>();
+  const { error } = getFieldState(name);
 
   return (
-    <div className="flex items-center gap-x-2">
+    <div className="flex items-center gap-x-4">
       {icon}
       <Controller
         name={name}
         control={control}
-        render={({ field }) => (
-          // <Input
-          //   disabled={disabled}
-          //   value={inputVal}
-          //   placeholder={placeholder}
-          //   className="flex-1"
-          //   onChange={(e) => {
-          //     const raw = e.target.value;
-          //     setInputVal(raw);
-          //     debounced(raw, field.onChange);
-          //   }}
-          //   onPaste={(e) => {
-          //     e.preventDefault();
-          //     const pasted = e.clipboardData.getData("text");
-          //     const formatted = formatHandleInput(pasted, platform);
-          //     setInputVal(formatted);
-          //     field.onChange(formatted);
-          //   }}
-          // />
-          <DebouncedControllerInput
-            field={field}
-            disabled={disabled}
-            placeholder={placeholder}
-            className="flex-1"
-            transform={(val) => formatHandleInput(val, platform)}
-          />
-        )}
+        render={({ field }) => {
+          return (
+            // <Input
+            //   disabled={disabled}
+            //   value={inputVal}
+            //   placeholder={placeholder}
+            //   className="flex-1"
+            //   onChange={(e) => {
+            //     const raw = e.target.value;
+            //     setInputVal(raw);
+            //     debounced(raw, field.onChange);
+            //   }}
+            //   onPaste={(e) => {
+            //     e.preventDefault();
+            //     const pasted = e.clipboardData.getData("text");
+            //     const formatted = formatHandleInput(pasted, platform);
+            //     setInputVal(formatted);
+            //     field.onChange(formatted);
+            //   }}
+            // />
+            <DebouncedControllerInput
+              field={field}
+              disabled={disabled}
+              placeholder={placeholder}
+              className={cn("flex-1", error && "invalid-field")}
+              transform={(val) => formatHandleInput(val, platform)}
+              onBlur={() => {
+                field.onBlur?.();
+                handleCheckSchema?.();
+              }}
+            />
+          );
+        }}
       />
       {isOrg && fieldKey && (
         <Input
           type="radio"
-          disabled={!watched?.trim()}
+          disabled={typeof watched !== "string" || !watched.trim()}
           name="primaryContact"
           value={fieldKey}
           checked={primaryField === fieldKey}

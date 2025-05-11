@@ -40,6 +40,7 @@ export type Organizer = {
       code: string;
       name: string;
       symbol: string;
+      format?: string;
     };
     demonym?: string;
     timezone?: string;

@@ -161,6 +161,7 @@ const organizationSchema = {
           code: v.string(),
           name: v.string(),
           symbol: v.string(),
+          format: v.optional(v.string()),
         }),
       ),
       demonym: v.optional(v.string()),
@@ -329,8 +330,8 @@ const openCallSchema = {
     budget: v.object({
       min: v.number(),
       max: v.optional(v.number()),
-      rate: v.number(),
-      unit: v.string(),
+      rate: v.optional(v.number()),
+      unit: v.optional(v.string()),
       currency: v.string(),
       allInclusive: v.boolean(),
       moreInfo: v.optional(v.string()),
@@ -348,7 +349,7 @@ const openCallSchema = {
 
   requirements: v.object({
     requirements: v.string(),
-    more: v.string(),
+    more: v.optional(v.string()),
     destination: v.string(),
     documents: v.optional(
       v.array(

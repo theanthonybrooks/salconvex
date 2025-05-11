@@ -302,7 +302,7 @@ const SubmissionFormOrgStep = ({
               }}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                  console.log("falsito");
+                  // console.log("falsito");
                   setNewOrgEvent(false);
                 } else if (
                   !newOrgEvent &&
@@ -326,7 +326,7 @@ const SubmissionFormOrgStep = ({
               data={eventsData}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                  console.log("falsito");
+                  // console.log("falsito");
                   setNewOrgEvent(false);
                 } else if (
                   !newOrgEvent &&
@@ -351,7 +351,7 @@ const SubmissionFormOrgStep = ({
               data={eventsData}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                  console.log("falsito");
+                  // console.log("falsito");
                   setNewOrgEvent(false);
                 } else if (
                   !newOrgEvent &&

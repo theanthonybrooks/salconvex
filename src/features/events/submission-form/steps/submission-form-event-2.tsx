@@ -25,6 +25,7 @@ interface SubmissionFormEventStep2Props {
   existingEvent: Doc<"events"> | null;
   categoryEvent: boolean;
   canNameEvent: boolean;
+  handleCheckSchema?: () => void;
 }
 
 const SubmissionFormEventStep2 = ({
@@ -35,6 +36,7 @@ const SubmissionFormEventStep2 = ({
 
   categoryEvent,
   canNameEvent,
+  handleCheckSchema,
 }: SubmissionFormEventStep2Props) => {
   const {
     control,
@@ -88,6 +90,7 @@ const SubmissionFormEventStep2 = ({
           <FormLinksInput
             existingOrgHasLinks={!!existingOrg?.links}
             type="event"
+            handleCheckSchema={handleCheckSchema}
           />
         </div>
       </div>
@@ -136,7 +139,7 @@ const SubmissionFormEventStep2 = ({
                         />
                       </SelectTrigger>
                       <SelectContent className="min-w-auto">
-                        <SelectItem fit value="false">
+                        <SelectItem fit value="False">
                           No, there&apos;s not an open call
                         </SelectItem>
                         <SelectItem fit value="Invite">

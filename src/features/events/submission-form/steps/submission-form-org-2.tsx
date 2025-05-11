@@ -1,5 +1,5 @@
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { FormLinksInput } from "@/components/ui/form-links-inputs";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Separator } from "@/components/ui/separator";
@@ -8,14 +8,16 @@ import { cn } from "@/lib/utils";
 import { Controller, useFormContext } from "react-hook-form";
 
 interface SubmissionFormOrgStep2Props {
-  className?: string; //just a placeholder
+  handleCheckSchema?: () => void;
 }
 
-const SubmissionFormOrgStep2 = ({}: SubmissionFormOrgStep2Props) => {
+const SubmissionFormOrgStep2 = ({
+  handleCheckSchema,
+}: SubmissionFormOrgStep2Props) => {
   const {
     control,
     // watch,
-    // formState: { errors },
+    formState: { errors },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
 
@@ -48,7 +50,10 @@ const SubmissionFormOrgStep2 = ({}: SubmissionFormOrgStep2Props) => {
               Organizer Links
             </Label>
 
-            <FormLinksInput type="organization" />
+            <FormLinksInput
+              type="organization"
+              handleCheckSchema={handleCheckSchema}
+            />
           </div>
         </div>
 
@@ -79,13 +84,28 @@ const SubmissionFormOrgStep2 = ({}: SubmissionFormOrgStep2Props) => {
                 name="organization.contact.organizer"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    id="event.location"
-                    value={field.value || ""}
-                    onChange={field.onChange}
-                    tabIndex={2}
+                  // <Input
+                  //   id="event.location"
+                  //   value={field.value || ""}
+                  //   onChange={field.onChange}
+                  //   tabIndex={2}
+                  //   placeholder="Name of primary contact"
+                  //   className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
+                  // />
+                  <DebouncedControllerInput
+                    field={field}
                     placeholder="Name of primary contact"
-                    className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
+                    className={cn(
+                      "w-full rounded border-foreground",
+                      errors?.organization?.contact?.organizer &&
+                        "invalid-field",
+                    )}
+                    tabIndex={2}
+                    onBlur={() => {
+                      field.onBlur?.();
+                      handleCheckSchema?.();
+                      // console.log("Blur me", field + type)
+                    }}
                   />
                 )}
               />

@@ -75,6 +75,7 @@ interface SearchMappedSelectProps<T> {
   placeholder?: string;
   // width?: string
   className?: string;
+  tabIndex?: number;
 }
 
 export function SearchMappedSelect<T>({
@@ -89,6 +90,7 @@ export function SearchMappedSelect<T>({
   searchFields,
   disabled = false,
   placeholder = "Select an option",
+  tabIndex,
 }: // width = "w-[280px]",
 SearchMappedSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -147,8 +149,8 @@ SearchMappedSelectProps<T>) {
   );
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
+      <PopoverTrigger asChild tabIndex={tabIndex}>
         <Button
           variant="outline"
           className={cn(
@@ -161,15 +163,16 @@ SearchMappedSelectProps<T>) {
             {selectedLabel ? getItemDisplay(selectedLabel) : placeholder}
           </span>
           {isOpen ? (
-            <ChevronUp className="absolute right-3 top-2 origin-center text-foreground/50" />
+            <ChevronUp className="absolute right-3 size-4 origin-center text-foreground/50" />
           ) : (
-            <ChevronDown className="absolute right-3 top-2 origin-center text-foreground/50" />
+            <ChevronDown className="absolute right-3 size-4 origin-center text-foreground/50" />
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent
         align="end"
         className="w-full min-w-[280px] max-w-[280px] border p-0 sm:max-w-full"
+        showCloseButton={false}
       >
         <Command shouldFilter={false}>
           <CommandInput
@@ -179,7 +182,7 @@ SearchMappedSelectProps<T>) {
             onValueChange={setSearchQuery}
             className="text-base sm:text-sm"
           />
-          <CommandList className="scrollable">
+          <CommandList className="scrollable mini darkbar max-h-36">
             {Object.entries(filteredData).map(([group, items]) => (
               <CommandGroup key={group} heading={group}>
                 {items.map((item) => {

@@ -2,6 +2,255 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "~/convex/_generated/server";
 
+export const createOrUpdateOpenCall = mutation({
+  args: {
+    orgId: v.id("organizations"),
+    eventId: v.id("events"),
+    openCallId: v.optional(v.id("openCalls")),
+    basicInfo: v.object({
+      appFee: v.number(),
+      callFormat: v.string(),
+      callType: v.string(),
+      dates: v.object({
+        ocStart: v.optional(v.union(v.string(), v.null())),
+        ocEnd: v.optional(v.union(v.string(), v.null())),
+        timezone: v.string(),
+        edition: v.number(),
+        // edition: v.number(), //note-to-self: this is used for the event's edition. Not sure if it's needed here. Could also just take from the event if it is necessary for some reason.
+      }),
+    }),
+    eligibility: v.object({
+      type: v.string(),
+      whom: v.array(v.string()),
+      details: v.optional(v.string()),
+    }),
+    compensation: v.object({
+      budget: v.object({
+        min: v.number(),
+        max: v.optional(v.number()),
+        rate: v.optional(v.number()),
+        unit: v.optional(v.string()),
+        currency: v.string(),
+        allInclusive: v.boolean(),
+        moreInfo: v.optional(v.string()),
+      }),
+
+      categories: v.object({
+        designFee: v.union(v.number(), v.boolean()),
+        accommodation: v.union(v.number(), v.boolean()),
+        food: v.union(v.number(), v.boolean()),
+        travelCosts: v.union(v.number(), v.boolean()),
+        materials: v.union(v.number(), v.boolean()),
+        equipment: v.union(v.number(), v.boolean()),
+      }),
+    }),
+    requirements: v.object({
+      requirements: v.string(),
+      more: v.string(),
+      destination: v.string(),
+      documents: v.optional(
+        v.array(
+          v.object({
+            title: v.string(),
+            href: v.string(),
+          }),
+        ),
+      ),
+      links: v.array(
+        v.object({
+          title: v.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
+          href: v.string(),
+        }),
+      ),
+      applicationLink: v.string(),
+      otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
+    }),
+    state: v.optional(v.string()), //draft, submitted, published, archived
+  },
+  // handler: async (ctx, args) => {
+  //   const userId = await getAuthUserId(ctx);
+  //   if (!userId) throw new ConvexError("Not authenticated");
+  //   const openCall = await ctx.db
+  //     .query("eventOpenCalls")
+  //     .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+  //     .unique();
+  //   let openCallResult = null;
+  //   if (!openCall) {
+
+  //     openCallResult = await ctx.db.insert("openCalls", {
+  //       adminNoteOC: "",
+  //       eventId: args.eventId,
+  //       organizerId: [args.orgId],
+  //       mainOrgId: args.orgId,
+  //       basicInfo: args.basicInfo,
+  //       eligibility: {
+  //         type: args.eligibility.type,
+  //         whom: args.eligibility.whom,
+  //         details: args.eligibility.details,
+  //       },
+  //       compensation: {
+  //         budget: {
+  //           min: args.compensation.budget.min,
+  //           max: args.compensation.budget.max,
+  //           rate: args.compensation.budget.rate,
+  //           unit: args.compensation.budget.unit,
+  //           currency: args.compensation.budget.currency,
+  //           allInclusive: args.compensation.budget.allInclusive,
+  //           moreInfo: args.compensation.budget.moreInfo,
+  //         },
+  //         categories: {
+  //           designFee: args.compensation.categories.designFee,
+  //           accommodation: args.compensation.categories.accommodation,
+  //           food: args.compensation.categories.food,
+  //           travelCosts: args.compensation.categories.travelCosts,
+  //           materials: args.compensation.categories.materials,
+  //           equipment: args.compensation.categories.equipment,
+  //         },
+  //       },
+  //       requirements: {
+  //         requirements: args.requirements.requirements,
+  //         more: args.requirements.more,
+  //         destination: args.requirements.destination,
+  //         // documents: args.documents,
+  //         links: [],
+  //         applicationLink: args.requirements.applicationLink,
+  //         otherInfo: args.requirements.otherInfo,
+  //       },
+  //       state: "draft",
+  //       lastUpdatedBy: userId,
+  //       lastUpdatedAt: Date.now(),
+  //       // approvedBy: undefined,
+  //     });
+
+  //     await ctx.db.insert("eventOpenCalls", {
+  //       eventId: args.eventId,
+  //       openCallId: openCallResult._id,
+  //       edition: args.basicInfo.dates.edition,
+  //       state: "draft",})
+
+  //     return;
+  //   }
+
+  //   openCallResult = await ctx.db.patch("openCalls", {
+  //     adminNoteOC: "",
+  //     eventId: args.eventId,
+  //     organizerId: [args.orgId],
+  //     mainOrgId: args.orgId,
+  //     basicInfo: args.basicInfo,
+  //     eligibility: {
+  //       type: args.eligibility.type,
+  //       whom: args.eligibility.whom,
+  //       details: args.eligibility.details,
+  //     },
+  //     compensation: {
+  //       budget: {
+  //         min: args.compensation.budget.min,
+  //         max: args.compensation.budget.max,
+  //         rate: args.compensation.budget.rate,
+  //         unit: args.compensation.budget.unit,
+  //         currency: args.compensation.budget.currency,
+  //         allInclusive: args.compensation.budget.allInclusive,
+  //         moreInfo: args.compensation.budget.moreInfo,
+  //       },
+  //       categories: {
+  //         designFee: args.compensation.categories.designFee,
+  //         accommodation: args.compensation.categories.accommodation,
+  //         food: args.compensation.categories.food,
+  //         travelCosts: args.compensation.categories.travelCosts,
+  //         materials: args.compensation.categories.materials,
+  //         equipment: args.compensation.categories.equipment,
+  //       },
+  //     },
+  //     requirements: {
+  //       requirements: args.requirements.requirements,
+  //       more: args.requirements.more,
+  //       destination: args.requirements.destination,
+  //       // documents: args.documents,
+  //       links: [],
+  //       applicationLink: args.requirements.applicationLink,
+  //       otherInfo: args.requirements.otherInfo,
+  //     },
+  //     state: "draft",
+  //     lastUpdatedBy: userId,
+  //     lastUpdatedAt: Date.now(),
+  //     // approvedBy: undefined,
+  //   });
+  //   return openCallResult;
+  // },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+
+    const openCallData = {
+      adminNoteOC: "",
+      eventId: args.eventId,
+      organizerId: [args.orgId],
+      mainOrgId: args.orgId,
+      basicInfo: args.basicInfo,
+      eligibility: args.eligibility,
+      compensation: args.compensation,
+      requirements: {
+        ...args.requirements,
+        links: args.requirements.links ?? [],
+      },
+      state: args.state ?? "draft",
+      lastUpdatedBy: userId,
+      lastUpdatedAt: Date.now(),
+    };
+
+    // Step 1: Lookup already exists — update both openCall and lookup
+    const lookup = await ctx.db
+      .query("eventOpenCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .unique();
+    console.log("ocId", args.openCallId);
+    console.log("lookup", lookup);
+
+    if (lookup) {
+      await ctx.db.patch(lookup.openCallId, openCallData);
+      await ctx.db.patch(lookup._id, {
+        edition: args.basicInfo.dates.edition,
+        state: args.state ?? "draft",
+      });
+      console.log("lookup updated", lookup);
+      return lookup.openCallId;
+    }
+
+    // Step 2: If user provided openCallId, validate and use it
+    if (args.openCallId) {
+      console.log("args.openCallId", args.openCallId);
+      const existing = await ctx.db.get(args.openCallId);
+      console.log("existing", existing);
+      if (existing) {
+        await ctx.db.patch(args.openCallId, openCallData);
+
+        await ctx.db.insert("eventOpenCalls", {
+          eventId: args.eventId,
+          openCallId: args.openCallId,
+          edition: args.basicInfo.dates.edition,
+          state: args.state ?? "draft",
+        });
+        console.log("existing updated", existing);
+        return args.openCallId;
+      }
+
+      throw new ConvexError("Provided openCallId does not exist.");
+    }
+
+    // Step 3: Create new openCall and lookup
+    const newId = await ctx.db.insert("openCalls", openCallData);
+
+    await ctx.db.insert("eventOpenCalls", {
+      eventId: args.eventId,
+      openCallId: newId,
+      edition: args.basicInfo.dates.edition,
+      state: args.state ?? "draft",
+    });
+
+    return newId;
+  },
+});
+
 export const getOpenCallByOrgId = query({
   args: {
     orgId: v.id("organizations"),

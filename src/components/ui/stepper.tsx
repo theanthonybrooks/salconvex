@@ -36,6 +36,8 @@ interface StepperProps {
   lastSaved?: string | null;
   errorMsg?: string;
   pending?: boolean;
+  onCheckSchema?: () => void;
+  isAdmin?: boolean;
 }
 
 export default function HorizontalLinearStepper({
@@ -57,6 +59,8 @@ export default function HorizontalLinearStepper({
   lastSaved,
   errorMsg,
   pending,
+  onCheckSchema,
+  isAdmin,
 }: StepperProps) {
   // console.log(errorMsg);
   const stepArray =
@@ -251,11 +255,22 @@ export default function HorizontalLinearStepper({
                 {errorMsg}
               </p>
             )}
+
             <section className="flex min-w-24 items-center justify-end gap-2">
               {lastSaved && activeStep >= 1 && (
                 <p className="mr-2 hidden text-xs italic text-muted-foreground lg:block">
                   Last saved: {lastSaved}
                 </p>
+              )}
+              {isAdmin && onCheckSchema && (
+                <Button
+                  variant="salWithShadowHiddenYlw"
+                  onClick={onCheckSchema}
+                  className="hidden items-center gap-1 sm:flex"
+                >
+                  {pending ? "Pending..." : "Check Schema"}
+                  {pending && <Loader className="size-4 animate-spin" />}
+                </Button>
               )}
               {cancelButton}
               {activeStep !== 0 && (

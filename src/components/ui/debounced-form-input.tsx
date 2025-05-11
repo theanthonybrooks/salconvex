@@ -28,6 +28,7 @@ export function DebouncedControllerInput<
     debounce((val: string) => {
       const transformed = transform ? transform(val) : val;
       field.onChange(transformed);
+      setLocalValue(transformed);
     }, debounceMs),
   ).current;
 
@@ -56,6 +57,12 @@ export function DebouncedControllerInput<
         const transformed = transform ? transform(pasted) : pasted;
         setLocalValue(transformed);
         field.onChange(transformed);
+      }}
+      onBlur={(e) => {
+        field.onBlur();
+        if (typeof inputProps.onBlur === "function") {
+          inputProps.onBlur(e);
+        }
       }}
     />
   );

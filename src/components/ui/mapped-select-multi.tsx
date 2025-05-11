@@ -32,6 +32,7 @@ interface SearchMappedMultiSelectProps<T> {
   className?: string;
   hideGroupLabels?: boolean;
   selectLimit?: number;
+  displayLimit?: number;
   tabIndex?: number;
   required?: boolean;
 }
@@ -49,6 +50,7 @@ export function SearchMappedMultiSelect<T>({
   placeholder = "Select options",
   hideGroupLabels = false,
   selectLimit,
+  displayLimit = 1,
   tabIndex,
   required,
 }: SearchMappedMultiSelectProps<T>) {
@@ -56,7 +58,7 @@ export function SearchMappedMultiSelect<T>({
   const [searchQuery, setSearchQuery] = useState("");
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const isLimit = values.length === selectLimit;
+  const isLimit = values?.length === selectLimit;
 
   // console.log("input ref", inputRef.current)
 
@@ -131,19 +133,19 @@ export function SearchMappedMultiSelect<T>({
         <Button
           variant="outline"
           className={cn(
-            "relative flex h-10 w-full items-center justify-between truncate border-foreground/20 bg-card py-1 pl-2 pr-[3px] font-normal hover:bg-background/20 focus:ring-1 focus:ring-foreground",
+            "relative flex h-10 w-full items-center justify-between truncate border-foreground/20 bg-card py-1 pl-2 pr-3 font-normal hover:bg-background/20 focus:ring-1 focus:ring-foreground",
             className,
-            required && values.length === 0 && "bg-salYellow/50",
+            required && values?.length === 0 && "bg-salYellow/50",
           )}
           disabled={disabled}
         >
           <span className={cn("truncate")}>
-            {values.length > 0 ? (
-              <div className="flex justify-start gap-1">
-                {values.slice(0, 1).map((val) => (
+            {values?.length > 0 ? (
+              <div className="flex items-center justify-start gap-1">
+                {values?.slice(0, displayLimit).map((val) => (
                   <span
                     key={val}
-                    className="flex items-center gap-1 whitespace-nowrap rounded border border-foreground/50 px-2 py-0.5 text-sm"
+                    className="max-w-[18ch] truncate rounded border border-foreground/50 px-2 py-0.5 text-sm"
                   >
                     {getItemLabel(
                       Object.values(data)
@@ -152,9 +154,9 @@ export function SearchMappedMultiSelect<T>({
                     )}
                   </span>
                 ))}
-                {values.length > 1 && (
-                  <span className="text-sm text-muted-foreground">
-                    +{values.length - 1} more
+                {values?.length > displayLimit && (
+                  <span className="flex items-center text-sm text-muted-foreground">
+                    +{values?.length - displayLimit} more
                   </span>
                 )}
               </div>
@@ -164,9 +166,9 @@ export function SearchMappedMultiSelect<T>({
           </span>
 
           {isOpen ? (
-            <ChevronUp className="text-foreground/50" />
+            <ChevronUp className="absolute right-3 size-4 origin-center text-foreground/50" />
           ) : (
-            <ChevronDown className="text-foreground/50" />
+            <ChevronDown className="absolute right-3 size-4 origin-center text-foreground/50" />
           )}
         </Button>
       </PopoverTrigger>
@@ -181,20 +183,23 @@ export function SearchMappedMultiSelect<T>({
             placeholder={
               isLimit
                 ? "Max 3 selected"
-                : values.length > 0 && selectLimit
-                  ? `Select up to ${selectLimit - values.length} more`
+                : values?.length > 0 && selectLimit
+                  ? `Select up to ${selectLimit - values?.length} more`
                   : "Search..."
             }
             // autoFocus
             value={searchQuery}
             onValueChange={setSearchQuery}
-            className="pr-8 text-base lg:text-sm"
+            className="pr-18 text-base lg:text-sm"
           />
-          {values.length > 0 && (
-            <X
-              className="absolute right-3 top-2 size-6 cursor-pointer text-black/80 hover:scale-110 hover:text-red-600"
-              onClick={onClear}
-            />
+          {values?.length > 0 && (
+            <span className="group absolute right-3 top-2 flex cursor-pointer items-center gap-1 hover:scale-105">
+              <p className="text-sm text-foreground/50">Reset</p>
+              <X
+                className="size-5 text-foreground/50 group-hover:text-red-600 group-active:scale-95"
+                onClick={onClear}
+              />
+            </span>
           )}
 
           <CommandList className="scrollable mini darkbar max-h-36">
@@ -205,7 +210,7 @@ export function SearchMappedMultiSelect<T>({
               >
                 {items.map((item) => {
                   const itemValue = getItemValue(item);
-                  const isSelected = values.includes(itemValue);
+                  const isSelected = values?.includes(itemValue);
 
                   return (
                     <CommandItem
@@ -214,12 +219,12 @@ export function SearchMappedMultiSelect<T>({
                         if (
                           !isSelected &&
                           selectLimit &&
-                          values.length >= selectLimit
+                          values?.length >= selectLimit
                         )
                           return;
 
                         const newValues = isSelected
-                          ? values.filter((val) => val !== itemValue)
+                          ? values?.filter((val) => val !== itemValue)
                           : [...values, itemValue];
 
                         onChange(newValues);

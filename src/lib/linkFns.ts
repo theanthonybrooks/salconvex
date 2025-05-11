@@ -81,6 +81,8 @@ function isValidChar(char: string, platform: PlatformType): boolean {
 export function autoHttps(url: string) {
   const raw = url.trim();
   return raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
+  // const normalized = raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
+  // return normalized.replace(/\/+$/, "");
 }
 
 export function formatDisplayUrl(url: string): string {
@@ -109,7 +111,7 @@ export function normalizeToHandle(value: string, domain: string): string {
     .replace(/^www\./i, "")
     .replace(new RegExp(`^${domain}/?`, "i"), "")
     .replace(/\/$/, "")
-    .replace(/^@/, "") // remove existing @ to avoid @@
+    .replace(/^@/, "")
     .trim()
     ? `@${value
         .replace(/^https?:\/\//i, "")

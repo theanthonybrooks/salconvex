@@ -271,7 +271,7 @@ export const ArtistProfileForm = ({
                 selectLimit={3}
                 placeholder="Select up to 3 nationalities"
                 getItemLabel={(country) => country.name.common}
-                getItemValue={(country) => country.cca2}
+                getItemValue={(country) => country.name.common}
                 searchFields={[
                   "name.common",
                   "name.official",

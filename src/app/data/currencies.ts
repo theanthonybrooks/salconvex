@@ -1,12 +1,12 @@
 export interface Currency {
-  symbol: string
-  code: string
-  name: string
-  format: string
+  symbol: string;
+  code: string;
+  name: string;
+  format: string;
 }
 
 interface CurrencyData {
-  [region: string]: Currency[]
+  [region: string]: Currency[];
 }
 
 export const currencies: CurrencyData[] = [
@@ -106,4 +106,4 @@ export const currencies: CurrencyData[] = [
       { symbol: "﷼", code: "IRR", name: "Iranian Rial", format: "#,##0" },
     ],
   },
-]
+];
