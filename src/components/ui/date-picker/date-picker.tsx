@@ -1,8 +1,9 @@
+import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
 import { fromSeason, toDate } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
-import { Button } from "./button";
+import { Button } from "../button";
 
 type PickerType = "month" | "year" | "season" | "dates";
 
@@ -124,9 +125,6 @@ export const CustomDatePicker = ({
       showMonthYearPicker={pickerType === "month"}
       showQuarterYearPicker={pickerType === "season"}
       withPortal={true}
-      // popperContainer={CalendarPortal}
-      //   popperPlacement="bottom"
-      //   portalId="react-datepicker-portal"
       minDate={
         isAdmin
           ? new Date(2010, 0, 1)
@@ -150,6 +148,9 @@ export const CustomDatePicker = ({
       }
       className={className}
       tabIndex={tabIndex}
+      renderCustomHeader={(props) => (
+        <DatePickerHeader {...props} pickerType={pickerType} />
+      )}
     />
   );
 };

@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { eventCategoryOptions } from "@/constants/thelist";
 import { EventCategory } from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
+import { UserPref } from "@/types/user";
 
 interface Props {
   filters: Filters;
@@ -21,6 +22,7 @@ interface Props {
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
+  userPref: UserPref | null;
 }
 
 export const EventFilters = ({

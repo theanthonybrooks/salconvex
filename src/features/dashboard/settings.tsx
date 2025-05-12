@@ -606,7 +606,15 @@ export default function SettingsPage() {
                   </div>
 
                   <SearchMappedSelect<Timezone>
-                    value={selectedTimezone ?? "GMT"}
+                     searchFields={[
+                      "name",
+                      "region",
+                      "abbreviation",
+                      "gmtOffset",
+                      "gmtAbbreviation",
+                      "iana",
+                    ]}
+                    value={selectedTimezone ?? "Europe/Berlin"}
                     onChange={setTimezone}
                     // className='w-full sm:w-[280px]'
                     data={timezones[0]}
@@ -619,13 +627,7 @@ export default function SettingsPage() {
                           : ""
                       })`
                     }
-                    searchFields={[
-                      "name",
-                      "region",
-                      "abbreviation",
-                      "gmtOffset",
-                      "gmtAbbreviation",
-                    ]}
+                   
                     getItemDisplay={(timezone) =>
                       `(${
                         timezone.region !== "North America"
@@ -633,7 +635,7 @@ export default function SettingsPage() {
                           : timezone.abbreviation
                       })  - ${timezone.name}`
                     }
-                    getItemValue={(timezone) => timezone.abbreviation}
+                    getItemValue={(timezone) => timezone.iana[0]}
                   />
                 </div>
                 <Separator />

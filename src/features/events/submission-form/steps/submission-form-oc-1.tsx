@@ -1,10 +1,10 @@
 import { currencies, Currency } from "@/app/data/currencies";
 import { Link } from "@/components/ui/custom-link";
+import { OcCustomDatePicker } from "@/components/ui/date-picker/oc-date-picker";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { Label } from "@/components/ui/label";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
-import { OcCustomDatePicker } from "@/components/ui/oc-date-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
@@ -13,7 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
+import { autoHttps } from "@/lib/linkFns";
 import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { CallFormat, EligibilityType } from "@/types/openCall";
@@ -29,6 +31,7 @@ interface SubmissionFormOC1Props {
   isMobile: boolean;
   categoryEvent: boolean;
   canNameEvent: boolean;
+  handleCheckSchema?: () => void;
 }
 
 const SubmissionFormOC1 = ({
@@ -38,6 +41,7 @@ const SubmissionFormOC1 = ({
 
   // categoryEvent,
   canNameEvent,
+  handleCheckSchema,
 }: SubmissionFormOC1Props) => {
   const {
     control,
@@ -46,39 +50,12 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  // const currentValues = getValues();
-  // const currentValues = getValues();
-  // const eventData = watch("event");
+
   const openCall = watch("openCall");
-  // const eventDates = eventData?.dates?.eventDates;
-  // const appFee = openCall?.basicInfo?.appFee;
-
-  // const category = eventData?.category as EventCategory;
-
-  // #region ------------- Queries, Actions, and Mutations --------------
-
-  // #endregion
-
-  // const hasEventLocation =
-  //   dirtyFields.event?.location || eventData?.location?.full !== undefined; // removed && eventNameValid
-  // const isOngoing = eventData?.dates?.eventFormat === "ongoing";
-  // const eventDatesFormat = eventData?.dates?.eventFormat;
-  // const hasEventFormat = !!eventData?.dates?.eventFormat;
-  // const eventDateFormatRequired = !!(
-  //   hasEventFormat &&
-  //   eventDatesFormat &&
-  //   ["setDates", "monthRange", "yearRange", "seasonRange"].includes(
-  //     eventDatesFormat,
-  //   )
-  // );
-  // const eventDateFormatNotRequired = !!(
-  //   hasEventFormat &&
-  //   eventDatesFormat &&
-  //   ["noEvent"].includes(eventDatesFormat)
-  // );
-  // const blankEventDates =
-  //   eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
-  // const isAdmin = user?.role?.includes("admin") || false;
+  const organizer = watch("organization");
+  const orgTimezone = organizer?.location?.timezone;
+  const callType = openCall?.basicInfo?.callType;
+  const fixedType = callType === "Fixed";
 
   const ocEligiblityType = openCall?.eligibility?.type;
   const isNational = ocEligiblityType === "National";
@@ -88,6 +65,11 @@ const SubmissionFormOC1 = ({
   const appFee = openCall?.basicInfo?.appFee;
   const validAppFeeAmount = !!appFee && appFee > 0;
   const noAppFeeAmount = !!appFee && appFee === 0;
+  const ocStart = openCall?.basicInfo?.dates?.ocStart;
+  const ocEnd = openCall?.basicInfo?.dates?.ocEnd;
+  const noEndRequired = callType && !fixedType;
+  const today = new Date();
+  const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
 
   // #region -------------- UseEffect ---------------
   useEffect(() => {
@@ -350,12 +332,6 @@ const SubmissionFormOC1 = ({
                   name="organization.location.currency"
                   control={control}
                   render={({ field }) => (
-                    // <DebouncedControllerInput
-                    //   disabled={!showAppFeeInput}
-                    //   field={field}
-                    //   placeholder="$"
-                    //   className="h-12 border border-foreground"
-                    // />
                     <SearchMappedSelect<Currency>
                       searchFields={["name", "symbol", "code"]}
                       className="max-w-28 border-none py-2 sm:h-fit"
@@ -416,7 +392,7 @@ const SubmissionFormOC1 = ({
                     value={field.value}
                     onChange={field.onChange}
                     pickerType="start"
-                    className="h-12"
+                    className="hansel min-h-12"
                   />
                 )}
               />
@@ -438,7 +414,10 @@ const SubmissionFormOC1 = ({
                     value={field.value}
                     onChange={field.onChange}
                     pickerType="end"
-                    className="h-12"
+                    className="gretel min-h-12"
+                    minDate={minDate}
+                    ocEnd={ocEnd}
+                    orgTimezone={orgTimezone}
                   />
                 )}
               />
@@ -446,7 +425,7 @@ const SubmissionFormOC1 = ({
           </>
         )}
       </div>
-      {/* {hasEventLocation && (
+      {(ocEnd || noEndRequired) && (
         <>
           <Separator
             thickness={2}
@@ -462,26 +441,66 @@ const SubmissionFormOC1 = ({
             )}
           >
             <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">
-                Step {categoryEvent ? 7 : 6}:{" "}
-              </p>
-              <p className="lg:text-xs">
-                {getEventCategoryLabelAbbr(category)} Dates
-              </p>
+              <p className="min-w-max font-bold lg:text-xl">Step 5:</p>
+              <p className="lg:text-xs">Application Requirements</p>
             </div>
-
-            <FormDatePicker
-              isAdmin={isAdmin}
-              title="Event Dates Format"
-              nameBase="event.dates"
-              type="event"
-              watchPath="event"
-            />
-
-          
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.type" className="sr-only">
+                Application Requirements
+              </Label>
+              <Controller
+                name="openCall.requirements.requirements"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Please be as specific as possible (limit 2000 characters)"
+                    charLimit={2000}
+                    purpose="openCall"
+                  />
+                )}
+              />
+            </div>
+            <div className="input-section">
+              <p className="min-w-max font-bold lg:text-xl">Step 6</p>
+              <p className="lg:text-xs">Application Link</p>
+              {/* TODO: when internal applications are implemented, add this back in */}
+              {/* <p className="lg:text-xs">(If external)</p> */}
+            </div>
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label
+                htmlFor="openCall.requirements.applicationLink"
+                className="sr-only"
+              >
+                Application Link
+              </Label>
+              <Controller
+                name="openCall.requirements.applicationLink"
+                control={control}
+                render={({ field }) => (
+                  <DebouncedControllerInput
+                    field={field}
+                    placeholder="Name of primary contact"
+                    className={cn(
+                      "w-full rounded border-foreground",
+                      errors?.openCall?.requirements?.applicationLink &&
+                        "invalid-field",
+                    )}
+                    transform={autoHttps}
+                    tabIndex={2}
+                    onBlur={() => {
+                      field.onBlur?.();
+                      handleCheckSchema?.();
+                      // console.log("Blur me", field + type)
+                    }}
+                  />
+                )}
+              />
+            </div>
           </div>
         </>
-      )}*/}
+      )}
     </div>
 
     //   )}

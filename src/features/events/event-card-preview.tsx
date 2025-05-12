@@ -25,9 +25,10 @@ import {
   getEventCategoryLabel,
   getEventTypeLabel,
 } from "@/lib/eventFns";
+import { RichTextDisplay } from "@/lib/richTextFns";
 
 import { cn } from "@/lib/utils";
-import { User } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -42,6 +43,7 @@ import { FaBookmark, FaMapLocationDot, FaRegBookmark } from "react-icons/fa6";
 export interface EventCardPreviewProps {
   event: CombinedEventPreviewCardData;
   user: User | null;
+  userPref: UserPref | null;
   publicView?: boolean;
 }
 
@@ -49,6 +51,7 @@ const EventCardPreview = ({
   event,
   publicView,
   user,
+  userPref,
 }: EventCardPreviewProps) => {
   const router = useRouter();
   const {
@@ -70,6 +73,7 @@ const EventCardPreview = ({
     // orgName,
     status: appStatus,
     slug,
+    artistNationality,
   } = event;
 
   const { opencall } = tabs;
@@ -80,6 +84,14 @@ const EventCardPreview = ({
   const eligibility = event.hasActiveOpenCall
     ? opencall?.eligibility
     : undefined;
+  const eligibilityType = eligibility?.type ?? "";
+  const eligibilityWhom = eligibility?.whom ?? [];
+  const artistEligible = artistNationality.some((artistNat) =>
+    eligibilityWhom.some(
+      (whom) => artistNat.trim().toLowerCase() === whom.trim().toLowerCase(),
+    ),
+  );
+  console.log(artistEligible, eligibilityWhom, artistNationality);
   const budget = compensation?.budget;
   const {
     min: budgetMin,
@@ -229,7 +241,7 @@ const EventCardPreview = ({
                 ) : (
                   formatOpenCallDeadline(
                     basicInfo.dates?.ocEnd || "",
-                    basicInfo.dates?.timezone,
+                    userPref?.timezone ?? basicInfo.dates?.timezone,
                     basicInfo.callType,
                     true,
                   )
@@ -280,7 +292,10 @@ const EventCardPreview = ({
                 ) : (
                   <span
                     className={cn(
-                      eligibility.type !== "International" && "text-red-600",
+                      !artistEligible &&
+                        eligibilityType !== "International" &&
+                        "text-red-600",
+                      artistEligible && "text-emerald-800",
                     )}
                   >
                     <EligibilityLabel
@@ -489,11 +504,18 @@ const EventCardPreview = ({
               </p>
             )}
             {(event.adminNote || event.adminNoteOC) && (
-              <p className="flex flex-col gap-y-1 text-sm">
+              <div className="flex flex-col gap-y-1 text-sm">
                 <span className="font-semibold">Note:</span>
-                {event.adminNoteOC && event.adminNoteOC}
-                {event.adminNote && !event.adminNoteOC && event.adminNote}
-              </p>
+                {event.adminNoteOC && (
+                  <RichTextDisplay
+                    html={event.adminNoteOC}
+                    className="text-sm"
+                  />
+                )}
+                {event.adminNote && !event.adminNoteOC && (
+                  <RichTextDisplay html={event.adminNote} className="text-sm" />
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -568,7 +590,11 @@ const EventCardPreview = ({
                     <span
                       className={cn(
                         "hidden xl:block",
-                        eligibility.type !== "International" && "text-red-600",
+
+                        !artistEligible &&
+                          eligibilityType !== "International" &&
+                          "text-red-600",
+                        artistEligible && "text-emerald-800",
                       )}
                     >
                       <EligibilityLabel
@@ -581,7 +607,10 @@ const EventCardPreview = ({
                     <span
                       className={cn(
                         "xl:hidden",
-                        eligibility.type !== "International" && "text-red-600",
+                        !artistEligible &&
+                          eligibilityType !== "International" &&
+                          "text-red-600",
+                        artistEligible && "text-emerald-800",
                       )}
                     >
                       <EligibilityLabel

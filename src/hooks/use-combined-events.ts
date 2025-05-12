@@ -7,7 +7,7 @@ import { api } from "~/convex/_generated/api";
 
 export type CombinedEventPreviewCardData = EventData & {
   tabs: { opencall: OpenCall | null };
-
+  artistNationality: string[];
   bookmarked: boolean;
   manualApplied?: boolean;
   hidden: boolean;
@@ -24,7 +24,11 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
   const events = useQuery(api.events.event.getPublishedEvents);
   const openCalls = useQuery(api.openCalls.openCall.getPublishedOpenCalls);
   const artistData = useQuery(api.artists.applications.getArtistApplications);
-  const { applications, listActions } = artistData ?? {};
+  const { applications, listActions, artist } = artistData ?? {};
+  const artistNationality = useMemo(
+    () => artist?.artistNationality ?? [],
+    [artist?.artistNationality],
+  );
 
   // if (!events) return [];
 
@@ -62,6 +66,7 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
               openCallStatus: null,
               eventId: event._id,
               slug: event.slug,
+              artistNationality,
             },
           ];
         }
@@ -118,8 +123,9 @@ export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
             openCallStatus,
             eventId: event._id,
             slug: event.slug,
+            artistNationality,
           };
         });
       });
-  }, [applications, events, listActions, openCalls]);
+  }, [applications, events, listActions, openCalls, artistNationality]);
 };

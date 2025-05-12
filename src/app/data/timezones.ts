@@ -1,15 +1,16 @@
 export interface Timezone {
-  gmtOffset: number
-  gmtAbbreviation: string
-  abbreviation: string
-  dstAbbreviation: string | null
-  name: string
-  region: string
-  utcOffsets: number[]
+  gmtOffset: number;
+  gmtAbbreviation: string;
+  abbreviation: string;
+  dstAbbreviation: string | null;
+  name: string;
+  region: string;
+  utcOffsets: number[];
+  iana: string[];
 }
 
 interface TimezoneData {
-  [region: string]: Timezone[]
+  [region: string]: Timezone[];
 }
 
 export const timezones: TimezoneData[] = [
@@ -23,6 +24,7 @@ export const timezones: TimezoneData[] = [
         name: "Eastern Standard Time",
         region: "North America",
         utcOffsets: [-5, -4],
+        iana: ["America/New_York", "America/Toronto"],
       },
       {
         gmtOffset: -6,
@@ -32,6 +34,7 @@ export const timezones: TimezoneData[] = [
         name: "Central Standard Time",
         region: "North America",
         utcOffsets: [-6, -5],
+        iana: ["America/Chicago", "America/Winnipeg"],
       },
       {
         gmtOffset: -7,
@@ -41,6 +44,7 @@ export const timezones: TimezoneData[] = [
         name: "Mountain Standard Time",
         region: "North America",
         utcOffsets: [-7, -6],
+        iana: ["America/Denver", "America/Edmonton"],
       },
       {
         gmtOffset: -8,
@@ -50,6 +54,7 @@ export const timezones: TimezoneData[] = [
         name: "Pacific Standard Time",
         region: "North America",
         utcOffsets: [-8, -7],
+        iana: ["America/Los_Angeles", "America/Vancouver"],
       },
       {
         gmtOffset: -9,
@@ -59,6 +64,7 @@ export const timezones: TimezoneData[] = [
         name: "Alaska Standard Time",
         region: "North America",
         utcOffsets: [-9, -8],
+        iana: ["America/Anchorage"],
       },
       {
         gmtOffset: -10,
@@ -68,6 +74,7 @@ export const timezones: TimezoneData[] = [
         name: "Hawaii Standard Time",
         region: "North America",
         utcOffsets: [-10],
+        iana: ["Pacific/Honolulu"],
       },
     ],
     "Europe & Africa": [
@@ -79,6 +86,7 @@ export const timezones: TimezoneData[] = [
         name: "Greenwich Mean Time",
         region: "Europe",
         utcOffsets: [0, 1],
+        iana: ["Europe/London"],
       },
       {
         gmtOffset: 1,
@@ -88,6 +96,13 @@ export const timezones: TimezoneData[] = [
         name: "Central European Time",
         region: "Europe",
         utcOffsets: [1, 2],
+        iana: [
+          "Europe/Berlin",
+          "Europe/Paris",
+          "Europe/Rome",
+          "Europe/Amsterdam",
+          "Europe/Brussels",
+        ],
       },
       {
         gmtOffset: 2,
@@ -97,7 +112,24 @@ export const timezones: TimezoneData[] = [
         name: "Eastern European Time",
         region: "Europe",
         utcOffsets: [2, 3],
+        iana: [
+          "Europe/Helsinki",
+          "Europe/Bucharest",
+          "Europe/Kyiv",
+          "Europe/Athens",
+        ],
       },
+      {
+        gmtOffset: 3,
+        gmtAbbreviation: "GMT+3",
+        abbreviation: "TRT",
+        dstAbbreviation: "TRT",
+        name: "Turkey Time",
+        region: "Europe",
+        utcOffsets: [3],
+        iana: ["Europe/Istanbul"],
+      },
+
       {
         gmtOffset: 1,
         gmtAbbreviation: "GMT+1",
@@ -106,6 +138,7 @@ export const timezones: TimezoneData[] = [
         name: "Western European Summer Time",
         region: "Europe",
         utcOffsets: [1],
+        iana: ["Atlantic/Canary", "Europe/Lisbon"],
       },
       {
         gmtOffset: 2,
@@ -115,6 +148,7 @@ export const timezones: TimezoneData[] = [
         name: "Central Africa Time",
         region: "Africa",
         utcOffsets: [2],
+        iana: ["Africa/Harare", "Africa/Maputo", "Africa/Kigali"],
       },
       {
         gmtOffset: 3,
@@ -124,6 +158,7 @@ export const timezones: TimezoneData[] = [
         name: "East Africa Time",
         region: "Africa",
         utcOffsets: [3],
+        iana: ["Africa/Nairobi", "Africa/Addis_Ababa", "Africa/Mogadishu"],
       },
     ],
     Asia: [
@@ -135,6 +170,7 @@ export const timezones: TimezoneData[] = [
         name: "Moscow Time",
         region: "Asia",
         utcOffsets: [3],
+        iana: ["Europe/Moscow"],
       },
       {
         gmtOffset: 5.5,
@@ -144,6 +180,7 @@ export const timezones: TimezoneData[] = [
         name: "India Standard Time",
         region: "Asia",
         utcOffsets: [5.5],
+        iana: ["Asia/Kolkata"],
       },
       {
         gmtOffset: 8,
@@ -153,6 +190,7 @@ export const timezones: TimezoneData[] = [
         name: "China Standard Time",
         region: "Asia",
         utcOffsets: [8],
+        iana: ["Asia/Shanghai"],
       },
       {
         gmtOffset: 9,
@@ -162,6 +200,7 @@ export const timezones: TimezoneData[] = [
         name: "Japan Standard Time",
         region: "Asia",
         utcOffsets: [9],
+        iana: ["Asia/Tokyo"],
       },
       {
         gmtOffset: 9,
@@ -171,6 +210,7 @@ export const timezones: TimezoneData[] = [
         name: "Korea Standard Time",
         region: "Asia",
         utcOffsets: [9],
+        iana: ["Asia/Seoul"],
       },
       {
         gmtOffset: 8,
@@ -180,6 +220,7 @@ export const timezones: TimezoneData[] = [
         name: "Indonesia Central Standard Time",
         region: "Asia",
         utcOffsets: [8],
+        iana: ["Asia/Makassar"],
       },
     ],
     "Australia & Pacific": [
@@ -191,6 +232,7 @@ export const timezones: TimezoneData[] = [
         name: "Australian Western Standard Time",
         region: "Australia & Pacific",
         utcOffsets: [8],
+        iana: ["Australia/Perth"],
       },
       {
         gmtOffset: 9.5,
@@ -200,6 +242,7 @@ export const timezones: TimezoneData[] = [
         name: "Australian Central Standard Time",
         region: "Australia & Pacific",
         utcOffsets: [9.5, 10.5],
+        iana: ["Australia/Adelaide", "Australia/Darwin"],
       },
       {
         gmtOffset: 10,
@@ -209,6 +252,7 @@ export const timezones: TimezoneData[] = [
         name: "Australian Eastern Standard Time",
         region: "Australia & Pacific",
         utcOffsets: [10, 11],
+        iana: ["Australia/Sydney", "Australia/Brisbane", "Australia/Melbourne"],
       },
       {
         gmtOffset: 12,
@@ -218,6 +262,7 @@ export const timezones: TimezoneData[] = [
         name: "New Zealand Standard Time",
         region: "Australia & Pacific",
         utcOffsets: [12, 13],
+        iana: ["Pacific/Auckland"],
       },
       {
         gmtOffset: 12,
@@ -227,6 +272,7 @@ export const timezones: TimezoneData[] = [
         name: "Fiji Time",
         region: "Australia & Pacific",
         utcOffsets: [12],
+        iana: ["Pacific/Fiji"],
       },
     ],
     "South America": [
@@ -238,6 +284,7 @@ export const timezones: TimezoneData[] = [
         name: "Argentina Time",
         region: "South America",
         utcOffsets: [-3],
+        iana: ["America/Argentina/Buenos_Aires"],
       },
       {
         gmtOffset: -4,
@@ -247,6 +294,7 @@ export const timezones: TimezoneData[] = [
         name: "Bolivia Time",
         region: "South America",
         utcOffsets: [-4],
+        iana: ["America/La_Paz"],
       },
       {
         gmtOffset: -3,
@@ -256,6 +304,7 @@ export const timezones: TimezoneData[] = [
         name: "Brasilia Time",
         region: "South America",
         utcOffsets: [-3, -2],
+        iana: ["America/Sao_Paulo"],
       },
       {
         gmtOffset: -4,
@@ -265,7 +314,8 @@ export const timezones: TimezoneData[] = [
         name: "Chile Standard Time",
         region: "South America",
         utcOffsets: [-4, -3],
+        iana: ["America/Santiago"],
       },
     ],
   },
-]
+];

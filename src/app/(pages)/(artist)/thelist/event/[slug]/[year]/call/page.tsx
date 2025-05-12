@@ -3,15 +3,21 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
 import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
+import { usePreloadedQuery } from "convex/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { api } from "~/convex/_generated/api";
 
 const OpenCallDetail = () => {
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const userPref = userData?.userPref ?? null;
+
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const router = useRouter();
@@ -83,11 +89,13 @@ const OpenCallDetail = () => {
             data={data}
             artist={artistData?.artist}
             className="lg:hidden"
+            userPref={userPref}
           />
           <OpenCallCardDetailDesktop
             data={data}
             artist={artistData?.artist}
             className="hidden lg:block"
+            userPref={userPref}
             // application={applicationData?.application}
           />
         </>

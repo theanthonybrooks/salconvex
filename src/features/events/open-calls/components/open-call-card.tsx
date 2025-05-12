@@ -21,15 +21,25 @@ import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/event";
+import { UserPref } from "@/types/user";
 
 interface OpenCallCardProps {
+  artist?: ArtistFull | null;
   event: EventData;
   openCall: OpenCall;
+  userPref: UserPref | null;
   format: "mobile" | "desktop";
 }
 
-const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
+const OpenCallCard = ({
+  artist,
+  event,
+  openCall,
+  format,
+  userPref,
+}: OpenCallCardProps) => {
   const { category: eventCategory, _id: id, location, dates } = event;
 
   const { locale, city, stateAbbr, country, countryAbbr } = location;
@@ -72,6 +82,16 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
 
   const { callType, dates: callDates } = basicInfo;
   const { ocStart, ocEnd, timezone } = callDates;
+  const userPrefTZ = userPref?.timezone;
+  const deadlineTimezone =
+    userPref?.timezone && userPrefTZ !== "" ? userPref.timezone : timezone;
+  const artistNationality = artist?.artistNationality ?? [];
+  //compare this to the eligibility whom array
+  const artistEligible = artistNationality.some((artistNat) =>
+    eligibilityWhom.some(
+      (whom) => artistNat.trim().toLowerCase() === whom.trim().toLowerCase(),
+    ),
+  );
 
   const hasBudgetRange = budgetMax && budgetMax > 0;
   const hasBudget = !!(budgetMin > 0 || hasBudgetRange);
@@ -123,7 +143,11 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     </span>
                     <br />{" "}
                     <span className="flex items-center gap-x-2">
-                      {formatOpenCallDeadline(ocEnd || "", timezone, callType)}
+                      {formatOpenCallDeadline(
+                        ocEnd || "",
+                        deadlineTimezone,
+                        callType,
+                      )}
                       {icsLink && callType === "Fixed" && (
                         <a
                           href={icsLink}
@@ -141,7 +165,11 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                     <br />
                     <span
                       className={cn(
-                        eligibilityType !== "International" && "text-red-600",
+                        "flex items-center gap-2",
+                        !artistEligible &&
+                          eligibilityType !== "International" &&
+                          "text-red-600",
+                        artistEligible && "text-emerald-600",
                       )}
                     >
                       <EligibilityLabel
@@ -149,15 +177,20 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                         whom={eligibilityWhom}
                         format="mobile"
                       />
+                      {!artistEligible && <span>(Ineligible)</span>}
                     </span>
                   </p>
                   {eligibilityDetails && (
-                    <p>
+                    <div>
                       <span className="font-semibold underline underline-offset-2">
                         More Info:
                       </span>
-                      <br /> {eligibilityDetails}
-                    </p>
+                      <br />
+                      <RichTextDisplay
+                        html={eligibilityDetails}
+                        className="text-sm"
+                      />
+                    </div>
                   )}
                 </div>
               </AccordionContent>
@@ -353,7 +386,11 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                   </span>
                   <br />{" "}
                   <span className="flex items-center gap-x-2">
-                    {formatOpenCallDeadline(ocEnd || "", timezone, callType)}
+                    {formatOpenCallDeadline(
+                      ocEnd || "",
+                      deadlineTimezone,
+                      callType,
+                    )}
                     {icsLink && callType === "Fixed" && (
                       <a
                         href={icsLink}
@@ -371,23 +408,32 @@ const OpenCallCard = ({ event, openCall, format }: OpenCallCardProps) => {
                   <br />
                   <span
                     className={cn(
-                      eligibilityType !== "International" && "text-red-600",
+                      "flex items-center gap-2",
+                      !artistEligible &&
+                        eligibilityType !== "International" &&
+                        "text-red-600",
+                      artistEligible && "text-emerald-600",
                     )}
                   >
                     <EligibilityLabel
                       type={eligibilityType}
                       whom={eligibilityWhom}
-                      format="desktop"
+                      format="mobile"
                     />
+                    {!artistEligible && <span>(Ineligible)</span>}
                   </span>
                 </p>
                 {eligibilityDetails && (
-                  <p>
+                  <div>
                     <span className="font-semibold underline underline-offset-2">
                       More Info:
                     </span>
-                    <br /> {eligibilityDetails}
-                  </p>
+                    <br />
+                    <RichTextDisplay
+                      html={eligibilityDetails}
+                      className="text-sm"
+                    />
+                  </div>
                 )}
               </div>
             </AccordionContent>

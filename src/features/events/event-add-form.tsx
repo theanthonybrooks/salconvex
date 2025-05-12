@@ -931,7 +931,7 @@ export const EventOCForm = ({
               },
             },
             requirements: {
-              requirements: "lalalala",
+              requirements: openCallData.requirements.requirements,
               more: "reqsMore",
               destination: "reqsDestination",
               documents: undefined,
@@ -941,7 +941,7 @@ export const EventOCForm = ({
                   href: "reqsLinkHref",
                 },
               ],
-              applicationLink: "reqsApplicationLink.com",
+              applicationLink: openCallData.requirements.applicationLink,
               otherInfo: undefined,
             },
             state: activeStep === 3 ? "draft" : "submitted",
@@ -1635,6 +1635,7 @@ export const EventOCForm = ({
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
+                handleCheckSchema={handleCheckSchema}
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}

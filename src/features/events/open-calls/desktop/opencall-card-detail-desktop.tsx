@@ -35,7 +35,7 @@ import { cn } from "@/lib/utils";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const router = useRouter();
-  const { data, artist, className } = props;
+  const { data, artist, userPref, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
     logo: eventLogo,
@@ -45,7 +45,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     dates,
     slug,
   } = event;
-
   const manualApplied = application?.manualApplied ?? false;
   const appStatus = application?.applicationStatus ?? null;
   const hasApplied = appStatus !== null;
@@ -63,13 +62,16 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const prodEnd = prodDates?.[0]?.end;
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
-  const appUrl = requirements?.applicationLink ?? "/thelist"; //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
+  const appUrl = requirements?.applicationLink ?? "/thelist";
 
   const [activeTab, setActiveTab] = useState("openCall");
 
   const { toggleListAction } = useToggleListAction(event._id);
   const { callType, dates: callDates } = basicInfo;
   const { ocStart, ocEnd, timezone } = callDates;
+  const userPrefTZ = userPref?.timezone;
+  const deadlineTimezone =
+    userPref?.timezone && userPrefTZ !== "" ? userPref.timezone : timezone;
 
   const openCallStatus = getOpenCallStatus(
     ocStart ? new Date(ocStart) : null,
@@ -355,7 +357,11 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               <div className="flex flex-col items-end gap-1">
                 <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
                   Deadline: &nbsp;
-                  {formatOpenCallDeadline(ocEnd || "", timezone, callType)}
+                  {formatOpenCallDeadline(
+                    ocEnd || "",
+                    deadlineTimezone,
+                    callType,
+                  )}
                 </span>
                 {application?.applicationTime && hasApplied && (
                   <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
@@ -401,7 +407,13 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           setActiveTab={setActiveTab}
         >
           <div id="openCall">
-            <OpenCallCard event={event} openCall={openCall} format="desktop" />
+            <OpenCallCard
+              artist={artist}
+              event={event}
+              openCall={openCall}
+              format="desktop"
+              userPref={userPref}
+            />
             <div className="mt-6 flex w-full justify-end">
               <ApplyButton
                 id={event._id}

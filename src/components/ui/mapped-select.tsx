@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 import { useState } from "react";
 
 interface MappedSelectProps<T> {
@@ -148,6 +148,12 @@ SearchMappedSelectProps<T>) {
     {},
   );
 
+  const onClear = (e: React.MouseEvent<SVGSVGElement>) => {
+    e.stopPropagation();
+    onChange("");
+    setIsOpen(false);
+  };
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <PopoverTrigger asChild tabIndex={tabIndex}>
@@ -180,8 +186,17 @@ SearchMappedSelectProps<T>) {
             autoFocus
             value={searchQuery}
             onValueChange={setSearchQuery}
-            className="text-base sm:text-sm"
+            className="pr-18 text-base sm:text-sm lg:text-sm"
           />
+          {value !== "" && (
+            <span className="group absolute right-3 top-2 flex cursor-pointer items-center gap-1 hover:scale-105">
+              <p className="text-sm text-foreground/50">Reset</p>
+              <X
+                className="size-5 text-foreground/50 group-hover:text-red-600 group-active:scale-95"
+                onClick={onClear}
+              />
+            </span>
+          )}
           <CommandList className="scrollable mini darkbar max-h-36">
             {Object.entries(filteredData).map(([group, items]) => (
               <CommandGroup key={group} heading={group}>

@@ -1,9 +1,10 @@
-import { toDate } from "@/lib/dateFns";
+import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
+import { getTimezoneFormat, toDate } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
 import { format, setHours, setMinutes, setSeconds } from "date-fns";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
-import { Button } from "./button";
+import { Button } from "../button";
 
 type OcPickerType = "start" | "end";
 
@@ -18,16 +19,25 @@ export interface OcCustomDatePickerProps {
   maxDate?: Date | string;
   tabIndex?: number;
   isAdmin?: boolean;
+  ocEnd?: string | null;
+  orgTimezone?: string;
 }
 
 interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
   value?: string;
   onClick?: () => void;
   pickerType?: OcPickerType;
+  ocEnd?: string | null;
+  orgTimezone?: string;
 }
 
 const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
-  ({ value, onClick, className, pickerType, ...rest }, ref) => {
+  (
+    { value, onClick, className, pickerType, ocEnd, orgTimezone, ...rest },
+    ref,
+  ) => {
+    const endDate = ocEnd ?? new Date().toISOString();
+    const timeZone = orgTimezone ?? "Europe/Berlin";
     const display =
       pickerType === "start" ? "Select start date" : "Select deadline";
     let formattedValue = "";
@@ -53,7 +63,12 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         )}
         {...rest}
       >
-        {formattedValue || display}
+        <span className="flex items-center gap-2">
+          {formattedValue || display}
+          {orgTimezone && (
+            <p className="text-sm">({getTimezoneFormat(endDate, timeZone)})</p>
+          )}
+        </span>
       </Button>
     );
   },
@@ -72,6 +87,8 @@ export const OcCustomDatePicker = ({
   tabIndex,
   pickerType,
   isAdmin,
+  ocEnd,
+  orgTimezone,
 }: OcCustomDatePickerProps) => {
   const parsedDate = value ? toDate(value) : null;
   const minToDate = minDate ? toDate(minDate) : null;
@@ -102,9 +119,6 @@ export const OcCustomDatePicker = ({
       withPortal={true}
       showTimeSelect={pickerType === "end"}
       injectTimes={[setHours(setMinutes(setSeconds(new Date(), 59), 59), 23)]}
-      // popperContainer={CalendarPortal}
-      //   popperPlacement="bottom"
-      //   portalId="react-datepicker-portal"
       minDate={
         isAdmin
           ? new Date(2010, 0, 1)
@@ -118,10 +132,18 @@ export const OcCustomDatePicker = ({
         (pickerType === "start" ? "Select start date" : "Select deadline")
       }
       customInput={
-        <DateInput className={inputClassName} pickerType={pickerType} />
+        <DateInput
+          className={inputClassName}
+          pickerType={pickerType}
+          ocEnd={ocEnd}
+          orgTimezone={orgTimezone}
+        />
       }
       className={cn(className, "rounded")}
       tabIndex={tabIndex}
+      renderCustomHeader={(props) => (
+        <DatePickerHeader {...props} pickerType={pickerType} />
+      )}
     />
   );
 };

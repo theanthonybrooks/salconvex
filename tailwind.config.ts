@@ -33,6 +33,7 @@ export default {
         "5xl": "3200px",
         "6xl": "3840px",
       },
+
       colors: {
         background: "hsl(var(--background))",
         backgroundHex: "var(--background-hex)",
@@ -164,6 +165,21 @@ export default {
         "25": "100px",
         "30": "120px",
         "50": "200px",
+      },
+      maxWidth: {
+        "10": "40px",
+        "15": "60px",
+        "20": "80px",
+        "25": "100px",
+        "30": "120px",
+        "40": "160px",
+        "50": "200px",
+        "60": "240px",
+        "70": "280px",
+        "80": "320px",
+        "90": "360px",
+        "100": "400px",
+        "3xl": "1536px",
       },
       height: {
         "13": "52px",

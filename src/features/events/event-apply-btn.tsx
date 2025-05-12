@@ -16,8 +16,14 @@ import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
-import { CheckCircleIcon, CircleDollarSignIcon, X } from "lucide-react";
+import {
+  CheckCircleIcon,
+  CircleDollarSignIcon,
+  LoaderPinwheel,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -149,13 +155,29 @@ export const ApplyButton = ({
 }: ApplyButtonProps) => {
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
+  const [pending, setPending] = useState(false);
 
-  const onApply = () => {
+  const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
-    toggleAppActions({
-      openCallId: openCallId as Id<"openCalls">,
-      manualApplied: true,
-    });
+
+    try {
+      setPending(true);
+      if (!appStatus) {
+        await toggleAppActions({
+          openCallId: openCallId as Id<"openCalls">,
+          manualApplied: true,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update application status", error);
+    } finally {
+      onDirectToLink();
+      setPending(false);
+    }
+  };
+  const onDirectToLink = () => {
+    if (!appUrl) return;
+    window.open(appUrl, "_blank", "noopener,noreferrer");
   };
   const onBookmark = () => {
     // setIsBookmarked(!isBookmarked);
@@ -304,10 +326,11 @@ export const ApplyButton = ({
 
               <AlertDialogPrimaryAction
                 variant="salWithShadow"
-                onClick={!appStatus ? onApply : () => {}}
-                className="sm:w-40"
+                onClick={onApply}
+                className="flex items-center gap-x-1 sm:w-40"
               >
-                {!appStatus ? "Apply" : "Continue"}
+                {!appStatus ? "Apply" : "Continue"}{" "}
+                {pending && <LoaderPinwheel className="size-4 animate-spin" />}
               </AlertDialogPrimaryAction>
             </AlertDialogFooter>
           </AlertDialogContent>

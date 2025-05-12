@@ -190,7 +190,7 @@ export function SearchMappedMultiSelect<T>({
             // autoFocus
             value={searchQuery}
             onValueChange={setSearchQuery}
-            className="pr-18 text-base lg:text-sm"
+            className="pr-18 text-base sm:text-sm"
           />
           {values?.length > 0 && (
             <span className="group absolute right-3 top-2 flex cursor-pointer items-center gap-1 hover:scale-105">

@@ -66,11 +66,26 @@ export const createOrUpdateOpenCall = mutation({
       otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
     }),
     state: v.optional(v.string()), //draft, submitted, published, archived
+    finalStep: v.optional(v.boolean()),
+    approved: v.optional(v.boolean()),
   },
-  
+
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+    const isAdmin = user?.role?.includes("admin");
+
+    const ocState = isAdmin
+      ? args.finalStep && args.approved
+        ? "published"
+        : "submitted"
+      : args.state;
 
     const openCallData = {
       adminNoteOC: "",
@@ -84,7 +99,7 @@ export const createOrUpdateOpenCall = mutation({
         ...args.requirements,
         links: args.requirements.links ?? [],
       },
-      state: args.state ?? "draft",
+      state: ocState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),
     };
@@ -101,7 +116,7 @@ export const createOrUpdateOpenCall = mutation({
       await ctx.db.patch(lookup.openCallId, openCallData);
       await ctx.db.patch(lookup._id, {
         edition: args.basicInfo.dates.edition,
-        state: args.state ?? "draft",
+        state: ocState,
       });
       console.log("lookup updated", lookup);
       return lookup.openCallId;
@@ -119,7 +134,7 @@ export const createOrUpdateOpenCall = mutation({
           eventId: args.eventId,
           openCallId: args.openCallId,
           edition: args.basicInfo.dates.edition,
-          state: args.state ?? "draft",
+          state: ocState,
         });
         console.log("existing updated", existing);
         return args.openCallId;
@@ -135,7 +150,7 @@ export const createOrUpdateOpenCall = mutation({
       eventId: args.eventId,
       openCallId: newId,
       edition: args.basicInfo.dates.edition,
-      state: args.state ?? "draft",
+      state: ocState,
     });
 
     return newId;

@@ -16,26 +16,35 @@ import { generateSkeletonGroups } from "@/lib/skeletonFns";
 import { cn, setParamIfNotDefault } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
-import { User, UserPref } from "@/types/user";
 // import { format } from "date-fns"
 
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { usePreloadedQuery } from "convex/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-interface Props {
-  // initialEvents: EventData[]
-  publicView: boolean;
-  userPref: UserPref | null;
-  user: User | null;
-}
+// interface Props {
 
-const ClientEventList = ({
-  // initialEvents,
-  publicView,
-  user,
-}: // userPref,
+// }
 
-Props) => {
+const ClientEventList = (
+  {
+    // initialEvents,
+    // publicView,
+    // user,
+  },
+) => {
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const user = userData?.user || null;
+  const accountType = user?.accountType ?? [];
+  const isArtist = accountType?.includes("artist");
+  const isAdmin = user?.role?.includes("admin");
+  const publicView =
+    (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
+  const userPref = userData?.userPref ?? null;
+
   const searchParams = useSearchParams();
   const allEvents = useEventPreviewCards();
   const isLoading = allEvents?.length === 0;
@@ -181,6 +190,7 @@ Props) => {
             onChange={handleFilterChange}
             onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
+            userPref={userPref}
           />
 
           {!isLoading && (
@@ -245,6 +255,7 @@ Props) => {
                   event={event}
                   publicView={publicView}
                   user={user}
+                  userPref={userPref}
                 />
               ))}
             </div>

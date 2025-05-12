@@ -184,6 +184,12 @@ export const formatOcDates = (start: string, end: string) => {
   }
 };
 
+export const getTimezoneFormat = (dateString: string, timezone: string) => {
+  const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone);
+  const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`;
+  return timeZoneFormat;
+};
+
 export const formatOpenCallDeadline = (
   dateString: string,
   timezone: string,

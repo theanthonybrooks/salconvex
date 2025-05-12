@@ -1,6 +1,7 @@
 import { ArtistFull } from "@/types/artist";
 import { EventData, SubmissionFormState } from "@/types/event";
 import { Organizer } from "@/types/organizer";
+import { UserPref } from "@/types/user";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export const callFormatValues = ["RFP", "RFQ"] as const;
@@ -19,8 +20,6 @@ export const callTypeValues = [
 ] as const;
 
 export type CallType = (typeof callTypeValues)[number];
-
-
 
 export const eligibilityTypeValues = [
   "International",
@@ -140,6 +139,7 @@ export interface OpenCallCardProps {
     organizer: Organizer;
     application?: OpenCallApplication | null;
   };
+  userPref: UserPref | null;
   artist?: ArtistFull | null; //todo:make this required
   className?: string;
 }

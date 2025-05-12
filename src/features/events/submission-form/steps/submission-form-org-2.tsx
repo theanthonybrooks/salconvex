@@ -77,8 +77,11 @@ const SubmissionFormOrgStep2 = ({
               <p className="lg:text-xs">Primary Contact</p>
             </div>
             <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="event.hasOpenCall" className="sr-only">
-                Change Me //TODO: change this
+              <Label
+                htmlFor="organization.contact.organizer"
+                className="sr-only"
+              >
+                Primary organizer contact
               </Label>
               <Controller
                 name="organization.contact.organizer"

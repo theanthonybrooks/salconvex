@@ -26,6 +26,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const {
     data,
     artist,
+    userPref,
     className,
     // organizer,
   } = props;
@@ -249,7 +250,13 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           </TabsList>
 
           <TabsContent value="opencall">
-            <OpenCallCard event={event} openCall={openCall} format="mobile" />
+            <OpenCallCard
+              artist={artist}
+              event={event}
+              openCall={openCall}
+              format="mobile"
+              userPref={userPref}
+            />
             <ApplyButton
               id={event._id}
               openCallId={openCallId}
