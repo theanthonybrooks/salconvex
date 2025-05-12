@@ -23,6 +23,7 @@ import {
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
@@ -31,7 +32,6 @@ import { EventCardProps } from "@/types/event";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { IoIosArrowRoundBack } from "react-icons/io";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const router = useRouter();
@@ -90,15 +90,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     }
   };
 
-  const onBackClick = () => {
-    const previous = sessionStorage.getItem("previousSalPage");
-    if (previous && previous.startsWith("/")) {
-      router.push(previous);
-    } else {
-      router.push("/thelist");
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -106,13 +97,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         className,
       )}
     >
-      <div
-        onClick={onBackClick}
-        className="col-start-1 row-span-1 mx-auto flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline"
-      >
-        <IoIosArrowRoundBack className="size-6" /> back to The List
-      </div>
-
+      <SalBackNavigation format="desktop" />
       <Card
         className={cn(
           "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",

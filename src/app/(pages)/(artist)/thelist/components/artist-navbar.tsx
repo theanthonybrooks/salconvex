@@ -253,7 +253,7 @@ TheListNavBarProps) {
           {!isMobile && (
             <div className="flex items-center gap-2">
               <Link href="/pricing?submit">
-                <Button className="h-9 border-2 border-transparent bg-background font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95">
+                <Button className="h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background active:scale-95">
                   Submit
                 </Button>
               </Link>
@@ -268,7 +268,7 @@ TheListNavBarProps) {
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
                         className={cn(
-                          "z-0 border-2 border-transparent font-bold hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                          "z-0 border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}

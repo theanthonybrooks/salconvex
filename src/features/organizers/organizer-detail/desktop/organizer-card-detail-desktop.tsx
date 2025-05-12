@@ -6,17 +6,15 @@ import { MapPin } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { OrganizerCardProps } from "@/types/organizer";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { IoIosArrowRoundBack } from "react-icons/io";
 
 export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
-  const router = useRouter();
   const { data, className } = props;
   const { events, organizer } = data;
   const {
@@ -56,15 +54,6 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
 
-  const onBackClick = () => {
-    const previous = sessionStorage.getItem("previousSalPage");
-    if (previous && previous.startsWith("/")) {
-      router.push(previous);
-    } else {
-      router.push("/thelist");
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -72,12 +61,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
         className,
       )}
     >
-      <div
-        onClick={onBackClick}
-        className="col-start-1 row-span-1 mx-auto flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline"
-      >
-        <IoIosArrowRoundBack className="size-6" /> back to The List
-      </div>
+      <SalBackNavigation format="desktop" />
 
       <Card
         className={cn(

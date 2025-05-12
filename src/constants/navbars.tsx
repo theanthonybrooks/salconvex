@@ -184,9 +184,9 @@ export const theListNavbarMenuLinks: {
     sub: ["all"],
   },
   {
-    title: "Submit",
-    href: "/pricing?submit",
-    description: "Submit an open call",
+    title: "Newsletter Archive",
+    href: "/newsletter",
+    description: "Archive of past newsletters",
     sub: ["all"],
   },
 ];

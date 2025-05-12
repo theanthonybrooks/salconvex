@@ -1,15 +1,14 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
 import { useQuery } from "convex-helpers/react/cache";
-import { useParams, useRouter } from "next/navigation";
-import { IoIosArrowRoundBack } from "react-icons/io";
+import { useParams } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
-  const router = useRouter();
   const { slug } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
@@ -33,27 +32,12 @@ const Event = () => {
 
   // console.log("event data", data);
 
-  const onBackClick = () => {
-    const previous = sessionStorage.getItem("previousSalPage");
-
-    if (previous && previous.includes("/thelist")) {
-      router.push(previous);
-    } else {
-      router.push("/thelist");
-    }
-  };
-
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
 
   return (
     <>
-      <div
-        onClick={onBackClick}
-        className="flex cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline lg:hidden"
-      >
-        <IoIosArrowRoundBack className="size-6" /> back to The List
-      </div>
+      <SalBackNavigation format="mobile" />
       {!data ? (
         // <p>Event: {data?.event.name}</p>
         <div className="flex min-h-screen w-full max-w-[min(90vw,1400px)] flex-col gap-6 pb-10 xl:grid xl:grid-cols-[300px_auto] xl:grid-rows-[60px_auto] xl:gap-y-0">

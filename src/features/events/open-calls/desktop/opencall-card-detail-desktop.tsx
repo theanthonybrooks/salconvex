@@ -12,12 +12,10 @@ import {
 } from "@/components/ui/state-accordion-test";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { CheckCircleIcon, EyeOff, Info, MapPin } from "lucide-react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-import { IoIosArrowRoundBack } from "react-icons/io";
 
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { EventCard } from "@/features/events/components/events-card";
@@ -27,6 +25,7 @@ import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCall
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 
 import EventDates from "@/features/events/components/event-dates";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { formatOpenCallDeadline, formatSingleDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
@@ -34,7 +33,6 @@ import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
-  const router = useRouter();
   const { data, artist, userPref, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
@@ -104,17 +102,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     { id: "organizer", label: "Organizer" },
   ];
 
-  const onBackClick = () => {
-    const previous = sessionStorage.getItem("previousSalPage");
-    console.log("previous", previous);
-
-    if (previous && previous.includes("/thelist")) {
-      router.push(previous);
-    } else {
-      router.push("/thelist");
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -122,12 +109,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         className,
       )}
     >
-      <div
-        onClick={onBackClick}
-        className="col-start-1 row-span-1 mx-auto flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline"
-      >
-        <IoIosArrowRoundBack className="size-6" /> back to The List
-      </div>
+      <SalBackNavigation format="desktop" />
 
       <Card
         className={cn(

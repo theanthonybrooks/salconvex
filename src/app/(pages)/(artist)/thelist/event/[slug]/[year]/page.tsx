@@ -8,9 +8,9 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { IoIosArrowRoundBack } from "react-icons/io";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
@@ -48,15 +48,6 @@ const Event = () => {
   //   edition: 2025,
   // });
 
-  const onBackClick = () => {
-    const previous = sessionStorage.getItem("previousSalPage");
-    if (previous && previous.includes("/thelist")) {
-      router.push(previous);
-    } else {
-      router.push("/thelist");
-    }
-  };
-
   // setTimeout(() => {
   //   window.scrollTo({ top: 0, behavior: "smooth" });
   // }, 50); // small delay gives time for back nav
@@ -73,12 +64,8 @@ const Event = () => {
 
   return (
     <>
-      <div
-        onClick={onBackClick}
-        className="flex cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline lg:hidden"
-      >
-        <IoIosArrowRoundBack className="size-6" /> back to The List
-      </div>
+      <SalBackNavigation format="mobile" />
+
       {!data ? (
         // <p>Event: {data?.event.name}</p>
         <div className="flex min-h-screen w-full max-w-[min(90vw,1400px)] flex-col gap-6 pb-10 xl:grid xl:grid-cols-[300px_auto] xl:grid-rows-[60px_auto] xl:gap-y-0">
