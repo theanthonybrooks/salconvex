@@ -58,7 +58,8 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
-  const appUrl = requirements?.applicationLink; //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
+  const appUrl = requirements?.applicationLink;
+   //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
 
   const { dates: callDates } = basicInfo;
   const { ocStart, ocEnd } = callDates;

@@ -27,6 +27,7 @@ import { useQuery } from "convex-helpers/react/cache";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
@@ -232,9 +233,11 @@ export const AccountTypeSwitch = ({
         >
           {isArtist
             ? "Switch to Organizer Options"
-            : hasSub && orgAccount
-              ? "Switch to Artist Options"
-              : "View your current plan"}
+            : hasSub
+              ? orgAccount
+                ? "Switch to Artist Options"
+                : "View your current plan"
+              : "Switch to Artist Options"}
         </Button>
       </div>
     </div>
@@ -466,6 +469,7 @@ const PricingCard = ({
 
 export default function Pricing() {
   useScrollToTopOnMount();
+  const searchParams = useSearchParams();
   const [isYearly, setIsYearly] = useState<boolean>(false);
 
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -479,7 +483,8 @@ export default function Pricing() {
   const user = userData?.user;
   const userAccountTypes = user?.accountType ?? [];
   // const multiType = userAccountTypes.length > 1
-  const accountType = user?.accountType[0] ?? "artist";
+  const [urlAccountType, setUrlAccountType] = useState<string | null>(null);
+  const accountType = urlAccountType ?? user?.accountType[0] ?? "artist";
   const isAdmin = user?.role?.includes("admin");
 
   // if (hasSub) {
@@ -488,11 +493,22 @@ export default function Pricing() {
 
   // console.log("accountType: ", accountType)
   const [selectedAccountType, setSelectedAccountType] = useState(accountType);
-
   // const userIsArtist = userAccountTypes.includes("artist")
   const isArtist = selectedAccountType === "artist";
   const isOrganizer = selectedAccountType === "organizer";
   const orgAccountType = userAccountTypes.includes("organizer");
+
+  useEffect(() => {
+    const hasSubmitParam = searchParams.has("submit");
+    const hash = window?.location?.hash;
+    const hasSubmitHash = hash === "#submit";
+    console.log(hasSubmitParam, hasSubmitHash);
+
+    if (hasSubmitParam || hasSubmitHash) {
+      setSelectedAccountType("organizer");
+      setUrlAccountType("organizer");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     setSelectedAccountType(accountType);

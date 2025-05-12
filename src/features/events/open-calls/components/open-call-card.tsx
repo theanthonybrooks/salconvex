@@ -158,7 +158,7 @@ const OpenCallCard = ({
                       )}
                     </span>
                   </div>
-                  <p>
+                  <span>
                     <span className="font-semibold underline underline-offset-2">
                       Eligible:
                     </span>
@@ -180,7 +180,7 @@ const OpenCallCard = ({
                       />
                       {!artistEligible && <span>(Ineligible)</span>}
                     </span>
-                  </p>
+                  </span>
                   {eligibilityDetails && (
                     <div>
                       <span className="font-semibold underline underline-offset-2">
@@ -227,7 +227,7 @@ const OpenCallCard = ({
                         true,
                       )}
 
-                    {noBudgetInfo && <p className="text-sm">No Info</p>}
+                    {noBudgetInfo && <p className="text-sm">No Budget Info</p>}
                   </div>
 
                   <OpenCallProvidedPreview
@@ -381,7 +381,7 @@ const OpenCallCard = ({
             <AccordionTrigger title="Deadline & Eligibility:" />
             <AccordionContent>
               <div className="space-y-2 p-3">
-                <div>
+                <span>
                   <span className="font-semibold underline underline-offset-2">
                     Deadline:
                   </span>
@@ -401,8 +401,8 @@ const OpenCallCard = ({
                       </a>
                     )}
                   </span>
-                </div>
-                <p>
+                </span>
+                <span>
                   <span className="font-semibold underline underline-offset-2">
                     Eligible:
                   </span>
@@ -424,7 +424,7 @@ const OpenCallCard = ({
                     />
                     {!artistEligible && <span>(Ineligible)</span>}
                   </span>
-                </p>
+                </span>
                 {eligibilityDetails && (
                   <div>
                     <span className="font-semibold underline underline-offset-2">

@@ -157,10 +157,10 @@ export const ApplyButton = ({
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);
   const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
+  const backToList = finalAppUrl === "/thelist";
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
-    console.log(appStatus, finalAppUrl);
     try {
       setPending(true);
       if (!appStatus) {
@@ -177,7 +177,6 @@ export const ApplyButton = ({
     }
   };
   const onDirectToLink = () => {
-    console.log("clicked", finalAppUrl);
     if (!finalAppUrl) return;
     window.open(finalAppUrl, "_blank", "noopener,noreferrer");
   };

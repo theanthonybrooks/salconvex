@@ -120,7 +120,13 @@ export const landingPageNavbarLinks: {
   {
     title: "Pricing",
     href: "/pricing",
-    description: "View them prices.",
+    description: "View pricing options",
+    sub: ["public"],
+  },
+  {
+    title: "Submit",
+    href: "/pricing?submit",
+    description: "Submit an event/open call",
     sub: ["public"],
   },
   // {
@@ -179,7 +185,7 @@ export const theListNavbarMenuLinks: {
   },
   {
     title: "Submit",
-    href: "/submit",
+    href: "/pricing?submit",
     description: "Submit an open call",
     sub: ["all"],
   },

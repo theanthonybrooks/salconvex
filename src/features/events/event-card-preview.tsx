@@ -23,6 +23,7 @@ import {
   formatCurrency,
   formatRate,
   getEventCategoryLabel,
+  getEventCategoryLabelAbbr,
   getEventTypeLabel,
 } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
@@ -204,7 +205,7 @@ const EventCardPreview = ({
             </span>
             {/* // todo: make this dynamic to show project, event, etc for the type */}
             <span className="text-2xs leading-[0.85rem]">
-              {getEventCategoryLabel(eventCategory)}
+              {getEventCategoryLabelAbbr(eventCategory)}
             </span>
           </div>
         </div>
@@ -278,7 +279,7 @@ const EventCardPreview = ({
               </p>
             )}
             {isCurrentlyOpen && (
-              <p
+              <span
                 className={cn(
                   "flex items-center gap-x-1 text-sm",
                   !event.hasActiveOpenCall && "hidden",
@@ -307,7 +308,7 @@ const EventCardPreview = ({
                     />
                   </span>
                 )}
-              </p>
+              </span>
             )}
           </div>
 
@@ -545,7 +546,7 @@ const EventCardPreview = ({
           <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
             <span className="font-semibold">Open Call:</span>
             <div className="flex flex-col gap-y-2">
-              <p className={cn("flex items-center gap-x-1 text-sm")}>
+              <span className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className={"font-semibold"}>
                   {/* {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}: */}
                   {hasOpenCall &&
@@ -579,8 +580,8 @@ const EventCardPreview = ({
                     </span>
                   </>
                 )}
-              </p>
-              <p className={cn("flex items-center gap-x-1 text-sm")}>
+              </span>
+              <span className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className="font-semibold">Eligible:</span>
                 {publicView ? (
                   <span className="pointer-events-none blur-[5px]">
@@ -625,7 +626,7 @@ const EventCardPreview = ({
                     </span>
                   </>
                 )}
-              </p>
+              </span>
               <div className="flex items-center gap-x-1">
                 <span className="font-semibold">Budget:</span>
                 {publicView ? (
@@ -697,22 +698,6 @@ const EventCardPreview = ({
           </div>
         )}
         <div className="flex flex-col items-center justify-center gap-y-6 py-6 text-sm">
-          {/* {openCall === "active" && (
-            <div
-              className={cn(
-                "border-dotted border-1.5 h-11 w-14 rounded-lg flex flex-col justify-center items-center py-[5px]",
-                !event.hasActiveOpenCall && "opacity-0"
-              )}>
-              <span className='text-2xs leading-[0.85rem]'>Call Type</span>
-              <span className='text-md font-bold font-foreground leading-[0.85rem]'>
-                {callFormat}
-              </span>
-              /~ // todo: make this dynamic to show project, event, etc for the type ~/
-              <span className='text-2xs leading-[0.85rem]'>
-                {getEventCategoryLabel(eventCategory)}
-              </span>
-            </div>
-          )}*/}
           {event.openCallStatus !== null && (
             <>
               {event.openCallStatus === "coming-soon" ? (
