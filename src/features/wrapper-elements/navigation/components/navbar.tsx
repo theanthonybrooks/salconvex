@@ -2,6 +2,7 @@
 
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -23,7 +24,6 @@ import { Unauthenticated } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
@@ -261,7 +261,7 @@ NavBarProps) {
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out [&_a]:hover:no-underline",
                                 component.href.includes(currentPage) &&
                                   fullPagePath === component.href &&
                                   "bg-background",
@@ -297,7 +297,7 @@ NavBarProps) {
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out [&_a]:hover:no-underline",
                                 component.href.includes(currentPage) &&
                                   currentPage !== "" &&
                                   "bg-background",

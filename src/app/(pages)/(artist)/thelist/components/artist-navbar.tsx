@@ -219,7 +219,9 @@ TheListNavBarProps) {
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >
-                View Pricing
+                <Button className="h-9 border-2 border-transparent bg-background font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95">
+                  View Pricing
+                </Button>
               </Link>
             </>
           )}
@@ -249,87 +251,96 @@ TheListNavBarProps) {
           )}
 
           {!isMobile && (
-            <div className="hidden items-center gap-8 pr-5 lg:flex">
-              <NavigationMenu
-                delayDuration={Infinity}
-                className="z-0"
-                align="right"
-              >
-                <NavigationMenuList className="christoph gap-2">
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger
-                      isCurrent={isActiveTheList}
-                      className={cn(
-                        "z-0 border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                        isActiveTheList &&
-                          "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
-                      )}
-                      onPointerMove={(event) => event.preventDefault()}
-                      onPointerLeave={(event) => event.preventDefault()}
-                    >
-                      The List
-                    </NavigationMenuTrigger>
-
-                    <NavigationMenuContent
-                      onPointerEnter={(event) => event.preventDefault()}
-                      onPointerLeave={(event) => event.preventDefault()}
-                    >
-                      <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
-                        {filteredNavbarMenuTheList.map((component) => (
-                          <ListItem
-                            key={component.title}
-                            title={component.title}
-                            href={component.href}
-                            className={cn(
-                              "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                              component.href === fullPagePath &&
-                                "bg-background",
-                            )}
-                          >
-                            {component.description}
-                          </ListItem>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-              {/* Right Side */}
-              <Unauthenticated>
-                <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
-                  <div className="flex items-center gap-4">
-                    <Link
-                      href="/auth/sign-in"
-                      prefetch={true}
-                      className="font-bold"
-                    >
-                      Sign in
-                    </Link>
-                    <Link href="/auth/register" prefetch={true}>
-                      <Button
-                        variant="salWithShadowHiddenYlw"
-                        className="hidden rounded-full font-bold lg:block"
+            <div className="flex items-center gap-2">
+              <Link href="/pricing?submit">
+                <Button className="h-9 border-2 border-transparent bg-background font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95">
+                  Submit
+                </Button>
+              </Link>
+              <div className="hidden items-center gap-8 pr-5 lg:flex">
+                <NavigationMenu
+                  delayDuration={Infinity}
+                  className="z-0"
+                  align="right"
+                >
+                  <NavigationMenuList className="christoph gap-2">
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        isCurrent={isActiveTheList}
+                        className={cn(
+                          "z-0 border-2 border-transparent font-bold hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                        )}
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
                       >
-                        Sign up
-                      </Button>
-                    </Link>
+                        The List
+                      </NavigationMenuTrigger>
+
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
+                          {filteredNavbarMenuTheList.map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                              className={cn(
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                component.href === fullPagePath &&
+                                  "bg-background",
+                              )}
+                            >
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+                {/* Right Side */}
+                <Unauthenticated>
+                  <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href="/auth/sign-in"
+                        prefetch={true}
+                        className="font-bold"
+                      >
+                        Sign in
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        prefetch={true}
+                        className="hover:no-underline"
+                      >
+                        <Button
+                          variant="salWithShadowHiddenYlw"
+                          className="hidden rounded-full font-bold lg:block"
+                        >
+                          Sign up
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </Unauthenticated>
-              {/* <Authenticated>
-                <UserProfile
-                  user={user}
-                  className="size-10"
-                  subscription={subStatus}
-                />
-                
-              </Authenticated> */}
-              {user && (
-                <div className="flex items-center gap-4">
-                  <UserProfile className="size-10" subscription={subStatus} />
-                  <FullPageNav user={user} />
-                </div>
-              )}
+                </Unauthenticated>
+                {/* <Authenticated>
+                  <UserProfile
+                    user={user}
+                    className="size-10"
+                    subscription={subStatus}
+                  />
+                  
+                </Authenticated> */}
+                {user && (
+                  <div className="flex items-center gap-4">
+                    <UserProfile className="size-10" subscription={subStatus} />
+                    <FullPageNav user={user} />
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

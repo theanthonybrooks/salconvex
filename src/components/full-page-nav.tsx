@@ -295,6 +295,12 @@ const FullPageNav = ({
 
   const isPricingPage = pathname.startsWith("/pricing");
 
+  const [currentPage, setCurrentPage] = useState<Location | null>(null);
+  // console.log(currentPage);
+  useEffect(() => {
+    setCurrentPage(window.location);
+  }, []);
+
   useEffect(() => {
     if (isOpen === "open") {
       setFreshOpen(true);
@@ -471,6 +477,26 @@ const FullPageNav = ({
               //   height: 0,
               // }}
             >
+              <Unauthenticated>
+                <div
+                  className={cn(
+                    "font-foreground m-x-auto flex w-full gap-3 border-b-2 border-foreground px-9 py-6 font-tanker text-[3rem] lowercase",
+                  )}
+                >
+                  <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
+                    <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
+                      Login
+                    </p>
+                  </Link>
+                  {/* <Separator orientation="vertical" /> */}
+                  <p>|</p>
+                  <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
+                    <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
+                      Register
+                    </p>
+                  </Link>
+                </div>
+              </Unauthenticated>
               <ul
                 className={cn(
                   "font-foreground m-x-auto w-full select-none font-tanker text-[4rem] lowercase",
@@ -575,6 +601,18 @@ const FullPageNav = ({
                   );
                 })}
               </ul>
+
+              <div
+                className={cn(
+                  "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
+                )}
+              >
+                <Link onClick={onHandleLinkClick} href={"/pricing?submit"}>
+                  <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
+                    Submit
+                  </p>
+                </Link>
+              </div>
               <Unauthenticated>
                 {!isPricingPage && (
                   <div
@@ -582,28 +620,14 @@ const FullPageNav = ({
                       "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
                     )}
                   >
-                    <Link
-                      onClick={onHandleLinkClick}
-                      href={"/pricing"}
-                      className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4"
-                    >
-                      Pricing
+                    <Link onClick={onHandleLinkClick} href={"/pricing"}>
+                      <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
+                        {" "}
+                        Pricing
+                      </p>
                     </Link>
                   </div>
                 )}
-                <div
-                  className={cn(
-                    "font-foreground m-x-auto w-full border-b-2 border-foreground py-6 pl-8 font-tanker text-[3rem] lowercase",
-                  )}
-                >
-                  <Link
-                    onClick={onHandleLinkClick}
-                    href={"/auth/sign-in"}
-                    className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:underline active:decoration-[5px] active:underline-offset-4"
-                  >
-                    Login | Register
-                  </Link>
-                </div>
               </Unauthenticated>
               <Authenticated>
                 <SignOutBtn>
@@ -612,7 +636,7 @@ const FullPageNav = ({
                       setTimeout(() => setIsOpen("closed"), 1000);
                     }}
                     className={cn(
-                      "font-foreground m-x-auto w-full py-6 pl-8 font-tanker text-[3rem] lowercase",
+                      "font-foreground m-x-auto w-full py-6 pl-8 font-tanker text-[3rem] lowercase active:scale-95",
                     )}
                   >
                     log out
@@ -651,7 +675,7 @@ const FullPageNav = ({
          *
          *
          * */}
-        {/* //---------------------- Grid (Desktop) Layout ---------------------- */}
+        {/*  //---------------------- Grid (Desktop) Layout ---------------------- */}
         {/* *
          *
          *
@@ -725,7 +749,9 @@ const FullPageNav = ({
                                 className={cn(
                                   "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
                                   activeCategory === section.title &&
+                                    !currentPage?.search?.includes("?submit") &&
                                     "text-white stroked wshadow",
+
                                   // activeCategory === section.title &&
                                   //   theme === "default" &&
                                   //   "text-white",
@@ -744,9 +770,32 @@ const FullPageNav = ({
                         })}
                         {!user && (
                           <Link onClick={onHandleLinkClick} href={"/pricing"}>
-                            Pricing
+                            <p
+                              className={cn(
+                                "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
+                                currentPage?.pathname?.includes("/pricing") &&
+                                  !currentPage.search?.includes("?submit") &&
+                                  "text-white stroked wshadow",
+                              )}
+                            >
+                              Pricing
+                            </p>
                           </Link>
                         )}
+                        <Link
+                          onClick={onHandleLinkClick}
+                          href={"/pricing?submit"}
+                        >
+                          <p
+                            className={cn(
+                              "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
+                              currentPage?.search?.includes("?submit") &&
+                                "text-white stroked wshadow",
+                            )}
+                          >
+                            Submit
+                          </p>
+                        </Link>
                       </ul>
                     </motion.div>
 
@@ -781,7 +830,7 @@ const FullPageNav = ({
                             >
                               <div
                                 className={cn(
-                                  "cursor-pointer transition-all duration-100 ease-in-out hover:translate-x-2",
+                                  // "cursor-pointer transition-all duration-100 ease-in-out hover:translate-x-2",
                                   pathname === item.path && "text-background",
                                   // item.path.includes("dashboard") &&
                                   //   "text-salPink"
@@ -790,83 +839,24 @@ const FullPageNav = ({
                                 <Link
                                   onClick={onHandleLinkClick}
                                   href={item.path}
-                                  className={cn(
-                                    "cursor-pointer",
-                                    pathname === item.path &&
-                                      "decoration-6 translate-x-2 text-foreground underline underline-offset-4 active:scale-95",
-                                    // item.path.includes("dashboard") &&
-                                    //   "text-salPink"
-                                  )}
                                 >
-                                  {item.title}
+                                  <p
+                                    className={cn(
+                                      "cursor-pointer",
+                                      pathname === item.path &&
+                                        "decoration-6 translate-x-2 text-foreground underline underline-offset-4 active:scale-95",
+                                      // item.path.includes("dashboard") &&
+                                      //   "text-salPink"
+                                    )}
+                                  >
+                                    {item.title}
+                                  </p>
                                 </Link>
                               </div>
                             </li>
                           ))}
                       </ul>
                     </motion.div>
-
-                    {/* Column 3 */}
-                    {/*     <motion.div
-                      className="flex flex-col items-center justify-end gap-y-4 p-4 pb-8"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.1, duration: 0.4 }}
-                    >
-                      /~ <div className="scrollable mini flex h-[30%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
-                        <p>User Notifications</p>
-                        <Separator />
-                        <p className="text-sm italic">
-                          Nothing to see here yet
-                        </p>
-                      </div>
-                      <div className="flex h-[50%] w-[80%] flex-col rounded-lg border-1.5 border-dotted border-foreground p-8">
-                        <p>Applications</p>
-                        <Separator className="mb-2" />
-                        <ol className="flex flex-col gap-y-3">
-                          <li className="flex gap-x-4 text-emerald-500">
-                            <p className="text-sm">Blah Event</p> -{" "}
-                            <span className="flex gap-x-2 text-sm">
-                              <CheckCircle />
-                              Accepted
-                            </span>
-                            <span className="flex gap-x-2 text-sm">
-                              1-25-2025
-                            </span>
-                          </li>
-                          <li className="flex gap-x-4 text-emerald-500">
-                            <p className="text-sm">Blah Event</p> -{" "}
-                            <span className="flex gap-x-2 text-sm">
-                              <CheckCircle />
-                              Accepted
-                            </span>
-                            <span className="flex gap-x-2 text-sm">
-                              1-16-2025
-                            </span>
-                          </li>
-                          <li className="flex gap-x-4 text-red-500">
-                            <p className="text-sm">Blah Event</p> -{" "}
-                            <span className="flex gap-x-2 text-sm">
-                              <XCircle />
-                              Rejected
-                            </span>
-                            <span className="flex gap-x-2 text-sm">
-                              1-8-2025
-                            </span>
-                          </li>
-                          <li className="flex gap-x-4 text-red-500">
-                            <p className="text-sm">Blah Event</p> -{" "}
-                            <span className="flex gap-x-2 text-sm">
-                              <XCircle />
-                              Rejected
-                            </span>
-                            <span className="flex gap-x-2 text-sm">
-                              1-2-2025
-                            </span>
-                          </li>
-                        </ol>
-                      </div> ~/
-                    </motion.div>*/}
                   </div>
 
                   {/* Fixed Bottom Row */}

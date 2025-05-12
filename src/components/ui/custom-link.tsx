@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { type ComponentPropsWithRef } from "react";
 const linkVariants = cva(
-  "transition-colors duration-200 ease-in-out text-base lg:text-sm",
+  "transition-colors duration-200 ease-in-out text-base lg:text-sm [&_button]:active:scale-95 [&_button]:hover:no-underline",
   {
     variants: {
       variant: {

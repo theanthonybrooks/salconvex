@@ -19,7 +19,7 @@ const buttonVariants = cva(
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80 `,
         ghost: `hover:scale-110 active:scale-95 border border-transparent `,
         ghost2: `hover:bg-none hover:text-accent-foreground hover:scale-105 `,
-        link: `text-primary underline-offset-2 hover:underline `,
+        link: `link-btn text-primary underline-offset-2 hover:underline  `,
         expandIcon: `group relative text-primary-foreground bg-primary hover:bg-primary/90 `,
         ringHover: `bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:ring-2 hover:ring-primary/90 hover:ring-offset-2 `,
         shine: `text-primary-foreground animate-shine bg-linear-to-r from-primary via-primary/75 to-primary bg-[length:400%_100%]  `,

@@ -157,7 +157,7 @@ export const ApplyButton = ({
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);
   const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
-  const backToList = finalAppUrl === "/thelist";
+  // const backToList = finalAppUrl === "/thelist";
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;

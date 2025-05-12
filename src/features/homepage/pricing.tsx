@@ -184,7 +184,7 @@ export const AccountTypeSwitch = ({
       <div className={cn("mt-8 flex flex-col items-center gap-4 3xl:mt-14")}>
         {isArtist ? (
           <p>
-            Want to <span className="font-bold">add</span> an open call?
+            Want to <span className="font-bold">add</span> an event/open call?
           </p>
         ) : !hasSub ? (
           <p>
@@ -361,7 +361,7 @@ const PricingCard = ({
           )}
           {!image && (
             <>
-              <CardTitle className="text-xl">{title}</CardTitle>
+              {!isFree && <CardTitle className="text-xl">{title}</CardTitle>}
               <CardDescription className={cn("text-foreground")}>
                 {description}
               </CardDescription>
@@ -502,11 +502,12 @@ export default function Pricing() {
     const hasSubmitParam = searchParams.has("submit");
     const hash = window?.location?.hash;
     const hasSubmitHash = hash === "#submit";
-    console.log(hasSubmitParam, hasSubmitHash);
 
     if (hasSubmitParam || hasSubmitHash) {
       setSelectedAccountType("organizer");
       setUrlAccountType("organizer");
+    } else {
+      setUrlAccountType(null);
     }
   }, [searchParams]);
 
@@ -528,7 +529,7 @@ export default function Pricing() {
   return (
     <section id="plans" className="price-card-cont px-4 pt-6">
       <div className="mx-auto max-w-7xl">
-        {isAdmin && <ExistingSubscription onClick={handleManageSubscription} />}
+        {/* {isAdmin && <ExistingSubscription onClick={handleManageSubscription} />} */}
         {((isArtist && !hasSub) || (isAdmin && !isOrganizer)) && (
           <>
             <PricingHeader

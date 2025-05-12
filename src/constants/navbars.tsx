@@ -93,12 +93,6 @@ export const landingPageNavbarLinks: {
   target?: string;
   sub: string[];
 }[] = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    description: "Access your personal dashboard.",
-    sub: ["active", "trialing"],
-  },
   // {
   //   title: "The List",
   //   href: "/thelist",
@@ -127,7 +121,13 @@ export const landingPageNavbarLinks: {
     title: "Submit",
     href: "/pricing?submit",
     description: "Submit an event/open call",
-    sub: ["public"],
+    sub: ["all"],
+  },
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    description: "Access your personal dashboard.",
+    sub: ["active", "trialing"],
   },
   // {
   //   title: "Billing",
