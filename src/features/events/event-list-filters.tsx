@@ -1,36 +1,30 @@
 "use client";
 
-import { MultiSelect } from "@/components/multi-select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { eventCategoryOptions } from "@/constants/thelist";
-import { EventCategory } from "@/types/event";
+import { dashboardNavItems } from "@/constants/links";
+import { TheListFilterDrawerIcon } from "@/features/thelist/components/mobile/filter-drawer-icon";
 import { Filters, SortOptions } from "@/types/thelist";
-import { UserPref } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 
 interface Props {
+  user: User | null;
   filters: Filters;
   sortOptions: SortOptions;
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
   userPref: UserPref | null;
+  isMobile: boolean;
 }
 
 export const EventFilters = ({
+  user,
   filters,
   sortOptions,
   onChange,
   onSortChange,
   onResetFilters,
+  isMobile,
 }: Props) => {
   const hasActiveFilters =
     filters.bookmarkedOnly ||
@@ -43,8 +37,29 @@ export const EventFilters = ({
     <div className="mb-6 flex w-full flex-col items-start gap-4 px-8 lg:max-w-[60vw]">
       <Separator className="w-full" thickness={2} />
 
-      <div className="my-6 flex gap-4">
-        <div className="flex flex-col gap-3">
+      <div className="my-6 grid w-full grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
+        {user && (
+          <div className="col-span-full flex flex-col">
+            <TheListFilterDrawerIcon
+              title={"Search"}
+              source={dashboardNavItems}
+              className="flex h-12"
+              // groupName={"Heading"}
+              shortcut="k"
+              placeholder="Search..."
+              user={user}
+              // userPref={userPref}
+              filters={filters}
+              sortOptions={sortOptions}
+              onChange={onChange}
+              onSortChange={onSortChange}
+              onResetFilters={onResetFilters}
+              hasActiveFilters={hasActiveFilters}
+              isMobile={isMobile}
+            />
+          </div>
+        )}
+        {/* <div className="hidden flex-col gap-3 md:flex">
           <section className="flex flex-col gap-2">
             <Label htmlFor="limit" className="flex items-center gap-2">
               Results per page:
@@ -120,7 +135,7 @@ export const EventFilters = ({
             </Select>
           </section>
         </div>
-        <div className="flex flex-col justify-between">
+        <div className="hidden flex-col justify-between md:flex">
           <div className="flex flex-col gap-4">
             <section className="flex flex-col gap-2">
               <Label htmlFor="eventTypes" className="flex items-center gap-2">
@@ -172,7 +187,7 @@ export const EventFilters = ({
               Clear filters
             </span>
           )}
-        </div>
+        </div> */}
       </div>
       <Separator className="w-full lg:max-w-[60vw]" thickness={2} />
     </div>

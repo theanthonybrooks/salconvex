@@ -48,7 +48,7 @@ TheListNavBarProps) {
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
-
+  const isAdmin = user?.role?.includes("admin");
   const fullPagePath = pathname;
   const currentPage = pathname.split("/")[1];
 
@@ -212,7 +212,7 @@ TheListNavBarProps) {
               />
             </Link>
           </motion.div>
-          {!user && (
+          {user === null && (
             <>
               <Link
                 href="/pricing#plans"
@@ -226,9 +226,10 @@ TheListNavBarProps) {
             </>
           )}
           {/* NOTE: Limit/hide search for users who don't have a subscription or those who aren't signed in */}
-          {user && (
+          {isAdmin && user && (
             <>
               <Search
+                iconOnly
                 title={"Search"}
                 source={dashboardNavItems}
                 className="hidden lg:flex"
@@ -237,7 +238,7 @@ TheListNavBarProps) {
                 placeholder="Search..."
                 user={user}
               />
-              <Search
+              {/* <Search
                 iconOnly
                 isMobile={isMobile}
                 title={"Search"}
@@ -246,7 +247,7 @@ TheListNavBarProps) {
                 className="lg:hidden"
                 placeholder="Search..."
                 user={user}
-              />
+              /> */}
             </>
           )}
 

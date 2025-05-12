@@ -19,7 +19,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "shadow-xs flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-foreground bg-transparent px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 [&>span]:line-clamp-1 [&>span]:w-full [&[data-placeholder]>span]:text-muted-foreground/70",
+      "shadow-xs flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-foreground bg-transparent px-3 py-2 text-base ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:text-sm [&>span]:line-clamp-1 [&>span]:w-full [&[data-placeholder]>span]:text-muted-foreground/70",
       className,
     )}
     {...props}
@@ -121,7 +121,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 text-sm focus:bg-salPinkLt focus:text-accent-foreground data-[state=checked]:bg-salPinkLt/50 data-[state=checked]:font-bold",
+      "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 text-base focus:bg-salPinkLt focus:text-accent-foreground data-[state=checked]:bg-salPinkLt/50 data-[state=checked]:font-bold sm:text-sm",
       indicator && !fit ? "pr-8" : fit ? "pr-2" : "justify-center pr-2",
 
       className,

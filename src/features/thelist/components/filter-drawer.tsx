@@ -1,8 +1,9 @@
 import { DialogTitle } from "@/components/ui/dialog";
+import { Filters, SortOptions } from "@/types/thelist";
 import { DashIcon } from "@radix-ui/react-icons";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
-import { CircleX, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { IoSearch } from "react-icons/io5";
 
@@ -12,11 +13,12 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
-export interface CommandItem {
+export interface TheListFilterCommandItem {
   label?: string;
   name?: string;
   icon?: React.ComponentType<{ className?: string }>;
@@ -29,7 +31,7 @@ export interface CommandItem {
   desc?: string;
 }
 
-interface CommandMenuProps<T extends CommandItem> {
+export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   isMobile?: boolean;
@@ -41,9 +43,16 @@ interface CommandMenuProps<T extends CommandItem> {
   userType?: string[];
   subStatus?: string | undefined;
   userRole?: string[] | undefined;
+  filters: Filters;
+  sortOptions: SortOptions;
+  onChange: (newFilters: Partial<Filters>) => void;
+  onSortChange: (newSort: Partial<SortOptions>) => void;
+  onResetFilters: () => void;
+  // user: User | null;
+  hasActiveFilters: boolean;
 }
 
-export const CommandMenuCustom = <T extends CommandItem>({
+export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   open,
   setOpen,
   title,
@@ -56,7 +65,14 @@ export const CommandMenuCustom = <T extends CommandItem>({
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
-}: CommandMenuProps<T>) => {
+  filters,
+  sortOptions,
+  onChange,
+  onSortChange,
+  onResetFilters,
+
+  hasActiveFilters,
+}: FilterDrawerProps<T>) => {
   // console.log(subStatus);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -145,8 +161,6 @@ export const CommandMenuCustom = <T extends CommandItem>({
     },
   };
 
-  //TODO: FIGURE OUT WHY THE EXIT ANIMATION DOESN'T HAPPEN
-
   const searchTerm = value.toLowerCase();
 
   const handleValueChange = (newValue: string) => {
@@ -190,15 +204,15 @@ export const CommandMenuCustom = <T extends CommandItem>({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent
         setOpen={setOpen}
-        className="fixed z-top h-[90vh] max-h-[90%] bg-card"
+        className="fixed z-[100] h-[90vh] max-h-[90%] bg-card"
       >
         <div className="relative h-full w-full">
-          <div className="flex h-full w-full flex-col overflow-hidden rounded-t-2xl pb-6 pt-4">
+          <div className="flex h-full w-full flex-col gap-3 overflow-hidden rounded-t-2xl pb-6 pt-4">
             <DrawerHeader>
               <DrawerTitle className="sr-only">{title}</DrawerTitle>
             </DrawerHeader>
 
-            <Command shouldFilter={false} className="flex h-full flex-col">
+            {/* <Command shouldFilter={false} className="flex h-full flex-col">
               <div className="relative flex flex-shrink-0 items-center gap-1 border-b border-black/20 px-6 pb-3">
                 <IoSearch className="p-1 text-3xl text-stone-400" />
                 <Command.Input
@@ -212,7 +226,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                     }
                   }}
                   placeholder={placeholder}
-                  className="focus:outline-hidden relative z-10 w-full overflow-hidden truncate whitespace-nowrap p-3 pr-12 text-lg selection:italic selection:text-foreground placeholder:text-stone-400"
+                  className="focus:outline-hidden relative z-10 w-full overflow-hidden truncate whitespace-nowrap p-3 pr-12 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
                 />
                 {value.length > 0 && (
                   <button
@@ -266,7 +280,149 @@ export const CommandMenuCustom = <T extends CommandItem>({
                   ))
                 )}
               </Command.List>
-            </Command>
+            </Command> */}
+            <FilterBase
+              isMobile={isMobile}
+              filters={filters}
+              sortOptions={sortOptions}
+              hasActiveFilters={hasActiveFilters}
+              setOpen={setOpen}
+              setValue={setValue}
+              value={value}
+              shortcut={shortcut}
+              placeholder={placeholder}
+              onChange={onChange}
+              onSortChange={onSortChange}
+              onResetFilters={onResetFilters}
+            />
+            {/* <div className="flex flex-col items-center gap-3 px-5 [&>section]:w-full [&>section]:flex-1">
+              <section className="flex flex-col gap-2">
+                <Label htmlFor="limit" className="flex items-center gap-2">
+                  Results per page:
+                </Label>
+                <Select
+                  name="limit"
+                  value={String(filters.limit)}
+                  onValueChange={(value) =>
+                    onChange({ limit: parseInt(value, 10) })
+                  }
+                >
+                  <SelectTrigger className="w-full text-center">
+                    <SelectValue placeholder="Limit" />
+                  </SelectTrigger>
+                  <SelectContent className="min-w-auto z-top">
+                    <SelectItem fit value="1">
+                      1
+                    </SelectItem>
+                    <SelectItem fit value="5">
+                      5
+                    </SelectItem>
+                    <SelectItem fit value="10">
+                      10
+                    </SelectItem>
+                    <SelectItem fit value="25">
+                      25
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </section>
+              <section className="flex flex-col gap-2">
+                <Label htmlFor="sortBy" className="flex items-center gap-2">
+                  Sort by:
+                </Label>
+                <Select
+                  name="sortBy"
+                  value={sortOptions.sortBy}
+                  onValueChange={(value) =>
+                    onSortChange({ sortBy: value as SortOptions["sortBy"] })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sort By" />
+                  </SelectTrigger>
+                  <SelectContent className="z-top">
+                    <SelectItem value="openCall">Open Call</SelectItem>
+                    <SelectItem value="eventStart">Event Start</SelectItem>
+                    <SelectItem value="name">Name</SelectItem>
+                  </SelectContent>
+                </Select>
+              </section>
+
+              <section className="flex flex-col gap-2">
+                <Label htmlFor="sortOrder" className="flex items-center gap-2">
+                  Sort order:
+                </Label>
+                <Select
+                  name="sortOrder"
+                  value={sortOptions.sortDirection}
+                  onValueChange={(value) =>
+                    onSortChange({
+                      sortDirection: value as SortOptions["sortDirection"],
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Direction" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                    <SelectItem value="desc">Descending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </section>
+
+              <section className="flex flex-col gap-2">
+                <Label htmlFor="eventTypes" className="flex items-center gap-2">
+                  Event Category:
+                </Label>
+                <MultiSelect
+                  options={eventCategoryOptions}
+                  value={filters.eventCategories ?? []}
+                  onValueChange={(value) =>
+                    onChange({ eventCategories: value as EventCategory[] })
+                  }
+                  placeholder="Category"
+                  variant="basic"
+                  selectAll={false}
+                  hasSearch={false}
+                  className="w-full border bg-card sm:h-9"
+                  shortResults
+                />
+              </section>
+              <section className="flex flex-row justify-around gap-2">
+                <label className="flex cursor-pointer items-center gap-2">
+                  <Checkbox
+                    id="bookmarkedOnly"
+                    checked={filters.bookmarkedOnly}
+                    onCheckedChange={(checked) =>
+                      onChange({ bookmarkedOnly: Boolean(checked) })
+                    }
+                  />
+                  <span className="text-sm">Bookmarked Only</span>
+                </label>
+
+                <label className="flex cursor-pointer items-center gap-2">
+                  <Checkbox
+                    id="showHidden"
+                    checked={filters.showHidden}
+                    onCheckedChange={(checked) =>
+                      onChange({ showHidden: Boolean(checked) })
+                    }
+                  />
+                  <span className="text-sm">
+                    {filters.showHidden ? "Hide" : "Show"} Hidden
+                  </span>
+                </label>
+                {hasActiveFilters && (
+                  <span
+                    className="cursor-pointer text-center text-sm text-foreground underline-offset-4 hover:underline"
+                    onClick={onResetFilters}
+                  >
+                    Clear filters
+                  </span>
+                )}
+              </section>
+            </div> */}
           </div>
         </div>
       </DrawerContent>
@@ -330,7 +486,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                   }
                 }}
                 placeholder={cn(placeholder, !isMobile && "  (Hint: Ctrl + /)")}
-                className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
+                className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-foreground placeholder:text-stone-400"
               />
             </div>
             <div className="max-h-60dvh search scrollable mini p-3">

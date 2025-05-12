@@ -261,7 +261,7 @@ export const MultiSelect = React.forwardRef<
             onClick={handleTogglePopover}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-[40px] w-full items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-[36px] [&_svg]:pointer-events-auto",
+              "flex h-11 w-full items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-9 [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
               className,
               variant === "basic" ? "border-foreground" : "",
@@ -289,7 +289,7 @@ export const MultiSelect = React.forwardRef<
                           }}
                         >
                           {IconComponent && (
-                            <IconComponent className="mr-2 h-4 w-4" />
+                            <IconComponent className="mr-2 size-4" />
                           )}
                           <p
                             className={cn("text-sm font-normal", textClassName)}
@@ -320,7 +320,7 @@ export const MultiSelect = React.forwardRef<
                       {`+ ${selectedValues.length - maxCount} more`}
 
                       <XCircle
-                        className="ml-2 h-4 w-4 cursor-pointer"
+                        className="ml-2 size-4 cursor-pointer"
                         onClick={(event) => {
                           event.stopPropagation();
                           clearExtraOptions();
@@ -369,7 +369,7 @@ export const MultiSelect = React.forwardRef<
               <div className="mx-auto flex w-full items-center justify-between">
                 <span
                   className={cn(
-                    "mx-3 text-sm font-normal text-foreground",
+                    "mx-3 text-sm font-normal text-foreground/50",
                     textClassName,
                   )}
                 >
@@ -388,7 +388,7 @@ export const MultiSelect = React.forwardRef<
           shiftOffset={shiftOffset}
           showCloseButton={false}
           className={cn(
-            "max-w-max border border-foreground p-0",
+            "z-top max-w-max border border-foreground p-0",
             hasSearch ? "w-auto" : "w-full min-w-[200px]",
             variant === "basic" ? "border-foreground" : "",
           )}
@@ -415,15 +415,15 @@ export const MultiSelect = React.forwardRef<
                   >
                     <div
                       className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
                         selectedValues.length === options.length
                           ? "bg-primary text-primary-foreground"
                           : "opacity-50 [&_svg]:invisible",
                       )}
                     >
-                      <CheckIcon className="h-4 w-4" />
+                      <CheckIcon className="size-4" />
                     </div>
-                    <span>(Select All)</span>
+                    <span className="text-base sm:text-sm">(Select All)</span>
                   </CommandItem>
                 )}
 
@@ -464,18 +464,20 @@ export const MultiSelect = React.forwardRef<
                           >
                             <div
                               className={cn(
-                                "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
                                 isSelected
                                   ? "bg-primary text-primary-foreground"
                                   : "opacity-50 [&_svg]:invisible",
                               )}
                             >
-                              <CheckIcon className="h-4 w-4" />
+                              <CheckIcon className="size-4" />
                             </div>
                             {option.icon && (
-                              <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                              <option.icon className="mr-2 size-4 text-muted-foreground" />
                             )}
-                            <span>{option.label}</span>
+                            <span className="text-base sm:text-sm">
+                              {option.label}
+                            </span>
                           </CommandItem>
                         );
                       })}
@@ -501,18 +503,20 @@ export const MultiSelect = React.forwardRef<
                         >
                           <div
                             className={cn(
-                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
                               isSelected
                                 ? "bg-primary text-primary-foreground"
                                 : "opacity-50 [&_svg]:invisible",
                             )}
                           >
-                            <CheckIcon className="h-4 w-4" />
+                            <CheckIcon className="size-4" />
                           </div>
                           {option.icon && (
-                            <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                            <option.icon className="mr-2 size-4 text-muted-foreground" />
                           )}
-                          <span>{option.label}</span>
+                          <span className="text-base sm:text-sm">
+                            {option.label}
+                          </span>
                         </CommandItem>
                       );
                     })}

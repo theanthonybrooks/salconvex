@@ -19,6 +19,7 @@ import { Filters, SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { usePreloadedQuery } from "convex/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -34,6 +35,7 @@ const ClientEventList = (
     // user,
   },
 ) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
@@ -191,6 +193,8 @@ const ClientEventList = (
             onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
             userPref={userPref}
+            user={user}
+            isMobile={isMobile}
           />
 
           {!isLoading && (

@@ -424,7 +424,7 @@ const Card: React.FC<CardProps> = ({
         onMouseLeave={!isEditing ? () => setIsHovered(false) : () => {}}
       >
         {isHovered && (
-          <div className="absolute right-0 top-0 flex items-center justify-center gap-x-2 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground">
+          <div className="absolute right-0 top-0 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
               mode="edit"
               onClick={() => setIsEditing(true)}
@@ -433,10 +433,7 @@ const Card: React.FC<CardProps> = ({
                 setIsHovered(false);
               }}
               trigger={
-                <Pencil
-                  size={16}
-                  className="cursor-pointer text-gray-500 hover:text-gray-700"
-                />
+                <Pencil className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
               }
               initialValues={{
                 title,
@@ -457,16 +454,15 @@ const Card: React.FC<CardProps> = ({
             />
 
             <X
-              size={16}
               onClick={handleDelete}
-              className="cursor-pointer text-red-500 hover:text-red-700"
+              className="size-7 cursor-pointer text-red-500 hover:text-red-700 sm:size-4"
             />
           </div>
         )}
         <span
           onClick={handleTogglePriority}
           className={cn(
-            "mt-1 h-2 w-2 rounded-full p-[5px] hover:cursor-pointer",
+            "mt-1 size-2 rounded-full p-[5px] hover:cursor-pointer",
             newPriority === "high"
               ? "bg-green-500"
               : newPriority === "low"
@@ -607,7 +603,7 @@ export const TaskDialog = ({
       // Reset form
       setTitle(initialValues?.title || "");
       setColumn(initialValues?.column || "todo");
-      setPriority(initialValues?.priority || "medium");
+      setPriority(initialValues?.priority || "high");
       setOrder(
         mode === "add" && initialValues?.order ? initialValues.order : "end",
       );
@@ -707,7 +703,7 @@ export const TaskDialog = ({
             )}
           </div>
 
-          <DialogFooter className="flex w-full items-center justify-between sm:justify-between">
+          <DialogFooter className="flex w-full flex-row items-center justify-between sm:justify-between">
             <div className="flex items-center gap-2">
               {/* <input
                 type="checkbox"
@@ -721,7 +717,7 @@ export const TaskDialog = ({
                 checked={isPublic}
                 onChange={() => setIsPublic(!isPublic)}
               />
-              <Label htmlFor="public-toggle">
+              <Label htmlFor="public-toggle" className="hidden sm:block">
                 {isPublic ? "Public Task" : "Private Task"}
               </Label>
             </div>

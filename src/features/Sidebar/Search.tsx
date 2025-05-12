@@ -79,7 +79,7 @@ export const Search = <T extends CommandItem>({
           className={cn("flex items-center gap-x-2", className)}
           onClick={() => setOpen(true)}
         >
-          <FiSearch className="h-8 w-8 cursor-pointer" />
+          <FiSearch className="size-8 cursor-pointer md:size-5" />
           {value && value !== "Search" && (
             <span className="flex items-center">
               &quot;
