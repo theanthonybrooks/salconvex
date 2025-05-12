@@ -178,7 +178,6 @@ const OpenCallCard = ({
                         format="mobile"
                         eligible={artistEligible}
                       />
-                      {!artistEligible && <span>(Ineligible)</span>}
                     </span>
                   </span>
                   {eligibilityDetails && (
@@ -422,7 +421,6 @@ const OpenCallCard = ({
                       format="mobile"
                       eligible={artistEligible}
                     />
-                    {!artistEligible && <span>(Ineligible)</span>}
                   </span>
                 </span>
                 {eligibilityDetails && (

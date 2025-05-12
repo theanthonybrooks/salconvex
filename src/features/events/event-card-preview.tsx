@@ -92,7 +92,6 @@ const EventCardPreview = ({
       (whom) => artistNat.trim().toLowerCase() === whom.trim().toLowerCase(),
     ),
   );
-  console.log(artistEligible, eligibilityWhom, artistNationality);
   const budget = compensation?.budget;
   const {
     min: budgetMin,

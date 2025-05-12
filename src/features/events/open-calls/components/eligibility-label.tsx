@@ -15,6 +15,7 @@ export const EligibilityLabel = ({
   preview = false,
   eligible,
 }: EligibilityLabelProps) => {
+  const international = type === "International";
   const multipleWhom = whom.length > 1;
   const mobilePreview = format === "mobile" && preview;
   const isMobile = format === "mobile";
@@ -32,7 +33,8 @@ export const EligibilityLabel = ({
   }
   if (whom.length === 0 || type === "International" || type === "Other") {
     if (type === "International") {
-      return "International (all)";
+      // return "International (all)";
+      parts.push("International (all)");
     }
     if (type === "Other") {
       if (preview) {
@@ -77,13 +79,20 @@ export const EligibilityLabel = ({
           parts.push(whomString);
         } else {
           return (
-            <div className="grid grid-cols-[auto,1fr] gap-x-2">
+            <div className="flex gap-1">
               <span>{type}:</span>
               <ul>
                 {whom.map((w) => (
                   <li key={w}>{w}</li>
                 ))}
               </ul>
+
+              {(international || eligible) && (
+                <CheckIcon className="size-4 shrink-0 translate-y-0.5 text-emerald-800" />
+              )}
+              {!international && eligible === false && (
+                <XIcon className="size-4 shrink-0 translate-y-1 text-red-600" />
+              )}
             </div>
           );
         }
@@ -94,8 +103,12 @@ export const EligibilityLabel = ({
   return (
     <span className="flex items-center gap-1">
       {parts.join(" ")}
-      {eligible && <CheckIcon className="size-4 shrink-0 text-emerald-800" />}
-      {eligible === false && <XIcon className="size-4 shrink-0 text-red-600" />}
+      {(international || eligible) && (
+        <CheckIcon className="size-4 shrink-0 text-emerald-800" />
+      )}
+      {!international && eligible === false && (
+        <XIcon className="size-4 shrink-0 text-red-600" />
+      )}
     </span>
   );
 };

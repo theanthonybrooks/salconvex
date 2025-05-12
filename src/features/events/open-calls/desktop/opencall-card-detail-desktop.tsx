@@ -106,7 +106,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
   const onBackClick = () => {
     const previous = sessionStorage.getItem("previousSalPage");
-    if (previous && previous.startsWith("/")) {
+    console.log("previous", previous);
+
+    if (previous && previous.includes("/thelist")) {
       router.push(previous);
     } else {
       router.push("/thelist");

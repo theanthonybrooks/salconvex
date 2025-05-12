@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { User } from "@/types/user";
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface EventContextMenuProps {
@@ -116,7 +116,7 @@ const EventContextMenu = ({
             {isHidden ? (
               <span className="flex items-center gap-x-1 capitalize">
                 <EyeOff className="size-4" />
-                Unhide
+                Unhide{" "}
                 {openCallId !== ""
                   ? "Open Call"
                   : eventCategory.slice(0, 1).toUpperCase() +
@@ -192,20 +192,36 @@ const EventContextMenu = ({
             </div>
           )}
           {isAdmin && (
-            <div
-              onClick={() => {
-                console.log("admin functions");
-              }}
-              className={cn(
-                "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                publicView && "hidden",
-              )}
-            >
-              <span className="flex items-center gap-x-1 text-sm">
-                <Pencil className="size-4" />
-                Edit Event
-              </span>
-            </div>
+            <>
+              <div
+                onClick={() => {
+                  console.log("admin functions");
+                }}
+                className={cn(
+                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                  publicView && "hidden",
+                )}
+              >
+                <span className="flex items-center gap-x-1 text-sm">
+                  <Pencil className="size-4" />
+                  Edit Event
+                </span>
+              </div>
+              <div
+                onClick={() => {
+                  navigator.clipboard.writeText(eventId);
+                }}
+                className={cn(
+                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                  publicView && "hidden",
+                )}
+              >
+                <span className="flex items-center gap-x-1 text-sm">
+                  <FaRegCopy className="size-4" />
+                  Copy Event ID
+                </span>
+              </div>
+            </>
           )}
         </div>
       </PopoverContent>
