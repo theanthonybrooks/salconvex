@@ -285,7 +285,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">App Fee</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="openCall.basicInfo.hasAppFee" className="sr-only">
                 Application Fee
               </Label>
@@ -301,7 +301,7 @@ const SubmissionFormOC1 = ({
                   >
                     <SelectTrigger
                       className={cn(
-                        "h-12 w-fit min-w-44 border text-center text-base sm:h-[50px]",
+                        "h-12 w-full min-w-44 border text-center text-base sm:h-[50px] sm:w-fit",
                       )}
                     >
                       <SelectValue placeholder="Is there an application fee?" />
@@ -318,7 +318,7 @@ const SubmissionFormOC1 = ({
                 )}
               />
 
-              <div className="flex items-center justify-center px-2">
+              <div className="hidden items-center justify-center px-2 sm:flex">
                 <ArrowRight
                   className={cn(
                     "invisible size-4 shrink-0 text-foreground/50",
@@ -327,7 +327,12 @@ const SubmissionFormOC1 = ({
                 />
               </div>
 
-              <div className="min-w-50 flex flex-1 items-center justify-between rounded border border-foreground px-3">
+              <div
+                className={cn(
+                  "min-w-50 flex flex-1 items-center justify-between rounded border border-foreground px-3",
+                  !showAppFeeInput && "hidden",
+                )}
+              >
                 <Controller
                   name="organization.location.currency"
                   control={control}
@@ -380,7 +385,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">Open Call Dates</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="openCall.basicInfo.dates" className="sr-only">
                 Open Call Dates
               </Label>
@@ -393,11 +398,12 @@ const SubmissionFormOC1 = ({
                     onChange={field.onChange}
                     pickerType="start"
                     className="hansel min-h-12"
+                    placeholder="Start Date"
                   />
                 )}
               />
 
-              <div className="flex items-center justify-center px-2">
+              <div className="hidden items-center justify-center px-2 sm:flex">
                 <ArrowRight
                   className={cn(
                     "invisible size-4 shrink-0 text-foreground/50",
@@ -418,6 +424,7 @@ const SubmissionFormOC1 = ({
                     minDate={minDate}
                     ocEnd={ocEnd}
                     orgTimezone={orgTimezone}
+                    placeholder="Deadline"
                   />
                 )}
               />

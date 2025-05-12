@@ -385,6 +385,10 @@ h3 {
     overflow-y: auto;
     overflow-x: hidden;
   }
+  &.justx {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
   overflow: auto;
   scrollbar-gutter: auto;
   /* &.boundless {
@@ -993,6 +997,9 @@ div:has(> div.react-datepicker__input-container) {
   display: flex;
   &:first-of-type:has(.hansel) {
     max-width: 8em;
+    @media (width < 768px) {
+      max-width: 100%;
+    }
   }
   &:nth-of-type(2):has(.gretel) {
     flex: 1;

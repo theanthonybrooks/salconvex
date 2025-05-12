@@ -169,13 +169,14 @@ const OpenCallCard = ({
                         !artistEligible &&
                           eligibilityType !== "International" &&
                           "text-red-600",
-                        artistEligible && "text-emerald-600",
+                        artistEligible && "text-emerald-800",
                       )}
                     >
                       <EligibilityLabel
                         type={eligibilityType}
                         whom={eligibilityWhom}
                         format="mobile"
+                        eligible={artistEligible}
                       />
                       {!artistEligible && <span>(Ineligible)</span>}
                     </span>
@@ -412,13 +413,14 @@ const OpenCallCard = ({
                       !artistEligible &&
                         eligibilityType !== "International" &&
                         "text-red-600",
-                      artistEligible && "text-emerald-600",
+                      artistEligible && "text-emerald-800",
                     )}
                   >
                     <EligibilityLabel
                       type={eligibilityType}
                       whom={eligibilityWhom}
                       format="mobile"
+                      eligible={artistEligible}
                     />
                     {!artistEligible && <span>(Ineligible)</span>}
                   </span>

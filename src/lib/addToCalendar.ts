@@ -84,11 +84,11 @@ export const generateICSFile = (
             : formattedDateFull
       }\n\n ${description}`
     : description;
-
+  const urlBase = `event/${slug}/${thisYear}`;
   const urlFormatted = url
     ? `https://www.thestreetartlist.com/thelist/${
-        isOpenCall ? `event/${slug}/call` : `event/${slug}`
-      }/${thisYear}`
+        isOpenCall ? `${urlBase}/call` : urlBase
+      }`
     : "";
 
   // console.log("formattedIsoOcStart", formattedIsoOcStart)

@@ -1,8 +1,11 @@
+import { CheckIcon, XIcon } from "lucide-react";
+
 interface EligibilityLabelProps {
   type: string | null;
   whom: string[];
   format?: "desktop" | "mobile";
   preview?: boolean;
+  eligible?: boolean;
 }
 
 export const EligibilityLabel = ({
@@ -10,6 +13,7 @@ export const EligibilityLabel = ({
   whom,
   format,
   preview = false,
+  eligible,
 }: EligibilityLabelProps) => {
   const multipleWhom = whom.length > 1;
   const mobilePreview = format === "mobile" && preview;
@@ -26,47 +30,50 @@ export const EligibilityLabel = ({
   ) {
     parts.push(`${type}:`);
   }
-  if (whom.length === 0 || type === "International") {
+  if (whom.length === 0 || type === "International" || type === "Other") {
     if (type === "International") {
       return "International (all)";
     }
     if (type === "Other") {
       if (preview) {
-        return "Other (see details)*";
+        return "Other (see details)";
       } else {
         return "See details below";
       }
     }
   } else if (whom.length === 1) {
-    if (!preview) {
-      parts.push("Artists from/residing in " + whom[0]);
-    } else {
-      parts.push(whom[0]);
-    }
-    // parts.push(whom[0]);
+    // if (mobilePreview) {
+    //   parts.push(type);
+    // } else {
+    //   parts.push(whom[0]);
+    // }
+    parts.push(whom[0]);
   } else if (multipleWhom) {
     if (preview) {
       if (whom.length > 2) {
-        parts.push("See app details*");
+        parts.push("See app details");
       } else if (isDesktop && whom.length <= 2) {
         // parts.push("Artists from/residing in ");
-        const whomString = whom.join(" & ");
+        const whomString = whom.join(" or ");
         parts.push(whomString);
+      } else if (mobilePreview) {
+        // parts.push(type);
+        parts.push(`${type}+`);
       }
     } else {
       if (isDesktop) {
-        parts.push("Artists from/residing in ");
+        // parts.push("Artists from/residing in ");
         const whomString =
           whom.length === 2
-            ? whom.join(" & ")
-            : `${whom.slice(0, -1).join(", ")}, and ${whom[whom.length - 1]}`;
+            ? whom.join(" or ")
+            : `${whom.slice(0, -1).join(", ")}, or ${whom[whom.length - 1]}`;
         parts.push(whomString);
       } else if (isMobile) {
         if (whom.length === 2) {
           const whomString =
             whom.length === 2
-              ? whom.join(" & ")
-              : `${whom.slice(0, -1).join(", ")}, and ${whom[whom.length - 1]}`;
+              ? whom.join(" or ")
+              : `${whom.slice(0, -1).join(", ")}, or ${whom[whom.length - 1]}`;
           parts.push(whomString);
         } else {
           return (
@@ -84,5 +91,11 @@ export const EligibilityLabel = ({
     }
   }
 
-  return <>{parts.join(" ")}</>;
+  return (
+    <span className="flex items-center gap-1">
+      {parts.join(" ")}
+      {eligible && <CheckIcon className="size-4 shrink-0 text-emerald-800" />}
+      {eligible === false && <XIcon className="size-4 shrink-0 text-red-600" />}
+    </span>
+  );
 };

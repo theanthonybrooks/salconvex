@@ -302,6 +302,7 @@ const eventOpenCallSchema = {
   openCallId: v.id("openCalls"),
   edition: v.number(),
   state: v.optional(v.string()), //draft, submitted, published, archived
+  lastEdited: v.optional(v.number()),
 };
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
 const openCallSchema = {

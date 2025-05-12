@@ -303,6 +303,7 @@ const EventCardPreview = ({
                       whom={eligibility.whom}
                       format="mobile"
                       preview={true}
+                      eligible={artistEligible}
                     />
                   </span>
                 )}
@@ -602,6 +603,7 @@ const EventCardPreview = ({
                         whom={eligibility.whom}
                         format="desktop"
                         preview={true}
+                        eligible={artistEligible}
                       />
                     </span>
                     <span
@@ -618,6 +620,7 @@ const EventCardPreview = ({
                         whom={eligibility.whom}
                         format="mobile"
                         preview={true}
+                        eligible={artistEligible}
                       />
                     </span>
                   </>

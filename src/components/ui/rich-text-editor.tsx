@@ -115,7 +115,7 @@ export const RichTextEditor = ({
   return (
     <div className="rounded border p-2">
       {/* Toolbar */}
-      <div className="mb-2 flex gap-2 border-b pb-2">
+      <div className="max-w-90dvw scrollable mini justx mb-2 flex gap-2 border-b pb-2">
         <Button
           variant="richTextButton"
           size="richText"

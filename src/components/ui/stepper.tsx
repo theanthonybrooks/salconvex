@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import { Check, CheckCircle2, Loader } from "lucide-react";
 import * as React from "react";
+import { FaCheckDouble } from "react-icons/fa6";
 import { z } from "zod";
 
 interface StepperProps {
@@ -31,6 +32,7 @@ interface StepperProps {
   onFinalSubmit?: () => void;
   cancelButton?: React.ReactNode;
   onSave?: () => void;
+  onPublish?: () => void;
   isDirty?: boolean;
   disabled?: boolean;
   lastSaved?: string | null;
@@ -54,6 +56,7 @@ export default function HorizontalLinearStepper({
   onFinalSubmit,
   cancelButton,
   onSave,
+  onPublish,
   isDirty,
   disabled,
   lastSaved,
@@ -63,6 +66,7 @@ export default function HorizontalLinearStepper({
   isAdmin,
 }: StepperProps) {
   // console.log(errorMsg);
+
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({
@@ -71,7 +75,8 @@ export default function HorizontalLinearStepper({
           optional: false,
         }))
       : steps;
-
+  const adminFinalStep = isAdmin && activeStep === stepArray.length - 1;
+  const finalStep = activeStep === stepArray.length - 1;
   const handleNext = () => {
     if (skipped && setSkipped) {
       if (skipped.has(activeStep)) {
@@ -202,7 +207,7 @@ export default function HorizontalLinearStepper({
           <div className={cn("flex items-center justify-between gap-x-4")}>
             <section className="flex items-center gap-x-2">
               <div>
-                {activeStep >= 1 && (
+                {activeStep >= 1 && activeStep !== stepArray.length - 1 && (
                   <>
                     <Button
                       variant="salWithShadowHidden"
@@ -256,22 +261,32 @@ export default function HorizontalLinearStepper({
               </p>
             )}
 
-            <section className="flex min-w-24 items-center justify-end gap-2">
+            <section
+              className={cn(
+                "flex min-w-24 items-center justify-end gap-2",
+                adminFinalStep &&
+                  "w-full flex-col justify-center sm:w-auto sm:flex-row sm:justify-end",
+              )}
+            >
               {lastSaved && activeStep >= 1 && (
                 <p className="mr-2 hidden text-xs italic text-muted-foreground lg:block">
                   Last saved: {lastSaved}
                 </p>
               )}
-              {isAdmin && onCheckSchema && (
-                <Button
-                  variant="salWithShadowHiddenYlw"
-                  onClick={onCheckSchema}
-                  className="hidden items-center gap-1 sm:flex"
-                >
-                  {pending ? "Pending..." : "Check Schema"}
-                  {pending && <Loader className="size-4 animate-spin" />}
-                </Button>
-              )}
+              {isAdmin &&
+                onCheckSchema &&
+                activeStep !== stepArray.length - 1 &&
+                isDirty && (
+                  <Button
+                    variant="salWithShadowHiddenYlw"
+                    onClick={onCheckSchema}
+                    className="hidden items-center gap-1 sm:flex"
+                  >
+                    {pending ? "Pending..." : "Check Schema"}
+                    {pending && <Loader className="size-4 animate-spin" />}
+                  </Button>
+                )}
+
               {cancelButton}
               {activeStep !== 0 && (
                 <Button
@@ -279,6 +294,7 @@ export default function HorizontalLinearStepper({
                   disabled={activeStep === 0 || pending}
                   // onClick={handleBack}
                   onClick={onBackStep ?? handleBack}
+                  className={cn(adminFinalStep && "hidden sm:flex")}
                 >
                   Back
                 </Button>
@@ -289,9 +305,17 @@ export default function HorizontalLinearStepper({
                   Skip
                 </Button>
               )}
+
               <Button
-                variant="salWithShadowHidden"
-                className="flex min-w-32 items-center gap-2"
+                variant={
+                  disabled || pending
+                    ? "salWithoutShadow"
+                    : "salWithShadowHidden"
+                }
+                className={cn(
+                  "flex min-w-32 items-center gap-2",
+                  finalStep && "w-full sm:w-auto",
+                )}
                 disabled={disabled || pending}
                 onClick={
                   activeStep === lastStep
@@ -299,7 +323,7 @@ export default function HorizontalLinearStepper({
                     : (onNextStep ?? handleNext)
                 }
               >
-                {activeStep === stepArray.length - 1 ? (
+                {finalStep ? (
                   finalLabel ? (
                     <div className="flex items-center gap-1">
                       {finalLabel} <CheckCircle2 className="size-5" />
@@ -314,6 +338,33 @@ export default function HorizontalLinearStepper({
                 )}
                 {pending && <Loader className="size-4 animate-spin" />}
               </Button>
+              {adminFinalStep && onPublish && (
+                <Button
+                  variant="salWithShadowHiddenYlw"
+                  onClick={onPublish}
+                  className={cn(
+                    "flex items-center gap-1",
+                    adminFinalStep && "w-full sm:w-auto",
+                  )}
+                >
+                  <div className="flex items-center gap-1">
+                    {pending ? "Publishing..." : "Publish"}{" "}
+                    <FaCheckDouble className="size-5" />
+                  </div>
+
+                  {pending && <Loader className="size-4 animate-spin" />}
+                </Button>
+              )}
+              {adminFinalStep && (
+                <Button
+                  variant="salWithShadowHiddenYlw"
+                  disabled={pending}
+                  onClick={onBackStep ?? handleBack}
+                  className={cn(adminFinalStep && "w-full sm:hidden")}
+                >
+                  Back
+                </Button>
+              )}
             </section>
           </div>
 

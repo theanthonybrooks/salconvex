@@ -717,6 +717,7 @@ export const createOrUpdateEvent = mutation({
       ),
     ),
     finalStep: v.optional(v.boolean()),
+    publish: v.optional(v.boolean()),
     adminNote: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -763,7 +764,9 @@ export const createOrUpdateEvent = mutation({
 
     const eventState = args.finalStep
       ? isAdmin
-        ? "published"
+        ? args.publish
+          ? "published"
+          : "submitted"
         : "submitted"
       : "draft";
     const eventCategory = args.category || "";

@@ -80,7 +80,7 @@ export const createOrUpdateOpenCall = mutation({
       .unique();
     if (!user) throw new ConvexError("User not found");
     const isAdmin = user?.role?.includes("admin");
-
+    console.log(args.approved, args.finalStep, args.state);
     const ocState = isAdmin
       ? args.finalStep && args.approved
         ? "published"
@@ -117,6 +117,7 @@ export const createOrUpdateOpenCall = mutation({
       await ctx.db.patch(lookup._id, {
         edition: args.basicInfo.dates.edition,
         state: ocState,
+        lastEdited: Date.now(),
       });
       console.log("lookup updated", lookup);
       return lookup.openCallId;

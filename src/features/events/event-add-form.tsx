@@ -596,7 +596,7 @@ export const EventOCForm = ({
   );
 
   const handleSave = useCallback(
-    async (direct = false) => {
+    async (direct = false, publish = false) => {
       if (pending) return;
       if (direct) {
         const isStepValid = handleCheckSchema();
@@ -944,7 +944,7 @@ export const EventOCForm = ({
               applicationLink: openCallData.requirements.applicationLink,
               otherInfo: undefined,
             },
-            state: activeStep === 3 ? "draft" : "submitted",
+            state: "draft",
           });
 
           reset({
@@ -1050,20 +1050,82 @@ export const EventOCForm = ({
             active: eventData.active,
 
             finalStep: true,
+            publish,
             orgId: orgData._id as Id<"organizations">,
           });
+          if (hasOpenCall && openCallData) {
+            await createOrUpdateOpenCall({
+              orgId: orgData._id as Id<"organizations">,
+              eventId: eventData._id as Id<"events">,
+              openCallId: openCallData?._id as Id<"openCalls">,
+              basicInfo: {
+                appFee: openCallData.basicInfo.appFee,
+                callFormat: openCallData.basicInfo.callFormat,
+                callType: openCallData.basicInfo.callType,
+                dates: {
+                  ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
+                  ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
+                  timezone: orgData.location?.timezone ?? "",
+                  edition: eventData.dates.edition,
+                },
+              },
+              eligibility: {
+                type: openCallData.eligibility.type,
+                whom: openCallData.eligibility.whom,
+                details: openCallData.eligibility.details,
+              },
+              compensation: {
+                budget: {
+                  min: 0,
+                  max: undefined,
+                  rate: undefined,
+                  unit: undefined,
+                  currency: orgData.location?.currency?.code ?? "",
+                  allInclusive: false,
+                  moreInfo: undefined,
+                },
+                categories: {
+                  designFee: true,
+                  accommodation: false,
+                  food: 100,
+                  travelCosts: true,
+                  materials: 1200,
+                  equipment: 500,
+                },
+              },
+              requirements: {
+                requirements: openCallData.requirements.requirements,
+                more: "reqsMore",
+                destination: "reqsDestination",
+                documents: undefined,
+                links: [
+                  {
+                    title: "reqsLinkTitle",
+                    href: "reqsLinkHref",
+                  },
+                ],
+                applicationLink: openCallData.requirements.applicationLink,
+                otherInfo: undefined,
+              },
+              state: publish ? "published" : "submitted",
+              finalStep: true,
+              approved: publish,
+            });
+          }
           eventResult = event;
           setExistingEvent(eventResult);
-
-          setPending(false);
         } catch (error) {
-          console.error("Failed to submit event:", error);
-          toast.error("Failed to submit event");
+          console.error("Failed to submit:", error);
+          toast.error("Failed to submit");
+        } finally {
           setPending(false);
+          setOpen(false);
         }
       }
     },
     [
+      setOpen,
+      hasOpenCall,
       openCallData,
       createOrUpdateOpenCall,
       hasUserEditedStep0,
@@ -1554,6 +1616,7 @@ export const EventOCForm = ({
         onFinalSubmit={handleSubmit((data) => onSubmit(data, hasOpenCall))}
         isDirty={hasUserEditedForm}
         onSave={() => handleSave(true)}
+        onPublish={() => handleSave(true, true)}
         lastSaved={lastSavedDate}
         disabled={!isValid || pending}
         pending={pending}

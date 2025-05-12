@@ -180,6 +180,10 @@ export default {
         "90": "360px",
         "100": "400px",
         "3xl": "1536px",
+        "90dvw": "90dvw",
+        "80dvw": "80dvw",
+        dvw: "100dvw",
+        screen: "100vw",
       },
       height: {
         "13": "52px",
