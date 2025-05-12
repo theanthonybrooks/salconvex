@@ -23,6 +23,7 @@ import {
 
 import { TbBrandPatreon } from "react-icons/tb";
 
+import { infoEmail } from "@/constants/siteInfo";
 import { JSX } from "react";
 import { IconType } from "react-icons";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
@@ -111,7 +112,7 @@ export const FOOTER_LINKS: FooterSection[] = [
       // { name: "Careers", href: "/careers" },
       {
         name: "Contact",
-        href: "mailto:info@thestreetartlist.com&subject=Site%20Contact",
+        href: `mailto:${infoEmail}&subject=Site%20Contact`,
       },
     ],
   },

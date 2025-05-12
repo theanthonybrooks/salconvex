@@ -6,6 +6,7 @@ import {
   tankerReg,
 } from "@/assets/fonts";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { siteUrl } from "@/constants/siteInfo";
 import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { PostHogProvider } from "@/providers/posthog-provider";
@@ -26,7 +27,7 @@ import { api } from "~/convex/_generated/api";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.streetartlist.com/"),
+  metadataBase: new URL(siteUrl[0]),
   title: {
     default: "The Street Art List",
     template: `%s | The Street Art List`,
@@ -41,8 +42,8 @@ export const metadata: Metadata = {
   openGraph: {
     description:
       "List of street art, graffiti, & mural projects. Created, maintained, and shared by @anthonybrooksart",
-    images: ["https://www.streetartlist.com/The-Street-Art-List.png"],
-    url: "https://thestreetartlist.com/",
+    images: [`${siteUrl[0]}/The-Street-Art-List.png`],
+    url: new URL(siteUrl[0]),
   },
   twitter: {
     card: "summary_large_image",
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     siteId: "",
     creator: "@imanthonybrooks",
     creatorId: "",
-    images: ["https://www.streetartlist.com/The-Street-Art-List.png"],
+    images: [`${siteUrl[0]}/The-Street-Art-List.png`],
   },
 };
 

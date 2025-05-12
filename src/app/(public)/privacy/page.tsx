@@ -1,4 +1,5 @@
 import { Link } from "@/components/ui/custom-link";
+import { infoEmail, siteUrl } from "@/constants/siteInfo";
 
 const PrivacyPage = () => {
   return (
@@ -120,11 +121,11 @@ const PrivacyPage = () => {
               <strong>Website</strong> refers to The Street Art List, accessible
               from{" "}
               <a
-                href="www.thestreetartlist.com"
+                href={siteUrl[0]}
                 rel="external nofollow noopener"
                 target="_blank"
               >
-                www.thestreetartlist.com
+                {siteUrl[0]}
               </a>
             </p>
           </li>
@@ -530,8 +531,8 @@ const PrivacyPage = () => {
         <p className="text-sm">
           If you have any questions about this Privacy Policy, you can contact
           us via email at{" "}
-          <Link href="mailto:info@thestreetartlist.com&subject=Privacy%20Policy">
-            info@thestreetartlist.com
+          <Link href={`mailto:${infoEmail}&subject=Privacy%20Policy`}>
+            {infoEmail}
           </Link>
         </p>
       </section>

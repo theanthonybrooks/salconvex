@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { SOCIAL_MEDIA_LINKS } from "@/constants/links";
+import { infoEmail } from "@/constants/siteInfo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { FaRegEnvelope } from "react-icons/fa6";
@@ -32,7 +33,7 @@ export default function SocialsRow({
         </Link>
       ))}
 
-      <Link href="mailto:info@thestreetartlist.com">
+      <Link href={`mailto:${infoEmail}`}>
         <Button
           variant="icon"
           size="icon"

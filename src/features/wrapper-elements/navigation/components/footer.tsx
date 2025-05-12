@@ -13,6 +13,7 @@ import { useAction } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
 
+import { infoEmail } from "@/constants/siteInfo";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEnvelope } from "react-icons/fa";
@@ -207,7 +208,7 @@ export default function Footer({ className }: { className?: string }) {
                 </Link>
               ))}
 
-              <Link href="mailto:info@thestreetartlist.com" target="_blank">
+              <Link href={`mailto:${infoEmail}`} target="_blank">
                 <Button variant="icon" size="icon" aria-label="Email">
                   <FaRegEnvelope className="size-7 md:size-5" />
                 </Button>

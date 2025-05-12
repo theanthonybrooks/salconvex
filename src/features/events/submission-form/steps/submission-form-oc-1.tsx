@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { autoHttps } from "@/lib/linkFns";
 import { sortedGroupedCountries } from "@/lib/locations";
@@ -159,7 +160,7 @@ const SubmissionFormOC1 = ({
         <span className="flex items-center justify-center gap-1 text-xs italic">
           For more information on Open Call Formats, check out the
           <Link
-            href="https://www.thestreetartlist.com/faq#call-formats"
+            href={`${siteUrl[0]}/faq#call-formats`}
             target="_blank"
             className="font-bold"
           >

@@ -137,7 +137,7 @@ const OpenCallCard = ({
               <AccordionTrigger title="Deadline & Eligibility:" />
               <AccordionContent>
                 <div className="space-y-2">
-                  <p>
+                  <div>
                     <span className="font-semibold underline underline-offset-2">
                       Deadline:
                     </span>
@@ -157,7 +157,7 @@ const OpenCallCard = ({
                         </a>
                       )}
                     </span>
-                  </p>
+                  </div>
                   <p>
                     <span className="font-semibold underline underline-offset-2">
                       Eligible:
@@ -240,7 +240,7 @@ const OpenCallCard = ({
               </AccordionTrigger>
               <AccordionContent>
                 <div className="mb-4 flex flex-col space-y-3 pb-3">
-                  <p>
+                  <div>
                     <span className="font-semibold underline underline-offset-2">
                       Budget:
                     </span>
@@ -267,7 +267,7 @@ const OpenCallCard = ({
                       )}
 
                     {noBudgetInfo && <p className="text-sm">No Info</p>}
-                  </p>
+                  </div>
                   <p className="mx-auto font-semibold underline underline-offset-2">
                     Compensation Includes:
                   </p>
@@ -381,7 +381,7 @@ const OpenCallCard = ({
             <AccordionTrigger title="Deadline & Eligibility:" />
             <AccordionContent>
               <div className="space-y-2 p-3">
-                <p>
+                <div>
                   <span className="font-semibold underline underline-offset-2">
                     Deadline:
                   </span>
@@ -401,7 +401,7 @@ const OpenCallCard = ({
                       </a>
                     )}
                   </span>
-                </p>
+                </div>
                 <p>
                   <span className="font-semibold underline underline-offset-2">
                     Eligible:

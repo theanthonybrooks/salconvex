@@ -62,7 +62,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const prodEnd = prodDates?.[0]?.end;
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
-  const appUrl = requirements?.applicationLink ?? "/thelist";
+  const appUrl = requirements?.applicationLink;
 
   const [activeTab, setActiveTab] = useState("openCall");
 

@@ -156,10 +156,11 @@ export const ApplyButton = ({
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);
+  const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
-
+    console.log(appStatus, finalAppUrl);
     try {
       setPending(true);
       if (!appStatus) {
@@ -176,8 +177,9 @@ export const ApplyButton = ({
     }
   };
   const onDirectToLink = () => {
-    if (!appUrl) return;
-    window.open(appUrl, "_blank", "noopener,noreferrer");
+    console.log("clicked", finalAppUrl);
+    if (!finalAppUrl) return;
+    window.open(finalAppUrl, "_blank", "noopener,noreferrer");
   };
   const onBookmark = () => {
     // setIsBookmarked(!isBookmarked);

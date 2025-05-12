@@ -1,3 +1,4 @@
+import { siteUrl } from "@/constants/siteInfo";
 import { getFourCharMonth } from "@/lib/dateFns";
 import { getEventCategoryLabel } from "@/lib/eventFns";
 import { EventCategory } from "@/types/event";
@@ -31,23 +32,13 @@ export const generateICSFile = (
   const formatDates = (start: string, end: string) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
-    //TODO: Add the time functionality back in when we have a time picker in the event submission flow
-    // const startTime = startDate.toLocaleString("en-US", {
-    //   hour: "numeric",
-    //   minute: "numeric",
-    //   timeZoneName: "short",
-    // })
-    // const endTime = endDate.toLocaleString("en-US", {
-    //   hour: "numeric",
-    //   minute: "numeric",
-    //   timeZoneName: "short",
-    // })
     const startMonth = getFourCharMonth(startDate);
     const startDay = startDate.getDate() || null; // Handle falsy values
     const startYear = startDate.getFullYear();
     const endMonth = getFourCharMonth(endDate);
     const endDay = endDate.getDate();
     const endYear = endDate.getFullYear();
+    //TODO: Add functionality to include all event dates and not just the first set of start/end.
 
     if (startYear !== endYear) {
       return `${startMonth} ${startDay}, ${startYear} - ${endMonth} ${endDay}, ${endYear}`;
@@ -86,16 +77,14 @@ export const generateICSFile = (
     : description;
   const urlBase = `event/${slug}/${thisYear}`;
   const urlFormatted = url
-    ? `https://www.thestreetartlist.com/thelist/${
-        isOpenCall ? `${urlBase}/call` : urlBase
-      }`
+    ? `${siteUrl[0]}/thelist/${isOpenCall ? `${urlBase}/call` : urlBase}`
     : "";
 
   // console.log("formattedIsoOcStart", formattedIsoOcStart)
   // console.log("formattedIsoOcEnd", formattedIsoOcEnd)
   // console.log("formattedIsoStart", formattedIsoStart)
   // console.log("formattedIsoEnd", formattedIsoEnd)
-
+  console.log(urlFormatted);
   const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0

@@ -1,4 +1,5 @@
 import { Link } from "@/components/ui/custom-link";
+import { infoEmail, supportEmail } from "@/constants/siteInfo";
 
 const TermsPage = () => {
   return (
@@ -86,9 +87,9 @@ const TermsPage = () => {
           constitutes copyright infringement, please send a detailed notice to:{" "}
           <Link
             className="font-semibold"
-            href="mailto:support@thestreetartlist.com"
+            href={`mailto:${supportEmail}&subject=T&C`}
           >
-            support@thestreetartlist.com
+            {supportEmail}
           </Link>
           {/* //TODO: Change this to admin@thestreetartlist.com when I get it set up */}
         </p>
@@ -120,9 +121,9 @@ const TermsPage = () => {
           contact us at{" "}
           <Link
             className="font-semibold"
-            href="mailto:info@thestreetartlist.com"
+            href={`mailto:${infoEmail}&subject=T&C`}
           >
-            info@thestreetartlist.com
+            {infoEmail}
           </Link>
           .
         </p>
