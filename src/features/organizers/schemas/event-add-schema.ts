@@ -515,8 +515,16 @@ export const openCallBaseSchema = z.object({
   basicInfo: z.object({
     hasAppFee: z.optional(z.string()),
     appFee: z.number(),
-    callFormat: z.string(),
-    callType: z.string(),
+    callFormat: z.union([z.literal("RFQ"), z.literal("RFP")]),
+    callType: z.union([
+      z.literal("Fixed"),
+      z.literal("Rolling"),
+      z.literal("Email"),
+      z.literal("Invite"),
+      z.literal("Unknown"),
+      z.literal("False"),
+    ]),
+
     dates: z.optional(
       z.object({
         ocStart: z.optional(z.union([z.string(), z.null()])), //todo: make not optional later
@@ -527,7 +535,12 @@ export const openCallBaseSchema = z.object({
     ),
   }),
   eligibility: z.object({
-    type: z.string().min(1, "Eligibility type is required"),
+    type: z.union([
+      z.literal("International"),
+      z.literal("National"),
+      z.literal("Regional/Local"),
+      z.literal("Other"),
+    ]),
     whom: z.array(z.string()),
     details: z.optional(z.string()),
   }),
@@ -569,7 +582,7 @@ export const openCallBaseSchema = z.object({
     //       href: z.string(),
     //     }),
     //   ),
-      applicationLink: z.string(),
+    applicationLink: z.string(),
     //   otherInfo: z.optional(z.array(z.string())), //todo: make not optional later
   }),
   // // state: z.string(), //draft, submitted, published, archived

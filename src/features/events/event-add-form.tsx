@@ -897,8 +897,8 @@ export const EventOCForm = ({
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
               appFee: openCallData.basicInfo.appFee,
-              callFormat: openCallData.basicInfo.callFormat,
-              callType: openCallData.basicInfo.callType,
+              callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
+              callType: openCallData.basicInfo.callType ?? "Unknown",
               dates: {
                 ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
                 ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
@@ -915,8 +915,8 @@ export const EventOCForm = ({
               budget: {
                 min: 0,
                 max: undefined,
-                rate: undefined,
-                unit: undefined,
+                rate: 0,
+                unit: "",
                 currency: orgData.location?.currency?.code ?? "",
                 allInclusive: false,
                 moreInfo: undefined,
@@ -1078,8 +1078,8 @@ export const EventOCForm = ({
                 budget: {
                   min: 0,
                   max: undefined,
-                  rate: undefined,
-                  unit: undefined,
+                  rate: 0,
+                  unit: "",
                   currency: orgData.location?.currency?.code ?? "",
                   allInclusive: false,
                   moreInfo: undefined,

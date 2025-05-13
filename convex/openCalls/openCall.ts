@@ -9,18 +9,30 @@ export const createOrUpdateOpenCall = mutation({
     openCallId: v.optional(v.id("openCalls")),
     basicInfo: v.object({
       appFee: v.number(),
-      callFormat: v.string(),
-      callType: v.string(),
+      callFormat: v.union(v.literal("RFQ"), v.literal("RFP")),
+      callType: v.union(
+        v.literal("Fixed"),
+        v.literal("Rolling"),
+        v.literal("Email"),
+        v.literal("Invite"),
+        v.literal("Unknown"),
+        v.literal("False"),
+      ),
       dates: v.object({
-        ocStart: v.optional(v.union(v.string(), v.null())),
-        ocEnd: v.optional(v.union(v.string(), v.null())),
+        ocStart: v.union(v.string(), v.null()),
+        ocEnd: v.union(v.string(), v.null()),
         timezone: v.string(),
         edition: v.number(),
         // edition: v.number(), //note-to-self: this is used for the event's edition. Not sure if it's needed here. Could also just take from the event if it is necessary for some reason.
       }),
     }),
     eligibility: v.object({
-      type: v.string(),
+      type: v.union(
+        v.literal("International"),
+        v.literal("National"),
+        v.literal("Regional/Local"),
+        v.literal("Other"),
+      ),
       whom: v.array(v.string()),
       details: v.optional(v.string()),
     }),
@@ -28,8 +40,8 @@ export const createOrUpdateOpenCall = mutation({
       budget: v.object({
         min: v.number(),
         max: v.optional(v.number()),
-        rate: v.optional(v.number()),
-        unit: v.optional(v.string()),
+        rate: v.number(),
+        unit: v.union(v.literal("ft²"), v.literal("m²"), v.literal("")),
         currency: v.string(),
         allInclusive: v.boolean(),
         moreInfo: v.optional(v.string()),
@@ -63,9 +75,16 @@ export const createOrUpdateOpenCall = mutation({
         }),
       ),
       applicationLink: v.string(),
-      otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
+      otherInfo: v.optional(v.array(v.string())),
     }),
-    state: v.optional(v.string()), //draft, submitted, published, archived
+    state: v.optional(
+      v.union(
+        v.literal("draft"),
+        v.literal("submitted"),
+        v.literal("published"),
+        v.literal("archived"),
+      ),
+    ),
     finalStep: v.optional(v.boolean()),
     approved: v.optional(v.boolean()),
   },

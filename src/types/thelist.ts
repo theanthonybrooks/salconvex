@@ -15,7 +15,7 @@ export interface Filters {
   bookmarkedOnly: boolean;
   eventTypes?: EventType[];
   eventCategories?: EventCategory[];
-  continent?: Continents;
+  continent?: Continents[];
   limit: number;
 }
 
@@ -25,5 +25,5 @@ export interface SortOptions {
 }
 
 export interface Pagination {
-  page: number;
+  page?: number;
 }

@@ -1,12 +1,7 @@
 import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 
-import {
-  EventCategory,
-  EventData,
-  EventType,
-  SubmissionFormState,
-} from "@/types/event";
+import { EventCategory, EventData, SubmissionFormState } from "@/types/event";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import slugify from "slugify";
@@ -523,10 +518,7 @@ export const getOrganizerBySlug = query({
       ...e,
       category: e.category as EventCategory,
       state: e.state as SubmissionFormState,
-      type:
-        Array.isArray(e.type) && e.type.length > 0 && e.type.length <= 2
-          ? (e.type as [EventType] | [EventType, EventType])
-          : undefined,
+      type: Array.isArray(e.type) ? e.type.slice(0, 2) : [],
     })) as EventData[];
 
     console.log(events);

@@ -1,7 +1,6 @@
 import {
   EventCategory,
   EventFormat,
-  EventType,
   ProdFormat,
   SubmissionFormState,
 } from "@/types/event";
@@ -617,10 +616,7 @@ export const getEventBySlug = query({
         ...event,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
-        type:
-          Array.isArray(event.type) && event.type.length <= 2
-            ? (event.type as [EventType] | [EventType, EventType])
-            : undefined,
+        type: event.type?.slice(0, 2) ?? [],
       },
       // openCall: openCall as OpenCall,
       organizer: organizer as Organizer,
@@ -674,10 +670,7 @@ export const getEventWithDetails = query({
         ...event,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
-        type:
-          Array.isArray(event.type) && event.type.length <= 2
-            ? (event.type as [EventType] | [EventType, EventType])
-            : undefined,
+        type: event.type?.slice(0, 2) ?? [],
       },
       openCall: openCall as OpenCall,
       organizer: organizer as Organizer,
@@ -727,10 +720,7 @@ export const getEventWithAppDetails = query({
         ...event,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
-        type:
-          Array.isArray(event.type) && event.type.length <= 2
-            ? (event.type as [EventType] | [EventType, EventType])
-            : undefined,
+        type: event.type?.slice(0, 2) ?? [],
       },
       openCall: openCall as OpenCall,
       organizer: organizer as Organizer,

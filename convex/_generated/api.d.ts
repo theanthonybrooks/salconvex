@@ -12,6 +12,7 @@ import type * as actions_getTimezone from "../actions/getTimezone.js";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
+import type * as artists_getUserEventMetadata from "../artists/getUserEventMetadata.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as events_event from "../events/event.js";
@@ -29,6 +30,8 @@ import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js
 import type * as plans from "../plans.js";
 import type * as stripeSubscriptions from "../stripeSubscriptions.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as thelist_getFilteredEvents from "../thelist/getFilteredEvents.js";
+import type * as thelist_getFilteredEventsPublic from "../thelist/getFilteredEventsPublic.js";
 import type * as uploads_user from "../uploads/user.js";
 import type * as users from "../users.js";
 
@@ -51,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
   "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
+  "artists/getUserEventMetadata": typeof artists_getUserEventMetadata;
   auth: typeof auth;
   crons: typeof crons;
   "events/event": typeof events_event;
@@ -68,6 +72,8 @@ declare const fullApi: ApiFromModules<{
   plans: typeof plans;
   stripeSubscriptions: typeof stripeSubscriptions;
   subscriptions: typeof subscriptions;
+  "thelist/getFilteredEvents": typeof thelist_getFilteredEvents;
+  "thelist/getFilteredEventsPublic": typeof thelist_getFilteredEventsPublic;
   "uploads/user": typeof uploads_user;
   users: typeof users;
 }>;

@@ -17,6 +17,7 @@ export const callTypeValues = [
   "Email",
   "Invite",
   "Unknown",
+  "False",
 ] as const;
 
 export type CallType = (typeof callTypeValues)[number];
@@ -60,7 +61,7 @@ export const openCallStatusValues = ["active", "ended", "coming-soon"] as const;
 
 export type OpenCallStatus = (typeof openCallStatusValues)[number] | null;
 
-export const RateUnitValues = ["ft²", "m²"] as const;
+export const RateUnitValues = ["ft²", "m²", ""] as const;
 
 export type RateUnit = (typeof RateUnitValues)[number];
 
@@ -105,7 +106,7 @@ export interface OpenCall {
   };
   requirements: {
     requirements: string;
-    more: string;
+    more?: string;
     destination: string;
     documents?: {
       title: string;
@@ -118,7 +119,7 @@ export interface OpenCall {
     otherInfo?: string[];
     applicationLink?: string;
   };
-  state: SubmissionFormState;
+  state?: SubmissionFormState;
 }
 
 // export interface OpenCallApplication {

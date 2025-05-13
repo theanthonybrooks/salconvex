@@ -6,19 +6,16 @@ import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
-import {
-  CombinedEventPreviewCardData,
-  useEventPreviewCards,
-} from "@/hooks/use-combined-events";
-import { useFilteredEvents } from "@/hooks/use-filtered-events";
 import { generateSkeletonGroups } from "@/lib/skeletonFns";
 // import { getFourCharMonth } from "@/lib/dateFns"
 import { cn, setParamIfNotDefault } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
+import { CombinedEventPreviewCardData } from "@/types/event";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { usePreloadedQuery } from "convex/react";
 import { useSearchParams } from "next/navigation";
@@ -48,11 +45,11 @@ const ClientEventList = (
   const userPref = userData?.userPref ?? null;
 
   const searchParams = useSearchParams();
-  const allEvents = useEventPreviewCards();
-  const isLoading = allEvents?.length === 0;
-  // const hasResults = allEvents?.length > 0;
+  // const allEvents = useEventPreviewCards();
+  // const isLoading = allEvents?.length === 0;
+  // // const hasResults = allEvents?.length > 0;
 
-  // console.log("allEvents", allEvents)
+  // // console.log("allEvents", allEvents)
 
   const defaultFilters: Filters = {
     showHidden: false,
@@ -92,6 +89,29 @@ const ClientEventList = (
   const [filters, setFilters] = useState<Filters>(currentFilters);
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
+  const queryResult = useFilteredEventsQuery(
+    {
+      showHidden: false,
+      bookmarkedOnly: false,
+      limit: 10,
+      eventTypes: [],
+      eventCategories: [],
+    },
+    {
+      sortBy: "openCall",
+      sortDirection: "asc",
+    },
+    { page: 1 },
+  );
+
+  const filteredEvents = queryResult?.results ?? [];
+  const total = queryResult?.total ?? 0;
+  const isLoading = !queryResult;
+  console.log("filteredEvents", filteredEvents);
+  console.log("total", total);
+  console.log("isLoading", isLoading);
+  console.log("queryResult", queryResult);
 
   const handleResetFilters = () => {
     setFilters(defaultFilters);
@@ -135,14 +155,11 @@ const ClientEventList = (
     );
   }, [filters, sortOptions, page]);
 
-  const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
-  const totalPages = Math.ceil(filteredEvents.length / filters.limit);
-  const totalResults = filteredEvents.length;
+  // const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
+  const totalPages = Math.ceil(total / filters.limit);
+  const totalResults = total;
 
-  const paginatedEvents = useMemo(() => {
-    const start = (page - 1) * filters.limit;
-    return filteredEvents.slice(start, start + filters.limit);
-  }, [filteredEvents, page, filters.limit]);
+  const paginatedEvents = filteredEvents;
 
   const groupedEvents = useMemo(() => {
     const groups: Record<

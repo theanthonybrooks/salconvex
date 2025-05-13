@@ -312,17 +312,29 @@ const openCallSchema = {
   mainOrgId: v.id("organizations"),
   basicInfo: v.object({
     appFee: v.number(),
-    callFormat: v.string(),
-    callType: v.string(),
+    callFormat: v.union(v.literal("RFQ"), v.literal("RFP")),
+    callType: v.union(
+      v.literal("Fixed"),
+      v.literal("Rolling"),
+      v.literal("Email"),
+      v.literal("Invite"),
+      v.literal("Unknown"),
+      v.literal("False"),
+    ),
     dates: v.object({
-      ocStart: v.optional(v.union(v.string(), v.null())), //todo: make not optional later
-      ocEnd: v.optional(v.union(v.string(), v.null())), //todo: make not optional later
+      ocStart: v.union(v.string(), v.null()),
+      ocEnd: v.union(v.string(), v.null()),
       timezone: v.string(),
       edition: v.number(),
     }),
   }),
   eligibility: v.object({
-    type: v.string(),
+    type: v.union(
+      v.literal("International"),
+      v.literal("National"),
+      v.literal("Regional/Local"),
+      v.literal("Other"),
+    ),
     //todo: later, add some method/additional fields that will enter in codes for country, region, etc. Maybe start small. Could be tables in the db, so they're easy to query and filter from convex. Then, use that to show user calls that they are or aren't eligible for. Could be put in as a systemic check to ensure that organizers aren't getting ineligible applicants.
     whom: v.array(v.string()),
     details: v.optional(v.string()),
@@ -331,8 +343,8 @@ const openCallSchema = {
     budget: v.object({
       min: v.number(),
       max: v.optional(v.number()),
-      rate: v.optional(v.number()),
-      unit: v.optional(v.string()),
+      rate: v.number(),
+      unit: v.union(v.literal("ft²"), v.literal("m²"), v.literal("")),
       currency: v.string(),
       allInclusive: v.boolean(),
       moreInfo: v.optional(v.string()),
@@ -370,7 +382,14 @@ const openCallSchema = {
     otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
   }),
   // state: v.string(), //draft, submitted, published, archived
-  state: v.optional(v.string()), //draft, submitted, published, archived
+  state: v.optional(
+    v.union(
+      v.literal("draft"),
+      v.literal("submitted"),
+      v.literal("published"),
+      v.literal("archived"),
+    ),
+  ), //draft, submitted, published, archived
   lastUpdatedBy: v.optional(v.id("users")),
   lastUpdatedAt: v.optional(v.number()),
   approvedBy: v.optional(v.id("users")),
@@ -519,7 +538,6 @@ export default defineSchema({
         "links.instagram",
       ],
     })
-
     .index("by_name", ["name"])
     .index("by_slug", ["slug"])
     .index("by_organizerId", ["organizerId"])

@@ -17,7 +17,6 @@ import {
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
 import { OpenCallProvidedPreview } from "@/features/events/open-calls/components/open-call-provided";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
-import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
 import {
   formatCurrency,
@@ -29,6 +28,7 @@ import {
 import { RichTextDisplay } from "@/lib/richTextFns";
 
 import { cn } from "@/lib/utils";
+import { CombinedEventPreviewCardData } from "@/types/event";
 import { User, UserPref } from "@/types/user";
 import {
   CheckCircleIcon,

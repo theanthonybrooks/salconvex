@@ -1,4 +1,4 @@
-import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
+/*import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
 import { isValidIsoDate } from "@/lib/dateFns";
 import { Filters, SortOptions } from "@/types/thelist";
 import { useMemo } from "react";
@@ -190,3 +190,4 @@ export const useFilteredEvents = (
     // .slice(0, filters.limit)
   }, [events, filters, sortOptions]);
 };
+*/

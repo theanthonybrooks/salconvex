@@ -1,5 +1,5 @@
 import { ArtistFull } from "@/types/artist";
-import { OpenCall } from "@/types/openCall";
+import { OpenCall, OpenCallStatus } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
@@ -41,7 +41,6 @@ export const eventCategoryOptions = [
   { value: "residency", label: "Residency", abbr: "Residency" },
   { value: "gfund", label: "Grant/Funding", abbr: "Grant/Fund" },
   { value: "roster", label: "Roster", abbr: "Roster" },
-  
 ] as const;
 
 export const eventCategoryValues = eventCategoryOptions.map(
@@ -85,7 +84,8 @@ export interface EventData {
   name: string;
   slug: string;
   logo: string;
-  type?: [EventType] | [EventType, EventType];
+  // type?: [EventType] | [EventType, EventType];
+  type?: EventType[];
   // eventType?: string[];
   category: EventCategory;
   dates: {
@@ -155,3 +155,14 @@ export interface EnrichedEvent extends Doc<"events"> {
   openCallStatus?: string | null;
   openCallId?: Id<"openCalls"> | null;
 }
+
+export type PublicEventPreviewData = Doc<"events"> & {
+  openCall: Doc<"openCalls"> | null;
+  openCallStatus: OpenCallStatus | null;
+  hasActiveOpenCall: boolean;
+  eventId: Id<"events">;
+  slug: string;
+  tabs: {
+    opencall: Doc<"openCalls"> | null;
+  };
+};

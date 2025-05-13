@@ -1,13 +1,13 @@
-import { CombinedEventPreviewCardData } from "@/hooks/use-combined-events";
 import {
   getFourCharMonth,
   getOrdinalSuffix,
   isValidIsoDate,
 } from "@/lib/dateFns";
+import { PublicEventPreviewData } from "@/types/event";
 import { format } from "date-fns";
 
 export function getGroupKeyFromEvent(
-  event: CombinedEventPreviewCardData,
+  event: PublicEventPreviewData,
   sortBy: string,
 ): {
   raw: string;
