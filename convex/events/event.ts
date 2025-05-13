@@ -14,146 +14,6 @@ import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
-// export const globalSearch = query({
-//   args: {
-//     searchTerm: v.string(),
-//     searchType: v.union(
-//       v.literal("events"),
-//       v.literal("orgs"),
-//       v.literal("loc"),
-//       v.literal("all"),
-//     ),
-//   },
-//   handler: async (ctx, { searchTerm, searchType }) => {
-//     const term = searchTerm.trim();
-//     const today = new Date().toISOString();
-
-//     if (!term) return { results: [], label: null };
-
-//     if (searchType === "events") {
-//       const results = await ctx.db
-//         .query("events")
-//         .withSearchIndex("search_by_name", (q) => q.search("name", term))
-//         .take(20);
-//       return { results, label: "Events" };
-//     }
-
-//     if (searchType === "orgs") {
-//       const results = await ctx.db
-//         .query("organizations")
-//         .withSearchIndex("search_by_name", (q) => q.search("name", term))
-//         .take(20);
-//       return { results, label: "Organizers" };
-//     }
-
-//     if (searchType === "loc") {
-//       const [eventLocResults, orgLocResults] = await Promise.all([
-//         ctx.db
-//           .query("events")
-//           .withSearchIndex("search_by_location", (q) =>
-//             q.search("location.full", term),
-//           )
-//           .take(20),
-//         ctx.db
-//           .query("organizations")
-//           .withSearchIndex("search_by_location", (q) =>
-//             q.search("location.full", term),
-//           )
-//           .take(20),
-//       ]);
-
-//       return {
-//         results: {
-//           events: eventLocResults,
-//           organizers: orgLocResults,
-//         },
-//         label: "Location",
-//       };
-//     }
-
-//     if (searchType === "all") {
-//       const [eventNameResults, orgNameResults, eventLocResults, orgLocResults] =
-//         await Promise.all([
-//           ctx.db
-//             .query("events")
-//             .withSearchIndex("search_by_name", (q) => q.search("name", term))
-//             .take(20),
-//           ctx.db
-//             .query("organizations")
-//             .withSearchIndex("search_by_name", (q) => q.search("name", term))
-//             .take(20),
-//           ctx.db
-//             .query("events")
-//             .withSearchIndex("search_by_location", (q) =>
-//               q.search("location.full", term),
-//             )
-//             .take(20),
-//           ctx.db
-//             .query("organizations")
-//             .withSearchIndex("search_by_location", (q) =>
-//               q.search("location.full", term),
-//             )
-//             .take(20),
-//         ]);
-
-//       return {
-//         results: {
-//           eventName: eventNameResults,
-//           orgName: orgNameResults,
-//           eventLoc: eventLocResults,
-//           orgLoc: orgLocResults,
-//         },
-//         label: "All",
-//       };
-//     }
-
-//     return { results: [], label: null };
-//   },
-// });
-
-// export const searchEvents = query({
-//   args: { searchTerm: v.string() },
-//   handler: async (ctx, args) => {
-//     const { searchTerm } = args;
-
-//     // Search by name using full-text search
-//     const nameResults = await ctx.db
-//       .query("events")
-//       .withSearchIndex("search_by_name", (q) => q.search("name", searchTerm))
-//       .take(20);
-
-//     // Get organizations to search and display org names
-//     const orgIds = [...new Set(nameResults.map((event) => event.mainOrgId))];
-//     const organizations = await Promise.all(orgIds.map((id) => ctx.db.get(id)));
-
-//     const orgsById = Object.fromEntries(
-//       organizations.filter(Boolean).map((org) => [org._id, org]),
-//     );
-
-//     // Search by location using regular indexes and filtering
-//     const locationResults = await ctx.db
-//       .query("events")
-//       .withIndex("by_city", (q) => q.eq("location.city", searchTerm))
-//       .collect();
-
-//     const countryResults = await ctx.db
-//       .query("events")
-//       .withIndex("by_countryFull", (q) => q.eq("location.country", searchTerm))
-//       .collect();
-
-//     // Combine and categorize results
-//     const results = {
-//       byName: nameResults.map((event) => ({
-//         ...event,
-//         organizerName: orgsById[event.mainOrgId]?.name || "Unknown",
-//       })),
-//       byLocation: [...locationResults, ...countryResults],
-//     };
-
-//     return results;
-//   },
-// });
-
 export const globalSearch = query({
   args: {
     searchTerm: v.string(),
@@ -169,32 +29,55 @@ export const globalSearch = query({
     if (!term) return { results: [], label: null };
 
     const today = new Date().toISOString();
+    const now = Date.parse(today);
 
-    // Step 1: Collect all event IDs with active open calls
-    const eventIdSet = new Set<Id<"events">>();
-    let cursor: string | null = null;
-    let done = false;
+    const allOpenCalls = await ctx.db.query("openCalls").collect();
 
-    while (!done) {
-      const { page, isDone, continueCursor } = await ctx.db
-        .query("openCalls")
-        .withIndex("by_endDate", (q) => q.gte("basicInfo.dates.ocEnd", today))
-        .paginate({ cursor, numItems: 100 });
+    //note-to-self: Flagging logic: 0 = none ever, 1 = expired, 2 = active, 3 = future (optional) for now
+    const attachOpenCallStatusFlag = <T extends { _id: Id<"events"> }>(
+      events: T[],
+    ) => {
+      const callMap = new Map<
+        Id<"events">,
+        { ocStart?: string; ocEnd?: string }[]
+      >();
 
-      for (const oc of page) {
-        eventIdSet.add(oc.eventId);
+      for (const oc of allOpenCalls) {
+        const { eventId, basicInfo } = oc;
+        const dates = basicInfo?.dates;
+        if (!dates) continue;
+        if (!callMap.has(eventId)) callMap.set(eventId, []);
+        callMap.get(eventId)!.push({
+          ocStart: dates.ocStart ?? undefined,
+          ocEnd: dates.ocEnd ?? undefined,
+        });
       }
 
-      cursor = continueCursor;
-      done = isDone;
-    }
+      return events.map((e) => {
+        const calls = callMap.get(e._id);
+        if (!calls || calls.length === 0) return { ...e, ocStatus: 0 };
 
-    // Step 2: Flagging helper
-    const attachOpenCallFlag = <T extends { _id: Id<"events"> }>(events: T[]) =>
-      events.map((e) => ({
-        ...e,
-        hasOpenCall: eventIdSet.has(e._id),
-      }));
+        let status = 1;
+        for (const { ocStart, ocEnd } of calls) {
+          const start = ocStart ? Date.parse(ocStart) : NaN;
+          const end = ocEnd ? Date.parse(ocEnd) : NaN;
+
+          if (!isNaN(start) && start > now) {
+            status = Math.max(status, 3); // future
+          } else if (
+            !isNaN(start) &&
+            !isNaN(end) &&
+            start <= now &&
+            end >= now
+          ) {
+            status = 2; // active overrides
+            break;
+          }
+        }
+
+        return { ...e, ocStatus: status };
+      });
+    };
 
     if (searchType === "events") {
       const events = await ctx.db
@@ -202,8 +85,7 @@ export const globalSearch = query({
         .withSearchIndex("search_by_name", (q) => q.search("name", term))
         .take(20);
 
-      const flagged = attachOpenCallFlag(events);
-      return { results: flagged, label: "Events" };
+      return { results: attachOpenCallStatusFlag(events), label: "Events" };
     }
 
     if (searchType === "orgs") {
@@ -230,11 +112,9 @@ export const globalSearch = query({
           .take(20),
       ]);
 
-      const flagged = attachOpenCallFlag(eventLocResults);
-
       return {
         results: {
-          events: flagged,
+          events: attachOpenCallStatusFlag(eventLocResults),
           organizers: orgLocResults,
         },
         label: "Location",
@@ -267,9 +147,9 @@ export const globalSearch = query({
 
       return {
         results: {
-          eventName: attachOpenCallFlag(eventName),
+          eventName: attachOpenCallStatusFlag(eventName),
           orgName,
-          eventLoc: attachOpenCallFlag(eventLoc),
+          eventLoc: attachOpenCallStatusFlag(eventLoc),
           orgLoc,
         },
         label: "All",

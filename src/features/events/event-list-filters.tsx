@@ -34,7 +34,7 @@ export const EventFilters = ({
     filters.continent !== undefined;
 
   return (
-    <div className="mb-6 flex w-full flex-col items-start gap-4 px-8 lg:max-w-[65vw]">
+    <div className="mb-6 flex w-full flex-col items-start gap-4 px-8 xl:max-w-[65vw]">
       <Separator className="w-full" thickness={2} />
 
       <TheListFilterDrawerIcon
@@ -55,7 +55,7 @@ export const EventFilters = ({
         isMobile={isMobile}
       />
 
-      <Separator className="w-full lg:max-w-[65vw]" thickness={2} />
+      <Separator className="w-full xl:max-w-[65vw]" thickness={2} />
     </div>
   );
 };

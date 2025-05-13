@@ -24,10 +24,14 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion } from "framer-motion";
 import { debounce } from "lodash";
-import { X } from "lucide-react";
+import {
+  LucideBookA,
+  LucideCalendarClock,
+  LucideCircleCheck,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { FaCheckDouble } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { api } from "~/convex/_generated/api";
 
@@ -40,7 +44,7 @@ export interface TheListFilterCommandItem {
   group?: string;
   meta?: string;
   edition?: number;
-  hasOpenCall?: boolean;
+  ocStatus?: number;
 }
 
 export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
@@ -82,7 +86,7 @@ type EventResult = {
   type?: EventType[];
   dates?: { edition?: number };
   location?: Location;
-  hasOpenCall: boolean;
+  ocStatus: number;
 };
 
 type OrgResult = {
@@ -224,11 +228,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
     groupedItems["Events"] = events.map((event) => ({
       name: event.name,
-      path: event.hasOpenCall
-        ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-        : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+      path:
+        event.ocStatus === 2 || event.ocStatus === 3
+          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
       meta: event.location?.full || "",
-      hasOpenCall: event.hasOpenCall,
+      ocStatus: event.ocStatus,
     }));
   }
 
@@ -240,9 +245,10 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     console.log(events);
     groupedItems["Events"] = events.map((event) => ({
       name: event.name,
-      path: event.hasOpenCall
-        ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-        : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+      path:
+        event.ocStatus === 2 || event.ocStatus === 3
+          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
       meta:
         getSearchLocationString(
           event.location?.city,
@@ -252,7 +258,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         event.location?.full ??
         "",
       edition: event.dates?.edition,
-      hasOpenCall: event.hasOpenCall,
+      ocStatus: event.ocStatus,
     }));
   }
 
@@ -260,7 +266,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     searchResults?.label === "Organizers" &&
     Array.isArray(searchResults.results)
   ) {
-    const organizers = searchResults.results as OrgResult[]; // 👈 Explicit assertion
+    const organizers = searchResults.results as OrgResult[];
     console.log(organizers);
     groupedItems["Organizers"] = organizers.map((organizer) => ({
       name: organizer.name,
@@ -293,12 +299,13 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path: event.hasOpenCall
-          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+        path:
+          event.ocStatus === 2 || event.ocStatus === 3
+            ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+            : `/thelist/event/${event.slug}/${event.dates?.edition}`,
         meta: `${event.category.toUpperCase()} — ${locationString ?? event.location?.full ?? ""}`,
         edition: event.dates?.edition,
-        hasOpenCall: event.hasOpenCall,
+        ocStatus: event.ocStatus,
         // meta: `${event.category.toUpperCase()}${typeLabel ? ": " + typeLabel : ""} — ${locationString ?? event.location?.full ?? ""}`,
         // edition: event.dates?.edition,
       };
@@ -326,12 +333,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path: event.hasOpenCall
+        path: event.ocStatus
           ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
           : `/thelist/event/${event.slug}/${event.dates?.edition}`,
         meta: `${event.category.toUpperCase()} — ${locationString ?? event.location?.full ?? ""}`,
         edition: event.dates?.edition,
-        hasOpenCall: event.hasOpenCall,
+        ocStatus: event.ocStatus,
       };
     });
 
@@ -457,10 +464,15 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                 <div className="grid w-full grid-cols-[1.5fr_auto_1fr] items-center gap-2">
                                   <span className="flex items-center gap-1 truncate">
                                     {item.name}
-                                    {"hasOpenCall" in item &&
-                                      item.hasOpenCall && (
-                                        <FaCheckDouble className="inline-block size-4 text-green-600" />
-                                      )}
+                                    {item.ocStatus === 2 && (
+                                      <LucideCircleCheck className="inline-block size-4 text-green-700" />
+                                    )}
+                                    {item.ocStatus === 1 && (
+                                      <LucideBookA className="inline-block size-4 text-blue-600" />
+                                    )}
+                                    {item.ocStatus === 3 && (
+                                      <LucideCalendarClock className="inline-block size-4 text-salPinkDark" />
+                                    )}
                                   </span>
 
                                   {item.edition ? (
@@ -607,7 +619,18 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           >
                             {groupKey.startsWith("Events") ? (
                               <div className="grid w-full grid-cols-[1.2fr_auto_1fr] items-center gap-2">
-                                <span className="truncate">{item.name}</span>
+                                <span className="flex items-center gap-1 truncate">
+                                  {item.name}
+                                  {item.ocStatus === 2 && (
+                                    <LucideCircleCheck className="inline-block size-4 text-green-700" />
+                                  )}
+                                  {item.ocStatus === 1 && (
+                                    <LucideBookA className="inline-block size-4 text-blue-600" />
+                                  )}
+                                  {item.ocStatus === 3 && (
+                                    <LucideCalendarClock className="inline-block size-4 text-salPinkDark" />
+                                  )}
+                                </span>{" "}
                                 {item.edition ? (
                                   <span className="text-center text-xs text-stone-500">
                                     {item.edition}
