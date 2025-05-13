@@ -94,7 +94,7 @@ const ClientEventList = (
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
-  const queryResult = useFilteredEventsQuery(filters, sortOptions, { page: 1 });
+  const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
 
   const filteredEvents = queryResult?.results ?? [];
   const total = queryResult?.total ?? 0;
