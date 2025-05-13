@@ -548,6 +548,17 @@ export default defineSchema({
     .index("by_openCallId", ["openCallId"]),
 
   openCalls: defineTable(openCallSchema)
+    .searchIndex("search_by_eventId", {
+      searchField: "eventId",
+      filterFields: [
+        "basicInfo.callType",
+        "basicInfo.dates.ocStart",
+        "basicInfo.dates.ocEnd",
+        "eligibility.type",
+        "eligibility.whom",
+      ],
+    })
+
     .index("by_eventId", ["eventId"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])

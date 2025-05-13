@@ -27,6 +27,7 @@ import { debounce } from "lodash";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { FaCheckDouble } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { api } from "~/convex/_generated/api";
 
@@ -39,6 +40,7 @@ export interface TheListFilterCommandItem {
   group?: string;
   meta?: string;
   edition?: number;
+  hasOpenCall?: boolean;
 }
 
 export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
@@ -80,6 +82,7 @@ type EventResult = {
   type?: EventType[];
   dates?: { edition?: number };
   location?: Location;
+  hasOpenCall: boolean;
 };
 
 type OrgResult = {
@@ -221,8 +224,55 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
     groupedItems["Events"] = events.map((event) => ({
       name: event.name,
-      path: `/thelist/event/${event.slug}/${event.dates?.edition}`,
+      path: event.hasOpenCall
+        ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+        : `/thelist/event/${event.slug}/${event.dates?.edition}`,
       meta: event.location?.full || "",
+      hasOpenCall: event.hasOpenCall,
+    }));
+  }
+
+  if (
+    searchResults?.label === "Events" &&
+    Array.isArray(searchResults.results)
+  ) {
+    const events = searchResults.results as EventResult[]; // 👈 Explicit assertion
+    console.log(events);
+    groupedItems["Events"] = events.map((event) => ({
+      name: event.name,
+      path: event.hasOpenCall
+        ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+        : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+      meta:
+        getSearchLocationString(
+          event.location?.city,
+          event.location?.countryAbbr,
+          event.location?.stateAbbr,
+        ) ??
+        event.location?.full ??
+        "",
+      edition: event.dates?.edition,
+      hasOpenCall: event.hasOpenCall,
+    }));
+  }
+
+  if (
+    searchResults?.label === "Organizers" &&
+    Array.isArray(searchResults.results)
+  ) {
+    const organizers = searchResults.results as OrgResult[]; // 👈 Explicit assertion
+    console.log(organizers);
+    groupedItems["Organizers"] = organizers.map((organizer) => ({
+      name: organizer.name,
+      path: `/thelist/organizer/${organizer.slug}`,
+      meta:
+        getSearchLocationString(
+          organizer.location?.city,
+          organizer.location?.countryAbbr,
+          organizer.location?.stateAbbr,
+        ) ??
+        organizer.location?.full ??
+        "",
     }));
   }
 
@@ -243,9 +293,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path: `/thelist/event/${event.slug}/${event.dates?.edition}`,
+        path: event.hasOpenCall
+          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
         meta: `${event.category.toUpperCase()} — ${locationString ?? event.location?.full ?? ""}`,
         edition: event.dates?.edition,
+        hasOpenCall: event.hasOpenCall,
         // meta: `${event.category.toUpperCase()}${typeLabel ? ": " + typeLabel : ""} — ${locationString ?? event.location?.full ?? ""}`,
         // edition: event.dates?.edition,
       };
@@ -253,7 +306,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
     groupedItems["Organizers by Name"] = allResults.orgName.map((org) => ({
       name: org.name,
-      path: `thelist/organizer/${org.slug}`,
+      path: `/thelist/organizer/${org.slug}`,
       meta:
         getSearchLocationString(
           org.location?.city,
@@ -273,15 +326,18 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path: `/events/${event.slug}`,
+        path: event.hasOpenCall
+          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
         meta: `${event.category.toUpperCase()} — ${locationString ?? event.location?.full ?? ""}`,
         edition: event.dates?.edition,
+        hasOpenCall: event.hasOpenCall,
       };
     });
 
     groupedItems["Organizers by Location"] = allResults.orgLoc.map((org) => ({
       name: org.name,
-      path: `/organizers/${org.slug}`,
+      path: `/thelist/organizer/${org.slug}`,
       meta:
         getSearchLocationString(
           org.location?.city,
@@ -292,10 +348,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         "",
     }));
   }
-
-  console.log(groupedItems);
-
-  console.log(Object.keys(groupedItems).length);
 
   return isMobile ? (
     <>
@@ -403,7 +455,14 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                             >
                               {groupKey.startsWith("Events") ? (
                                 <div className="grid w-full grid-cols-[1.5fr_auto_1fr] items-center gap-2">
-                                  <span className="truncate">{item.name}</span>
+                                  <span className="flex items-center gap-1 truncate">
+                                    {item.name}
+                                    {"hasOpenCall" in item &&
+                                      item.hasOpenCall && (
+                                        <FaCheckDouble className="inline-block size-4 text-green-600" />
+                                      )}
+                                  </span>
+
                                   {item.edition ? (
                                     <span className="text-center text-xs text-stone-500">
                                       {item.edition}
