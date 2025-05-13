@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { eventCategoryOptions } from "@/constants/thelist";
+import { SearchType } from "@/features/thelist/components/filter-drawer";
 import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
@@ -25,6 +26,8 @@ export interface FilterBaseProps {
 
   setOpen: Dispatch<SetStateAction<boolean>>;
   setValue: Dispatch<SetStateAction<string>>;
+  searchType?: SearchType;
+  setSearchType: Dispatch<SetStateAction<SearchType>>;
   value: string;
   shortcut: string;
   placeholder: string;
@@ -41,6 +44,8 @@ export const FilterBase = ({
   hasActiveFilters,
   setOpen,
   setValue,
+  searchType,
+  setSearchType,
   value,
   placeholder,
   onChange,
@@ -57,33 +62,58 @@ export const FilterBase = ({
         <div className="flex flex-col items-center gap-3 px-5 sm:hidden [&>section]:w-full [&>section]:flex-1">
           <section className="flex flex-col gap-2">
             <section className="flex flex-col gap-2">
-              <Label htmlFor="list-search" className="flex items-center gap-2">
-                Search:
-              </Label>
-              <div
-                className={cn(
-                  "flex w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
-                  className,
-                )}
-              >
-                <FiSearch
-                  className="mr-2 size-5 cursor-pointer"
-                  onClick={() => {
-                    setOpen(true);
-                  }}
-                />
-                <input
-                  onFocus={(e) => {
-                    e.target.blur();
-                    setOpen(true);
-                  }}
-                  type="text"
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder={placeholder}
-                  value={value}
-                  //   value={value}
-                  className="focus:outline-hidden w-full bg-transparent placeholder:text-foreground/30"
-                />
+              <div className="flex justify-between gap-3">
+                <Label
+                  htmlFor="list-search"
+                  className="flex items-center gap-2"
+                >
+                  Search:
+                </Label>
+                <Label htmlFor="limit" className="flex items-center gap-2">
+                  Search Type:
+                </Label>
+              </div>
+              <div className="flex justify-between gap-3">
+                <div
+                  className={cn(
+                    "flex w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                    className,
+                  )}
+                >
+                  <FiSearch
+                    className="mr-2 size-5 cursor-pointer"
+                    onClick={() => {
+                      setOpen(true);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder={placeholder}
+                    value={value}
+                    //   value={value}
+                    className="focus:outline-hidden w-full flex-1 bg-transparent placeholder:text-foreground/30"
+                  />
+                </div>
+                <section>
+                  <Select
+                    name="searchType"
+                    value={searchType}
+                    onValueChange={(value) =>
+                      setSearchType(value as "events" | "loc" | "orgs" | "all")
+                    }
+                  >
+                    <SelectTrigger className="w-32 text-center">
+                      <SelectValue placeholder="Search Type" />
+                    </SelectTrigger>
+                    <SelectContent align="end" className="z-top">
+                      <SelectItem value="events">Events</SelectItem>
+                      <SelectItem value="orgs">Organizers</SelectItem>
+                      <SelectItem value="loc">Location</SelectItem>
+                      <SelectItem value="all">All</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </section>
               </div>
             </section>
             <Label htmlFor="limit" className="flex items-center gap-2">

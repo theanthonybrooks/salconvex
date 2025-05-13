@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  SearchType,
   TheListFilterCommandItem,
   TheListFilterDrawer,
 } from "@/features/thelist/components/filter-drawer";
@@ -52,6 +53,7 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
 }: ListFilterProps<T>) => {
   const subscription = useQuery(api.subscriptions.getUserSubscriptionStatus);
   const subStatus = subscription?.subStatus;
+  const [searchType, setSearchType] = useState<SearchType>("all");
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(placeholder);
@@ -59,7 +61,7 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
   const userRole = user?.role;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-center gap-2">
       {!isMobile && !iconOnly && (
         <FilterBase
           isMobile={isMobile}
@@ -75,6 +77,8 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
           onSortChange={onSortChange}
           onResetFilters={onResetFilters}
           className={className}
+          searchType={searchType}
+          setSearchType={setSearchType}
         />
       )}
       {iconOnly && (
@@ -123,6 +127,8 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
         onSortChange={onSortChange}
         onResetFilters={onResetFilters}
         hasActiveFilters={hasActiveFilters}
+        searchType={searchType}
+        setSearchType={setSearchType}
       />
     </div>
   );

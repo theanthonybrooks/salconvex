@@ -6,6 +6,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -56,10 +57,14 @@ export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   sortOptions: SortOptions;
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
+  searchType: SearchType;
+  setSearchType: React.Dispatch<React.SetStateAction<SearchType>>;
   onResetFilters: () => void;
   // user: User | null;
   hasActiveFilters: boolean;
 }
+
+export type SearchType = "events" | "orgs" | "loc" | "all";
 
 type Location = {
   full?: string;
@@ -106,6 +111,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   onChange,
   onSortChange,
   onResetFilters,
+  searchType,
+  setSearchType,
 
   hasActiveFilters,
 }: FilterDrawerProps<T>) => {
@@ -117,9 +124,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState(value);
-  const [searchType, setSearchType] = useState<
-    "events" | "loc" | "orgs" | "all"
-  >("all");
 
   const { data: searchResults } = useQueryWithStatus(
     api.events.event.globalSearch,
@@ -294,35 +298,143 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   console.log(Object.keys(groupedItems).length);
 
   return isMobile ? (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent
-        setOpen={setOpen}
-        className="fixed z-[100] h-[90vh] max-h-[90%] bg-card"
-      >
-        <div className="relative h-full w-full">
-          <div className="flex h-full w-full flex-col gap-3 overflow-hidden rounded-t-2xl pb-6 pt-4">
-            <DrawerHeader>
-              <DrawerTitle className="sr-only">{title}</DrawerTitle>
-            </DrawerHeader>
+    <>
+      <div className="flex items-center gap-1 border-b border-stone-300 pr-2">
+        <IoSearch className="size-7 shrink-0 p-1 text-stone-400" />
+        <Input
+          ref={inputRef}
+          value={value}
+          onClick={() => setOpen(true)}
+          onChange={(e) => handleValueChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setOpen(false);
+            }
+            if (e.key === "Escape") {
+              setValue("");
+              setSearch("");
+              setOpen(false);
+            }
+          }}
+          placeholder={cn(placeholder)}
+          className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-foreground placeholder:text-stone-400"
+        />
+        {value?.trim().length > 0 && (
+          <button
+            onClick={() => {
+              setValue("");
+              setSearch("");
+            }}
+            className="rounded p-1 px-2 hover:scale-125 active:scale-110"
+          >
+            <X className="size-7 text-stone-600 hover:scale-105 hover:text-red-700 active:scale-95 sm:size-5" />
+          </button>
+        )}
+        {/* <Select
+          name="searchType"
+          value={searchType}
+          onValueChange={(value) =>
+            setSearchType(value as "events" | "loc" | "orgs" | "all")
+          }
+        >
+          <SelectTrigger className="w-50 text-center">
+            <SelectValue placeholder="Search Type" />
+          </SelectTrigger>
+          <SelectContent align="end" className="z-top">
+            <SelectItem value="events">Events</SelectItem>
+            <SelectItem value="orgs">Organizers</SelectItem>
+            <SelectItem value="loc">Location</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+          </SelectContent>
+        </Select> */}
+      </div>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerContent
+          setOpen={setOpen}
+          className="fixed z-[100] h-[90vh] max-h-[90%] bg-card"
+        >
+          <div className="relative h-full w-full">
+            <div className="flex h-full w-full flex-col gap-3 overflow-hidden rounded-t-2xl pb-6 pt-4">
+              <DrawerHeader>
+                <DrawerTitle className="sr-only">{title}</DrawerTitle>
+              </DrawerHeader>
 
-            <FilterBase
-              isMobile={isMobile}
-              filters={filters}
-              sortOptions={sortOptions}
-              hasActiveFilters={hasActiveFilters}
-              setOpen={setOpen}
-              setValue={setValue}
-              value={value}
-              shortcut={shortcut}
-              placeholder={placeholder}
-              onChange={onChange}
-              onSortChange={onSortChange}
-              onResetFilters={onResetFilters}
-            />
+              <FilterBase
+                isMobile={isMobile}
+                filters={filters}
+                sortOptions={sortOptions}
+                hasActiveFilters={hasActiveFilters}
+                setOpen={setOpen}
+                setValue={setValue}
+                searchType={searchType}
+                setSearchType={setSearchType}
+                value={value}
+                shortcut={shortcut}
+                placeholder={placeholder}
+                onChange={onChange}
+                onSortChange={onSortChange}
+                onResetFilters={onResetFilters}
+              />
+              <div className="scrollable mini flex flex-col gap-2 px-5 pb-5">
+                {Object.values(groupedItems).every(
+                  (items) => items.length === 0,
+                ) ? (
+                  <p className="text-sm italic text-stone-400">
+                    No results found for &quot;
+                    <span className="italic">{value}</span>&quot;
+                  </p>
+                ) : (
+                  Object.entries(groupedItems)
+                    .filter(([, items]) => items.length > 0)
+                    .map(([groupKey, groupItems]) => (
+                      <div key={groupKey}>
+                        <h3 className="mb-1 mt-3 text-xs font-semibold text-stone-500">
+                          {groupKey.toUpperCase()}
+                        </h3>
+                        <ul className="flex flex-col gap-1">
+                          {groupItems.map((item) => (
+                            <li
+                              key={item.path}
+                              onClick={() => {
+                                router.push(item.path || "/thelist");
+                                setOpen(false);
+                              }}
+                              className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-stone-100 active:bg-stone-200"
+                            >
+                              {groupKey.startsWith("Events") ? (
+                                <div className="grid w-full grid-cols-[1.5fr_auto_1fr] items-center gap-2">
+                                  <span className="truncate">{item.name}</span>
+                                  {item.edition ? (
+                                    <span className="text-center text-xs text-stone-500">
+                                      {item.edition}
+                                    </span>
+                                  ) : (
+                                    <span />
+                                  )}
+                                  <span className="truncate text-right text-xs text-stone-500">
+                                    {item.meta}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex w-full justify-between gap-2">
+                                  <span className="truncate">{item.name}</span>
+                                  <span className="truncate text-xs text-stone-500">
+                                    {item.meta}
+                                  </span>
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </DrawerContent>
-    </Drawer>
+        </DrawerContent>
+      </Drawer>
+    </>
   ) : (
     <Command.Dialog
       open={open}
@@ -425,41 +537,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                         heading={groupKey.toUpperCase()}
                         className="mb-5 border-t-1.5 border-stone-200 pt-2 text-sm text-stone-400 first:border-t-0"
                       >
-                        {/*        {groupItems.map((item) => (
-                        <Command.Item
-                          key={item.path}
-                          className="group flex cursor-pointer items-center justify-between rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
-                          onSelect={() => {
-                            router.push(item.path || "/thelist");
-                            setOpen(false);
-                          }}
-                        >
-                          /~ <span>{item.name}</span>
-                          {item.edition && (
-                            <span className="text-xs text-stone-500">
-                              {item.edition}
-                            </span>
-                          )}
-                          {item.meta && (
-                            <span className="text-xs text-stone-500">
-                              {item.meta}
-                            </span>
-                          )} ~/
-                          <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2">
-                            <span className="truncate">{item.name}</span>
-                            {item.edition && (
-                              <span className="text-center text-xs text-stone-500">
-                                {item.edition}
-                              </span>
-                            )}
-                            {item.meta && (
-                              <span className="truncate text-right text-xs text-stone-500">
-                                {item.meta}
-                              </span>
-                            )}
-                          </div>
-                        </Command.Item>
-                      ))}*/}
                         {groupItems.map((item) => (
                           <Command.Item
                             key={item.path}
