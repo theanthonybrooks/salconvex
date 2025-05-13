@@ -1,11 +1,9 @@
-// convex/events/getUserEventMetadata.ts
-
 import { ApplicationStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import { query } from "~/convex/_generated/server";
 
-export type UserEventMetadata = {
+export type ArtistEventMetadata = {
   bookmarked: Id<"events">[];
   hidden: Id<"events">[];
   applied: Id<"events">[];
@@ -19,9 +17,9 @@ export type UserEventMetadata = {
   >;
 };
 
-export const getUserEventMetadata = query({
+export const getArtistEventMetadata = query({
   args: {},
-  handler: async (ctx): Promise<UserEventMetadata | null> => {
+  handler: async (ctx): Promise<ArtistEventMetadata | null> => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 

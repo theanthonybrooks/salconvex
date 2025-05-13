@@ -9,18 +9,23 @@ import Pricing from "@/features/homepage/pricing";
 import { generateSkeletonGroups } from "@/lib/skeletonFns";
 // import { getFourCharMonth } from "@/lib/dateFns"
 import { cn, setParamIfNotDefault } from "@/lib/utils";
-import { EventCategory, EventType } from "@/types/event";
+import {
+  CombinedEventPreviewCardData,
+  EventCategory,
+  EventType,
+} from "@/types/event";
 import { Filters, SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
-import { CombinedEventPreviewCardData } from "@/types/event";
+// import { CombinedEventPreviewCardData } from "@/types/event";
 
+import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import type { MergedEventPreviewData } from "@/types/event"; // or define a local merged type inline
 import { usePreloadedQuery } from "convex/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-
 // interface Props {
 
 // }
@@ -32,10 +37,14 @@ const ClientEventList = (
     // user,
   },
 ) => {
+  // inside ClientEventList()
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const artistData = usePreloadedQuery(preloadedArtistData);
+  console.log(artistData);
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
@@ -45,11 +54,6 @@ const ClientEventList = (
   const userPref = userData?.userPref ?? null;
 
   const searchParams = useSearchParams();
-  // const allEvents = useEventPreviewCards();
-  // const isLoading = allEvents?.length === 0;
-  // // const hasResults = allEvents?.length > 0;
-
-  // // console.log("allEvents", allEvents)
 
   const defaultFilters: Filters = {
     showHidden: false,
@@ -90,24 +94,12 @@ const ClientEventList = (
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
-  const queryResult = useFilteredEventsQuery(
-    {
-      showHidden: false,
-      bookmarkedOnly: false,
-      limit: 10,
-      eventTypes: [],
-      eventCategories: [],
-    },
-    {
-      sortBy: "openCall",
-      sortDirection: "asc",
-    },
-    { page: 1 },
-  );
+  const queryResult = useFilteredEventsQuery(filters, sortOptions, { page: 1 });
 
   const filteredEvents = queryResult?.results ?? [];
   const total = queryResult?.total ?? 0;
   const isLoading = !queryResult;
+  console.log(queryResult);
   console.log("filteredEvents", filteredEvents);
   console.log("total", total);
   console.log("isLoading", isLoading);
@@ -157,9 +149,49 @@ const ClientEventList = (
 
   // const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
   const totalPages = Math.ceil(total / filters.limit);
+
+  //  const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
+  //     if (!artistData) return filteredEvents;
+
+  //     return filteredEvents.map((event) => {
+  //       const openCallId = event.tabs.opencall?._id;
+
+  //       return {
+  //         ...event,
+  //         bookmarked: artistData.bookmarked.includes(event._id),
+  //         hidden: artistData.hidden.includes(event._id),
+  //         applied: artistData.applied.includes(event._id),
+  //         manualApplied:
+  //           openCallId && artistData.applicationData[openCallId]?.manualApplied,
+  //         status: openCallId
+  //           ? (artistData.applicationData[openCallId]?.status ?? null)
+  //           : null,
+  //         artistNationality: artistData.artistNationality,
+  //       };
+  //     });
+  //   }, [filteredEvents, artistData]);
+  const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
+    return (queryResult?.results ?? []).map((event) => {
+      const openCallId = event.tabs?.opencall?._id;
+      return {
+        ...event,
+        bookmarked: artistData?.bookmarked.includes(event._id) ?? false,
+        hidden: artistData?.hidden.includes(event._id) ?? false,
+        applied: artistData?.applied.includes(event._id) ?? false,
+        manualApplied: openCallId
+          ? (artistData?.applicationData?.[openCallId]?.manualApplied ?? false)
+          : false,
+        status: openCallId
+          ? (artistData?.applicationData?.[openCallId]?.status ?? null)
+          : null,
+        artistNationality: artistData?.artistNationality ?? [],
+      };
+    });
+  }, [queryResult?.results, artistData]);
+
   const totalResults = total;
 
-  const paginatedEvents = filteredEvents;
+  const paginatedEvents = enrichedEvents;
 
   const groupedEvents = useMemo(() => {
     const groups: Record<

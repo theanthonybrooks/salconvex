@@ -1,132 +1,39 @@
-/*// import { useMemo } from "react";
+// import type {
+//   CombinedEventPreviewCardData,
+//   PublicEventPreviewData,
+// } from "@/types/event";
+// import { UserEventMetadata } from "~/convex/artists/getUserEventMetadata";
 
-import { EventCategory, EventData, EventType } from "@/types/event";
-import { ApplicationStatus, OpenCall, OpenCallStatus } from "@/types/openCall";
-import { useQuery } from "convex-helpers/react/cache";
-import { api } from "~/convex/_generated/api";
+// // Hook assumes you've already fetched and filtered public event data
+// export function useCombinedEventPreviewCards(
+//   publicEvents: PublicEventPreviewData[],
+//   userMeta: UserEventMetadata | null,
+// ): CombinedEventPreviewCardData[] {
+//   return publicEvents.map((event) => {
+//     const openCall = event.openCall;
+//     const openCallId = openCall?._id;
+//     const eventId = event._id;
 
-export type CombinedEventPreviewCardData = EventData & {
-  tabs: { opencall: OpenCall | null };
-  // artistNationality: string[];
-  // bookmarked: boolean;
-  // manualApplied?: boolean;
-  // hidden: boolean;
-  // status: ApplicationStatus | null;
-  hasActiveOpenCall: boolean;
-  appFee?: number;
-  openCallStatus: OpenCallStatus | null;
-  adminNoteOC?: string | null;
-  eventId: string;
-  slug: string;
-};
+//     const bookmarked = userMeta?.bookmarked.includes(eventId) ?? false;
+//     const hidden = userMeta?.hidden.includes(eventId) ?? false;
+//     const applied = userMeta?.applied.includes(eventId) ?? false;
+//     const artistNationality = userMeta?.artistNationality ?? [];
 
-// export const useEventPreviewCards = (): CombinedEventPreviewCardData[] => {
-//   const events = useQuery(api.events.event.getPublishedEvents);
-//   const openCalls = useQuery(api.openCalls.openCall.getPublishedOpenCalls);
-//   const artistData = useQuery(api.artists.applications.getArtistApplications);
-//   const { applications, listActions, artist } = artistData ?? {};
-//   const artistNationality = useMemo(
-//     () => artist?.artistNationality ?? [],
-//     [artist?.artistNationality],
-//   );
+//     const appData = openCallId ? userMeta?.applicationData[openCallId] : null;
+//     const manualApplied = appData?.manualApplied ?? false;
+//     const status = appData?.status ?? null;
 
-//   // if (!events) return [];
-
-//   return useMemo(() => {
-//     if (!events) return [];
-//     return events
-//       .filter((event) => event.state === "published")
-//       .flatMap<CombinedEventPreviewCardData>((event) => {
-//         if (!openCalls) return [];
-
-//         const filteredOpenCalls = openCalls
-//           .filter((oc) => oc.eventId === event._id)
-//           .filter((oc) => oc.state === "published");
-
-//         if (filteredOpenCalls.length === 0) {
-//           const listAction = listActions?.find(
-//             (la) => la.eventId === event._id,
-//           );
-
-//           return [
-//             {
-//               ...(event as unknown as EventData),
-//               tabs: {
-//                 opencall: null,
-//               },
-//               type: event.type as [EventType] | [EventType, EventType],
-//               category: event.category as EventCategory,
-
-//               bookmarked: listAction?.bookmarked ?? false,
-//               hidden: listAction?.hidden ?? false,
-//               status: null,
-//               adminNoteOC: null,
-//               appFee: 0,
-//               hasActiveOpenCall: false,
-//               openCallStatus: null,
-//               eventId: event._id,
-//               slug: event.slug,
-//               artistNationality,
-//             },
-//           ];
-//         }
-
-//         // Case: Event has one or more open calls
-//         return filteredOpenCalls.map((openCall) => {
-//           const listAction = listActions?.find(
-//             (la) => la.eventId === event._id,
-//           );
-
-//           const application = applications?.find(
-//             (app) => app.openCallId === openCall?._id,
-//           );
-
-//           const ocDates = openCall?.basicInfo?.dates;
-//           const ocType = openCall?.basicInfo?.callType;
-
-//           const now = new Date();
-//           const start = ocDates?.ocStart ? new Date(ocDates.ocStart) : null;
-//           const end = ocDates?.ocEnd ? new Date(ocDates.ocEnd) : null;
-
-//           let openCallStatus: OpenCallStatus | null = null;
-//           if (start && end && ocType === "Fixed") {
-//             if (now < start) openCallStatus = "coming-soon";
-//             else if (now > end) openCallStatus = "ended";
-//             else openCallStatus = "active";
-//           } else if (!start && end && ocType === "Fixed") {
-//             if (now > end) openCallStatus = "ended";
-//             else openCallStatus = "active";
-//           } else if (ocType === "Rolling") {
-//             openCallStatus = "active";
-//           } else if (ocType === "Email" && end) {
-//             if (now > end) openCallStatus = "ended";
-//             else openCallStatus = "active";
-//           } else {
-//             openCallStatus = null;
-//           }
-
-//           const hasActiveOpenCall = openCallStatus === "active";
-
-//           return {
-//             ...(event as unknown as EventData),
-//             tabs: { opencall: openCall as unknown as OpenCall },
-//             type: event.type as [EventType] | [EventType, EventType],
-//             category: event.category as EventCategory,
-//             bookmarked: listAction?.bookmarked ?? false,
-//             hidden: listAction?.hidden ?? false,
-//             status:
-//               (application?.applicationStatus as ApplicationStatus) ?? null,
-//             manualApplied: application?.manualApplied ?? false,
-//             adminNoteOC: openCall?.adminNoteOC ?? null,
-//             appFee: openCall?.basicInfo.appFee ?? 0,
-//             hasActiveOpenCall,
-//             openCallStatus,
-//             eventId: event._id,
-//             slug: event.slug,
-//             artistNationality,
-//           };
-//         });
-//       });
-//   }, [applications, events, listActions, openCalls, artistNationality]);
-// };
-*/
+//     return {
+//       ...event,
+//       tabs: {
+//         opencall: openCall ?? null,
+//       },
+//       artistNationality,
+//       bookmarked,
+//       hidden,
+//       applied,
+//       manualApplied,
+//       status,
+//     };
+//   });
+// }

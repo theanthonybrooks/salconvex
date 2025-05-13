@@ -1,7 +1,8 @@
 import { ArtistFull } from "@/types/artist";
+import { ApplicationStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { Doc } from "~/convex/_generated/dataModel";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
 
 export const updateOrCreateArtist = mutation({
@@ -212,3 +213,17 @@ export const artistListActions = mutation({
     }
   },
 });
+
+export type ArtistEventMetadata = {
+  bookmarked: Id<"events">[];
+  hidden: Id<"events">[];
+  applied: Id<"events">[];
+  artistNationality: string[];
+  applicationData: Record<
+    Id<"openCalls">,
+    {
+      status: ApplicationStatus | null;
+      manualApplied: boolean;
+    }
+  >;
+};

@@ -1,6 +1,7 @@
 import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
 import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { query } from "~/convex/_generated/server";
 
@@ -11,6 +12,8 @@ export const getFilteredEventsPublic = query({
       eventTypes: v.optional(v.array(v.string())),
       continent: v.optional(v.array(v.string())),
       limit: v.optional(v.number()),
+      showHidden: v.optional(v.boolean()),
+      bookmarkedOnly: v.optional(v.boolean()),
     }),
     sortOptions: v.object({
       sortBy: v.union(
@@ -23,6 +26,8 @@ export const getFilteredEventsPublic = query({
     page: v.optional(v.number()),
   },
   handler: async (ctx, { filters, sortOptions, page }) => {
+    const userId = await getAuthUserId(ctx);
+
     let events = await ctx.db
       .query("events")
       .withIndex("by_state", (q) => q.eq("state", "published"))
@@ -85,6 +90,7 @@ export const getFilteredEventsPublic = query({
 
         return {
           ...event,
+          _creationTime: event._creationTime,
           openCall: openCall ?? null,
           openCallStatus,
           hasActiveOpenCall,

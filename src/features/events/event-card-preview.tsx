@@ -48,6 +48,20 @@ export interface EventCardPreviewProps {
   publicView?: boolean;
 }
 
+// interface EventCardPreviewProps {
+//   event: PublicEventPreviewData & {
+//     bookmarked: boolean;
+//     hidden: boolean;
+//     applied: boolean;
+//     manualApplied: boolean;
+//     status: ApplicationStatus | null;
+//     artistNationality: string[];
+//   };
+//   user: User | null;
+//   userPref: UserPref | null;
+//   publicView?: boolean;
+// }
+
 const EventCardPreview = ({
   event,
   publicView,

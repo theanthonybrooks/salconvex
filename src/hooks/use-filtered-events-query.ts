@@ -7,7 +7,7 @@ export const useFilteredEventsQuery = (
   sortOptions: SortOptions,
   pagination: Pagination,
 ) => {
-  return useQuery(api.thelist.getFilteredEvents.getFilteredEvents, {
+  return useQuery(api.thelist.getFilteredEventsPublic.getFilteredEventsPublic, {
     filters,
     sortOptions,
     page: pagination.page,

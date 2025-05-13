@@ -1,4 +1,4 @@
-import { CallType } from "@/types/openCall"
+import { CallType } from "@/types/openCall";
 
 export const CALL_TYPE_LABELS: Record<Exclude<CallType, null>, string> = {
   Fixed: "Fixed Deadline",
@@ -6,4 +6,5 @@ export const CALL_TYPE_LABELS: Record<Exclude<CallType, null>, string> = {
   Email: "Application via Email",
   Invite: "Invite-Only",
   Unknown: "Unknown Deadline",
-}
+  False: "False",
+};

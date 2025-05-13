@@ -1,5 +1,5 @@
 import { ArtistFull } from "@/types/artist";
-import { OpenCall, OpenCallStatus } from "@/types/openCall";
+import { ApplicationStatus, OpenCall, OpenCallStatus } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
@@ -156,13 +156,53 @@ export interface EnrichedEvent extends Doc<"events"> {
   openCallId?: Id<"openCalls"> | null;
 }
 
-export type PublicEventPreviewData = Doc<"events"> & {
-  openCall: Doc<"openCalls"> | null;
+export type PublicEventPreviewData = EventData & {
+  openCall: OpenCall | null;
   openCallStatus: OpenCallStatus | null;
   hasActiveOpenCall: boolean;
   eventId: Id<"events">;
   slug: string;
   tabs: {
-    opencall: Doc<"openCalls"> | null;
+    opencall: OpenCall | null;
   };
+};
+
+export type ArtistEventMetadata = {
+  bookmarked: Id<"events">[];
+  hidden: Id<"events">[];
+  applied: Id<"events">[];
+  artistNationality: string[];
+  applicationData: Record<
+    Id<"openCalls">,
+    {
+      status: ApplicationStatus | null;
+      manualApplied: boolean;
+    }
+  >;
+};
+
+export type MergedEventPreviewData = PublicEventPreviewData & {
+  bookmarked: boolean;
+  hidden: boolean;
+  applied: boolean;
+  manualApplied: boolean;
+  status: ApplicationStatus | null;
+  artistNationality: string[];
+};
+
+export type CombinedEventPreviewCardData = EventData & {
+  tabs: { opencall: OpenCall | null };
+  hasActiveOpenCall: boolean;
+  appFee?: number;
+  openCallStatus: OpenCallStatus | null;
+  adminNoteOC?: string | null;
+  eventId: string;
+  slug: string;
+
+  // User-specific metadata (nullable when unauthenticated)
+  artistNationality: string[];
+  bookmarked: boolean;
+  hidden: boolean;
+  manualApplied?: boolean;
+  status: ApplicationStatus | null;
 };
