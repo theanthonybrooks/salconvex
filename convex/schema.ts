@@ -460,11 +460,66 @@ export default defineSchema({
 
   // Organization Tables
   organizations: defineTable(organizationSchema)
+    .searchIndex("search_by_name", {
+      searchField: "name",
+      filterFields: [
+        "location.locale",
+        "location.city",
+        "location.state",
+        "location.country",
+        "location.continent",
+        "links.instagram",
+      ],
+    })
+    .searchIndex("search_by_location", {
+      searchField: "location.full",
+      filterFields: [
+        "location.locale",
+        "location.city",
+        "location.state",
+        "location.stateAbbr",
+        "location.countryAbbr",
+        "location.country",
+        "location.continent",
+      ],
+    })
+    .searchIndex("search_by_handle", {
+      searchField: "links.instagram",
+    })
     .index("by_name", ["name"])
     .index("by_slug", ["slug"])
     .index("by_ownerId", ["ownerId"]),
 
   events: defineTable(eventSchema)
+    .searchIndex("search_by_location", {
+      searchField: "location.full",
+      filterFields: [
+        "location.locale",
+        "location.city",
+        "location.state",
+        "location.stateAbbr",
+        "location.countryAbbr",
+        "location.country",
+        "location.continent",
+      ],
+    })
+    .searchIndex("search_by_name", {
+      searchField: "name",
+      filterFields: [
+        "location.locale",
+        "location.city",
+        "location.state",
+        "location.country",
+        "location.continent",
+        "dates.edition",
+        "dates.eventDates",
+        "dates.prodDates",
+        "type",
+        "category",
+        "links.instagram",
+      ],
+    })
+
     .index("by_name", ["name"])
     .index("by_slug", ["slug"])
     .index("by_organizerId", ["organizerId"])
@@ -478,12 +533,15 @@ export default defineSchema({
     .index("by_eventType", ["type"])
     .index("by_category", ["category"])
     .index("by_state", ["state"])
-    .index("by_country", ["location.countryAbbr"]),
-  // .index("by_continent", ["location.continent"]), //TODO: add this back once I have the continents mapped properly
+    .index("by_city", ["location.city"])
+    .index("by_countryFull", ["location.country", "location.countryAbbr"])
+    .index("by_country", ["location.countryAbbr"])
+    .index("by_continent", ["location.continent"]),
 
   eventOrganizers: defineTable(eventOrganizerSchema)
     .index("by_eventId", ["eventId"])
-    .index("by_organizerId", ["organizerId"]),
+    .index("by_organizerId", ["organizerId"])
+    .index("by_eventIdAndOrganizerId", ["eventId", "organizerId"]),
 
   eventOpenCalls: defineTable(eventOpenCallSchema)
     .index("by_eventId", ["eventId"])

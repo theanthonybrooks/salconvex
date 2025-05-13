@@ -14,41 +14,143 @@ import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
-// export async function generateUniqueNameAndSlug(
-//   ctx: MutationCtx,
-//   baseName: string,
-//   baseEdition: number,
-// ): Promise<{ name: string; slug: string; baseEdition: number }> {
-//   let name = baseName;
-//   let edition = baseEdition;
-//   let suffix = 1;
+export const globalSearch = query({
+  args: {
+    searchTerm: v.string(),
+    searchType: v.union(
+      v.literal("events"),
+      v.literal("orgs"),
+      v.literal("loc"),
+      v.literal("all"),
+    ),
+  },
+  handler: async (ctx, { searchTerm, searchType }) => {
+    const term = searchTerm.trim();
+    if (!term) return { results: [], label: null };
 
-//   // Check if the exact name is available
-//   const existing = await ctx.db
-//     .query("events")
-//     .withIndex("by_name_and_edition", (q) =>
-//       q.eq("name", name).eq("dates.edition", edition),
-//     )
-//     .unique();
+    if (searchType === "events") {
+      const results = await ctx.db
+        .query("events")
+        .withSearchIndex("search_by_name", (q) => q.search("name", term))
+        .take(20);
+      return { results, label: "Events" };
+    }
 
-//   if (!existing) {
-//     return { name, slug: slugify(name), baseEdition };
-//   }
+    if (searchType === "orgs") {
+      const results = await ctx.db
+        .query("organizations")
+        .withSearchIndex("search_by_name", (q) => q.search("name", term))
+        .take(20);
+      return { results, label: "Organizers" };
+    }
 
-//   // Try incrementing numeric suffixes
-//   const base = baseName.replace(/(?:[-\s])(\d+)$/, "");
-//   while (true) {
-//     name = `${base}-${suffix}`;
-//     const exists = await ctx.db
+    if (searchType === "loc") {
+      const [eventLocResults, orgLocResults] = await Promise.all([
+        ctx.db
+          .query("events")
+          .withSearchIndex("search_by_location", (q) =>
+            q.search("location.full", term),
+          )
+          .take(20),
+        ctx.db
+          .query("organizations")
+          .withSearchIndex("search_by_location", (q) =>
+            q.search("location.full", term),
+          )
+          .take(20),
+      ]);
+
+      return {
+        results: {
+          events: eventLocResults,
+          organizers: orgLocResults,
+        },
+        label: "Location",
+      };
+    }
+
+    if (searchType === "all") {
+      const [eventNameResults, orgNameResults, eventLocResults, orgLocResults] =
+        await Promise.all([
+          ctx.db
+            .query("events")
+            .withSearchIndex("search_by_name", (q) => q.search("name", term))
+            .take(20),
+          ctx.db
+            .query("organizations")
+            .withSearchIndex("search_by_name", (q) => q.search("name", term))
+            .take(20),
+          ctx.db
+            .query("events")
+            .withSearchIndex("search_by_location", (q) =>
+              q.search("location.full", term),
+            )
+            .take(20),
+          ctx.db
+            .query("organizations")
+            .withSearchIndex("search_by_location", (q) =>
+              q.search("location.full", term),
+            )
+            .take(20),
+        ]);
+
+      return {
+        results: {
+          eventName: eventNameResults,
+          orgName: orgNameResults,
+          eventLoc: eventLocResults,
+          orgLoc: orgLocResults,
+        },
+        label: "All",
+      };
+    }
+
+    return { results: [], label: null };
+  },
+});
+
+// export const searchEvents = query({
+//   args: { searchTerm: v.string() },
+//   handler: async (ctx, args) => {
+//     const { searchTerm } = args;
+
+//     // Search by name using full-text search
+//     const nameResults = await ctx.db
 //       .query("events")
-//       .withIndex("by_name", (q) => q.eq("name", name))
-//       .first();
-//     if (!exists) break;
-//     suffix++;
-//   }
+//       .withSearchIndex("search_by_name", (q) => q.search("name", searchTerm))
+//       .take(20);
 
-//   return { name, slug: slugify(name), baseEdition };
-// }
+//     // Get organizations to search and display org names
+//     const orgIds = [...new Set(nameResults.map((event) => event.mainOrgId))];
+//     const organizations = await Promise.all(orgIds.map((id) => ctx.db.get(id)));
+
+//     const orgsById = Object.fromEntries(
+//       organizations.filter(Boolean).map((org) => [org._id, org]),
+//     );
+
+//     // Search by location using regular indexes and filtering
+//     const locationResults = await ctx.db
+//       .query("events")
+//       .withIndex("by_city", (q) => q.eq("location.city", searchTerm))
+//       .collect();
+
+//     const countryResults = await ctx.db
+//       .query("events")
+//       .withIndex("by_countryFull", (q) => q.eq("location.country", searchTerm))
+//       .collect();
+
+//     // Combine and categorize results
+//     const results = {
+//       byName: nameResults.map((event) => ({
+//         ...event,
+//         organizerName: orgsById[event.mainOrgId]?.name || "Unknown",
+//       })),
+//       byLocation: [...locationResults, ...countryResults],
+//     };
+
+//     return results;
+//   },
+// });
 
 export async function generateUniqueNameAndSlug(
   ctx: MutationCtx,

@@ -90,6 +90,7 @@ const PopoverContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
     showCloseButton?: boolean;
     shiftOffset?: number;
+    showArrow?: boolean;
   }
 >(
   (
@@ -100,6 +101,7 @@ const PopoverContent = React.forwardRef<
       children,
       shiftOffset,
       showCloseButton = true,
+      showArrow = true,
       ...props
     },
     ref,
@@ -116,7 +118,7 @@ const PopoverContent = React.forwardRef<
         {...props}
       >
         {/* <PopoverPrimitive.Arrow className='fill-white' /> */}
-        <CustomArrow shiftOffset={shiftOffset} />
+        {showArrow && <CustomArrow shiftOffset={shiftOffset} />}
         <PopoverPrimitive.Close
           aria-label="Close popover"
           className="absolute right-3 top-2 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"

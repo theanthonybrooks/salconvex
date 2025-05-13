@@ -259,3 +259,16 @@ export function getOrganizerLocationString(
 
   return parts.filter(Boolean).join(", ");
 }
+export function getSearchLocationString(
+  city?: string,
+  countryAbbr?: string,
+  stateAbbr?: string,
+): string {
+  const parts = [
+    city && `${city}`,
+    city && stateAbbr && `${stateAbbr}`,
+    countryAbbr,
+  ];
+
+  return parts.filter(Boolean).join(", ");
+}

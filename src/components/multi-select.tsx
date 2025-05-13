@@ -2,7 +2,6 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import {
-  CheckIcon,
   ChevronDown,
   ChevronUp,
   WandSparkles,
@@ -31,6 +30,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect } from "react";
+import { FaCheck } from "react-icons/fa";
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -101,6 +101,8 @@ interface MultiSelectProps
    * Optional, defaults to 0 (no animation).
    */
 
+  showArrow?: boolean;
+
   animation?: number;
 
   /**
@@ -160,6 +162,7 @@ export const MultiSelect = React.forwardRef<
       placeholder = "Select options",
       animation = 0,
       maxCount = 3,
+      showArrow,
       modalPopover = false,
       shortResults = false,
       tabIndex,
@@ -261,7 +264,7 @@ export const MultiSelect = React.forwardRef<
             onClick={handleTogglePopover}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-11 w-full items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-9 [&_svg]:pointer-events-auto",
+              "flex h-11 w-full min-w-40 items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-9 [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
               className,
               variant === "basic" ? "border-foreground" : "",
@@ -387,9 +390,10 @@ export const MultiSelect = React.forwardRef<
         <PopoverContent
           shiftOffset={shiftOffset}
           showCloseButton={false}
+          showArrow={showArrow}
           className={cn(
             "z-top max-w-max border border-foreground p-0",
-            hasSearch ? "w-auto" : "w-full min-w-[200px]",
+            // hasSearch ? "w-auto" : "w-full min-w-[200px]",
             variant === "basic" ? "border-foreground" : "",
           )}
           align="start"
@@ -421,7 +425,7 @@ export const MultiSelect = React.forwardRef<
                           : "opacity-50 [&_svg]:invisible",
                       )}
                     >
-                      <CheckIcon className="size-4" />
+                      <FaCheck className="size-3" />
                     </div>
                     <span className="text-base sm:text-sm">(Select All)</span>
                   </CommandItem>
@@ -470,7 +474,7 @@ export const MultiSelect = React.forwardRef<
                                   : "opacity-50 [&_svg]:invisible",
                               )}
                             >
-                              <CheckIcon className="size-4" />
+                              <FaCheck className="size-3" />
                             </div>
                             {option.icon && (
                               <option.icon className="mr-2 size-4 text-muted-foreground" />
@@ -505,11 +509,11 @@ export const MultiSelect = React.forwardRef<
                             className={cn(
                               "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
                               isSelected
-                                ? "bg-primary text-primary-foreground"
+                                ? "bg-card text-foreground"
                                 : "opacity-50 [&_svg]:invisible",
                             )}
                           >
-                            <CheckIcon className="size-4" />
+                            <FaCheck className="size-3" />
                           </div>
                           {option.icon && (
                             <option.icon className="mr-2 size-4 text-muted-foreground" />

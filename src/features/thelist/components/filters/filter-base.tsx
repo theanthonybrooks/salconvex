@@ -176,6 +176,7 @@ export const FilterBase = ({
               hasSearch={false}
               className="w-full border bg-card sm:h-9"
               shortResults
+              showArrow={false}
             />
           </section>
           <section className="flex flex-row justify-around gap-2">
@@ -307,8 +308,10 @@ export const FilterBase = ({
                 selectAll={false}
                 hasSearch={false}
                 textClassName="text-center"
-                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                className="w-40 border bg-transparent hover:bg-white/30 sm:h-12"
+                badgeClassName="h-9"
                 shortResults
+                showArrow={false}
               />
             </section>
             <section className="flex flex-col gap-2">

@@ -30,6 +30,7 @@ export const getCallTypeLabel = (callType: CallType): string => {
 
 export const getEventTypeLabel = (
   eventType: EventType | [EventType, EventType] | null,
+  // eventType: EventType[] | null,
 ): string => {
   if (!eventType) return "";
 
