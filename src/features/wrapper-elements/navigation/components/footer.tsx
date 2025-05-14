@@ -14,6 +14,7 @@ import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
 
 import { infoEmail } from "@/constants/siteInfo";
+import { isValidEmail } from "@/lib/linkFns";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,16 +25,18 @@ import { api } from "~/convex/_generated/api";
 
 interface NewsletterFormProps {
   email: string;
+  firstName: string;
 }
 
 export default function Footer({ className }: { className?: string }) {
   const {
     register,
     handleSubmit,
+    watch,
     // formState: { errors },
     reset,
-  } = useForm<NewsletterFormProps>();
-
+  } = useForm<NewsletterFormProps>({ mode: "onChange" });
+  const emailVals = watch("email");
   const links = footerLinks;
   const footerText = footerCRText();
   const numColumns = Object.keys(links).length;
@@ -54,34 +57,46 @@ export default function Footer({ className }: { className?: string }) {
 
   const onSubscribe = async (data: NewsletterFormProps) => {
     if (!data.email) return;
+
     try {
       setSubAction("subbing");
-      await subscribeToNewsletter({ email: data.email, newsletter: true });
-    } catch (err: unknown) {
-      if (err instanceof ConvexError) {
+      const result = await subscribeToNewsletter({
+        email: data.email,
+        firstName: data.firstName,
+        newsletter: true,
+      });
+      if (result?.status === "too_many_attempts") {
         toast.error(
-          typeof err.data === "string" &&
-            "Unable to sign up. Please contact support or try again later.",
+          "You've already subscribed to the newsletter with this email. Please check your spam folder or contact support.",
         );
-      } else if (err instanceof Error) {
+      } else if (result?.status === "already_subscribed") {
+        toast.success("You're already subscribed to the newsletter.");
+        setSubAction("subscribed");
+      } else if (result?.status === "already_subscribed diff email") {
+        toast.info(
+          "You're already subscribed with a different email. Please check your spam folder.",
+        );
+        setSubAction("cta");
+      } else if (result?.status === "diff user has email") {
         toast.error(
-          typeof err.message === "string" &&
-            "Unable to sign up. Please contact support or try again later.",
+          "This email is already in use. Please use a different email or contact support.",
         );
+        setSubAction("cta");
       } else {
-        toast.error("An unknown error occurred.");
+        toast.success("You're now subscribed to the newsletter!");
+        setSubAction("subscribed");
       }
-      return;
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error(
+        "Unable to sign up. Please contact support or try again later.",
+      );
     } finally {
-      setSubAction("subscribed");
-      toast.success("You're now subscribed to the newsletter!");
+      setTimeout(() => {
+        setSubAction("cta");
+        reset();
+      }, 2000);
     }
-
-    console.log(data);
-    setTimeout(() => {
-      setSubAction("cta");
-      reset();
-    }, 2000);
   };
 
   const handleManageSubscription = async () => {
@@ -115,7 +130,7 @@ export default function Footer({ className }: { className?: string }) {
             : err.message || "An unexpected error occurred.",
         );
       } else {
-        toast.error("An unknown error occurred.");
+        toast.error("An unknown error occurred.", { autoClose: 1000 });
       }
       return;
     }
@@ -186,19 +201,28 @@ export default function Footer({ className }: { className?: string }) {
                 onSubmit={handleSubmit(onSubscribe)}
                 className="mt-4 sm:flex sm:max-w-md md:w-full"
               >
-                <div className="flex-1">
+                <div className="flex flex-1 flex-col gap-3">
                   <Input
                     {...register("email", { required: true })}
                     type="email"
                     placeholder="Enter your email"
-                    className="h-11 w-full min-w-0 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
+                    className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
                   />
+                  {emailVals !== "" && isValidEmail(emailVals) && (
+                    <Input
+                      {...register("firstName", { required: true })}
+                      type="text"
+                      placeholder="Enter your first name"
+                      className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
+                    />
+                  )}
                 </div>
                 <div className="mt-3 sm:ml-3 sm:mt-0">
                   <Button
                     type="submit"
                     variant="salWithShadowHidden"
                     className="flex w-full items-center justify-center gap-2 font-bold md:w-[150px]"
+                    disabled={subAction === "subbing"}
                   >
                     {subAction === "cta"
                       ? "Subscribe"

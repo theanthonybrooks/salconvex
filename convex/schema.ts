@@ -430,8 +430,11 @@ const applicationsSchema = {
 
 const newsletterSchema = {
   userId: v.union(v.id("users"), v.null()),
+  firstName: v.string(),
   email: v.string(),
   newsletter: v.boolean(),
+  timesAttempted: v.number(),
+  lastAttempt: v.number(),
 };
 
 export default defineSchema({

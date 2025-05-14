@@ -122,3 +122,6 @@ export function normalizeToHandle(value: string, domain: string): string {
         .trim()}`
     : "";
 }
+
+export const isValidEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
