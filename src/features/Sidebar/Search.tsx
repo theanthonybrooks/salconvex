@@ -9,6 +9,7 @@ import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
 import { useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
+import { TbWorldSearch } from "react-icons/tb";
 import { api } from "~/convex/_generated/api";
 
 interface SearchProps<T extends CommandItem> {
@@ -79,7 +80,7 @@ export const Search = <T extends CommandItem>({
           className={cn("flex items-center gap-x-2", className)}
           onClick={() => setOpen(true)}
         >
-          <FiSearch className="size-8 cursor-pointer md:size-5" />
+          <TbWorldSearch className="size-8 cursor-pointer md:size-5" />
           {value && value !== "Search" && (
             <span className="flex items-center">
               &quot;

@@ -29,7 +29,7 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
-  hasActiveFilters: boolean;
+  hasActiveFilters: boolean | undefined;
   // userPref: UserPref | null;
 }
 

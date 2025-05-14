@@ -32,11 +32,11 @@ const continentOrder = [
 ];
 
 export const select_continents = [
-  { label: "North America", value: "North America" },
-  { label: "South America", value: "South America" },
-  { label: "Europe", value: "Europe" },
   { label: "Asia", value: "Asia" },
+  { label: "Europe", value: "Europe" },
+  { label: "North America", value: "North America" },
   { label: "Oceania", value: "Oceania" },
+  { label: "South America", value: "South America" },
 ];
 
 const getContinentLabel = (country: Country): string | null => {

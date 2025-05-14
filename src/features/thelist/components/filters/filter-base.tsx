@@ -19,7 +19,12 @@ import {
   eventTypeOptions,
 } from "@/types/event";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
-import { LucideFilter, LucideFilterX } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  LucideFilter,
+  LucideFilterX,
+} from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import {
@@ -33,7 +38,7 @@ export interface FilterBaseProps {
   isMobile: boolean;
   filters: Filters;
   sortOptions: SortOptions;
-  hasActiveFilters: boolean;
+  hasActiveFilters: boolean | undefined;
 
   setOpen: Dispatch<SetStateAction<boolean>>;
   setValue: Dispatch<SetStateAction<string>>;
@@ -452,7 +457,7 @@ export const FilterBase = ({
                 textClassName="text-center"
                 className="w-40 border bg-transparent hover:bg-white/30 sm:h-12"
                 badgeClassName="h-9"
-                maxCount={1}
+                shortResults
                 showArrow={false}
               />
             </section>
@@ -475,7 +480,7 @@ export const FilterBase = ({
                 textClassName="text-center"
                 className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
                 badgeClassName="h-9"
-                maxCount={1}
+                shortResults
                 showArrow={false}
               />
             </section>
@@ -509,19 +514,37 @@ export const FilterBase = ({
                 </SelectContent>
               </Select>
             </section>
-            <Button
-              variant="icon"
-              size="icon"
-              type="button"
-              onClick={() => setShowFull((prev) => !prev)}
-              className="mt-4 cursor-pointer active:scale-95"
-            >
-              {showFull ? (
-                <LucideFilterX className="size-5" />
-              ) : (
-                <LucideFilter className="size-5" />
-              )}
-            </Button>
+            <section className="ml-2 flex flex-col gap-2 self-end">
+              <span
+                className={cn(
+                  "flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline",
+                  !hasActiveFilters &&
+                    "pointer-events-none cursor-default opacity-50",
+                )}
+                onClick={onResetFilters}
+              >
+                {hasActiveFilters ? (
+                  <LucideFilterX className="size-4" />
+                ) : (
+                  <LucideFilter className="size-4" />
+                )}
+                Clear filters
+              </span>
+
+              <div onClick={() => setShowFull((prev) => !prev)}>
+                {showFull ? (
+                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline">
+                    <ChevronUp className="size-4" />
+                    Less Filters
+                  </span>
+                ) : (
+                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline">
+                    <ChevronDown className="size-4" />
+                    More Filters
+                  </span>
+                )}
+              </div>
+            </section>
           </div>
           {showFull && (
             <div className="flex flex-col gap-3">
@@ -548,7 +571,7 @@ export const FilterBase = ({
                     textClassName="text-center"
                     className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
                     badgeClassName="h-9"
-                    maxCount={1}
+                    shortResults
                     showArrow={false}
                   />
                 </section>
@@ -577,15 +600,6 @@ export const FilterBase = ({
                     </span>
                   </label>
                 </section>
-
-                {hasActiveFilters && (
-                  <span
-                    className="cursor-pointer self-end text-center text-sm text-foreground underline-offset-4 hover:underline"
-                    onClick={onResetFilters}
-                  >
-                    Clear filters
-                  </span>
-                )}
               </div>
             </div>
           )}

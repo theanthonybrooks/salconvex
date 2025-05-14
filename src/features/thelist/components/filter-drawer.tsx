@@ -64,7 +64,7 @@ export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   setSearchType: React.Dispatch<React.SetStateAction<SearchType>>;
   onResetFilters: () => void;
   // user: User | null;
-  hasActiveFilters: boolean;
+  hasActiveFilters: boolean | undefined;
 }
 
 export type SearchType = "events" | "orgs" | "loc" | "all";

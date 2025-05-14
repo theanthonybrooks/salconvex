@@ -31,7 +31,7 @@ export const EventFilters = ({
     filters.showHidden ||
     (filters.eventTypes && filters.eventTypes.length > 0) ||
     (filters.eventCategories && filters.eventCategories.length > 0) ||
-    filters.continent !== undefined;
+    (filters.continent && filters.continent.length > 0);
 
   return (
     <div className="mb-6 flex w-full flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12">
