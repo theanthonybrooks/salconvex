@@ -14,7 +14,7 @@ import {
   EventCategory,
   EventType,
 } from "@/types/event";
-import { Filters, SortOptions } from "@/types/thelist";
+import { Continents, Filters, SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
 // import { CombinedEventPreviewCardData } from "@/types/event";
 
@@ -24,6 +24,7 @@ import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import type { MergedEventPreviewData } from "@/types/event"; // or define a local merged type inline
 import { usePreloadedQuery } from "convex/react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 // interface Props {
@@ -44,7 +45,7 @@ const ClientEventList = (
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const artistData = usePreloadedQuery(preloadedArtistData);
-  console.log(artistData);
+  // console.log(artistData);
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
@@ -80,6 +81,9 @@ const ClientEventList = (
     eventCategories:
       (searchParams.get("cat")?.split(",") as EventCategory[]) ??
       defaultFilters.eventCategories,
+    continent:
+      (searchParams.get("cont")?.split(",") as Continents[]) ??
+      defaultFilters.continent,
   };
 
   const currentSort: SortOptions = {
@@ -95,18 +99,11 @@ const ClientEventList = (
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
-  const NextPgResult = useFilteredEventsQuery(filters, sortOptions, {
+  void useFilteredEventsQuery(filters, sortOptions, {
     page: page + 1,
   });
-  console.log("next pg loaded", !!NextPgResult);
-  const filteredEvents = queryResult?.results ?? [];
   const total = queryResult?.total ?? 0;
   const isLoading = !queryResult;
-  console.log(queryResult);
-  console.log("filteredEvents", filteredEvents);
-  console.log("total", total);
-  console.log("isLoading", isLoading);
-  console.log("queryResult", queryResult);
 
   const handleResetFilters = () => {
     setFilters(defaultFilters);
@@ -116,6 +113,7 @@ const ClientEventList = (
 
   useEffect(() => {
     const params = new URLSearchParams();
+
     setParamIfNotDefault(params, "h", filters.showHidden, false);
     setParamIfNotDefault(params, "b", filters.bookmarkedOnly, false);
     setParamIfNotDefault(params, "l", filters.limit, 10);
@@ -127,6 +125,10 @@ const ClientEventList = (
     if (filters.eventCategories?.length)
       params.set("cat", filters.eventCategories.join(","));
     else params.delete("cat");
+
+    if (filters.continent?.length)
+      params.set("cont", filters.continent.join(","));
+    else params.delete("cont");
 
     if (page && page !== 1) {
       params.set("page", page.toString());
@@ -150,29 +152,8 @@ const ClientEventList = (
     );
   }, [filters, sortOptions, page]);
 
-  // const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
   const totalPages = Math.ceil(total / filters.limit);
 
-  //  const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
-  //     if (!artistData) return filteredEvents;
-
-  //     return filteredEvents.map((event) => {
-  //       const openCallId = event.tabs.opencall?._id;
-
-  //       return {
-  //         ...event,
-  //         bookmarked: artistData.bookmarked.includes(event._id),
-  //         hidden: artistData.hidden.includes(event._id),
-  //         applied: artistData.applied.includes(event._id),
-  //         manualApplied:
-  //           openCallId && artistData.applicationData[openCallId]?.manualApplied,
-  //         status: openCallId
-  //           ? (artistData.applicationData[openCallId]?.status ?? null)
-  //           : null,
-  //         artistNationality: artistData.artistNationality,
-  //       };
-  //     });
-  //   }, [filteredEvents, artistData]);
   const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
     return (queryResult?.results ?? []).map((event) => {
       const openCallId = event.tabs?.opencall?._id;
@@ -233,7 +214,7 @@ const ClientEventList = (
   };
 
   const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
-
+  const hasResults = totalResults > 0;
   return (
     <>
       {!publicView && (
@@ -250,7 +231,7 @@ const ClientEventList = (
             isMobile={isMobile}
           />
 
-          {!isLoading && (
+          {!isLoading && hasResults && (
             <BasicPagination
               page={page}
               totalPages={totalPages}
@@ -287,40 +268,58 @@ const ClientEventList = (
           ))}
         </div>
       ) : (
-        groupedEvents.map((group) => (
-          <div key={group.title.raw} className="mb-6">
-            <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
-              {group.title.parts ? (
-                <>
-                  {group.title.parts.month}
-                  <span className="flex items-start">
-                    {group.title.parts.day}
-                    <p className="align-super text-sm">
-                      {group.title.parts.suffix}
-                    </p>
-                  </span>
-                  {group.title.parts.year && ` (${group.title.parts.year})`}
-                </>
-              ) : (
-                group.title.raw
-              )}
-            </h3>
-            <div className="space-y-4 sm:space-y-6">
-              {group.events.map((event, index) => (
-                <EventCardPreview
-                  key={index}
-                  event={event}
-                  publicView={publicView}
-                  user={user}
-                  userPref={userPref}
-                />
-              ))}
+        <>
+          {hasResults ? (
+            groupedEvents.map((group) => (
+              <div key={group.title.raw} className="mb-6">
+                <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
+                  {group.title.parts ? (
+                    <>
+                      {group.title.parts.month}
+                      <span className="flex items-start">
+                        {group.title.parts.day}
+                        <p className="align-super text-sm">
+                          {group.title.parts.suffix}
+                        </p>
+                      </span>
+                      {group.title.parts.year && ` (${group.title.parts.year})`}
+                    </>
+                  ) : group.title.label ? (
+                    group.title.label
+                  ) : (
+                    group.title.raw
+                  )}
+                </h3>
+                <div className="space-y-4 sm:space-y-6">
+                  {group.events.map((event, index) => (
+                    <EventCardPreview
+                      key={index}
+                      event={event}
+                      publicView={publicView}
+                      user={user}
+                      userPref={userPref}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center gap-5">
+              <h1 className="text-2xl font-bold">No Results</h1>
+              <Image
+                src="/nothinghere.gif"
+                alt="No Results Found"
+                loading="eager"
+                width={400}
+                height={400}
+                className="h-full w-full rounded-full"
+              />
             </div>
-          </div>
-        ))
+          )}
+        </>
       )}
 
-      {!publicView && (
+      {!publicView && hasResults && (
         <BasicPagination
           page={page}
           totalPages={totalPages}

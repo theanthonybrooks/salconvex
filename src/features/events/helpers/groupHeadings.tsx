@@ -4,13 +4,17 @@ import {
   isValidIsoDate,
 } from "@/lib/dateFns";
 import { PublicEventPreviewData } from "@/types/event";
+
 import { format } from "date-fns";
+import { JSX } from "react";
+import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa6";
 
 export function getGroupKeyFromEvent(
   event: PublicEventPreviewData,
   sortBy: string,
 ): {
   raw: string;
+  label?: JSX.Element;
   parts?: {
     month: string;
     day: number;
@@ -72,8 +76,21 @@ export function getGroupKeyFromEvent(
     };
   }
 
+  // if (sortBy === "name") {
+  //   return { raw: `"${event.name.slice(0, 1).toUpperCase()}"` };
+  // }
+
   if (sortBy === "name") {
-    return { raw: `"${event.name.slice(0, 1)}"` };
+    return {
+      raw: `${event.name.slice(0, 1).toUpperCase()}`,
+      label: (
+        <span className="inline-flex items-center gap-1">
+          <FaQuoteLeft className="-translate-y-1 text-xs" />
+          {event.name.slice(0, 1).toUpperCase()}
+          <FaQuoteRight className="-translate-y-1 text-xs" />
+        </span>
+      ),
+    };
   }
 
   return { raw: "Ungrouped" };

@@ -163,13 +163,14 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 3,
       showArrow,
-      modalPopover = false,
+      // modalPopover = false,
       shortResults = false,
       tabIndex,
       // asChild = false,
       className,
       badgeClassName,
       textClassName,
+      disabled,
       ...props
     },
     ref,
@@ -250,21 +251,35 @@ export const MultiSelect = React.forwardRef<
       }
     }, [isPopoverOpen, hasSearch]);
 
+    // useEffect(() => {
+    //   if (!isPopoverOpen) return;
+
+    //   const scrollbarWidth =
+    //     window.innerWidth - document.documentElement.clientWidth;
+    //   const originalOverflow = document.body.style.overflow;
+    //   const originalPaddingRight = document.body.style.paddingRight;
+
+    //   document.body.style.overflow = "hidden";
+    //   document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    //   return () => {
+    //     document.body.style.overflow = originalOverflow;
+    //     document.body.style.paddingRight = originalPaddingRight;
+    //   };
+    // }, [isPopoverOpen]);
+
     return (
-      <Popover
-        open={isPopoverOpen}
-        onOpenChange={setIsPopoverOpen}
-        modal={modalPopover}
-      >
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal>
         <PopoverTrigger asChild>
           <Button
             ref={ref}
             {...props}
             tabIndex={tabIndex}
             onClick={handleTogglePopover}
+            disabled={disabled}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-11 w-full min-w-40 items-center justify-between rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black sm:h-9 [&_svg]:pointer-events-auto",
+              "flex h-11 w-full min-w-40 items-center justify-between rounded-md border border-red-500 bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
               className,
               variant === "basic" ? "border-foreground" : "",
@@ -379,20 +394,33 @@ export const MultiSelect = React.forwardRef<
                   {placeholder}
                 </span>
                 {isPopoverOpen ? (
-                  <ChevronUp className="mx-2 h-4 cursor-pointer text-muted-foreground" />
+                  <ChevronUp
+                    className={cn(
+                      "mx-2 h-4 cursor-pointer text-muted-foreground",
+                      disabled &&
+                        "pointer-events-none cursor-default opacity-50",
+                    )}
+                  />
                 ) : (
-                  <ChevronDown className="mx-2 h-4 cursor-pointer text-muted-foreground" />
+                  <ChevronDown
+                    className={cn(
+                      "mx-2 h-4 cursor-pointer text-muted-foreground",
+                      disabled &&
+                        "pointer-events-none cursor-default opacity-50",
+                    )}
+                  />
                 )}
               </div>
             )}
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          side="bottom"
           shiftOffset={shiftOffset}
           showCloseButton={false}
           showArrow={showArrow}
           className={cn(
-            "z-top max-w-max border border-foreground p-0",
+            "z-top w-[--radix-popover-trigger-width] border border-foreground p-0",
             // hasSearch ? "w-auto" : "w-full min-w-[200px]",
             variant === "basic" ? "border-foreground" : "",
           )}
@@ -410,7 +438,7 @@ export const MultiSelect = React.forwardRef<
             )}
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup>
+              <CommandGroup className="scrollable invis">
                 {selectAll && (
                   <CommandItem
                     key="all"
@@ -419,7 +447,7 @@ export const MultiSelect = React.forwardRef<
                   >
                     <div
                       className={cn(
-                        "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
+                        "mr-2 flex size-4 items-start justify-center rounded-sm border border-primary",
                         selectedValues.length === options.length
                           ? "bg-primary text-primary-foreground"
                           : "opacity-50 [&_svg]:invisible",
@@ -446,6 +474,7 @@ export const MultiSelect = React.forwardRef<
                     <CommandGroup
                       key={group}
                       heading={group === "Ungrouped" ? undefined : group}
+                      className="scrollable mini justy max-h-64"
                     >
                       {groupOptions.map((option, idx) => {
                         const isSelected = selectedValues.includes(
@@ -468,7 +497,7 @@ export const MultiSelect = React.forwardRef<
                           >
                             <div
                               className={cn(
-                                "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
+                                "mr-2 flex size-4 items-start justify-center rounded-sm border border-primary",
                                 isSelected
                                   ? "bg-primary text-primary-foreground"
                                   : "opacity-50 [&_svg]:invisible",
@@ -488,7 +517,7 @@ export const MultiSelect = React.forwardRef<
                     </CommandGroup>
                   ))
                 ) : (
-                  <CommandGroup>
+                  <CommandGroup className="scrollable mini justy max-h-50">
                     {options.map((option, idx) => {
                       const isSelected = selectedValues.includes(option.value);
                       const isDisabled = !!(
@@ -507,7 +536,7 @@ export const MultiSelect = React.forwardRef<
                         >
                           <div
                             className={cn(
-                              "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
+                              "mr-2 flex size-4 items-start justify-center rounded-sm border border-primary",
                               isSelected
                                 ? "bg-card text-foreground"
                                 : "opacity-50 [&_svg]:invisible",

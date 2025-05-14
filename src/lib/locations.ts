@@ -31,6 +31,14 @@ const continentOrder = [
   "Oceania",
 ];
 
+export const select_continents = [
+  { label: "North America", value: "North America" },
+  { label: "South America", value: "South America" },
+  { label: "Europe", value: "Europe" },
+  { label: "Asia", value: "Asia" },
+  { label: "Oceania", value: "Oceania" },
+];
+
 const getContinentLabel = (country: Country): string | null => {
   if (
     country.subregion === "North America" ||

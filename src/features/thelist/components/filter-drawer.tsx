@@ -6,6 +6,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { FlairBadge } from "@/components/ui/flair-badge";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,14 +25,10 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion } from "framer-motion";
 import { debounce } from "lodash";
-import {
-  LucideBookA,
-  LucideCalendarClock,
-  LucideCircleCheck,
-  X,
-} from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
 import { IoSearch } from "react-icons/io5";
 import { api } from "~/convex/_generated/api";
 
@@ -438,10 +435,18 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 {Object.values(groupedItems).every(
                   (items) => items.length === 0,
                 ) ? (
-                  <p className="text-sm italic text-stone-400">
-                    No results found for &quot;
-                    <span className="italic">{value}</span>&quot;
-                  </p>
+                  <>
+                    {value.length > 0 && (
+                      <span className="inline-flex items-center gap-2">
+                        No results found for
+                        <span className="inline-flex items-center gap-[1px] italic">
+                          <BiSolidQuoteLeft className="size-1 -translate-y-1" />
+                          {value}
+                          <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
+                        </span>
+                      </span>
+                    )}
+                  </>
                 ) : (
                   Object.entries(groupedItems)
                     .filter(([, items]) => items.length > 0)
@@ -465,13 +470,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                   <span className="flex items-center gap-1 truncate">
                                     {item.name}
                                     {item.ocStatus === 2 && (
-                                      <LucideCircleCheck className="inline-block size-4 text-green-700" />
-                                    )}
-                                    {item.ocStatus === 1 && (
-                                      <LucideBookA className="inline-block size-4 text-blue-600" />
-                                    )}
-                                    {item.ocStatus === 3 && (
-                                      <LucideCalendarClock className="inline-block size-4 text-salPinkDark" />
+                                      <FlairBadge>Open Call</FlairBadge>
                                     )}
                                   </span>
 
@@ -538,7 +537,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative flex max-h-[80vh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-2xl"
+            className="relative flex max-h-[80dvh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <DialogTitle className="sr-only">{title}</DialogTitle>
@@ -595,10 +594,26 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 {Object.values(groupedItems).every(
                   (items) => items.length === 0,
                 ) ? (
-                  <Command.Empty>
-                    No results found for{" "}
-                    <span className="italic">&quot;{value}&quot;</span>
-                  </Command.Empty>
+                  <>
+                    {value.length !== 0 ? (
+                      <Command.Empty>
+                        <span className="inline-flex items-center gap-2">
+                          No results found for
+                          <span className="inline-flex items-center gap-[1px] italic">
+                            <BiSolidQuoteLeft className="size-1 -translate-y-1" />
+                            {value}
+                            <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
+                          </span>
+                        </span>
+                      </Command.Empty>
+                    ) : (
+                      <Command.Empty>
+                        <span className="text-foreground/60">
+                          Search for events, organizers, or locations
+                        </span>
+                      </Command.Empty>
+                    )}
+                  </>
                 ) : (
                   Object.entries(groupedItems)
                     .filter(([, items]) => items.length > 0)
@@ -622,15 +637,9 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                 <span className="flex items-center gap-1 truncate">
                                   {item.name}
                                   {item.ocStatus === 2 && (
-                                    <LucideCircleCheck className="inline-block size-4 text-green-700" />
+                                    <FlairBadge>Open Call</FlairBadge>
                                   )}
-                                  {item.ocStatus === 1 && (
-                                    <LucideBookA className="inline-block size-4 text-blue-600" />
-                                  )}
-                                  {item.ocStatus === 3 && (
-                                    <LucideCalendarClock className="inline-block size-4 text-salPinkDark" />
-                                  )}
-                                </span>{" "}
+                                </span>
                                 {item.edition ? (
                                   <span className="text-center text-xs text-stone-500">
                                     {item.edition}

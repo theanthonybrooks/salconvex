@@ -9,14 +9,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { eventCategoryOptions } from "@/constants/thelist";
 import { SearchType } from "@/features/thelist/components/filter-drawer";
+import { select_continents } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { EventCategory } from "@/types/event";
-import { Filters, SortOptions } from "@/types/thelist";
-import { LucideFilter } from "lucide-react";
+import {
+  EventCategory,
+  eventCategoryOptions,
+  EventType,
+  eventTypeOptions,
+} from "@/types/event";
+import { Continents, Filters, SortOptions } from "@/types/thelist";
+import { LucideFilter, LucideFilterX } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
+import {
+  LiaSortAlphaDownAltSolid,
+  LiaSortAlphaDownSolid,
+  LiaSortNumericDownAltSolid,
+  LiaSortNumericDownSolid,
+} from "react-icons/lia";
 
 export interface FilterBaseProps {
   isMobile: boolean;
@@ -56,6 +67,10 @@ export const FilterBase = ({
   // user,
 }: FilterBaseProps) => {
   const [showFull, setShowFull] = useState(false);
+  const notEvent =
+    filters.eventCategories?.length !== 0 &&
+    !filters.eventCategories?.includes("event");
+  const alphaSort = sortOptions.sortBy === "name";
   return (
     <>
       {isMobile ? (
@@ -184,18 +199,43 @@ export const FilterBase = ({
                 <SelectValue placeholder="Direction" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="asc">Ascending</SelectItem>
-                <SelectItem value="desc">Descending</SelectItem>
+                <SelectItem value="asc">
+                  <span className="flex items-center gap-1 text-nowrap">
+                    {alphaSort ? (
+                      <LiaSortAlphaDownSolid className="size-4" />
+                    ) : (
+                      <LiaSortNumericDownSolid className="size-4" />
+                    )}
+                    Asc
+                  </span>
+                </SelectItem>
+                <SelectItem
+                  value="desc"
+                  className="flex items-center gap-1 text-nowrap"
+                >
+                  <span className="flex items-center gap-1 text-nowrap">
+                    {/* <LiaSortAlphaDownSolid className="size-4" /> */}
+                    {alphaSort ? (
+                      <LiaSortAlphaDownAltSolid className="size-4" />
+                    ) : (
+                      <LiaSortNumericDownAltSolid className="size-4" />
+                    )}
+                    Desc
+                  </span>
+                </SelectItem>
               </SelectContent>
             </Select>
           </section>
 
           <section className="flex flex-col gap-2">
-            <Label htmlFor="eventTypes" className="flex items-center gap-2">
+            <Label
+              htmlFor="eventCategories"
+              className="flex items-center gap-2"
+            >
               Event Category:
             </Label>
             <MultiSelect
-              options={eventCategoryOptions}
+              options={[...eventCategoryOptions]}
               value={filters.eventCategories ?? []}
               onValueChange={(value) =>
                 onChange({ eventCategories: value as EventCategory[] })
@@ -205,6 +245,49 @@ export const FilterBase = ({
               selectAll={false}
               hasSearch={false}
               className="w-full border bg-card sm:h-9"
+              shortResults
+              showArrow={false}
+            />
+          </section>
+          <section className="flex flex-col gap-2">
+            <Label htmlFor="eventTypes" className="flex items-center gap-2">
+              Event Type:
+            </Label>
+            <MultiSelect
+              options={[...eventTypeOptions]}
+              value={filters.eventTypes ?? []}
+              onValueChange={(value) =>
+                onChange({ eventTypes: value as EventType[] })
+              }
+              placeholder="--Event Type--"
+              disabled={notEvent}
+              variant="basic"
+              selectAll={false}
+              hasSearch={false}
+              textClassName="text-center"
+              className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+              badgeClassName="h-9"
+              shortResults
+              showArrow={false}
+            />
+          </section>
+          <section className="flex flex-col gap-2">
+            <Label htmlFor="continents" className="flex items-center gap-2">
+              Continent:
+            </Label>
+            <MultiSelect
+              options={select_continents}
+              value={filters.continent ?? []}
+              onValueChange={(value) =>
+                onChange({ continent: value as Continents[] })
+              }
+              placeholder="--Continent--"
+              variant="basic"
+              selectAll={false}
+              hasSearch={false}
+              textClassName="text-center"
+              className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+              badgeClassName="h-9"
               shortResults
               showArrow={false}
             />
@@ -291,7 +374,7 @@ export const FilterBase = ({
                   onSortChange({ sortBy: value as SortOptions["sortBy"] })
                 }
               >
-                <SelectTrigger className="w-full min-w-50 hover:bg-white/30 sm:h-12">
+                <SelectTrigger className="w-full min-w-40 hover:bg-white/30 sm:h-12">
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
@@ -314,21 +397,46 @@ export const FilterBase = ({
                   })
                 }
               >
-                <SelectTrigger className="w-full min-w-40 hover:bg-white/30 sm:h-12">
+                <SelectTrigger className="w-fit min-w-25 hover:bg-white/30 sm:h-12 [&_span]:flex [&_span]:items-center [&_span]:justify-center [&_span]:gap-1 [&_svg]:size-4">
                   <SelectValue placeholder="Direction" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="asc">Ascending</SelectItem>
-                  <SelectItem value="desc">Descending</SelectItem>
+                  <SelectItem value="asc">
+                    <span className="flex items-center gap-1 text-nowrap">
+                      {alphaSort ? (
+                        <LiaSortAlphaDownSolid className="size-4" />
+                      ) : (
+                        <LiaSortNumericDownSolid className="size-4" />
+                      )}
+                      Asc
+                    </span>
+                  </SelectItem>
+                  <SelectItem
+                    value="desc"
+                    className="flex items-center gap-1 text-nowrap"
+                  >
+                    <span className="flex items-center gap-1 text-nowrap">
+                      {/* <LiaSortAlphaDownSolid className="size-4" /> */}
+                      {alphaSort ? (
+                        <LiaSortAlphaDownAltSolid className="size-4" />
+                      ) : (
+                        <LiaSortNumericDownAltSolid className="size-4" />
+                      )}
+                      Desc
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </section>
             <section className="flex flex-col gap-2">
-              <Label htmlFor="eventTypes" className="flex items-center gap-2">
+              <Label
+                htmlFor="eventCategories"
+                className="flex items-center gap-2"
+              >
                 Event Category:
               </Label>
               <MultiSelect
-                options={eventCategoryOptions}
+                options={[...eventCategoryOptions]}
                 value={filters.eventCategories ?? []}
                 onValueChange={(value) =>
                   onChange({ eventCategories: value as EventCategory[] })
@@ -339,6 +447,29 @@ export const FilterBase = ({
                 hasSearch={false}
                 textClassName="text-center"
                 className="w-40 border bg-transparent hover:bg-white/30 sm:h-12"
+                badgeClassName="h-9"
+                shortResults
+                showArrow={false}
+              />
+            </section>
+
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="eventTypes" className="flex items-center gap-2">
+                Event Type:
+              </Label>
+              <MultiSelect
+                options={[...eventTypeOptions]}
+                value={filters.eventTypes ?? []}
+                onValueChange={(value) =>
+                  onChange({ eventTypes: value as EventType[] })
+                }
+                placeholder="--Event Type--"
+                disabled={notEvent}
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                textClassName="text-center"
+                className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
                 badgeClassName="h-9"
                 shortResults
                 showArrow={false}
@@ -355,7 +486,7 @@ export const FilterBase = ({
                   onChange({ limit: parseInt(value, 10) })
                 }
               >
-                <SelectTrigger className="w-full min-w-20 text-center hover:bg-white/30 sm:h-12">
+                <SelectTrigger className="w-full min-w-15 text-center hover:bg-white/30 sm:h-12">
                   <SelectValue placeholder="Limit" />
                 </SelectTrigger>
                 <SelectContent className="min-w-auto z-top">
@@ -381,14 +512,43 @@ export const FilterBase = ({
               onClick={() => setShowFull((prev) => !prev)}
               className="mt-4 cursor-pointer active:scale-95"
             >
-              <LucideFilter className="size-5" />
+              {showFull ? (
+                <LucideFilterX className="size-5" />
+              ) : (
+                <LucideFilter className="size-5" />
+              )}
             </Button>
           </div>
           {showFull && (
             <div className="flex flex-col gap-3">
               <p className="font-bold">More Filters:</p>
-              <div className="flex gap-3">
-                <section className="flex flex-row justify-around gap-3">
+              <div className="flex items-center gap-3"></div>
+              <div className="flex items-center gap-3">
+                <section className="flex flex-col gap-2">
+                  <Label
+                    htmlFor="continents"
+                    className="flex items-center gap-2"
+                  >
+                    Continent:
+                  </Label>
+                  <MultiSelect
+                    options={select_continents}
+                    value={filters.continent ?? []}
+                    onValueChange={(value) =>
+                      onChange({ continent: value as Continents[] })
+                    }
+                    placeholder="--Continent--"
+                    variant="basic"
+                    selectAll={false}
+                    hasSearch={false}
+                    textClassName="text-center"
+                    className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+                    badgeClassName="h-9"
+                    shortResults
+                    showArrow={false}
+                  />
+                </section>
+                <section className="flex flex-col gap-3 self-end">
                   <label className="flex cursor-pointer items-center gap-2">
                     <Checkbox
                       id="bookmarkedOnly"
@@ -416,7 +576,7 @@ export const FilterBase = ({
 
                 {hasActiveFilters && (
                   <span
-                    className="cursor-pointer text-center text-sm text-foreground underline-offset-4 hover:underline"
+                    className="cursor-pointer self-end text-center text-sm text-foreground underline-offset-4 hover:underline"
                     onClick={onResetFilters}
                   >
                     Clear filters

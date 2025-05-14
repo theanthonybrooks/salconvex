@@ -3,7 +3,7 @@ import { Id } from "~/convex/_generated/dataModel";
 
 type SortBy = "openCall" | "name" | "eventStart";
 type SortDirection = "asc" | "desc";
-type Continents =
+export type Continents =
   | "North America"
   | "Europe"
   | "Asia"
