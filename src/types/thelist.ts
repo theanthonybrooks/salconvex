@@ -1,4 +1,5 @@
 import { EventCategory, EventType } from "@/types/event";
+import { Id } from "~/convex/_generated/dataModel";
 
 type SortBy = "openCall" | "name" | "eventStart";
 type SortDirection = "asc" | "desc";
@@ -11,8 +12,8 @@ type Continents =
   | "South America";
 
 export interface Filters {
-  showHidden: boolean;
-  bookmarkedOnly: boolean;
+  showHidden?: boolean;
+  bookmarkedOnly?: boolean;
   eventTypes?: EventType[];
   eventCategories?: EventCategory[];
   continent?: Continents[];
@@ -26,4 +27,10 @@ export interface SortOptions {
 
 export interface Pagination {
   page?: number;
+}
+
+export interface ArtistEventMetadata {
+  bookmarked: Id<"events">[];
+  hidden: Id<"events">[];
+  applied: Id<"events">[];
 }

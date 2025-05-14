@@ -12,8 +12,6 @@ export const getFilteredEventsPublic = query({
       eventTypes: v.optional(v.array(v.string())),
       continent: v.optional(v.array(v.string())),
       limit: v.optional(v.number()),
-      showHidden: v.optional(v.boolean()),
-      bookmarkedOnly: v.optional(v.boolean()),
     }),
     sortOptions: v.object({
       sortBy: v.union(

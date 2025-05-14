@@ -92,7 +92,7 @@ export const FilterBase = ({
                     placeholder={placeholder}
                     value={value}
                     //   value={value}
-                    className="focus:outline-hidden w-full flex-1 bg-transparent placeholder:text-foreground/30"
+                    className="focus:outline-hidden w-full flex-1 bg-transparent text-base placeholder:text-foreground/30"
                   />
                 </div>
                 <section>
@@ -252,7 +252,7 @@ export const FilterBase = ({
               </Label>
               <div
                 className={cn(
-                  "sm:max-w-[max(250px, 30vw)] min-w-50 relative flex w-full max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                  "sm:max-w-[max(250px, 30vw)] relative flex w-full min-w-50 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
                   className,
                 )}
               >
@@ -275,7 +275,7 @@ export const FilterBase = ({
                   className="w-full max-w-64 truncate bg-transparent pr-10 placeholder:text-foreground/30"
                 />
 
-                <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-xs lg:flex">
+                <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex">
                   <FiCommand /> + {shortcut}
                 </span>
               </div>
@@ -291,7 +291,7 @@ export const FilterBase = ({
                   onSortChange({ sortBy: value as SortOptions["sortBy"] })
                 }
               >
-                <SelectTrigger className="min-w-50 w-full hover:bg-white/30 sm:h-12">
+                <SelectTrigger className="w-full min-w-50 hover:bg-white/30 sm:h-12">
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">

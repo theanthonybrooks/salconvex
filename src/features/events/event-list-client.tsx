@@ -93,8 +93,18 @@ const ClientEventList = (
   const [filters, setFilters] = useState<Filters>(currentFilters);
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+
+  const queryFilters = {
+    eventTypes: filters.eventTypes,
+    eventCategories: filters.eventCategories,
+    limit: filters.limit,
+  };
+
+  const queryResult = useFilteredEventsQuery(queryFilters, sortOptions, {
+    page,
+  });
+
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
-  const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
 
   const filteredEvents = queryResult?.results ?? [];
   const total = queryResult?.total ?? 0;
@@ -147,29 +157,6 @@ const ClientEventList = (
     );
   }, [filters, sortOptions, page]);
 
-  // const filteredEvents = useFilteredEvents(allEvents, filters, sortOptions);
-  const totalPages = Math.ceil(total / filters.limit);
-
-  //  const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
-  //     if (!artistData) return filteredEvents;
-
-  //     return filteredEvents.map((event) => {
-  //       const openCallId = event.tabs.opencall?._id;
-
-  //       return {
-  //         ...event,
-  //         bookmarked: artistData.bookmarked.includes(event._id),
-  //         hidden: artistData.hidden.includes(event._id),
-  //         applied: artistData.applied.includes(event._id),
-  //         manualApplied:
-  //           openCallId && artistData.applicationData[openCallId]?.manualApplied,
-  //         status: openCallId
-  //           ? (artistData.applicationData[openCallId]?.status ?? null)
-  //           : null,
-  //         artistNationality: artistData.artistNationality,
-  //       };
-  //     });
-  //   }, [filteredEvents, artistData]);
   const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
     return (queryResult?.results ?? []).map((event) => {
       const openCallId = event.tabs?.opencall?._id;
@@ -189,9 +176,19 @@ const ClientEventList = (
     });
   }, [queryResult?.results, artistData]);
 
-  const totalResults = total;
+  // const totalResults = total;
+  // const totalPages = Math.ceil(total / filters.limit);
 
-  const paginatedEvents = enrichedEvents;
+  // const paginatedEvents = enrichedEvents;
+  const paginatedEvents = useMemo(() => {
+    return enrichedEvents.filter((event) => {
+      if (!filters.showHidden && event.hidden) return false;
+      if (filters.bookmarkedOnly && !event.bookmarked) return false;
+      return true;
+    });
+  }, [enrichedEvents, filters.showHidden, filters.bookmarkedOnly]);
+  const totalResults = paginatedEvents.length;
+  const totalPages = Math.ceil(totalResults / filters.limit);
 
   const groupedEvents = useMemo(() => {
     const groups: Record<

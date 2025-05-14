@@ -11,7 +11,6 @@ import { Filters, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
 import { useState } from "react";
-import { FiSearch } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
 
 interface ListFilterProps<T extends TheListFilterCommandItem> {
@@ -61,7 +60,7 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
   const userRole = user?.role;
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className={cn("flex items-center justify-center gap-2", className)}>
       {!isMobile && !iconOnly && (
         <FilterBase
           isMobile={isMobile}
@@ -76,37 +75,11 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
           onChange={onChange}
           onSortChange={onSortChange}
           onResetFilters={onResetFilters}
-          className={className}
+          className={cn("flex h-12")}
           searchType={searchType}
           setSearchType={setSearchType}
         />
       )}
-      {iconOnly && (
-        <div
-          className={cn("flex items-center gap-x-2", className)}
-          onClick={() => setOpen(true)}
-        >
-          <FiSearch className="size-8 cursor-pointer sm:size-5" />
-          {value && value !== "Search" && (
-            <span className="flex items-center">
-              &quot;
-              <p className="max-w-[15ch] overflow-hidden truncate whitespace-nowrap">
-                {value}
-              </p>
-              &quot;
-            </span>
-          )}
-        </div>
-      )}
-      {/* <Button
-        variant="icon"
-        size="icon"
-        type="button"
-        onClick={() => setOpen(true)}
-        className="cursor-pointer"
-      >
-        <FiFilter className="size-5 " />
-      </Button> */}
 
       <TheListFilterDrawer
         open={open}

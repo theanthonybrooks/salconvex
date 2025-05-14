@@ -358,8 +358,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
   return isMobile ? (
     <>
-      <div className="flex items-center gap-1 border-b border-stone-300 pr-2">
-        <IoSearch className="size-7 shrink-0 p-1 text-stone-400" />
+      <div className="flex items-center gap-1 rounded-lg border p-2 px-3">
+        <IoSearch className="size-7 shrink-0 p-1 text-foreground" />
         <Input
           ref={inputRef}
           value={value}
@@ -376,7 +376,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
             }
           }}
           placeholder={cn(placeholder)}
-          className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-foreground placeholder:text-stone-400"
+          className="focus:outline-hidden relative z-10 w-full border-none bg-transparent p-3 text-lg selection:italic selection:text-foreground placeholder:text-foreground/40"
         />
         {value?.trim().length > 0 && (
           <button
