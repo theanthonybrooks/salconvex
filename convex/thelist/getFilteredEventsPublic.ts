@@ -94,8 +94,8 @@ export const getFilteredEventsPublic = query({
           filters.continent!.includes(e.location.continent),
       );
     }
+    let totalOpenCalls = 0;
 
-    // Enrich with open call data
     const enriched = await Promise.all(
       events.map(async (event) => {
         const openCall = await ctx.db
@@ -125,6 +125,9 @@ export const getFilteredEventsPublic = query({
           }
 
           hasActiveOpenCall = openCallStatus === "active";
+        }
+        if (hasActiveOpenCall) {
+          totalOpenCalls++;
         }
 
         return {
@@ -157,6 +160,7 @@ export const getFilteredEventsPublic = query({
     return {
       results: paginated as PublicEventPreviewData[],
       total: sorted.length,
+      totalOpenCalls,
     };
   },
 });

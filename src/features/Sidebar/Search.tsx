@@ -77,7 +77,10 @@ export const Search = <T extends CommandItem>({
       )}
       {iconOnly && (
         <div
-          className={cn("flex items-center gap-x-2", className)}
+          className={cn(
+            "flex items-center gap-x-2 hover:scale-110 active:scale-95",
+            className,
+          )}
           onClick={() => setOpen(true)}
         >
           <TbWorldSearch className="size-8 cursor-pointer md:size-5" />

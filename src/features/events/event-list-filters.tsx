@@ -34,8 +34,8 @@ export const EventFilters = ({
     (filters.continent && filters.continent.length > 0);
 
   return (
-    <div className="mb-6 flex w-full flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12">
-      <Separator className="mx-auto w-3/4" thickness={2} />
+    <div className="mx-auto mb-6 flex w-full max-w-[90vw] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12">
+      <Separator className="mx-auto" thickness={2} />
 
       <TheListFilterDrawerIcon
         title={"Search"}
@@ -55,7 +55,7 @@ export const EventFilters = ({
         isMobile={isMobile}
       />
 
-      <Separator className="mx-auto w-3/4" thickness={2} />
+      <Separator className="mx-auto" thickness={2} />
     </div>
   );
 };

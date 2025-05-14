@@ -18,7 +18,7 @@ const buttonVariants = cva(
         outline: `border-1.5 border-foreground bg-background hover:bg-white/30 `,
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80 `,
         ghost: `hover:scale-110 active:scale-95 border border-transparent `,
-        ghost2: `hover:bg-none hover:text-accent-foreground hover:scale-105 `,
+        ghost2: `hover:bg-none hover:text-accent-foreground hover:scale-105 active:scale-95 `,
         link: `link-btn text-primary underline-offset-2 hover:underline  `,
         expandIcon: `group relative text-primary-foreground bg-primary hover:bg-primary/90 `,
         ringHover: `bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:ring-2 hover:ring-primary/90 hover:ring-offset-2 `,

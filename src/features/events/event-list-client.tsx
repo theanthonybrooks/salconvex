@@ -103,6 +103,7 @@ const ClientEventList = (
     page: page + 1,
   });
   const total = queryResult?.total ?? 0;
+  const totalOpen = queryResult?.totalOpenCalls ?? 0;
   const isLoading = !queryResult;
 
   const handleResetFilters = () => {
@@ -235,6 +236,7 @@ const ClientEventList = (
             <BasicPagination
               page={page}
               totalPages={totalPages}
+              totalOpenCalls={totalOpen}
               totalResults={totalResults}
               onPageChange={setPage}
             />

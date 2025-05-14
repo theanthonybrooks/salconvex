@@ -517,7 +517,7 @@ export const MultiSelect = React.forwardRef<
                     </CommandGroup>
                   ))
                 ) : (
-                  <CommandGroup className="scrollable mini justy max-h-50">
+                  <CommandGroup className="scrollable mini justy max-h-64">
                     {options.map((option, idx) => {
                       const isSelected = selectedValues.includes(option.value);
                       const isDisabled = !!(

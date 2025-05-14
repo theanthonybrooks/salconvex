@@ -208,6 +208,11 @@ export default function Home() {
           </PopoverContent>
         </Popover>
       </motion.div>
+      <div className="mx-auto flex w-full max-w-[60vw] justify-center text-balance px-8 py-20 text-center">
+        If you&apos;ve found this page, welcome! You&apos;re a bit early as
+        it&apos;s still in development and will soon be in beta for the public.
+        I&apos;ll post on IG and announce the release soon :).
+      </div>
     </motion.div>
   );
 }

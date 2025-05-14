@@ -340,7 +340,7 @@ export const FilterBase = ({
               htmlFor="eventCategories"
               className="flex items-center gap-2"
             >
-              Event Category:
+              Category:
             </Label>
             <MultiSelect
               options={[...eventCategoryOptions]}
@@ -546,7 +546,7 @@ export const FilterBase = ({
                 htmlFor="eventCategories"
                 className="flex items-center gap-2"
               >
-                Event Category:
+                Category:
               </Label>
               <MultiSelect
                 options={[...eventCategoryOptions]}
@@ -623,7 +623,7 @@ export const FilterBase = ({
                 className={cn(
                   "flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline",
                   !hasActiveFilters &&
-                    "pointer-events-none cursor-default opacity-50",
+                    "pointer-events-none cursor-default opacity-40",
                 )}
                 onClick={onResetFilters}
               >
@@ -637,12 +637,12 @@ export const FilterBase = ({
 
               <div onClick={() => setShowFull((prev) => !prev)}>
                 {showFull ? (
-                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline">
+                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
                     <ChevronUp className="size-4" />
                     Less Filters
                   </span>
                 ) : (
-                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline">
+                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
                     <ChevronDown className="size-4" />
                     More Filters
                   </span>

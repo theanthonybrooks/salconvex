@@ -12,14 +12,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
-import { useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 // import { SignOutButton, useUser } from "@clerk/nextjs";
 import { LogOut, LucideLayoutDashboard, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { FaUserNinja } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
-import { api } from "~/convex/_generated/api";
 
 interface UserProfileProps {
   // user: UserType;
@@ -32,7 +32,8 @@ export function UserProfile({
   className,
   subscription,
 }: UserProfileProps) {
-  const userData = useQuery(api.users.getCurrentUser, {});
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user;
   const userRole = user?.role;
   const isAdmin = userRole?.includes("admin");
@@ -47,7 +48,7 @@ export function UserProfile({
         >
           <Avatar
             className={cn(
-              "h-[50px] w-[50px] border-1.5 border-border",
+              "h-[50px] w-[50px] border-1.5 border-border active:scale-95",
               className,
             )}
           >
@@ -79,10 +80,7 @@ export function UserProfile({
                   "border-1.5 border-border bg-userIcon font-bold text-foreground",
                 )}
               >
-                {/* {user?.firstName?.[0]}
-                {user?.lastName?.[0]} */}
                 <FaUserNinja className="size-5" />
-                {/* <FaRegFaceFlushed className='h-6 w-6' /> */}
               </AvatarFallback>
             </Avatar>
 
@@ -112,15 +110,6 @@ export function UserProfile({
 
           {subscription !== "none" && subscription !== "cancelled" && (
             <>
-              {/* <Link
-            href='/user-profile'
-            className='hover:underline underline-offset-2 hover:cursor-pointer'>
-            <DropdownMenuItem className='focus:bg-blue-50 dark:focus:bg-blue-950'>
-              <User className='mr-2 size-4' />
-              <span>Profile</span>
-            </DropdownMenuItem>
-          </Link> */}
-
               <Link
                 href="/dashboard/"
                 className="underline-offset-2 hover:cursor-pointer hover:underline"

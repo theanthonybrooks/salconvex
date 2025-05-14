@@ -17,6 +17,7 @@ interface BasicPaginationProps {
   page: number;
   totalPages: number;
   totalResults: number;
+  totalOpenCalls?: number;
   bottomPag?: boolean;
   className?: string;
 
@@ -27,6 +28,7 @@ export const BasicPagination = ({
   page,
   totalPages,
   totalResults,
+  totalOpenCalls,
   bottomPag = false,
   className,
 
@@ -58,9 +60,14 @@ export const BasicPagination = ({
           )}
         >
           {!bottomPag && totalPages !== 0 && (
-            <p className={cn("mx-auto text-center")}>
-              Total Results: {totalResults}
-            </p>
+            <div className="mb-5 flex w-full items-center justify-around gap-4 sm:mb-0 sm:w-auto sm:gap-2">
+              <p className={cn("mx-auto text-nowrap text-center")}>
+                Results: {totalResults}
+              </p>
+              <p className={cn("mx-auto text-nowrap text-center")}>
+                Open Calls: {totalOpenCalls}
+              </p>
+            </div>
           )}
           {totalPages !== 0 ? (
             <div className="col-start-2 flex items-center justify-center gap-4">
