@@ -345,7 +345,7 @@ NavBarProps) {
                     </Link>
                     <Link href="/auth/register" prefetch={true}>
                       <Button
-                        variant="salWithShadowHiddenYlw"
+                        variant="salWithShadowHiddenBg"
                         className="hidden rounded-full font-bold lg:block"
                       >
                         Sign up

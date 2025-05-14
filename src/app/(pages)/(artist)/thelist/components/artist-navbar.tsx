@@ -318,7 +318,7 @@ TheListNavBarProps) {
                         className="hover:no-underline"
                       >
                         <Button
-                          variant="salWithShadowHiddenYlw"
+                          variant="salWithShadowHiddenBg"
                           className="hidden rounded-full font-bold lg:block"
                         >
                           Sign up
