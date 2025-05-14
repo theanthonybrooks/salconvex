@@ -74,158 +74,157 @@ export const FilterBase = ({
   return (
     <>
       {isMobile ? (
-        <div className="flex flex-col items-center gap-3 px-5 sm:hidden [&>section]:w-full [&>section]:flex-1">
+        <div className="flex flex-col items-center gap-4 px-5 sm:hidden [&>section]:w-full [&>section]:flex-1">
           <section className="flex flex-col gap-2">
+            <div className="flex justify-between gap-3">
+              <Label htmlFor="list-search" className="flex items-center gap-2">
+                Search:
+              </Label>
+              <Label htmlFor="limit" className="flex items-center gap-2">
+                Search Type:
+              </Label>
+            </div>
+            <div className="flex justify-between gap-3">
+              <div
+                className={cn(
+                  "flex w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                  className,
+                )}
+              >
+                <FiSearch
+                  className="mr-2 size-5 cursor-pointer"
+                  onClick={() => {
+                    setOpen(true);
+                  }}
+                />
+                <input
+                  type="text"
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder={placeholder}
+                  value={value}
+                  //   value={value}
+                  className="focus:outline-hidden w-full flex-1 bg-transparent text-base placeholder:text-foreground/30"
+                />
+              </div>
+              <section>
+                <Select
+                  name="searchType"
+                  value={searchType}
+                  onValueChange={(value) =>
+                    setSearchType(value as "events" | "loc" | "orgs" | "all")
+                  }
+                >
+                  <SelectTrigger className="w-32 text-center">
+                    <SelectValue placeholder="Search Type" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="z-top">
+                    <SelectItem value="events">Events</SelectItem>
+                    <SelectItem value="orgs">Organizers</SelectItem>
+                    <SelectItem value="loc">Location</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
+                  </SelectContent>
+                </Select>
+              </section>
+            </div>
+          </section>
+          <div className="flex items-center justify-between gap-3">
             <section className="flex flex-col gap-2">
-              <div className="flex justify-between gap-3">
-                <Label
-                  htmlFor="list-search"
-                  className="flex items-center gap-2"
-                >
-                  Search:
-                </Label>
-                <Label htmlFor="limit" className="flex items-center gap-2">
-                  Search Type:
-                </Label>
-              </div>
-              <div className="flex justify-between gap-3">
-                <div
-                  className={cn(
-                    "flex w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
-                    className,
-                  )}
-                >
-                  <FiSearch
-                    className="mr-2 size-5 cursor-pointer"
-                    onClick={() => {
-                      setOpen(true);
-                    }}
-                  />
-                  <input
-                    type="text"
-                    onChange={(e) => setValue(e.target.value)}
-                    placeholder={placeholder}
-                    value={value}
-                    //   value={value}
-                    className="focus:outline-hidden w-full flex-1 bg-transparent text-base placeholder:text-foreground/30"
-                  />
-                </div>
-                <section>
-                  <Select
-                    name="searchType"
-                    value={searchType}
-                    onValueChange={(value) =>
-                      setSearchType(value as "events" | "loc" | "orgs" | "all")
-                    }
-                  >
-                    <SelectTrigger className="w-32 text-center">
-                      <SelectValue placeholder="Search Type" />
-                    </SelectTrigger>
-                    <SelectContent align="end" className="z-top">
-                      <SelectItem value="events">Events</SelectItem>
-                      <SelectItem value="orgs">Organizers</SelectItem>
-                      <SelectItem value="loc">Location</SelectItem>
-                      <SelectItem value="all">All</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </section>
-              </div>
+              <Label htmlFor="limit" className="flex items-center gap-2">
+                Per page:
+              </Label>
+              <Select
+                name="limit"
+                value={String(filters.limit)}
+                onValueChange={(value) =>
+                  onChange({ limit: parseInt(value, 10) })
+                }
+              >
+                <SelectTrigger className="w-full min-w-15 text-center">
+                  <SelectValue placeholder="Limit" />
+                </SelectTrigger>
+                <SelectContent className="min-w-auto z-top">
+                  <SelectItem fit value="1">
+                    1
+                  </SelectItem>
+                  <SelectItem fit value="5">
+                    5
+                  </SelectItem>
+                  <SelectItem fit value="10">
+                    10
+                  </SelectItem>
+                  <SelectItem fit value="25">
+                    25
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </section>
-            <Label htmlFor="limit" className="flex items-center gap-2">
-              Results per page:
-            </Label>
-            <Select
-              name="limit"
-              value={String(filters.limit)}
-              onValueChange={(value) =>
-                onChange({ limit: parseInt(value, 10) })
-              }
-            >
-              <SelectTrigger className="w-full text-center">
-                <SelectValue placeholder="Limit" />
-              </SelectTrigger>
-              <SelectContent className="min-w-auto z-top">
-                <SelectItem fit value="1">
-                  1
-                </SelectItem>
-                <SelectItem fit value="5">
-                  5
-                </SelectItem>
-                <SelectItem fit value="10">
-                  10
-                </SelectItem>
-                <SelectItem fit value="25">
-                  25
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </section>
-          <section className="flex flex-col gap-2">
-            <Label htmlFor="sortBy" className="flex items-center gap-2">
-              Sort by:
-            </Label>
-            <Select
-              name="sortBy"
-              value={sortOptions.sortBy}
-              onValueChange={(value) =>
-                onSortChange({ sortBy: value as SortOptions["sortBy"] })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent className="z-top">
-                <SelectItem value="openCall">Open Call</SelectItem>
-                <SelectItem value="eventStart">Event Start</SelectItem>
-                <SelectItem value="name">Name</SelectItem>
-              </SelectContent>
-            </Select>
-          </section>
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="sortBy" className="flex items-center gap-2">
+                Sort by:
+              </Label>
+              <Select
+                name="sortBy"
+                value={sortOptions.sortBy}
+                onValueChange={(value) =>
+                  onSortChange({ sortBy: value as SortOptions["sortBy"] })
+                }
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Sort By" />
+                </SelectTrigger>
+                <SelectContent className="z-top">
+                  <SelectItem value="openCall">Open Call</SelectItem>
+                  <SelectItem value="eventStart">Event Start</SelectItem>
+                  <SelectItem value="name">Name</SelectItem>
+                </SelectContent>
+              </Select>
+            </section>
 
-          <section className="flex flex-col gap-2">
-            <Label htmlFor="sortOrder" className="flex items-center gap-2">
-              Sort order:
-            </Label>
-            <Select
-              name="sortOrder"
-              value={sortOptions.sortDirection}
-              onValueChange={(value) =>
-                onSortChange({
-                  sortDirection: value as SortOptions["sortDirection"],
-                })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Direction" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="asc">
-                  <span className="flex items-center gap-1 text-nowrap">
-                    {alphaSort ? (
-                      <LiaSortAlphaDownSolid className="size-4" />
-                    ) : (
-                      <LiaSortNumericDownSolid className="size-4" />
-                    )}
-                    Asc
-                  </span>
-                </SelectItem>
-                <SelectItem
-                  value="desc"
-                  className="flex items-center gap-1 text-nowrap"
-                >
-                  <span className="flex items-center gap-1 text-nowrap">
-                    {/* <LiaSortAlphaDownSolid className="size-4" /> */}
-                    {alphaSort ? (
-                      <LiaSortAlphaDownAltSolid className="size-4" />
-                    ) : (
-                      <LiaSortNumericDownAltSolid className="size-4" />
-                    )}
-                    Desc
-                  </span>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </section>
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="sortOrder" className="flex items-center gap-2">
+                Sort order:
+              </Label>
+              <Select
+                name="sortOrder"
+                value={sortOptions.sortDirection}
+                onValueChange={(value) =>
+                  onSortChange({
+                    sortDirection: value as SortOptions["sortDirection"],
+                  })
+                }
+              >
+                <SelectTrigger className="w-fit min-w-25 hover:bg-white/30 sm:h-12 [&_span]:flex [&_span]:items-center [&_span]:justify-center [&_span]:gap-1 [&_svg]:size-4">
+                  <SelectValue placeholder="Direction" />
+                </SelectTrigger>
+                <SelectContent className="z-top">
+                  <SelectItem value="asc">
+                    <span className="flex items-center gap-1 text-nowrap">
+                      {alphaSort ? (
+                        <LiaSortAlphaDownSolid className="size-4" />
+                      ) : (
+                        <LiaSortNumericDownSolid className="size-4" />
+                      )}
+                      Asc
+                    </span>
+                  </SelectItem>
+                  <SelectItem
+                    value="desc"
+                    className="flex items-center gap-1 text-nowrap"
+                  >
+                    <span className="flex items-center gap-1 text-nowrap">
+                      {/* <LiaSortAlphaDownSolid className="size-4" /> */}
+                      {alphaSort ? (
+                        <LiaSortAlphaDownAltSolid className="size-4" />
+                      ) : (
+                        <LiaSortNumericDownAltSolid className="size-4" />
+                      )}
+                      Desc
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </section>
+          </div>
 
           <section className="flex flex-col gap-2">
             <Label
@@ -245,7 +244,7 @@ export const FilterBase = ({
               selectAll={false}
               hasSearch={false}
               className="w-full border bg-card sm:h-9"
-              shortResults
+              maxCount={1}
               showArrow={false}
             />
           </section>
@@ -265,9 +264,10 @@ export const FilterBase = ({
               selectAll={false}
               hasSearch={false}
               textClassName="text-center"
-              className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+              className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
               badgeClassName="h-9"
-              shortResults
+              maxCount={1}
+              // shortResults
               showArrow={false}
             />
           </section>
@@ -286,9 +286,10 @@ export const FilterBase = ({
               selectAll={false}
               hasSearch={false}
               textClassName="text-center"
-              className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+              className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
               badgeClassName="h-9"
-              shortResults
+              maxCount={1}
+              // shortResults
               showArrow={false}
             />
           </section>
@@ -335,7 +336,7 @@ export const FilterBase = ({
               </Label>
               <div
                 className={cn(
-                  "sm:max-w-[max(250px, 30vw)] relative flex w-fit min-w-20 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                  "relative flex w-36 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
                   className,
                 )}
               >
@@ -448,7 +449,7 @@ export const FilterBase = ({
                 textClassName="text-center"
                 className="w-40 border bg-transparent hover:bg-white/30 sm:h-12"
                 badgeClassName="h-9"
-                shortResults
+                maxCount={1}
                 showArrow={false}
               />
             </section>
@@ -471,7 +472,7 @@ export const FilterBase = ({
                 textClassName="text-center"
                 className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
                 badgeClassName="h-9"
-                shortResults
+                maxCount={1}
                 showArrow={false}
               />
             </section>
@@ -544,7 +545,7 @@ export const FilterBase = ({
                     textClassName="text-center"
                     className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
                     badgeClassName="h-9"
-                    shortResults
+                    maxCount={1}
                     showArrow={false}
                   />
                 </section>
