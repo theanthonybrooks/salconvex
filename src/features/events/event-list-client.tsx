@@ -304,15 +304,15 @@ const ClientEventList = (
               </div>
             ))
           ) : (
-            <div className="flex flex-col items-center gap-5">
+            <div className="mb-12 mt-6 flex flex-col items-center gap-5">
               <h1 className="text-2xl font-bold">No Results</h1>
               <Image
                 src="/nothinghere.gif"
                 alt="No Results Found"
                 loading="eager"
-                width={400}
-                height={400}
-                className="h-full w-full rounded-full"
+                width={300}
+                height={300}
+                className="h-full w-full max-w-[80vw] rounded-full"
               />
             </div>
           )}

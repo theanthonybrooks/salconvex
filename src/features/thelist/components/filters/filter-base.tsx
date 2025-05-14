@@ -328,14 +328,14 @@ export const FilterBase = ({
         </div>
       ) : (
         <div className="hidden flex-col gap-5 px-5 sm:flex">
-          <div className="flex items-center gap-3">
+          <div className="flex max-w-[80vw] flex-wrap items-center gap-3">
             <section className="flex flex-col gap-2">
               <Label htmlFor="list-search" className="flex items-center gap-2">
                 Search:
               </Label>
               <div
                 className={cn(
-                  "sm:max-w-[max(250px, 30vw)] relative flex w-full min-w-50 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                  "sm:max-w-[max(250px, 30vw)] relative flex w-fit min-w-20 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
                   className,
                 )}
               >
