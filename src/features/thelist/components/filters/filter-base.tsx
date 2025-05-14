@@ -1,6 +1,9 @@
+"use client";
+
 import { MultiSelect } from "@/components/multi-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FlairBadge } from "@/components/ui/flair-badge";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -9,7 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SearchType } from "@/features/thelist/components/filter-drawer";
+import {
+  SearchType,
+  TheListFilterCommandItem,
+} from "@/features/thelist/components/filter-drawer";
 import { select_continents } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import {
@@ -25,7 +31,9 @@ import {
   LucideFilter,
   LucideFilterX,
 } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import {
   LiaSortAlphaDownAltSolid,
@@ -47,6 +55,7 @@ export interface FilterBaseProps {
   value: string;
   shortcut: string;
   placeholder: string;
+  groupedResults?: Record<string, TheListFilterCommandItem[]>;
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
@@ -69,13 +78,41 @@ export const FilterBase = ({
   onResetFilters,
   className,
   shortcut,
+  groupedResults,
   // user,
 }: FilterBaseProps) => {
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [showFull, setShowFull] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const notEvent =
     filters.eventCategories?.length !== 0 &&
     !filters.eventCategories?.includes("event");
   const alphaSort = sortOptions.sortBy === "name";
+
+  // useEffect(() => {
+
+  //   if (value.length > 0 && !dropdownOpen) {
+  //     setDropdownOpen(true);
+  //   }
+  // }, [value, dropdownOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
       {isMobile ? (
@@ -92,7 +129,7 @@ export const FilterBase = ({
             <div className="flex justify-between gap-3">
               <div
                 className={cn(
-                  "flex w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                  "relative flex w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
                   className,
                 )}
               >
@@ -104,13 +141,80 @@ export const FilterBase = ({
                 />
                 <input
                   type="text"
-                  onChange={(e) => setValue(e.target.value)}
+                  onChange={(e) => {
+                    setDropdownOpen(true);
+                    setValue(e.target.value);
+                  }}
                   placeholder={placeholder}
                   value={value}
                   //   value={value}
                   className="focus:outline-hidden w-full flex-1 bg-transparent text-base placeholder:text-foreground/30"
                 />
+                {groupedResults && dropdownOpen && (
+                  <div
+                    ref={dropdownRef}
+                    className="scrollable mini max-h-70 absolute left-0 top-full z-top mt-2 flex w-[calc(100vw-40px)] flex-col gap-2 rounded-lg border border-foreground bg-card px-5 py-4"
+                  >
+                    {Object.values(groupedResults).every(
+                      (items) => items.length === 0,
+                    ) ? (
+                      <>
+                        {value.length > 0 && (
+                          <span className="inline-flex items-center gap-2 text-lg">
+                            No results found for
+                            <span className="inline-flex items-center gap-[1px] italic">
+                              <BiSolidQuoteLeft className="size-1 -translate-y-1" />
+                              {value}
+                              <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
+                            </span>
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      Object.entries(groupedResults)
+                        .filter(([, items]) => items.length > 0)
+                        .map(([groupKey, groupItems]) => (
+                          <div key={groupKey}>
+                            <h3 className="mb-2 mt-3 text-xs font-semibold text-stone-400">
+                              {groupKey.toUpperCase()}
+                            </h3>
+                            <ul className="flex flex-col gap-1">
+                              {groupItems.map((item) => (
+                                <li
+                                  key={item.path}
+                                  onClick={() => {
+                                    router.push(item.path || "/thelist");
+                                    setOpen(false);
+                                    setDropdownOpen(false);
+                                  }}
+                                  className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-base transition-colors active:scale-95 active:underline"
+                                >
+                                  {groupKey.startsWith("Events") ? (
+                                    <div className="grid w-full grid-cols-[1.5fr_auto_1fr] items-center gap-2">
+                                      <span className="flex items-center gap-1 truncate">
+                                        {item.name}
+                                        {item.ocStatus === 2 && (
+                                          <FlairBadge>Open Call</FlairBadge>
+                                        )}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex w-full justify-between gap-2">
+                                      <span className="truncate">
+                                        {item.name}
+                                      </span>
+                                    </div>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                )}
               </div>
+
               <section>
                 <Select
                   name="searchType"
@@ -132,8 +236,8 @@ export const FilterBase = ({
               </section>
             </div>
           </section>
-          <div className="flex items-center justify-between gap-3">
-            <section className="flex flex-col gap-2">
+          <div className="flex w-full max-w-full items-center justify-between gap-3">
+            <section className="flex flex-1 flex-col gap-2">
               <Label htmlFor="limit" className="flex items-center gap-2">
                 Per page:
               </Label>
@@ -163,7 +267,7 @@ export const FilterBase = ({
                 </SelectContent>
               </Select>
             </section>
-            <section className="flex flex-col gap-2">
+            <section className="flex flex-1 flex-col gap-2">
               <Label htmlFor="sortBy" className="flex items-center gap-2">
                 Sort by:
               </Label>
@@ -174,7 +278,7 @@ export const FilterBase = ({
                   onSortChange({ sortBy: value as SortOptions["sortBy"] })
                 }
               >
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="min-w-25">
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">

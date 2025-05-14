@@ -215,6 +215,7 @@ export default {
         "25": "100px",
         "30": "120px",
         "50": "200px",
+        "70": "280px",
       },
       fontSize: {
         "2xs": "0.6rem",

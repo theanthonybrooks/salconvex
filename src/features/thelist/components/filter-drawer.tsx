@@ -386,23 +386,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
             <X className="size-7 text-stone-600 hover:scale-105 hover:text-red-700 active:scale-95 sm:size-5" />
           </button>
         )}
-        {/* <Select
-          name="searchType"
-          value={searchType}
-          onValueChange={(value) =>
-            setSearchType(value as "events" | "loc" | "orgs" | "all")
-          }
-        >
-          <SelectTrigger className="w-50 text-center">
-            <SelectValue placeholder="Search Type" />
-          </SelectTrigger>
-          <SelectContent align="end" className="z-top">
-            <SelectItem value="events">Events</SelectItem>
-            <SelectItem value="orgs">Organizers</SelectItem>
-            <SelectItem value="loc">Location</SelectItem>
-            <SelectItem value="all">All</SelectItem>
-          </SelectContent>
-        </Select> */}
       </div>
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent
@@ -430,8 +413,9 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 onChange={onChange}
                 onSortChange={onSortChange}
                 onResetFilters={onResetFilters}
+                groupedResults={groupedItems}
               />
-              <div className="scrollable mini flex flex-col gap-2 px-5 pb-5">
+              {/* <div className="scrollable mini flex flex-col gap-2 px-5 pb-5">
                 {Object.values(groupedItems).every(
                   (items) => items.length === 0,
                 ) ? (
@@ -499,7 +483,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                       </div>
                     ))
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </DrawerContent>
