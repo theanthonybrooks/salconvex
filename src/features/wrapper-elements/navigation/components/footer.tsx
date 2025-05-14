@@ -9,11 +9,12 @@ import {
 import { footerCRText } from "@/constants/text";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
 
 import { infoEmail } from "@/constants/siteInfo";
+import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEnvelope } from "react-icons/fa";
@@ -39,6 +40,9 @@ export default function Footer({ className }: { className?: string }) {
   const [subAction, setSubAction] = useState("cta");
   const subscription = useQuery(api.subscriptions.getUserSubscription);
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
+  const subscribeToNewsletter = useMutation(
+    api.newsletter.subscriber.subscribeToNewsletter,
+  );
 
   const subStatus = subscription?.status || "none";
   const filteredLinks = links
@@ -49,16 +53,35 @@ export default function Footer({ className }: { className?: string }) {
     .filter(({ items }) => items.length > 0);
 
   const onSubscribe = async (data: NewsletterFormProps) => {
-    setSubAction("subbing");
-    setTimeout(() => {
-      setSubAction("done");
-    }, 2000);
-    //todo: Handle newsletter submission
+    if (!data.email) return;
+    try {
+      setSubAction("subbing");
+      await subscribeToNewsletter({ email: data.email, newsletter: true });
+    } catch (err: unknown) {
+      if (err instanceof ConvexError) {
+        toast.error(
+          typeof err.data === "string" &&
+            "Unable to sign up. Please contact support or try again later.",
+        );
+      } else if (err instanceof Error) {
+        toast.error(
+          typeof err.message === "string" &&
+            "Unable to sign up. Please contact support or try again later.",
+        );
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+      return;
+    } finally {
+      setSubAction("subscribed");
+      toast.success("You're now subscribed to the newsletter!");
+    }
+
     console.log(data);
     setTimeout(() => {
       setSubAction("cta");
       reset();
-    }, 4000);
+    }, 2000);
   };
 
   const handleManageSubscription = async () => {
@@ -101,7 +124,7 @@ export default function Footer({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "max-w-screen flex justify-center border-t border-border bg-background",
+        "flex max-w-screen justify-center border-t border-border bg-background",
         className,
       )}
     >
@@ -151,14 +174,14 @@ export default function Footer({ className }: { className?: string }) {
               data-type="newsletter"
               className="width-full mx-auto flex flex-col justify-center border-border md:border-l-[1px] md:pl-[5rem]"
             >
-              <div>
+              {/* <div>
                 <p className="text-sm font-semibold text-foreground">
                   Stay Updated
                 </p>
                 <p className="mb-4 mt-4 text-sm text-foreground md:mb-8">
                   Subscribe to the newsletter for regular updates
                 </p>
-              </div>
+              </div> */}
               <form
                 onSubmit={handleSubmit(onSubscribe)}
                 className="mt-4 sm:flex sm:max-w-md md:w-full"
@@ -192,6 +215,13 @@ export default function Footer({ className }: { className?: string }) {
                   </Button>
                 </div>
               </form>
+              <Image
+                src="/newsletter_bubble.png"
+                alt="Newsletter sign up. Sign up to receive updates and news about the Street Art List."
+                width={250}
+                height={150}
+                className="mt-4"
+              />
             </div>
           </div>
         </div>

@@ -22,6 +22,7 @@ import type * as http from "../http.js";
 import type * as kanban_cards from "../kanban/cards.js";
 import type * as kanban_display from "../kanban/display.js";
 import type * as migrations from "../migrations.js";
+import type * as newsletter_subscriber from "../newsletter/subscriber.js";
 import type * as openCalls_openCall from "../openCalls/openCall.js";
 import type * as organizer_organizations from "../organizer/organizations.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   "kanban/cards": typeof kanban_cards;
   "kanban/display": typeof kanban_display;
   migrations: typeof migrations;
+  "newsletter/subscriber": typeof newsletter_subscriber;
   "openCalls/openCall": typeof openCalls_openCall;
   "organizer/organizations": typeof organizer_organizations;
   "otp/resendOtp": typeof otp_resendOtp;

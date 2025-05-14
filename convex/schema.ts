@@ -428,6 +428,12 @@ const applicationsSchema = {
   manualApplied: v.optional(v.boolean()),
 };
 
+const newsletterSchema = {
+  userId: v.union(v.id("users"), v.null()),
+  email: v.string(),
+  newsletter: v.boolean(),
+};
+
 export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
@@ -710,4 +716,8 @@ export default defineSchema({
     language: v.optional(v.string()),
     theme: v.optional(v.string()),
   }).index("by_userId", ["userId"]),
+
+  newsletter: defineTable(newsletterSchema)
+    .index("by_userId", ["userId"])
+    .index("by_email", ["email"]),
 });

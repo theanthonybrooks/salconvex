@@ -32,9 +32,9 @@ export const EventFilters = ({
     (filters.eventTypes && filters.eventTypes.length > 0) ||
     (filters.eventCategories && filters.eventCategories.length > 0) ||
     (filters.continent && filters.continent.length > 0);
-
+  //TODO: Add filters for: applied, open calls, budget range?, eligibility, ... ?
   return (
-    <div className="mx-auto mb-6 flex w-full max-w-[90vw] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12">
+    <div className="mx-auto mb-6 flex w-full max-w-[90vw] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12 2xl:max-w-[80vw]">
       <Separator className="mx-auto" thickness={2} />
 
       <TheListFilterDrawerIcon

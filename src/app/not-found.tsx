@@ -11,9 +11,9 @@ export default async function NotFound() {
       <div className="h-full min-h-screen">
         <NavbarWrapper type="public" />
         <div className="scrollable mini darkbar flex min-h-screen flex-col justify-between">
-          <main className="min-w-screen flex h-full flex-grow flex-col items-center justify-center px-4 pt-[135px] lg:pt-[100px]">
+          <main className="flex h-full min-w-screen flex-grow flex-col items-center justify-center px-4 pt-[135px] lg:pt-[100px]">
             <Image
-              src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc28zdmdycW5tN3FuN2hpZnFhMG9xZXJybGhwNTY3OG14aW16aG9oMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/HVxExOaWkOsOcdOWpA/giphy.gif"
+              src="/error-page.gif"
               alt="404 Error"
               width={300}
               height={300}

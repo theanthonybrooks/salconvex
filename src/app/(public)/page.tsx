@@ -208,10 +208,18 @@ export default function Home() {
           </PopoverContent>
         </Popover>
       </motion.div>
-      <div className="mx-auto flex w-full max-w-[60vw] justify-center text-balance px-8 py-20 text-center">
+
+      <div className="mx-auto mt-10 flex w-full max-w-[60vw] flex-col items-center justify-center gap-5 text-balance rounded-2xl border-1.5 border-foreground bg-white/60 px-8 py-20 text-center text-base">
+        <Image
+          src="/hello.gif"
+          alt="Hello there"
+          width={300}
+          height={300}
+          className="mx-auto mb-4 max-w-[90vw] rounded-full border-2"
+        />
         If you&apos;ve found this page, welcome! You&apos;re a bit early as
         it&apos;s still in development and will soon be in beta for the public.
-        I&apos;ll post on IG and announce the release soon :).
+        I&apos;ll post on IG and announce the release soon 😉.
       </div>
     </motion.div>
   );
