@@ -453,7 +453,7 @@ export const MultiSelect = React.forwardRef<
                           : "opacity-50 [&_svg]:invisible",
                       )}
                     >
-                      <FaCheck className="size-3" />
+                      <FaCheck className="size-2.5" />
                     </div>
                     <span className="text-base sm:text-sm">(Select All)</span>
                   </CommandItem>
@@ -503,7 +503,7 @@ export const MultiSelect = React.forwardRef<
                                   : "opacity-50 [&_svg]:invisible",
                               )}
                             >
-                              <FaCheck className="size-3" />
+                              <FaCheck className="size-2.5" />
                             </div>
                             {option.icon && (
                               <option.icon className="mr-2 size-4 text-muted-foreground" />
@@ -542,7 +542,7 @@ export const MultiSelect = React.forwardRef<
                                 : "opacity-50 [&_svg]:invisible",
                             )}
                           >
-                            <FaCheck className="size-3" />
+                            <FaCheck className="size-2.5" />
                           </div>
                           {option.icon && (
                             <option.icon className="mr-2 size-4 text-muted-foreground" />

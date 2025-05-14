@@ -293,30 +293,32 @@ export const FilterBase = ({
               showArrow={false}
             />
           </section>
-          <section className="flex flex-row justify-around gap-2">
-            <label className="flex cursor-pointer items-center gap-2">
-              <Checkbox
-                id="bookmarkedOnly"
-                checked={filters.bookmarkedOnly}
-                onCheckedChange={(checked) =>
-                  onChange({ bookmarkedOnly: Boolean(checked) })
-                }
-              />
-              <span className="text-sm">Bookmarked Only</span>
-            </label>
+          <div className="mt-2 flex w-full justify-around">
+            <section className="flex flex-col gap-3">
+              <label className="flex cursor-pointer items-center gap-2">
+                <Checkbox
+                  id="bookmarkedOnly"
+                  checked={filters.bookmarkedOnly}
+                  onCheckedChange={(checked) =>
+                    onChange({ bookmarkedOnly: Boolean(checked) })
+                  }
+                />
+                <span className="text-sm">Bookmarked Only</span>
+              </label>
 
-            <label className="flex cursor-pointer items-center gap-2">
-              <Checkbox
-                id="showHidden"
-                checked={filters.showHidden}
-                onCheckedChange={(checked) =>
-                  onChange({ showHidden: Boolean(checked) })
-                }
-              />
-              <span className="text-sm">
-                {filters.showHidden ? "Hide" : "Show"} Hidden
-              </span>
-            </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <Checkbox
+                  id="showHidden"
+                  checked={filters.showHidden}
+                  onCheckedChange={(checked) =>
+                    onChange({ showHidden: Boolean(checked) })
+                  }
+                />
+                <span className="text-sm">
+                  {filters.showHidden ? "Hide" : "Show"} Hidden
+                </span>
+              </label>
+            </section>
             {hasActiveFilters && (
               <span
                 className="cursor-pointer text-center text-sm text-foreground underline-offset-4 hover:underline"
@@ -325,7 +327,7 @@ export const FilterBase = ({
                 Clear filters
               </span>
             )}
-          </section>
+          </div>
         </div>
       ) : (
         <div className="hidden flex-col gap-5 px-5 sm:flex">
