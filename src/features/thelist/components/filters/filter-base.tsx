@@ -293,8 +293,8 @@ export const FilterBase = ({
               showArrow={false}
             />
           </section>
-          <div className="mt-2 flex w-full justify-around">
-            <section className="flex flex-col gap-3">
+          <div className="mt-2 flex w-full justify-between">
+            <section className="flex flex-col gap-4">
               <label className="flex cursor-pointer items-center gap-2">
                 <Checkbox
                   id="bookmarkedOnly"
@@ -320,12 +320,13 @@ export const FilterBase = ({
               </label>
             </section>
             {hasActiveFilters && (
-              <span
-                className="cursor-pointer text-center text-sm text-foreground underline-offset-4 hover:underline"
+              <Button
+                variant="salWithoutShadow"
+                className="cursor-pointer text-center text-base font-semibold text-foreground underline-offset-4 hover:underline"
                 onClick={onResetFilters}
               >
                 Clear filters
-              </span>
+              </Button>
             )}
           </div>
         </div>
