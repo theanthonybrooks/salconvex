@@ -23,6 +23,9 @@ const DOC_TYPES = [
   "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
 ];
 
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif"];
+const BOTH_TYPES = [...DOC_TYPES, ...IMAGE_TYPES];
+
 type ActualFileObject = FilePondFile["file"];
 
 type FilePondInputProps = {
@@ -42,7 +45,9 @@ export function FilePondInput({
   maxFiles = 5,
   purpose,
 }: FilePondInputProps) {
-  const UserAcceptedFileTypes = purpose === "docs" ? DOC_TYPES : ["image/*"];
+  //   const UserAcceptedFileTypes = purpose === "docs" ? DOC_TYPES : ["image/*"];
+  const UserAcceptedFileTypes = purpose === "docs" ? BOTH_TYPES : ["image/*"];
+
   return (
     <FilePond
       allowMultiple

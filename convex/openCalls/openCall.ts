@@ -60,7 +60,6 @@ export const createOrUpdateOpenCall = mutation({
       requirements: v.string(),
       more: v.string(),
       destination: v.string(),
-
       links: v.array(
         v.object({
           title: v.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
@@ -100,6 +99,11 @@ export const createOrUpdateOpenCall = mutation({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
     if (!user) throw new ConvexError("User not found");
+    let existingOpenCall = null;
+    if (args.openCallId) {
+      existingOpenCall = await ctx.db.get(args.openCallId);
+    }
+
     const isAdmin = user?.role?.includes("admin");
     console.log(args.approved, args.finalStep, args.state);
     const ocState = isAdmin
@@ -118,10 +122,12 @@ export const createOrUpdateOpenCall = mutation({
       compensation: args.compensation,
       requirements: {
         ...args.requirements,
-        documents: [],
         links: args.requirements.links ?? [],
       },
-      documents: args.documents,
+      documents: [
+        ...(existingOpenCall?.documents ?? []),
+        ...(args.documents ?? []),
+      ],
       state: ocState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),

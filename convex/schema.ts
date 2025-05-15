@@ -379,15 +379,6 @@ const openCallSchema = {
     requirements: v.string(),
     more: v.optional(v.string()),
     destination: v.string(),
-    documents: v.optional(
-      v.array(
-        v.object({
-          id: v.optional(v.id("openCallFiles")),
-          title: v.string(), //do I ask for the title or just use the path? Not sure.
-          href: v.string(),
-        }),
-      ),
-    ),
     links: v.array(
       v.object({
         title: v.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.

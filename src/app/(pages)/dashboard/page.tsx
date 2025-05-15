@@ -437,7 +437,7 @@ export default function Dashboard() {
                 variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
-                <Link variant="standard" href="/pricing#plans">
+                <Link variant="standard" href="/pricing?submit">
                   <LucideCalendarPlus2 className="size-5" />
                   Submit Event/Open Call
                 </Link>

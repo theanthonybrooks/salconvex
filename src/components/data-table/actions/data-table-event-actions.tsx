@@ -7,6 +7,7 @@ import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 import {
+  Eye,
   LucideFolderCheck,
   LucideFolderClock,
   LucideFolderInput,
@@ -23,6 +24,24 @@ interface DeleteEventActionProps extends EventActionProps {
 interface SubmittedActionProps extends EventActionProps {
   state: SubmissionFormState;
 }
+
+interface ToEventActionProps extends EventActionProps {
+  edition: number;
+}
+
+export const GoToEvent = ({ eventId, edition }: ToEventActionProps) => {
+  return (
+    <DropdownMenuItem
+      onClick={() => {
+        window.location.href = `/thelist/event/${eventId}/${edition}`;
+      }}
+      className="flex items-center gap-x-1"
+    >
+      <Eye className="size-4" />
+      View Event
+    </DropdownMenuItem>
+  );
+};
 
 export const DuplicateEvent = ({ eventId }: EventActionProps) => {
   const duplicateEvent = useMutation(api.events.event.duplicateEvent);

@@ -7,6 +7,7 @@ import {
   ArchiveEvent,
   DeleteEvent,
   DuplicateEvent,
+  GoToEvent,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
 import { DataTableEventEdition } from "@/components/data-table/actions/data-table-event-edition";
@@ -326,6 +327,7 @@ export const columns: ColumnDef<Event>[] = [
       const ocState = event.openCallState;
       const openCallId = event.openCallId;
       const hasOC = !!openCallId;
+      const edition = event.dates.edition;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -393,6 +395,7 @@ export const columns: ColumnDef<Event>[] = [
                       isAdmin && <ApproveBoth openCallId={openCallId} />}
                   </>
                 )}
+                <GoToEvent eventId={event._id} edition={edition} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}

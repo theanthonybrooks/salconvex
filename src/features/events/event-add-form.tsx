@@ -900,7 +900,6 @@ export const EventOCForm = ({
         if (!openCallData) return;
 
         if (openCallData.tempFiles && openCallData.tempFiles?.length > 0) {
-          console.log("openCallData.tempFiles", openCallData.tempFiles);
           const result = await handleOrgFileUrl({
             data: { files: openCallData.tempFiles },
             generateUploadUrl,
@@ -925,11 +924,6 @@ export const EventOCForm = ({
               ? (openCallData._id as Id<"openCalls">)
               : undefined,
           });
-
-          console.log("saved files:", saveResults);
-
-          // console.log("url", url);
-          // console.log("id", id);
         }
         const documents = saveResults.map((saved, i) => {
           const matched = openCallFiles?.find(
@@ -944,13 +938,6 @@ export const EventOCForm = ({
             href: saved.url,
           };
         });
-
-        console.log("documents", documents);
-
-        console.log("openCallFiles", openCallFiles);
-
-        console.log("openCallData", openCallData);
-        console.log("openCallData._id", openCallData._id);
 
         try {
           setPending(true);
