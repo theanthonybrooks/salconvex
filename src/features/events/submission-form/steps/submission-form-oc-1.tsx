@@ -330,8 +330,9 @@ const SubmissionFormOC1 = ({
 
               <div
                 className={cn(
-                  "min-w-50 flex flex-1 items-center justify-between rounded border border-foreground px-3",
-                  !showAppFeeInput && "hidden",
+                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
+                  !showAppFeeInput &&
+                    "opacity-50 [@media(max-width:640px)]:hidden",
                 )}
               >
                 <Controller

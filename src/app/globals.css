@@ -970,6 +970,12 @@ div:has(> .react-datepicker__input-container) {
   /* min-width: min(50vw, 300px);
   min-height: min(60dvh, 300px);
   max-height: calc(85dvh - 10rem); */
+  &[aria-label="Choose Date and Time"] {
+    @media (width <= 768px) {
+      flex-direction: column;
+      width: 90vw;
+    }
+  }
 }
 /* 
 .react-datepicker__navigation--previous {
@@ -1002,7 +1008,7 @@ div:has(> div.react-datepicker__input-container) {
   display: flex;
   &:first-of-type:has(.hansel) {
     max-width: 8em;
-    @media (width < 768px) {
+    @media (width <= 768px) {
       max-width: 100%;
     }
   }
@@ -1019,6 +1025,17 @@ div:has(> div.react-datepicker__input-container) {
 
 .react-datepicker__month {
   margin: 0.5rem;
+  @media (max-width: 768px) {
+    font-size: 1.2em;
+  }
+  & .react-datepicker__week {
+    @media (max-width: 768px) {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
   &.react-datepicker__monthPicker {
     display: flex;
     flex-direction: column;
@@ -1040,12 +1057,18 @@ div:has(> div.react-datepicker__input-container) {
     & > div {
       padding: 0.25em;
     }
+    @media (max-width: 768px) {
+      font-size: 1.2em;
+    }
   }
 }
 .react-datepicker__time-container {
   width: 14em;
-  @media (width < 768px) {
-    /* make some class to stack the calendar and time input. Or show a different time input for mobile? Not sure; */
+  @media (width <= 768px) {
+    width: 100%;
+    font-size: 2.25em;
+    border-left: none;
+    border-top: 1px solid hsl(var(--foreground) / 0.3);
   }
   & .react-datepicker__time {
     display: flex;
@@ -1062,6 +1085,22 @@ div:has(> div.react-datepicker__input-container) {
   scrollbar-gutter: auto;
   min-height: 65dvh;
   max-height: 65dvh;
+  @media (max-width: 768px) {
+    max-height: 140px;
+    min-height: 140px;
+  }
+  & .react-datepicker__time-list-item {
+    @media (max-width: 768px) {
+      padding-block: 0.5em !important;
+      height: auto !important;
+      &:first-of-type {
+        margin-top: 0.25em;
+      }
+      &:last-of-type {
+        margin-bottom: 0.25em;
+      }
+    }
+  }
 }
 .react-datepicker__time-list::-webkit-scrollbar {
   width: 4px;

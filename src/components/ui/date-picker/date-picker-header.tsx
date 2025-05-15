@@ -67,7 +67,7 @@ export const DatePickerHeader = ({
 
       <div className="flex flex-1 flex-col items-center gap-y-2">
         {!isDate && !isMonth && (
-          <span className="text-base font-bold">
+          <span className="text-3xl font-bold sm:text-base">
             {yearActions ? format(date, "yyyy") : format(date, "MMMM yyyy")}
           </span>
         )}
