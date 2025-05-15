@@ -21,13 +21,10 @@ export default async function HomeLayout({
     //<ClientAuthWrapper>
     <ArtistPreloadContextProvider preloadedArtistData={preloadedArtistData}>
       <NavbarWrapper type="thelist" />
-      <div className="flex flex-col pt-32">
-        <main className="flex w-full flex-1 flex-col items-center px-4">
-          {children}
-        </main>
-
-        <Footer />
-      </div>
+      <main className="flex w-full flex-1 flex-col items-center px-4 pt-32">
+        {children}
+      </main>
+      <Footer />
     </ArtistPreloadContextProvider>
     // </ClientAuthWrapper>
   );

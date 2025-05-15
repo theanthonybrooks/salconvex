@@ -127,7 +127,7 @@ TheListNavBarProps) {
           <ArrowUpIcon className="size-8 sm:size-6" />
         </div>
       )}
-      <motion.div
+      <motion.nav
         initial={{ boxShadow: "none" }}
         animate={{
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
@@ -288,7 +288,7 @@ TheListNavBarProps) {
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out [&_a]:hover:no-underline",
                                 component.href === fullPagePath &&
                                   "bg-background",
                               )}
@@ -358,7 +358,7 @@ TheListNavBarProps) {
             />
           </div>
         </div>
-      </motion.div>
+      </motion.nav>
 
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
     </>

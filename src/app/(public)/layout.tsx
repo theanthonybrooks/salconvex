@@ -10,11 +10,13 @@ export default async function HomeLayout({
     // <ClientAuthWrapper>
     <>
       <NavbarWrapper type="public" />
-      <div className="flex h-full flex-col pt-36 lg:pt-25">
-        <main className="flex flex-1 flex-col px-4">{children}</main>
+      {/* <div className="flex h-full flex-col"> */}
+      <main className="flex flex-1 flex-col px-4 pt-36 lg:pt-25">
+        {children}
+      </main>
 
-        <Footer className="mt-10" />
-      </div>
+      <Footer className="mt-10" />
+      {/* </div> */}
     </>
     // </ClientAuthWrapper>
   );

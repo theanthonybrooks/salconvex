@@ -14,17 +14,17 @@
 html,
 body,
 :root {
-  height: 100vh;
-  height: 100dvh;
   font-variant-ligatures: none;
   font-feature-settings:
     "liga" 0,
     "clig" 0;
 }
 
-/* body {
-  scrollbar-gutter: auto;
-} */
+body {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
 
 @layer base {
   :root {

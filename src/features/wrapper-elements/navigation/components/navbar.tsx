@@ -80,7 +80,7 @@ NavBarProps) {
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <motion.div
+      <motion.nav
         id="navbar"
         initial={{ boxShadow: "none" }}
         animate={{
@@ -261,7 +261,7 @@ NavBarProps) {
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out [&_a]:hover:no-underline",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                                 component.href.includes(currentPage) &&
                                   fullPagePath === component.href &&
                                   "bg-background",
@@ -297,7 +297,7 @@ NavBarProps) {
                               title={component.title}
                               href={component.href}
                               className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out [&_a]:hover:no-underline",
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                                 component.href.includes(currentPage) &&
                                   currentPage !== "" &&
                                   "bg-background",
@@ -388,7 +388,7 @@ NavBarProps) {
             />
           </div>
         </div>
-      </motion.div>
+      </motion.nav>
     </>
   );
 }
@@ -409,7 +409,7 @@ export const ListItem = React.forwardRef<
           href={href}
           ref={ref}
           className={cn(
-            "outline-hidden block select-none space-y-1 p-3 leading-none no-underline",
+            "outline-hidden block select-none space-y-1 p-3 leading-none no-underline hover:no-underline",
           )}
           {...props}
         >
