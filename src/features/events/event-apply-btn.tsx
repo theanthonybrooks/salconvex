@@ -17,6 +17,10 @@ import { cn } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
 import {
+  getExternalErrorHtml,
+  getExternalRedirectHtml,
+} from "@/utils/loading-page-html";
+import {
   CheckCircleIcon,
   CircleDollarSignIcon,
   LoaderPinwheel,
@@ -25,6 +29,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { toast } from "react-toastify";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface ApplyButtonShortProps {
@@ -155,57 +160,17 @@ export const ApplyButton = ({
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
-
-    const loadingHtml = `
-    <html>
-      <head>
-        <title>Redirecting...</title>
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            text-align: center;
-          }
-          .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #333;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        </style>
-      </head>
-      <body>
-        <div>
-          <div class="loader"></div>
-          <p>Redirecting you to the application site...</p>
-          <p>If you're not redirected, <a href="${finalAppUrl}" target="_self">click here</a>.</p>
-        </div>
-      </body>
-    </html>
-  `;
-
     const newTab = window.open("about:blank");
 
     if (!newTab) {
+      toast.error(
+        "Application redirect blocked. Please enable popups for this site.",
+      );
       console.error("Popup was blocked");
       return;
     }
 
-    newTab.document.write(loadingHtml);
+    newTab.document.write(getExternalRedirectHtml(finalAppUrl));
     newTab.document.close();
 
     try {
@@ -222,10 +187,8 @@ export const ApplyButton = ({
     } catch (error) {
       console.error("Application update failed:", error);
       if (!newTab.closed) {
-        newTab.document.body.innerHTML = `
-        <h1>Something went wrong.</h1>
-        <p>Please try again later or visit <a href="${finalAppUrl}">${finalAppUrl}</a> directly.</p>
-      `;
+        newTab.document.write(getExternalErrorHtml(finalAppUrl));
+        newTab.document.close();
       }
     } finally {
       setPending(false);
@@ -257,6 +220,7 @@ export const ApplyButton = ({
         : "Apply"
       : "View More";
   const hasApplied = appStatus !== null;
+
   return (
     <div
       className={cn(
