@@ -72,11 +72,6 @@ export const ApplyButtonShort = ({
 
       <Button
         asChild
-        // onClick={() => {
-        //   if (appStatus === null) {
-        //     setManualApplied("applied")
-        //   }
-        // }}
         onClick={() => {
           window.history.pushState({}, "", currentUrl);
           // sessionStorage.setItem("previousSalPage", window.location.pathname);
@@ -157,29 +152,86 @@ export const ApplyButton = ({
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);
   const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
-  // const backToList = finalAppUrl === "/thelist";
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
+
+    const loadingHtml = `
+    <html>
+      <head>
+        <title>Redirecting...</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+          }
+          .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #333;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      </head>
+      <body>
+        <div>
+          <div class="loader"></div>
+          <p>Redirecting you to the application site...</p>
+          <p>If you're not redirected, <a href="${finalAppUrl}" target="_self">click here</a>.</p>
+        </div>
+      </body>
+    </html>
+  `;
+
+    const newTab = window.open("about:blank");
+
+    if (!newTab) {
+      console.error("Popup was blocked");
+      return;
+    }
+
+    newTab.document.write(loadingHtml);
+    newTab.document.close();
+
     try {
       setPending(true);
+
       if (!appStatus) {
         await toggleAppActions({
           openCallId: openCallId as Id<"openCalls">,
           manualApplied: true,
         });
       }
+
+      newTab.location.href = finalAppUrl;
     } catch (error) {
-      console.error("Failed to update application status", error);
+      console.error("Application update failed:", error);
+      if (!newTab.closed) {
+        newTab.document.body.innerHTML = `
+        <h1>Something went wrong.</h1>
+        <p>Please try again later or visit <a href="${finalAppUrl}">${finalAppUrl}</a> directly.</p>
+      `;
+      }
     } finally {
-      onDirectToLink();
       setPending(false);
     }
   };
-  const onDirectToLink = () => {
-    if (!finalAppUrl) return;
-    window.open(finalAppUrl, "_blank", "noopener,noreferrer");
-  };
+
   const onBookmark = () => {
     // setIsBookmarked(!isBookmarked);
     toggleListAction({ bookmarked: !isBookmarked });
@@ -217,20 +269,9 @@ export const ApplyButton = ({
       {!finalButton && (
         <Button
           onClick={() => {
-            // if (appStatus === null) {
-            //   setManualApplied("applied")
-            // }
             window.history.pushState({}, "", currentUrl);
-            // sessionStorage.setItem("previousSalPage", window.location.pathname);
             router.push(href);
-            // router.push(href, { scroll: false });
           }}
-          // onClick={() => {
-          //   if (appStatus === null) {
-          //     setManualApplied("applied")
-          //   }
-          // }}
-          //Todo: Add this to the event detail page and it will sync the state to the main page. Easy peasy
           variant="salWithShadowHiddenLeft"
           size="lg"
           className={cn(
@@ -257,12 +298,6 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              // onClick={() => {
-              //   if (appStatus === null) {
-              //     setManualApplied("applied")
-              //   }
-              // }}
-              //Todo: Add this to the event detail page and it will sync the state to the main page. Easy peasy
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
@@ -368,17 +403,7 @@ export const ApplyButton = ({
           <CheckCircleIcon className="text-emerald-600 sm:size-5" />
         </Button>
       )}
-      {/* <Button
-      variant='salWithShadowHidden'
-      size='lg'
-      className='rounded-l-none border-l w-fit sm:px-2 px-2'
-      onClick={() => setIsHidden(!isHidden)}>
-      {isHidden ? (
-        <EyeOff className='size-8 text-red-500' />
-      ) : (
-        <Eye className='size-8' />
-      )}
-    </Button> */}
+
       <EventContextMenu
         eventId={id}
         openCallId={openCallId}

@@ -490,7 +490,7 @@ const FullPageNav = ({
                   </Link>
                   {/* <Separator orientation="vertical" /> */}
                   <p>|</p>
-                  <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
+                  <Link onClick={onHandleLinkClick} href={"/auth/register"}>
                     <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
                       Register
                     </p>
