@@ -151,52 +151,52 @@ export default function Home() {
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h3 className="italic">Marching Band Mural</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Pieve Santo Stefano, Tuscany (IT)
                 </p>
               </div>
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">More info:</h4>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Italian artist located in Copenhagen, Denmark
                 </p>
               </div>
-              <ul>
-                <li className="flex items-center gap-x-4">
+              <ul className="flex flex-col gap-2 sm:gap-1 [&*svg]:size-4">
+                <li className="flex items-center gap-x-3">
                   <FaInstagram />
                   <Link
                     href="https://instagram.com/chus.art"
-                    className="text-sm text-muted-foreground"
+                    className="text-base text-muted-foreground"
                     target="_blank"
                   >
                     @chus.art
                   </Link>
                 </li>
-                <li className="flex items-center gap-x-4">
+                <li className="flex items-center gap-x-3">
                   <FaFacebook />
                   <Link
                     href="https://www.facebook.com/mattiachus"
-                    className="text-sm text-muted-foreground"
+                    className="text-base text-muted-foreground"
                     target="_blank"
                   >
                     @mattiachus
                   </Link>
                 </li>
-                <li className="flex items-center gap-x-4">
+                <li className="flex items-center gap-x-3">
                   <FaGlobe />
                   <Link
                     href="https://chus.it"
-                    className="text-sm text-muted-foreground"
+                    className="text-base text-muted-foreground"
                     target="_blank"
                   >
                     www.chus.it
                   </Link>
                 </li>
-                <li className="flex items-center gap-x-4">
+                <li className="flex items-center gap-x-3">
                   <FaEnvelope />
                   <Link
                     href="mailto:mattia.chus@gmail.com"
-                    className="text-sm text-muted-foreground"
+                    className="text-base text-muted-foreground"
                     target="_blank"
                   >
                     mattia.chus@gmail.com
