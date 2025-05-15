@@ -11,7 +11,7 @@ export function getExternalRedirectHtml(redirectUrl: string) {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 100dvh;
             font-family: sans-serif;
             background-color: #f4f4f4;
             color: #333;
