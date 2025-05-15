@@ -1081,13 +1081,33 @@ div:has(> div.react-datepicker__input-container) {
   }
 }
 .react-datepicker__time-list {
+  position: relative;
   overflow: auto;
   scrollbar-gutter: auto;
   min-height: 65dvh;
   max-height: 65dvh;
+
   @media (max-width: 768px) {
-    max-height: 140px;
-    min-height: 140px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 35%,
+      black 65%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 35%,
+      black 65%,
+      transparent 100%
+    );
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    max-height: 200px;
+    min-height: 200px;
   }
   & .react-datepicker__time-list-item {
     @media (max-width: 768px) {
