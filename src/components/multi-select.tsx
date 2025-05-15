@@ -362,7 +362,7 @@ export const MultiSelect = React.forwardRef<
                 </div>
                 <div className="flex items-center justify-between">
                   <XIcon
-                    className="mx-2 h-4 cursor-pointer text-muted-foreground hover:scale-110 hover:text-red-600"
+                    className="mx-2 h-4 cursor-pointer text-foreground/50 hover:scale-110 hover:text-red-600"
                     onClick={(event) => {
                       event.stopPropagation();
                       handleClear();
@@ -375,9 +375,9 @@ export const MultiSelect = React.forwardRef<
                         className="flex h-full min-h-6"
                       />
                       {isPopoverOpen ? (
-                        <ChevronUp className="mx-2 h-4 cursor-pointer text-muted-foreground" />
+                        <ChevronUp className="mx-2 h-4 cursor-pointer text-foreground/50" />
                       ) : (
-                        <ChevronDown className="mx-2 h-4 cursor-pointer text-muted-foreground" />
+                        <ChevronDown className="mx-2 h-4 cursor-pointer text-foreground/50" />
                       )}
                     </>
                   )}
@@ -396,7 +396,7 @@ export const MultiSelect = React.forwardRef<
                 {isPopoverOpen ? (
                   <ChevronUp
                     className={cn(
-                      "mx-2 h-4 cursor-pointer text-muted-foreground",
+                      "mx-2 h-4 cursor-pointer text-foreground/50",
                       disabled &&
                         "pointer-events-none cursor-default opacity-50",
                     )}
@@ -404,7 +404,7 @@ export const MultiSelect = React.forwardRef<
                 ) : (
                   <ChevronDown
                     className={cn(
-                      "mx-2 h-4 cursor-pointer text-muted-foreground",
+                      "mx-2 h-4 cursor-pointer text-foreground/50",
                       disabled &&
                         "pointer-events-none cursor-default opacity-50",
                     )}
@@ -506,7 +506,7 @@ export const MultiSelect = React.forwardRef<
                               <FaCheck className="size-3 translate-y-[1.1px]" />
                             </div>
                             {option.icon && (
-                              <option.icon className="mr-2 size-4 text-muted-foreground" />
+                              <option.icon className="mr-2 size-4 text-foreground/50" />
                             )}
                             <span className="text-base sm:text-sm">
                               {option.label}
@@ -545,7 +545,7 @@ export const MultiSelect = React.forwardRef<
                             <FaCheck className="size-3 translate-y-[1.1px]" />
                           </div>
                           {option.icon && (
-                            <option.icon className="mr-2 size-4 text-muted-foreground" />
+                            <option.icon className="mr-2 size-4 text-foreground/50" />
                           )}
                           <span className="text-base sm:text-sm">
                             {option.label}
@@ -588,7 +588,7 @@ export const MultiSelect = React.forwardRef<
           <WandSparkles
             className={cn(
               "my-2 h-3 w-3 cursor-pointer bg-background text-foreground",
-              isAnimating ? "" : "text-muted-foreground",
+              isAnimating ? "" : "text-foreground/50",
             )}
             onClick={() => setIsAnimating(!isAnimating)}
           />

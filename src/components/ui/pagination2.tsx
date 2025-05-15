@@ -83,7 +83,7 @@ export const BasicPagination = ({
                 <TiArrowLeftOutline className="size-9 text-foreground hover:scale-110 sm:size-6" />
               </span>
 
-              <span className="flex flex-row items-center gap-2">
+              <span className="flex select-none flex-row items-center gap-2">
                 Page
                 <Select
                   value={String(inputVal)}

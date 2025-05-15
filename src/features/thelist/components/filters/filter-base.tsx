@@ -194,7 +194,9 @@ export const FilterBase = ({
                                       <span className="flex items-center gap-1 truncate">
                                         {item.name}
                                         {item.ocStatus === 2 && (
-                                          <FlairBadge>Open Call</FlairBadge>
+                                          <FlairBadge className="bg-green-500/20">
+                                            Open Call
+                                          </FlairBadge>
                                         )}
                                       </span>
                                     </div>

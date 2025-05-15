@@ -415,75 +415,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 onResetFilters={onResetFilters}
                 groupedResults={groupedItems}
               />
-              {/* <div className="scrollable mini flex flex-col gap-2 px-5 pb-5">
-                {Object.values(groupedItems).every(
-                  (items) => items.length === 0,
-                ) ? (
-                  <>
-                    {value.length > 0 && (
-                      <span className="inline-flex items-center gap-2">
-                        No results found for
-                        <span className="inline-flex items-center gap-[1px] italic">
-                          <BiSolidQuoteLeft className="size-1 -translate-y-1" />
-                          {value}
-                          <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
-                        </span>
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  Object.entries(groupedItems)
-                    .filter(([, items]) => items.length > 0)
-                    .map(([groupKey, groupItems]) => (
-                      <div key={groupKey}>
-                        <h3 className="mb-1 mt-3 text-xs font-semibold text-stone-500">
-                          {groupKey.toUpperCase()}
-                        </h3>
-                        <ul className="flex flex-col gap-1">
-                          {groupItems.map((item) => (
-                            <li
-                              key={item.path}
-                              onClick={() => {
-                                router.push(item.path || "/thelist");
-                                setOpen(false);
-                              }}
-                              className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-stone-100 active:bg-stone-200"
-                            >
-                              {groupKey.startsWith("Events") ? (
-                                <div className="grid w-full grid-cols-[1.5fr_auto_1fr] items-center gap-2">
-                                  <span className="flex items-center gap-1 truncate">
-                                    {item.name}
-                                    {item.ocStatus === 2 && (
-                                      <FlairBadge>Open Call</FlairBadge>
-                                    )}
-                                  </span>
-
-                                  {item.edition ? (
-                                    <span className="text-center text-xs text-stone-500">
-                                      {item.edition}
-                                    </span>
-                                  ) : (
-                                    <span />
-                                  )}
-                                  <span className="truncate text-right text-xs text-stone-500">
-                                    {item.meta}
-                                  </span>
-                                </div>
-                              ) : (
-                                <div className="flex w-full justify-between gap-2">
-                                  <span className="truncate">{item.name}</span>
-                                  <span className="truncate text-xs text-stone-500">
-                                    {item.meta}
-                                  </span>
-                                </div>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))
-                )}
-              </div> */}
             </div>
           </div>
         </DrawerContent>
@@ -621,7 +552,9 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                 <span className="flex items-center gap-1 truncate">
                                   {item.name}
                                   {item.ocStatus === 2 && (
-                                    <FlairBadge>Open Call</FlairBadge>
+                                    <FlairBadge className="bg-green-500/20">
+                                      Open Call
+                                    </FlairBadge>
                                   )}
                                 </span>
                                 {item.edition ? (
