@@ -92,7 +92,7 @@ export default function SettingsPage() {
   const updateUser = useMutation(api.users.updateUser);
   const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage);
   const removeProfileImage = useMutation(api.uploads.user.removeProfileImage);
-  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const [selectedTimezone, setTimezone] = useState<string | undefined>(
     undefined,
   );
@@ -606,7 +606,7 @@ export default function SettingsPage() {
                   </div>
 
                   <SearchMappedSelect<Timezone>
-                     searchFields={[
+                    searchFields={[
                       "name",
                       "region",
                       "abbreviation",
@@ -627,7 +627,6 @@ export default function SettingsPage() {
                           : ""
                       })`
                     }
-                   
                     getItemDisplay={(timezone) =>
                       `(${
                         timezone.region !== "North America"

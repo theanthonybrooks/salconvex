@@ -568,14 +568,7 @@ export const openCallBaseSchema = z.object({
     requirements: z.string(),
     //   more: z.string(),
     //   destination: z.string(),
-    //   documents: z.optional(
-    //     z.array(
-    //       z.object({
-    //         title: z.string(), //do I ask for the title or just use the path? Not sure.
-    //         href: z.string(),
-    //       }),
-    //     ),
-    //   ),
+
     //   links: z.array(
     //     z.object({
     //       title: z.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
@@ -585,7 +578,28 @@ export const openCallBaseSchema = z.object({
     applicationLink: z.string(),
     //   otherInfo: z.optional(z.array(z.string())), //todo: make not optional later
   }),
-  // // state: z.string(), //draft, submitted, published, archived
+  documents: z.optional(
+    z.array(
+      z.object({
+        id: z.optional(z.string()),
+        title: z.string(), //do I ask for the title or just use the path? Not sure.
+        href: z.string(),
+      }),
+    ),
+  ),
+  // tempFiles: z.optional(
+  //   z.array(
+  //     z.custom<Blob & { name: string; lastModified: number }>((v) => {
+  //       return (
+  //         typeof v === "object" &&
+  //         v !== null &&
+  //         "name" in v &&
+  //         "lastModified" in v
+  //       );
+  //     }),
+  //   ),
+  // ),
+  tempFiles: z.array(z.instanceof(File)).optional(),
 });
 
 export const openCallStep1Schema = z

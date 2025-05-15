@@ -60,14 +60,7 @@ export const createOrUpdateOpenCall = mutation({
       requirements: v.string(),
       more: v.string(),
       destination: v.string(),
-      documents: v.optional(
-        v.array(
-          v.object({
-            title: v.string(),
-            href: v.string(),
-          }),
-        ),
-      ),
+
       links: v.array(
         v.object({
           title: v.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
@@ -77,6 +70,15 @@ export const createOrUpdateOpenCall = mutation({
       applicationLink: v.string(),
       otherInfo: v.optional(v.array(v.string())),
     }),
+    documents: v.optional(
+      v.array(
+        v.object({
+          id: v.id("openCallFiles"),
+          title: v.string(),
+          href: v.string(),
+        }),
+      ),
+    ),
     state: v.optional(
       v.union(
         v.literal("draft"),
@@ -116,8 +118,10 @@ export const createOrUpdateOpenCall = mutation({
       compensation: args.compensation,
       requirements: {
         ...args.requirements,
+        documents: [],
         links: args.requirements.links ?? [],
       },
+      documents: args.documents,
       state: ocState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),

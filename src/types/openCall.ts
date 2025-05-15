@@ -108,10 +108,7 @@ export interface OpenCall {
     requirements: string;
     more?: string;
     destination: string;
-    documents?: {
-      title: string;
-      href: string;
-    }[];
+
     links?: {
       title: string;
       href: string;
@@ -119,6 +116,11 @@ export interface OpenCall {
     otherInfo?: string[];
     applicationLink?: string;
   };
+  documents?: {
+    id?: Id<"openCallFiles">;
+    title: string;
+    href: string;
+  }[];
   state?: SubmissionFormState;
 }
 

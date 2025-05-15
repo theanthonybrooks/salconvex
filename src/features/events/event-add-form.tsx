@@ -41,7 +41,7 @@ import SubmissionFormOC1 from "@/features/events/submission-form/steps/submissio
 import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-1";
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { toSeason, toYearMonth } from "@/lib/dateFns";
-import { handleFileUrl } from "@/lib/fileUploadFns";
+import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -181,6 +181,7 @@ export const EventOCForm = ({
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+  const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
   const createOrUpdateOpenCall = useMutation(
     api.openCalls.openCall.createOrUpdateOpenCall,
   );
@@ -188,7 +189,7 @@ export const EventOCForm = ({
     api.events.event.updateEventLastEditedAt,
   );
   const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
-  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // #endregion
   // #region ------------- State --------------
@@ -888,9 +889,69 @@ export const EventOCForm = ({
       }
       if (activeStep === 3 && hasUserEditedStep3) {
         let openCallResult = null;
+        let openCallFiles = null;
+        let saveResults: {
+          id: Id<"openCallFiles">;
+          url: string;
+          fileName?: string;
+          storageId: Id<"_storage">;
+        }[] = [];
+
         if (!openCallData) return;
+
+        if (openCallData.tempFiles && openCallData.tempFiles?.length > 0) {
+          console.log("openCallData.tempFiles", openCallData.tempFiles);
+          const result = await handleOrgFileUrl({
+            data: { files: openCallData.tempFiles },
+            generateUploadUrl,
+          });
+
+          if (!result) {
+            toast.error("Failed to upload files", {
+              autoClose: 2000,
+              pauseOnHover: false,
+              hideProgressBar: true,
+            });
+            return;
+          }
+          openCallFiles = result;
+
+          saveResults = await saveOrgFile({
+            files: result, // this is your array from handleOrgFileUrl
+            reason: "docs",
+            organizationId: orgData._id as Id<"organizations">,
+            eventId: eventData._id as Id<"events">,
+            openCallId: openCallData._id
+              ? (openCallData._id as Id<"openCalls">)
+              : undefined,
+          });
+
+          console.log("saved files:", saveResults);
+
+          // console.log("url", url);
+          // console.log("id", id);
+        }
+        const documents = saveResults.map((saved, i) => {
+          const matched = openCallFiles?.find(
+            (original) => original.storageId === saved.storageId,
+          );
+
+          return {
+            id: saved.id,
+            title:
+              matched?.fileName ??
+              `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
+            href: saved.url,
+          };
+        });
+
+        console.log("documents", documents);
+
+        console.log("openCallFiles", openCallFiles);
+
         console.log("openCallData", openCallData);
         console.log("openCallData._id", openCallData._id);
+
         try {
           setPending(true);
           openCallResult = await createOrUpdateOpenCall({
@@ -936,7 +997,6 @@ export const EventOCForm = ({
               requirements: openCallData.requirements.requirements,
               more: "reqsMore",
               destination: "reqsDestination",
-              documents: undefined,
               links: [
                 {
                   title: "reqsLinkTitle",
@@ -946,7 +1006,7 @@ export const EventOCForm = ({
               applicationLink: openCallData.requirements.applicationLink,
               otherInfo: undefined,
             },
-            state: "draft",
+            documents,
           });
 
           reset({
@@ -1099,7 +1159,7 @@ export const EventOCForm = ({
                 requirements: openCallData.requirements.requirements,
                 more: "reqsMore",
                 destination: "reqsDestination",
-                documents: undefined,
+
                 links: [
                   {
                     title: "reqsLinkTitle",
@@ -1109,6 +1169,11 @@ export const EventOCForm = ({
                 applicationLink: openCallData.requirements.applicationLink,
                 otherInfo: undefined,
               },
+              documents: openCallData.documents?.map((doc) => ({
+                id: doc.id as Id<"openCallFiles">,
+                title: doc.title,
+                href: doc.href,
+              })),
               state: publish ? "published" : "submitted",
               finalStep: true,
               approved: publish,
@@ -1126,6 +1191,7 @@ export const EventOCForm = ({
       }
     },
     [
+      saveOrgFile,
       setOpen,
       hasOpenCall,
       openCallData,

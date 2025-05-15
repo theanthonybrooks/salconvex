@@ -1088,8 +1088,7 @@ div:has(> div.react-datepicker__input-container) {
   max-height: 65dvh;
 
   @media (max-width: 768px) {
-    
-        max-height: 200px;
+    max-height: 200px;
     min-height: 200px;
     -webkit-mask-image: linear-gradient(
       to bottom,
@@ -1109,7 +1108,6 @@ div:has(> div.react-datepicker__input-container) {
     mask-size: 100% 100%;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-
   }
   & .react-datepicker__time-list-item {
     @media (max-width: 768px) {
@@ -1385,4 +1383,8 @@ div:has(> div.react-datepicker__input-container) {
     opacity: 0;
     height: 0;
   }
+}
+
+.filepond--credits {
+  display: none;
 }

@@ -49,6 +49,21 @@ export const eventFormatValidator = v.union(
   v.literal("ongoing"),
 );
 
+const openCallFilesSchema = v.object({
+  storageId: v.id("_storage"),
+  uploadedBy: v.id("users"),
+  organizationId: v.id("organizations"),
+  eventId: v.id("events"),
+  openCallId: v.optional(v.id("openCalls")),
+  fileName: v.string(),
+  fileUrl: v.string(),
+  fileType: v.string(),
+  fileSize: v.number(),
+  lastModified: v.number(),
+  reason: v.string(),
+  uploadedAt: v.number(),
+});
+
 const customUserSchema = {
   // Include Convex Auth fields you want to use
   name: v.optional(v.string()),
@@ -367,6 +382,7 @@ const openCallSchema = {
     documents: v.optional(
       v.array(
         v.object({
+          id: v.optional(v.id("openCallFiles")),
           title: v.string(), //do I ask for the title or just use the path? Not sure.
           href: v.string(),
         }),
@@ -381,6 +397,15 @@ const openCallSchema = {
     applicationLink: v.string(),
     otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
   }),
+  documents: v.optional(
+    v.array(
+      v.object({
+        id: v.optional(v.id("openCallFiles")),
+        title: v.string(), //do I ask for the title or just use the path? Not sure.
+        href: v.string(),
+      }),
+    ),
+  ),
   // state: v.string(), //draft, submitted, published, archived
   state: v.optional(
     v.union(
@@ -723,4 +748,11 @@ export default defineSchema({
   newsletter: defineTable(newsletterSchema)
     .index("by_userId", ["userId"])
     .index("by_email", ["email"]),
+
+  openCallFiles: defineTable(openCallFilesSchema)
+    .index("by_storageId", ["storageId"])
+    .index("by_eventId", ["eventId"])
+    .index("by_openCallId", ["openCallId"])
+    .index("by_userId", ["uploadedBy"])
+    .index("by_organizationId", ["organizationId"]),
 });

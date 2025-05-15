@@ -48,6 +48,7 @@ const OpenCallCard = ({
     compensation,
     basicInfo,
     eligibility,
+    documents,
     requirements,
     _id: openCallId,
   } = openCall;
@@ -72,9 +73,12 @@ const OpenCallCard = ({
     requirements: reqs,
     more: reqsMore,
     // destination: reqsDestination, //for email submissions?
-    documents: reqsDocs,
+
     links: reqsLinks,
   } = requirements;
+
+  const reqsDocs = documents ?? [];
+  
 
   const catLength = Object.keys(categories).length;
   const hasCategories = catLength > 0;

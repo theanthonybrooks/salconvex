@@ -106,7 +106,7 @@ export const ArtistProfileForm = ({
   // const userNationality = currentValues.artistNationality;
   // NOTE: Generate the upload url to use Convex's storage
   const handleManageSubscription = useManageSubscription(subscription ?? {});
-  const generateUploadUrl = useMutation(api.uploads.user.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const artistInfo = useQuery(api.artists.artistActions.getArtist, {});
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const updateArtist = useMutation(

@@ -21,10 +21,18 @@ import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { CallFormat, EligibilityType } from "@/types/openCall";
 import { User } from "@/types/user";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import { ArrowRight } from "lucide-react";
 import { useEffect } from "react";
+import { registerPlugin } from "react-filepond";
 import { Controller, useFormContext } from "react-hook-form";
 import { Country } from "world-countries";
+
+registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
+
+import { FilePondInput } from "@/features/files/filepond";
+import "filepond/dist/filepond.min.css";
 
 interface SubmissionFormOC1Props {
   user: User | undefined;
@@ -490,7 +498,7 @@ const SubmissionFormOC1 = ({
                 render={({ field }) => (
                   <DebouncedControllerInput
                     field={field}
-                    placeholder="Name of primary contact"
+                    placeholder="Link to external application form"
                     className={cn(
                       "w-full rounded border-foreground",
                       errors?.openCall?.requirements?.applicationLink &&
@@ -504,6 +512,86 @@ const SubmissionFormOC1 = ({
                       // console.log("Blur me", field + type)
                     }}
                   />
+                )}
+              />
+            </div>
+            <div className="input-section">
+              <p className="min-w-max font-bold lg:text-xl">Step 7</p>
+              <p className="lg:text-xs">Application Docs</p>
+            </div>
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="openCall.tempFiles" className="sr-only">
+                Application Documents
+              </Label>
+              <Controller
+                name="openCall.tempFiles"
+                control={control}
+                render={({ field }) => (
+                  <FilePondInput
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    purpose="docs"
+                    maxFileSize="5MB"
+                  />
+
+                  // <FilePond
+                  //   allowMultiple={true}
+                  //   maxFiles={5}
+                  //   maxFileSize="1MB"
+                  //   allowFileTypeValidation={true}
+                  //   acceptedFileTypes={[
+                  //     "application/pdf",
+                  //     "application/msword",
+                  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  //   ]}
+                  //   onupdatefiles={(items: FilePondFile[]) => {
+                  //     const files = items.map((item) => item.file);
+                  //     field.onChange(files);
+                  //   }}
+                  // />
+                  // <FilePond
+                  //   allowMultiple
+                  //   maxFiles={5}
+                  //   allowFileTypeValidation={true}
+                  //   allowFileSizeValidation={true}
+                  //   maxFileSize="1MB" // per file
+                  //   acceptedFileTypes={[
+                  //     "application/pdf",
+                  //     "application/msword",
+                  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  //   ]}
+                  //   labelFileTypeNotAllowed="Only PDF or Word documents allowed"
+                  //   labelMaxFileSizeExceeded="File is too large"
+                  //   fileValidateTypeLabelExpectedTypesMap={{
+                  //     "application/pdf": ".pdf",
+                  //     "application/msword": ".doc",
+                  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                  //       ".docx",
+                  //   }}
+                  //   onupdatefiles={(items) => {
+                  //     // Optional: manually filter to be safe
+                  //     const acceptedMimeTypes = new Set([
+                  //       "application/pdf",
+                  //       "application/msword",
+                  //       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  //     ]);
+                  //     const filtered = items.filter((item) =>
+                  //       acceptedMimeTypes.has(item.file.type),
+                  //     );
+                  //     const totalSize = filtered.reduce(
+                  //       (sum, i) => sum + i.file.size,
+                  //       0,
+                  //     );
+                  //     const maxTotalSize = 10 * 1024 * 1024;
+
+                  //     if (totalSize > maxTotalSize) {
+                  //       alert("Total upload size exceeds 10MB.");
+                  //       return;
+                  //     }
+
+                  //     field.onChange(filtered.map((item) => item.file));
+                  //   }}
+                  // />
                 )}
               />
             </div>
