@@ -1156,11 +1156,7 @@ export const EventOCForm = ({
                 applicationLink: openCallData.requirements.applicationLink,
                 otherInfo: undefined,
               },
-              documents: openCallData.documents?.map((doc) => ({
-                id: doc.id as Id<"openCallFiles">,
-                title: doc.title,
-                href: doc.href,
-              })),
+              documents: undefined,
               state: publish ? "published" : "submitted",
               finalStep: true,
               approved: publish,
