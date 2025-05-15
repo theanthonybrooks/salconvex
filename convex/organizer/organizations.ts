@@ -170,7 +170,7 @@ export const createNewOrg = mutation({
         });
       }
       const updatedOrg = await ctx.db.get(org._id);
-      return { orgId: org._id, org: updatedOrg };
+      return { orgId: org._id, org: updatedOrg, fileUrl };
     }
 
     const orgId = await ctx.db.insert("organizations", {

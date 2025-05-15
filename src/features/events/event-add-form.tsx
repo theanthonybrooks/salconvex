@@ -608,7 +608,8 @@ export const EventOCForm = ({
         }
       }
       let orgResult = null;
-
+      let orgLogoFullUrl = "/1.jpg";
+      console.log(hasUserEditedStep0);
       if (hasUserEditedStep0) {
         console.log("user edited step 0");
         const result = await handleFileUrl({
@@ -616,6 +617,7 @@ export const EventOCForm = ({
           generateUploadUrl,
           getTimezone,
         });
+
         if (!result) {
           toast.error("Failed to upload logo", {
             autoClose: 2000,
@@ -624,14 +626,15 @@ export const EventOCForm = ({
           });
           return;
         }
-        const { logoUrl, logoStorageId, timezone, timezoneOffset } = result;
-
+        const { logoStorageId, timezone, timezoneOffset } = result;
+        const logo = typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
+        console.log(result);
         try {
           setPending(true);
           const { org } = await createNewOrg({
             organizationName: orgData.name,
             logoStorageId,
-            logo: logoUrl,
+            logo,
             location: {
               full: orgData.location.full,
               locale: orgData.location.locale,
@@ -657,6 +660,11 @@ export const EventOCForm = ({
             },
           });
           orgResult = org;
+          // orgLogoFullUrl = fileUrl ?? orgResult?.logo ?? "/1.jpg";
+          orgLogoFullUrl =
+            orgResult?.logo ??
+            (orgData.logo === "string" ? orgData.logo : "/1.jpg");
+
           setPending(false);
           // toast.success(
           //   existingOrg
@@ -670,7 +678,7 @@ export const EventOCForm = ({
           if (existingOrg) {
             setExistingOrg({
               ...existingOrg,
-              logo: typeof orgData.logo === "string" ? orgData.logo : logoUrl,
+              logo: orgLogoFullUrl,
               location: {
                 ...existingOrg.location,
                 ...orgData.location,
@@ -686,8 +694,7 @@ export const EventOCForm = ({
           setPending(false);
         }
 
-        const orgLogoFullUrl = orgResult?.logo ?? "/1.jpg";
-        const eventFullUrl = eventData?.logo ?? "/1.jpg";
+        const eventFullUrl = eventData?.logo ?? orgLogoFullUrl;
 
         if (existingEvent) {
           // console.log("existing event");
@@ -747,7 +754,6 @@ export const EventOCForm = ({
       // await handleFormValues();
       if (activeStep === 1 && hasUserEditedEventSteps) {
         let result = {
-          logoUrl: eventData?.logo as string,
           logoStorageId: eventData?.logoStorageId as Id<"_storage"> | undefined,
           timezone: existingEvent?.location?.timezone,
           timezoneOffset: existingEvent?.location?.timezoneOffset,
@@ -758,7 +764,6 @@ export const EventOCForm = ({
           !eventData?.logoStorageId;
 
         if (needsUpload) {
-          console.log("needs upload");
           const uploadResult = await handleFileUrl({
             data: eventData,
             generateUploadUrl,
@@ -777,14 +782,11 @@ export const EventOCForm = ({
           console.log(result);
         }
         console.log("doesnt need upload");
-        const { logoUrl, logoStorageId, timezone, timezoneOffset } = result;
-        console.log(logoUrl, logoStorageId, timezone, timezoneOffset);
+        const { logoStorageId, timezone, timezoneOffset } = result;
+        console.log(logoStorageId, timezone, timezoneOffset);
         let eventResult = null;
-        let eventLogo = "1.jpg";
-
-        if (typeof logoUrl === "string") {
-          eventLogo = logoUrl;
-        }
+        const eventLogo =
+          typeof eventData.logo === "string" ? eventData.logo : "1.jpg";
 
         try {
           setPending(true);

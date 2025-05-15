@@ -1088,6 +1088,9 @@ div:has(> div.react-datepicker__input-container) {
   max-height: 65dvh;
 
   @media (max-width: 768px) {
+    
+        max-height: 200px;
+    min-height: 200px;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
@@ -1106,8 +1109,7 @@ div:has(> div.react-datepicker__input-container) {
     mask-size: 100% 100%;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-    max-height: 200px;
-    min-height: 200px;
+
   }
   & .react-datepicker__time-list-item {
     @media (max-width: 768px) {

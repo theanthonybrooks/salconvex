@@ -641,7 +641,9 @@ export const TaskDialog = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Label htmlFor="title">Task</Label>
+          <Label htmlFor="title" className="sr-only">
+            Task
+          </Label>
           <textarea
             name="title"
             value={title}
@@ -655,7 +657,7 @@ export const TaskDialog = ({
               }
             }}
             placeholder="Task title..."
-            className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+            className="scrollable mini w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
 
           <Label htmlFor="column">Column</Label>

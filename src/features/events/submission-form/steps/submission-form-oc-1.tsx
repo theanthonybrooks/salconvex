@@ -157,8 +157,8 @@ const SubmissionFormOC1 = ({
         </div>
         <div />
         {/* TODO: Add a popover modal or link to the FAQ page for more information on call formats */}
-        <span className="flex items-center justify-center gap-1 text-xs italic">
-          For more information on Open Call Formats, check out the
+        <p className="mt-1 text-balance text-center text-xs italic">
+          For more information on Open Call Formats, check out the{" "}
           <Link
             href={`${siteUrl[0]}/faq#call-formats`}
             target="_blank"
@@ -166,7 +166,7 @@ const SubmissionFormOC1 = ({
           >
             FAQ
           </Link>
-        </span>
+        </p>
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
           <p className="lg:text-xs">Eligibility</p>
