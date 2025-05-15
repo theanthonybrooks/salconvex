@@ -56,12 +56,12 @@ export const saveOrgFile = mutation({
         await ctx.storage.delete(file.storageId);
 
         console.log(`Duplicate skipped: ${file.fileName}`);
-        uploadedRecords.push({
-          id: duplicate._id,
-          url: duplicate.fileUrl,
-          storageId: duplicate.storageId,
-          fileName: duplicate.fileName,
-        });
+        // uploadedRecords.push({
+        //   id: duplicate._id,
+        //   url: duplicate.fileUrl,
+        //   storageId: duplicate.storageId,
+        //   fileName: duplicate.fileName,
+        // });
         continue;
       }
 

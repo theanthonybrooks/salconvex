@@ -83,18 +83,6 @@ export const normalizeSocialLinks = migrations.define({
   },
 });
 
-export const clearDocsFR = migrations.define({
-  table: "openCalls",
-  migrateOne: async (ctx, doc) => {
-    await ctx.db.patch(doc._id, {
-      requirements: {
-        ...doc.requirements,
-        documents: undefined,
-      },
-    });
-  },
-});
-
 export const clearContactPrimaryContact = migrations.define({
   table: "organizations",
   migrateOne: async (ctx, doc) => {
@@ -155,8 +143,6 @@ export const runNorm = migrations.runner(
 export const runCP = migrations.runner(
   internal.migrations.clearContactPrimaryContact,
 );
-
-export const runCD = migrations.runner(internal.migrations.clearDocsFR);
 
 // export const runRemoveOrgNames = migrations.runner(
 //   internal.migrations.removeMainOrgName,
