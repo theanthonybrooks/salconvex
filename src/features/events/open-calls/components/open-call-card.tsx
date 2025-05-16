@@ -12,6 +12,7 @@ import { OpenCall } from "@/types/openCall";
 
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
+import { LightboxGallery } from "@/components/ui/lightbox-gallery";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
 import {
   OpenCallProvided,
@@ -78,7 +79,6 @@ const OpenCallCard = ({
   } = requirements;
 
   const reqsDocs = documents ?? [];
-  
 
   const catLength = Object.keys(categories).length;
   const hasCategories = catLength > 0;
@@ -317,7 +317,7 @@ const OpenCallCard = ({
               </AccordionContent>
             </AccordionItem>
 
-            {reqsDocs && reqsDocs.length > 0 && (
+            {/* {reqsDocs && reqsDocs.length > 0 && (
               <AccordionItem value="Docs">
                 <AccordionTrigger title="Documents:" />
                 <AccordionContent>
@@ -335,7 +335,65 @@ const OpenCallCard = ({
                   </ol>
                 </AccordionContent>
               </AccordionItem>
+            )} */}
+            {reqsDocs && reqsDocs.length > 0 && (
+              <>
+                {reqsDocs.some((doc) =>
+                  /\.(pdf|docx?|pptx?)$/i.test(doc.title),
+                ) && (
+                  <AccordionItem value="Docs">
+                    <AccordionTrigger title="Documents:" />
+                    <AccordionContent>
+                      <ol className="list-outside list-decimal px-4 pl-6">
+                        {reqsDocs
+                          .filter((doc) =>
+                            /\.(pdf|docx?|pptx?)$/i.test(doc.title),
+                          )
+                          .map((document, index) => (
+                            <li key={index} className="py-2">
+                              <div className="flex items-center gap-x-2">
+                                {document.title}
+                                <a
+                                  href={document.href}
+                                  download={document.title}
+                                >
+                                  <Download className="size-5 hover:scale-110" />
+                                </a>
+                              </div>
+                            </li>
+                          ))}
+                      </ol>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+                {reqsDocs.some((doc) => /\.(jpe?g|png)$/i.test(doc.title)) && (
+                  <AccordionItem value="Images">
+                    <AccordionTrigger title="Images:" />
+                    <AccordionContent>
+                      <ol className="list-outside list-decimal px-4 pl-6">
+                        {reqsDocs
+                          .filter((doc) => /\.(jpe?g|png)$/i.test(doc.title))
+                          .map((document, index) => (
+                            <li key={index} className="py-2">
+                              <div className="flex items-center gap-x-2">
+                                {document.title}
+                                <a
+                                  href={document.href}
+                                  download={document.title}
+                                >
+                                  <Download className="size-5 hover:scale-110" />
+                                </a>
+                              </div>
+                            </li>
+                          ))}
+                      </ol>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+              </>
             )}
+
             {reqsLinks && reqsLinks.length > 0 && (
               <AccordionItem value="AppLinks">
                 <AccordionTrigger title="Links:" />
@@ -567,7 +625,7 @@ const OpenCallCard = ({
               )}
             </AccordionContent>
           </AccordionItem>
-
+          {/* 
           {reqsDocs && reqsDocs.length > 0 && (
             <AccordionItem
               value="AppDocs"
@@ -589,6 +647,78 @@ const OpenCallCard = ({
                 </ol>
               </AccordionContent>
             </AccordionItem>
+          )} */}
+          {reqsDocs && reqsDocs.length > 0 && (
+            <>
+              {reqsDocs.some((doc) =>
+                /\.(pdf|docx?|pptx?)$/i.test(doc.title),
+              ) && (
+                <AccordionItem
+                  value="AppDocs"
+                  className="rounded-lg border-2 bg-white/30 px-4"
+                >
+                  <AccordionTrigger title="Documents:" />
+                  <AccordionContent>
+                    <ol className="list-outside list-decimal px-4 pl-6">
+                      {reqsDocs
+                        .filter((doc) =>
+                          /\.(pdf|docx?|pptx?)$/i.test(doc.title),
+                        )
+                        .map((document, index) => (
+                          <li key={index} className="py-2">
+                            <div className="flex items-center gap-x-2">
+                              {document.title}
+                              <a href={document.href} download={document.title}>
+                                <Download className="size-5 hover:scale-110" />
+                              </a>
+                            </div>
+                          </li>
+                        ))}
+                    </ol>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
+              {reqsDocs.some((doc) => /\.(jpe?g|png)$/i.test(doc.title)) && (
+                <AccordionItem
+                  value="AppImgs"
+                  className="rounded-lg border-2 bg-white/30 px-4"
+                >
+                  <AccordionTrigger title="Images:" />
+                  <AccordionContent>
+                    <div className="flex items-center gap-3">
+                      {/* {reqsDocs
+                        .filter((doc) => /\.(jpe?g|png)$/i.test(doc.title))
+                        .map((document, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-col items-center gap-2"
+                          >
+                            <Image
+                              src={document.href}
+                              alt={document.title}
+                              width={200}
+                              height={200}
+                              className=""
+                            />
+                            <div className="flex items-center gap-x-2">
+                              {document.title}
+                              <a href={document.href} download={document.title}>
+                                <Download className="size-5 hover:scale-110" />
+                              </a>
+                            </div>
+                          </div>
+                        ))} */}
+                      <LightboxGallery
+                        images={reqsDocs.filter((doc) =>
+                          /\.(jpe?g|png)$/i.test(doc.title),
+                        )}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </>
           )}
           {reqsLinks && reqsLinks.length > 0 && (
             <AccordionItem

@@ -329,7 +329,7 @@ const SubmissionFormOC1 = ({
               >
                 <SelectTrigger
                   className={cn(
-                    "h-12 w-full min-w-44 border text-center text-base sm:h-[50px] sm:w-fit",
+                    "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
                   )}
                 >
                   <SelectValue placeholder="Application fee?*" />

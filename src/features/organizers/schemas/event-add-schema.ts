@@ -554,11 +554,11 @@ export const openCallStep1Schema = z
           path: ["openCall", "eligibility", "details"],
         });
       }
-      if (trimmed !== "International" && trimmedDetails?.length < 33) {
+      if (trimmed !== "International" && trimmedDetails?.length < 22) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message:
-            "More info is required for non-international calls (min 25 characters)",
+            "More info is required for non-international calls (min 15 characters)",
           path: ["openCall", "eligibility", "details"],
         });
       }
