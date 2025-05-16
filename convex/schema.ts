@@ -59,6 +59,7 @@ const openCallFilesSchema = v.object({
   fileUrl: v.string(),
   fileType: v.string(),
   fileSize: v.number(),
+  archived: v.optional(v.boolean()),
   lastModified: v.number(),
   reason: v.string(),
   uploadedAt: v.number(),
@@ -394,6 +395,7 @@ const openCallSchema = {
         id: v.optional(v.id("openCallFiles")),
         title: v.string(), //do I ask for the title or just use the path? Not sure.
         href: v.string(),
+        archived: v.optional(v.boolean()),
       }),
     ),
   ),

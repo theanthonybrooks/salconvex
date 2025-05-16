@@ -15,6 +15,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormOrgStepProps {
+  isMobile: boolean;
   existingOrg: Doc<"organizations"> | null;
   existingEvent: Doc<"events"> | null;
   eventsData: EnrichedEvent[];
@@ -38,6 +39,7 @@ interface SubmissionFormOrgStepProps {
 }
 
 const SubmissionFormOrgStep = ({
+  isMobile,
   existingOrgs,
   existingOrg,
   // existingEvent,
@@ -145,7 +147,11 @@ const SubmissionFormOrgStep = ({
                   validationError={invalidOrgWZod}
                   onLoadClick={setExistingOrg}
                   onReset={handleReset}
-                  placeholder="Search or enter new name"
+                  placeholder={
+                    isMobile
+                      ? "Search or enter new"
+                      : "Search or enter new name"
+                  }
                   className="mb-3 h-12 lg:mb-0 lg:h-20"
                   inputClassName="rounded-lg py-2 text-base lg:text-xl"
                   tabIndex={1}

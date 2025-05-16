@@ -38,7 +38,7 @@ interface SearchMappedMultiSelectProps<T> {
 }
 
 export function SearchMappedMultiSelect<T>({
-  values,
+  values = [],
   data,
   getItemLabel,
   getItemValue,

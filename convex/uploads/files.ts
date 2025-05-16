@@ -1,5 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import { mutation } from "~/convex/_generated/server";
 
@@ -88,5 +88,112 @@ export const saveOrgFile = mutation({
     }
 
     return uploadedRecords;
+  },
+});
+
+export const deleteFile = mutation({
+  args: {
+    fileId: v.id("openCallFiles"),
+    eventId: v.id("events"),
+    archive: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { archive, ...args }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    const isAdmin = user.role?.includes("admin");
+    const file = await ctx.db.get(args.fileId);
+    if (!file) return null;
+
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
+
+    const hasBeenPublished = openCall?.approvedBy !== undefined;
+
+    if (hasBeenPublished || archive) {
+      if (isAdmin && !archive) {
+        // Admins can fully delete
+        await ctx.db.delete(args.fileId);
+        if (file.storageId) await ctx.storage.delete(file.storageId);
+        if (openCall?._id && openCall.documents) {
+          const filteredDocs = openCall.documents.filter(
+            (doc) => doc.id !== args.fileId,
+          );
+          await ctx.db.patch(openCall._id, {
+            documents: filteredDocs,
+          });
+        }
+      } else {
+        // Non-admins archive instead of delete
+        await ctx.db.patch(args.fileId, {
+          archived: true,
+        });
+
+        if (openCall?._id && openCall.documents) {
+          const updatedDocs = openCall.documents.map((doc) =>
+            doc.id === args.fileId ? { ...doc, archived: true } : doc,
+          );
+          await ctx.db.patch(openCall._id, {
+            documents: updatedDocs,
+          });
+        }
+      }
+    } else {
+      // Not published: full delete + remove from openCall documents
+      await ctx.db.delete(args.fileId);
+      if (file.storageId) await ctx.storage.delete(file.storageId);
+
+      if (openCall?._id && openCall.documents) {
+        const filteredDocs = openCall.documents.filter(
+          (doc) => doc.id !== args.fileId,
+        );
+        await ctx.db.patch(openCall._id, {
+          documents: filteredDocs,
+        });
+      }
+    }
+  },
+});
+
+export const editFileName = mutation({
+  args: {
+    fileId: v.id("openCallFiles"),
+    eventId: v.id("events"),
+    newTitle: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    const file = await ctx.db.get(args.fileId);
+    if (!file) return null;
+
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
+
+    if (openCall?._id && openCall.documents) {
+      const updatedDocs = openCall.documents.map((doc) =>
+        doc.id === args.fileId ? { ...doc, title: args.newTitle } : doc,
+      );
+      await ctx.db.patch(openCall._id, {
+        documents: updatedDocs,
+      });
+    }
   },
 });

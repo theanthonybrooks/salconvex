@@ -518,6 +518,7 @@ export const openCallBaseSchema = z.object({
         id: z.optional(z.string()),
         title: z.string(),
         href: z.string(),
+        archived: z.optional(z.boolean()),
       }),
     ),
   ),

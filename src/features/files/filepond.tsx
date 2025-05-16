@@ -34,7 +34,7 @@ type FilePondInputProps = {
   acceptedFileTypes?: string[];
   maxFileSize?: string;
   maxFiles?: number;
-  purpose: "docs" | "images";
+  purpose: "docs" | "images" | "both";
 };
 
 export function FilePondInput({
@@ -46,8 +46,14 @@ export function FilePondInput({
   purpose,
 }: FilePondInputProps) {
   //   const UserAcceptedFileTypes = purpose === "docs" ? DOC_TYPES : ["image/*"];
-  const UserAcceptedFileTypes = purpose === "docs" ? BOTH_TYPES : ["image/*"];
-
+  const docsOnly = purpose === "docs";
+  //   const imagesOnly = purpose === "images";
+  const multiPurpose = purpose === "both";
+  const UserAcceptedFileTypes = docsOnly
+    ? DOC_TYPES
+    : multiPurpose
+      ? BOTH_TYPES
+      : ["image/*"];
   return (
     <FilePond
       allowMultiple
@@ -59,9 +65,34 @@ export function FilePondInput({
       allowFileRename
       //   fileRenameFunction={(file) => `${Date.now()}-${file.name}`}
       files={value}
-      onupdatefiles={(fileItems: FilePondFile[]) => {
-        const files = fileItems.map((item) => item.file);
-        onChange(files);
+      //   onupdatefiles={(fileItems: FilePondFile[]) => {
+      //     const files = fileItems.map((item) => item.file);
+      //     onChange(files);
+      //   }}
+      onupdatefiles={(fileItems) => {
+        const maxSizeByType: Record<string, number> = {
+          "application/pdf": 1, // MB
+          "image/png": 2,
+          "image/jpeg": 2,
+        };
+
+        const filteredItems = fileItems.filter((item) => {
+          const file = item.file;
+          const sizeMB = file.size / (1024 * 1024);
+          const allowedSize = maxSizeByType[file.type] ?? 1;
+          console.log(file.type, allowedSize, sizeMB);
+
+          if (sizeMB > allowedSize) {
+            alert(
+              `${file.name} exceeds the ${allowedSize}MB limit for ${file.type}`,
+            );
+            return false; // exclude this file
+          }
+
+          return true;
+        });
+
+        onChange(filteredItems.map((item) => item.file));
       }}
       server={null}
       instantUpload={false}

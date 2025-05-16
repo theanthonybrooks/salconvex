@@ -32,7 +32,9 @@ import { Country } from "world-countries";
 registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
 import { FilePondInput } from "@/features/files/filepond";
+import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import "filepond/dist/filepond.min.css";
+import { Id } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormOC1Props {
   user: User | undefined;
@@ -45,7 +47,7 @@ interface SubmissionFormOC1Props {
 
 const SubmissionFormOC1 = ({
   // user,
-  // isAdmin,
+  isAdmin,
   isMobile,
 
   // categoryEvent,
@@ -60,22 +62,21 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
   const eventName = watch("event.name");
+  const eventId = watch("event._id");
+  const isDraft = openCall?.state === "draft";
   const orgTimezone = organizer?.location?.timezone;
   const callType = openCall?.basicInfo?.callType;
   const fixedType = callType === "Fixed";
-  console.log(openCall?.requirements?.applicationLink?.trim().length);
   const ocEligiblityType = openCall?.eligibility?.type;
   const isNational = ocEligiblityType === "National";
   const international = ocEligiblityType === "International";
   const eligDetails = openCall?.eligibility?.details ?? "";
   const showAppFeeInput = hasAppFee?.trim() === "true";
-  console.log(showAppFeeInput, hasAppFee?.trim());
   const hasRequiredDetails =
     (eligDetails.trim().length > 10 && !international) || international;
   const appFee = openCall?.basicInfo?.appFee;
@@ -564,10 +565,18 @@ const SubmissionFormOC1 = ({
                     <FilePondInput
                       value={field.value ?? []}
                       onChange={field.onChange}
-                      purpose="docs"
+                      purpose="images"
                       maxFileSize="5MB"
                     />
                   )}
+                />
+
+                <OpenCallFilesTable
+                  isMobile={isMobile}
+                  files={(openCall.documents ?? []).filter(hasId)}
+                  eventId={eventId as Id<"events">}
+                  isDraft={isDraft}
+                  isAdmin={isAdmin}
                 />
               </div>
             </>

@@ -1695,6 +1695,7 @@ export const EventOCForm = ({
             {/* //------ 1st Step: Org & Event Selection ------ */}
             {activeStep === 0 && (
               <SubmissionFormOrgStep
+                isMobile={isMobile}
                 existingOrg={existingOrg}
                 existingEvent={existingEvent}
                 eventsData={eventsData}
