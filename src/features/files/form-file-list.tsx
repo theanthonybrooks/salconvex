@@ -123,7 +123,7 @@ export function OpenCallFilesTable({
                         if (e.key === "Escape") setEditingId(null);
                       }}
                       autoFocus
-                      className="text-sm"
+                      className="text-base sm:text-sm"
                     />
                   ) : (
                     <button
