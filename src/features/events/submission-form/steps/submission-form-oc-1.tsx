@@ -65,6 +65,7 @@ const SubmissionFormOC1 = ({
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
+  const eventName = watch("event.name");
   const orgTimezone = organizer?.location?.timezone;
   const callType = openCall?.basicInfo?.callType;
   const fixedType = callType === "Fixed";
@@ -499,8 +500,11 @@ const SubmissionFormOC1 = ({
                       value={field.value ?? ""}
                       onChange={field.onChange}
                       placeholder="Please be as specific as possible (limit 2000 characters)"
-                      charLimit={2000}
+                      charLimit={3000}
                       purpose="openCall"
+                      asModal={true}
+                      title={eventName}
+                      subtitle="Application Requirements"
                     />
                   )}
                 />

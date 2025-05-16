@@ -371,23 +371,13 @@ const OpenCallCard = ({
                   <AccordionItem value="Images">
                     <AccordionTrigger title="Images:" />
                     <AccordionContent>
-                      <ol className="list-outside list-decimal px-4 pl-6">
-                        {reqsDocs
-                          .filter((doc) => /\.(jpe?g|png)$/i.test(doc.title))
-                          .map((document, index) => (
-                            <li key={index} className="py-2">
-                              <div className="flex items-center gap-x-2">
-                                {document.title}
-                                <a
-                                  href={document.href}
-                                  download={document.title}
-                                >
-                                  <Download className="size-5 hover:scale-110" />
-                                </a>
-                              </div>
-                            </li>
-                          ))}
-                      </ol>
+                      <div className="flex items-center gap-3">
+                        <LightboxGallery
+                          images={reqsDocs.filter((doc) =>
+                            /\.(jpe?g|png)$/i.test(doc.title),
+                          )}
+                        />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 )}
@@ -687,28 +677,6 @@ const OpenCallCard = ({
                   <AccordionTrigger title="Images:" />
                   <AccordionContent>
                     <div className="flex items-center gap-3">
-                      {/* {reqsDocs
-                        .filter((doc) => /\.(jpe?g|png)$/i.test(doc.title))
-                        .map((document, index) => (
-                          <div
-                            key={index}
-                            className="flex flex-col items-center gap-2"
-                          >
-                            <Image
-                              src={document.href}
-                              alt={document.title}
-                              width={200}
-                              height={200}
-                              className=""
-                            />
-                            <div className="flex items-center gap-x-2">
-                              {document.title}
-                              <a href={document.href} download={document.title}>
-                                <Download className="size-5 hover:scale-110" />
-                              </a>
-                            </div>
-                          </div>
-                        ))} */}
                       <LightboxGallery
                         images={reqsDocs.filter((doc) =>
                           /\.(jpe?g|png)$/i.test(doc.title),

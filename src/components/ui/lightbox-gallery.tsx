@@ -67,7 +67,7 @@ export function LightboxGallery({
             console.log("clicky");
             setSelectedIndex(null);
           }}
-          className="max-w-fit bg-card shadow-xl"
+          className="bg-card shadow-xl sm:max-w-fit"
         >
           <div className="relative h-full max-h-[90vh] w-full max-w-[90vw] rounded">
             <DialogTitle className="sr-only">{selected?.title}</DialogTitle>

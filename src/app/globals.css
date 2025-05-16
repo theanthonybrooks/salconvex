@@ -1259,7 +1259,22 @@ div:has(> div.react-datepicker__input-container) {
 }
 /* #endregion */
 /* #region ------------- Rich Text -------------- */
+.ProseMirror {
+  @apply scrollable justy mini;
+}
+/* .rich-modal-cont {
+  max-width: 90vw;
+} */
 .rich-text {
+  &.rich-modal {
+    @media (max-width: 768px) {
+      max-width: 85vw;
+    }
+    display: flex;
+    & .ProseMirror {
+      padding: 1em 2em 2em;
+    }
+  }
   & * a {
     font-weight: 600;
     text-decoration: underline;
@@ -1323,6 +1338,15 @@ div:has(> div.react-datepicker__input-container) {
 
   & ol ol ol {
     list-style-type: lower-roman;
+  }
+}
+
+.rich-text__preview-wrapper {
+  & p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
   }
 }
 

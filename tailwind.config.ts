@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-
 import tailwindcssAnimate from "tailwindcss-animate";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import { PluginAPI } from "tailwindcss/types/config";
