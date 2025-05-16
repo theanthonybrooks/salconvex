@@ -352,6 +352,7 @@ export const EventOCForm = ({
   const hasUserEditedStep3 =
     JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
     activeStep === 3;
+
   const hasUserEditedStep5 =
     JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
     activeStep === 5;
@@ -888,7 +889,6 @@ export const EventOCForm = ({
         }
       }
       if (activeStep === 3 && hasUserEditedStep3) {
-        let openCallResult = null;
         let openCallFiles = null;
         let saveResults: {
           id: Id<"openCallFiles">;
@@ -941,7 +941,7 @@ export const EventOCForm = ({
 
         try {
           setPending(true);
-          openCallResult = await createOrUpdateOpenCall({
+          await createOrUpdateOpenCall({
             orgId: orgData._id as Id<"organizations">,
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
@@ -1002,7 +1002,6 @@ export const EventOCForm = ({
               ...currentValues.openCall,
             },
           });
-          console.log("openCallResult", openCallResult);
         } catch (error) {
           console.error("Failed to create or update open call:", error);
           toast.error("Failed to create or update open call");
@@ -1437,13 +1436,16 @@ export const EventOCForm = ({
         event: {
           ...existingEvent,
         },
+        openCall: {
+          ...(ocData ?? {}),
+        },
       });
       prevEventRef.current = existingEvent;
       canClearEventData.current = true;
     } else if (!existingEvent) {
       setLastSaved(null);
     }
-  }, [existingEvent, reset, currentValues]);
+  }, [existingEvent, reset, currentValues, ocData]);
 
   useEffect(() => {
     if (savedState.current === false && eventLastEditedAt) {
@@ -1749,7 +1751,7 @@ export const EventOCForm = ({
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={handleCheckSchema}
+                handleCheckSchema={() => handleCheckSchema(false)}
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}

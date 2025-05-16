@@ -378,76 +378,6 @@ const openCallCheckSchema = z.object({
   callType: z.union([z.enum(callTypeValues), z.literal("False")]),
 });
 
-// const openCallSchema = z.object({
-//   adminNoteOC: z.optional(z.string()),
-//   eventId: z.string(),
-//   organizerId: z.array(z.string()),
-//   mainOrgId: z.string(),
-//   basicInfo: z.object({
-//     appFee: z.number(),
-//     callFormat: z.string(),
-//     callType: z.string(),
-//     dates: z.object({
-//       ocStart: z.optional(z.union([z.string(), z.null()])), //todo: make not optional later
-//       ocEnd: z.optional(z.union([z.string(), z.null()])), // todo: make not optional later
-
-//       timezone: z.string(),
-//       edition: z.number(),
-//     }),
-//   }),
-//   eligibility: z.object({
-//     type: z.string(),
-//     //todo: later, add some method/additional fields that will enter in codes for country, region, etc. Maybe start small. Could be tables in the db, so they're easy to query and filter from convex. Then, use that to show user calls that they are or aren't eligible for. Could be put in as a systemic check to ensure that organizers aren't getting ineligible applicants.
-//     whom: z.array(z.string()),
-//     details: z.optional(z.string()),
-//   }),
-//   compensation: z.object({
-//     budget: z.object({
-//       min: z.number(),
-//       max: z.optional(z.number()),
-//       rate: z.number(),
-//       unit: z.string(),
-//       currency: z.string(),
-//       allInclusive: z.boolean(),
-//       moreInfo: z.optional(z.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
-//     }),
-//     categories: z.object({
-//       designFee: z.union([z.number(), z.boolean()]).optional(),
-//       accommodation: z.union([z.number(), z.boolean()]).optional(),
-//       food: z.union([z.number(), z.boolean()]).optional(),
-//       travelCosts: z.union([z.number(), z.boolean()]).optional(),
-//       materials: z.union([z.number(), z.boolean()]).optional(),
-//       equipment: z.union([z.number(), z.boolean()]).optional(),
-//     }),
-//   }),
-
-//   requirements: z.object({
-//     requirements: z.string(),
-//     more: z.string(),
-//     destination: z.string(),
-//     documents: z.optional(
-//       z.array(
-//         z.object({
-//           title: z.string(), //do I ask for the title or just use the path? Not sure.
-//           href: z.string(),
-//         }),
-//       ),
-//     ),
-//     links: z.array(
-//       z.object({
-//         title: z.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
-//         href: z.string(),
-//       }),
-//     ),
-//     applicationLink: z.string(),
-//     otherInfo: z.optional(z.array(z.string())), //todo: make not optional later
-//   }),
-//   // state: z.string(), //draft, submitted, published, archived
-//   state: z.optional(z.string()), //draft, submitted, published, archived
-//   lastUpdatedBy: z.optional(z.string()),
-//   lastUpdatedAt: z.optional(z.number()),
-// });
-
 export const step1Schema = z
   .object({
     organization: organizationSchema,
@@ -513,7 +443,6 @@ export const openCallBaseSchema = z.object({
 
   // mainOrgId: z.string(), //todo: add this later when multiple orgs are supported
   basicInfo: z.object({
-    hasAppFee: z.optional(z.string()),
     appFee: z.number(),
     callFormat: z.union([z.literal("RFQ"), z.literal("RFP")]),
     callType: z.union([
@@ -527,8 +456,8 @@ export const openCallBaseSchema = z.object({
 
     dates: z.optional(
       z.object({
-        ocStart: z.optional(z.union([z.string(), z.null()])), //todo: make not optional later
-        ocEnd: z.optional(z.union([z.string(), z.null()])), // todo: make not optional later
+        ocStart: z.optional(z.union([z.string(), z.null()])),
+        ocEnd: z.optional(z.union([z.string(), z.null()])),
         timezone: z.optional(z.string()), //todo: make not optional later
         // edition: z.number(), //note-to-self: this is used for the event's edition. Not sure if it's needed here. Could also just take from the event if it is necessary for some reason.
       }),
@@ -575,30 +504,23 @@ export const openCallBaseSchema = z.object({
     //       href: z.string(),
     //     }),
     //   ),
-    applicationLink: z.string(),
+    applicationLink: z
+      .string()
+      .min(8, "URL is too short")
+      .refine((val) => !val || isValidUrl(val), {
+        message: "Must be a valid URL (https://...)",
+      }),
     //   otherInfo: z.optional(z.array(z.string())), //todo: make not optional later
   }),
   documents: z.optional(
     z.array(
       z.object({
         id: z.optional(z.string()),
-        title: z.string(), //do I ask for the title or just use the path? Not sure.
+        title: z.string(),
         href: z.string(),
       }),
     ),
   ),
-  // tempFiles: z.optional(
-  //   z.array(
-  //     z.custom<Blob & { name: string; lastModified: number }>((v) => {
-  //       return (
-  //         typeof v === "object" &&
-  //         v !== null &&
-  //         "name" in v &&
-  //         "lastModified" in v
-  //       );
-  //     }),
-  //   ),
-  // ),
   tempFiles: z.array(z.instanceof(File)).optional(),
 });
 
@@ -621,7 +543,7 @@ export const openCallStep1Schema = z
   .superRefine((data, ctx) => {
     if (data.openCall?.eligibility?.type.trim()) {
       const trimmed = data.openCall?.eligibility?.type.trim();
-      const trimmedDetails = data.openCall?.eligibility?.details?.trim();
+      const trimmedDetails = data.openCall?.eligibility?.details?.trim() ?? "";
       if (
         trimmed === "National" &&
         data.openCall?.eligibility?.whom?.length === 0
@@ -629,20 +551,28 @@ export const openCallStep1Schema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Select at least one eligible nationality",
-          path: ["openCall", "eligiblity", "details"],
+          path: ["openCall", "eligibility", "details"],
         });
       }
-      if (
-        trimmed !== "International" &&
-        trimmedDetails &&
-        trimmedDetails.length <= 3
-      ) {
+      if (trimmed !== "International" && trimmedDetails?.length < 33) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "More info is required for non-international calls",
-          path: ["openCall", "eligiblity", "details"],
+          message:
+            "More info is required for non-international calls (min 25 characters)",
+          path: ["openCall", "eligibility", "details"],
         });
       }
+    }
+    if (
+      data.openCall?.basicInfo?.callType === "Fixed" &&
+      (!data.openCall?.basicInfo?.dates?.ocStart ||
+        !data.openCall?.basicInfo?.dates?.ocEnd)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Fixed calls must have a start and end date",
+        path: ["openCall", "basicInfo", "dates"],
+      });
     }
   });
 

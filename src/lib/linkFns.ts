@@ -78,11 +78,18 @@ function isValidChar(char: string, platform: PlatformType): boolean {
   }
 }
 
-export function autoHttps(url: string) {
+// export function autoHttps(url: string) {
+//   const raw = url.trim();
+//   return raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
+// }
+
+export function autoHttps(url: string): string {
   const raw = url.trim();
-  return raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
-  // const normalized = raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
-  // return normalized.replace(/\/+$/, "");
+
+  // Remove any leading malformed or valid protocol (http:/, http://, https:/, https://)
+  const cleaned = raw.replace(/^https?:\/{0,2}/i, "");
+
+  return `https://${cleaned}`;
 }
 
 export function formatDisplayUrl(url: string): string {

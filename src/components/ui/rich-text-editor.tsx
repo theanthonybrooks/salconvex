@@ -8,8 +8,10 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import DOMPurify from "dompurify";
-import { useEffect, useState } from "react";
+import { debounce } from "lodash"; // already assumed installed
+import { useEffect, useRef, useState } from "react";
 import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
+
 import {
   FaBold,
   FaItalic,
@@ -51,6 +53,14 @@ export const RichTextEditor = ({
   purpose,
 }: Props) => {
   const forOpenCall = purpose === "openCall";
+
+  const debouncedOnChange = useRef(
+    debounce((html: string) => {
+      const normalized = html.trim() === "<p></p>" ? "" : html.trim();
+      onChange(normalized);
+    }, 300),
+  ).current;
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -96,7 +106,13 @@ export const RichTextEditor = ({
         ALLOWED_TAGS,
         ALLOWED_ATTR,
       });
-      onChange(clean);
+      const normalized = clean.trim() === "<p></p>" ? "" : clean.trim();
+
+      onChange(normalized);
+    },
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      debouncedOnChange(html);
     },
   });
 
@@ -115,7 +131,7 @@ export const RichTextEditor = ({
   return (
     <div className="rounded border p-2">
       {/* Toolbar */}
-      <div className="max-w-90dvw scrollable mini justx mb-2 flex gap-2 border-b pb-2">
+      <div className="scrollable mini justx mb-2 flex max-w-90dvw gap-2 border-b pb-2">
         <Button
           variant="richTextButton"
           size="richText"

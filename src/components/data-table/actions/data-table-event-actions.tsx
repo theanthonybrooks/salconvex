@@ -25,15 +25,16 @@ interface SubmittedActionProps extends EventActionProps {
   state: SubmissionFormState;
 }
 
-interface ToEventActionProps extends EventActionProps {
+interface ToEventActionProps {
+  slug: string;
   edition: number;
 }
 
-export const GoToEvent = ({ eventId, edition }: ToEventActionProps) => {
+export const GoToEvent = ({ slug, edition }: ToEventActionProps) => {
   return (
     <DropdownMenuItem
       onClick={() => {
-        window.location.href = `/thelist/event/${eventId}/${edition}`;
+        window.location.href = `/thelist/event/${slug}/${edition}`;
       }}
       className="flex items-center gap-x-1"
     >

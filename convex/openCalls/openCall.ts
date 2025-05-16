@@ -109,7 +109,9 @@ export const createOrUpdateOpenCall = mutation({
     const ocState = isAdmin
       ? args.finalStep && args.approved
         ? "published"
-        : "submitted"
+        : !args.finalStep
+          ? "draft"
+          : "submitted"
       : args.state;
 
     const openCallData = {

@@ -61,6 +61,7 @@ export type Event = {
   dates: {
     edition: number;
   };
+  slug: string;
   state: SubmissionFormState;
   category: string;
   type: EventType[];
@@ -328,6 +329,7 @@ export const columns: ColumnDef<Event>[] = [
       const openCallId = event.openCallId;
       const hasOC = !!openCallId;
       const edition = event.dates.edition;
+      const slug = event.slug;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -395,7 +397,7 @@ export const columns: ColumnDef<Event>[] = [
                       isAdmin && <ApproveBoth openCallId={openCallId} />}
                   </>
                 )}
-                <GoToEvent eventId={event._id} edition={edition} />
+                <GoToEvent slug={slug} edition={edition} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}

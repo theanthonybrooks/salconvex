@@ -228,14 +228,18 @@ export default function HorizontalLinearStepper({
                     <Button
                       variant="salWithShadowHidden"
                       className={cn(
-                        "hidden items-center gap-2 bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:flex",
+                        "hidden items-center gap-2 bg-salPinkLtHover opacity-0 hover:bg-salPinkLt disabled:opacity-40 lg:flex",
                         isDirty && onSave !== undefined && "opacity-100",
                       )}
                       //todo: fix the conditional styling that uses isDirty and onSave
                       disabled={!isDirty || disabled}
                       onClick={onSave}
                     >
-                      {pending ? "Saving" : "Save Progress"}
+                      {pending
+                        ? "Saving"
+                        : !isDirty || disabled
+                          ? "Saved"
+                          : "Save Progress"}
                       {pending && <Loader className="size-4 animate-spin" />}
                     </Button>
                   </>
@@ -326,7 +330,8 @@ export default function HorizontalLinearStepper({
                 {finalStep ? (
                   finalLabel ? (
                     <div className="flex items-center gap-1">
-                      {finalLabel} <CheckCircle2 className="size-5" />
+                      {finalLabel}
+                      {!pending && <CheckCircle2 className="size-5" />}
                     </div>
                   ) : (
                     "Finish"
@@ -349,7 +354,7 @@ export default function HorizontalLinearStepper({
                 >
                   <div className="flex items-center gap-1">
                     {pending ? "Publishing..." : "Publish"}{" "}
-                    <FaCheckDouble className="size-5" />
+                    {!pending && <FaCheckDouble className="size-5" />}
                   </div>
 
                   {pending && <Loader className="size-4 animate-spin" />}

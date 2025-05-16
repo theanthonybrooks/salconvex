@@ -24,7 +24,7 @@ import { User } from "@/types/user";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import { ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { registerPlugin } from "react-filepond";
 import { Controller, useFormContext } from "react-hook-form";
 import { Country } from "world-countries";
@@ -40,7 +40,7 @@ interface SubmissionFormOC1Props {
   isMobile: boolean;
   categoryEvent: boolean;
   canNameEvent: boolean;
-  handleCheckSchema?: () => void;
+  handleCheckSchema: () => void;
 }
 
 const SubmissionFormOC1 = ({
@@ -49,51 +49,69 @@ const SubmissionFormOC1 = ({
   isMobile,
 
   // categoryEvent,
-  canNameEvent,
+
   handleCheckSchema,
 }: SubmissionFormOC1Props) => {
   const {
     control,
     watch,
     setValue,
+
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+
+  const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
   const orgTimezone = organizer?.location?.timezone;
   const callType = openCall?.basicInfo?.callType;
   const fixedType = callType === "Fixed";
-
+  console.log(openCall?.requirements?.applicationLink?.trim().length);
   const ocEligiblityType = openCall?.eligibility?.type;
   const isNational = ocEligiblityType === "National";
-
-  const hasAppFee = openCall?.basicInfo?.hasAppFee;
+  const international = ocEligiblityType === "International";
+  const eligDetails = openCall?.eligibility?.details ?? "";
   const showAppFeeInput = hasAppFee?.trim() === "true";
+  console.log(showAppFeeInput, hasAppFee?.trim());
+  const hasRequiredDetails =
+    (eligDetails.trim().length > 10 && !international) || international;
   const appFee = openCall?.basicInfo?.appFee;
-  const validAppFeeAmount = !!appFee && appFee > 0;
-  const noAppFeeAmount = !!appFee && appFee === 0;
+  const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
+  const noAppFeeAmount = typeof appFee === "number" && appFee === 0;
   const ocStart = openCall?.basicInfo?.dates?.ocStart;
   const ocEnd = openCall?.basicInfo?.dates?.ocEnd;
   const noEndRequired = callType && !fixedType;
   const today = new Date();
   const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
-
   // #region -------------- UseEffect ---------------
+
+  useEffect(() => {
+    if (!fixedType) {
+      setValue("openCall.basicInfo.dates.ocEnd", undefined);
+      setValue("openCall.basicInfo.dates.ocStart", undefined);
+    }
+  }, [fixedType, setValue]);
+
   useEffect(() => {
     const formValue = hasAppFee?.trim();
     const shouldBe = validAppFeeAmount ? "true" : "";
-    if (!formValue) {
-      if (validAppFeeAmount) {
-        setValue("openCall.basicInfo.hasAppFee", shouldBe);
-      } else {
-        setValue("openCall.basicInfo.hasAppFee", "false");
-      }
+
+    if (!formValue && validAppFeeAmount) {
+      setHasAppFee(shouldBe);
+    } else if (!formValue && noAppFeeAmount) {
+      setHasAppFee("false");
     } else if (formValue === "false" && validAppFeeAmount) {
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
+
+  useEffect(() => {
+    if (hasAppFee === "false" && appFee === undefined) {
+      setValue("openCall.basicInfo.appFee", 0);
+    }
+  }, [appFee, hasAppFee, setValue]);
 
   useEffect(() => {
     if (!ocEligiblityType) return;
@@ -214,7 +232,7 @@ const SubmissionFormOC1 = ({
                       Regional/Local Artists
                     </SelectItem>
                     <SelectItem fit value="Other">
-                      Other (specify below)
+                      Other (specify below - Required)
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -238,7 +256,7 @@ const SubmissionFormOC1 = ({
                 control={control}
                 render={({ field }) => (
                   <SearchMappedMultiSelect<Country>
-                    values={field.value}
+                    values={field.value ?? []}
                     onChange={field.onChange}
                     data={sortedGroupedCountries}
                     placeholder="Select eligible nationalities"
@@ -278,6 +296,10 @@ const SubmissionFormOC1 = ({
                   <RichTextEditor
                     value={field.value ?? ""}
                     onChange={field.onChange}
+                    // onChange={(val) => {
+                    //   field.onChange(val);
+                    //   // handleCheckSchema();
+                    // }}
                     placeholder="Please be as specific as possible (limit 750 characters)"
                     charLimit={750}
                   />
@@ -287,7 +309,7 @@ const SubmissionFormOC1 = ({
           </>
         )}
 
-        {canNameEvent && (
+        {hasRequiredDetails && (
           <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">Step 3:</p>
@@ -295,37 +317,32 @@ const SubmissionFormOC1 = ({
             </div>
 
             <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="openCall.basicInfo.hasAppFee" className="sr-only">
+              <Label htmlFor="hasAppFee" className="sr-only">
                 Application Fee
               </Label>
-              <Controller
-                name="openCall.basicInfo.hasAppFee"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    onValueChange={(value: "true" | "false" | "") => {
-                      field.onChange(value);
-                    }}
-                    value={field.value || ""}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "h-12 w-full min-w-44 border text-center text-base sm:h-[50px] sm:w-fit",
-                      )}
-                    >
-                      <SelectValue placeholder="Is there an application fee?" />
-                    </SelectTrigger>
-                    <SelectContent className="min-w-auto">
-                      <SelectItem fit value="true">
-                        Yes
-                      </SelectItem>
-                      <SelectItem fit value="false">
-                        No
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+
+              <Select
+                onValueChange={(value: "true" | "false" | "") => {
+                  setHasAppFee(value);
+                }}
+                value={hasAppFee}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "h-12 w-full min-w-44 border text-center text-base sm:h-[50px] sm:w-fit",
+                  )}
+                >
+                  <SelectValue placeholder="Application fee?*" />
+                </SelectTrigger>
+                <SelectContent className="min-w-auto">
+                  <SelectItem fit value="true">
+                    Yes
+                  </SelectItem>
+                  <SelectItem fit value="false">
+                    No
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
               <div className="hidden items-center justify-center px-2 sm:flex">
                 <ArrowRight
@@ -390,214 +407,169 @@ const SubmissionFormOC1 = ({
                 />
               </div>
             </div>
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 4:</p>
-              <p className="lg:text-xs">Open Call Dates</p>
-            </div>
-
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="openCall.basicInfo.dates" className="sr-only">
-                Open Call Dates
-              </Label>
-              <Controller
-                name="openCall.basicInfo.dates.ocStart"
-                control={control}
-                render={({ field }) => (
-                  <OcCustomDatePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    pickerType="start"
-                    className="hansel min-h-12"
-                    placeholder="Start Date"
-                  />
-                )}
-              />
-
-              <div className="hidden items-center justify-center px-2 sm:flex">
-                <ArrowRight
-                  className={cn(
-                    "invisible size-4 shrink-0 text-foreground/50",
-                    showAppFeeInput && "visible",
-                  )}
-                />
-              </div>
-
-              <Controller
-                name="openCall.basicInfo.dates.ocEnd"
-                control={control}
-                render={({ field }) => (
-                  <OcCustomDatePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    pickerType="end"
-                    className="gretel min-h-12"
-                    minDate={minDate}
-                    ocEnd={ocEnd}
-                    orgTimezone={orgTimezone}
-                    placeholder="Deadline"
-                  />
-                )}
-              />
-            </div>
           </>
         )}
       </div>
-      {(ocEnd || noEndRequired) && (
-        <>
-          <Separator
-            thickness={2}
-            className="mx-auto hidden xl:block"
-            orientation="vertical"
-          />
-          <div
-            className={cn(
-              "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-              "lg:pt-10 xl:py-10 4xl:my-auto",
-              // "xl:self-center",
-            )}
-          >
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 5:</p>
-              <p className="lg:text-xs">Application Requirements</p>
-            </div>
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="event.type" className="sr-only">
-                Application Requirements
-              </Label>
-              <Controller
-                name="openCall.requirements.requirements"
-                control={control}
-                render={({ field }) => (
-                  <RichTextEditor
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    placeholder="Please be as specific as possible (limit 2000 characters)"
-                    charLimit={2000}
-                    purpose="openCall"
-                  />
-                )}
-              />
-            </div>
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 6</p>
-              <p className="lg:text-xs">Application Link</p>
-              {/* TODO: when internal applications are implemented, add this back in */}
-              {/* <p className="lg:text-xs">(If external)</p> */}
-            </div>
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label
-                htmlFor="openCall.requirements.applicationLink"
-                className="sr-only"
-              >
-                Application Link
-              </Label>
-              <Controller
-                name="openCall.requirements.applicationLink"
-                control={control}
-                render={({ field }) => (
-                  <DebouncedControllerInput
-                    field={field}
-                    placeholder="Link to external application form"
-                    className={cn(
-                      "w-full rounded border-foreground",
-                      errors?.openCall?.requirements?.applicationLink &&
-                        "invalid-field",
+
+      <>
+        <Separator
+          thickness={2}
+          className="mx-auto hidden xl:block"
+          orientation="vertical"
+        />
+        <div
+          className={cn(
+            "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+            "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+            "lg:pt-10 xl:py-10 4xl:my-auto",
+            // "xl:self-center",
+          )}
+        >
+          {" "}
+          {fixedType &&
+            ocEligiblityType &&
+            hasRequiredDetails &&
+            typeof appFee === "number" && (
+              <>
+                <div className="input-section">
+                  <p className="min-w-max font-bold lg:text-xl">Step 4:</p>
+                  <p className="lg:text-xs">Open Call Dates</p>
+                </div>
+
+                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+                  <Label htmlFor="openCall.basicInfo.dates" className="sr-only">
+                    Open Call Dates
+                  </Label>
+                  <Controller
+                    name="openCall.basicInfo.dates.ocStart"
+                    control={control}
+                    render={({ field }) => (
+                      <OcCustomDatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        pickerType="start"
+                        className="hansel min-h-12"
+                        placeholder="Start Date"
+                      />
                     )}
-                    transform={autoHttps}
-                    tabIndex={2}
-                    onBlur={() => {
-                      field.onBlur?.();
-                      handleCheckSchema?.();
-                      // console.log("Blur me", field + type)
-                    }}
-                  />
-                )}
-              />
-            </div>
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 7</p>
-              <p className="lg:text-xs">Application Docs</p>
-            </div>
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="openCall.tempFiles" className="sr-only">
-                Application Documents
-              </Label>
-              <Controller
-                name="openCall.tempFiles"
-                control={control}
-                render={({ field }) => (
-                  <FilePondInput
-                    value={field.value ?? []}
-                    onChange={field.onChange}
-                    purpose="docs"
-                    maxFileSize="5MB"
                   />
 
-                  // <FilePond
-                  //   allowMultiple={true}
-                  //   maxFiles={5}
-                  //   maxFileSize="1MB"
-                  //   allowFileTypeValidation={true}
-                  //   acceptedFileTypes={[
-                  //     "application/pdf",
-                  //     "application/msword",
-                  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                  //   ]}
-                  //   onupdatefiles={(items: FilePondFile[]) => {
-                  //     const files = items.map((item) => item.file);
-                  //     field.onChange(files);
-                  //   }}
-                  // />
-                  // <FilePond
-                  //   allowMultiple
-                  //   maxFiles={5}
-                  //   allowFileTypeValidation={true}
-                  //   allowFileSizeValidation={true}
-                  //   maxFileSize="1MB" // per file
-                  //   acceptedFileTypes={[
-                  //     "application/pdf",
-                  //     "application/msword",
-                  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                  //   ]}
-                  //   labelFileTypeNotAllowed="Only PDF or Word documents allowed"
-                  //   labelMaxFileSizeExceeded="File is too large"
-                  //   fileValidateTypeLabelExpectedTypesMap={{
-                  //     "application/pdf": ".pdf",
-                  //     "application/msword": ".doc",
-                  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                  //       ".docx",
-                  //   }}
-                  //   onupdatefiles={(items) => {
-                  //     // Optional: manually filter to be safe
-                  //     const acceptedMimeTypes = new Set([
-                  //       "application/pdf",
-                  //       "application/msword",
-                  //       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                  //     ]);
-                  //     const filtered = items.filter((item) =>
-                  //       acceptedMimeTypes.has(item.file.type),
-                  //     );
-                  //     const totalSize = filtered.reduce(
-                  //       (sum, i) => sum + i.file.size,
-                  //       0,
-                  //     );
-                  //     const maxTotalSize = 10 * 1024 * 1024;
+                  <div className="hidden items-center justify-center px-2 sm:flex">
+                    <ArrowRight
+                      className={cn("size-4 shrink-0 text-foreground/50")}
+                    />
+                  </div>
 
-                  //     if (totalSize > maxTotalSize) {
-                  //       alert("Total upload size exceeds 10MB.");
-                  //       return;
-                  //     }
-
-                  //     field.onChange(filtered.map((item) => item.file));
-                  //   }}
-                  // />
-                )}
-              />
-            </div>
-          </div>
-        </>
-      )}
+                  <Controller
+                    name="openCall.basicInfo.dates.ocEnd"
+                    control={control}
+                    render={({ field }) => (
+                      <OcCustomDatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        pickerType="end"
+                        className="gretel min-h-12"
+                        minDate={minDate}
+                        ocEnd={ocEnd}
+                        orgTimezone={orgTimezone}
+                        placeholder="Deadline"
+                      />
+                    )}
+                  />
+                </div>
+              </>
+            )}
+          {(ocEnd || noEndRequired) && hasRequiredDetails && (
+            <>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">
+                  Step {fixedType ? 5 : 4}:
+                </p>
+                <p className="lg:text-xs">Application Requirements</p>
+              </div>
+              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="event.type" className="sr-only">
+                  Application Requirements
+                </Label>
+                <Controller
+                  name="openCall.requirements.requirements"
+                  control={control}
+                  render={({ field }) => (
+                    <RichTextEditor
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      placeholder="Please be as specific as possible (limit 2000 characters)"
+                      charLimit={2000}
+                      purpose="openCall"
+                    />
+                  )}
+                />
+              </div>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">
+                  Step {fixedType ? 6 : 5}:
+                </p>
+                <p className="lg:text-xs">Application Link</p>
+                {/* TODO: when internal applications are implemented, add this back in */}
+                {/* <p className="lg:text-xs">(If external)</p> */}
+              </div>
+              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <Label
+                  htmlFor="openCall.requirements.applicationLink"
+                  className="sr-only"
+                >
+                  Application Link
+                </Label>
+                <Controller
+                  name="openCall.requirements.applicationLink"
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerInput
+                      field={field}
+                      placeholder="Link to external application form"
+                      className={cn(
+                        "w-full rounded border-foreground",
+                        errors?.openCall?.requirements?.applicationLink &&
+                          "invalid-field",
+                      )}
+                      transform={autoHttps}
+                      tabIndex={2}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                        // console.log("Blur me", field + type)
+                      }}
+                    />
+                  )}
+                />
+              </div>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">
+                  Step {fixedType ? 7 : 6}:
+                </p>
+                <p className="lg:text-xs">Application Docs</p>
+              </div>
+              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="openCall.tempFiles" className="sr-only">
+                  Application Documents
+                </Label>
+                <Controller
+                  name="openCall.tempFiles"
+                  control={control}
+                  render={({ field }) => (
+                    <FilePondInput
+                      value={field.value ?? []}
+                      onChange={field.onChange}
+                      purpose="docs"
+                      maxFileSize="5MB"
+                    />
+                  )}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </>
     </div>
 
     //   )}

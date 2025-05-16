@@ -1084,8 +1084,8 @@ div:has(> div.react-datepicker__input-container) {
   position: relative;
   overflow: auto;
   scrollbar-gutter: auto;
-  min-height: 65dvh;
-  max-height: 65dvh;
+  min-height: min(65dvh, 450px);
+  max-height: min(65dvh, 450px);
 
   @media (max-width: 768px) {
     max-height: 200px;
@@ -1385,6 +1385,54 @@ div:has(> div.react-datepicker__input-container) {
   }
 }
 
+/* #region ---------- FilePond -------------- */
 .filepond--credits {
   display: none;
 }
+.filepond--wrapper {
+  border: 1px solid hsl(var(--foreground));
+  overflow: hidden;
+  border-radius: 0.3em;
+  & .filepond--root {
+    margin-bottom: 0 !important;
+  }
+  & .filepond--panel-root {
+    background-color: transparent;
+  }
+}
+
+.filepond--item {
+  & .filepond--file-wrapper {
+    /* background: hsl(var(--background)); */
+    border-radius: 0.3em;
+    border: 1px solid hsl(var(--foreground) / 0.3);
+    & .filepond--file-info {
+      & span.filepond--file-info-main {
+        color: hsl(var(--foreground));
+      }
+      & span.filepond--file-info-sub {
+        color: hsl(var(--foreground) / 0.8);
+      }
+    }
+  }
+  & .filepond--item-panel {
+    background: hsl(var(--background));
+    border: 1px solid hsl(var(--foreground) / 0.3);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+  & .filepond--file-action-button.filepond--action-remove-item {
+    &:focus,
+    &:hover {
+      box-shadow: none !important;
+    }
+    &:hover {
+      cursor: pointer;
+      scale: 1.1;
+    }
+    &:active {
+      scale: 0.95;
+    }
+  }
+}
+
+/* #endregion */
