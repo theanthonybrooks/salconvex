@@ -1,4 +1,4 @@
-import Force404Url from "@/components/force404url";
+// import Force404Url from "@/components/force404url";
 import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
@@ -7,7 +7,7 @@ import Image from "next/image";
 export default async function NotFound() {
   return (
     <ClientAuthWrapper>
-      <Force404Url />
+      {/* <Force404Url /> */}
       <div className="h-full min-h-screen">
         <NavbarWrapper type="public" />
         <div className="scrollable mini darkbar flex min-h-screen flex-col justify-between">
