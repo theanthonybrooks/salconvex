@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CropModal } from "@/components/ui/crop-modal";
 import { cn } from "@/lib/utils";
-import { LoaderPinwheel, PlusIcon } from "lucide-react";
+import { LoaderCircle, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -200,7 +200,7 @@ export default function AvatarUploader({
                 >
                   {loading ? (
                     <div className="flex flex-row items-center gap-2">
-                      <LoaderPinwheel className="h-4 w-4 animate-spin" />
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
                       Uploading...
                     </div>
                   ) : (

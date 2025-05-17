@@ -55,7 +55,7 @@ import {
   Eye,
   EyeOff,
   Globe,
-  LoaderPinwheel,
+  LoaderCircle,
   Mail,
   Palette,
   Shield,
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                   >
                     {isSaving ? (
                       <span className="flex items-center gap-2">
-                        <LoaderPinwheel className="size-4 animate-spin" />
+                        <LoaderCircle className="size-4 animate-spin" />
                         Saving...
                       </span>
                     ) : hoverSave ? (

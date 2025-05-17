@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 import {
   Form,
   FormControl,
@@ -30,7 +31,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import CloseBtn from "@/features/auth/components/close-btn";
+
 import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
 import { onEmailChange } from "@/lib/privacy";
@@ -295,12 +296,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
-      <CloseBtn
+      <DialogCloseBtn
         title="Are you sure?"
         description="You can always start again at any time though an account is required to apply to open calls."
-        onAction={onCancelSignup}
         actionTitle="Confirm"
-        actionClassName="px-10"
+        onAction={onCancelSignup}
       />
       {step === "signUp" && (
         <CardHeader className="space-y-0 pb-0">

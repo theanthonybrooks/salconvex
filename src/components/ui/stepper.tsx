@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
-import { Check, CheckCircle2, Loader } from "lucide-react";
+import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
 import * as React from "react";
 import { FaCheckDouble } from "react-icons/fa6";
 import { z } from "zod";
@@ -240,7 +240,9 @@ export default function HorizontalLinearStepper({
                         : !isDirty || disabled
                           ? "Saved"
                           : "Save Progress"}
-                      {pending && <Loader className="size-4 animate-spin" />}
+                      {pending && (
+                        <LoaderCircle className="size-4 animate-spin" />
+                      )}
                     </Button>
                   </>
                 )}
@@ -287,7 +289,9 @@ export default function HorizontalLinearStepper({
                     className="hidden items-center gap-1 sm:flex"
                   >
                     {pending ? "Pending..." : "Check Schema"}
-                    {pending && <Loader className="size-4 animate-spin" />}
+                    {pending && (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    )}
                   </Button>
                 )}
 
@@ -341,7 +345,7 @@ export default function HorizontalLinearStepper({
                 ) : (
                   "Next"
                 )}
-                {pending && <Loader className="size-4 animate-spin" />}
+                {pending && <LoaderCircle className="size-4 animate-spin" />}
               </Button>
               {adminFinalStep && onPublish && (
                 <Button
@@ -357,7 +361,7 @@ export default function HorizontalLinearStepper({
                     {!pending && <FaCheckDouble className="size-5" />}
                   </div>
 
-                  {pending && <Loader className="size-4 animate-spin" />}
+                  {pending && <LoaderCircle className="size-4 animate-spin" />}
                 </Button>
               )}
               {adminFinalStep && (

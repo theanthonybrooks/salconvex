@@ -10,7 +10,7 @@ import {
 import { Event } from "@/features/events/components/events-data-table/columns";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import { LoaderPinwheel } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
@@ -65,7 +65,7 @@ export const DataTableEventEdition = ({
           <SelectTrigger className="h-8 w-[80px]">
             {pendingEdition !== null ? (
               <span className="flex w-full items-center justify-center">
-                <LoaderPinwheel className="ml-1 size-4 animate-spin text-muted-foreground" />
+                <LoaderCircle className="ml-1 size-4 animate-spin text-muted-foreground" />
               </span>
             ) : (
               <SelectValue placeholder={String(currentEdition)} />

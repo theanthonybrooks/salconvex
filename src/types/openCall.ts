@@ -119,6 +119,7 @@ export interface OpenCall {
     id?: Id<"openCallFiles">;
     title: string;
     href: string;
+    archived?: boolean;
   }[];
   state?: SubmissionFormState;
 }

@@ -161,7 +161,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           </div>
 
           <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 text-balance pr-1 text-base font-semibold capitalize">
+            <p className="mb-1 max-w-[18ch] hyphens-auto text-balance break-words pr-1 text-base font-semibold capitalize">
               {event?.name}
             </p>
           </div>

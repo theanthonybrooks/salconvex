@@ -162,13 +162,13 @@ export const AccountSubscribeForm = ({
             title={unsavedAlertTitle}
             description={unsavedAlertDescription}
             onAction={() => {
-              handleClose(true);
-            }}
-            actionTitle="Save Draft & Exit"
-            onPrimaryAction={() => {
               handleClose(false);
             }}
-            primaryActionTitle="Exit"
+            primaryActionTitle="Save Draft & Exit"
+            onPrimaryAction={() => {
+              handleClose(true);
+            }}
+            actionTitle="Exit"
             className="w-full"
           />
         ) : (

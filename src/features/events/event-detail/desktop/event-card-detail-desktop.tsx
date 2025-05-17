@@ -103,7 +103,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",
         )}
       >
-        <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
+        <div className="col-span-full mb-4 grid w-full max-w-[calc(100%-12px)] grid-cols-[75px_auto] gap-x-3 pt-2">
           <div className="col-span-1 flex items-center justify-center">
             <Image
               src={eventLogo}
@@ -117,7 +117,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           </div>
 
           <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 text-balance pr-1 text-base font-semibold capitalize">
+            <p className="mb-1 max-w-[18ch] hyphens-auto text-balance break-words pr-1 text-base font-semibold capitalize">
               {event?.name}
             </p>
           </div>

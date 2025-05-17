@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
+export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  transition-colors   disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 [&_svg]:pointer-events-none ",
@@ -29,6 +30,7 @@ const buttonVariants = cva(
         linkHover2: `relative after:absolute after:bg-primary after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:ease-in-out after:duration-300 `,
         salWithShadow: `bg-white text-foreground border-2 border-foreground font-medium shadow-slg transition-all duration-300 linear hover:shadow-slgHover hover:translate-x-[-1px]  active:shadow-none active:translate-x-[-3px] active:translate-y-[3px]   dark:border-primary-foreground dark:text-primary-foreground `,
         salWithShadowHidden: `bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground `,
+        salWithShadowHiddenPink: `bg-salPink text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground `,
         salWithShadowHiddenBg: `bg-background text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-slg hover:translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground `,
         salWithShadowHiddenLeft: `bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-llg hover:-translate-x-[3px] hover:translate-y-[-3px] active:shadow-none active:translate-x-0 active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground `,
         salWithShadowHiddenVert: `bg-white text-foreground border-2 border-foreground font-medium shadow-none transition-all duration-300 linear hover:shadow-vlg  hover:translate-y-[-3px] active:shadow-none  active:translate-y-0 dark:border-primary-foreground dark:text-primary-foreground `,

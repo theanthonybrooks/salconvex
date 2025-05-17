@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import { ArrowRight, CheckCircle, LoaderPinwheel } from "lucide-react";
+import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
 import { infoEmail } from "@/constants/siteInfo";
 import { isValidEmail } from "@/lib/linkFns";
@@ -232,7 +232,7 @@ export default function Footer({ className }: { className?: string }) {
                     {subAction === "cta" ? (
                       <ArrowRight className="ml-2 size-4" />
                     ) : subAction === "subbing" ? (
-                      <LoaderPinwheel className="size-4 animate-spin" />
+                      <LoaderCircle className="size-4 animate-spin" />
                     ) : (
                       <CheckCircle className="size-4" />
                     )}

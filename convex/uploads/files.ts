@@ -132,14 +132,18 @@ export const deleteFile = mutation({
           });
         }
       } else {
-        // Non-admins archive instead of delete
+        // Non-admins archive instead of delete — or toggle archive state
+        const newArchivedState = !file.archived;
+
         await ctx.db.patch(args.fileId, {
-          archived: true,
+          archived: newArchivedState,
         });
 
         if (openCall?._id && openCall.documents) {
           const updatedDocs = openCall.documents.map((doc) =>
-            doc.id === args.fileId ? { ...doc, archived: true } : doc,
+            doc.id === args.fileId
+              ? { ...doc, archived: newArchivedState }
+              : doc,
           );
           await ctx.db.patch(openCall._id, {
             documents: updatedDocs,

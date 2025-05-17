@@ -113,7 +113,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
       <button
-        className="absolute right-5 top-4 z-10 text-lg font-bold text-foreground hover:rounded-full hover:text-salPink focus-visible:bg-salPink"
+        className="absolute right-5 top-4 z-10 text-lg font-bold text-foreground hover:text-red-600 focus:text-red-600"
         aria-label="Back to homepage"
         tabIndex={8}
         onClick={() => router.push("/")}

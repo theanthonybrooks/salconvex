@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import { Loader, LogOut } from "lucide-react";
+import { LoaderCircle, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export const UserBtn = () => {
@@ -18,7 +18,9 @@ export const UserBtn = () => {
   const { data, isLoading } = useCurrentUser();
 
   if (isLoading) {
-    return <Loader className="size-4 animate-spin text-muted-foreground" />;
+    return (
+      <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+    );
   }
 
   if (!data) {

@@ -52,7 +52,7 @@ const Event = () => {
               Loading...
             </p>
           </Skeleton>
-          {/* Loading <LoaderPinwheel className="animate-spin" /> */}
+          {/* Loading <LoaderCircle className="animate-spin" /> */}
         </div>
       ) : (
         <>

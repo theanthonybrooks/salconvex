@@ -229,7 +229,9 @@ const EventCardPreview = ({
         <div className="flex flex-col gap-y-3 pb-3 pt-3">
           <div className="mb-2 flex flex-col gap-y-1">
             <div className="mb-2 flex flex-col gap-y-1">
-              <p className="text-base font-semibold">{event?.name}</p>
+              <p className="break-words text-base font-semibold">
+                {event?.name}
+              </p>
               <p className="text-sm">{locationString}</p>
             </div>
             <div className="flex items-start gap-x-1 text-sm">
@@ -493,7 +495,7 @@ const EventCardPreview = ({
                   height={48}
                   width={48}
                 />
-                <p className="text-base font-semibold">{name}</p>
+                <p className="break-words text-base font-semibold">{name}</p>
                 {/* <p className='text-sm'>{locationString}</p> */}
               </div>
             </Link>

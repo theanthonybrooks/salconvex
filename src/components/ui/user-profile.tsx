@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { infoEmail } from "@/constants/siteInfo";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ import { usePreloadedQuery } from "convex/react";
 // import { SignOutButton, useUser } from "@clerk/nextjs";
 import { LogOut, LucideLayoutDashboard, Settings, Users } from "lucide-react";
 import Link from "next/link";
+import { BiSupport } from "react-icons/bi";
 import { FaUserNinja } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
 
@@ -151,6 +153,16 @@ export function UserProfile({
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <Link
+          href={`mailto:${infoEmail}?subject=Support`}
+          className="underline-offset-2 hover:cursor-pointer hover:underline"
+        >
+          <DropdownMenuItem className="focus:bg-salYellow/50">
+            <BiSupport className="mr-2 size-4" />
+            <span>Help & Support</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         <SignOutBtn>
           <DropdownMenuItem className="focus:bg-salPink/50">

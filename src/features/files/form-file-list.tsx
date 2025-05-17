@@ -6,7 +6,7 @@ import { FilePreviewer } from "@/components/ui/popover-file-preview";
 import { getMimeTypeFromHref } from "@/lib/fileFns";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
-import { Book, X } from "lucide-react";
+import { Book, Download, X } from "lucide-react";
 import { useState } from "react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -24,6 +24,9 @@ interface Props {
   isDraft: boolean;
   isAdmin: boolean;
   isMobile: boolean;
+  isPublic?: boolean;
+  type?: "docs" | "images";
+  className?: string;
 }
 
 export function hasId<T extends { id?: unknown }>(
@@ -38,12 +41,20 @@ export function OpenCallFilesTable({
   isDraft,
   isAdmin,
   isMobile,
+  isPublic = false,
+  type,
+  className,
 }: Props) {
   const deleteFile = useMutation(api.uploads.files.deleteFile);
   const editFileName = useMutation(api.uploads.files.editFileName);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState("");
+  const isDocument = type === "docs";
+  const documentPattern = /\.(pdf|docx?|pptx?)$/i;
+  const visibleFiles = isDocument
+    ? files.filter((doc) => documentPattern.test(doc.title))
+    : files;
 
   const startEditing = (id: string, currentTitle: string) => {
     setEditingId(id);
@@ -66,19 +77,20 @@ export function OpenCallFilesTable({
   const mobileHidden = "hidden md:block";
   const mobileEditing = isMobile && editingId !== null;
   return (
-    <div className="mt-2 space-y-2">
-      <span className="flex items-center gap-2">
-        {" "}
-        <Label className="sm underline underline-offset-2">
-          Existing Files:
-        </Label>{" "}
-        <p className="text-xs italic text-foreground/60">
-          Click on a file to edit its name{" "}
-        </p>
-      </span>
+    <div className={cn("mt-2 space-y-2", className)}>
+      {!isPublic && (
+        <span className="flex items-center gap-2">
+          <Label className="sm underline underline-offset-2">
+            Existing Files:
+          </Label>
+          <p className="text-xs italic text-foreground/60">
+            Click on a file to edit its name
+          </p>
+        </span>
+      )}
       <table className="w-full table-auto text-sm text-foreground/70">
         <thead>
-          <tr className="border-b border-muted text-left">
+          <tr className="border-b border-muted text-left text-xs">
             <th className="w-8 px-2 py-1">#</th>
             <th className="px-2 py-1">Document</th>
             {!mobileEditing && (
@@ -86,20 +98,25 @@ export function OpenCallFilesTable({
                 {!isMobile && "Preview"}
               </th>
             )}
-            {!isDraft && !mobileEditing && (
-              <th className={cn("w-10 px-2 py-1 text-center", mobileHidden)}>
+            {!isDraft && !mobileEditing && !isPublic && (
+              <th className={cn("w-12 px-2 py-1 text-center", mobileHidden)}>
                 Archive
               </th>
             )}
-            {!mobileEditing && (
+            {!mobileEditing && !isPublic && (
               <th className={cn("w-10 px-2 py-1 text-center")}>
                 {!isMobile && "Delete"}
+              </th>
+            )}
+            {isPublic && (
+              <th className={cn("w-10 px-2 py-1 text-center")}>
+                {!isMobile && "Download"}
               </th>
             )}
           </tr>
         </thead>
         <tbody>
-          {files
+          {visibleFiles
             .sort((a, b) => a.title.localeCompare(b.title))
             .map((doc, i) => (
               <tr
@@ -113,7 +130,17 @@ export function OpenCallFilesTable({
                     editingId === doc.id && "max-w-auto",
                   )}
                 >
-                  {editingId === doc.id ? (
+                  {isPublic ? (
+                    <FilePreviewer
+                      title={doc.title}
+                      href={doc.href}
+                      type={getMimeTypeFromHref(doc.title)}
+                      isPublic={isPublic}
+                      icon={false}
+                    >
+                      {doc.title}
+                    </FilePreviewer>
+                  ) : editingId === doc.id ? (
                     <Input
                       value={tempTitle}
                       onChange={(e) => setTempTitle(e.target.value)}
@@ -131,7 +158,10 @@ export function OpenCallFilesTable({
                         "w-full truncate text-left hover:underline",
                         doc.archived && "line-through",
                       )}
-                      onClick={() => startEditing(doc.id, doc.title)}
+                      onClick={() => {
+                        if (isPublic) return;
+                        startEditing(doc.id, doc.title);
+                      }}
                     >
                       {doc.title}
                     </button>
@@ -140,12 +170,14 @@ export function OpenCallFilesTable({
                 {!mobileEditing && (
                   <td className={cn("px-2 py-2 text-center")}>
                     <FilePreviewer
+                      title={doc.title}
                       href={doc.href}
                       type={getMimeTypeFromHref(doc.title)}
+                      isPublic={isPublic}
                     />
                   </td>
                 )}
-                {!isDraft && !isMobile && (
+                {!isDraft && !isMobile && !isPublic && (
                   <td className="px-2 py-2 text-center">
                     <Book
                       className={cn(
@@ -164,7 +196,7 @@ export function OpenCallFilesTable({
                     />
                   </td>
                 )}
-                {!mobileEditing && (
+                {!mobileEditing && !isPublic && (
                   <td className="px-2 py-2 text-center">
                     <X
                       className={cn(
@@ -177,6 +209,17 @@ export function OpenCallFilesTable({
                         })
                       }
                     />
+                  </td>
+                )}
+                {isPublic && (
+                  <td className="px-2 py-2 text-center">
+                    <a href={doc.href} download={doc.title}>
+                      <Download
+                        className={cn(
+                          "mx-auto size-4 cursor-pointer hover:scale-110 active:scale-95",
+                        )}
+                      />
+                    </a>
                   </td>
                 )}
               </tr>

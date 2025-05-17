@@ -577,6 +577,7 @@ const SubmissionFormOC1 = ({
                   eventId={eventId as Id<"events">}
                   isDraft={isDraft}
                   isAdmin={isAdmin}
+                  
                 />
               </div>
             </>

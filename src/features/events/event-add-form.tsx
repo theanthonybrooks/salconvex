@@ -422,7 +422,7 @@ export const EventOCForm = ({
         },
       );
 
-      if (paid) {
+      if (paid && !isAdmin) {
         setTimeout(() => {
           onClick();
           // onClick()

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CalendarClockIcon, Download } from "lucide-react";
+import { CalendarClockIcon } from "lucide-react";
 
 import {
   Accordion,
@@ -18,6 +18,7 @@ import {
   OpenCallProvided,
   OpenCallProvidedPreview,
 } from "@/features/events/open-calls/components/open-call-provided";
+import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
@@ -344,25 +345,15 @@ const OpenCallCard = ({
                   <AccordionItem value="Docs">
                     <AccordionTrigger title="Documents:" />
                     <AccordionContent>
-                      <ol className="list-outside list-decimal px-4 pl-6">
-                        {reqsDocs
-                          .filter((doc) =>
-                            /\.(pdf|docx?|pptx?)$/i.test(doc.title),
-                          )
-                          .map((document, index) => (
-                            <li key={index} className="py-2">
-                              <div className="flex items-center gap-x-2">
-                                {document.title}
-                                <a
-                                  href={document.href}
-                                  download={document.title}
-                                >
-                                  <Download className="size-5 hover:scale-110" />
-                                </a>
-                              </div>
-                            </li>
-                          ))}
-                      </ol>
+                      <OpenCallFilesTable
+                        files={(reqsDocs ?? []).filter(hasId)}
+                        eventId={event._id}
+                        isDraft={false}
+                        isAdmin={false}
+                        isPublic={true}
+                        type="docs"
+                        isMobile={true}
+                      />
                     </AccordionContent>
                   </AccordionItem>
                 )}
@@ -649,22 +640,16 @@ const OpenCallCard = ({
                 >
                   <AccordionTrigger title="Documents:" />
                   <AccordionContent>
-                    <ol className="list-outside list-decimal px-4 pl-6">
-                      {reqsDocs
-                        .filter((doc) =>
-                          /\.(pdf|docx?|pptx?)$/i.test(doc.title),
-                        )
-                        .map((document, index) => (
-                          <li key={index} className="py-2">
-                            <div className="flex items-center gap-x-2">
-                              {document.title}
-                              <a href={document.href} download={document.title}>
-                                <Download className="size-5 hover:scale-110" />
-                              </a>
-                            </div>
-                          </li>
-                        ))}
-                    </ol>
+                    <OpenCallFilesTable
+                      files={(reqsDocs ?? []).filter(hasId)}
+                      eventId={event._id}
+                      isDraft={false}
+                      isAdmin={false}
+                      isPublic={true}
+                      type="docs"
+                      isMobile={false}
+                      className="max-w-100"
+                    />
                   </AccordionContent>
                 </AccordionItem>
               )}

@@ -23,7 +23,7 @@ import {
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
-  LoaderPinwheel,
+  LoaderCircle,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -330,7 +330,7 @@ export const ApplyButton = ({
                 className="flex items-center gap-x-1 sm:w-40"
               >
                 {!appStatus ? "Apply" : "Continue"}{" "}
-                {pending && <LoaderPinwheel className="size-4 animate-spin" />}
+                {pending && <LoaderCircle className="size-4 animate-spin" />}
               </AlertDialogPrimaryAction>
             </AlertDialogFooter>
           </AlertDialogContent>

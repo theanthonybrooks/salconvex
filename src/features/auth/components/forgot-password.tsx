@@ -1,17 +1,5 @@
 import { FormError } from "@/components/form-error";
 import ResendTimer from "@/components/resend-timer";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPrimaryAction,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,6 +8,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,61 +19,25 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import CloseBtn from "@/features/auth/components/close-btn";
 import { ForgotPasswordSchema, ResetPasswordSchema } from "@/schemas/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { Eye, EyeOff, InfoIcon, LoaderCircle, X } from "lucide-react";
+import { Eye, EyeOff, InfoIcon, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "~/convex/_generated/api";
 
 interface ForgotPasswordProps {
   switchFlow: () => void;
 }
 
-const CloseMsg: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
-  const router = useRouter();
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <button
-          className="absolute right-5 top-4 z-10 rounded text-lg font-bold text-foreground hover:rounded-full hover:text-salPink focus:bg-salPink"
-          aria-label="Close modal"
-          // tabIndex={successfulCreation ? 6 : 4}
-        >
-          <X size={25} />
-        </button>
-      </AlertDialogTrigger>
-      <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-2xl">
-            Where would you like to go?
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-foreground">
-            If you&apos;ve remembered your password, you can login. Otherwise,
-            you can stay here to reset your password, or go to the homepage.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={switchFlow}>Login</AlertDialogAction>
-          <AlertDialogPrimaryAction onClick={() => router.push("/")}>
-            Return to homepage
-          </AlertDialogPrimaryAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-};
-
-const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
+const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
   const router = useRouter();
   const convex = useConvex();
   const updatePassword = useMutation(api.users.updatePassword);
@@ -194,15 +147,15 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
 
   return step === "forgot" ? (
     <Card className="w-full border-none border-foreground bg-salYellow p-8 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
-      <CloseBtn
-        description=" If you've remembered your password, you can login. Otherwise, you
-            can stay here to reset your password, or go to the homepage."
-        onAction={switchFlow}
+      <DialogCloseBtn
+        title="Where would you like to go?"
+        description="If you've remembered your password, you can login. Otherwise, you can stay here to reset your password, or go to the homepage."
         actionTitle="Login"
+        onAction={switchFlow}
+        primaryActionTitle="Return to homepage"
         onPrimaryAction={() => router.push("/")}
       />
 
-      {/* <CloseMsg switchFlow={switchFlow} /> */}
       <Form {...forgotForm}>
         <CardHeader className="items-center justify-center space-y-6 px-0 pt-0">
           <section className="flex flex-col items-center justify-center">
@@ -292,7 +245,14 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
     </Card>
   ) : (
     <Card className="w-full border-none border-foreground bg-salYellow shadow-none md:relative md:border-2 md:border-solid md:bg-white md:p-8">
-      <CloseMsg switchFlow={switchFlow} />
+      <DialogCloseBtn
+        title="Where would you like to go?"
+        description="If you've remembered your password, you can login. Otherwise, enter the code to reset your password, or go to the homepage."
+        actionTitle="Login"
+        onAction={switchFlow}
+        primaryActionTitle="Return to homepage"
+        onPrimaryAction={() => router.push("/")}
+      />
       <Form {...resetForm}>
         <CardHeader className="flex-col items-center justify-center">
           <div className="flex flex-row items-center justify-center">
@@ -430,20 +390,23 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ switchFlow }) => {
             /> */}
             {error && <div className="error">{error}</div>}
             <div className="flex justify-center gap-x-4">
-              <Button
-                variant="salWithShadow"
+              <DialogCloseBtn
+                title="Are you sure?"
+                description="If you've remembered your password, you can login. Otherwise, you can stay here to reset your password, or go to the homepage."
+                actionTitle="Login"
+                onAction={switchFlow}
+                primaryActionTitle="Return to homepage"
+                onPrimaryAction={() => setStep("forgot")}
                 type="button"
-                size="lg"
-                onClick={() => setStep("forgot")}
-                className="w-full bg-salYellow md:bg-white"
-              >
-                Cancel
-              </Button>
+                triggerTitle="Cancel"
+                triggerClassName="w-full md:bg-white"
+                triggerVariant="salWithShadowHiddenYlw"
+              />
               <Button
-                variant="salWithShadowYlw"
+                variant="salWithShadowHidden"
                 type="submit"
                 size="lg"
-                className="w-full bg-white md:bg-salYellow"
+                className="w-full md:bg-salYellow"
               >
                 {isLoading ? (
                   <LoaderCircle className="animate-spin" />

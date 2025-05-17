@@ -1,45 +1,97 @@
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Eye } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import { useState } from "react";
 
-export function FilePreviewer({ href, type }: { href: string; type: string }) {
+interface FilePreviewerProps {
+  href: string;
+  type: string;
+  title: string;
+  icon?: boolean;
+  children?: React.ReactNode;
+  isPublic: boolean;
+}
+
+export function FilePreviewer({
+  href,
+  type,
+  title,
+  icon = true,
+  children,
+  isPublic = false,
+}: FilePreviewerProps) {
   const [open, setOpen] = useState(false);
   const isImage = type?.startsWith("image/");
   return (
     <>
-      <Eye
-        className="mx-auto size-4 cursor-pointer text-blue-600 opacity-70 transition hover:scale-110 hover:opacity-100"
-        onClick={() => setOpen(true)}
-      />
+      {icon ? (
+        <Eye
+          className="mx-auto size-4 cursor-pointer text-blue-600 opacity-70 transition hover:scale-110 hover:opacity-100"
+          onClick={() => setOpen(true)}
+        />
+      ) : (
+        <div
+          className="mx-auto flex cursor-pointer items-center gap-1 truncate"
+          onClick={() => setOpen(true)}
+        >
+          {children}
+        </div>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           className={cn(
-            "h-[90dvh] w-[90vw] max-w-full bg-background p-0",
+            "flex h-[90dvh] w-[95vw] max-w-full flex-col gap-0 bg-background p-0",
             isImage && "h-fit w-fit",
           )}
+          closeBtnClassName="opacity-100 bg-card "
         >
           <DialogTitle className="sr-only">File Preview</DialogTitle>
-          {type.startsWith("image/") ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={href}
-                alt="Preview"
-                className="max-h-full max-w-full object-contain"
+          <div className="flex-1">
+            {type.startsWith("image/") ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={href}
+                  alt="Preview"
+                  className="max-h-full max-w-full object-contain"
+                />
+              </>
+            ) : type === "application/pdf" ? (
+              <iframe
+                src={`${href}#zoom=page-width`}
+                className="scrollable mini h-full w-full"
+                title="PDF Preview"
               />
-            </>
-          ) : type === "application/pdf" ? (
-            <iframe
-              src={href}
-              className="h-full w-full"
-              title="PDF Preview"
-              frameBorder="0"
-            />
-          ) : (
-            <p className="p-4 text-center text-muted-foreground">
-              Preview not supported
-            </p>
+            ) : (
+              <p className="p-4 text-center text-muted-foreground">
+                Preview not supported
+              </p>
+            )}
+          </div>
+
+          {isPublic && (
+            <div className="flex min-h-12 w-full justify-end gap-2 bg-[#3c3c3c] px-4 py-2">
+              <Button variant="salWithShadowHidden" type="button">
+                <a href={href} download={title}>
+                  <Download
+                    className={cn(
+                      "mx-auto size-4 cursor-pointer hover:scale-110 active:scale-95",
+                    )}
+                  />
+                </a>
+              </Button>
+              <DialogClose asChild>
+                <Button variant="salWithShadowHidden" type="button">
+                  Close Preview
+                </Button>
+              </DialogClose>
+            </div>
           )}
         </DialogContent>
       </Dialog>

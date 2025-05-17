@@ -33,6 +33,7 @@ interface CustomDialogContentProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   showCloseButton?: boolean;
   overlayClassName?: string;
+  closeBtnClassName?: string;
 }
 
 const DialogContent = React.forwardRef<
@@ -40,7 +41,14 @@ const DialogContent = React.forwardRef<
   CustomDialogContentProps
 >(
   (
-    { className, overlayClassName, children, showCloseButton = true, ...props },
+    {
+      className,
+      overlayClassName,
+      children,
+      showCloseButton = true,
+      closeBtnClassName,
+      ...props
+    },
     ref,
   ) => (
     <DialogPortal>
@@ -55,7 +63,12 @@ const DialogContent = React.forwardRef<
       >
         {children}
         {showCloseButton && (
-          <DialogPrimitive.Close className="focus:outline-hidden absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          <DialogPrimitive.Close
+            className={cn(
+              "focus:outline-hidden absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:cursor-pointer hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+              closeBtnClassName,
+            )}
+          >
             <X className="size-8 hover:text-red-600 md:size-6 xl:size-7" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>

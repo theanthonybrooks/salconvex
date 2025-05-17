@@ -22,7 +22,7 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
   const role = user?.role;
 
   if (!userData) {
-    router.replace("/pricing");
+    router.replace("/auth/sign-in");
   }
   const subData = usePreloadedQuery(preloadedSubStatus);
   const subStatus = subData?.subStatus ?? "none";
