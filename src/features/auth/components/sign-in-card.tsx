@@ -87,7 +87,8 @@ const SignInCard: React.FC<SignInCardProps> = ({
 
   const onProviderSignIn = (value: "github" | "google" | "apple") => {
     setIsLoading(value);
-    signIn(value, { redirectTo: "/auth/sign-up?err=newUser" }).finally(() => {
+    // signIn(value, { redirectTo: "/auth/sign-up?err=newUser" }).finally(() => {
+    signIn(value).finally(() => {
       setPending(false);
       setIsLoading("");
     });
