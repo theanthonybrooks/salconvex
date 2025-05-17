@@ -221,7 +221,9 @@ export default function Home() {
         />
         If you&apos;ve found this page, welcome! You&apos;re a bit early as
         it&apos;s still in development and will soon be in beta for the public.
-        I&apos;ll post on IG and announce the release soon 😉.
+        I&apos;ll post on IG and announce the release soon 😉. Don&apos;t try to
+        sign up. It&apos;s in testing and not available. Any created accounts in
+        the meantime will be deleted.
       </div>
     </>
   );

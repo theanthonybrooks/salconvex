@@ -320,6 +320,7 @@ TheListNavBarProps) {
                         <Button
                           variant="salWithShadowHiddenBg"
                           className="hidden rounded-full font-bold lg:block"
+                          disabled
                         >
                           Sign up
                         </Button>

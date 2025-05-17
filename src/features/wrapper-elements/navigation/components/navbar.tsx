@@ -338,6 +338,7 @@ NavBarProps) {
                     <Link href="/auth/sign-in" prefetch={true}>
                       <Button
                         variant="link"
+                        disabled
                         className="hidden rounded-full font-bold lg:block"
                       >
                         Sign in
@@ -347,6 +348,7 @@ NavBarProps) {
                       <Button
                         variant="salWithShadowHiddenBg"
                         className="hidden rounded-full font-bold lg:block"
+                        disabled
                       >
                         Sign up
                       </Button>
