@@ -7,6 +7,7 @@ import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
 import FilePondPluginFileRename from "filepond-plugin-file-rename";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { toast } from "react-toastify";
 
 registerPlugin(
   FilePondPluginFileValidateType,
@@ -22,6 +23,19 @@ const DOC_TYPES = [
   "application/vnd.ms-powerpoint", // .ppt
   "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
 ];
+
+const FILE_TYPE_LABELS: Record<string, string> = {
+  "application/pdf": "PDF document",
+  "application/msword": "Word document (.doc)",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "Word document (.docx)",
+  "application/vnd.ms-powerpoint": "PowerPoint presentation (.ppt)",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "PowerPoint presentation (.pptx)",
+  "image/png": "PNG image",
+  "image/jpeg": "JPEG image",
+  "image/gif": "GIF",
+};
 
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif"];
 const BOTH_TYPES = [...DOC_TYPES, ...IMAGE_TYPES];
@@ -71,22 +85,34 @@ export function FilePondInput({
       //   }}
       onupdatefiles={(fileItems) => {
         const maxSizeByType: Record<string, number> = {
-          "application/pdf": 1, // MB
+          "application/pdf": 2.5, // MB
+          "application/msword": 2.5, // MB
+          "application/docx": 2.5, // MB
+          "application/doc": 2.5, // MB
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation": 2.5, // MB
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": 2.5, // MB
+          "application/vnd.ms-powerpoint": 2.5, // MB
           "image/png": 2,
           "image/jpeg": 2,
+          "image/gif": 2,
         };
 
         const filteredItems = fileItems.filter((item) => {
           const file = item.file;
           const sizeMB = file.size / (1024 * 1024);
           const allowedSize = maxSizeByType[file.type] ?? 1;
-          console.log(file.type, allowedSize, sizeMB);
+          const label = FILE_TYPE_LABELS[file.type] ?? file.type;
 
+          // console.log(file.type, allowedSize, sizeMB, label);
           if (sizeMB > allowedSize) {
-            alert(
-              `${file.name} exceeds the ${allowedSize}MB limit for ${file.type}`,
+            toast.error(
+              `${file.name} exceeds the ${allowedSize}MB limit for ${label}s`,
+              {
+                toastId: "file-upload-error",
+              },
             );
-            return false; // exclude this file
+
+            return false;
           }
 
           return true;

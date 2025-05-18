@@ -59,7 +59,7 @@ export function FilePreviewer({
                 <img
                   src={href}
                   alt="Preview"
-                  className="max-h-full max-w-full object-contain"
+                  className="max-h-[90dvh] max-w-full object-contain"
                 />
               </>
             ) : type === "application/pdf" ? (

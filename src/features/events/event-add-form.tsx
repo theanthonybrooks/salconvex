@@ -984,12 +984,7 @@ export const EventOCForm = ({
               requirements: openCallData.requirements.requirements,
               more: "reqsMore",
               destination: "reqsDestination",
-              links: [
-                {
-                  title: "reqsLinkTitle",
-                  href: "reqsLinkHref",
-                },
-              ],
+              links: openCallData.requirements.links,
               applicationLink: openCallData.requirements.applicationLink,
               otherInfo: undefined,
             },
@@ -1757,7 +1752,14 @@ export const EventOCForm = ({
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}
             {activeStep === 4 && (
-              <p className="gap-4 xl:grid xl:grid-cols-2 xl:gap-6">Budget</p>
+              <SubmissionFormOC1
+                user={user}
+                isAdmin={isAdmin}
+                isMobile={isMobile}
+                categoryEvent={categoryEvent}
+                canNameEvent={canNameEvent}
+                handleCheckSchema={() => handleCheckSchema(false)}
+              />
             )}
 
             {/* //------ 6th Step: Organization Details  ------ */}

@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
 interface DialogCloseBtnProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   type?: "icon" | "button";
   title?: string;
   description: string;

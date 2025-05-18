@@ -20,7 +20,7 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-// import { Unauthenticated } from "convex/react";
+import { Unauthenticated } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
@@ -332,7 +332,7 @@ NavBarProps) {
               </motion.div>
 
               {/* Right Side */}
-              {/* <Unauthenticated>
+              <Unauthenticated>
                 <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
                   <div className="flex items-center gap-4">
                     <Link href="/auth/sign-in" prefetch={true}>
@@ -353,7 +353,7 @@ NavBarProps) {
                     </Link>
                   </div>
                 </div>
-              </Unauthenticated> */}
+              </Unauthenticated>
               {user && (
                 <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
                   <UserProfile className="size-10" subscription={subStatus} />

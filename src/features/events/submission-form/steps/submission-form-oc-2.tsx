@@ -31,13 +31,12 @@ import { Country } from "world-countries";
 
 registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
-import { ExternalLinksInput } from "@/features/events/open-calls/components/external-links-input";
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import "filepond/dist/filepond.min.css";
 import { Id } from "~/convex/_generated/dataModel";
 
-interface SubmissionFormOC1Props {
+interface SubmissionFormOC2Props {
   user: User | undefined;
   isAdmin: boolean;
   isMobile: boolean;
@@ -46,7 +45,7 @@ interface SubmissionFormOC1Props {
   handleCheckSchema: () => void;
 }
 
-const SubmissionFormOC1 = ({
+const SubmissionFormOC2 = ({
   // user,
   isAdmin,
   isMobile,
@@ -54,7 +53,7 @@ const SubmissionFormOC1 = ({
   // categoryEvent,
 
   handleCheckSchema,
-}: SubmissionFormOC1Props) => {
+}: SubmissionFormOC2Props) => {
   const {
     control,
     watch,
@@ -63,7 +62,6 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
@@ -89,7 +87,6 @@ const SubmissionFormOC1 = ({
   const noEndRequired = callType && !fixedType;
   const today = new Date();
   const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
-
   // #region -------------- UseEffect ---------------
 
   useEffect(() => {
@@ -584,16 +581,6 @@ const SubmissionFormOC1 = ({
                     />
                   )}
               </div>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType ? 8 : 7}:
-                </p>
-                <p className="lg:text-xs">External Links</p>
-              </div>
-              <ExternalLinksInput
-                name="openCall.requirements.links"
-                handleCheckSchema={handleCheckSchema}
-              />
             </>
           )}
         </div>
@@ -604,4 +591,4 @@ const SubmissionFormOC1 = ({
   );
 };
 
-export default SubmissionFormOC1;
+export default SubmissionFormOC2;

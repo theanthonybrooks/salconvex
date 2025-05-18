@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import CharacterCount from "@tiptap/extension-character-count";
 import Link from "@tiptap/extension-link";
@@ -22,7 +23,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
-import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import DOMPurify from "dompurify";
 import { CheckIcon, LoaderCircle, Pencil } from "lucide-react";
@@ -89,6 +90,12 @@ export const RichTextEditor = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pending, setPending] = useState(false);
   const forOpenCall = purpose === "openCall";
+  const plainText = tempContent
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const count = plainText.length;
+  console.log(count);
 
   const editor = useEditor({
     content: tempContent,
@@ -145,6 +152,7 @@ export const RichTextEditor = ({
     },
   });
   const hasFormatting =
+    (editor && selectionHasAnyMarks(editor)) ||
     editor?.isActive("bold") ||
     editor?.isActive("italic") ||
     editor?.isActive("strike") ||
@@ -153,8 +161,6 @@ export const RichTextEditor = ({
     editor?.isActive("orderedList") ||
     editor?.isActive("taskList");
   const hasLink = editor?.isActive("link");
-
-  console.log(editor);
 
   const handleLink = useCallback(() => {
     if (!editor) return;
@@ -214,6 +220,21 @@ export const RichTextEditor = ({
     setOpen(false);
   };
 
+  function selectionHasAnyMarks(editor: Editor) {
+    const { from, to } = editor.state.selection;
+    let hasMarks = false;
+
+    editor.state.doc.nodesBetween(from, to, (node) => {
+      if (node.marks?.length) {
+        hasMarks = true;
+        return false; // stop traversal early
+      }
+      return true;
+    });
+
+    return hasMarks;
+  }
+
   useEffect(() => {
     if (open && editor) {
       setTempContent(value);
@@ -238,20 +259,27 @@ export const RichTextEditor = ({
     const handlePaste = (event: ClipboardEvent) => {
       const pastedText = event.clipboardData?.getData("text/plain") ?? "";
       const pastedLength = pastedText.length;
-      const currentLength = editor.storage.characterCount.characters();
-      const projectedLength = currentLength + pastedLength;
+      const currentLength = count;
 
-      console.log(pastedText, pastedLength, currentLength, projectedLength);
+      const projectedLength = currentLength + pastedLength;
 
       if (projectedLength > charLimit) {
         event.preventDefault();
         if (charLimit - currentLength <= 0) {
           toast.warning(
             `You've reached the maximum number of characters allowed for this field. Please remove some text and try again.`,
+            {
+              toastId: "char-limit",
+            },
           );
-        } else {
+        }
+
+        {
           toast.warning(
             `Pasted content is too long at ${pastedLength} characters, while only ${charLimit - currentLength} ${currentLength > 0 && "more"} characters are allowed.`,
+            {
+              toastId: "char-limit",
+            },
           );
         }
       }
@@ -259,7 +287,7 @@ export const RichTextEditor = ({
 
     view.dom.addEventListener("paste", handlePaste);
     return () => view.dom.removeEventListener("paste", handlePaste);
-  }, [editor, charLimit]);
+  }, [editor, charLimit, count]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -296,6 +324,10 @@ export const RichTextEditor = ({
 
   const activeButtonClass = cn(
     " bg-salYellow/20 font-bold text-black border-b-2 border-foreground",
+  );
+
+  const disabledButtonClass = cn(
+    "pointer-events-none cursor-default opacity-50",
   );
 
   const EditorUI = (
@@ -362,6 +394,8 @@ export const RichTextEditor = ({
           >
             <FaStrikethrough className="size-4 shrink-0" />
           </Button>
+
+          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
           <Button
             variant="richTextButton"
             size="richText"
@@ -402,6 +436,7 @@ export const RichTextEditor = ({
               <FaListCheck className="size-4 shrink-0" />
             </Button>
           )}
+          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
 
           <Button
             variant="richTextButton"
@@ -422,40 +457,43 @@ export const RichTextEditor = ({
             <FaLink className="size-4 shrink-0" />
           </Button>
 
-          {hasLink && (
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().unsetLink().run()}
-              className={cn(
-                buttonClass,
-                editor.isActive("link")
-                  ? "border-red-800 bg-red-50 font-bold text-black hover:bg-red-100"
-                  : "text-gray-400",
-              )}
-            >
-              <FaUnlink className="size-4 shrink-0" />
-            </Button>
-          )}
-          {hasFormatting && (
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .clearNodes() // reset block-level nodes like lists/headings
-                  .unsetAllMarks() // remove inline formatting like bold/italic
-                  .run()
-              }
-              className={cn(buttonClass, "text-gray-500")}
-            >
-              <FaRemoveFormat className="size-4 shrink-0" />
-            </Button>
-          )}
+          <Button
+            variant="richTextButton"
+            size="richText"
+            type="button"
+            onClick={() => editor.chain().focus().unsetLink().run()}
+            className={cn(
+              buttonClass,
+              editor.isActive("link")
+                ? "border-red-800 bg-red-50 font-bold text-black hover:bg-red-100"
+                : "text-gray-400",
+              !hasLink && disabledButtonClass,
+            )}
+          >
+            <FaUnlink className="size-4 shrink-0" />
+          </Button>
+          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
+
+          <Button
+            variant="richTextButton"
+            size="richText"
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .clearNodes() // reset block-level nodes like lists/headings
+                .unsetAllMarks() // remove inline formatting like bold/italic
+                .run()
+            }
+            className={cn(
+              buttonClass,
+              "text-gray-500",
+              !hasFormatting && disabledButtonClass,
+            )}
+          >
+            <FaRemoveFormat className="size-4 shrink-0" />
+          </Button>
         </div>
         {asModal && (
           <span
@@ -689,7 +727,10 @@ export const RichTextEditor = ({
               <AlertDialogCancel onClick={() => setShowUnsavedDialog(false)}>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction onClick={handleDiscard}>
+              <AlertDialogAction
+                onClick={handleDiscard}
+                variant="salWithShadowHiddenYlw"
+              >
                 Discard
               </AlertDialogAction>
               <AlertDialogPrimaryAction onClick={handleAccept} className="w-30">
