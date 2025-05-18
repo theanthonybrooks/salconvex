@@ -28,6 +28,14 @@ export const ExternalLinksInput = ({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [isParentOpen, setIsParentOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevLengthRef = useRef(fields.length);
+
+  useEffect(() => {
+    if (fields.length > prevLengthRef.current) {
+      setOpenIndex(fields.length - 1);
+    }
+    prevLengthRef.current = fields.length;
+  }, [fields.length]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

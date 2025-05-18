@@ -1141,12 +1141,7 @@ export const EventOCForm = ({
                 more: "reqsMore",
                 destination: "reqsDestination",
 
-                links: [
-                  {
-                    title: "reqsLinkTitle",
-                    href: "reqsLinkHref",
-                  },
-                ],
+                links: openCallData.requirements.links,
                 applicationLink: openCallData.requirements.applicationLink,
                 otherInfo: undefined,
               },
