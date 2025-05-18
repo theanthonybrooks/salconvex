@@ -473,25 +473,6 @@ export const openCallBaseSchema = z.object({
     whom: z.array(z.string()),
     details: z.optional(z.string()),
   }),
-  // compensation: z.object({
-  //   budget: z.object({
-  //     min: z.number(),
-  //     max: z.optional(z.number()),
-  //     rate: z.number(),
-  //     unit: z.string(),
-  //     currency: z.string(),
-  //     allInclusive: z.boolean(),
-  //     moreInfo: z.optional(z.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
-  //   }),
-  //   categories: z.object({
-  //     designFee: z.union([z.number(), z.boolean()]).optional(),
-  //     accommodation: z.union([z.number(), z.boolean()]).optional(),
-  //     food: z.union([z.number(), z.boolean()]).optional(),
-  //     travelCosts: z.union([z.number(), z.boolean()]).optional(),
-  //     materials: z.union([z.number(), z.boolean()]).optional(),
-  //     equipment: z.union([z.number(), z.boolean()]).optional(),
-  //   }),
-  // }),
 
   requirements: z.object({
     requirements: z.string(),
@@ -530,6 +511,27 @@ export const openCallBaseSchema = z.object({
   tempFiles: z.array(z.instanceof(File)).optional(),
 });
 
+export const openCallCompensationSchema = z.object({
+  budget: z.object({
+    min: z.number(),
+    max: z.optional(z.number()),
+    rate: z.number(),
+    unit: z.union([z.literal("ft²"), z.literal("m²"), z.literal("")]),
+    currency: z.string(),
+    allInclusive: z.boolean(),
+    moreInfo: z.optional(z.string()), //ensure that this has a 500 char limit to avoid the crazies. Also, no rich text formatting. Just plain text. or? very limited to allow line breaks, but that's it?
+  }),
+  categories: z.object({
+    artistStipend: z.union([z.number(), z.boolean()]).optional(),
+    designFee: z.union([z.number(), z.boolean()]).optional(),
+    accommodation: z.union([z.number(), z.boolean()]).optional(),
+    food: z.union([z.number(), z.boolean()]).optional(),
+    travelCosts: z.union([z.number(), z.boolean()]).optional(),
+    materials: z.union([z.number(), z.boolean()]).optional(),
+    equipment: z.union([z.number(), z.boolean()]).optional(),
+  }),
+});
+
 export const openCallStep1Schema = z
   .object({
     organization: z.object({
@@ -550,6 +552,7 @@ export const openCallStep1Schema = z
     if (data.openCall?.eligibility?.type.trim()) {
       const trimmed = data.openCall?.eligibility?.type.trim();
       const trimmedDetails = data.openCall?.eligibility?.details?.trim() ?? "";
+      console.log(trimmed);
       if (
         trimmed === "National" &&
         data.openCall?.eligibility?.whom?.length === 0
@@ -560,11 +563,13 @@ export const openCallStep1Schema = z
           path: ["openCall", "eligibility", "details"],
         });
       }
-      if (trimmed !== "International" && trimmedDetails?.length < 22) {
+      if (
+        (trimmed === "Other" || trimmed === "Regional/Local") &&
+        trimmedDetails?.length < 22
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message:
-            "More info is required for non-international calls (min 15 characters)",
+          message: "More info is required (min 15 characters)",
           path: ["openCall", "eligibility", "details"],
         });
       }
@@ -582,7 +587,11 @@ export const openCallStep1Schema = z
     }
   });
 
-export const openCallSchema = openCallBaseSchema.extend({
+export const openCallStep2Schema = openCallBaseSchema.extend({
+  compensation: openCallCompensationSchema,
+});
+
+export const openCallSchema = openCallStep2Schema.extend({
   state: z.optional(z.string()),
 });
 

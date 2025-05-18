@@ -44,6 +44,7 @@ export const applicationStatusValues = [
 ];
 
 export const openCallCategoryFields = [
+  { label: "Artist Stipend", key: "artistStipend" },
   { label: "Design Fee", key: "designFee" },
   { label: "Accommodation", key: "accommodation" },
   { label: "Food", key: "food" },

@@ -95,7 +95,6 @@ export const RichTextEditor = ({
     .replace(/\s+/g, " ")
     .trim();
   const count = plainText.length;
-  console.log(count);
 
   const editor = useEditor({
     content: tempContent,
@@ -688,7 +687,10 @@ export const RichTextEditor = ({
                 dangerouslySetInnerHTML={{ __html: value }}
               />
             ) : (
-              <span className="italic text-gray-400">{placeholder}</span>
+              <span className="italic text-gray-400">
+                <p>{placeholder}</p>
+                <p>{`Limit (${charLimit} characters)`}</p>
+              </span>
             )}
           </div>
           {hoverPreview && value.trim().length > 0 && (

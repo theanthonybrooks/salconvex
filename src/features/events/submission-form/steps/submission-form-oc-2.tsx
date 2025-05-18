@@ -1,5 +1,4 @@
 import { currencies, Currency } from "@/app/data/currencies";
-import { Link } from "@/components/ui/custom-link";
 import { OcCustomDatePicker } from "@/components/ui/date-picker/oc-date-picker";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { Label } from "@/components/ui/label";
@@ -14,12 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { autoHttps } from "@/lib/linkFns";
 import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { CallFormat, EligibilityType } from "@/types/openCall";
 import { User } from "@/types/user";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
@@ -31,6 +28,7 @@ import { Country } from "world-countries";
 
 registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
+import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import "filepond/dist/filepond.min.css";
@@ -62,10 +60,11 @@ const SubmissionFormOC2 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
+  const [hasBudget, setHasBudget] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
+  const orgCurrency = organizer?.location?.currency;
   const eventName = watch("event.name");
   const eventId = watch("event._id");
   const isDraft = openCall?.state === "draft";
@@ -76,17 +75,22 @@ const SubmissionFormOC2 = ({
   const isNational = ocEligiblityType === "National";
   const international = ocEligiblityType === "International";
   const eligDetails = openCall?.eligibility?.details ?? "";
-  const showAppFeeInput = hasAppFee?.trim() === "true";
+  const showBudgetInputs = hasBudget?.trim() === "true";
   const hasRequiredDetails =
     (eligDetails.trim().length > 10 && !international) || international;
-  const appFee = openCall?.basicInfo?.appFee;
-  const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
-  const noAppFeeAmount = typeof appFee === "number" && appFee === 0;
+  const budgetMin = openCall?.compensation?.budget?.min;
+  const budgetMax = openCall?.compensation?.budget?.max;
+  const budgetRate = openCall?.compensation?.budget?.rate;
+  const validBudgetMin = typeof budgetMin === "number" && budgetMin > 0;
+  const validBudgetRate = typeof budgetRate === "number" && budgetRate > 0;
+  // const hasMinOrRateBudget = validBudgetMin || validBudgetRate;
+  const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
   const ocStart = openCall?.basicInfo?.dates?.ocStart;
   const ocEnd = openCall?.basicInfo?.dates?.ocEnd;
   const noEndRequired = callType && !fixedType;
   const today = new Date();
   const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
+  // const hasRate = openCall?.compensation?.budget?.unit;
   // #region -------------- UseEffect ---------------
 
   useEffect(() => {
@@ -97,23 +101,45 @@ const SubmissionFormOC2 = ({
   }, [fixedType, setValue]);
 
   useEffect(() => {
-    const formValue = hasAppFee?.trim();
-    const shouldBe = validAppFeeAmount ? "true" : "";
+    const formValue = hasBudget?.trim();
+    const shouldBe = validBudgetMin ? "true" : "";
 
-    if (!formValue && validAppFeeAmount) {
-      setHasAppFee(shouldBe);
-    } else if (!formValue && noAppFeeAmount) {
-      setHasAppFee("false");
-    } else if (formValue === "false" && validAppFeeAmount) {
-      setValue("openCall.basicInfo.appFee", 0);
+    if (!formValue && validBudgetMin) {
+      setHasBudget(shouldBe);
+      setValue("openCall.compensation.budget.max", budgetMin);
+    } else if (!formValue && noBudgetMin) {
+      setHasBudget("false");
+    } else if (formValue === "false" && validBudgetRate) {
+      setValue("openCall.compensation.budget.min", 0);
+      setValue("openCall.compensation.budget.rate", 0);
     }
-  }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
+  }, [
+    validBudgetRate,
+    validBudgetMin,
+    noBudgetMin,
+    setValue,
+    hasBudget,
+    budgetMin,
+  ]);
 
   useEffect(() => {
-    if (hasAppFee === "false" && appFee === undefined) {
-      setValue("openCall.basicInfo.appFee", 0);
+    const min = budgetMin;
+    const max = budgetMax;
+
+    if (typeof min === "number") {
+      if (typeof max !== "number" || max < min) {
+        setValue("openCall.compensation.budget.max", min);
+      }
     }
-  }, [appFee, hasAppFee, setValue]);
+  }, [budgetMin, budgetMax, setValue]);
+
+  useEffect(() => {
+    if (hasBudget === "false" && budgetMin === undefined) {
+      setValue("openCall.compensation.budget.min", 0);
+      setValue("openCall.compensation.budget.max", 0);
+      setValue("openCall.compensation.budget.rate", 0);
+    }
+  }, [budgetMin, hasBudget, setValue]);
 
   useEffect(() => {
     if (!ocEligiblityType) return;
@@ -144,104 +170,279 @@ const SubmissionFormOC2 = ({
       >
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
-          <p className="lg:text-xs">Call Format</p>
+          <p className="lg:text-xs">Budget</p>
         </div>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-          <Label htmlFor="event.category" className="sr-only">
-            Open Call Format
+        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+          <Label htmlFor="hasBudget" className="sr-only">
+            Project Budget
           </Label>
-          <Controller
-            name="openCall.basicInfo.callFormat"
-            control={control}
-            render={({ field }) => {
-              return (
-                <Select
-                  onValueChange={(value: CallFormat) => {
-                    field.onChange(value);
-                  }}
-                  value={field.value || ""}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-12 w-full border text-center text-base sm:h-[50px]",
-                      errors.event?.category && "invalid-field",
-                    )}
-                  >
-                    <SelectValue placeholder="Call Format (select one)" />
-                  </SelectTrigger>
-                  <SelectContent className="min-w-auto">
-                    <SelectItem fit value="RFQ">
-                      RFQ (Request for Qualifications)
-                    </SelectItem>
-                    <SelectItem fit value="RFP">
-                      RFP (Request for Proposals)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              );
+
+          <Select
+            onValueChange={(value: "true" | "false" | "") => {
+              setHasBudget(value);
             }}
-          />
-        </div>
-        <div />
-        {/* TODO: Add a popover modal or link to the FAQ page for more information on call formats */}
-        <p className="mt-1 text-balance text-center text-xs italic">
-          For more information on Open Call Formats, check out the{" "}
-          <Link
-            href={`${siteUrl[0]}/faq#call-formats`}
-            target="_blank"
-            className="font-bold"
+            value={hasBudget}
           >
-            FAQ
-          </Link>
-        </p>
-        <div className="input-section">
-          <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
-          <p className="lg:text-xs">Eligibility</p>
-        </div>
+            <SelectTrigger
+              className={cn(
+                "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
+              )}
+            >
+              <SelectValue placeholder="Project Budget?*" />
+            </SelectTrigger>
+            <SelectContent className="min-w-auto">
+              <SelectItem fit value="true">
+                Yes
+              </SelectItem>
+              <SelectItem fit value="false">
+                No
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-          <Label htmlFor="event.category" className="sr-only">
-            Open Call Eligibility
-          </Label>
-          <Controller
-            name="openCall.eligibility.type"
-            control={control}
-            render={({ field }) => {
-              return (
-                <Select
-                  onValueChange={(value: EligibilityType) => {
-                    field.onChange(value);
+          <div className="hidden items-center justify-center px-2 sm:flex">
+            <ArrowRight
+              className={cn(
+                "invisible size-4 shrink-0 text-foreground/50",
+                showBudgetInputs && "visible",
+              )}
+            />
+          </div>
+
+          <div
+            className={cn(
+              "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
+              !showBudgetInputs &&
+                "opacity-50 [@media(max-width:640px)]:hidden",
+            )}
+          >
+            <Controller
+              name="openCall.compensation.budget.currency"
+              control={control}
+              render={({ field }) => (
+                <SearchMappedSelect<Currency>
+                  searchFields={["name", "symbol", "code"]}
+                  className="w-40 border-none py-2 sm:h-fit sm:w-40"
+                  value={field.value ?? orgCurrency?.code ?? "USD"}
+                  onChange={(code) => {
+                    const selected = Object.values(currencies[0])
+                      .flat()
+                      .find((cur) => cur.code === code);
+
+                    if (selected) field.onChange(selected.code);
                   }}
-                  value={field.value || ""}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-12 w-full border text-center text-base sm:h-[50px]",
-                      errors.event?.category && "invalid-field",
-                    )}
-                  >
-                    <SelectValue placeholder="Eligiblity type (select one)" />
-                  </SelectTrigger>
-                  <SelectContent className="min-w-auto">
-                    <SelectItem fit value="International">
-                      International Artists (All)
-                    </SelectItem>
-                    <SelectItem fit value="National">
-                      National Artists
-                    </SelectItem>
-                    <SelectItem fit value="Regional/Local">
-                      Regional/Local Artists
-                    </SelectItem>
-                    <SelectItem fit value="Other">
-                      Other (specify below - Required)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              );
-            }}
-          />
+                  data={currencies[0]}
+                  getItemLabel={(c) => `${c.symbol} (${c.code}) - ${c.name}`}
+                  getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
+                  getItemValue={(c) => c.code}
+                  disabled={!showBudgetInputs}
+                />
+              )}
+            />
+            <div className="flex w-full flex-col">
+              <div className="flex w-full select-none items-center justify-center gap-1 text-2xs text-foreground/50">
+                <p>Minimum - Maximum</p>
+              </div>
+              <div className="flex w-full items-center gap-1">
+                <Controller
+                  name="openCall.compensation.budget.min"
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerNumInput
+                      field={field}
+                      formatNumber={true}
+                      min={0}
+                      disabled={!showBudgetInputs}
+                      placeholder="Minimum"
+                      className="h-fit border-none pb-2 pr-0 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
+                    />
+                  )}
+                />
+                <p className="pb-2">{" - "}</p>
+                <Controller
+                  name="openCall.compensation.budget.max"
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerNumInput
+                      // min={budgetMin}
+                      // type="number"
+                      disabled={!showBudgetInputs}
+                      formatNumber={true}
+                      field={{
+                        ...field,
+                        onChange: (val: string) => {
+                          const num = parseFloat(val);
+                          field.onChange(isNaN(num) ? 0 : num);
+                        },
+                      }}
+                      placeholder="Maximum "
+                      className="arrowless h-fit border-none pb-2 pl-0 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          </div>
         </div>
+        {validBudgetMin && (
+          <>
+            <div className="input-section">
+              <p className="lg:text-xs">Rate:</p>
+              <p className="text-xs">(optional)</p>
+            </div>
+
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="hasBudget" className="sr-only">
+                Budget Rate
+              </Label>
+              <div
+                className={cn(
+                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
+                  !showBudgetInputs &&
+                    "opacity-50 [@media(max-width:640px)]:hidden",
+                )}
+              >
+                <Controller
+                  name="openCall.compensation.budget.currency"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchMappedSelect<Currency>
+                      searchFields={["name", "symbol", "code"]}
+                      className="w-40 border-none py-2 sm:h-fit sm:w-40"
+                      value={field.value ?? orgCurrency?.code ?? "USD"}
+                      onChange={(code) => {
+                        const selected = Object.values(currencies[0])
+                          .flat()
+                          .find((cur) => cur.code === code);
+
+                        if (selected) field.onChange(selected.code);
+                      }}
+                      data={currencies[0]}
+                      getItemLabel={(c) =>
+                        `${c.symbol} (${c.code}) - ${c.name}`
+                      }
+                      getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
+                      getItemValue={(c) => c.code}
+                      disabled={!showBudgetInputs}
+                    />
+                  )}
+                />
+                <div className="flex w-full flex-col">
+                  <div className="flex w-full items-center gap-1">
+                    <Controller
+                      name="openCall.compensation.budget.rate"
+                      control={control}
+                      render={({ field }) => (
+                        <DebouncedControllerNumInput
+                          field={field}
+                          formatNumber={true}
+                          min={0}
+                          disabled={!showBudgetInputs}
+                          placeholder="Rate (ex: $30/ft²)"
+                          className="h-fit border-none p-2 text-center focus:border-none focus:outline-none sm:text-base"
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <p className="m-auto px-2"> per </p>
+
+              <Controller
+                name="openCall.compensation.budget.unit"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    // onValueChange={(value: "ft²" | "m²" | "") => {
+                    //   setHasRate(value);
+                    // }}
+                    onValueChange={field.onChange}
+                    value={field.value ?? ""}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
+                      )}
+                    >
+                      <SelectValue placeholder="Rate Unit" />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-auto">
+                      <SelectItem fit value="ft²">
+                        ft²
+                      </SelectItem>
+                      <SelectItem fit value="m²">
+                        m²
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          </>
+        )}
+
+        {validBudgetMin && (
+          <>
+            <div className="input-section">
+              <p className="lg:text-xs">All inclusive</p>
+            </div>
+
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.category" className="sr-only">
+                All inclusive budget selection
+              </Label>
+              <div className="flex items-center justify-between">
+                <span>
+                  <p className="text-sm text-foreground">
+                    Is the budget for this open call all-inclusive?
+                  </p>
+                  <p className="text-xs text-foreground/50">
+                    What does this mean?{" "}
+                    <a
+                      href="https://support.streetartlist.com/hc/en-us/articles/1500000466818-What-does-all-inclusive-mean-"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Learn more
+                    </a>
+                    {/* TODO: Add a popover modal or link to the FAQ page for more information on call formats */}
+                  </p>
+                </span>
+                <Controller
+                  name="openCall.compensation.budget.allInclusive"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={(val: string) =>
+                        field.onChange(val === "true")
+                      }
+                      // value={String(field.value) ?? ""}
+                      value={String(field.value)}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
+                        )}
+                      >
+                        <SelectValue placeholder="All Inclusive Budget?" />
+                      </SelectTrigger>
+                      <SelectContent className="min-w-auto">
+                        <SelectItem fit value="true">
+                          Yes
+                        </SelectItem>
+                        <SelectItem fit value="false">
+                          No
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+          </>
+        )}
         {ocEligiblityType === "National" && (
           <>
             <div className="input-section self-start">
@@ -280,8 +481,7 @@ const SubmissionFormOC2 = ({
             </div>
           </>
         )}
-
-        {ocEligiblityType && (
+        {validBudgetMin && (
           <>
             <div className="input-section self-start">
               <p className="lg:text-xs">More Info</p>
@@ -292,122 +492,17 @@ const SubmissionFormOC2 = ({
                 Eligibility Continued... (if not &quot;International&quot;)
               </Label>
               <Controller
-                name="openCall.eligibility.details"
+                name="openCall.compensation.budget.moreInfo"
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    // onChange={(val) => {
-                    //   field.onChange(val);
-                    //   // handleCheckSchema();
-                    // }}
-                    placeholder="Please be as specific as possible (limit 750 characters)"
-                    charLimit={750}
+                    placeholder="Please list any other compensation-related info here (limit 1000 characters)"
+                    charLimit={1000}
                   />
                 )}
               />
-            </div>
-          </>
-        )}
-
-        {hasRequiredDetails && (
-          <>
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 3:</p>
-              <p className="lg:text-xs">App Fee</p>
-            </div>
-
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="hasAppFee" className="sr-only">
-                Application Fee
-              </Label>
-
-              <Select
-                onValueChange={(value: "true" | "false" | "") => {
-                  setHasAppFee(value);
-                }}
-                value={hasAppFee}
-              >
-                <SelectTrigger
-                  className={cn(
-                    "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
-                  )}
-                >
-                  <SelectValue placeholder="Application fee?*" />
-                </SelectTrigger>
-                <SelectContent className="min-w-auto">
-                  <SelectItem fit value="true">
-                    Yes
-                  </SelectItem>
-                  <SelectItem fit value="false">
-                    No
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="hidden items-center justify-center px-2 sm:flex">
-                <ArrowRight
-                  className={cn(
-                    "invisible size-4 shrink-0 text-foreground/50",
-                    showAppFeeInput && "visible",
-                  )}
-                />
-              </div>
-
-              <div
-                className={cn(
-                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
-                  !showAppFeeInput &&
-                    "opacity-50 [@media(max-width:640px)]:hidden",
-                )}
-              >
-                <Controller
-                  name="organization.location.currency"
-                  control={control}
-                  render={({ field }) => (
-                    <SearchMappedSelect<Currency>
-                      searchFields={["name", "symbol", "code"]}
-                      className="max-w-28 border-none py-2 sm:h-fit"
-                      value={field.value?.code ?? "USD"}
-                      onChange={(code) => {
-                        const selected = Object.values(currencies[0])
-                          .flat()
-                          .find((cur) => cur.code === code);
-
-                        if (selected) field.onChange(selected);
-                      }}
-                      data={currencies[0]}
-                      getItemLabel={(c) =>
-                        `${c.symbol} (${c.code}) - ${c.name}`
-                      }
-                      getItemDisplay={(c) => `(${c.code}) ${c.symbol} `}
-                      getItemValue={(c) => c.code}
-                      disabled={!showAppFeeInput}
-                    />
-                  )}
-                />
-                <Controller
-                  name="openCall.basicInfo.appFee"
-                  control={control}
-                  render={({ field }) => (
-                    <DebouncedControllerInput
-                      type="number"
-                      disabled={!showAppFeeInput}
-                      // field={field}
-                      field={{
-                        ...field,
-                        onChange: (val: string) => {
-                          const num = parseFloat(val);
-                          field.onChange(isNaN(num) ? 0 : num);
-                        },
-                      }}
-                      placeholder="Enter Amount"
-                      className="h-fit border-none py-2 text-center focus:border-none focus:outline-none sm:text-base"
-                    />
-                  )}
-                />
-              </div>
             </div>
           </>
         )}
@@ -431,7 +526,7 @@ const SubmissionFormOC2 = ({
           {fixedType &&
             ocEligiblityType &&
             hasRequiredDetails &&
-            typeof appFee === "number" && (
+            typeof budgetMin === "number" && (
               <>
                 <div className="input-section">
                   <p className="min-w-max font-bold lg:text-xl">Step 4:</p>

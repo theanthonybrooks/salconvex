@@ -48,12 +48,13 @@ export const createOrUpdateOpenCall = mutation({
       }),
 
       categories: v.object({
-        designFee: v.union(v.number(), v.boolean()),
-        accommodation: v.union(v.number(), v.boolean()),
-        food: v.union(v.number(), v.boolean()),
-        travelCosts: v.union(v.number(), v.boolean()),
-        materials: v.union(v.number(), v.boolean()),
-        equipment: v.union(v.number(), v.boolean()),
+        artistStipend: v.optional(v.union(v.number(), v.boolean())),
+        designFee: v.optional(v.union(v.number(), v.boolean())),
+        accommodation: v.optional(v.union(v.number(), v.boolean())),
+        food: v.optional(v.union(v.number(), v.boolean())),
+        travelCosts: v.optional(v.union(v.number(), v.boolean())),
+        materials: v.optional(v.union(v.number(), v.boolean())),
+        equipment: v.optional(v.union(v.number(), v.boolean())),
       }),
     }),
     requirements: v.object({

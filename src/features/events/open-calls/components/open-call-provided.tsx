@@ -1,7 +1,7 @@
 import { formatCompCurrency } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { OpenCall, openCallCategoryFields } from "@/types/openCall";
-import { FaPaintRoller, FaRegCommentDots } from "react-icons/fa6";
+import { FaPaintRoller, FaUserCheck } from "react-icons/fa6";
 import { IoAirplane } from "react-icons/io5";
 import {
   PiForkKnifeFill,
@@ -84,13 +84,14 @@ export const OpenCallProvidedPreview = ({
 }: OpenCallProvidedPreviewProps) => {
   const isMobile = format === "mobile";
   const budgetItems = [
+    { key: "artistStipend", Icon: FaUserCheck, source: "category" },
     { key: "designFee", Icon: PiPencilLineFill, source: "category" },
     { key: "accommodation", Icon: PiHouseLineFill, source: "category" },
     { key: "food", Icon: PiForkKnifeFill, source: "category" },
     { key: "materials", Icon: FaPaintRoller, source: "category" },
     { key: "travelCosts", Icon: IoAirplane, source: "category" },
     { key: "equipment", Icon: TbStairs, source: "category" },
-    { key: "budgetMoreInfo", Icon: FaRegCommentDots, source: "moreInfo" },
+    // { key: "budgetMoreInfo", Icon: FaRegCommentDots, source: "moreInfo" },
   ];
 
   return (

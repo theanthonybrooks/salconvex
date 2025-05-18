@@ -367,6 +367,7 @@ const openCallSchema = {
     }),
 
     categories: v.object({
+      artistStipend: v.optional(v.union(v.number(), v.boolean())),
       designFee: v.optional(v.union(v.number(), v.boolean())),
       accommodation: v.optional(v.union(v.number(), v.boolean())),
       food: v.optional(v.union(v.number(), v.boolean())),

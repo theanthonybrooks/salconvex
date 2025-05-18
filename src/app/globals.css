@@ -512,6 +512,12 @@ input::placeholder {
   color: foreground;
 }
 
+input[type="number"].arrowless::-webkit-inner-spin-button,
+input[type="number"].arrowless::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 input::-webkit-autofill,
 input::-webkit-autofill:hover,
 input::-webkit-autofill:focus,

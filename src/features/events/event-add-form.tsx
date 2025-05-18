@@ -31,6 +31,7 @@ import {
   eventSubmitSchema,
   eventWithOCSchema,
   openCallStep1Schema,
+  openCallStep2Schema,
   orgDetailsSchema,
   step1Schema,
 } from "@/features/organizers/schemas/event-add-schema";
@@ -38,6 +39,7 @@ import {
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
 import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
+import SubmissionFormOC2 from "@/features/events/submission-form/steps/submission-form-oc-2";
 import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-1";
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { toSeason, toYearMonth } from "@/lib/dateFns";
@@ -85,6 +87,7 @@ const steps = [
     id: 5,
     label: "Budget & Compensation",
     mobileLabel: "Budget/Compensation",
+    schema: openCallStep2Schema,
   },
   {
     id: 6,
@@ -352,6 +355,9 @@ export const EventOCForm = ({
   const hasUserEditedStep3 =
     JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
     activeStep === 3;
+  const hasUserEditedStep4 =
+    JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
+    activeStep === 4;
 
   const hasUserEditedStep5 =
     JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
@@ -1004,6 +1010,77 @@ export const EventOCForm = ({
           setPending(false);
         }
       }
+      if (activeStep === 4 && hasUserEditedStep4) {
+        if (!openCallData) return;
+
+        try {
+          setPending(true);
+          await createOrUpdateOpenCall({
+            orgId: orgData._id as Id<"organizations">,
+            eventId: eventData._id as Id<"events">,
+            openCallId: openCallData?._id as Id<"openCalls">,
+            basicInfo: {
+              appFee: openCallData.basicInfo.appFee,
+              callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
+              callType: openCallData.basicInfo.callType ?? "Unknown",
+              dates: {
+                ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
+                ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
+                timezone: orgData.location?.timezone ?? "",
+                edition: eventData.dates.edition,
+              },
+            },
+            eligibility: {
+              type: openCallData.eligibility.type,
+              whom: openCallData.eligibility.whom,
+              details: openCallData.eligibility.details,
+            },
+            compensation: {
+              budget: {
+                min: openCallData.compensation.budget.min,
+                max: openCallData.compensation.budget.max,
+                rate: openCallData.compensation.budget.rate,
+                unit: openCallData.compensation.budget.unit,
+                currency: openCallData.compensation.budget.currency,
+                allInclusive: openCallData.compensation.budget.allInclusive,
+                moreInfo: openCallData.compensation.budget.moreInfo,
+              },
+              categories: {
+                artistStipend:
+                  openCallData.compensation.categories.artistStipend,
+                designFee: openCallData.compensation.categories.designFee,
+                accommodation:
+                  openCallData.compensation.categories.accommodation,
+                food: openCallData.compensation.categories.food,
+                travelCosts: openCallData.compensation.categories.travelCosts,
+                materials: openCallData.compensation.categories.materials,
+                equipment: openCallData.compensation.categories.equipment,
+              },
+            },
+            requirements: {
+              requirements: openCallData.requirements.requirements,
+              more: "reqsMore",
+              destination: "reqsDestination",
+              links: openCallData.requirements.links,
+              applicationLink: openCallData.requirements.applicationLink,
+              otherInfo: undefined,
+            },
+            documents: undefined,
+          });
+
+          reset({
+            ...currentValues,
+            openCall: {
+              ...currentValues.openCall,
+            },
+          });
+        } catch (error) {
+          console.error("Failed to create or update open call:", error);
+          toast.error("Failed to create or update open call");
+        } finally {
+          setPending(false);
+        }
+      }
       if (activeStep === steps.length - 2) {
         console.log("saving org details");
 
@@ -1170,6 +1247,7 @@ export const EventOCForm = ({
       createOrUpdateOpenCall,
       hasUserEditedStep0,
       hasUserEditedStep3,
+      hasUserEditedStep4,
       orgData,
       generateUploadUrl,
       getTimezone,
@@ -1747,7 +1825,7 @@ export const EventOCForm = ({
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}
             {activeStep === 4 && (
-              <SubmissionFormOC1
+              <SubmissionFormOC2
                 user={user}
                 isAdmin={isAdmin}
                 isMobile={isMobile}

@@ -384,7 +384,7 @@ const SubmissionFormOC1 = ({
                       getItemLabel={(c) =>
                         `${c.symbol} (${c.code}) - ${c.name}`
                       }
-                      getItemDisplay={(c) => `(${c.code}) ${c.symbol} `}
+                      getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
                       getItemValue={(c) => c.code}
                       disabled={!showAppFeeInput}
                     />
