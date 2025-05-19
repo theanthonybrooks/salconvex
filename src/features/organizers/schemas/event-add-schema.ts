@@ -616,7 +616,8 @@ export const openCallStep2Schema = z
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Non-all-inclusive budgets must have at least one category",
+        message:
+          "Budgets without all-inclusive budgets must have at least one category",
         path: ["openCall", "compensation", "budget", "allInclusive"],
       });
     }

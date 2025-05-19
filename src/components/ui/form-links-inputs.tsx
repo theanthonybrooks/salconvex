@@ -242,7 +242,7 @@ export const FormLinksInput = ({
                 )}
               />
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-x-4">
                 <FaEnvelope className={cn("size-5 shrink-0")} />
                 <Controller
                   name={`${type}.links.email`}

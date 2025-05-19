@@ -80,6 +80,7 @@ const SubmissionFormOC2 = ({
   const hasBudgetMin = hasBudget?.trim() === "true" && validBudgetMin;
   const noBudget = hasBudget?.trim() === "false";
   const allInclusive = openCall?.compensation?.budget?.allInclusive;
+  const prevBudgetMaxRef = useRef<number | undefined>(undefined);
   const budgetMaxRef = useRef(budgetMax);
 
   const setValueRef = useRef(setValue);
@@ -104,11 +105,30 @@ const SubmissionFormOC2 = ({
     }
   }, [validBudgetMin, noBudgetMin, setValue, hasBudget, budgetMin]);
 
-  // Keep refs in sync
   useEffect(() => {
-    budgetMaxRef.current = budgetMax;
-    handleCheckSchema();
+    const isValidNumber = typeof budgetMax === "number" && !isNaN(budgetMax);
+
+    if (
+      budgetMax === prevBudgetMaxRef.current ||
+      (!isValidNumber && typeof budgetMax !== "undefined")
+    ) {
+      return;
+    }
+
+    prevBudgetMaxRef.current = budgetMax;
+
+    const timeout = setTimeout(() => {
+      handleCheckSchema(); // Suppress toast
+    }, 300);
+
+    return () => clearTimeout(timeout);
   }, [budgetMax, handleCheckSchema]);
+
+  // // Keep refs in sync
+  // useEffect(() => {
+  //   budgetMaxRef.current = budgetMax;
+  //   handleCheckSchema();
+  // }, [budgetMax, handleCheckSchema]);
 
   useEffect(() => {
     setValueRef.current = setValue;
@@ -116,16 +136,14 @@ const SubmissionFormOC2 = ({
 
   useEffect(() => {
     const min = budgetMin;
+    const max = budgetMaxRef.current;
+
+    if (typeof min !== "number") return;
+    if (typeof max === "number" && max >= min) return;
 
     const timeout = setTimeout(() => {
-      const max = budgetMaxRef.current;
       const setVal = setValueRef.current;
-
-      if (typeof min === "number") {
-        if (typeof max !== "number" || max < min) {
-          setVal("openCall.compensation.budget.max", min);
-        }
-      }
+      setVal("openCall.compensation.budget.max", min);
     }, 400);
 
     return () => clearTimeout(timeout);
@@ -347,6 +365,7 @@ const SubmissionFormOC2 = ({
                         <DebouncedControllerNumInput
                           field={field}
                           formatNumber={true}
+                          value={field.value ?? 0}
                           min={0}
                           disabled={!showBudgetInputs}
                           placeholder="Rate (ex: $30/ft²)"
@@ -424,8 +443,8 @@ const SubmissionFormOC2 = ({
                       onValueChange={(val: string) =>
                         field.onChange(val === "true")
                       }
-                      // value={String(field.value) ?? ""}
-                      value={String(field.value)}
+                      value={String(field.value) ?? ""}
+                      // value={field.value ? String(field.value) : ""}
                     >
                       <SelectTrigger
                         className={cn(
