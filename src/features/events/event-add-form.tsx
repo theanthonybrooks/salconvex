@@ -1011,6 +1011,23 @@ export const EventOCForm = ({
             documents,
           });
 
+          let lastEditedResult = null;
+          if (existingEvent?._id) {
+            lastEditedResult = await updateEventLastEditedAt({
+              eventId: existingEvent._id,
+            });
+          }
+          if (lastEditedResult) {
+            const lastEditedAt = lastEditedResult.lastEditedAt;
+            setLastSaved(lastEditedAt);
+            if (existingEvent) {
+              setExistingEvent({
+                ...existingEvent,
+                lastEditedAt,
+              });
+            }
+          }
+
           reset({
             ...currentValues,
             openCall: {
@@ -1073,14 +1090,30 @@ export const EventOCForm = ({
             },
             requirements: {
               requirements: openCallData.requirements.requirements,
-              more: "reqsMore",
-              destination: "reqsDestination",
+              more: undefined,
+              destination: undefined,
               links: openCallData.requirements.links,
               applicationLink: openCallData.requirements.applicationLink,
               otherInfo: undefined,
             },
             documents: undefined,
           });
+          let lastEditedResult = null;
+          if (existingEvent?._id) {
+            lastEditedResult = await updateEventLastEditedAt({
+              eventId: existingEvent._id,
+            });
+          }
+          if (lastEditedResult) {
+            const lastEditedAt = lastEditedResult.lastEditedAt;
+            setLastSaved(lastEditedAt);
+            if (existingEvent) {
+              setExistingEvent({
+                ...existingEvent,
+                lastEditedAt,
+              });
+            }
+          }
 
           reset({
             ...currentValues,
@@ -1238,8 +1271,8 @@ export const EventOCForm = ({
               },
               requirements: {
                 requirements: openCallData.requirements.requirements,
-                more: "reqsMore",
-                destination: "reqsDestination",
+                more: undefined,
+                destination: undefined,
 
                 links: openCallData.requirements.links,
                 applicationLink: openCallData.requirements.applicationLink,

@@ -108,7 +108,7 @@ export interface OpenCall {
   requirements: {
     requirements: string;
     more?: string;
-    destination: string;
+    destination?: string;
     links?: {
       title: string;
       href: string;

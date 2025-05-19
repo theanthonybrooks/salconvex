@@ -59,8 +59,8 @@ export const createOrUpdateOpenCall = mutation({
     }),
     requirements: v.object({
       requirements: v.string(),
-      more: v.string(),
-      destination: v.string(),
+      more: v.optional(v.string()),
+      destination: v.optional(v.string()),
       links: v.array(
         v.object({
           title: v.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
