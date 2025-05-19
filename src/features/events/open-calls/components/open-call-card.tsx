@@ -98,7 +98,7 @@ const OpenCallCard = ({
     ),
   );
 
-  const hasBudgetRange = budgetMax && budgetMax > 0;
+  const hasBudgetRange = budgetMax && budgetMax > 0 && budgetMax !== budgetMin;
   const hasBudget = !!(budgetMin > 0 || hasBudgetRange);
   const hasRate = !!budgetRate && budgetRate > 0;
   const noBudgetInfo = !hasBudget && !hasRate;
@@ -552,9 +552,11 @@ const OpenCallCard = ({
                     noBudgetInfo={noBudgetInfo}
                     currency={currency}
                   />
-                  <p className="mt-2 text-center text-xs italic text-muted-foreground">
-                    (Items listed above are in addition to the main budget)
-                  </p>
+                  {!allInclusive && (
+                    <p className="mt-2 text-center text-xs italic text-muted-foreground">
+                      (Items listed above are in addition to the main budget)
+                    </p>
+                  )}
                 </div>
 
                 {budgetMoreInfo && (

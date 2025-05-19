@@ -587,13 +587,40 @@ export const openCallStep1Schema = z
     }
   });
 
-export const openCallStep2Schema = openCallBaseSchema.extend({
+export const openCallFullSchema = openCallBaseSchema.extend({
   compensation: openCallCompensationSchema,
 });
 
-export const openCallSchema = openCallStep2Schema.extend({
+export const openCallSchema = openCallFullSchema.extend({
   state: z.optional(z.string()),
 });
+
+export const openCallStep2Schema = z
+  .object({
+    openCall: openCallFullSchema,
+  })
+  .superRefine((data, ctx) => {
+    const allInclusive = data.openCall.compensation.budget.allInclusive;
+    const budgetMin = data.openCall.compensation.budget.min;
+    const budgetMax = data.openCall.compensation.budget.max;
+    if (budgetMin && budgetMax && budgetMin > budgetMax) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Budget max must be greater than or equal to min",
+        path: ["openCall", "compensation", "budget", "max"],
+      });
+    }
+    if (
+      !allInclusive &&
+      Object.keys(data.openCall.compensation.categories).length === 0
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Non-all-inclusive budgets must have at least one category",
+        path: ["openCall", "compensation", "budget", "allInclusive"],
+      });
+    }
+  });
 
 export const eventWithOCSchema = z
   .object({

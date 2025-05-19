@@ -223,7 +223,8 @@ export default function Home() {
         it&apos;s still in development and will soon be in beta for the public.
         I&apos;ll post on IG and announce the release soon 😉. Please don&apos;t
         try to sign up. It&apos;s in testing and not available. Any created
-        accounts in the meantime will be deleted.
+        accounts in the meantime will be deleted as I&apos;m doing a lot of
+        changes in the database while getting everything connected.
       </div>
     </>
   );

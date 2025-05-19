@@ -89,7 +89,7 @@ export const formatCurrency = (
   const currencySymbol = formatter.format(0).replace(/\d/g, "").trim();
 
   // Handle different cases
-  if (max) {
+  if (max && min !== max) {
     if (!preview) {
       return `${currencySymbol}${min.toLocaleString(
         locale,

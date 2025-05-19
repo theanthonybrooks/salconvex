@@ -44,17 +44,17 @@ export const applicationStatusValues = [
 ];
 
 export const openCallCategoryFields = [
-  { label: "Artist Stipend", key: "artistStipend" },
-  { label: "Design Fee", key: "designFee" },
-  { label: "Accommodation", key: "accommodation" },
-  { label: "Food", key: "food" },
-  { label: "Travel Costs", key: "travelCosts" },
-  { label: "Materials", key: "materials" },
-  { label: "Equipment", key: "equipment" },
+  { label: "Artist Stipend", value: "artistStipend" },
+  { label: "Design Fee", value: "designFee" },
+  { label: "Accommodation", value: "accommodation" },
+  { label: "Food", value: "food" },
+  { label: "Travel Costs", value: "travelCosts" },
+  { label: "Materials", value: "materials" },
+  { label: "Equipment", value: "equipment" },
 ] as const;
 
 export type OpenCallCategoryKey =
-  (typeof openCallCategoryFields)[number]["key"];
+  (typeof openCallCategoryFields)[number]["value"];
 
 export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
 

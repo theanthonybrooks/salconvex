@@ -72,6 +72,7 @@ const SubmissionFormOC1 = ({
   const eventId = watch("event._id");
   const isDraft = openCall?.state === "draft";
   const orgTimezone = organizer?.location?.timezone;
+  const callFormat = openCall?.basicInfo?.callFormat;
   const callType = openCall?.basicInfo?.callType;
   const fixedType = callType === "Fixed";
   const ocEligiblityType = openCall?.eligibility?.type;
@@ -198,53 +199,57 @@ const SubmissionFormOC1 = ({
             FAQ
           </Link>
         </p>
-        <div className="input-section">
-          <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
-          <p className="lg:text-xs">Eligibility</p>
-        </div>
+        {callFormat && (
+          <>
+            <div className="input-section">
+              <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
+              <p className="lg:text-xs">Eligibility</p>
+            </div>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-          <Label htmlFor="event.category" className="sr-only">
-            Open Call Eligibility
-          </Label>
-          <Controller
-            name="openCall.eligibility.type"
-            control={control}
-            render={({ field }) => {
-              return (
-                <Select
-                  onValueChange={(value: EligibilityType) => {
-                    field.onChange(value);
-                  }}
-                  value={field.value || ""}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-12 w-full border text-center text-base sm:h-[50px]",
-                      errors.event?.category && "invalid-field",
-                    )}
-                  >
-                    <SelectValue placeholder="Eligiblity type (select one)" />
-                  </SelectTrigger>
-                  <SelectContent className="min-w-auto">
-                    <SelectItem fit value="International">
-                      International Artists (All)
-                    </SelectItem>
-                    <SelectItem fit value="National">
-                      National Artists
-                    </SelectItem>
-                    <SelectItem fit value="Regional/Local">
-                      Regional/Local Artists
-                    </SelectItem>
-                    <SelectItem fit value="Other">
-                      Other (specify below - Required)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              );
-            }}
-          />
-        </div>
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.category" className="sr-only">
+                Open Call Eligibility
+              </Label>
+              <Controller
+                name="openCall.eligibility.type"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <Select
+                      onValueChange={(value: EligibilityType) => {
+                        field.onChange(value);
+                      }}
+                      value={field.value || ""}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "h-12 w-full border text-center text-base sm:h-[50px]",
+                          errors.event?.category && "invalid-field",
+                        )}
+                      >
+                        <SelectValue placeholder="Eligiblity type (select one)" />
+                      </SelectTrigger>
+                      <SelectContent className="min-w-auto">
+                        <SelectItem fit value="International">
+                          International Artists (All)
+                        </SelectItem>
+                        <SelectItem fit value="National">
+                          National Artists
+                        </SelectItem>
+                        <SelectItem fit value="Regional/Local">
+                          Regional/Local Artists
+                        </SelectItem>
+                        <SelectItem fit value="Other">
+                          Other (specify below - Required)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  );
+                }}
+              />
+            </div>
+          </>
+        )}
         {ocEligiblityType === "National" && (
           <>
             <div className="input-section self-start">
@@ -305,7 +310,7 @@ const SubmissionFormOC1 = ({
                     //   field.onChange(val);
                     //   // handleCheckSchema();
                     // }}
-                    placeholder="Please be as specific as possible (limit 750 characters)"
+                    placeholder="Please be as specific as possible"
                     charLimit={750}
                   />
                 )}
@@ -503,7 +508,7 @@ const SubmissionFormOC1 = ({
                     <RichTextEditor
                       value={field.value ?? ""}
                       onChange={field.onChange}
-                      placeholder="Please be as specific as possible (limit 2000 characters)"
+                      placeholder="Please be as specific as possible"
                       charLimit={3000}
                       purpose="openCall"
                       asModal={true}

@@ -346,7 +346,7 @@ const SubmissionFormEventStep1 = ({
                           <RichTextEditor
                             value={field.value ?? ""}
                             onChange={field.onChange}
-                            placeholder="Short blurb about your project/event... (limit 200 characters)"
+                            placeholder="Short blurb about your project/event... "
                             charLimit={200}
                           />
                         )}

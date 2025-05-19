@@ -78,7 +78,12 @@ export function FilePreviewer({
           {isPublic && (
             <div className="flex min-h-12 w-full justify-end gap-2 bg-[#3c3c3c] px-4 py-2">
               <Button variant="salWithShadowHidden" type="button">
-                <a href={href} download={title}>
+                <a
+                  href={href}
+                  download={title}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Download
                     className={cn(
                       "mx-auto size-4 cursor-pointer hover:scale-110 active:scale-95",

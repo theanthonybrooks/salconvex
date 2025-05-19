@@ -5,6 +5,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -145,15 +146,14 @@ const SubmissionFormEventStep2 = ({
                         <SelectItem fit value="Invite">
                           No, it&apos;s an invite only event
                         </SelectItem>
-
                         {/* <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
                             Or select the type of call:
                           </p> */}
+                        <SelectSeparator />{" "}
                         <span className="flex items-center gap-1 px-3 py-1 text-xs italic text-muted-foreground">
                           <HiArrowTurnLeftDown className="size-4 shrink-0 translate-y-1.5" />
                           Or select the type of call
                         </span>
-
                         <SelectItem fit value="Fixed">
                           Fixed Deadline
                         </SelectItem>
@@ -196,7 +196,7 @@ const SubmissionFormEventStep2 = ({
                     <RichTextEditor
                       value={field.value ?? ""}
                       onChange={field.onChange}
-                      placeholder="Add any other info about your project/event... (limit 500 characters)"
+                      placeholder="Add any other info about your project/event..."
                       charLimit={500}
                     />
                   )}

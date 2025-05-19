@@ -213,7 +213,12 @@ export function OpenCallFilesTable({
                 )}
                 {isPublic && (
                   <td className="px-2 py-2 text-center">
-                    <a href={doc.href} download={doc.title}>
+                    <a
+                      href={doc.href}
+                      download={doc.title}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Download
                         className={cn(
                           "mx-auto size-4 cursor-pointer hover:scale-110 active:scale-95",

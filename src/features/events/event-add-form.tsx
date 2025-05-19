@@ -238,6 +238,7 @@ export const EventOCForm = ({
   const isStepValidZod = useMemo(() => {
     if (!currentSchema) return true;
     const result = currentSchema.safeParse(watchedValues);
+    console.log(result);
     return result.success;
   }, [watchedValues, currentSchema]);
   // #endregion
@@ -390,7 +391,7 @@ export const EventOCForm = ({
 
   //
   // #region ------------- Console Logs --------------
-
+  console.log(errors);
   if (errors && Object.keys(errors).length > 0) {
     console.log(errors);
   }
@@ -1196,21 +1197,24 @@ export const EventOCForm = ({
               },
               compensation: {
                 budget: {
-                  min: 0,
-                  max: undefined,
-                  rate: 0,
-                  unit: "",
-                  currency: orgData.location?.currency?.code ?? "",
-                  allInclusive: false,
-                  moreInfo: undefined,
+                  min: openCallData.compensation.budget.min,
+                  max: openCallData.compensation.budget.max,
+                  rate: openCallData.compensation.budget.rate,
+                  unit: openCallData.compensation.budget.unit,
+                  currency: openCallData.compensation.budget.currency,
+                  allInclusive: openCallData.compensation.budget.allInclusive,
+                  moreInfo: openCallData.compensation.budget.moreInfo,
                 },
                 categories: {
-                  designFee: true,
-                  accommodation: false,
-                  food: 100,
-                  travelCosts: true,
-                  materials: 1200,
-                  equipment: 500,
+                  artistStipend:
+                    openCallData.compensation.categories.artistStipend,
+                  designFee: openCallData.compensation.categories.designFee,
+                  accommodation:
+                    openCallData.compensation.categories.accommodation,
+                  food: openCallData.compensation.categories.food,
+                  travelCosts: openCallData.compensation.categories.travelCosts,
+                  materials: openCallData.compensation.categories.materials,
+                  equipment: openCallData.compensation.categories.equipment,
                 },
               },
               requirements: {

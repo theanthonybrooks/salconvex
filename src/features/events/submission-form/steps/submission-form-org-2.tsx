@@ -130,7 +130,7 @@ const SubmissionFormOrgStep2 = ({
                   <RichTextEditor
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    placeholder="Add any info about your organization... (limit 750 characters)"
+                    placeholder="Add any info about your organization... "
                     charLimit={750}
                     purpose="organizerAbout"
                   />

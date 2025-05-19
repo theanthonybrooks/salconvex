@@ -520,18 +520,14 @@ const EventCardPreview = ({
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </p>
             )}
-            {(event.adminNote || event.adminNoteOC) && (
+            {event.about && (
               <div className="flex flex-col gap-y-1 text-sm">
-                <span className="font-semibold">Note:</span>
-                {event.adminNoteOC && (
-                  <RichTextDisplay
-                    html={event.adminNoteOC}
-                    className="text-sm"
-                  />
-                )}
-                {event.adminNote && !event.adminNoteOC && (
-                  <RichTextDisplay html={event.adminNote} className="text-sm" />
-                )}
+                <span className="font-semibold">About:</span>
+
+                <RichTextDisplay
+                  html={event.about}
+                  className="line-clamp-3 text-sm"
+                />
               </div>
             )}
           </div>

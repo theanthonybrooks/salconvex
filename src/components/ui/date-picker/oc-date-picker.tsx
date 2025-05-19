@@ -66,9 +66,8 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         <span className="flex items-center gap-2">
           {formattedValue || display}
           {orgTimezone && (
-            <p className="text-sm xl:hidden">
-              ({getTimezoneFormat(endDate, timeZone)})
-            </p>
+            // <p className="text-sm xl:hidden">
+            <p className="text-sm">({getTimezoneFormat(endDate, timeZone)})</p>
           )}
         </span>
       </Button>

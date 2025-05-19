@@ -90,7 +90,7 @@ export const RichTextEditor = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pending, setPending] = useState(false);
   const forOpenCall = purpose === "openCall";
-  const plainText = tempContent
+  const plainText = (tempContent || "")
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim();
@@ -200,7 +200,7 @@ export const RichTextEditor = ({
     setDisplayText("");
   }, [editor, linkUrl, displayText]);
 
-  const handleAccept = () => {
+  const handleAccept = useCallback(() => {
     setPending(true);
     const clean = DOMPurify.sanitize(tempContent, {
       ALLOWED_TAGS,
@@ -212,7 +212,7 @@ export const RichTextEditor = ({
       setPending(false);
       setOpen(false);
     }, 1000);
-  };
+  }, [tempContent, onChange]);
 
   const handleDiscard = () => {
     setTempContent(value);
@@ -233,6 +233,23 @@ export const RichTextEditor = ({
 
     return hasMarks;
   }
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCmdEnter = e.metaKey && e.key === "Enter";
+      const isCtrlEnter = e.ctrlKey && e.key === "Enter";
+
+      if ((isCmdEnter || isCtrlEnter) && hasUnsavedChanges) {
+        e.preventDefault();
+        handleAccept();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, hasUnsavedChanges, handleAccept]);
 
   useEffect(() => {
     if (open && editor) {
@@ -675,12 +692,12 @@ export const RichTextEditor = ({
     return (
       <>
         <div
-          className="relative cursor-pointer overflow-hidden rounded border p-2"
+          className="relative cursor-pointer rounded border p-2"
           onClick={() => setOpen(true)}
           onMouseEnter={() => setHoverPreview(true)}
           onMouseLeave={() => setHoverPreview(false)}
         >
-          <div className="max-h-20 min-h-14 text-sm text-muted-foreground">
+          <div className="scrollable justy mini max-h-20 min-h-14 text-sm text-muted-foreground">
             {value ? (
               <div
                 className="rich-text__preview-wrapper prose max-w-none truncate text-foreground"

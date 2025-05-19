@@ -52,9 +52,9 @@ export const OpenCallProvided = ({
 }: OpenCallProvidedProps) => {
   return (
     <div className="flex flex-col justify-between pr-[1px]">
-      {openCallCategoryFields.map(({ key, label }, index) => (
+      {openCallCategoryFields.map(({ value, label }, index) => (
         <div
-          key={key}
+          key={value}
           className={cn(
             "flex items-center justify-between border-b border-dashed border-foreground/20 px-2 py-1",
             index % 2 === 0 ? "bg-transparent" : "bg-transparent",
@@ -63,7 +63,7 @@ export const OpenCallProvided = ({
           <p className="font-medium">{label}:</p>
           <p className="text-right">
             {getDisplayValue(
-              categories?.[key],
+              categories?.[value],
               allInclusive,
               noBudgetInfo,
               currency,
