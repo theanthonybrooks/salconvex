@@ -872,7 +872,14 @@ export const createOrUpdateEvent = mutation({
     const eventCategory = args.category || "";
     const isEvent = eventCategory === "event";
     const eventType = isEvent ? args.type || [] : [];
-
+    const eventFormatOutput =
+      (args.dates.eventFormat as EventFormat) || args.finalStep
+        ? "noEvent"
+        : undefined;
+    const prodFormatOutput =
+      (args.dates.prodFormat as ProdFormat) || args.finalStep
+        ? "sameAsEvent"
+        : undefined;
     console.log("eventState", eventState);
 
     if (event) {
@@ -892,8 +899,8 @@ export const createOrUpdateEvent = mutation({
           ...args.dates,
           edition: args.dates.edition || new Date().getFullYear(),
           eventDates: args.dates.eventDates || [{ start: "", end: "" }],
-          eventFormat: (args.dates.eventFormat as EventFormat) || undefined,
-          prodFormat: (args.dates.prodFormat as ProdFormat) || undefined,
+          eventFormat: eventFormatOutput,
+          prodFormat: prodFormatOutput,
 
           noProdStart: args.dates.noProdStart || false,
         },

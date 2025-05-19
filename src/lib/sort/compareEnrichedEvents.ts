@@ -1,4 +1,4 @@
-import { isValidIsoDate } from "@/lib/dateFns";
+import { FAR_FUTURE, isValidIsoDate, parseEventDate } from "@/lib/dateFns";
 import { SortOptions } from "@/types/thelist";
 
 import { EventData } from "@/types/event";
@@ -31,7 +31,7 @@ export const compareEnrichedEvents = (
       const isValid = startDate && isValidIsoDate(startDate);
       const validStartDate = isValid ? new Date(startDate) : null;
       const isOngoing = item.dates.eventFormat === "ongoing";
-      const eventStartDate = new Date(startDate ?? Infinity);
+      const eventStartDate = parseEventDate(startDate) ?? FAR_FUTURE;
       const isPast = eventStartDate < now;
 
       let priority: number;
@@ -101,8 +101,21 @@ export const compareEnrichedEvents = (
       const isPublished = ocState === "published";
       const ocStatus = item.openCallStatus;
       const isRolling = callType === "Rolling";
+      const startDate = item.dates.eventDates[0].start;
+
       const ocEnd = new Date(ocEndRaw ?? 0);
       const isPast = ocEnd < now;
+      const eventStartDate = parseEventDate(startDate) ?? FAR_FUTURE;
+      const eventFormat = item.dates.eventFormat;
+      // if (item.name === "asdfasfd") {
+      //   console.log(
+      //     item.name,
+      //     eventStartDate,
+      //     startDate,
+      //     parseEventDate(startDate),
+      //     eventFormat,
+      //   );
+      // }
 
       let priority: number;
 
@@ -115,16 +128,26 @@ export const compareEnrichedEvents = (
         priority = 4;
       } else if (!hasOpenCall && !!callType && isPublished) {
         priority = 5;
-      } else {
+      } else if (eventFormat === "ongoing") {
         priority = 6;
+      } else if (eventFormat === "noEvent") {
+        priority = 8;
+      } else {
+        priority = eventFormat ? 7 : Infinity;
       }
 
+      // if (item.name === "asdfasfd ") {
+      //   console.log(item.name, priority);
+      // } else if (item.name === "something newer") {
+      //   console.log(item.name, priority);
+      // }
+
       return {
+        name: item.name,
         priority,
         ocEnd: ocEnd.getTime(),
-        eventStart: new Date(
-          item.dates.eventDates[0].start ?? Infinity,
-        ).getTime(),
+        ocEndDate: ocEnd,
+        eventStart: eventStartDate.getTime(),
       };
     };
 
@@ -137,6 +160,52 @@ export const compareEnrichedEvents = (
 
     if (priorityA.priority < 3) {
       return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
+    }
+
+    if (priorityA.priority === 5) {
+      const aDate = priorityA.ocEndDate ?? FAR_FUTURE;
+      const bDate = priorityB.ocEndDate ?? FAR_FUTURE;
+
+      const aYear = aDate.getFullYear();
+      const bYear = bDate.getFullYear();
+
+      if (aYear !== bYear) return -1;
+    }
+
+    if (priorityA.priority === 6 || priorityA.priority === 8) {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      return directionMultiplier * aName.localeCompare(bName);
+    }
+
+    if (priorityA.priority === 7) {
+      const aEventStart = new Date(priorityA.eventStart) ?? FAR_FUTURE;
+      const bEventStart = new Date(priorityB.eventStart) ?? FAR_FUTURE;
+      // const aName = a.name.toLowerCase();
+      // const bName = b.name.toLowerCase();
+
+      // console.log(aName, bName, aEventStart, bEventStart);
+
+      const aYear = aEventStart.getFullYear();
+      const bYear = bEventStart.getFullYear();
+      const thisYear = new Date().getFullYear();
+
+      const aIsThisYear = aYear === thisYear;
+      const bIsThisYear = bYear === thisYear;
+
+      // Prefer events from this year
+      if (aIsThisYear && !bIsThisYear) return -1;
+      if (!aIsThisYear && bIsThisYear) return 1;
+
+      // If both in same year, sort by time
+      if (aYear === bYear) {
+        return (
+          directionMultiplier * (aEventStart.getTime() - bEventStart.getTime())
+        );
+      }
+
+      // Otherwise, sort by year descending (newer first)
+      return 1;
     }
 
     return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);

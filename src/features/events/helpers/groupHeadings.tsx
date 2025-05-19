@@ -2,6 +2,7 @@ import {
   getFourCharMonth,
   getOrdinalSuffix,
   isValidIsoDate,
+  seasonalTerms,
 } from "@/lib/dateFns";
 import { PublicEventPreviewData } from "@/types/event";
 
@@ -28,18 +29,20 @@ export function getGroupKeyFromEvent(
   const ocEnd = basicInfo?.dates?.ocEnd;
   const ocEndDate = ocEnd && isValidIsoDate(ocEnd) ? new Date(ocEnd) : null;
   const ocStatus = event.openCallStatus;
-
+  // const eventFormat = event.dates.eventFormat;
   const eventStart = event.dates?.eventDates[0]?.start;
   const eventStartDate =
     eventStart && isValidIsoDate(eventStart) ? new Date(eventStart) : null;
   const isPast = !!ocEndDate && ocEndDate < new Date();
   const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
+  const isYear = eventStart.trim().length === 4;
+  const isSeason = seasonalTerms.includes(eventStart.trim());
 
   if (
     sortBy === "openCall" &&
     callType === "Fixed" &&
     ocEnd &&
-    ocStatus === "active"
+    (ocStatus === "active" || ocStatus === "ended")
   ) {
     if (ocEndDate) {
       const day = ocEndDate.getDate();
@@ -68,11 +71,16 @@ export function getGroupKeyFromEvent(
   }
 
   if (sortBy === "eventStart" && eventStart) {
-    if (eventStartDate) {
+    if (eventStartDate && !isYear && !isSeason) {
       const day = eventStartDate.getDate();
       const month = getFourCharMonth(eventStartDate);
       const suffix = getOrdinalSuffix(day);
       const year = isPastStart ? format(eventStartDate, "yyyy") : undefined;
+
+      if (event.name === "asdfasfd ") {
+        console.log(event.name, eventStart, isSeason, isYear);
+      }
+
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },

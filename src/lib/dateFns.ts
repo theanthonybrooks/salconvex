@@ -2,6 +2,8 @@ import { EventFormat } from "@/types/event";
 import { CallType } from "@/types/openCall";
 import { DateTime } from "luxon";
 
+export const FAR_FUTURE = new Date("9999-12-31");
+export const seasonalTerms = ["spring", "summer", "fall", "winter"];
 export const formatEventDates = (
   start: string,
   end: string,
@@ -15,8 +17,6 @@ export const formatEventDates = (
   if (eventFormat === "noEvent") {
     return "No Event Dates";
   }
-
-  const seasonalTerms = ["spring", "summer", "fall", "winter"];
 
   const isSeasonalStart = seasonalTerms.some((term) =>
     start.toLowerCase().includes(term),
@@ -434,4 +434,30 @@ export const fromSeason = (input: string): Date | null => {
 
   const month = monthMap[season];
   return new Date(year, month, 1);
+};
+
+export const parseEventDate = (
+  input: string | null | undefined,
+): Date | null => {
+  if (!input) return null;
+
+  // First try seasonal parsing
+  const seasonalMatch = input.match(/^(Spring|Summer|Fall|Winter)\s+\d{4}$/i);
+  if (seasonalMatch) {
+    return fromSeason(input);
+  }
+
+  // Try ISO parsing using relaxedIsoRegex
+  if (isValidIsoDate(input)) {
+    const padded =
+      input.length === 4
+        ? `${input}-01-01`
+        : input.length === 7
+          ? `${input}-01`
+          : input;
+    const parsed = new Date(padded);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  return null;
 };

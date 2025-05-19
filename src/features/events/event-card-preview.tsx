@@ -156,6 +156,8 @@ const EventCardPreview = ({
 
   const isCurrentlyOpen =
     basicInfo && budget && eligibility && event.hasActiveOpenCall;
+  //Todo: Add functionality that provides info for upcoming open calls as well. Maybe.
+  // const isUpcoming =  basicInfo && budget && eligibility && openCallStatus === "coming-soon"
 
   // const userCurrency = userPref?.currency ?? ""
 
@@ -706,7 +708,6 @@ const EventCardPreview = ({
             <span className="font-semibold">Event Links:</span>
 
             <LinkList event={event} purpose="preview" />
-      
           </div>
         )}
         <div className="flex flex-col items-center justify-center gap-y-6 py-6 text-sm">

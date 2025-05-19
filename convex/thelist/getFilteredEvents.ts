@@ -122,6 +122,7 @@ export const getFilteredEvents = query({
         let hasActiveOpenCall = false;
 
         const now = Date.now();
+        const isPublished = openCall?.state === "published";
         const ocType = openCall?.basicInfo?.callType;
         const ocStart = openCall?.basicInfo?.dates?.ocStart
           ? new Date(openCall.basicInfo.dates.ocStart).getTime()
@@ -130,7 +131,7 @@ export const getFilteredEvents = query({
           ? new Date(openCall.basicInfo.dates.ocEnd).getTime()
           : null;
 
-        if (openCall && openCall.state === "published") {
+        if (openCall && isPublished) {
           if (ocType === "Fixed") {
             if (ocStart && now < ocStart) {
               openCallStatus = "coming-soon";
@@ -176,6 +177,7 @@ export const getFilteredEvents = query({
           openCall: openCall ?? null,
           openCallStatus,
           hasActiveOpenCall,
+
           bookmarked: bookmarkedSet.has(event._id),
           hidden: hiddenSet.has(event._id),
           applied: appliedEventIds.has(event._id),
