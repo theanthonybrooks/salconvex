@@ -90,12 +90,12 @@ export const formatCurrency = (
 
   // Handle different cases
   if (max && min !== max) {
-    if (!preview) {
+    if (!preview && min !== 0) {
       return `${currencySymbol}${min.toLocaleString(
         locale,
       )} - ${max.toLocaleString(locale)}`;
     } else if (min === 0) {
-      return `Up to ${currencySymbol}${max.toLocaleString(locale)}+`;
+      return `Up to ${currencySymbol}${max.toLocaleString(locale)}`;
     } else {
       return total ? formatter.format(max) : `${formatter.format(max)}+`;
     }

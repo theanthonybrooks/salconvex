@@ -706,6 +706,7 @@ const EventCardPreview = ({
             <span className="font-semibold">Event Links:</span>
 
             <LinkList event={event} purpose="preview" />
+      
           </div>
         )}
         <div className="flex flex-col items-center justify-center gap-y-6 py-6 text-sm">

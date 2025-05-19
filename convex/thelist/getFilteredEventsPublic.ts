@@ -34,12 +34,12 @@ export const getFilteredEventsPublic = query({
           .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
           .collect()
       : [];
-    const applicationData = user?._id
-      ? await ctx.db
-          .query("artists")
-          .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
-          .collect()
-      : [];
+    // const applicationData = user?._id
+    //   ? await ctx.db
+    //       .query("artists")
+    //       .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
+    //       .collect()
+    //   : [];
     // console.log(listActions);
     // console.log(applicationData);
     const bookmarkedIds = listActions

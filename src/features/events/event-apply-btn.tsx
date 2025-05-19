@@ -58,7 +58,7 @@ export const ApplyButtonShort = ({
       ? `/thelist/event/${slug}/${edition}`
       : publicView && openCall === "active"
         ? "/pricing#plans"
-        : openCall === "active"
+        : !publicView && openCall
           ? `/thelist/event/${slug}/${edition}/call`
           : `/thelist/event/${slug}/${edition}`;
 
@@ -209,7 +209,7 @@ export const ApplyButton = ({
         ? `/thelist/event/${slug}/${edition}`
         : publicView && openCall === "active"
           ? "/pricing#plans"
-          : openCall === "active"
+          : !publicView && openCall
             ? `/thelist/event/${slug}/${edition}/call`
             : `/thelist/event/${slug}/${edition}`;
 
@@ -218,7 +218,12 @@ export const ApplyButton = ({
       ? appStatus !== null && !publicView && !isPreview
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
         : "Apply"
-      : "View More";
+      : openCall === "ended"
+        ? appStatus !== null && !publicView && !isPreview
+          ? appStatus.slice(0, 1).toUpperCase() +
+            appStatus.slice(1).toLowerCase()
+          : "View More"
+        : "View More";
   const hasApplied = appStatus !== null;
 
   return (
@@ -262,6 +267,7 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
+              disabled={openCall !== "active"}
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(

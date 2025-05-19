@@ -97,6 +97,9 @@ export const compareEnrichedEvents = (
       const hasOpenCall = item.hasActiveOpenCall;
       const callType = item.tabs.opencall?.basicInfo?.callType;
       const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd;
+      const ocState = item.tabs.opencall?.state;
+      const isPublished = ocState === "published";
+      const ocStatus = item.openCallStatus;
       const isRolling = callType === "Rolling";
       const ocEnd = new Date(ocEndRaw ?? 0);
       const isPast = ocEnd < now;
@@ -108,10 +111,12 @@ export const compareEnrichedEvents = (
         else if (callType === "Rolling") priority = 1;
         else if (callType === "Email") priority = 2;
         else priority = 3;
-      } else if (!hasOpenCall && !!callType) {
+      } else if (ocStatus === "coming-soon") {
         priority = 4;
-      } else {
+      } else if (!hasOpenCall && !!callType && isPublished) {
         priority = 5;
+      } else {
+        priority = 6;
       }
 
       return {

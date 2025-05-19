@@ -803,6 +803,7 @@ export const EventOCForm = ({
             eventData.dates.prodFormat === "sameAsEvent"
               ? eventData.dates.eventDates
               : eventData.dates.prodDates;
+
           const { event } = await createOrUpdateEvent({
             _id: eventData._id || "",
             name: eventData.name,
@@ -1146,7 +1147,13 @@ export const EventOCForm = ({
       if (activeStep === steps.length - 1) {
         console.log("saving final step");
         let eventResult = null;
-
+        const eventLinks =
+          eventData.links && Object.keys(eventData.links).length > 1
+            ? eventData.links
+            : orgData.links && {
+                ...orgData.links,
+                sameAsOrganizer: true,
+              };
         try {
           setPending(true);
 
@@ -1164,7 +1171,7 @@ export const EventOCForm = ({
               ...eventData.location,
             },
             about: eventData.about,
-            links: eventData.links,
+            links: eventLinks,
             otherInfo: eventData.otherInfo || undefined,
             adminNote: eventData.adminNote || undefined,
 

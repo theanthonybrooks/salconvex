@@ -398,7 +398,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               format="desktop"
               userPref={userPref}
             />
-            {/* <div className="mt-6 flex w-full justify-end">
+            <div className="mt-6 flex w-full justify-end lg:hidden">
               <ApplyButton
                 id={event._id}
                 openCallId={openCallId}
@@ -415,7 +415,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 detailCard
                 finalButton
               />
-            </div> */}
+            </div>
           </div>
           <div id="event">
             <EventCard event={event} format="desktop" />

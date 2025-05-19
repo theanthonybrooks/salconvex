@@ -24,7 +24,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { FaApple, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 
 interface SignInCardProps {
   // setState: (state: SignInFlow) => void
@@ -166,7 +166,25 @@ const SignInCard: React.FC<SignInCardProps> = ({
         </div>
       )}
       <CardContent className="grid gap-y-4">
-        <div className="grid grid-cols-2 gap-x-4">
+        <Button
+          variant="salWithShadowHidden"
+          size="lg"
+          type="button"
+          className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 md:bg-white"
+          onClick={() => onProviderSignIn("google")}
+          disabled={pending}
+          tabIndex={1}
+        >
+          {isLoading === "google" ? (
+            <LoaderCircle className="size-4 animate-spin" />
+          ) : (
+            <>
+              <FaGoogle className="size-4" />
+              Continue with Google
+            </>
+          )}
+        </Button>
+        {/* <div className="grid grid-cols-2 gap-x-4">
           <Button
             variant="salWithShadowHidden"
             size="lg"
@@ -206,7 +224,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
               </>
             )}
           </Button>
-        </div>
+        </div> */}
         <p className="flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
           or
         </p>

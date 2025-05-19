@@ -1,4 +1,5 @@
 import { formatDisplayUrl } from "@/lib/linkFns";
+import { cn } from "@/lib/utils";
 import { EventData } from "@/types/event";
 import { Organizer } from "@/types/organizer";
 import { Globe, Phone } from "lucide-react";
@@ -21,10 +22,29 @@ interface LinkListProps {
 
 export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
   const listPreview = purpose === "preview";
+
+  const visibleEventLinks =
+    event?.links &&
+    Object.entries(event.links).filter(([key, value]) => {
+      if (!value) return false;
+      if (
+        listPreview &&
+        ["email", "phone", "linkAggregate", "other"].includes(key)
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+  const totalVisibleLinks = visibleEventLinks?.length || 0;
+  if (totalVisibleLinks === 0) {
+    return <div className="p-3 italic">See event details for full links</div>;
+  }
+
   return (
     <>
       {event && event.links && (
-        <div className="flex flex-col gap-y-2 p-3">
+        <div className={cn("flex flex-col gap-y-2", !listPreview && "p-3")}>
           {event.links?.email && !listPreview && (
             <a href={`mailto:${event.links.email}?subject=${event.name}`}>
               <div className="flex items-center gap-x-2">

@@ -23,9 +23,11 @@ export function getGroupKeyFromEvent(
   };
 } {
   const basicInfo = event.tabs.opencall?.basicInfo;
+  // const isPublished = event.tabs.opencall?.state === "published";
   const callType = basicInfo?.callType;
   const ocEnd = basicInfo?.dates?.ocEnd;
   const ocEndDate = ocEnd && isValidIsoDate(ocEnd) ? new Date(ocEnd) : null;
+  const ocStatus = event.openCallStatus;
 
   const eventStart = event.dates?.eventDates[0]?.start;
   const eventStartDate =
@@ -33,7 +35,12 @@ export function getGroupKeyFromEvent(
   const isPast = !!ocEndDate && ocEndDate < new Date();
   const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
 
-  if (sortBy === "openCall" && callType === "Fixed" && ocEnd) {
+  if (
+    sortBy === "openCall" &&
+    callType === "Fixed" &&
+    ocEnd &&
+    ocStatus === "active"
+  ) {
     if (ocEndDate) {
       const day = ocEndDate.getDate();
       const month = getFourCharMonth(ocEndDate);
@@ -51,8 +58,12 @@ export function getGroupKeyFromEvent(
 
   if (sortBy === "openCall") {
     if (callType === "Rolling") return { raw: "Rolling Open Call" };
-    if (callType === "Email") return { raw: "Email Open Call" };
-    if (!!callType) return { raw: "Past Open Call" };
+    if (callType === "Email") return { raw: "Open Email Submissions" };
+    if (callType === "Invite") return { raw: "Invite Only" };
+    if (ocStatus === "coming-soon") return { raw: "Coming Soon!" };
+    if (ocStatus === "ended") return { raw: "Past Open Call" };
+
+    // if (!!callType && isPublished) return { raw: String(callType) };
     return { raw: "No Public Open Call" };
   }
 

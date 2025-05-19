@@ -41,7 +41,7 @@ export const RichTextDisplay = ({ html, className }: RichTextDisplayProps) => {
                 className="mb-1 flex gap-1 first:mt-2"
               >
                 <Checkbox
-                  className="rich-check flex gap-x-1"
+                  className="rich-check"
                   defaultChecked={checked}
                   onCheckedChange={(newChecked) => {
                     const parent = document.activeElement?.closest("li");
