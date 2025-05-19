@@ -398,7 +398,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               format="desktop"
               userPref={userPref}
             />
-            <div className="mt-6 flex w-full justify-end lg:hidden">
+            <div className="mt-6 flex w-full justify-end xl:hidden">
               <ApplyButton
                 id={event._id}
                 openCallId={openCallId}

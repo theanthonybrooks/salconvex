@@ -118,7 +118,7 @@ const SubmissionFormOC2 = ({
     prevBudgetMaxRef.current = budgetMax;
 
     const timeout = setTimeout(() => {
-      handleCheckSchema(); // Suppress toast
+      handleCheckSchema(); 
     }, 300);
 
     return () => clearTimeout(timeout);
