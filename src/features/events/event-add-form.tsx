@@ -370,6 +370,7 @@ export const EventOCForm = ({
     hasUserEditedEventSteps ||
     hasUserEditedStep0 ||
     hasUserEditedStep3 ||
+    hasUserEditedStep4 ||
     hasUserEditedStep5
   );
   const prevOrgRef = useRef(existingOrg);
@@ -384,6 +385,7 @@ export const EventOCForm = ({
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep1;
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
+  console.log(activeStep);
 
   // #endregion
   // #endregion
@@ -980,12 +982,22 @@ export const EventOCForm = ({
                 moreInfo: undefined,
               },
               categories: {
-                designFee: true,
-                accommodation: false,
-                food: 100,
-                travelCosts: true,
-                materials: 1200,
-                equipment: 500,
+                artistStipend:
+                  openCallData.compensation?.categories?.artistStipend ??
+                  undefined,
+                designFee:
+                  openCallData.compensation?.categories?.designFee ?? undefined,
+                accommodation:
+                  openCallData.compensation?.categories?.accommodation ??
+                  undefined,
+                food: openCallData.compensation?.categories?.food ?? undefined,
+                travelCosts:
+                  openCallData.compensation?.categories?.travelCosts ??
+                  undefined,
+                materials:
+                  openCallData.compensation?.categories?.materials ?? undefined,
+                equipment:
+                  openCallData.compensation?.categories?.equipment ?? undefined,
               },
             },
             requirements: {

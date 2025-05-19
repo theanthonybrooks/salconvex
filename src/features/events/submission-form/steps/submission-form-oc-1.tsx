@@ -77,11 +77,15 @@ const SubmissionFormOC1 = ({
   const fixedType = callType === "Fixed";
   const ocEligiblityType = openCall?.eligibility?.type;
   const isNational = ocEligiblityType === "National";
-  const international = ocEligiblityType === "International";
+  const isInternational = ocEligiblityType === "International";
   const eligDetails = openCall?.eligibility?.details ?? "";
+  const appDetails = openCall?.requirements?.requirements ?? "";
   const showAppFeeInput = hasAppFee?.trim() === "true";
   const hasRequiredDetails =
-    (eligDetails.trim().length > 10 && !international) || international;
+    eligDetails.trim().length > 10 || isInternational || isNational;
+  const hasAppRequiredDetails = appDetails?.trim().length > 10;
+  const appLink = openCall?.requirements?.applicationLink ?? "";
+  const hasAppLink = appLink?.trim().length > 10;
   const appFee = openCall?.basicInfo?.appFee;
   const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
   const noAppFeeAmount = typeof appFee === "number" && appFee === 0;
@@ -134,7 +138,7 @@ const SubmissionFormOC1 = ({
       className={cn(
         "flex h-full flex-col gap-4 xl:justify-center",
         "mx-auto max-w-max",
-        "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
+        "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[40%_10%_50%] xl:gap-0",
       )}
     >
       <div
@@ -410,7 +414,7 @@ const SubmissionFormOC1 = ({
                           field.onChange(isNaN(num) ? 0 : num);
                         },
                       }}
-                      placeholder="Enter Amount"
+                      placeholder={hasAppFee ? "Enter Amount" : ""}
                       className="h-fit border-none py-2 text-center focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
@@ -518,87 +522,96 @@ const SubmissionFormOC1 = ({
                   )}
                 />
               </div>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType ? 6 : 5}:
-                </p>
-                <p className="lg:text-xs">Application Link</p>
-                {/* TODO: when internal applications are implemented, add this back in */}
-                {/* <p className="lg:text-xs">(If external)</p> */}
-              </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                <Label
-                  htmlFor="openCall.requirements.applicationLink"
-                  className="sr-only"
-                >
-                  Application Link
-                </Label>
-                <Controller
-                  name="openCall.requirements.applicationLink"
-                  control={control}
-                  render={({ field }) => (
-                    <DebouncedControllerInput
-                      field={field}
-                      placeholder="Link to external application form"
-                      className={cn(
-                        "w-full rounded border-foreground",
-                        errors?.openCall?.requirements?.applicationLink &&
-                          "invalid-field",
+
+              {hasAppRequiredDetails && (
+                <>
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {fixedType ? 6 : 5}:
+                    </p>
+                    <p className="lg:text-xs">Application Link</p>
+                    {/* TODO: when internal applications are implemented, add this back in */}
+                    {/* <p className="lg:text-xs">(If external)</p> */}
+                  </div>
+                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <Label
+                      htmlFor="openCall.requirements.applicationLink"
+                      className="sr-only"
+                    >
+                      Application Link
+                    </Label>
+                    <Controller
+                      name="openCall.requirements.applicationLink"
+                      control={control}
+                      render={({ field }) => (
+                        <DebouncedControllerInput
+                          field={field}
+                          placeholder="Link to external application form"
+                          className={cn(
+                            "w-full rounded border-foreground",
+                            errors?.openCall?.requirements?.applicationLink &&
+                              "invalid-field",
+                          )}
+                          transform={autoHttps}
+                          tabIndex={2}
+                          onBlur={() => {
+                            field.onBlur?.();
+                            handleCheckSchema?.();
+                            // console.log("Blur me", field + type)
+                          }}
+                        />
                       )}
-                      transform={autoHttps}
-                      tabIndex={2}
-                      onBlur={() => {
-                        field.onBlur?.();
-                        handleCheckSchema?.();
-                        // console.log("Blur me", field + type)
-                      }}
                     />
-                  )}
-                />
-              </div>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType ? 7 : 6}:
-                </p>
-                <p className="lg:text-xs">Application Docs</p>
-              </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                <Label htmlFor="openCall.tempFiles" className="sr-only">
-                  Application Documents
-                </Label>
-                <Controller
-                  name="openCall.tempFiles"
-                  control={control}
-                  render={({ field }) => (
-                    <FilePondInput
-                      value={field.value ?? []}
-                      onChange={field.onChange}
-                      purpose="both"
-                      maxFileSize="5MB"
+                  </div>
+                </>
+              )}
+              {hasAppLink && (
+                <>
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {fixedType ? 7 : 6}:
+                    </p>
+                    <p className="lg:text-xs">Application Docs</p>
+                  </div>
+                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <Label htmlFor="openCall.tempFiles" className="sr-only">
+                      Application Documents
+                    </Label>
+                    <Controller
+                      name="openCall.tempFiles"
+                      control={control}
+                      render={({ field }) => (
+                        <FilePondInput
+                          value={field.value ?? []}
+                          onChange={field.onChange}
+                          purpose="both"
+                          maxFileSize="5MB"
+                        />
+                      )}
                     />
-                  )}
-                />
-                {Array.isArray(openCall?.documents) &&
-                  openCall.documents.length > 0 && (
-                    <OpenCallFilesTable
-                      isMobile={isMobile}
-                      files={openCall.documents.filter(hasId)}
-                      eventId={eventId as Id<"events">}
-                      isDraft={isDraft}
-                      isAdmin={isAdmin}
-                    />
-                  )}
-              </div>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType ? 8 : 7}:
-                </p>
-                <p className="lg:text-xs">External Links</p>
-              </div>
-              <ExternalLinksInput
-                name="openCall.requirements.links"
-                handleCheckSchema={handleCheckSchema}
-              />
+                    {Array.isArray(openCall?.documents) &&
+                      openCall.documents.length > 0 && (
+                        <OpenCallFilesTable
+                          isMobile={isMobile}
+                          files={openCall.documents.filter(hasId)}
+                          eventId={eventId as Id<"events">}
+                          isDraft={isDraft}
+                          isAdmin={isAdmin}
+                        />
+                      )}
+                  </div>
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {fixedType ? 8 : 7}:
+                    </p>
+                    <p className="lg:text-xs">External Links</p>
+                  </div>
+                  <ExternalLinksInput
+                    name="openCall.requirements.links"
+                    handleCheckSchema={handleCheckSchema}
+                  />
+                </>
+              )}
             </>
           )}
         </div>

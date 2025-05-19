@@ -24,8 +24,11 @@ registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
 import { MultiSelect } from "@/components/multi-select";
 import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
+import { getCurrencySymbol } from "@/lib/currencyFns";
 import { openCallCategoryFields } from "@/types/openCall";
 import "filepond/dist/filepond.min.css";
+
+type CategoryKey = (typeof openCallCategoryFields)[number]["value"];
 
 interface SubmissionFormOC2Props {
   user: User | undefined;
@@ -51,12 +54,17 @@ const SubmissionFormOC2 = ({
     setValue,
 
     // getValues,
-    formState: { errors },
+    // formState: { errors },
   } = useFormContext<EventOCFormValues>();
   const [hasBudget, setHasBudget] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
+  const selectedCategories = watch("openCall.compensation.categories") ?? {};
+  const activeCategoryFields = openCallCategoryFields.filter(
+    ({ value }) => selectedCategories?.[value],
+  );
+
   const orgCurrency = organizer?.location?.currency;
   // const eventName = watch("event.name");
   // const eventId = watch("event._id");
@@ -64,14 +72,19 @@ const SubmissionFormOC2 = ({
 
   const budgetMin = openCall?.compensation?.budget?.min;
   const budgetMax = openCall?.compensation?.budget?.max;
-  const budgetRate = openCall?.compensation?.budget?.rate;
+  // const budgetRate = openCall?.compensation?.budget?.rate;
   const validBudgetMin = typeof budgetMin === "number" && budgetMin > 0;
-  const validBudgetRate = typeof budgetRate === "number" && budgetRate > 0;
+  // const validBudgetRate = typeof budgetRate === "number" && budgetRate > 0;
   // const hasMinOrRateBudget = validBudgetMin || validBudgetRate;
   const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
+  const hasBudgetMin = hasBudget?.trim() === "true" && validBudgetMin;
+  const noBudget = hasBudget?.trim() === "false";
   const allInclusive = openCall?.compensation?.budget?.allInclusive;
+  const budgetMaxRef = useRef(budgetMax);
 
-  console.log(errors);
+  const setValueRef = useRef(setValue);
+  // const noBudget
+
   // const hasRate = openCall?.compensation?.budget?.unit;
   // #region -------------- UseEffect ---------------
 
@@ -84,21 +97,12 @@ const SubmissionFormOC2 = ({
       setValue("openCall.compensation.budget.max", budgetMin);
     } else if (!formValue && noBudgetMin) {
       setHasBudget("false");
-    } else if (formValue === "false" && validBudgetRate) {
+    } else if (formValue === "false" && validBudgetMin) {
       setValue("openCall.compensation.budget.min", 0);
+      setValue("openCall.compensation.budget.max", 0);
       setValue("openCall.compensation.budget.rate", 0);
     }
-  }, [
-    validBudgetRate,
-    validBudgetMin,
-    noBudgetMin,
-    setValue,
-    hasBudget,
-    budgetMin,
-  ]);
-
-  const budgetMaxRef = useRef(budgetMax);
-  const setValueRef = useRef(setValue);
+  }, [validBudgetMin, noBudgetMin, setValue, hasBudget, budgetMin]);
 
   // Keep refs in sync
   useEffect(() => {
@@ -155,14 +159,19 @@ const SubmissionFormOC2 = ({
         "flex h-full flex-col gap-4 xl:justify-center",
         "mx-auto max-w-max",
         "xl:mx-0 xl:grid xl:max-w-none",
-        allInclusive === false && "xl:grid-cols-[45%_10%_45%] xl:gap-0",
+        allInclusive === false &&
+          showBudgetInputs &&
+          "xl:grid-cols-[45%_10%_45%] xl:gap-0",
+        !showBudgetInputs && "lg:gap-0",
       )}
     >
       <div
         className={cn(
           "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-          "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+          "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
           "lg:pb-10 xl:py-10 4xl:my-auto",
+          !showBudgetInputs && "lg:gap-y-0 lg:pb-0 xl:pb-0",
+          showBudgetInputs && "self-start",
 
           // "xl:self-center",
         )}
@@ -213,7 +222,7 @@ const SubmissionFormOC2 = ({
             className={cn(
               "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
               !showBudgetInputs &&
-                "opacity-50 [@media(max-width:640px)]:hidden",
+                "border-foreground/30 opacity-50 [@media(max-width:640px)]:hidden",
             )}
           >
             <Controller
@@ -254,11 +263,13 @@ const SubmissionFormOC2 = ({
                       min={0}
                       disabled={!showBudgetInputs}
                       placeholder="Minimum"
-                      className="h-fit border-none pb-2 pr-0 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
+                      className="h-fit border-none px-0 pb-2 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
-                <p className="pb-2">{" - "}</p>
+                <p className={cn("pb-2", !showBudgetInputs && "opacity-40")}>
+                  {" - "}
+                </p>
                 <Controller
                   name="openCall.compensation.budget.max"
                   control={control}
@@ -276,7 +287,7 @@ const SubmissionFormOC2 = ({
                         },
                       }}
                       placeholder="Maximum "
-                      className="arrowless h-fit border-none pb-2 pl-0 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
+                      className="arrowless h-fit border-none px-0 pb-2 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
@@ -436,47 +447,10 @@ const SubmissionFormOC2 = ({
                 />
               </div>
             </div>
-
-            <div className="input-section self-start">
-              <p className="lg:text-xs">More Info</p>
-            </div>
-
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="event.type" className="sr-only">
-                Eligibility Continued... (if not &quot;International&quot;)
-              </Label>
-              <Controller
-                name="openCall.compensation.budget.moreInfo"
-                control={control}
-                render={({ field }) => (
-                  <RichTextEditor
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    placeholder="Please list any other compensation-related info here"
-                    charLimit={1000}
-                  />
-                )}
-              />
-            </div>
           </>
         )}
-      </div>
-
-      {allInclusive === false && (
-        <>
-          <Separator
-            thickness={2}
-            className="mx-auto hidden xl:block"
-            orientation="vertical"
-          />
-          <div
-            className={cn(
-              "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-              "lg:pt-10 xl:py-10 4xl:my-auto",
-              // "xl:self-center",
-            )}
-          >
+        {(hasBudgetMin || noBudget) && (
+          <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
               <p className="lg:text-xs">Categories</p>
@@ -500,18 +474,29 @@ const SubmissionFormOC2 = ({
                     textClassName="text-base"
                     options={[...openCallCategoryFields]}
                     onValueChange={(selected: string[] = []) => {
-                      console.log(selected);
-                      const result = Object.fromEntries(
-                        selected.map((key) => [key, true]),
-                      );
-                      field.onChange(result);
+                      const currentValues = field.value ?? {};
+
+                      const updated = Object.fromEntries(
+                        selected.map((key) => {
+                          const typedKey = key as CategoryKey;
+                          const existingValue = currentValues[typedKey];
+                          return [
+                            typedKey,
+                            typeof existingValue === "number"
+                              ? existingValue
+                              : true,
+                          ];
+                        }),
+                      ) as Record<CategoryKey, boolean | number>;
+
+                      field.onChange(updated);
                       handleCheckSchema();
                     }}
                     defaultValue={Object.entries(field.value ?? {})
                       .filter(([, isSelected]) => isSelected)
                       .map(([key]) => key)}
                     shortResults={isMobile}
-                    placeholder="Select what's provided (min 1)"
+                    placeholder="Select what's provided"
                     variant="basic"
                     maxCount={1}
                     height={10}
@@ -523,157 +508,102 @@ const SubmissionFormOC2 = ({
                 )}
               />
             </div>
-            {/*{" "}
-            {typeof budgetMin === "number" && (
+          </>
+        )}
+      </div>
+
+      {allInclusive === false && (hasBudgetMin || noBudget) && (
+        <>
+          {showBudgetInputs && (
+            <Separator
+              thickness={2}
+              className="mx-auto hidden xl:block"
+              orientation="vertical"
+            />
+          )}
+          <div
+            className={cn(
+              "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
+              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+              "lg:pt-10 xl:py-10 4xl:my-auto",
+              !showBudgetInputs && "lg:gap-y-0 lg:pt-0 xl:pt-0",
+
+              // "xl:self-center",
+            )}
+          >
+            {activeCategoryFields.length > 0 && hasBudgetMin && (
               <>
                 <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">Step 4:</p>
-                  <p className="lg:text-xs">Open Call Dates</p>
+                  <p className="lg:text-xs">Categories</p>
+                  <p className="lg:text-xs">Continued</p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="openCall.basicInfo.dates" className="sr-only">
-                    Open Call Dates
+                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                  <Label htmlFor="event.type" className="sr-only">
+                    Compensation Category Amounts (Optional)
                   </Label>
-                  /~ <Controller
-                    name="openCall.basicInfo.dates.ocStart"
-                    control={control}
-                    render={({ field }) => (
-                      <OcCustomDatePicker
-                        value={field.value}
-                        onChange={field.onChange}
-                        pickerType="start"
-                        className="hansel min-h-12"
-                        placeholder="Start Date"
-                      />
-                    )}
-                  /> ~/
-
-                  <div className="hidden items-center justify-center px-2 sm:flex">
-                    <ArrowRight
-                      className={cn("size-4 shrink-0 text-foreground/50")}
-                    />
-                  </div>
-
-                  /~ <Controller
-                    name="openCall.basicInfo.dates.ocEnd"
-                    control={control}
-                    render={({ field }) => (
-                      <OcCustomDatePicker
-                        value={field.value}
-                        onChange={field.onChange}
-                        pickerType="end"
-                        className="gretel min-h-12"
-                        minDate={minDate}
-                        ocEnd={ocEnd}
-                        orgTimezone={orgTimezone}
-                        placeholder="Deadline"
-                      />
-                    )}
-                  /> ~/
+                  {activeCategoryFields.map(({ label, value }) => (
+                    <div
+                      key={value}
+                      className="flex items-center justify-between gap-4 rounded-md border p-3"
+                    >
+                      {/* Optional: Replace with an icon specific to each category if needed */}
+                      <span className="flex-1 text-sm font-medium text-foreground">
+                        {label}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {getCurrencySymbol(
+                          openCall?.compensation?.budget?.currency ?? "USD",
+                        )}
+                        <Controller
+                          name={`openCall.compensation.categories.${value}`}
+                          control={control}
+                          render={({ field }) => (
+                            <DebouncedControllerNumInput
+                              field={{
+                                ...field,
+                                onChange: (val) => {
+                                  console.log(val);
+                                  const num = parseFloat(val);
+                                  field.onChange(isNaN(num) ? true : num);
+                                },
+                              }}
+                              min={0}
+                              formatNumber={true}
+                              placeholder="ex. 250"
+                              className="w-25 text-right"
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </>
             )}
-            <>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  /~ Step {fixedType ? 5 : 4}: ~/
-                </p>
-                <p className="lg:text-xs">Application Requirements</p>
-              </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                <Label htmlFor="event.type" className="sr-only">
-                  Application Requirements
-                </Label>
-                <Controller
-                  name="openCall.requirements.requirements"
-                  control={control}
-                  render={({ field }) => (
-                    <RichTextEditor
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      placeholder="Please be as specific as possible"
-                      charLimit={3000}
-                      purpose="openCall"
-                      asModal={true}
-                      title={eventName}
-                      subtitle="Application Requirements"
-                    />
-                  )}
-                />
-              </div>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  /~ Step {fixedType ? 6 : 5}: ~/
-                </p>
-                <p className="lg:text-xs">Application Link</p>
-                /~ TODO: when internal applications are implemented, add this back in ~/
-                /~ <p className="lg:text-xs">(If external)</p> ~/
-              </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                <Label
-                  htmlFor="openCall.requirements.applicationLink"
-                  className="sr-only"
-                >
-                  Application Link
-                </Label>
-                <Controller
-                  name="openCall.requirements.applicationLink"
-                  control={control}
-                  render={({ field }) => (
-                    <DebouncedControllerInput
-                      field={field}
-                      placeholder="Link to external application form"
-                      className={cn(
-                        "w-full rounded border-foreground",
-                        errors?.openCall?.requirements?.applicationLink &&
-                          "invalid-field",
-                      )}
-                      transform={autoHttps}
-                      tabIndex={2}
-                      onBlur={() => {
-                        field.onBlur?.();
-                        handleCheckSchema?.();
-                        // console.log("Blur me", field + type)
-                      }}
-                    />
-                  )}
-                />
-              </div>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  /~ Step {fixedType ? 7 : 6}: ~/
-                </p>
-                <p className="lg:text-xs">Application Docs</p>
-              </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                <Label htmlFor="openCall.tempFiles" className="sr-only">
-                  Application Documents
-                </Label>
-                <Controller
-                  name="openCall.tempFiles"
-                  control={control}
-                  render={({ field }) => (
-                    <FilePondInput
-                      value={field.value ?? []}
-                      onChange={field.onChange}
-                      purpose="both"
-                      maxFileSize="5MB"
-                    />
-                  )}
-                />
-                {Array.isArray(openCall?.documents) &&
-                  openCall.documents.length > 0 && (
-                    <OpenCallFilesTable
-                      isMobile={isMobile}
-                      files={openCall.documents.filter(hasId)}
-                      eventId={eventId as Id<"events">}
-                      isDraft={isDraft}
-                      isAdmin={isAdmin}
-                    />
-                  )}
-              </div>
-            </>*/}
+
+            <div className="input-section self-start">
+              <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
+              <p className="lg:text-xs">More Info</p>
+            </div>
+
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.type" className="sr-only">
+                Eligibility Continued... (if not &quot;International&quot;)
+              </Label>
+              <Controller
+                name="openCall.compensation.budget.moreInfo"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Please list any other compensation-related info here"
+                    charLimit={1000}
+                  />
+                )}
+              />
+            </div>
           </div>
         </>
       )}
