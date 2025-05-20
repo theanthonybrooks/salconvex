@@ -1,4 +1,5 @@
-export function getExternalRedirectHtml(redirectUrl: string) {
+export function getExternalRedirectHtml(redirectUrl: string, type?: number) {
+  const redirectType = type === 1 ? "Stripe" : "the application site";
   return `
     <html>
       <head>
@@ -63,7 +64,7 @@ export function getExternalRedirectHtml(redirectUrl: string) {
       <body>
         <div>
           <div class="loader"></div>
-          <h1>Redirecting you to the application site…</h1>
+          <h1>Redirecting you to ${redirectType}…</h1>
           <p>If you're not redirected, <a href="${redirectUrl}" target="_self">click here</a>.</p>
         </div>
       </body>

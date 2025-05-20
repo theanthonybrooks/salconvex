@@ -27,6 +27,7 @@ interface SubmissionFormEventStep2Props {
   categoryEvent: boolean;
   canNameEvent: boolean;
   handleCheckSchema?: () => void;
+  formType: number;
 }
 
 const SubmissionFormEventStep2 = ({
@@ -38,6 +39,7 @@ const SubmissionFormEventStep2 = ({
   categoryEvent,
   canNameEvent,
   handleCheckSchema,
+  formType,
 }: SubmissionFormEventStep2Props) => {
   const {
     control,
@@ -51,6 +53,8 @@ const SubmissionFormEventStep2 = ({
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
   const category = watch("event.category");
+  const eventOnly = formType === 1 && !isAdmin;
+  const freeCall = formType === 2 && !isAdmin;
 
   // #region ------------- Queries, Actions, and Mutations --------------
 
@@ -76,7 +80,7 @@ const SubmissionFormEventStep2 = ({
       >
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">
-            Step {categoryEvent ? 9 : 8}:{" "}
+            Step {categoryEvent && !eventOnly ? 9 : 8}:{" "}
           </p>
           <p className="lg:text-xs">
             {getEventCategoryLabelAbbr(category)} Links
@@ -113,73 +117,86 @@ const SubmissionFormEventStep2 = ({
         >
           {canNameEvent && (
             <>
-              <div className="input-section">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step {categoryEvent ? 10 : 9}:{" "}
-                </p>
-                <p className="lg:text-xs">Open Call</p>
-              </div>
-              <div className="mx-auto mb-2 flex w-full max-w-[74dvw] flex-col gap-2 sm:mb-auto lg:min-w-[300px] lg:max-w-md">
-                <Label htmlFor="event.hasOpenCall" className="sr-only">
-                  Open Call
-                </Label>
-                <Controller
-                  name="openCall.basicInfo.callType"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        // setHasOpenCall(value);
-                      }}
-                      value={field.value ?? ""}
-                    >
-                      <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
-                        <SelectValue
-                          placeholder={`Does your ${getEventCategoryLabelAbbr(category).toLowerCase()} have an open call?`}
-                        />
-                      </SelectTrigger>
-                      <SelectContent className="min-w-auto">
-                        <SelectItem fit value="False">
-                          No, there&apos;s not an open call
-                        </SelectItem>
-                        <SelectItem fit value="Invite">
-                          No, it&apos;s an invite only event
-                        </SelectItem>
-                        {/* <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
-                            Or select the type of call:
-                          </p> */}
-                        <SelectSeparator />{" "}
-                        <span className="flex items-center gap-1 px-3 py-1 text-xs italic text-muted-foreground">
-                          <HiArrowTurnLeftDown className="size-4 shrink-0 translate-y-1.5" />
-                          Or select the type of call
-                        </span>
-                        <SelectItem fit value="Fixed">
-                          Fixed Deadline
-                        </SelectItem>
-                        <SelectItem fit value="Rolling">
-                          Rolling Open Call
-                        </SelectItem>
-                        <SelectItem fit value="Email">
-                          Open email submissions
-                        </SelectItem>
-                        {isAdmin && (
-                          <SelectItem
-                            fit
-                            value="Unknown"
-                            className="bg-red-100 italic"
-                          >
-                            Unknown - Admin Only
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
+              {!eventOnly && (
+                <>
+                  <div className="input-section">
+                    <p className="min-w-max font-bold lg:text-xl">
+                      Step {categoryEvent ? 10 : 9}:
+                    </p>
+                    <p className="lg:text-xs">Open Call</p>
+                  </div>
+                  <div className="mx-auto mb-2 flex w-full max-w-[74dvw] flex-col gap-2 sm:mb-auto lg:min-w-[300px] lg:max-w-md">
+                    <Label htmlFor="event.hasOpenCall" className="sr-only">
+                      Open Call
+                    </Label>
+                    <Controller
+                      name="event.hasOpenCall"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // setHasOpenCall(value);
+                          }}
+                          value={field.value ?? ""}
+                        >
+                          <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                            <SelectValue
+                              placeholder={
+                                !freeCall
+                                  ? `Do you have an open call?`
+                                  : `Select the type of call`
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent className="min-w-auto">
+                            {!freeCall && (
+                              <>
+                                <SelectItem fit value="False">
+                                  No, there&apos;s not an open call
+                                </SelectItem>
+                                <SelectItem fit value="Invite">
+                                  No, it&apos;s an invite only event
+                                </SelectItem>
+                                {/* <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
+                                Or select the type of call:
+                              </p> */}
+                                <SelectSeparator />{" "}
+                                <span className="flex items-center gap-1 px-3 py-1 text-xs italic text-muted-foreground">
+                                  <HiArrowTurnLeftDown className="size-4 shrink-0 translate-y-1.5" />
+                                  Or select the type of call
+                                </span>
+                              </>
+                            )}
+                            <SelectItem fit value="Fixed">
+                              Fixed Deadline
+                            </SelectItem>
+                            <SelectItem fit value="Rolling">
+                              Rolling Open Call
+                            </SelectItem>
+                            <SelectItem fit value="Email">
+                              Open email submissions
+                            </SelectItem>
+                            {isAdmin && (
+                              <SelectItem
+                                fit
+                                value="Unknown"
+                                className="bg-red-100 italic"
+                              >
+                                Unknown - Admin Only
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
               <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {categoryEvent ? 11 : 10}:{" "}
+                  Step {categoryEvent && !eventOnly ? 11 : eventOnly ? 9 : 10}
+                  :{" "}
                 </p>
                 <p className="lg:text-xs">Other Info</p>
               </div>

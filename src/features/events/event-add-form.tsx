@@ -28,7 +28,6 @@ import {
 import {
   eventDetailsSchema,
   eventOnlySchema,
-  eventSubmitSchema,
   eventWithOCSchema,
   openCallStep1Schema,
   openCallStep2Schema,
@@ -44,6 +43,7 @@ import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submi
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
+import { getOcPricing } from "@/lib/pricingFns";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -99,7 +99,8 @@ const steps = [
     id: 7,
     label: "Recap",
     mobileLabel: "Recap",
-    schema: eventSubmitSchema,
+    // schema: eventSubmitSchema,
+    schema: eventWithOCSchema,
   },
 ];
 
@@ -114,13 +115,15 @@ interface EventOCFormProps {
   setHasUnsavedChanges: (value: boolean) => void;
   activeStep: number;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  isEligibleForFree: boolean;
+  planKey: string;
 }
 
 export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const EventOCForm = ({
   user,
-  onClick,
+  // onClick,
   shouldClose,
   setOpen,
   setShouldClose,
@@ -128,10 +131,16 @@ export const EventOCForm = ({
   setHasUnsavedChanges,
   activeStep,
   setActiveStep,
+  isEligibleForFree,
+  planKey,
 }: EventOCFormProps) => {
+  const isAdmin = user?.role?.includes("admin") || false;
+  const formType = Number(planKey);
+  const eventOnly = formType === 1 && !isAdmin;
+  const freeCall = formType === 2 && !isAdmin;
+  const paidCall = formType === 3 && !isAdmin;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
-  const isAdmin = user?.role?.includes("admin") || false;
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
     resolver: zodResolver(eventWithOCSchema),
     defaultValues: {
@@ -141,12 +150,13 @@ export const EventOCForm = ({
         location: undefined,
       },
       event: {
+        formType,
         name: "",
+        hasOpenCall: "False",
       },
       openCall: {
         basicInfo: {
           appFee: 0,
-          callType: "Unknown",
         },
         eligibility: {
           whom: [],
@@ -180,8 +190,14 @@ export const EventOCForm = ({
   } = form;
   // #region ------------- Definitions --------------
   // #region ------------- Actions, Mutations, Queries --------------
+
+  // const paidCall = formType === 3 && !isAdmin;
+
   const currentValues = getValues();
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
+  const getCheckoutUrl = useAction(
+    api.stripeSubscriptions.createStripeCheckoutSession,
+  );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
@@ -269,7 +285,7 @@ export const EventOCForm = ({
   // #region ------------- Variables --------------
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
-  const eventOpenCall = openCallData?.basicInfo?.callType ?? "";
+  const eventOpenCall = eventData?.hasOpenCall ?? "";
   const now = new Date();
   const openCallEnd = openCallData?.basicInfo?.dates?.ocEnd
     ? new Date(openCallData?.basicInfo?.dates?.ocEnd)
@@ -312,7 +328,7 @@ export const EventOCForm = ({
   const eventChoiceMade = !!(existingEvent || newOrgEvent || !existingOrg);
 
   const category = eventData?.category as EventCategory;
-  const categoryEvent = category === "event";
+  const categoryEvent = category === "event" || formType === 1;
 
   const typeEvent =
     ((eventData?.type && eventData?.type?.length > 0) ||
@@ -331,7 +347,7 @@ export const EventOCForm = ({
 
   const { data: ocData, isSuccess: openCallSuccess } = useQueryWithStatus(
     api.openCalls.openCall.getOpenCallByEventId,
-    existingEvent ? { eventId: existingEvent._id } : "skip",
+    existingEvent && hasOpenCall ? { eventId: existingEvent._id } : "skip",
   );
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
@@ -385,7 +401,31 @@ export const EventOCForm = ({
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep1;
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
-  console.log(activeStep);
+
+  // const applicationFee = ocData?.basicInfo?.appFee;
+  // const hasApplicationFee =
+  //   !!applicationFee &&
+  //   typeof applicationFee === "number" &&
+  //   applicationFee > 0;
+  const projectMaxBudget = ocData?.compensation?.budget?.max;
+  const projectMinBudget = ocData?.compensation?.budget?.min;
+  const projectBudget = (projectMaxBudget || projectMinBudget) ?? 0;
+  // const budgetLg =
+  //   typeof projectMaxBudget === "number" && projectMaxBudget >= 1000;
+
+  // const hasProjectBudget =
+  //   !!projectBudget && typeof projectBudget === "number" && projectBudget > 0;
+  // console.log(projectBudget, hasProjectBudget, hasApplicationFee);
+  const submissionCost = getOcPricing(projectBudget);
+  // console.log(submissionCost);
+  // console.log(submissionCost?.price);
+  const alreadyPaid = !!openCallData?.paid;
+  const alreadyApprovedOC = !!openCallData?.approvedBy;
+  const alreadyApprovedEvent = !!eventData?.approvedBy;
+  console.log(alreadyPaid);
+  const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
+  console.log(alreadyApproved);
+  // console.log(activeStep);
 
   // #endregion
   // #endregion
@@ -393,18 +433,18 @@ export const EventOCForm = ({
 
   //
   // #region ------------- Console Logs --------------
-  console.log(errors);
+  // console.log(errors);
   if (errors && Object.keys(errors).length > 0) {
     console.log(errors);
   }
-  console.log(
-    isValid,
-    validOrgWZod,
-    isStepValidZod,
-    eventChoiceMade,
-    validStep1,
-  );
-  console.log(openCallData);
+  // console.log(
+  //   isValid,
+  //   validOrgWZod,
+  //   isStepValidZod,
+  //   eventChoiceMade,
+  //   validStep1,
+  // );
+  // console.log(openCallData);
   // #endregion
 
   //
@@ -415,25 +455,51 @@ export const EventOCForm = ({
     setActiveStep(0);
   };
 
-  const onSubmit = async (data: EventOCFormValues, paid: boolean) => {
-    console.log(paid);
-    console.log("data", data);
+  const onSubmit = async () => {
+    let url: string | undefined;
+    // console.log(paidCall);
+    // console.log("data", data);
+
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
       await handleSave(true);
+      if (paidCall && !alreadyPaid) {
+        const result = await getCheckoutUrl({
+          planKey,
+          slidingPrice: submissionCost?.price ?? 50,
+          accountType: "organizer",
+          isEligibleForFree,
+          openCallId: openCallData?._id as Id<"openCalls">,
+        });
+        url = result.url;
+      }
+
       toast.success(
-        hasOpenCall
-          ? "Successfully updated profile! Forwarding to Stripe..."
-          : "Successfully submitted event!",
+        paidCall && !alreadyPaid
+          ? "Successfully submitted project! Forwarding to Stripe..."
+          : alreadyPaid || alreadyApproved
+            ? "Successfully updated project!"
+            : "Successfully submitted event!",
         {
-          onClick: () => toast.dismiss(), // dismisses the current toast
+          onClick: () => toast.dismiss(),
         },
       );
-
-      if (paid && !isAdmin) {
+      // console.log("submitting: ", paidCall, isAdmin);
+      if (paidCall && !alreadyPaid && !isAdmin) {
         setTimeout(() => {
-          onClick();
+          const newTab = window.open("about:blank");
+          if (!newTab) {
+            toast.error(
+              "Stripe redirect blocked. Please enable popups for this site.",
+            );
+            console.error("Popup was blocked");
+            return;
+          }
+          if (url) {
+            newTab.location.href = url;
+          }
+          // onClick();
           // onClick()
         }, 2000);
       } else {
@@ -457,6 +523,8 @@ export const EventOCForm = ({
     }
     handleFirstStep();
     if (activeStep === 2 && !hasOpenCall) {
+      unregister("openCall");
+
       setActiveStep((prev) => prev + 3);
       setValue("event.state", "draft");
     } else {
@@ -487,12 +555,13 @@ export const EventOCForm = ({
       setActiveStep((prev) => prev - 3);
     } else if (activeStep === 5) {
       if (!orgData?.contact?.primaryContact) {
-        console.log("weiners");
         unregister("organization.contact");
         unregister("organization.links");
         console.log(getValues("organization"));
       }
       if (!hasOpenCall) {
+        console.log("heya");
+        unregister("openCall");
         setActiveStep((prev) => prev - 3);
       } else {
         setActiveStep((prev) => prev - 1);
@@ -523,11 +592,13 @@ export const EventOCForm = ({
           merge({}, currentValues, {
             event: {
               // ...existingEvent,
+              formType,
               ...currentValues.event,
               location: locationFromEvent,
               links: {
                 ...eventLinks,
               },
+              hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             },
           }),
         );
@@ -535,6 +606,7 @@ export const EventOCForm = ({
         reset({
           ...currentValues,
           event: {
+            formType,
             name: "",
             logo: currentValues.organization.logo,
             logoStorageId: currentValues.organization.logoStorageId,
@@ -554,7 +626,7 @@ export const EventOCForm = ({
               ...eventLinks,
             },
             //TODO: cOME BACK TO THIS!
-            // hasOpenCall: "false",
+            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
           },
         });
         console.log("waffles");
@@ -727,6 +799,7 @@ export const EventOCForm = ({
               ...orgResult,
             },
             event: {
+              formType,
               ...existingEvent,
               logo: eventFullUrl,
               logoStorageId: existingEvent?.logoStorageId ?? logoStorageId,
@@ -745,6 +818,7 @@ export const EventOCForm = ({
               ...orgResult,
             },
             event: {
+              formType,
               name: "",
               logo: orgLogoFullUrl || eventFullUrl,
               logoStorageId,
@@ -758,6 +832,7 @@ export const EventOCForm = ({
                 edition: new Date().getFullYear(),
                 noProdStart: false,
               },
+              hasOpenCall: "False",
             },
           });
         }
@@ -790,11 +865,11 @@ export const EventOCForm = ({
             return;
           }
           result = uploadResult;
-          console.log(result);
+          // console.log(result);
         }
-        console.log("doesnt need upload");
+        // console.log("doesnt need upload");
         const { logoStorageId, timezone, timezoneOffset } = result;
-        console.log(logoStorageId, timezone, timezoneOffset);
+        // console.log(logoStorageId, timezone, timezoneOffset);
         let eventResult = null;
         const eventLogo =
           typeof eventData.logo === "string" ? eventData.logo : "1.jpg";
@@ -814,6 +889,7 @@ export const EventOCForm = ({
             logo: eventLogo,
             type: eventData.type || [],
             category: eventData.category,
+            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
@@ -838,12 +914,15 @@ export const EventOCForm = ({
           eventResult = event;
 
           setExistingEvent(eventResult);
+          console.log(event);
+          console.log(currentValues.event);
 
           reset(
             merge({}, currentValues, {
               event,
             }),
           );
+
           setPending(false);
         } catch (error) {
           console.error("Failed to create new event:", error);
@@ -865,6 +944,7 @@ export const EventOCForm = ({
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
             category: eventData.category,
+            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             dates: {
               ...eventData.dates,
             },
@@ -886,6 +966,7 @@ export const EventOCForm = ({
           reset(
             merge({}, currentValues, {
               event: {
+                formType,
                 ...eventData,
               },
             }),
@@ -951,14 +1032,14 @@ export const EventOCForm = ({
 
         try {
           setPending(true);
-          await createOrUpdateOpenCall({
+          const ocResult = await createOrUpdateOpenCall({
             orgId: orgData._id as Id<"organizations">,
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
-              appFee: openCallData.basicInfo.appFee,
+              appFee: !freeCall ? openCallData.basicInfo.appFee : 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
-              callType: openCallData.basicInfo.callType ?? "Unknown",
+              callType: eventData.hasOpenCall ?? "False",
               dates: {
                 ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
                 ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
@@ -978,7 +1059,7 @@ export const EventOCForm = ({
                 rate: 0,
                 unit: "",
                 currency: orgData.location?.currency?.code ?? "",
-                allInclusive: false,
+                allInclusive: true,
                 moreInfo: undefined,
               },
               categories: {
@@ -1009,6 +1090,7 @@ export const EventOCForm = ({
               otherInfo: undefined,
             },
             documents,
+            paid: openCallData.paid ?? false,
           });
 
           let lastEditedResult = null;
@@ -1028,12 +1110,19 @@ export const EventOCForm = ({
             }
           }
 
-          reset({
-            ...currentValues,
-            openCall: {
-              ...currentValues.openCall,
-            },
-          });
+          // reset({
+          //   ...currentValues,
+          //   openCall: {
+          //     ...(ocResult || currentValues.openCall),
+          //   },
+          // });
+          reset(
+            merge({}, currentValues, {
+              openCall: {
+                ...(ocResult || currentValues.openCall),
+              },
+            }),
+          );
         } catch (error) {
           console.error("Failed to create or update open call:", error);
           toast.error("Failed to create or update open call");
@@ -1051,9 +1140,9 @@ export const EventOCForm = ({
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
-              appFee: openCallData.basicInfo.appFee,
+              appFee: !freeCall ? openCallData.basicInfo.appFee : 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
-              callType: openCallData.basicInfo.callType ?? "Unknown",
+              callType: eventData.hasOpenCall ?? "False",
               dates: {
                 ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
                 ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
@@ -1097,6 +1186,7 @@ export const EventOCForm = ({
               otherInfo: undefined,
             },
             documents: undefined,
+            paid: openCallData.paid ?? false,
           });
           let lastEditedResult = null;
           if (existingEvent?._id) {
@@ -1209,6 +1299,7 @@ export const EventOCForm = ({
             logo: eventData.logo as string,
             type: eventData.type || [],
             category: eventData.category,
+            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             dates: {
               ...eventData.dates,
             },
@@ -1232,9 +1323,9 @@ export const EventOCForm = ({
               eventId: eventData._id as Id<"events">,
               openCallId: openCallData?._id as Id<"openCalls">,
               basicInfo: {
-                appFee: openCallData.basicInfo.appFee,
+                appFee: !freeCall ? openCallData.basicInfo.appFee : 0,
                 callFormat: openCallData.basicInfo.callFormat,
-                callType: openCallData.basicInfo.callType,
+                callType: eventData.hasOpenCall ?? "False",
                 dates: {
                   ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
                   ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
@@ -1282,6 +1373,7 @@ export const EventOCForm = ({
               state: publish ? "published" : "submitted",
               finalStep: true,
               approved: publish,
+              paid: formType === 3 && !alreadyPaid ? false : true,
             });
           }
           eventResult = event;
@@ -1296,6 +1388,10 @@ export const EventOCForm = ({
       }
     },
     [
+      alreadyPaid,
+      formType,
+      eventOnly,
+      freeCall,
       saveOrgFile,
       setOpen,
       hasOpenCall,
@@ -1343,14 +1439,15 @@ export const EventOCForm = ({
         location: undefined,
       },
       event: {
+        formType,
         name: "",
         logo: "/1.jpg",
         location: undefined,
+        hasOpenCall: "False",
       },
       openCall: {
         basicInfo: {
           appFee: 0,
-          callType: "Unknown",
         },
         eligibility: {
           whom: [],
@@ -1371,6 +1468,7 @@ export const EventOCForm = ({
   // #endregion
 
   // #region -------------UseEffects --------------
+
   useEffect(() => {
     if (hasUserEditedForm) {
       updateLastChanged();
@@ -1378,15 +1476,15 @@ export const EventOCForm = ({
   }, [watchedValues, updateLastChanged, hasUserEditedForm]);
 
   useEffect(() => {
-    console.log("active step: ", activeStep);
+    // console.log("active step: ", activeStep);
   }, [activeStep]);
 
   useEffect(() => {
-    console.log("existingOrg", existingOrg);
+    // console.log("existingOrg", existingOrg);
   }, [existingOrg]);
   useEffect(() => {
     if (orgData?.name !== undefined && orgData?.name !== "") {
-      console.log("orgData", getValues("organization"));
+      // console.log("orgData", getValues("organization"));
       // console.log("org", existingOrg);
     }
   }, [orgData, existingOrg, getValues]);
@@ -1397,7 +1495,7 @@ export const EventOCForm = ({
   }, [eventData, existingEvent]);
 
   useEffect(() => {
-    console.log("oc", openCallData);
+    // console.log("oc", openCallData);
   }, [openCallData]);
 
   // useEffect(() => {
@@ -1406,12 +1504,12 @@ export const EventOCForm = ({
   // }, [eventLogo, eventName]);
 
   useEffect(() => {
-    console.log("form valid:", isValid, "step valid:", isStepValidZod);
+    // console.log("form valid:", isValid, "step valid:", isStepValidZod);
   }, [isValid, isStepValidZod]);
 
   useEffect(() => {
     if (dirtyFields) {
-      console.log(dirtyFields);
+      // console.log(dirtyFields);
     }
   }, [dirtyFields]);
 
@@ -1448,9 +1546,9 @@ export const EventOCForm = ({
 
     const debouncedCheck = debounce(() => {
       const serialized = JSON.stringify(errors);
-      console.log("errors changed", serialized);
+      // console.log("errors changed", serialized);
       if (serialized !== prevErrorJson.current) {
-        console.log("error changed");
+        // console.log("error changed");
         prevErrorJson.current = serialized;
         canCheckSchema.current = true;
       }
@@ -1464,7 +1562,7 @@ export const EventOCForm = ({
   }, [errors, schema, hasUserEditedForm]);
 
   useEffect(() => {
-    console.log(isStepValidZod, hasUserEditedForm, canCheckSchema.current);
+    // console.log(isStepValidZod, hasUserEditedForm, canCheckSchema.current);
     if (!canCheckSchema.current) {
       if (isStepValidZod) {
         canCheckSchema.current = true;
@@ -1516,7 +1614,7 @@ export const EventOCForm = ({
       existingOrg &&
       typeof existingOrg._id === "string" &&
       existingOrg._id.length > 0;
-    console.log("existingOrg", existingOrg);
+    // console.log("existingOrg", existingOrg);
 
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
@@ -1528,6 +1626,7 @@ export const EventOCForm = ({
           ...existingOrg,
         },
         event: {
+          formType,
           name: "",
         },
       });
@@ -1535,7 +1634,7 @@ export const EventOCForm = ({
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, reset, getValues]);
+  }, [existingOrg, reset, getValues, formType]);
 
   useEffect(() => {
     const eventReady =
@@ -1558,7 +1657,9 @@ export const EventOCForm = ({
       reset({
         ...currentValues,
         event: {
+          formType,
           ...existingEvent,
+          hasOpenCall: !eventOnly ? existingEvent.hasOpenCall : "False",
         },
         openCall: {
           ...(ocData ?? {}),
@@ -1569,7 +1670,7 @@ export const EventOCForm = ({
     } else if (!existingEvent) {
       setLastSaved(null);
     }
-  }, [existingEvent, reset, currentValues, ocData]);
+  }, [existingEvent, reset, currentValues, ocData, eventOnly, formType]);
 
   useEffect(() => {
     if (savedState.current === false && eventLastEditedAt) {
@@ -1626,12 +1727,12 @@ export const EventOCForm = ({
     if (selectedRow && Object.keys(selectedRow).length > 0) {
       canClearEventData.current = true;
     } else if (isSelectedRowEmpty) {
-      console.log("empty row");
+      // console.log("empty row");
       // canClearEventData.current = false;
       setNewOrgEvent(true);
     }
-    console.log(isSelectedRowEmpty);
-    console.log("selected row", selectedRow);
+    // console.log(isSelectedRowEmpty);
+    // console.log("selected row", selectedRow);
   }, [selectedRow, isSelectedRowEmpty]);
 
   useEffect(() => {
@@ -1647,6 +1748,7 @@ export const EventOCForm = ({
         },
 
         event: {
+          formType,
           name: "",
           logo: currentValues?.organization?.logo || "/1.jpg",
           location: {
@@ -1657,7 +1759,7 @@ export const EventOCForm = ({
       });
       canClearEventData.current = false;
     }
-  }, [clearEventDataTrigger, reset, currentValues, eventData]);
+  }, [clearEventDataTrigger, reset, currentValues, eventData, formType]);
 
   useEffect(() => {
     if (!eventDatesFormat) return;
@@ -1758,13 +1860,8 @@ export const EventOCForm = ({
   useEffect(() => {
     if (!openCallSuccess) return;
     if (ocData) {
-      setValue(
-        "openCall.basicInfo.callType",
-        ocData?.basicInfo?.callType ?? "Unknown",
-      );
+      console.log(ocData);
       setValue("openCall", ocData);
-    } else if (!ocData) {
-      setValue("openCall.basicInfo.callType", "False");
     }
   }, [openCallSuccess, ocData, setValue, reset]);
 
@@ -1789,8 +1886,8 @@ export const EventOCForm = ({
         steps={steps}
         skipped={skipped}
         className="px-2 xl:px-8"
-        finalLabel="Submit"
-        onFinalSubmit={handleSubmit((data) => onSubmit(data, hasOpenCall))}
+        finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
+        onFinalSubmit={handleSubmit(() => onSubmit())}
         isDirty={hasUserEditedForm}
         onSave={() => handleSave(true)}
         onPublish={() => handleSave(true, true)}
@@ -1813,7 +1910,10 @@ export const EventOCForm = ({
         <div ref={topRef} />
         <FormProvider {...form}>
           <form
-            onSubmit={handleSubmit((data) => onSubmit(data, hasOpenCall))}
+            onSubmit={handleSubmit((data) => {
+              console.log("submitting:", data);
+              onSubmit();
+            })}
             className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px] 3xl:max-w-[2000px]"
           >
             {/* //------ 1st Step: Org & Event Selection ------ */}
@@ -1850,6 +1950,7 @@ export const EventOCForm = ({
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
+                formType={formType}
               />
             )}
 
@@ -1865,6 +1966,7 @@ export const EventOCForm = ({
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
                 handleCheckSchema={() => handleCheckSchema(false)}
+                formType={formType}
               />
             )}
             {/* //------ 4th Step: OC Start & Budget  ------ */}
@@ -1877,6 +1979,7 @@ export const EventOCForm = ({
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 handleCheckSchema={() => handleCheckSchema(false)}
+                formType={formType}
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}
@@ -1888,6 +1991,7 @@ export const EventOCForm = ({
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 handleCheckSchema={() => handleCheckSchema(false)}
+                formType={formType}
               />
             )}
 

@@ -31,6 +31,7 @@ export function getGroupKeyFromEvent(
   const ocStatus = event.openCallStatus;
   // const eventFormat = event.dates.eventFormat;
   const eventStart = event.dates?.eventDates[0]?.start;
+  const eventOCStatus = event.hasOpenCall;
   const eventStartDate =
     eventStart && isValidIsoDate(eventStart) ? new Date(eventStart) : null;
   const isPast = !!ocEndDate && ocEndDate < new Date();
@@ -62,7 +63,7 @@ export function getGroupKeyFromEvent(
   if (sortBy === "openCall") {
     if (callType === "Rolling") return { raw: "Rolling Open Call" };
     if (callType === "Email") return { raw: "Open Email Submissions" };
-    if (callType === "Invite") return { raw: "Invite Only" };
+    if (eventOCStatus === "Invite") return { raw: "Invite Only" };
     if (ocStatus === "coming-soon") return { raw: "Coming Soon!" };
     if (ocStatus === "ended") return { raw: "Past Open Call" };
 

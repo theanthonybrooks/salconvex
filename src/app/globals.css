@@ -1154,6 +1154,10 @@ div:has(> div.react-datepicker__input-container) {
   position: absolute;
 }
 
+.react-datepicker__month-text.react-datepicker__month-text--disabled {
+  color: hsl(var(--foreground) / 0.3);
+}
+
 .react-datepicker__month .react-datepicker__month-text,
 .react-datepicker__month .react-datepicker__quarter-text {
   width: auto;
@@ -1300,7 +1304,7 @@ div:has(> div.react-datepicker__input-container) {
   & > ul:not([data-type="taskList"]) {
     list-style-type: disc;
   }
-  & > ul:is([data-type="taskList"]) {
+  & * ul:is([data-type="taskList"]) {
     list-style-type: none;
     display: flex;
     flex-direction: column;

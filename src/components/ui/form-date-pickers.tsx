@@ -78,6 +78,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
   const isEvent = type === "event";
+  const categoryNotEvent = eventData?.category !== "event";
   const isProduction = type === "production";
   //   const isOpenCall = type === "openCall";
   //   const isOther = type === "other";
@@ -151,6 +152,8 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       initialValue.current = formatValue as string | undefined;
     }
 
+    console.log(initialValue.current, formatValue);
+
     const hasFormatChanged = !!(
       formatValue &&
       initialValue.current &&
@@ -213,58 +216,11 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     } else if (type === "event") {
       const isOngoing = formatValue === "ongoing";
       if (isOngoing) {
-        // setValue("event.dates.prodFormat", undefined, {
-        //   shouldValidate: true,
-        //   shouldDirty: true,
-        // });
-        // setValue("event.dates.prodDates", undefined, {
-        //   shouldValidate: true,
-        //   shouldDirty: true,
-        // });
         unregister("event.dates.prodFormat");
         unregister("event.dates.prodDates");
       }
-      // if (formatValue === "monthRange") {
-      //   setValue(
-      //     "event.dates.eventDates",
-      //     [{ start: toYearMonth(new Date()), end: "" }],
-      //     {
-      //       shouldValidate: true,
-      //       shouldDirty: true,
-      //     },
-      //   );
-      // }
-      // if (formatValue === "yearRange") {
-      //   setValue(
-      //     "event.dates.eventDates",
-      //     [{ start: toYear(new Date()), end: "" }],
-      //     {
-      //       shouldValidate: true,
-      //       shouldDirty: true,
-      //     },
-      //   );
-      // }
-      // if (formatValue === "seasonRange") {
-      //   setValue(
-      //     "event.dates.eventDates",
-      //     [{ start: toSeason(new Date()), end: "" }],
-      //     {
-      //       shouldValidate: true,
-      //       shouldDirty: true,
-      //     },
-      //   );
-      // }
-      // if (formatValue === "setDates") {
-      //   setValue(
-      //     "event.dates.eventDates",
-      //     [{ start: new Date().toISOString(), end: "" }],
-      //     {
-      //       shouldValidate: true,
-      //       shouldDirty: true,
-      //     },
-      //   );
-      // }
     }
+    initialValue.current = formatValue as string | undefined;
   }, [formatValue, type, eventData?.dates?.eventDates, setValue, unregister]);
 
   useEffect(() => {
@@ -322,14 +278,18 @@ export const FormDatePicker = <T extends EventOCFormValues>({
             >
               <SelectTrigger className="h-12 w-full border text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
                 <SelectValue
-                  placeholder={`${getEventCategoryLabelAbbr(
-                    eventData?.category as EventCategory,
-                  )} Date Format (select one)`}
+                  placeholder={
+                    isEvent
+                      ? `${getEventCategoryLabelAbbr(
+                          eventData?.category as EventCategory,
+                        )} Date Format (select one)`
+                      : "Production Date Format (select one)"
+                  }
                   className="placeholder:text-muted-foreground/70"
                 />
               </SelectTrigger>
               <SelectContent className="min-w-auto">
-                {isEvent && (
+                {isEvent && categoryNotEvent && (
                   <SelectItem fit value="noEvent">
                     No Event
                   </SelectItem>

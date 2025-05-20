@@ -44,12 +44,14 @@ interface SubmissionFormOC1Props {
   categoryEvent: boolean;
   canNameEvent: boolean;
   handleCheckSchema: () => void;
+  formType: number;
 }
 
 const SubmissionFormOC1 = ({
   // user,
   isAdmin,
   isMobile,
+  formType,
 
   // categoryEvent,
 
@@ -63,18 +65,19 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-
+  const freeCall = formType === 2 && !isAdmin;
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
   const eventName = watch("event.name");
   const eventId = watch("event._id");
+  const callType = watch("event.hasOpenCall");
   const isDraft = openCall?.state === "draft";
   const orgTimezone = organizer?.location?.timezone;
   const callFormat = openCall?.basicInfo?.callFormat;
-  const callType = openCall?.basicInfo?.callType;
   const fixedType = callType === "Fixed";
+  const emailType = callType === "Email";
   const ocEligiblityType = openCall?.eligibility?.type;
   const isNational = ocEligiblityType === "National";
   const isInternational = ocEligiblityType === "International";
@@ -323,7 +326,7 @@ const SubmissionFormOC1 = ({
           </>
         )}
 
-        {hasRequiredDetails && (
+        {hasRequiredDetails && !freeCall && (
           <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">Step 3:</p>
@@ -446,7 +449,9 @@ const SubmissionFormOC1 = ({
             typeof appFee === "number" && (
               <>
                 <div className="input-section">
-                  <p className="min-w-max font-bold lg:text-xl">Step 4:</p>
+                  <p className="min-w-max font-bold lg:text-xl">
+                    Step {freeCall ? 3 : 4}:
+                  </p>
                   <p className="lg:text-xs">Open Call Dates</p>
                 </div>
 
@@ -497,7 +502,7 @@ const SubmissionFormOC1 = ({
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType ? 5 : 4}:
+                  Step {fixedType && !freeCall ? 5 : 4}:
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
@@ -512,7 +517,7 @@ const SubmissionFormOC1 = ({
                     <RichTextEditor
                       value={field.value ?? ""}
                       onChange={field.onChange}
-                      placeholder="Please be as specific as possible"
+                      placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={3000}
                       purpose="openCall"
                       asModal={true}
@@ -527,7 +532,7 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType ? 6 : 5}:
+                      Step {fixedType && !freeCall ? 6 : 5}:
                     </p>
                     <p className="lg:text-xs">Application Link</p>
                     {/* TODO: when internal applications are implemented, add this back in */}
@@ -569,7 +574,7 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType ? 7 : 6}:
+                      Step {fixedType && !freeCall ? 7 : 6}:
                     </p>
                     <p className="lg:text-xs">Application Docs</p>
                   </div>
@@ -602,7 +607,7 @@ const SubmissionFormOC1 = ({
                   </div>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType ? 8 : 7}:
+                      Step {fixedType && !freeCall ? 8 : 7}:
                     </p>
                     <p className="lg:text-xs">External Links</p>
                   </div>

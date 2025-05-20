@@ -37,6 +37,7 @@ interface SubmissionFormOC2Props {
   categoryEvent: boolean;
   canNameEvent: boolean;
   handleCheckSchema: () => void;
+  formType: number;
 }
 
 const SubmissionFormOC2 = ({
@@ -47,17 +48,21 @@ const SubmissionFormOC2 = ({
   // categoryEvent,
 
   handleCheckSchema,
+  formType,
 }: SubmissionFormOC2Props) => {
+  const paidCall = formType === 3;
   const {
     control,
     watch,
     setValue,
 
+    // setError,
     // getValues,
     // formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const [hasBudget, setHasBudget] = useState<"true" | "false" | "">("");
-
+  const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
+    paidCall ? "true" : "",
+  );
   const openCall = watch("openCall");
   const organizer = watch("organization");
   const selectedCategories = watch("openCall.compensation.categories") ?? {};
@@ -73,7 +78,8 @@ const SubmissionFormOC2 = ({
   const budgetMin = openCall?.compensation?.budget?.min;
   const budgetMax = openCall?.compensation?.budget?.max;
   // const budgetRate = openCall?.compensation?.budget?.rate;
-  const validBudgetMin = typeof budgetMin === "number" && budgetMin > 0;
+  const validBudgetMin =
+    typeof budgetMin === "number" && budgetMin > (paidCall ? 1 : 0);
   // const validBudgetRate = typeof budgetRate === "number" && budgetRate > 0;
   // const hasMinOrRateBudget = validBudgetMin || validBudgetRate;
   const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
@@ -82,12 +88,31 @@ const SubmissionFormOC2 = ({
   const allInclusive = openCall?.compensation?.budget?.allInclusive;
   const prevBudgetMaxRef = useRef<number | undefined>(undefined);
   const budgetMaxRef = useRef(budgetMax);
+  // const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
+  const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
   // const noBudget
 
   // const hasRate = openCall?.compensation?.budget?.unit;
   // #region -------------- UseEffect ---------------
+
+  // useEffect(() => {
+  //   if (!budgetLg) return;
+  //   if (budgetLg) {
+  //     setError("openCall.compensation.budget.max", {
+  //       type: "manual",
+  //       message: "Budget max must be less than 1000 for free calls",
+  //     });
+  //   }
+  // }, [budgetLg, setError]);
+
+  useEffect(() => {
+    if (!paidCall) return;
+    if (paidCall) {
+      setHasBudget("true");
+    }
+  }, [paidCall, setValue]);
 
   useEffect(() => {
     const formValue = hasBudget?.trim();
@@ -118,7 +143,7 @@ const SubmissionFormOC2 = ({
     prevBudgetMaxRef.current = budgetMax;
 
     const timeout = setTimeout(() => {
-      handleCheckSchema(); 
+      handleCheckSchema();
     }, 300);
 
     return () => clearTimeout(timeout);
@@ -161,12 +186,17 @@ const SubmissionFormOC2 = ({
   // }, [budgetMin, budgetMax, setValue]);
 
   useEffect(() => {
-    if (hasBudget === "false" && budgetMin === undefined) {
+    if (hasBudget === "true" || !hasBudgetValues) return;
+    if (hasBudget === "false" && hasBudgetValues) {
       setValue("openCall.compensation.budget.min", 0);
       setValue("openCall.compensation.budget.max", 0);
       setValue("openCall.compensation.budget.rate", 0);
+      setValue("openCall.compensation.budget.allInclusive", false);
+      // setValue("openCall.compensation.budget.currency", "USD");
+      // setValue("openCall.compensation.budget.allInclusive", false);
+      // setValue("openCall.compensation.budget.unit", "");
     }
-  }, [budgetMin, hasBudget, setValue]);
+  }, [hasBudgetValues, hasBudget, setValue]);
 
   // #endregion
 
@@ -174,13 +204,14 @@ const SubmissionFormOC2 = ({
     <div
       id="step-1-container"
       className={cn(
-        "flex h-full flex-col gap-4 xl:justify-center",
-        "mx-auto max-w-max",
+        "my-auto flex h-fit w-full flex-col gap-4 xl:justify-center",
+        "mx-auto sm:max-w-max",
         "xl:mx-0 xl:grid xl:max-w-none",
         allInclusive === false &&
           showBudgetInputs &&
           "xl:grid-cols-[45%_10%_45%] xl:gap-0",
-        !showBudgetInputs && "lg:gap-0",
+        !showBudgetInputs && "my-auto h-fit lg:gap-0",
+        // "min-w-[74vw] sm:min-w-full",
       )}
     >
       <div
@@ -188,7 +219,7 @@ const SubmissionFormOC2 = ({
           "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
           "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
           "lg:pb-10 xl:py-10 4xl:my-auto",
-          !showBudgetInputs && "lg:gap-y-0 lg:pb-0 xl:pb-0",
+          !showBudgetInputs && "lg:gap-y-4 lg:pb-5 xl:pb-5",
           showBudgetInputs && "self-start",
 
           // "xl:self-center",
@@ -203,38 +234,41 @@ const SubmissionFormOC2 = ({
           <Label htmlFor="hasBudget" className="sr-only">
             Project Budget
           </Label>
+          {!paidCall && (
+            <>
+              <Select
+                onValueChange={(value: "true" | "false" | "") => {
+                  setHasBudget(value);
+                }}
+                value={hasBudget}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
+                  )}
+                >
+                  <SelectValue placeholder="Project Budget?*" />
+                </SelectTrigger>
+                <SelectContent className="min-w-auto">
+                  <SelectItem fit value="true">
+                    Yes
+                  </SelectItem>
+                  <SelectItem fit value="false">
+                    No
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
-          <Select
-            onValueChange={(value: "true" | "false" | "") => {
-              setHasBudget(value);
-            }}
-            value={hasBudget}
-          >
-            <SelectTrigger
-              className={cn(
-                "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
-              )}
-            >
-              <SelectValue placeholder="Project Budget?*" />
-            </SelectTrigger>
-            <SelectContent className="min-w-auto">
-              <SelectItem fit value="true">
-                Yes
-              </SelectItem>
-              <SelectItem fit value="false">
-                No
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="hidden items-center justify-center px-2 sm:flex">
-            <ArrowRight
-              className={cn(
-                "invisible size-4 shrink-0 text-foreground/50",
-                showBudgetInputs && "visible",
-              )}
-            />
-          </div>
+              <div className="hidden items-center justify-center px-2 sm:flex">
+                <ArrowRight
+                  className={cn(
+                    "invisible size-4 shrink-0 text-foreground/50",
+                    showBudgetInputs && "visible",
+                  )}
+                />
+              </div>
+            </>
+          )}
 
           <div
             className={cn(
@@ -368,7 +402,7 @@ const SubmissionFormOC2 = ({
                           value={field.value ?? 0}
                           min={0}
                           disabled={!showBudgetInputs}
-                          placeholder="Rate (ex: $30/ft²)"
+                          placeholder="Rate (ex: 30)"
                           className="h-fit border-none p-2 text-center focus:border-none focus:outline-none sm:text-base"
                         />
                       )}
@@ -418,10 +452,12 @@ const SubmissionFormOC2 = ({
               <Label htmlFor="event.category" className="sr-only">
                 All inclusive budget selection
               </Label>
-              <div className="flex items-center justify-between">
-                <span>
+              <div className="flex flex-col justify-between sm:flex-row sm:items-center">
+                <span className="mb-2 sm:mb-0">
                   <p className="text-sm text-foreground">
-                    Is the budget for this open call all-inclusive?
+                    {isMobile
+                      ? "Is the budget all-inclusive?"
+                      : " Is the budget for this open call all-inclusive?"}
                   </p>
                   <p className="text-xs text-foreground/50">
                     What does this mean?{" "}
@@ -515,7 +551,11 @@ const SubmissionFormOC2 = ({
                       .filter(([, isSelected]) => isSelected)
                       .map(([key]) => key)}
                     shortResults={isMobile}
-                    placeholder="Select what's provided"
+                    placeholder={
+                      isMobile
+                        ? `Select what's provided${noBudget ? " (min 1)" : ""}`
+                        : `Select what's provided${noBudget ? " (minimum 1 category)" : ""}`
+                    }
                     variant="basic"
                     maxCount={1}
                     height={10}
@@ -582,7 +622,6 @@ const SubmissionFormOC2 = ({
                               field={{
                                 ...field,
                                 onChange: (val) => {
-                                  console.log(val);
                                   const num = parseFloat(val);
                                   field.onChange(isNaN(num) ? true : num);
                                 },

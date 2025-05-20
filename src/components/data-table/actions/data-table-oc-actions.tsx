@@ -1,6 +1,6 @@
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { SubmissionFormState } from "@/types/event";
+import { SubmissionFormState } from "@/types/openCall";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { LucideFolderCheck, LucideFolderInput } from "lucide-react";

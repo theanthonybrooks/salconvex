@@ -82,6 +82,7 @@ export const createOrUpdateOpenCall = mutation({
     state: v.optional(
       v.union(
         v.literal("draft"),
+        v.literal("pending"),
         v.literal("submitted"),
         v.literal("published"),
         v.literal("archived"),
@@ -89,6 +90,7 @@ export const createOrUpdateOpenCall = mutation({
     ),
     finalStep: v.optional(v.boolean()),
     approved: v.optional(v.boolean()),
+    paid: v.optional(v.boolean()),
   },
 
   handler: async (ctx, args) => {
@@ -113,7 +115,9 @@ export const createOrUpdateOpenCall = mutation({
         : !args.finalStep
           ? "draft"
           : "submitted"
-      : args.state;
+      : args.finalStep && !args.paid
+        ? "pending"
+        : args.state;
 
     const openCallData = {
       adminNoteOC: "",
@@ -134,6 +138,7 @@ export const createOrUpdateOpenCall = mutation({
       state: ocState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),
+      paid: args.paid ?? false,
     };
 
     // Step 1: Lookup already exists — update both openCall and lookup
@@ -151,8 +156,8 @@ export const createOrUpdateOpenCall = mutation({
         state: ocState,
         lastEdited: Date.now(),
       });
-      console.log("lookup updated", lookup);
-      return lookup.openCallId;
+      console.log("lookup updated", lookup, openCallData);
+      return openCallData;
     }
 
     // Step 2: If user provided openCallId, validate and use it
@@ -169,8 +174,8 @@ export const createOrUpdateOpenCall = mutation({
           edition: args.basicInfo.dates.edition,
           state: ocState,
         });
-        console.log("existing updated", existing);
-        return args.openCallId;
+        console.log("existing updated", existing, openCallData);
+        return openCallData;
       }
 
       throw new ConvexError("Provided openCallId does not exist.");
@@ -186,7 +191,8 @@ export const createOrUpdateOpenCall = mutation({
       state: ocState,
     });
 
-    return newId;
+    console.log(openCallData);
+    return openCallData;
   },
 });
 
@@ -225,6 +231,7 @@ export const getOpenCallByEventId = query({
   handler: async (ctx, args) => {
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
+    if (event.hasOpenCall === "Invite") return null;
 
     const openCall = await ctx.db
       .query("openCalls")
@@ -364,6 +371,7 @@ export const changeOCStatus = mutation({
         state: ocState,
         lastEditedAt: Date.now(),
         approvedBy: approvedBy,
+        approvedAt: Date.now(),
       });
     } else {
       await ctx.db.patch(eventId, {
@@ -374,6 +382,7 @@ export const changeOCStatus = mutation({
       state: ocState,
       lastUpdatedAt: Date.now(),
       approvedBy: approvedBy,
+      approvedAt: Date.now(),
     });
 
     return { oc };

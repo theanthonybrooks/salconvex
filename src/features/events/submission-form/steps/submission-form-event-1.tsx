@@ -21,6 +21,7 @@ import { EventCategory, eventTypeOptions } from "@/types/event";
 import { User } from "@/types/user";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useEffect, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -33,6 +34,7 @@ interface SubmissionFormEventStep1Props {
   existingEvent: Doc<"events"> | null;
   categoryEvent: boolean;
   canNameEvent: boolean;
+  formType: number;
 }
 
 const SubmissionFormEventStep1 = ({
@@ -43,6 +45,7 @@ const SubmissionFormEventStep1 = ({
   existingEvent,
   categoryEvent,
   canNameEvent,
+  formType,
 }: SubmissionFormEventStep1Props) => {
   const {
     control,
@@ -54,18 +57,24 @@ const SubmissionFormEventStep1 = ({
   // const currentValues = getValues();
   const currentValues = getValues();
   const eventData = watch("event");
+  const initialName = useRef(eventData?.name ?? "");
   const eventName = eventData?.name;
+  const hasEventName = !!eventName && eventName.trim().length >= 3;
   const eventDates = eventData?.dates?.eventDates;
-
+  console.log(eventData);
   const category = eventData?.category as EventCategory;
-
+  const diffName = !!eventName && eventName !== initialName.current;
+  console.log(eventName, initialName.current);
+  console.log(diffName);
+  const previousEventNameValid = hasEventName && !diffName;
+  console.log(previousEventNameValid);
   // #region ------------- Queries, Actions, and Mutations --------------
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const { isSuccess: eventNameValid, isError: eventNameExistsError } =
     useQueryWithStatus(
       api.events.event.checkEventNameExists,
-      eventName && eventName.trim().length >= 3
+      hasEventName && diffName
         ? {
             name: eventName,
             organizationId: existingOrg?._id,
@@ -75,10 +84,13 @@ const SubmissionFormEventStep1 = ({
     );
   // #endregion
 
+  console.log(eventNameValid);
+  const nameValidTrigger = eventNameValid || previousEventNameValid;
+
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
   const hasEventLocation =
     (dirtyFields.event?.location || eventData?.location?.full !== undefined) &&
-    eventNameValid;
+    nameValidTrigger;
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasEventFormat = !!eventData?.dates?.eventFormat;
@@ -98,6 +110,13 @@ const SubmissionFormEventStep1 = ({
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const orgData = watch("organization");
   const isAdmin = user?.role?.includes("admin") || false;
+  const eventOnly = formType === 1 && !isAdmin;
+
+  useEffect(() => {
+    if (formType === 1) {
+      setValue("event.category", "event");
+    }
+  }, [formType, setValue]);
 
   return (
     <div
@@ -117,61 +136,67 @@ const SubmissionFormEventStep1 = ({
           // "xl:self-center",
         )}
       >
-        <div className="input-section">
-          <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
-          <p className="lg:text-xs">Category</p>
-        </div>
+        {!eventOnly && (
+          <>
+            <div className="input-section">
+              <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
+              <p className="lg:text-xs">Category</p>
+            </div>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-          <Label htmlFor="event.category" className="sr-only">
-            Event Category
-          </Label>
-          <Controller
-            name="event.category"
-            control={control}
-            render={({ field }) => {
-              return (
-                <Select
-                  onValueChange={(value: EventCategory) => {
-                    field.onChange(value);
-                  }}
-                  value={field.value || ""}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-12 w-full border text-center text-base sm:h-[50px]",
-                      errors.event?.category && "invalid-field",
-                    )}
-                  >
-                    <SelectValue placeholder="Event/Project Category (select one)" />
-                  </SelectTrigger>
-                  <SelectContent className="min-w-auto">
-                    <SelectItem fit value="event">
-                      Event
-                    </SelectItem>
-                    <SelectItem fit value="project">
-                      Project
-                    </SelectItem>
-                    <SelectItem fit value="residency">
-                      Residency
-                    </SelectItem>
-                    <SelectItem fit value="gfund">
-                      Grant/Fund
-                    </SelectItem>
-                    <SelectItem fit value="roster">
-                      Artist Roster
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              );
-            }}
-          />
-        </div>
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.category" className="sr-only">
+                Event Category
+              </Label>
+              <Controller
+                name="event.category"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <Select
+                      onValueChange={(value: EventCategory) => {
+                        field.onChange(value);
+                      }}
+                      value={field.value || ""}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "h-12 w-full border text-center text-base sm:h-[50px]",
+                          errors.event?.category && "invalid-field",
+                        )}
+                      >
+                        <SelectValue placeholder="Event/Project Category (select one)" />
+                      </SelectTrigger>
+                      <SelectContent className="min-w-auto">
+                        <SelectItem fit value="event">
+                          Event
+                        </SelectItem>
+                        <SelectItem fit value="project">
+                          Project
+                        </SelectItem>
+                        <SelectItem fit value="residency">
+                          Residency
+                        </SelectItem>
+                        <SelectItem fit value="gfund">
+                          Grant/Fund
+                        </SelectItem>
+                        <SelectItem fit value="roster">
+                          Artist Roster
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  );
+                }}
+              />
+            </div>
+          </>
+        )}
 
         {categoryEvent && (
           <>
             <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
+              <p className="min-w-max font-bold lg:text-xl">
+                Step {eventOnly ? 1 : 2}:
+              </p>
               <p className="lg:text-xs">Event Type</p>
             </div>
 
@@ -216,7 +241,7 @@ const SubmissionFormEventStep1 = ({
           <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">
-                Step {categoryEvent ? 3 : 2}:{" "}
+                Step {categoryEvent && !eventOnly ? 3 : 2}:{" "}
               </p>
               <p className="lg:text-xs">
                 {getEventCategoryLabelAbbr(category)} Name
@@ -252,11 +277,11 @@ const SubmissionFormEventStep1 = ({
                 </span>
               )}
             </div>
-            {eventNameValid && (
+            {nameValidTrigger && (
               <>
                 <div className="input-section">
                   <p className="min-w-max font-bold lg:text-xl">
-                    Step {categoryEvent ? 4 : 3}:{" "}
+                    Step {categoryEvent && !eventOnly ? 4 : 3}:{" "}
                   </p>
                   <p className="lg:text-xs">Location</p>
                 </div>
@@ -290,7 +315,7 @@ const SubmissionFormEventStep1 = ({
                 </div>
                 <div className="input-section">
                   <p className="min-w-max font-bold lg:text-xl">
-                    Step {categoryEvent ? 5 : 4}:{" "}
+                    Step {categoryEvent && !eventOnly ? 5 : 4}:{" "}
                   </p>
                   <p className="lg:text-xs">
                     {getEventCategoryLabelAbbr(category)} Logo
@@ -328,7 +353,7 @@ const SubmissionFormEventStep1 = ({
                   <>
                     <div className="input-section h-full">
                       <p className="min-w-max font-bold lg:text-xl">
-                        Step {categoryEvent ? 6 : 5}:{" "}
+                        Step {categoryEvent && !eventOnly ? 6 : 5}:{" "}
                       </p>
                       <p className="lg:text-xs">
                         {getEventCategoryLabelAbbr(category)} Details/Notes
@@ -348,6 +373,7 @@ const SubmissionFormEventStep1 = ({
                             onChange={field.onChange}
                             placeholder="Short blurb about your project/event... "
                             charLimit={200}
+                            noList={true}
                           />
                         )}
                       />
@@ -376,7 +402,7 @@ const SubmissionFormEventStep1 = ({
           >
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">
-                Step {categoryEvent ? 7 : 6}:{" "}
+                Step {categoryEvent && !eventOnly ? 7 : 6}:{" "}
               </p>
               <p className="lg:text-xs">
                 {getEventCategoryLabelAbbr(category)} Dates
@@ -397,7 +423,7 @@ const SubmissionFormEventStep1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent ? 8 : 7}:{" "}
+                      Step {categoryEvent && !eventOnly ? 8 : 7}:{" "}
                     </p>
                     <p className="lg:text-xs">Production Dates</p>
                   </div>

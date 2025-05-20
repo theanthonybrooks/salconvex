@@ -1,7 +1,15 @@
 import { ArtistFull } from "@/types/artist";
-import { ApplicationStatus, OpenCall, OpenCallStatus } from "@/types/openCall";
+import {
+  ApplicationStatus,
+  CallType,
+  OpenCall,
+  OpenCallStatus,
+} from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
+
+export const freeEvents = ["gjm", "pup"];
+export const paidEvents = ["mur", "saf", "mus", "oth"];
 
 export const eventTypeOptions = [
   { value: "gjm", label: "Graffiti Jam" },
@@ -88,6 +96,7 @@ export interface EventData {
   type?: EventType[];
   // eventType?: string[];
   category: EventCategory;
+  hasOpenCall: CallType;
   dates: {
     edition: number;
     eventDates: { start: string; end: string }[];

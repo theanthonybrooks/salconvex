@@ -22,6 +22,8 @@ export const ExternalLinksInput = ({
   name,
   handleCheckSchema,
 }: ExternalLinksInputProps) => {
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const { control, watch } = useFormContext();
   const { fields, append, remove } = useFieldArray({ name, control });
 
@@ -29,6 +31,15 @@ export const ExternalLinksInput = ({
   const [isParentOpen, setIsParentOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevLengthRef = useRef(fields.length);
+
+  useEffect(() => {
+    if (isParentOpen && openIndex !== null) {
+      const target = itemRefs.current[openIndex];
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [isParentOpen, openIndex]);
 
   useEffect(() => {
     if (fields.length > prevLengthRef.current) {
@@ -101,7 +112,12 @@ export const ExternalLinksInput = ({
                       open={isOpen}
                       onOpenChange={(open) => setOpenIndex(open ? index : null)}
                     >
-                      <div className="relative flex w-full flex-col rounded border border-border px-3 py-3">
+                      <div
+                        ref={(el) => {
+                          itemRefs.current[index] = el;
+                        }}
+                        className="relative flex w-full flex-col rounded border border-border px-3 py-3"
+                      >
                         <CollapsibleTrigger asChild>
                           <div className="flex items-start justify-between gap-2">
                             {!isOpen && (
@@ -139,7 +155,7 @@ export const ExternalLinksInput = ({
                               <DebouncedControllerInput
                                 field={field}
                                 placeholder="Link title (e.g. 'Call Guidelines')"
-                                className="w-full rounded border border-input px-3 py-2 text-sm"
+                                className="w-full rounded border border-input px-3 py-2 sm:text-sm"
                               />
                             )}
                           />
@@ -185,7 +201,7 @@ export const ExternalLinksInput = ({
                   <Button
                     type="button"
                     variant="ghost"
-                    className="self-start px-0 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                    className="mx-auto self-start px-0 text-base text-muted-foreground underline underline-offset-2 hover:text-foreground sm:text-sm"
                     onClick={() => append({ title: "", href: "" })}
                   >
                     + Add another link

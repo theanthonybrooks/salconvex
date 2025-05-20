@@ -51,6 +51,7 @@ const OpenCallDetail = () => {
     }
   }, [isError, router]);
   return (
+    // <OpenCallDetailWrapper>
     <>
       <SalBackNavigation format="mobile" />
 
@@ -88,6 +89,7 @@ const OpenCallDetail = () => {
         </>
       )}
     </>
+    // </OpenCallDetailWrapper>
   );
 };
 

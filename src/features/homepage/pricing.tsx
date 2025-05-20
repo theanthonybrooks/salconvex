@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { useAction, usePreloadedQuery } from "convex/react";
 
 import { Separator } from "@/components/ui/separator";
-import DiscreteSlider from "@/components/ui/slider";
 import {
   AccountSubscribeForm,
   ModeType,
@@ -28,7 +27,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 type PricingSwitchProps = {
@@ -54,12 +53,12 @@ type PricingCardProps = {
   image?: string;
 };
 
-const pricingRange = [
-  { value: 1, label: "Up to $5K" },
-  { value: 33, label: "$10K" },
-  { value: 66, label: "$20K" },
-  { value: 100, label: "$25K+" },
-];
+// const pricingRange = [
+//   { value: 1, label: "Up to $5K" },
+//   { value: 33, label: "$10K" },
+//   { value: 66, label: "$20K" },
+//   { value: 100, label: "$25K+" },
+// ];
 
 const pricingIntervals = [
   { name: "Monthly", val: "0" },
@@ -271,7 +270,7 @@ const PricingCard = ({
   const isOrganizer = accountType === "organizer";
   const isFree = prices.rate === 0;
   // const [slidingPrice, setSlidingPrice] = useState(50)
-  const [sliderPrice, setSliderPrice] = useState(0);
+  // const [sliderPrice, setSliderPrice] = useState(0);
   const getCheckoutUrl = useAction(
     api.stripeSubscriptions.createStripeCheckoutSession,
   );
@@ -285,23 +284,22 @@ const PricingCard = ({
     user ? {} : "skip",
   );
 
-  const isEligibleForFree =
-    (!isFree && isOrganizer && hadFreeCall === false) || !user;
+  const isEligibleForFree = (isOrganizer && hadFreeCall === false) || !user;
 
-  const slidingPrice = useMemo(() => {
-    switch (sliderPrice) {
-      case 1:
-        return 50;
-      case 33:
-        return 100;
-      case 66:
-        return 200;
-      case 100:
-        return 250;
-      default:
-        return 50;
-    }
-  }, [sliderPrice]);
+  // const slidingPrice = useMemo(() => {
+  //   switch (sliderPrice) {
+  //     case 1:
+  //       return 50;
+  //     case 33:
+  //       return 100;
+  //     case 66:
+  //       return 200;
+  //     case 100:
+  //       return 250;
+  //     default:
+  //       return 50;
+  //   }
+  // }, [sliderPrice]);
 
   const handleCheckout = async (
     interval: "month" | "year",
@@ -312,7 +310,7 @@ const PricingCard = ({
         interval,
         planKey,
         hadTrial,
-        slidingPrice: slidingPrice,
+        slidingPrice: 50,
         accountType,
         isEligibleForFree,
       });
@@ -381,12 +379,21 @@ const PricingCard = ({
                       : (prices.month?.usd?.amount?.toFixed(0) ?? "N/A")
                   }`
                 ) : isEligibleForFree ? (
-                  <span className="flex items-center gap-1">
-                    <span className="mr-1 line-through">${slidingPrice}</span>
-                    <span className="font-semibold text-green-600">$0</span>
-                  </span>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm text-muted-foreground">Starting at</p>
+                    <span className="flex items-center gap-1">
+                      <span className="mr-1 line-through">$50</span>
+                      {/* <span className="mr-1 line-through">${slidingPrice}</span> */}
+                      <span className="font-semibold text-green-600">$0</span>
+                    </span>
+                  </div>
                 ) : (
-                  `$${slidingPrice}`
+                  // `$${slidingPrice}`
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm text-muted-foreground">Starting at</p>
+
+                    <p>$50</p>
+                  </div>
                 )
               ) : (
                 "Free"
@@ -408,7 +415,7 @@ const PricingCard = ({
               First Open Call is free
             </p>
           )}
-          {isOrganizer && !isFree && (
+          {/* {isOrganizer && !isFree && (
             <div className="mt-3 flex flex-col gap-2">
               <p>Select your project budget:</p>
               <DiscreteSlider
@@ -423,7 +430,7 @@ const PricingCard = ({
                 className="mx-auto max-w-[80%]"
               />
             </div>
-          )}
+          )} */}
 
           <div className="mt-6 space-y-2">
             {features?.map((feature) => (
@@ -444,12 +451,19 @@ const PricingCard = ({
             *Feature Coming Soon
           </p>
         )}
+        {isFree && planKey === "2" && (
+          <p className="mt-2 w-full text-center text-sm text-foreground">
+            No application fees allowed
+          </p>
+        )}
         <AccountSubscribeForm
           user={user}
           mode={accountType as ModeType}
           onClick={() => {
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false);
           }}
+          planKey={planKey}
+          isEligibleForFree={isEligibleForFree}
         >
           <Button
             variant={
@@ -593,25 +607,28 @@ export default function Pricing() {
             className="mt-10 flex flex-col justify-center gap-y-6 md:flex-row md:gap-8 3xl:mt-16"
           >
             {orgPlans &&
-              orgPlans.map((plan) => {
-                const { key, prices, ...rest } = plan;
+              orgPlans
+                .sort((a, b) => Number(a.key) - Number(b.key))
+                .map((plan) => {
+                  const { key, prices, ...rest } = plan;
+                  console.log(plan);
 
-                const normalizedPrices = {
-                  month: undefined,
-                  year: undefined,
-                  rate: prices?.rate ?? 0,
-                };
-                return (
-                  <PricingCard
-                    key={plan.title}
-                    user={user}
-                    planKey={key}
-                    {...rest}
-                    accountType={selectedAccountType}
-                    prices={normalizedPrices}
-                  />
-                );
-              })}
+                  const normalizedPrices = {
+                    month: undefined,
+                    year: undefined,
+                    rate: prices?.rate ?? 0,
+                  };
+                  return (
+                    <PricingCard
+                      key={plan.title}
+                      user={user}
+                      planKey={key}
+                      {...rest}
+                      accountType={selectedAccountType}
+                      prices={normalizedPrices}
+                    />
+                  );
+                })}
           </motion.div>
         )}
 

@@ -35,9 +35,11 @@ import {
 import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventType, SubmissionFormState } from "@/types/event";
+import { SubmissionFormState as OpenCallState } from "@/types/openCall";
 import {
   CheckCircle2,
   Circle,
+  DollarSign,
   LucideClipboardCopy,
   MoreHorizontal,
 } from "lucide-react";
@@ -213,8 +215,7 @@ export const columns: ColumnDef<Event>[] = [
     ),
 
     cell: ({ row }) => {
-      const ocState =
-        (row.getValue("openCallState") as SubmissionFormState) || null;
+      const ocState = (row.getValue("openCallState") as OpenCallState) || null;
       return (
         <div className="flex justify-center">
           <div
@@ -222,6 +223,7 @@ export const columns: ColumnDef<Event>[] = [
               "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
               !ocState && "border-transparent",
               ocState === "draft" && "bg-orange-200",
+              ocState === "pending" && "bg-indigo-100",
               ocState === "submitted" && "bg-blue-200",
               ocState === "published" && "bg-green-200",
             )}
@@ -231,6 +233,8 @@ export const columns: ColumnDef<Event>[] = [
                 <FaRegFloppyDisk className="size-4 shrink-0" />
               ) : ocState === "submitted" ? (
                 <Circle className="size-4 shrink-0" />
+              ) : ocState === "pending" ? (
+                <DollarSign className="size-4 shrink-0" />
               ) : ocState === "published" ? (
                 <CheckCircle2 className="size-4 shrink-0" />
               ) : (

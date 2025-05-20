@@ -14,6 +14,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Link } from "@/components/ui/custom-link";
+import Pricing from "@/features/homepage/pricing";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -226,6 +227,7 @@ export default function Home() {
         accounts in the meantime will be deleted as I&apos;m doing a lot of
         changes in the database while getting everything connected.
       </div>
+      <Pricing />
     </>
   );
 }

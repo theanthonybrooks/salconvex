@@ -101,6 +101,7 @@ export default function HorizontalLinearStepper({
 
   const handleReset = () => setActiveStep(0);
   const lastStep = stepArray.length - 1;
+  console.log(activeStep, lastStep, onFinalSubmit);
 
   return (
     <div
@@ -325,11 +326,7 @@ export default function HorizontalLinearStepper({
                   finalStep && "w-full sm:w-auto",
                 )}
                 disabled={disabled || pending}
-                onClick={
-                  activeStep === lastStep
-                    ? onFinalSubmit
-                    : (onNextStep ?? handleNext)
-                }
+                onClick={finalStep ? onFinalSubmit : (onNextStep ?? handleNext)}
               >
                 {finalStep ? (
                   finalLabel ? (

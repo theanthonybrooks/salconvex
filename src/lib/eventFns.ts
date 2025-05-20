@@ -5,8 +5,16 @@ import {
   eventCategoryOptions,
   EventType,
   eventTypeOptions,
+  freeEvents,
+  paidEvents,
 } from "@/types/event";
 import { CallType } from "@/types/openCall";
+
+export const isFreeEvent = (eventTypes: EventType[] | string[]): boolean => {
+  const hasFree = eventTypes.some((type) => freeEvents.includes(type));
+  const hasPaid = eventTypes.some((type) => paidEvents.includes(type));
+  return hasFree && !hasPaid;
+};
 
 export const getCallTypeLabel = (callType: CallType): string => {
   if (!callType) return "";

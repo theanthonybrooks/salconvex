@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import Stripe from "stripe";
+import { Id } from "~/convex/_generated/dataModel";
 import { api, internal } from "./_generated/api";
 import {
   action,
@@ -74,6 +75,7 @@ export const createStripeCheckoutSession = action({
     accountType: v.optional(v.string()),
     slidingPrice: v.optional(v.number()),
     isEligibleForFree: v.optional(v.boolean()),
+    openCallId: v.optional(v.id("openCalls")),
   },
   handler: async (
     ctx,
@@ -84,8 +86,10 @@ export const createStripeCheckoutSession = action({
       accountType?: string;
       slidingPrice?: number;
       isEligibleForFree?: boolean;
+      openCallId?: Id<"openCalls"> | undefined;
     },
   ): Promise<{ url: string }> => {
+    console.log("args: ", args);
     const identity = await getAuthUserId(ctx);
     if (!identity) throw new Error("Not authenticated");
     const result = await ctx.runQuery(api.users.getCurrentUser, {});
@@ -106,6 +110,7 @@ export const createStripeCheckoutSession = action({
         key: args.planKey,
       },
     );
+    console.log(plan);
     if (args.accountType === "artist") {
       if (!plan || !plan.prices || !plan.prices.month) {
         throw new Error("Plan not found or missing pricing info");
@@ -126,6 +131,8 @@ export const createStripeCheckoutSession = action({
       userId: user.tokenIdentifier,
       userEmail: user.email,
       plan: args.planKey,
+      openCallId: args.openCallId ?? "",
+      accountType: args.accountType ?? "",
       interval:
         args.accountType === "organizer"
           ? "One-time"
@@ -313,8 +320,6 @@ export const subscriptionStoreWebhook = mutation({
           }
           // TODO: Add logic to check which type of subscription was made. Org or Artist. Currently just inserts "One-time-ly" for organizers
 
-          
-
           const existingUser = await ctx.db
             .query("users")
             .withIndex("by_token", (q) => q.eq("tokenIdentifier", userId))
@@ -379,6 +384,12 @@ export const subscriptionStoreWebhook = mutation({
         const oneTime = metaInterval === "One-time";
         const freeCall =
           args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
+        const createdAt = new Date(
+          args.body.data.object.created * 1000,
+        ).getTime();
+        console.log("createdAt: ", createdAt);
+        const paymentStatus = args.body.data.object.payment_status;
+        console.log("paymentStatus: ", paymentStatus);
 
         const checkoutUser = await ctx.db
           .query("userSubscriptions")
@@ -463,10 +474,25 @@ export const subscriptionStoreWebhook = mutation({
         console.log("existingUser checkout: ", existingUser);
         if (existingUser) {
           console.log("metadata: ", metadata);
+          console.log(metadata?.accountType);
+          console.log(metadata?.openCallId);
+
           //TODO: Add logic for organizations. Currently, it's adding the metadata in the style of artists plans, which isn't useful or accurate.
-          await ctx.db.patch(existingUser._id, {
-            subscription: `${metadata.interval}ly-${metadata.plan}`,
-          });
+
+          if (metadata?.accountType === "organizer") {
+            await ctx.db.patch(existingUser._id, {
+              subscription: `${metadata.interval}-${metadata.plan}`,
+            });
+            await ctx.db.patch(metadata.openCallId, {
+              paid: paymentStatus === "paid" ? true : false,
+              paidAt: createdAt,
+              state: paymentStatus === "paid" ? "submitted" : "pending",
+            });
+          } else if (metadata?.accountType === "artist") {
+            await ctx.db.patch(existingUser._id, {
+              subscription: `${metadata.interval}ly-${metadata.plan}`,
+            });
+          }
         }
 
         break;

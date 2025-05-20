@@ -226,6 +226,14 @@ const eventSchema = {
   logoStorageId: v.optional(v.id("_storage")),
   type: typeValidator,
   category: categoryValidator,
+  hasOpenCall: v.union(
+    v.literal("Fixed"),
+    v.literal("Rolling"),
+    v.literal("Email"),
+    v.literal("Invite"),
+    v.literal("Unknown"),
+    v.literal("False"),
+  ),
 
   dates: v.object({
     edition: v.number(),
@@ -304,6 +312,7 @@ const eventSchema = {
   active: v.optional(v.boolean()),
   lastEditedAt: v.optional(v.number()),
   approvedBy: v.optional(v.id("users")),
+  approvedAt: v.optional(v.number()),
 };
 
 const eventOrganizerSchema = {
@@ -404,6 +413,7 @@ const openCallSchema = {
   state: v.optional(
     v.union(
       v.literal("draft"),
+      v.literal("pending"),
       v.literal("submitted"),
       v.literal("published"),
       v.literal("archived"),
@@ -412,6 +422,10 @@ const openCallSchema = {
   lastUpdatedBy: v.optional(v.id("users")),
   lastUpdatedAt: v.optional(v.number()),
   approvedBy: v.optional(v.id("users")),
+  approvedAt: v.optional(v.number()),
+  paid: v.optional(v.boolean()),
+  paidAt: v.optional(v.number()),
+  publicPreview: v.optional(v.boolean()),
 };
 
 const openCallOrganizerSchema = {

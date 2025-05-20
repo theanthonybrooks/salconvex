@@ -34,6 +34,8 @@ interface AccountSubscribeFormProps {
   user: User | undefined;
   onClick: () => void;
   children?: React.ReactNode;
+  planKey: string;
+  isEligibleForFree: boolean;
 }
 
 export const AccountSubscribeForm = ({
@@ -42,6 +44,8 @@ export const AccountSubscribeForm = ({
   user,
   children,
   onClick,
+  planKey,
+  isEligibleForFree,
 }: AccountSubscribeFormProps) => {
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -54,6 +58,10 @@ export const AccountSubscribeForm = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [shouldExit, setShouldExit] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  // const postType =
+  //   planKey === "1" ? "eventOnly" : planKey === "2" ? "freeCall" : "paidCall";
+
+  // console.log(isEligibleForFree, planKey, postType);
 
   const alertDialogDescription = isArtist
     ? hasUnsavedChanges
@@ -155,6 +163,8 @@ export const AccountSubscribeForm = ({
             shouldClose={shouldExit}
             setShouldClose={setShouldExit}
             setOpen={setOpen}
+            isEligibleForFree={isEligibleForFree}
+            planKey={planKey}
           />
         )}
         {hasUnsavedChanges ? (

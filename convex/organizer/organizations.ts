@@ -441,7 +441,7 @@ export const isOwnerOrIsNewOrg = query({
       (org) => org.name.toLowerCase() === inputName,
     ).unique();
 
-    console.log("owner", owner);
+    // console.log("owner", owner);
 
     if (owner && owner.ownerId === user._id) return "ownedByUser";
     if (owner) throw new ConvexError("Organization already exists");
@@ -457,15 +457,15 @@ export const isOwnerOrIsNewOrg = query({
       (org) => org.name.toLowerCase() === inputName,
     ).unique();
 
-    console.log("org", org);
-    console.log("user id", userId);
+    // console.log("org", org);
+    // console.log("user id", userId);
 
     if (org) throw new ConvexError("Organization already exists");
 
-    console.log("if org");
+    // console.log("if org");
     if (inputName === "") return null;
 
-    console.log("else");
+    // console.log("else");
     return "available";
   },
 });
@@ -505,7 +505,7 @@ export const getOrganizerBySlug = query({
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
 
-    console.log(organizer);
+    // console.log(organizer);
 
     if (!organizer) throw new ConvexError("No organizer found");
 
@@ -521,7 +521,7 @@ export const getOrganizerBySlug = query({
       type: Array.isArray(e.type) ? e.type.slice(0, 2) : [],
     })) as EventData[];
 
-    console.log(events);
+    // console.log(events);
 
     return { organizer: organizer as Organizer, events };
   },

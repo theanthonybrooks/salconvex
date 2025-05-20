@@ -48,7 +48,7 @@ TheListNavBarProps) {
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
-  const isAdmin = user?.role?.includes("admin");
+  // const isAdmin = user?.role?.includes("admin");
   const fullPagePath = pathname;
   const currentPage = pathname.split("/")[1];
 
@@ -226,7 +226,7 @@ TheListNavBarProps) {
             </>
           )}
           {/* NOTE: Limit/hide search for users who don't have a subscription or those who aren't signed in */}
-          {isAdmin && user && (
+          {user && (
             <>
               <Search
                 iconOnly

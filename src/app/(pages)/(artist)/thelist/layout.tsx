@@ -2,7 +2,10 @@ import { ArtistPreloadContextProvider } from "@/features/wrapper-elements/artist
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { preloadQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { api } from "~/convex/_generated/api";
 
 export default async function HomeLayout({
@@ -10,12 +13,34 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname");
   const token = await convexAuthNextjsToken();
   const preloadedArtistData = await preloadQuery(
     api.artists.getArtistEventMetadata.getArtistEventMetadata,
     {},
     { token },
   );
+  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
+
+  const subscription = await fetchQuery(
+    api.subscriptions.getUserSubscriptionStatus,
+    {},
+    { token },
+  );
+
+  const user = userData?.user;
+  const isArtist = user?.accountType.includes("artist");
+  const hasSub = subscription?.hasActiveSubscription;
+  const isAdmin = user?.role.includes("admin");
+  const ocPage = pathname?.endsWith("/call");
+
+  if (!isAdmin) {
+    if ((!isArtist || !hasSub) && ocPage) {
+      const redirectPath = pathname?.replace(/\/call\/?$/, "");
+      redirect(redirectPath ?? "/thelist");
+    }
+  }
 
   return (
     //<ClientAuthWrapper>

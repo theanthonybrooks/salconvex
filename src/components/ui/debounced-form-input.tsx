@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
@@ -45,6 +46,12 @@ export function DebouncedControllerInput<
   return (
     <Input
       {...inputProps}
+      className={cn(
+        "text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
+        typeof inputProps.className === "string"
+          ? inputProps.className
+          : undefined,
+      )}
       value={localValue}
       onChange={(e) => {
         const val = e.target.value;

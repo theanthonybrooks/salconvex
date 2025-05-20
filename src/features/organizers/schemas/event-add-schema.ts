@@ -194,9 +194,11 @@ const organizationSchema = z.object({
 });
 
 export const eventBase = z.object({
+  formType: z.optional(z.number()),
   _id: z.optional(z.string()),
   // name: z.optional(z.string()),
   name: z.string(),
+  hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
 
   //TODO: Add message for "Event category is required"
   category: z.enum(toMutableEnum(eventCategoryValues)),
@@ -238,6 +240,7 @@ export const eventBase = z.object({
   about: z.string().optional(),
   active: z.boolean().optional(),
   adminNote: z.string().optional(),
+  approvedBy: z.optional(z.string()),
 });
 
 // export const eventDetails = eventBase.superRefine((data, ctx) => {
@@ -374,9 +377,9 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   }
 });
 
-const openCallCheckSchema = z.object({
-  callType: z.union([z.enum(callTypeValues), z.literal("False")]),
-});
+// const openCallCheckSchema = z.object({
+//   callType: z.union([z.enum(callTypeValues), z.literal("False")]),
+// });
 
 export const step1Schema = z
   .object({
@@ -432,9 +435,9 @@ export const eventDetailsSchema = z.object({
   event: eventBase.extend({
     links: linksSchemaStrict,
   }),
-  openCall: z.object({
-    basicInfo: openCallCheckSchema,
-  }),
+  // openCall: z.object({
+  //   basicInfo: openCallCheckSchema,
+  // }),
 });
 
 export const openCallBaseSchema = z.object({
@@ -445,14 +448,14 @@ export const openCallBaseSchema = z.object({
   basicInfo: z.object({
     appFee: z.number(),
     callFormat: z.union([z.literal("RFQ"), z.literal("RFP")]),
-    callType: z.union([
-      z.literal("Fixed"),
-      z.literal("Rolling"),
-      z.literal("Email"),
-      z.literal("Invite"),
-      z.literal("Unknown"),
-      z.literal("False"),
-    ]),
+    // callType: z.union([
+    //   z.literal("Fixed"),
+    //   z.literal("Rolling"),
+    //   z.literal("Email"),
+    //   z.literal("Invite"),
+    //   z.literal("Unknown"),
+    //   z.literal("False"),
+    // ]),
 
     dates: z.optional(
       z.object({
@@ -508,7 +511,12 @@ export const openCallBaseSchema = z.object({
       }),
     ),
   ),
+  paid: z.optional(z.boolean()),
+  paidAt: z.optional(z.number()),
+  publicPreview: z.optional(z.boolean()),
   tempFiles: z.array(z.instanceof(File)).optional(),
+  approvedBy: z.optional(z.string()),
+  approvedAt: z.optional(z.number()),
 });
 
 export const openCallCompensationSchema = z.object({
@@ -546,13 +554,15 @@ export const openCallStep1Schema = z
         ),
       }),
     }),
+    event: eventBase.extend({
+      hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
+    }),
     openCall: openCallBaseSchema,
   })
   .superRefine((data, ctx) => {
     if (data.openCall?.eligibility?.type.trim()) {
       const trimmed = data.openCall?.eligibility?.type.trim();
       const trimmedDetails = data.openCall?.eligibility?.details?.trim() ?? "";
-      console.log(trimmed);
       if (
         trimmed === "National" &&
         data.openCall?.eligibility?.whom?.length === 0
@@ -575,7 +585,7 @@ export const openCallStep1Schema = z
       }
     }
     if (
-      data.openCall?.basicInfo?.callType === "Fixed" &&
+      data.event?.hasOpenCall === "Fixed" &&
       (!data.openCall?.basicInfo?.dates?.ocStart ||
         !data.openCall?.basicInfo?.dates?.ocEnd)
     ) {
@@ -598,11 +608,29 @@ export const openCallSchema = openCallFullSchema.extend({
 export const openCallStep2Schema = z
   .object({
     openCall: openCallFullSchema,
+    event: eventBase,
   })
   .superRefine((data, ctx) => {
     const allInclusive = data.openCall.compensation.budget.allInclusive;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
+    const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
+    const missingBudget = typeof budgetMin === "number" && budgetMin <= 1;
+    const paidCall = data.event.formType === 3;
+    if (missingBudget && paidCall) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Minimum budget is required for paid calls",
+        path: ["openCall", "compensation", "budget"],
+      });
+    }
+    if (budgetLg && data.event.formType === 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Budget max must be less than 1000 for free calls",
+        path: ["openCall", "compensation", "budget", "max"],
+      });
+    }
     if (budgetMin && budgetMax && budgetMin > budgetMax) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -617,7 +645,7 @@ export const openCallStep2Schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "Budgets without all-inclusive budgets must have at least one category",
+          "Open calls without all-inclusive budgets must have at least one category",
         path: ["openCall", "compensation", "budget", "allInclusive"],
       });
     }
@@ -628,19 +656,28 @@ export const eventWithOCSchema = z
     organization: organizationSchema,
     event: eventBase.extend({
       state: z.enum(eventStates),
+      hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
     }),
     openCall: openCallSchema.optional(),
   })
   .superRefine((data, ctx) => {
-    if (
-      validOCVals.includes(data.openCall?.basicInfo?.callType ?? "") &&
-      !data.openCall
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Open Call details are required when 'hasOpenCall' is true.",
-        path: ["openCall"],
-      });
+    const callType = data.event.hasOpenCall;
+    const shouldBePresent = validOCVals.includes(callType ?? "");
+
+    if (shouldBePresent) {
+      const hasMinimalStructure =
+        !!data.openCall?.eligibility &&
+        !!data.openCall?.requirements &&
+        !!data.openCall?.requirements.applicationLink;
+
+      if (!hasMinimalStructure) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Open Call details are required when callType is Fixed, Rolling, or Email.",
+          path: ["openCall"],
+        });
+      }
     }
   });
 

@@ -1,5 +1,5 @@
 import { ArtistFull } from "@/types/artist";
-import { EventData, SubmissionFormState } from "@/types/event";
+import { EventData } from "@/types/event";
 import { Organizer } from "@/types/organizer";
 import { UserPref } from "@/types/user";
 import { Doc, Id } from "~/convex/_generated/dataModel";
@@ -10,6 +10,15 @@ export type CallFormat = (typeof callFormatValues)[number];
 
 export const validOCVals = ["Fixed", "Rolling", "Email"];
 export const invalidOCVals = ["Invite", "Unknown", "False"];
+
+export const openCallStates = [
+  "draft",
+  "submitted",
+  "pending",
+  "published",
+  "archived",
+] as const;
+export type SubmissionFormState = (typeof openCallStates)[number];
 
 export const callTypeValues = [
   "Fixed",
@@ -123,6 +132,9 @@ export interface OpenCall {
     archived?: boolean;
   }[];
   state?: SubmissionFormState;
+  paid?: boolean;
+  paidAt?: number;
+  publicPreview?: boolean;
 }
 
 // export interface OpenCallApplication {

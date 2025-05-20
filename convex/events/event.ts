@@ -183,7 +183,7 @@ export async function generateUniqueNameAndSlug(
     .unique();
 
   if (!existingExact) {
-    return { name: baseName, slug: slugify(baseName) };
+    return { name: baseName, slug: slugify(baseName, { lower: true }) };
   }
 
   while (true) {
@@ -196,7 +196,7 @@ export async function generateUniqueNameAndSlug(
       .unique();
 
     if (!exists) {
-      return { name: tryName, slug: slugify(tryName) };
+      return { name: tryName, slug: slugify(tryName, { lower: true }) };
     }
 
     suffix++;
@@ -259,6 +259,7 @@ export const getTotalNumberOfEvents = query({
 export const getEventByOrgId = query({
   args: {
     orgId: v.id("organizations"),
+    formType: v.optional(v.number()), //todo: add this later to show/hide relevant events depending on the form type when submitting something new.
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -421,41 +422,6 @@ export const getAllEvents = query({
   },
 });
 
-// export const checkEventNameExists = query({
-//   args: {
-//     name: v.string(),
-//     organizationId: v.optional(v.id("organizations")),
-//     eventId: v.optional(v.id("events")),
-//   },
-//   handler: async (ctx, args) => {
-//     const inputName = args.name.trim().toLowerCase();
-//     const edition = new Date().getFullYear();
-
-//     console.log("inputName", inputName);
-
-//     const existingEvent = await filter(
-//       ctx.db.query("events"),
-//       (event) => event.name.toLowerCase() === inputName,
-//     ).unique();
-
-//     console.log("existingEvent", existingEvent);
-//     console.log("inputName", inputName);
-
-//     const sameEvent = args.eventId && args.eventId === existingEvent?._id
-
-//     if (sameEvent) return true;
-
-//     // const existing = await ctx.db
-//     //   .query("events")
-//     //   .filter((q) => q.eq(q.field("name"), args.name.toLowerCase()))
-//     //   .first();
-
-//     if (existingEvent)
-//       throw new ConvexError("An event with that name already exists.");
-//     return true;
-//   },
-// });
-
 export const updateEdition = mutation({
   args: {
     eventId: v.id("events"),
@@ -532,39 +498,21 @@ export const checkEventNameExists = query({
 
     for (const event of existingEvents) {
       const sameEvent = !!(args.eventId && args.eventId === event._id);
+      // console.log(args.name, event.name);
+      // console.log(sameEvent);
 
       const sameOrg =
         args.organizationId && args.organizationId === event.mainOrgId;
       const sameEdition = args.edition && args.edition === event.dates.edition;
-      // console.log(
-      //   "Same Event: ",
-      //   sameEvent,
-      //   "Same Org: ",
-      //   sameOrg,
-      //   "Same Edition: ",
-      //   sameEdition,
-      // );
-      // console.log(
-      //   "Event Edition: ",
-      //   event.dates.edition,
-      //   "vs Args Edition: ",
-      //   args.edition,
-      // );
-      // console.log(
-      //   "Event Org: ",
-      //   event.mainOrgId,
-      //   "vs Args Org: ",
-      //   args.organizationId,
-      // );
+
+      // console.log(sameOrg, sameEdition);
 
       if (sameEvent || (!sameEdition && !!sameOrg)) continue;
 
+      // console.log("throwing error");
       throw new ConvexError(
         `An event with the name ${args.name} already exists.`,
       );
-      // throw new ConvexError(
-      //   `An event with this name and edition (${args.name} - ${args.edition}) already exists.`,
-      // );
     }
 
     return true;
@@ -739,6 +687,14 @@ export const createOrUpdateEvent = mutation({
     logo: v.string(),
     type: typeValidator,
     category: categoryValidator,
+    hasOpenCall: v.union(
+      v.literal("Fixed"),
+      v.literal("Rolling"),
+      v.literal("Email"),
+      v.literal("Invite"),
+      v.literal("Unknown"),
+      v.literal("False"),
+    ),
 
     dates: v.object({
       edition: v.number(),
@@ -872,15 +828,13 @@ export const createOrUpdateEvent = mutation({
     const eventCategory = args.category || "";
     const isEvent = eventCategory === "event";
     const eventType = isEvent ? args.type || [] : [];
+
     const eventFormatOutput =
-      (args.dates.eventFormat as EventFormat) || args.finalStep
-        ? "noEvent"
-        : undefined;
+      (args.dates.eventFormat as EventFormat) ??
+      (args.finalStep ? "noEvent" : undefined);
     const prodFormatOutput =
-      (args.dates.prodFormat as ProdFormat) || args.finalStep
-        ? "sameAsEvent"
-        : undefined;
-    console.log("eventState", eventState);
+      (args.dates.prodFormat as ProdFormat) ??
+      (args.finalStep ? "sameAsEvent" : undefined);
 
     if (event) {
       const isOwner = event.mainOrgId === args.orgId || isAdmin;
@@ -891,10 +845,12 @@ export const createOrUpdateEvent = mutation({
 
       await ctx.db.patch(event._id, {
         name: args.name,
+        slug: args.slug,
         logo: fileUrl || args.logo,
         logoStorageId: args.logoStorageId,
         type: eventType,
         category: eventCategory,
+        hasOpenCall: args.hasOpenCall,
         dates: {
           ...args.dates,
           edition: args.dates.edition || new Date().getFullYear(),
@@ -929,6 +885,7 @@ export const createOrUpdateEvent = mutation({
       logoStorageId: args.logoStorageId,
       type: eventType,
       category: eventCategory,
+      hasOpenCall: args.hasOpenCall,
       dates: {
         ...args.dates,
         edition: args.dates.edition || new Date().getFullYear(),
@@ -982,6 +939,7 @@ export const approveEvent = mutation({
       state: eventState,
       lastEditedAt: Date.now(),
       approvedBy: userId,
+      approvedAt: Date.now(),
     });
 
     return { event };
@@ -1075,6 +1033,7 @@ export const duplicateEvent = mutation({
       logoStorageId: event.logoStorageId,
       type: event.type,
       category: event.category,
+      hasOpenCall: "False",
       dates: {
         ...event.dates,
         edition: eventEdition,

@@ -100,7 +100,7 @@ export function DebouncedControllerNumInput<
       inputMode="numeric"
       pattern="[0-9,]*"
       className={cn(
-        "placeholder:text-sm placeholder:text-foreground/50",
+        "text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
         typeof inputProps.className === "string"
           ? inputProps.className
           : undefined,

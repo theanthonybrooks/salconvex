@@ -111,6 +111,15 @@ export const updateAllSlugsToLowerCase = migrations.define({
   },
 });
 
+export const addHasOpenCall = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, doc) => {
+    await ctx.db.patch(doc._id, { hasOpenCall: "Unknown" });
+  },
+});
+
+export const runAHOC = migrations.runner(internal.migrations.addHasOpenCall);
+
 export const runOrgSlugs = migrations.runner(
   internal.migrations.updateAllSlugsToLowerCase,
 );
@@ -154,3 +163,4 @@ export const runCP = migrations.runner(
 // FOR DEVELOPMENT:
 //  npx convex run migrations:runUpdatePublic
 //  npx convex run migrations:
+

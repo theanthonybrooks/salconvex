@@ -314,7 +314,7 @@ const ClientEventList = (
                 loading="eager"
                 width={300}
                 height={300}
-                className="h-full w-full max-w-[80vw] rounded-full"
+                className="w-full max-w-[80vw] rounded-full"
               />
             </div>
           )}

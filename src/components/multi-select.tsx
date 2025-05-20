@@ -279,7 +279,7 @@ export const MultiSelect = React.forwardRef<
             disabled={disabled}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-11 w-full min-w-40 items-center justify-between rounded-md border border-red-500 bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
+              "flex h-11 w-full min-w-40 items-center justify-between truncate rounded-md border border-red-500 bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
               className,
               variant === "basic" ? "border-foreground" : "",

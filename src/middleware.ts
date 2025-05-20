@@ -3,6 +3,7 @@ import {
   createRouteMatcher,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
+import { NextResponse } from "next/server";
 
 // const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
 //note-to-self: Moved dashboard logic to the dashboard layout where it checks user and subscription status
@@ -16,19 +17,25 @@ const isOpenCallPage = createRouteMatcher([
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
     // const isAuthenticated = await isAuthenticatedNextjs()
+    const isAuthenticated = await convexAuth.isAuthenticated();
+    console.log("isAuthenticatedNextjs:", isAuthenticated);
     // console.log("isAuthenticatedNextjs:", isAuthenticated)
 
-    if (isAuthPage(request) && (await convexAuth.isAuthenticated())) {
+    if (isAuthPage(request) && isAuthenticated) {
       return nextjsMiddlewareRedirect(request, "/");
     }
 
-    if (isOpenCallPage(request) && !(await convexAuth.isAuthenticated())) {
+    if (isOpenCallPage(request) && !isAuthenticated) {
       return nextjsMiddlewareRedirect(request, "/auth/sign-in");
     }
 
     // if (isAuthPage(request) && isAuthenticated) {
     //   return nextjsMiddlewareRedirect(request, "/")
     // }
+
+    const response = NextResponse.next();
+    response.headers.set("x-pathname", request.nextUrl.pathname);
+    return response;
   },
   { cookieConfig: { maxAge: 60 * 60 * 24 * 30 } },
 );

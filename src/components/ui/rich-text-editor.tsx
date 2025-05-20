@@ -51,6 +51,7 @@ interface Props {
   asModal?: boolean;
   title?: string;
   subtitle?: string;
+  noList?: boolean;
 }
 
 export const ALLOWED_TAGS = [
@@ -77,6 +78,7 @@ export const RichTextEditor = ({
   asModal = true,
   title,
   subtitle,
+  noList,
 }: Props) => {
   const linkDialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -346,6 +348,8 @@ export const RichTextEditor = ({
     "pointer-events-none cursor-default opacity-50",
   );
 
+  const noListButtonClass = cn(noList && "!hidden");
+
   const EditorUI = (
     <div
       className={cn(
@@ -420,6 +424,7 @@ export const RichTextEditor = ({
             className={cn(
               buttonClass,
               editor.isActive("bulletList") && activeButtonClass,
+              noListButtonClass,
             )}
           >
             <FaListUl className="size-4 shrink-0" />
@@ -432,6 +437,7 @@ export const RichTextEditor = ({
             className={cn(
               buttonClass,
               editor.isActive("orderedList") && activeButtonClass,
+              noListButtonClass,
             )}
           >
             <FaListOl className="size-4 shrink-0" />
@@ -447,12 +453,16 @@ export const RichTextEditor = ({
                 editor.isActive("taskList")
                   ? activeButtonClass
                   : "text-gray-500",
+                noListButtonClass,
               )}
             >
               <FaListCheck className="size-4 shrink-0" />
             </Button>
           )}
-          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
+          <Separator
+            orientation="vertical"
+            className={cn("mx-2 hidden sm:block", noListButtonClass)}
+          />
 
           <Button
             variant="richTextButton"

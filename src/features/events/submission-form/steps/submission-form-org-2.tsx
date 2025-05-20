@@ -40,7 +40,7 @@ const SubmissionFormOrgStep2 = ({
             // "xl:self-center",
           )}
         >
-          <div className="input-section">
+          <div className="input-section self-start">
             <p className="min-w-max font-bold lg:text-xl">Step 1:</p>
             <p className="lg:text-xs">Organizer Links</p>
           </div>
