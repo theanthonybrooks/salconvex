@@ -13,6 +13,7 @@ import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as artists_getArtistEventMetadata from "../artists/getArtistEventMetadata.js";
+import type * as artists_listActions from "../artists/listActions.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as events_event from "../events/event.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
   "artists/getArtistEventMetadata": typeof artists_getArtistEventMetadata;
+  "artists/listActions": typeof artists_listActions;
   auth: typeof auth;
   crons: typeof crons;
   "events/event": typeof events_event;

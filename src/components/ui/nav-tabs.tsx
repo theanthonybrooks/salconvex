@@ -67,6 +67,7 @@ export default function NavTabs({
 
             return (
               <button
+                type="button"
                 key={tab.id}
                 style={{ zIndex: tabZIndex, position: "relative" }}
                 className={cn(

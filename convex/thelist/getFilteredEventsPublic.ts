@@ -28,12 +28,24 @@ export const getFilteredEventsPublic = query({
   handler: async (ctx, { filters, sortOptions, page }) => {
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
-    const listActions = user?._id
+    const isAdmin = user?.role?.includes("admin");
+    const subscription = user
       ? await ctx.db
-          .query("listActions")
-          .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
-          .collect()
-      : [];
+          .query("userSubscriptions")
+          .withIndex("userId", (q) => q.eq("userId", user._id))
+          .first()
+      : null;
+    const hasActiveSubscription =
+      subscription?.status === "active" ||
+      subscription?.status === "trialing" ||
+      isAdmin;
+    const listActions =
+      user?._id && hasActiveSubscription
+        ? await ctx.db
+            .query("listActions")
+            .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
+            .collect()
+        : [];
     // const applicationData = user?._id
     //   ? await ctx.db
     //       .query("artists")

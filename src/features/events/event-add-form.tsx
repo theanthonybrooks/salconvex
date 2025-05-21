@@ -41,6 +41,7 @@ import SubmissionFormOC1 from "@/features/events/submission-form/steps/submissio
 import SubmissionFormOC2 from "@/features/events/submission-form/steps/submission-form-oc-2";
 import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-1";
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
+import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
@@ -2005,9 +2006,10 @@ export const EventOCForm = ({
             {/* //------ Final Step: Recap  ------ */}
             {activeStep === steps.length - 1 && (
               <>
-                <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
+                {/* <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
                   {JSON.stringify(getValues(), null, 2)}
-                </pre>
+                </pre> */}
+                <SubmissionFormRecapDesktop />
               </>
             )}
 
