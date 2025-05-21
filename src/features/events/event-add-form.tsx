@@ -468,7 +468,11 @@ export const EventOCForm = ({
       if (paidCall && !alreadyPaid) {
         const result = await getCheckoutUrl({
           planKey,
-          slidingPrice: submissionCost?.price ?? 50,
+          slidingPrice:
+            typeof submissionCost?.price === "number" &&
+            submissionCost?.price > 0
+              ? submissionCost?.price
+              : 50,
           accountType: "organizer",
           isEligibleForFree,
           openCallId: openCallData?._id as Id<"openCalls">,
