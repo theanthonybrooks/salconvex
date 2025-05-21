@@ -297,6 +297,7 @@ export const EventOCForm = ({
   const hasOpenCall =
     validOCVals.includes(eventOpenCall) &&
     ((!isAdmin && !pastEvent) || isAdmin);
+  console.log(hasOpenCall, isAdmin, pastEvent);
 
   const eventName = eventData?.name;
   // const eventLogo = eventData?.logo;
@@ -1478,43 +1479,43 @@ export const EventOCForm = ({
     }
   }, [watchedValues, updateLastChanged, hasUserEditedForm]);
 
-  useEffect(() => {
-    // console.log("active step: ", activeStep);
-  }, [activeStep]);
+  // useEffect(() => {
+  //   // console.log("active step: ", activeStep);
+  // }, [activeStep]);
 
-  useEffect(() => {
-    // console.log("existingOrg", existingOrg);
-  }, [existingOrg]);
-  useEffect(() => {
-    if (orgData?.name !== undefined && orgData?.name !== "") {
-      // console.log("orgData", getValues("organization"));
-      // console.log("org", existingOrg);
-    }
-  }, [orgData, existingOrg, getValues]);
+  // useEffect(() => {
+  //   // console.log("existingOrg", existingOrg);
+  // }, [existingOrg]);
+  // useEffect(() => {
+  //   if (orgData?.name !== undefined && orgData?.name !== "") {
+  // console.log("orgData", getValues("organization"));
+  // console.log("org", existingOrg);
+  //   }
+  // }, [orgData, existingOrg, getValues]);
 
   useEffect(() => {
     console.log("eventData", eventData);
     // console.log("existingEvent", existingEvent);
   }, [eventData, existingEvent]);
 
-  useEffect(() => {
-    // console.log("oc", openCallData);
-  }, [openCallData]);
+  // useEffect(() => {
+  // console.log("oc", openCallData);
+  // }, [openCallData]);
 
   // useEffect(() => {
   //   console.log("eventLogo", eventLogo);
   //   console.log("eventName", eventName);
   // }, [eventLogo, eventName]);
 
-  useEffect(() => {
-    // console.log("form valid:", isValid, "step valid:", isStepValidZod);
-  }, [isValid, isStepValidZod]);
+  // useEffect(() => {
+  // console.log("form valid:", isValid, "step valid:", isStepValidZod);
+  // }, [isValid, isStepValidZod]);
 
-  useEffect(() => {
-    if (dirtyFields) {
-      // console.log(dirtyFields);
-    }
-  }, [dirtyFields]);
+  // useEffect(() => {
+  //   if (dirtyFields) {
+  //     console.log(dirtyFields);
+  //   }
+  // }, [dirtyFields]);
 
   useEffect(() => {
     if (scrollTrigger) {
@@ -1663,7 +1664,9 @@ export const EventOCForm = ({
           formType,
           ...existingEvent,
           category: !eventOnly ? existingEvent.category : "event",
-          hasOpenCall: !eventOnly ? existingEvent.hasOpenCall : "False",
+          hasOpenCall: !eventOnly
+            ? (existingEvent.hasOpenCall ?? "Fixed")
+            : "False",
         },
         openCall: {
           ...(ocData ?? {}),
@@ -1709,15 +1712,8 @@ export const EventOCForm = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (orgHasNoEvents && activeStep === 0) {
-  //     setNewOrgEvent(true);
-  //   }
-  // }, [orgHasNoEvents, activeStep]);
-
   useEffect(() => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
-    // console.log("furthest step", furthestStep);
   }, [activeStep, furthestStep]);
 
   useEffect(() => {
@@ -1731,17 +1727,14 @@ export const EventOCForm = ({
     if (selectedRow && Object.keys(selectedRow).length > 0) {
       canClearEventData.current = true;
     } else if (isSelectedRowEmpty) {
-      // console.log("empty row");
-      // canClearEventData.current = false;
       setNewOrgEvent(true);
     }
-    // console.log(isSelectedRowEmpty);
-    // console.log("selected row", selectedRow);
   }, [selectedRow, isSelectedRowEmpty]);
 
+  //todo: if necessary, perhaps unregister open call in this?
   useEffect(() => {
     if (clearEventDataTrigger) {
-      console.log("hmm");
+      // console.log("hmm");
       setFurthestStep(0);
       setSelectedRow({});
       console.log("clearing event data", eventData);
