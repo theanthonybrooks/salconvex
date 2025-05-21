@@ -47,6 +47,7 @@ import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
@@ -478,20 +479,20 @@ export const EventOCForm = ({
       );
       // console.log("submitting: ", paidCall, isAdmin);
       if (paidCall && !alreadyPaid && !isAdmin) {
-        setTimeout(() => {
-          if (!newTab) {
-            toast.error(
-              "Stripe redirect blocked. Please enable popups for this site.",
-            );
-            console.error("Popup was blocked");
-            return;
-          }
-          if (url) {
-            newTab.location.href = url;
-          }
+        if (!newTab) {
+          toast.error(
+            "Stripe redirect blocked. Please enable popups for this site.",
+          );
+          console.error("Popup was blocked");
+          return;
+        }
+        if (url) {
+          newTab.document.write(getExternalRedirectHtml(url, 1));
+          newTab.document.close();
+          newTab.location.href = url;
           // onClick();
           // onClick()
-        }, 2000);
+        }
       } else {
         //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
         // handleReset();
@@ -500,6 +501,9 @@ export const EventOCForm = ({
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
+      if (!newTab?.closed) {
+        newTab?.document.close();
+      }
     }
   };
   // TODO: Convert timezone on deadline to user timezone on submit to ensure that displayed time is correct.

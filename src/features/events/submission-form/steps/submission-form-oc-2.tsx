@@ -227,9 +227,11 @@ const SubmissionFormOC2 = ({
           // "xl:self-center",
         )}
       >
-        <p className="col-span-2 rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-3 text-center">
-          Past open calls are read-only (archived)
-        </p>
+        {pastEvent && (
+          <p className="col-span-2 rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-3 text-center">
+            Past open calls are read-only (archived)
+          </p>
+        )}
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
           <p className="lg:text-xs">Budget</p>

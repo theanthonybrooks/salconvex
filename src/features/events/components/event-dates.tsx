@@ -21,16 +21,20 @@ const EventDates = ({
   className,
   type = "event",
 }: EventDatesProps) => {
+  // if (!event || !event.dates) return null;
+
   const { dates } = event;
-  const mappedEventDates = dates.eventDates.map(({ start, end }) => ({
-    start,
-    end,
-  }));
-  const mappedProdDates = dates.prodDates?.map(({ start, end }) => ({
-    start,
-    end,
-  }));
-  const eventSliceLimit = limit === 0 ? mappedEventDates.length : (limit ?? 3);
+  const mappedEventDates =
+    dates?.eventDates?.map(({ start, end }) => ({
+      start,
+      end,
+    })) ?? [];
+  const mappedProdDates =
+    dates?.prodDates?.map(({ start, end }) => ({
+      start,
+      end,
+    })) ?? [];
+  const eventSliceLimit = limit === 0 ? mappedEventDates?.length : (limit ?? 3);
   const forEvent = type === "event";
   const forProd = type === "production";
   const isOngoing = dates?.eventFormat === "ongoing";
@@ -45,22 +49,22 @@ const EventDates = ({
     return <span className="flex flex-col gap-1">No Event Dates</span>;
   }
 
-  if (forProd && !mappedProdDates) {
-    return;
-  }
+  // if (forProd && !mappedProdDates) {
+  //   return;
+  // }
 
   return (
     <>
       {forEvent && (
         <div className={cn("flex flex-col gap-y-1", className)}>
           {mappedEventDates
-            .slice(0, eventSliceLimit)
+            ?.slice(0, eventSliceLimit)
             .map(({ start, end }, index) => {
               const isLastVisible =
                 index ===
-                Math.min(mappedEventDates.length, eventSliceLimit) - 1;
+                Math.min(mappedEventDates?.length, eventSliceLimit) - 1;
               const shouldShowPlus =
-                isLastVisible && mappedEventDates.length > eventSliceLimit;
+                isLastVisible && mappedEventDates?.length > eventSliceLimit;
 
               return (
                 <span key={index} className="flex flex-col gap-1">
@@ -75,7 +79,7 @@ const EventDates = ({
                   {shouldShowPlus && (
                     <p className="text-sm italic text-foreground">
                       {shouldShowPlus &&
-                        `+${mappedEventDates.length - eventSliceLimit} more date${mappedEventDates.length - eventSliceLimit > 1 ? "s" : ""}`}
+                        `+${mappedEventDates?.length - eventSliceLimit} more date${mappedEventDates?.length - eventSliceLimit > 1 ? "s" : ""}`}
                     </p>
                   )}
                 </span>
@@ -86,7 +90,7 @@ const EventDates = ({
       {forProd && mappedProdDates && (
         <div className={cn("flex flex-col gap-y-1", className)}>
           {mappedProdDates
-            .slice(0, eventSliceLimit)
+            ?.slice(0, eventSliceLimit)
             .map(({ start, end }, index) => {
               return (
                 <span key={index} className="flex flex-col gap-1">
