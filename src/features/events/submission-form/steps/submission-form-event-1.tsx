@@ -110,20 +110,22 @@ const SubmissionFormEventStep1 = ({
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const orgData = watch("organization");
   const isAdmin = user?.role?.includes("admin") || false;
-  const eventOnly = formType === 1 && !isAdmin;
+  const eventOnly = formType === 1;
 
   useEffect(() => {
     if (formType === 1) {
       setValue("event.category", "event");
+      // setValue("event.hasOpenCall", "False");
     }
   }, [formType, setValue]);
+  console.log(formType);
 
   return (
     <div
       id="step-1-container"
       className={cn(
         "flex h-full flex-col gap-4 xl:justify-center",
-        "mx-auto max-w-max",
+        "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
       )}
     >

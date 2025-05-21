@@ -2,8 +2,10 @@ import { formatEventDates } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
 import { EventData } from "@/types/event";
 
+type MinimalEventWithDates = Pick<EventData, "dates">;
+
 interface EventDatesProps {
-  event: EventData;
+  event: MinimalEventWithDates;
   limit?: number;
   format: "desktop" | "mobile";
   preview?: boolean;

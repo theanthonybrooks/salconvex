@@ -137,8 +137,8 @@ export const EventOCForm = ({
 }: EventOCFormProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
   const formType = Number(planKey);
-  const eventOnly = formType === 1 && !isAdmin;
-  const freeCall = formType === 2 && !isAdmin;
+  const eventOnly = formType === 1;
+  const freeCall = formType === 2;
   const paidCall = formType === 3 && !isAdmin;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
@@ -599,6 +599,8 @@ export const EventOCForm = ({
               links: {
                 ...eventLinks,
               },
+              category: !eventOnly ? eventData.category : "event",
+
               hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             },
           }),
@@ -615,6 +617,8 @@ export const EventOCForm = ({
               ...currentValues.organization.location,
               sameAsOrganizer: true,
             },
+            category: !eventOnly ? eventData.category : "event",
+
             dates: {
               edition: new Date().getFullYear(),
               // eventFormat: undefined,
@@ -889,7 +893,7 @@ export const EventOCForm = ({
             logoStorageId,
             logo: eventLogo,
             type: eventData.type || [],
-            category: eventData.category,
+            category: !eventOnly ? eventData.category : "event",
             hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             dates: {
               edition: eventData.dates.edition,
@@ -944,7 +948,7 @@ export const EventOCForm = ({
 
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
-            category: eventData.category,
+            category: !eventOnly ? eventData.category : "event",
             hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             dates: {
               ...eventData.dates,
@@ -1299,7 +1303,7 @@ export const EventOCForm = ({
             slug: slugify(eventData.name, { lower: true }),
             logo: eventData.logo as string,
             type: eventData.type || [],
-            category: eventData.category,
+            category: !eventOnly ? eventData.category : "event",
             hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
             dates: {
               ...eventData.dates,
@@ -1660,6 +1664,7 @@ export const EventOCForm = ({
         event: {
           formType,
           ...existingEvent,
+          category: !eventOnly ? existingEvent.category : "event",
           hasOpenCall: !eventOnly ? existingEvent.hasOpenCall : "False",
         },
         openCall: {
@@ -2009,7 +2014,7 @@ export const EventOCForm = ({
                 {/* <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
                   {JSON.stringify(getValues(), null, 2)}
                 </pre> */}
-                <SubmissionFormRecapDesktop />
+                <SubmissionFormRecapDesktop formType={formType} />
               </>
             )}
 

@@ -151,6 +151,20 @@ export const RichTextEditor = ({
         );
       }
     },
+    editorProps: {
+      handleKeyDown(view, event) {
+        const isCmdEnter = event.metaKey && event.key === "Enter";
+        const isCtrlEnter = event.ctrlKey && event.key === "Enter";
+
+        if ((isCmdEnter || isCtrlEnter) && hasUnsavedChanges) {
+          event.preventDefault();
+          handleAccept();
+          return true;
+        }
+
+        return false;
+      },
+    },
   });
   const hasFormatting =
     (editor && selectionHasAnyMarks(editor)) ||

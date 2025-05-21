@@ -780,6 +780,14 @@ button:active {
   }
 }
 
+/* Form recap */
+
+.form-recap {
+  & * th {
+    font-weight: 600;
+  }
+}
+
 /* FullCalendar */
 
 .fc-toolbar {

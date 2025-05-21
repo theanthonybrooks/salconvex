@@ -1,8 +1,10 @@
 import { toMutableEnum } from "@/lib/zodFns";
 import {
   eventCategoryValues,
+  eventFormatValues,
   eventStates,
   eventTypeValues,
+  prodFormatValues,
 } from "@/types/event";
 import { callTypeValues, validOCVals } from "@/types/openCall";
 import { z } from "zod";
@@ -215,8 +217,10 @@ export const eventBase = z.object({
   }),
 
   dates: z.object({
-    eventFormat: z.optional(z.string()),
-    prodFormat: z.optional(z.string()),
+    eventFormat: z.optional(
+      z.union([z.enum(eventFormatValues), z.literal("")]),
+    ),
+    prodFormat: z.optional(z.union([z.enum(prodFormatValues), z.literal("")])),
     edition: z.number(),
     eventDates: z.array(
       z.object({
@@ -335,7 +339,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   }
   if (
     data.dates?.eventFormat &&
-    data.dates?.eventFormat !== "" &&
+    // data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&
     data.dates?.prodFormat === undefined
   ) {
@@ -348,7 +352,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
 
   if (
     data.dates?.eventFormat &&
-    data.dates?.eventFormat !== "" &&
+    // data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&
     !data.dates?.noProdStart &&
     (!Array.isArray(data.dates?.prodDates) ||

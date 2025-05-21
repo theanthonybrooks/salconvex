@@ -65,7 +65,7 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const freeCall = formType === 2 && !isAdmin;
+  const freeCall = formType === 2;
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
 
   const openCall = watch("openCall");
@@ -140,7 +140,7 @@ const SubmissionFormOC1 = ({
       id="step-1-container"
       className={cn(
         "flex h-full flex-col gap-4 xl:justify-center",
-        "mx-auto max-w-max",
+        "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[40%_10%_50%] xl:gap-0",
       )}
     >

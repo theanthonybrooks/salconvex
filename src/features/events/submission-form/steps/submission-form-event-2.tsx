@@ -53,8 +53,8 @@ const SubmissionFormEventStep2 = ({
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
   const category = watch("event.category");
-  const eventOnly = formType === 1 && !isAdmin;
-  const freeCall = formType === 2 && !isAdmin;
+  const eventOnly = formType === 1;
+  const freeCall = formType === 2;
 
   // #region ------------- Queries, Actions, and Mutations --------------
 
@@ -65,7 +65,7 @@ const SubmissionFormEventStep2 = ({
       id="step-2-container"
       className={cn(
         "flex h-full flex-col gap-4 xl:justify-center",
-        "mx-auto max-w-max",
+        "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
       )}
     >

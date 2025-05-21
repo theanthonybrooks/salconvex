@@ -14,14 +14,20 @@ import {
 } from "react-icons/fa6";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
 
+interface MinimalEventLike {
+  name: string;
+  links?: EventData["links"];
+}
+
 interface LinkListProps {
-  event?: EventData;
+  event?: MinimalEventLike;
   organizer?: Organizer;
   purpose?: string;
 }
 
 export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
   const listPreview = purpose === "preview";
+  const submitRecap = purpose === "recap";
 
   const visibleEventLinks =
     event?.links &&
@@ -44,7 +50,13 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
   return (
     <>
       {event && event.links && (
-        <div className={cn("flex flex-col gap-y-2", !listPreview && "p-3")}>
+        <div
+          className={cn(
+            "flex flex-col gap-y-2",
+            !listPreview && "p-3",
+            submitRecap && "p-0",
+          )}
+        >
           {event.links?.email && !listPreview && (
             <a href={`mailto:${event.links.email}?subject=${event.name}`}>
               <div className="flex items-center gap-x-2">
