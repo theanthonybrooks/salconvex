@@ -47,20 +47,20 @@ export const SubmissionFormRecapDesktop = ({
       setActiveTab={setActiveTab}
       className="form-recap"
     >
-      <div id="event" className="overflow-x-auto px-4">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div id="event" className="px-4">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[40%_60%]">
           <table className="w-full table-auto border-separate border-spacing-y-2 text-left text-sm">
             <tbody>
               <tr>
-                <th className="pr-4 align-top font-medium">Logo</th>
-                <td>
+                <th className="event-logo pr-4 align-top font-medium">Logo</th>
+                <td className="event-logo">
                   {typeof eventData.logo === "string" && (
                     <Image
                       src={eventData.logo}
                       alt="Event Logo"
-                      width={60}
-                      height={60}
-                      className={cn("size-[60px] rounded-full border-2")}
+                      width={80}
+                      height={80}
+                      className={cn("size-20 rounded-full border-2")}
                     />
                   )}
                 </td>

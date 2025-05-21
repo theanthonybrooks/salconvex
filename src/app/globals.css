@@ -786,6 +786,10 @@ button:active {
   & * th {
     font-weight: 600;
   }
+  td:not(.event-logo),
+  th:not(.event-logo) {
+    border-bottom: 1px solid hsl(var(--foreground) / 0.1);
+  }
 }
 
 /* FullCalendar */

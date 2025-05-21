@@ -1,10 +1,6 @@
-interface ArtistPageDBProps {
-  className?: string;
-}
-
-export default async function ArtistPageDB({ className }: ArtistPageDBProps) {
+export default async function ArtistPageDB() {
   return (
-    <div className={className}>
+    <div>
       <h1>ArtistPageDB</h1>
     </div>
   );
