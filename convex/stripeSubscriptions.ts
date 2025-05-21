@@ -188,8 +188,11 @@ export const createStripeCheckoutSession = action({
         metadata: metadata,
         client_reference_id: metadata.userId,
         discounts: args.isEligibleForFree
-          ? [{ coupon: "KT7bnfqn" }]
+          ? [{ coupon: "Qd1pEJ7t" }]
           : undefined,
+        // discounts: args.isEligibleForFree
+        //   ? [{ coupon: "KT7bnfqn" }]
+        //   : undefined,
         //TODO: Add coupon and products to production version of Stripe
       });
 
@@ -383,7 +386,8 @@ export const subscriptionStoreWebhook = mutation({
         const metaInterval = metadata?.interval;
         const oneTime = metaInterval === "One-time";
         const freeCall =
-          args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
+          args.body.data.object.discounts[0]?.coupon === "Qd1pEJ7t";
+        // args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
         const createdAt = new Date(
           args.body.data.object.created * 1000,
         ).getTime();
@@ -545,6 +549,9 @@ export const subscriptionStoreWebhook = mutation({
         if (updatedSub) {
           const updates: any = {
             status: base.object.status,
+            cancelAt: base.object.cancel_at
+              ? new Date(base.object.cancel_at * 1000).getTime()
+              : undefined,
             canceledAt: base.object.canceled_at
               ? new Date(base.object.canceled_at * 1000).getTime()
               : undefined,
@@ -558,6 +565,7 @@ export const subscriptionStoreWebhook = mutation({
             currentPeriodEnd: base.object.current_period_end
               ? new Date(base.object.current_period_end * 1000).getTime()
               : undefined,
+            cancelAtPeriodEnd: base.object.cancel_at_period_end ?? false,
             stripeId: args.body.data.object.id,
             //test if actually needed - the stripeId changes when the subscription is updated, but I don't know if it's able to reference/find the new one in reference to the old one or not. Wait and see.
             lastEditedAt: new Date().getTime(),
@@ -661,6 +669,7 @@ export const subscriptionStoreWebhook = mutation({
           await ctx.db.patch(uncanceledSub._id, {
             status: args.body.data.status,
             cancelAtPeriodEnd: false,
+            cancelAt: undefined,
             canceledAt: undefined,
             customerCancellationReason: undefined,
             customerCancellationComment: undefined,

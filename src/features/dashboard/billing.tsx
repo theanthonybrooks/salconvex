@@ -23,6 +23,10 @@ export default function BillingPage() {
     subscription?.canceledAt !== undefined && subscription?.canceledAt;
 
   const isCancelled = subscription?.status === "cancelled";
+  // const cancelAtTime = new Date(subscription?.cancelAt ?? Date.now());
+  const cancelAtTime = subscription?.cancelAt
+    ? new Date(subscription.cancelAt)
+    : undefined;
 
   let interval: string | undefined;
   // let nextInterval: string | undefined
@@ -39,6 +43,7 @@ export default function BillingPage() {
   }
 
   const handleManageSubscription = async () => {
+    let url: string | undefined;
     if (!subscription?.customerId) {
       toast.error(
         "No subscription found. Please contact support if this is incorrect.",
@@ -51,7 +56,19 @@ export default function BillingPage() {
         customerId: subscription.customerId,
       });
       if (result?.url) {
-        window.location.href = result.url;
+        // window.location.href = result.url;
+        url = result.url;
+      }
+      const newTab = window.open("about:blank");
+      if (!newTab) {
+        toast.error(
+          "Stripe redirect blocked. Please enable popups for this site.",
+        );
+        console.error("Popup was blocked");
+        return;
+      }
+      if (url) {
+        newTab.location.href = url;
       }
     } catch (err: unknown) {
       if (err instanceof ConvexError) {
@@ -193,12 +210,26 @@ export default function BillingPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Next Due Date:</span>
-                  <span className="font-medium">
-                    {isCancelled
-                      ? "Cancelled"
-                      : format(currentPeriodEnd, "MMM do, yyyy")}
-                  </span>
+                  {!cancelAtTime && (
+                    <>
+                      <span className="text-muted-foreground">
+                        Next Due Date:
+                      </span>
+                      <span className="font-medium">
+                        {isCancelled
+                          ? "Cancelled"
+                          : format(currentPeriodEnd, "MMM do, yyyy")}
+                      </span>
+                    </>
+                  )}
+                  {cancelAtTime && !isCancelled && (
+                    <>
+                      <span className="text-muted-foreground">Cancels on:</span>
+                      <span className="font-medium text-red-500">
+                        {format(cancelAtTime, "MMM do, yyyy")}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">

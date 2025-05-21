@@ -722,6 +722,7 @@ export default defineSchema({
     startedAt: v.optional(v.number()),
     trialEndsAt: v.optional(v.number()),
     endedAt: v.optional(v.number()),
+    cancelAt: v.optional(v.number()),
     canceledAt: v.optional(v.number()),
     customerCancellationReason: v.optional(v.string()),
     customerCancellationComment: v.optional(v.string()),

@@ -18,7 +18,7 @@ export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
     // const isAuthenticated = await isAuthenticatedNextjs()
     const isAuthenticated = await convexAuth.isAuthenticated();
-    console.log("isAuthenticatedNextjs:", isAuthenticated);
+    // console.log("isAuthenticatedNextjs:", isAuthenticated);
     // console.log("isAuthenticatedNextjs:", isAuthenticated)
 
     if (isAuthPage(request) && isAuthenticated) {

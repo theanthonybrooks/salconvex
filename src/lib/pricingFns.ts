@@ -22,7 +22,7 @@ export const OC_PRICING_TIERS = [
   },
 ];
 export function getOcPricing(input: number | true) {
-  if (input === 0) return { name: "base", price: 0 };
+  if (input === 0) return { name: "base", price: 50 };
   if (input === true || input <= 5000) {
     return OC_PRICING_TIERS.find((tier) => tier.name === "base")!;
   } else if (input > 5000 && input <= 10000) {
