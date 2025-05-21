@@ -403,30 +403,14 @@ export const EventOCForm = ({
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
 
-  // const applicationFee = ocData?.basicInfo?.appFee;
-  // const hasApplicationFee =
-  //   !!applicationFee &&
-  //   typeof applicationFee === "number" &&
-  //   applicationFee > 0;
   const projectMaxBudget = ocData?.compensation?.budget?.max;
   const projectMinBudget = ocData?.compensation?.budget?.min;
   const projectBudget = (projectMaxBudget || projectMinBudget) ?? 0;
-  // const budgetLg =
-  //   typeof projectMaxBudget === "number" && projectMaxBudget >= 1000;
-
-  // const hasProjectBudget =
-  //   !!projectBudget && typeof projectBudget === "number" && projectBudget > 0;
-  // console.log(projectBudget, hasProjectBudget, hasApplicationFee);
   const submissionCost = getOcPricing(projectBudget);
-  // console.log(submissionCost);
-  // console.log(submissionCost?.price);
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
-  console.log(alreadyPaid);
   const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
-  console.log(alreadyApproved);
-  // console.log(activeStep);
 
   // #endregion
   // #endregion
@@ -605,7 +589,9 @@ export const EventOCForm = ({
               },
               category: !eventOnly ? eventData.category : "event",
 
-              hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
+              hasOpenCall: !eventOnly
+                ? (eventData.hasOpenCall ?? "Fixed")
+                : "False",
             },
           }),
         );
@@ -635,7 +621,7 @@ export const EventOCForm = ({
               ...eventLinks,
             },
             //TODO: cOME BACK TO THIS!
-            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
+            hasOpenCall: !eventOnly ? "Fixed" : "False",
           },
         });
         console.log("waffles");
@@ -841,7 +827,9 @@ export const EventOCForm = ({
                 edition: new Date().getFullYear(),
                 noProdStart: false,
               },
-              hasOpenCall: "False",
+              hasOpenCall: !eventOnly
+                ? (eventData.hasOpenCall ?? "Fixed")
+                : "False",
             },
           });
         }
@@ -898,7 +886,9 @@ export const EventOCForm = ({
             logo: eventLogo,
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
+            hasOpenCall: !eventOnly
+              ? (eventData.hasOpenCall ?? "Fixed")
+              : "False",
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
@@ -953,7 +943,9 @@ export const EventOCForm = ({
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
+            hasOpenCall: !eventOnly
+              ? (eventData.hasOpenCall ?? "Fixed")
+              : "False",
             dates: {
               ...eventData.dates,
             },
@@ -1308,7 +1300,9 @@ export const EventOCForm = ({
             logo: eventData.logo as string,
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly ? eventData.hasOpenCall : "False",
+            hasOpenCall: !eventOnly
+              ? (eventData.hasOpenCall ?? "Fixed")
+              : "False",
             dates: {
               ...eventData.dates,
             },
