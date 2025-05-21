@@ -679,7 +679,7 @@ export const RichTextEditor = ({
         )}
       />
 
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+      <div className="absolute bottom-4 right-4 flex flex-col gap-2 rounded bg-white">
         <p className="mr-1 text-right text-sm text-gray-500">
           {editor.storage.characterCount.characters()}/{charLimit}
         </p>

@@ -1,9 +1,14 @@
 // TODO: Add the terms of service checkboxes
 
 "use client";
-
 import { LinkList } from "@/components/ui/link-list";
 import NavTabs from "@/components/ui/nav-tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/state-accordion-test";
 import EventDates from "@/features/events/components/event-dates";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
@@ -147,30 +152,47 @@ export const SubmissionFormRecapDesktop = ({
               )}
 
               <tr>
-                <th className="pr-4 align-top font-medium">Links</th>
-                <td>
+                <th className="event-links pr-4 align-top font-medium">
+                  Links
+                </th>
+                <td className="event-links">
                   <LinkList event={eventData} purpose="recap" />
                 </td>
               </tr>
             </tbody>
           </table>
-          <div className="space-y-6">
-            {eventData.about && (
-              <div>
-                <h4 className="mb-1 text-sm font-medium text-muted-foreground">
-                  About
-                </h4>
-                <RichTextDisplay html={eventData.about || ""} />
-              </div>
-            )}
-            {eventData.otherInfo && (
-              <div>
-                <h4 className="mb-1 text-sm font-medium text-muted-foreground">
-                  Other Info
-                </h4>
-                <RichTextDisplay html={eventData.otherInfo || ""} />
-              </div>
-            )}
+          {/* <Separator
+            thickness={2}
+            orientation="vertical"
+            className="my-4 mx-auto border-foreground/"
+          /> */}
+          <div className="space-y-6 border-l-2 border-foreground/10 px-8 pt-2">
+            <Accordion type="multiple" defaultValue={["About", "OtherInfo"]}>
+              {eventData.about && (
+                <AccordionItem value="About">
+                  {/* <p className="mb-1 text-sm font-medium">About</p> */}
+                  <AccordionTrigger title="About" />
+                  <AccordionContent>
+                    <RichTextDisplay
+                      html={eventData.about || ""}
+                      className="text-sm"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+              {eventData.otherInfo && (
+                <AccordionItem value="OtherInfo">
+                  {/* <p className="mb-1 text-sm font-medium">About</p> */}
+                  <AccordionTrigger title="Other Info" />
+                  <AccordionContent>
+                    <RichTextDisplay
+                      html={eventData.otherInfo || ""}
+                      className="text-sm"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </Accordion>
           </div>
         </div>
       </div>
