@@ -52,6 +52,7 @@ interface Props {
   title?: string;
   subtitle?: string;
   noList?: boolean;
+  readOnly?: boolean;
 }
 
 export const ALLOWED_TAGS = [
@@ -79,6 +80,7 @@ export const RichTextEditor = ({
   title,
   subtitle,
   noList,
+  readOnly,
 }: Props) => {
   const linkDialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -100,6 +102,7 @@ export const RichTextEditor = ({
 
   const editor = useEditor({
     content: tempContent,
+    editable: !readOnly,
     extensions: [
       StarterKit.configure({
         bold: {},
@@ -139,6 +142,7 @@ export const RichTextEditor = ({
     ],
 
     onUpdate: ({ editor }) => {
+      if (readOnly) return;
       const html = editor.getHTML();
       setTempContent(html);
       const count = editor.storage.characterCount.characters();
@@ -352,6 +356,7 @@ export const RichTextEditor = ({
     asModal &&
       "p-3 transition-all duration:300 ease-in-out hover:-translate-y-1 ",
     "active:scale-95 text-foreground/60",
+    readOnly && "pointer-events-none opacity-50 cursor-default",
   );
 
   const activeButtonClass = cn(
@@ -676,6 +681,7 @@ export const RichTextEditor = ({
         className={cn(
           "rich-text min-h-[100px] flex-1",
           asModal && "rich-modal [&_div.ProseMirror]:max-h-[calc(90dvh-140px)]",
+          readOnly && "pointer-events-none cursor-default",
         )}
       />
 
@@ -700,7 +706,7 @@ export const RichTextEditor = ({
               }
             }}
           >
-            {hasUnsavedChanges ? "Save" : "Cancel"}
+            {hasUnsavedChanges ? "Save" : readOnly ? "Close" : "Cancel"}
             {hasUnsavedChanges && !pending && (
               <CheckIcon className="ml-1 size-4 shrink-0" />
             )}
@@ -716,7 +722,10 @@ export const RichTextEditor = ({
     return (
       <>
         <div
-          className="relative cursor-pointer rounded border p-2"
+          className={cn(
+            "relative cursor-pointer rounded border p-2",
+            readOnly && "pointer-events-none border-foreground/50 opacity-50",
+          )}
           onClick={() => setOpen(true)}
           onMouseEnter={() => setHoverPreview(true)}
           onMouseLeave={() => setHoverPreview(false)}
@@ -724,7 +733,9 @@ export const RichTextEditor = ({
           <div className="scrollable justy mini max-h-20 min-h-14 text-sm text-muted-foreground">
             {value ? (
               <div
-                className="rich-text__preview-wrapper prose max-w-none truncate text-foreground"
+                className={cn(
+                  "rich-text__preview-wrapper prose max-w-none truncate text-foreground",
+                )}
                 dangerouslySetInnerHTML={{ __html: value }}
               />
             ) : (

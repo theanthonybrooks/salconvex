@@ -153,7 +153,7 @@ export const EventOCForm = ({
       event: {
         formType,
         name: "",
-        hasOpenCall: "False",
+        hasOpenCall: "Fixed",
       },
       openCall: {
         basicInfo: {
@@ -292,12 +292,9 @@ export const EventOCForm = ({
     ? new Date(openCallData?.basicInfo?.dates?.ocEnd)
     : null;
 
-  const pastEvent = openCallEnd && openCallEnd < now;
-
-  const hasOpenCall =
-    validOCVals.includes(eventOpenCall) &&
-    ((!isAdmin && !pastEvent) || isAdmin);
-  console.log(hasOpenCall, isAdmin, pastEvent);
+  const pastEvent = !!openCallEnd && openCallEnd < now;
+  //note-to-self: this is what's hiding the open call sections from users (non-admins). The idea being that they shouldn't be able to change anything. Perhaps the better way would be to still show it, but have it disabled/read only? It's confusing at the moment.
+  const hasOpenCall = validOCVals.includes(eventOpenCall);
 
   const eventName = eventData?.name;
   // const eventLogo = eventData?.logo;
@@ -443,8 +440,12 @@ export const EventOCForm = ({
 
   const onSubmit = async () => {
     let url: string | undefined;
+    let newTab: Window | null = null;
     // console.log(paidCall);
     // console.log("data", data);
+    if (paidCall && !alreadyPaid && !isAdmin) {
+      newTab = window.open("about:blank");
+    }
 
     try {
       // console.log("organizer mode)");
@@ -478,7 +479,6 @@ export const EventOCForm = ({
       // console.log("submitting: ", paidCall, isAdmin);
       if (paidCall && !alreadyPaid && !isAdmin) {
         setTimeout(() => {
-          const newTab = window.open("about:blank");
           if (!newTab) {
             toast.error(
               "Stripe redirect blocked. Please enable popups for this site.",
@@ -1977,6 +1977,7 @@ export const EventOCForm = ({
                 canNameEvent={canNameEvent}
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
+                pastEvent={pastEvent}
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}
@@ -1989,6 +1990,7 @@ export const EventOCForm = ({
                 canNameEvent={canNameEvent}
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
+                pastEvent={pastEvent}
               />
             )}
 

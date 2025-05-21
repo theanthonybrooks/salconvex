@@ -38,6 +38,7 @@ interface SubmissionFormOC2Props {
   canNameEvent: boolean;
   handleCheckSchema: () => void;
   formType: number;
+  pastEvent: boolean;
 }
 
 const SubmissionFormOC2 = ({
@@ -49,6 +50,7 @@ const SubmissionFormOC2 = ({
 
   handleCheckSchema,
   formType,
+  pastEvent,
 }: SubmissionFormOC2Props) => {
   const paidCall = formType === 3;
   const {
@@ -225,6 +227,9 @@ const SubmissionFormOC2 = ({
           // "xl:self-center",
         )}
       >
+        <p className="col-span-2 rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-3 text-center">
+          Past open calls are read-only (archived)
+        </p>
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">Step 1: </p>
           <p className="lg:text-xs">Budget</p>
@@ -241,6 +246,7 @@ const SubmissionFormOC2 = ({
                   setHasBudget(value);
                 }}
                 value={hasBudget}
+                disabled={pastEvent}
               >
                 <SelectTrigger
                   className={cn(
@@ -275,6 +281,7 @@ const SubmissionFormOC2 = ({
               "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
               !showBudgetInputs &&
                 "border-foreground/30 opacity-50 [@media(max-width:640px)]:hidden",
+              pastEvent && "border-foreground/50 opacity-50",
             )}
           >
             <Controller
@@ -296,7 +303,7 @@ const SubmissionFormOC2 = ({
                   getItemLabel={(c) => `${c.symbol} (${c.code}) - ${c.name}`}
                   getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
                   getItemValue={(c) => c.code}
-                  disabled={!showBudgetInputs}
+                  disabled={!showBudgetInputs || pastEvent}
                 />
               )}
             />
@@ -313,7 +320,7 @@ const SubmissionFormOC2 = ({
                       field={field}
                       formatNumber={true}
                       min={0}
-                      disabled={!showBudgetInputs}
+                      disabled={!showBudgetInputs || pastEvent}
                       placeholder="Minimum"
                       className="h-fit border-none px-0 pb-2 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
                     />
@@ -329,7 +336,7 @@ const SubmissionFormOC2 = ({
                     <DebouncedControllerNumInput
                       // min={budgetMin}
                       // type="number"
-                      disabled={!showBudgetInputs}
+                      disabled={!showBudgetInputs || pastEvent}
                       formatNumber={true}
                       field={{
                         ...field,
@@ -363,6 +370,7 @@ const SubmissionFormOC2 = ({
                   "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
                   !showBudgetInputs &&
                     "opacity-50 [@media(max-width:640px)]:hidden",
+                  pastEvent && "border-foreground/50 opacity-50",
                 )}
               >
                 <Controller
@@ -386,7 +394,7 @@ const SubmissionFormOC2 = ({
                       }
                       getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
                       getItemValue={(c) => c.code}
-                      disabled={!showBudgetInputs}
+                      disabled={!showBudgetInputs || pastEvent}
                     />
                   )}
                 />
@@ -401,7 +409,7 @@ const SubmissionFormOC2 = ({
                           formatNumber={true}
                           value={field.value ?? 0}
                           min={0}
-                          disabled={!showBudgetInputs}
+                          disabled={!showBudgetInputs || pastEvent}
                           placeholder="Rate (ex: 30)"
                           className="h-fit border-none p-2 text-center focus:border-none focus:outline-none sm:text-base"
                         />
@@ -418,6 +426,7 @@ const SubmissionFormOC2 = ({
                 control={control}
                 render={({ field }) => (
                   <Select
+                    disabled={pastEvent}
                     // onValueChange={(value: "ft²" | "m²" | "") => {
                     //   setHasRate(value);
                     // }}
@@ -476,6 +485,7 @@ const SubmissionFormOC2 = ({
                   control={control}
                   render={({ field }) => (
                     <Select
+                      disabled={pastEvent}
                       onValueChange={(val: string) =>
                         field.onChange(val === "true")
                       }
@@ -520,6 +530,7 @@ const SubmissionFormOC2 = ({
                 control={control}
                 render={({ field }) => (
                   <MultiSelect
+                    disabled={pastEvent}
                     id="openCall.compensation.categories"
                     className={cn(
                       "h-12 border sm:h-[50px]",
@@ -604,7 +615,10 @@ const SubmissionFormOC2 = ({
                   {activeCategoryFields.map(({ label, value }) => (
                     <div
                       key={value}
-                      className="flex items-center justify-between gap-4 rounded-md border p-3"
+                      className={cn(
+                        "flex items-center justify-between gap-4 rounded-md border p-3",
+                        pastEvent && "border-foreground/50 opacity-50",
+                      )}
                     >
                       {/* Optional: Replace with an icon specific to each category if needed */}
                       <span className="flex-1 text-sm font-medium text-foreground">
@@ -619,6 +633,7 @@ const SubmissionFormOC2 = ({
                           control={control}
                           render={({ field }) => (
                             <DebouncedControllerNumInput
+                              disabled={pastEvent}
                               field={{
                                 ...field,
                                 onChange: (val) => {
@@ -658,6 +673,7 @@ const SubmissionFormOC2 = ({
                     onChange={field.onChange}
                     placeholder="Please list any other compensation-related info here"
                     charLimit={1000}
+                    readOnly={pastEvent}
                   />
                 )}
               />

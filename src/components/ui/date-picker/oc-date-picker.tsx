@@ -21,6 +21,7 @@ export interface OcCustomDatePickerProps {
   isAdmin?: boolean;
   ocEnd?: string | null;
   orgTimezone?: string;
+  disabled?: boolean;
 }
 
 interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
@@ -90,6 +91,7 @@ export const OcCustomDatePicker = ({
   isAdmin,
   ocEnd,
   orgTimezone,
+  disabled,
 }: OcCustomDatePickerProps) => {
   const parsedDate = value ? toDate(value) : null;
   const minToDate = minDate ? toDate(minDate) : null;
@@ -111,6 +113,7 @@ export const OcCustomDatePicker = ({
 
   return (
     <DatePicker
+      disabled={disabled}
       selected={parsedDate}
       onChange={(date) => {
         onChange(date ? date.toISOString() : null);

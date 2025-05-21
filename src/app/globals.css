@@ -976,6 +976,11 @@ button:active {
 
 div:has(> .react-datepicker__input-container) {
   width: 100%;
+  &:is([disabled]) {
+    button {
+      border-color: hsl(var(--foreground) / 0.3);
+    }
+  }
 }
 
 .react-datepicker {
@@ -1445,6 +1450,9 @@ div:has(> div.react-datepicker__input-container) {
   }
   & .filepond--panel-root {
     background-color: transparent;
+  }
+  &:has(div[data-disabled]) {
+    border-color: hsl(var(--foreground) / 0.3);
   }
 }
 

@@ -49,6 +49,7 @@ type FilePondInputProps = {
   maxFileSize?: string;
   maxFiles?: number;
   purpose: "docs" | "images" | "both";
+  disabled?: boolean;
 };
 
 export function FilePondInput({
@@ -58,6 +59,7 @@ export function FilePondInput({
   maxFileSize = "1MB",
   maxFiles = 5,
   purpose,
+  disabled,
 }: FilePondInputProps) {
   //   const UserAcceptedFileTypes = purpose === "docs" ? DOC_TYPES : ["image/*"];
   const docsOnly = purpose === "docs";
@@ -70,6 +72,7 @@ export function FilePondInput({
       : ["image/*"];
   return (
     <FilePond
+      disabled={disabled}
       allowMultiple
       //   allowFileMetadata
       //   fileMetadataObject={{ customName: "sinfully named file" }}

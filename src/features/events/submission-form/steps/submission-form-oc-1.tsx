@@ -45,6 +45,7 @@ interface SubmissionFormOC1Props {
   canNameEvent: boolean;
   handleCheckSchema: () => void;
   formType: number;
+  pastEvent: boolean;
 }
 
 const SubmissionFormOC1 = ({
@@ -56,6 +57,7 @@ const SubmissionFormOC1 = ({
   // categoryEvent,
 
   handleCheckSchema,
+  pastEvent,
 }: SubmissionFormOC1Props) => {
   const {
     control,
@@ -168,6 +170,7 @@ const SubmissionFormOC1 = ({
             render={({ field }) => {
               return (
                 <Select
+                  disabled={pastEvent}
                   onValueChange={(value: CallFormat) => {
                     field.onChange(value);
                   }}
@@ -223,6 +226,7 @@ const SubmissionFormOC1 = ({
                 render={({ field }) => {
                   return (
                     <Select
+                      disabled={pastEvent}
                       onValueChange={(value: EligibilityType) => {
                         field.onChange(value);
                       }}
@@ -273,6 +277,7 @@ const SubmissionFormOC1 = ({
                 control={control}
                 render={({ field }) => (
                   <SearchMappedMultiSelect<Country>
+                    disabled={pastEvent}
                     values={field.value ?? []}
                     onChange={field.onChange}
                     data={sortedGroupedCountries}
@@ -311,6 +316,7 @@ const SubmissionFormOC1 = ({
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
+                    readOnly={pastEvent}
                     value={field.value ?? ""}
                     onChange={field.onChange}
                     // onChange={(val) => {
@@ -339,6 +345,7 @@ const SubmissionFormOC1 = ({
               </Label>
 
               <Select
+                disabled={pastEvent}
                 onValueChange={(value: "true" | "false" | "") => {
                   setHasAppFee(value);
                 }}
@@ -398,7 +405,7 @@ const SubmissionFormOC1 = ({
                       }
                       getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
                       getItemValue={(c) => c.code}
-                      disabled={!showAppFeeInput}
+                      disabled={!showAppFeeInput || pastEvent}
                     />
                   )}
                 />
@@ -408,7 +415,7 @@ const SubmissionFormOC1 = ({
                   render={({ field }) => (
                     <DebouncedControllerInput
                       type="number"
-                      disabled={!showAppFeeInput}
+                      disabled={!showAppFeeInput || pastEvent}
                       // field={field}
                       field={{
                         ...field,
@@ -464,6 +471,7 @@ const SubmissionFormOC1 = ({
                     control={control}
                     render={({ field }) => (
                       <OcCustomDatePicker
+                        disabled={pastEvent}
                         value={field.value}
                         onChange={field.onChange}
                         pickerType="start"
@@ -484,6 +492,7 @@ const SubmissionFormOC1 = ({
                     control={control}
                     render={({ field }) => (
                       <OcCustomDatePicker
+                        disabled={pastEvent}
                         value={field.value}
                         onChange={field.onChange}
                         pickerType="end"
@@ -515,6 +524,7 @@ const SubmissionFormOC1 = ({
                   control={control}
                   render={({ field }) => (
                     <RichTextEditor
+                      readOnly={pastEvent}
                       value={field.value ?? ""}
                       onChange={field.onChange}
                       placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
@@ -550,6 +560,7 @@ const SubmissionFormOC1 = ({
                       control={control}
                       render={({ field }) => (
                         <DebouncedControllerInput
+                          disabled={pastEvent}
                           field={field}
                           placeholder="Link to external application form"
                           className={cn(
@@ -591,6 +602,7 @@ const SubmissionFormOC1 = ({
                           onChange={field.onChange}
                           purpose="both"
                           maxFileSize="5MB"
+                          disabled={pastEvent}
                         />
                       )}
                     />
@@ -614,6 +626,7 @@ const SubmissionFormOC1 = ({
                   <ExternalLinksInput
                     name="openCall.requirements.links"
                     handleCheckSchema={handleCheckSchema}
+                    disabled={pastEvent}
                   />
                 </>
               )}

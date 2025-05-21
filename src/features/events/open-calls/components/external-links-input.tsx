@@ -16,11 +16,13 @@ import { BiExpandVertical } from "react-icons/bi";
 interface ExternalLinksInputProps {
   name: `openCall.requirements.links`;
   handleCheckSchema?: () => void;
+  disabled?: boolean;
 }
 
 export const ExternalLinksInput = ({
   name,
   handleCheckSchema,
+  disabled,
 }: ExternalLinksInputProps) => {
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -83,7 +85,10 @@ export const ExternalLinksInput = ({
     <>
       <div
         ref={containerRef}
-        className="mx-auto flex min-h-12 w-full max-w-[74dvw] cursor-pointer flex-col justify-center gap-2 rounded border border-foreground px-4 py-2 lg:min-w-[300px] lg:max-w-md"
+        className={cn(
+          "mx-auto flex min-h-12 w-full max-w-[74dvw] cursor-pointer flex-col justify-center gap-2 rounded border border-foreground px-4 py-2 lg:min-w-[300px] lg:max-w-md",
+          disabled && "pointer-events-none border-foreground/30 opacity-50",
+        )}
       >
         {fields.length > 0 ? (
           <Collapsible open={isParentOpen} onOpenChange={setIsParentOpen}>

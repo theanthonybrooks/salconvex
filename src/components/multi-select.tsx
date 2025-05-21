@@ -267,6 +267,9 @@ export const MultiSelect = React.forwardRef<
     //     document.body.style.paddingRight = originalPaddingRight;
     //   };
     // }, [isPopoverOpen]);
+    const disabledClass = disabled
+      ? "pointer-events-none opacity-50 border-foreground/50"
+      : "";
 
     return (
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal>
@@ -300,6 +303,7 @@ export const MultiSelect = React.forwardRef<
                             isAnimating ? "animate-bounce" : "",
                             multiSelectVariants({ variant }),
                             badgeClassName,
+                            disabledClass,
                           )}
                           style={{
                             animationDuration: `${animation}s`,
@@ -332,13 +336,17 @@ export const MultiSelect = React.forwardRef<
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/40",
                         isAnimating ? "animate-bounce" : "",
                         badgeClassName,
+                        disabledClass,
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
                       {`+ ${selectedValues.length - maxCount} more`}
 
                       <XCircle
-                        className="ml-2 size-4 cursor-pointer"
+                        className={cn(
+                          "ml-2 size-4 cursor-pointer",
+                          disabledClass,
+                        )}
                         onClick={(event) => {
                           event.stopPropagation();
                           clearExtraOptions();
@@ -353,6 +361,7 @@ export const MultiSelect = React.forwardRef<
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/50",
                         isAnimating ? "animate-bounce" : "",
                         badgeClassName,
+                        disabledClass,
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >

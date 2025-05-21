@@ -96,7 +96,7 @@ export const SubmissionFormRecapDesktop = ({
                 </tr>
               )}
 
-              {eventData.dates.eventFormat === "ongoing" && (
+              {eventData.dates?.eventFormat === "ongoing" && (
                 <tr>
                   <th className="pr-4 align-top font-medium">
                     Event Dates Format
@@ -113,13 +113,13 @@ export const SubmissionFormRecapDesktop = ({
                       dates: {
                         ...eventData.dates,
                         eventFormat:
-                          eventData.dates.eventFormat === ""
+                          eventData.dates?.eventFormat === ""
                             ? undefined
-                            : eventData.dates.eventFormat,
+                            : eventData.dates?.eventFormat,
                         prodFormat:
-                          eventData.dates.prodFormat === ""
+                          eventData.dates?.prodFormat === ""
                             ? undefined
-                            : eventData.dates.prodFormat,
+                            : eventData.dates?.prodFormat,
                       },
                     }}
                     format="desktop"
@@ -144,9 +144,24 @@ export const SubmissionFormRecapDesktop = ({
                     Production Dates
                   </th>
                   <td>
-                    {eventData.dates?.prodDates
-                      ?.map((d) => d.start)
-                      .join(", ") || "-"}
+                    <EventDates
+                      event={{
+                        dates: {
+                          ...eventData.dates,
+                          eventFormat:
+                            eventData.dates?.eventFormat === ""
+                              ? undefined
+                              : eventData.dates?.eventFormat,
+                          prodFormat:
+                            eventData.dates?.prodFormat === ""
+                              ? undefined
+                              : eventData.dates?.prodFormat,
+                        },
+                      }}
+                      format="desktop"
+                      limit={0}
+                      type="production"
+                    />
                   </td>
                 </tr>
               )}
