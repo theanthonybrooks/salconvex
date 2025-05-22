@@ -570,11 +570,12 @@ const SubmissionFormOC2 = ({
                       .filter(([, isSelected]) => isSelected)
                       .map(([key]) => key)}
                     shortResults={isMobile}
-                    placeholder={
-                      isMobile
-                        ? `Select what's provided${noBudget ? " (min 1)" : ""}`
-                        : `Select what's provided${noBudget ? " (minimum 1 category)" : ""}`
-                    }
+                    placeholder="Select what's provided"
+                    // placeholder={
+                    //   isMobile
+                    //     ? `Select what's provided${noBudget ? " (min 1)" : ""}`
+                    //     : `Select what's provided${noBudget ? " (minimum 1 category)" : ""}`
+                    // }
                     variant="basic"
                     maxCount={1}
                     height={10}

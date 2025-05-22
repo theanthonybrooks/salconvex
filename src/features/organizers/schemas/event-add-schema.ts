@@ -567,7 +567,6 @@ export const openCallStep1Schema = z
   .superRefine((data, ctx) => {
     if (data.openCall?.eligibility?.type.trim()) {
       const trimmed = data.openCall?.eligibility?.type.trim();
-      const trimmedDetails = data.openCall?.eligibility?.details?.trim() ?? "";
       if (
         trimmed === "National" &&
         data.openCall?.eligibility?.whom?.length === 0
@@ -580,7 +579,7 @@ export const openCallStep1Schema = z
       }
       if (
         (trimmed === "Other" || trimmed === "Regional/Local") &&
-        trimmedDetails?.length < 22
+        (data.openCall?.eligibility?.details?.trim() ?? "")?.length < 22
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -616,7 +615,7 @@ export const openCallStep2Schema = z
     event: eventBase,
   })
   .superRefine((data, ctx) => {
-    const allInclusive = data.openCall.compensation.budget.allInclusive;
+    // const allInclusive = data.openCall.compensation.budget.allInclusive;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
     const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
@@ -643,7 +642,7 @@ export const openCallStep2Schema = z
         path: ["openCall", "compensation", "budget", "max"],
       });
     }
-    if (
+    /*   if (
       !allInclusive &&
       Object.keys(data.openCall.compensation.categories).length === 0
     ) {
@@ -653,7 +652,7 @@ export const openCallStep2Schema = z
           "Open calls without all-inclusive budgets must have at least one category",
         path: ["openCall", "compensation", "budget", "allInclusive"],
       });
-    }
+    }*/
   });
 
 export const eventWithOCSchema = z
