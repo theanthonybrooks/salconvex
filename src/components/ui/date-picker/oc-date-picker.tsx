@@ -23,6 +23,7 @@ export interface OcCustomDatePickerProps {
   ocEnd?: string | null;
   orgTimezone?: string;
   disabled?: boolean;
+  showTimeZone?: boolean;
 }
 
 interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
@@ -31,11 +32,21 @@ interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
   pickerType?: OcPickerType;
   ocEnd?: string | null;
   orgTimezone?: string;
+  showTimeZone?: boolean;
 }
 
 const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
   (
-    { value, onClick, className, pickerType, ocEnd, orgTimezone, ...rest },
+    {
+      value,
+      onClick,
+      className,
+      pickerType,
+      ocEnd,
+      orgTimezone,
+      showTimeZone,
+      ...rest
+    },
     ref,
   ) => {
     const endDate = ocEnd ?? new Date().toISOString();
@@ -67,7 +78,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
       >
         <span className="flex items-center gap-2">
           {formattedValue || display}
-          {orgTimezone && (
+          {orgTimezone && showTimeZone && (
             // <p className="text-sm xl:hidden">
             <p className="text-sm">({getTimezoneFormat(endDate, timeZone)})</p>
           )}
@@ -91,6 +102,7 @@ export const OcCustomDatePicker = ({
   pickerType,
   isAdmin,
   ocEnd,
+  showTimeZone = true,
   orgTimezone,
   disabled,
 }: OcCustomDatePickerProps) => {
@@ -121,8 +133,17 @@ export const OcCustomDatePicker = ({
       selected={parsedDate}
       onChange={(date) => {
         if (!date || !orgTimezone) return onChange(null);
-        const zonedDate = fromZonedTime(date, orgTimezone);
-        onChange(zonedDate.toISOString());
+        if (pickerType === "end") {
+          const zonedDate = fromZonedTime(date, orgTimezone);
+          console.log(zonedDate);
+          onChange(zonedDate.toISOString());
+        } else if (pickerType === "start") {
+          const cleanDate = new Date(date);
+          cleanDate.setHours(0, 0, 0, 0);
+          const zonedDate = fromZonedTime(cleanDate, orgTimezone);
+          console.log(zonedDate);
+          onChange(zonedDate.toISOString());
+        }
       }}
       dateFormat={dateFormat}
       openToDate={openToDate}
@@ -148,6 +169,7 @@ export const OcCustomDatePicker = ({
           pickerType={pickerType}
           ocEnd={ocEnd}
           orgTimezone={orgTimezone}
+          showTimeZone={showTimeZone}
         />
       }
       className={cn(className, "rounded")}

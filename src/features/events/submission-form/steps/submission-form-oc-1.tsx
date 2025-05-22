@@ -490,6 +490,8 @@ const SubmissionFormOC1 = ({
                         pickerType="start"
                         className="hansel min-h-12"
                         placeholder="Start Date"
+                        orgTimezone={orgTimezone}
+                        showTimeZone={false}
                       />
                     )}
                   />
