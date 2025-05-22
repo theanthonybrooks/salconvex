@@ -52,18 +52,18 @@ export const landingPageNavbarMenuLinksTheList: {
     description: "Open calls ending this week.",
     sub: ["all"],
   },
-  {
-    title: "World Map",
-    href: "/map",
-    description: "Map of all street art fests, mural projects, etc.",
-    sub: ["all"],
-  },
-  {
-    title: "Calendar",
-    href: "/calendar",
-    description: "View upcoming events.",
-    sub: ["all"],
-  },
+  // {
+  //   title: "World Map",
+  //   href: "/map",
+  //   description: "Map of all street art fests, mural projects, etc.",
+  //   sub: ["all"],
+  // },
+  // {
+  //   title: "Calendar",
+  //   href: "/calendar",
+  //   description: "View upcoming events.",
+  //   sub: ["all"],
+  // },
   // {
   //   title: "The Archive",
   //   href: "/archive",
@@ -76,12 +76,6 @@ export const landingPageNavbarMenuLinksTheList: {
   //   description: "The price of job security.",
   //   sub: ["all"],
   // },
-  {
-    title: "Smog",
-    href: "/smog",
-    description: "The dragon that ate my family.",
-    sub: ["admin"],
-  },
 ];
 
 export const landingPageNavbarLinks: {

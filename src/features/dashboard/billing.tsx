@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAction, useQuery } from "convex/react";
 import { format } from "date-fns";
 
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
 import { CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
@@ -44,6 +45,8 @@ export default function BillingPage() {
 
   const handleManageSubscription = async () => {
     let url: string | undefined;
+    const newTab = window.open("about:blank");
+
     if (!subscription?.customerId) {
       toast.error(
         "No subscription found. Please contact support if this is incorrect.",
@@ -59,7 +62,6 @@ export default function BillingPage() {
         // window.location.href = result.url;
         url = result.url;
       }
-      const newTab = window.open("about:blank");
       if (!newTab) {
         toast.error(
           "Stripe redirect blocked. Please enable popups for this site.",
@@ -68,9 +70,14 @@ export default function BillingPage() {
         return;
       }
       if (url) {
+        newTab.document.write(getExternalRedirectHtml(url, 1));
+        newTab.document.close();
         newTab.location.href = url;
       }
     } catch (err: unknown) {
+      if (!newTab?.closed) {
+        newTab?.document.close();
+      }
       if (err instanceof ConvexError) {
         toast.error(
           typeof err.data === "string" &&

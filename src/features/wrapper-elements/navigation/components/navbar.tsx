@@ -39,6 +39,7 @@ export default function NavBar({
   subStatus,
 }: // userPref,
 NavBarProps) {
+  const isAdmin = user?.role?.includes("admin");
   const pathname = usePathname();
   const { scrollY } = useScroll();
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -237,42 +238,44 @@ NavBarProps) {
               >
                 <NavigationMenu delayDuration={Infinity}>
                   <NavigationMenuList className="gap-2">
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger
-                        isCurrent={isActiveResources}
-                        className={cn(
-                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                          isActiveResources &&
-                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
-                        )}
-                        onPointerMove={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}
-                      >
-                        Resources
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent
-                        onPointerEnter={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}
-                      >
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
-                          {filteredNavbarMenuResources.map((component) => (
-                            <ListItem
-                              key={component.title}
-                              title={component.title}
-                              href={component.href}
-                              className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                component.href.includes(currentPage) &&
-                                  fullPagePath === component.href &&
-                                  "bg-background",
-                              )}
-                            >
-                              {component.description}
-                            </ListItem>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
+                    {isAdmin && (
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger
+                          isCurrent={isActiveResources}
+                          className={cn(
+                            "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                            isActiveResources &&
+                              "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                          )}
+                          onPointerMove={(event) => event.preventDefault()}
+                          onPointerLeave={(event) => event.preventDefault()}
+                        >
+                          Resources
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent
+                          onPointerEnter={(event) => event.preventDefault()}
+                          onPointerLeave={(event) => event.preventDefault()}
+                        >
+                          <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
+                            {filteredNavbarMenuResources.map((component) => (
+                              <ListItem
+                                key={component.title}
+                                title={component.title}
+                                href={component.href}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  component.href.includes(currentPage) &&
+                                    fullPagePath === component.href &&
+                                    "bg-background",
+                                )}
+                              >
+                                {component.description}
+                              </ListItem>
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    )}
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}

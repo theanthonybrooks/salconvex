@@ -27,6 +27,8 @@ interface Props {
   isPublic?: boolean;
   type?: "docs" | "images";
   className?: string;
+  disabled?: boolean;
+  recap?: boolean;
 }
 
 export function hasId<T extends { id?: unknown }>(
@@ -44,6 +46,8 @@ export function OpenCallFilesTable({
   isPublic = false,
   type,
   className,
+  disabled,
+  recap,
 }: Props) {
   const deleteFile = useMutation(api.uploads.files.deleteFile);
   const editFileName = useMutation(api.uploads.files.editFileName);
@@ -80,9 +84,11 @@ export function OpenCallFilesTable({
     <div className={cn("mt-2 space-y-2", className)}>
       {!isPublic && (
         <span className="flex items-center gap-2">
-          <Label className="sm underline underline-offset-2">
-            Existing Files:
-          </Label>
+          {!recap && (
+            <Label className="sm underline underline-offset-2">
+              Existing Files:
+            </Label>
+          )}
           <p className="text-xs italic text-foreground/60">
             Click on a file to edit its name
           </p>
@@ -103,7 +109,7 @@ export function OpenCallFilesTable({
                 Archive
               </th>
             )}
-            {!mobileEditing && !isPublic && (
+            {!mobileEditing && !isPublic && !disabled && (
               <th className={cn("w-10 px-2 py-1 text-center")}>
                 {!isMobile && "Delete"}
               </th>
@@ -196,7 +202,7 @@ export function OpenCallFilesTable({
                     />
                   </td>
                 )}
-                {!mobileEditing && !isPublic && (
+                {!mobileEditing && !isPublic && !disabled && (
                   <td className="px-2 py-2 text-center">
                     <X
                       className={cn(

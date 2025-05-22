@@ -193,6 +193,7 @@ const organizationSchema = z.object({
   about: z.optional(z.string()),
   contact: contactSchema.optional(),
   links: linksSchemaStrict.optional(),
+  hadFreeCall: z.optional(z.boolean()),
 });
 
 export const eventBase = z.object({

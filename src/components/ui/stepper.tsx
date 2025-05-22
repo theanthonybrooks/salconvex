@@ -66,7 +66,7 @@ export default function HorizontalLinearStepper({
   isAdmin,
 }: StepperProps) {
   // console.log(errorMsg);
-
+  console.log(disabled);
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({

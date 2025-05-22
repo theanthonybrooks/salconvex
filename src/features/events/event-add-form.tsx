@@ -136,6 +136,7 @@ export const EventOCForm = ({
   isEligibleForFree,
   planKey,
 }: EventOCFormProps) => {
+  const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
   const formType = Number(planKey);
   const eventOnly = formType === 1;
@@ -214,6 +215,8 @@ export const EventOCForm = ({
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // #endregion
   // #region ------------- State --------------
+  const [acceptedTerms, setAcceptedTerms] = useState(isAdmin);
+  const [infoVerified, setInfoVerified] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [furthestStep, setFurthestStep] = useState(0);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
@@ -285,6 +288,7 @@ export const EventOCForm = ({
   // const eventDatesWatch = watch("event.dates");
   // #endregion
   // #region ------------- Variables --------------
+  const userAcceptedTerms = acceptedTerms && infoVerified;
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
@@ -411,6 +415,7 @@ export const EventOCForm = ({
   const alreadyApprovedEvent = !!eventData?.approvedBy;
   const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
 
+  console.log(finalStep, acceptedTerms, isAdmin);
   // #endregion
   // #endregion
   //
@@ -466,17 +471,16 @@ export const EventOCForm = ({
         });
         url = result.url;
       }
-
-      toast.success(
-        paidCall && !alreadyPaid
-          ? "Successfully submitted project! Forwarding to Stripe..."
-          : alreadyPaid || alreadyApproved
+      if (!paidCall) {
+        toast.success(
+          alreadyPaid || alreadyApproved
             ? "Successfully updated project!"
             : "Successfully submitted event!",
-        {
-          onClick: () => toast.dismiss(),
-        },
-      );
+          {
+            onClick: () => toast.dismiss(),
+          },
+        );
+      }
       // console.log("submitting: ", paidCall, isAdmin);
       if (paidCall && !alreadyPaid && !isAdmin) {
         if (!newTab) {
@@ -1321,7 +1325,7 @@ export const EventOCForm = ({
 
             active: eventData.active,
 
-            finalStep: true,
+            finalStep,
             publish,
             orgId: orgData._id as Id<"organizations">,
           });
@@ -1379,7 +1383,7 @@ export const EventOCForm = ({
               },
               documents: undefined,
               state: publish ? "published" : "submitted",
-              finalStep: true,
+              finalStep,
               approved: publish,
               paid: formType === 3 && !alreadyPaid ? false : true,
             });
@@ -1396,6 +1400,7 @@ export const EventOCForm = ({
       }
     },
     [
+      finalStep,
       alreadyPaid,
       formType,
       eventOnly,
@@ -1476,6 +1481,14 @@ export const EventOCForm = ({
   // #endregion
 
   // #region -------------UseEffects --------------
+
+  useEffect(() => {
+    if (!alreadyPaid) return;
+    if (alreadyPaid) {
+      setAcceptedTerms(true);
+      setInfoVerified(true);
+    }
+  }, [alreadyPaid]);
 
   useEffect(() => {
     if (hasUserEditedForm) {
@@ -1893,7 +1906,7 @@ export const EventOCForm = ({
         onSave={() => handleSave(true)}
         onPublish={() => handleSave(true, true)}
         lastSaved={lastSavedDate}
-        disabled={!isValid || pending}
+        disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
         cancelButton={
           <DialogClose asChild>
@@ -2011,7 +2024,17 @@ export const EventOCForm = ({
                 {/* <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
                   {JSON.stringify(getValues(), null, 2)}
                 </pre> */}
-                <SubmissionFormRecapDesktop formType={formType} />
+                <SubmissionFormRecapDesktop
+                  formType={formType}
+                  isAdmin={isAdmin}
+                  setAcceptedTerms={setAcceptedTerms}
+                  setInfoVerified={setInfoVerified}
+                  infoVerified={infoVerified}
+                  acceptedTerms={acceptedTerms}
+                  submissionCost={submissionCost?.price}
+                  isEligibleForFree={isEligibleForFree}
+                  alreadyPaid={alreadyPaid}
+                />
               </>
             )}
 

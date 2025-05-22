@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/carousel";
 import { Link } from "@/components/ui/custom-link";
 import Pricing from "@/features/homepage/pricing";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
+import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -26,6 +28,9 @@ import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
 
 export default function Home() {
   const searchParams = useSearchParams();
+  const { preloadedSubStatus } = useConvexPreload();
+  const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const hasActiveSubscription = subStatus?.hasActiveSubscription;
 
   const [currentSlide, setCurrentSlide] = useState(1);
   // const { scrollY } = useScroll()
@@ -209,25 +214,30 @@ export default function Home() {
         </Popover>
       </motion.div>
 
-      <div className="mx-auto mt-10 flex w-full flex-col items-center justify-center gap-5 text-balance rounded-2xl border-1.5 border-foreground bg-white/60 px-8 py-20 text-center text-base sm:max-w-[60vw]">
-        <h2 className="w-fit text-center font-tanker text-[2.6rem] leading-10">
-          Oh hello!
-        </h2>
-        <Image
-          src="/hello.gif"
-          alt="Hello there"
-          width={300}
-          height={300}
-          className="mx-auto my-4 max-w-[70vw] rounded-full border-2"
-        />
-        If you&apos;ve found this page, welcome! You&apos;re a bit early as
-        it&apos;s still in development and will soon be in beta for the public.
-        I&apos;ll post on IG and announce the release soon 😉. Please don&apos;t
-        try to sign up. It&apos;s in testing and not available. Any created
-        accounts in the meantime will be deleted as I&apos;m doing a lot of
-        changes in the database while getting everything connected.
-      </div>
-      <Pricing />
+      {!hasActiveSubscription && (
+        <>
+          <div className="mx-auto mt-10 flex w-full flex-col items-center justify-center gap-5 text-balance rounded-2xl border-1.5 border-foreground bg-white/60 px-8 py-20 text-center text-base sm:max-w-[60vw]">
+            <h2 className="w-fit text-center font-tanker text-[2.6rem] leading-10">
+              Oh hello!
+            </h2>
+            <Image
+              src="/hello.gif"
+              alt="Hello there"
+              width={300}
+              height={300}
+              className="mx-auto my-4 max-w-[70vw] rounded-full border-2"
+            />
+            If you&apos;ve found this page, welcome! You&apos;re a bit early as
+            it&apos;s still in development and will soon be in beta for the
+            public. I&apos;ll post on IG and announce the release soon 😉.
+            Please don&apos;t try to sign up. It&apos;s in testing and not
+            available. Any created accounts in the meantime will be deleted as
+            I&apos;m doing a lot of changes in the database while getting
+            everything connected.
+          </div>
+          <Pricing />
+        </>
+      )}
     </>
   );
 }

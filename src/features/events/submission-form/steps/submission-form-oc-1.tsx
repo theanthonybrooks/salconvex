@@ -103,11 +103,14 @@ const SubmissionFormOC1 = ({
   // #region -------------- UseEffect ---------------
 
   useEffect(() => {
+    if (!callType || fixedType) return;
     if (!fixedType) {
-      setValue("openCall.basicInfo.dates.ocEnd", undefined);
-      setValue("openCall.basicInfo.dates.ocStart", undefined);
+      setValue("openCall.basicInfo.dates.ocEnd", "");
+      setValue("openCall.basicInfo.dates.ocStart", "");
+      setValue("openCall.basicInfo.appFee", 0);
+      // setHasAppFee("false")
     }
-  }, [fixedType, setValue]);
+  }, [fixedType, setValue, callType]);
 
   useEffect(() => {
     const formValue = hasAppFee?.trim();
@@ -614,6 +617,7 @@ const SubmissionFormOC1 = ({
                           eventId={eventId as Id<"events">}
                           isDraft={isDraft}
                           isAdmin={isAdmin}
+                          disabled={pastEvent}
                         />
                       )}
                   </div>

@@ -41,24 +41,28 @@ const contactLabel = (type: string, value: string) => {
   }
 };
 
+import { cn } from "@/lib/utils";
 import { Organizer } from "@/types/organizer";
 import React from "react";
 
+export type OrgContactProps = Pick<Organizer, "contact" | "links">;
 interface OrganizerMainContactProps {
-  organizer: Organizer;
+  organizer: OrgContactProps;
+  linkOnly?: boolean;
 }
 
 export const OrganizerMainContact = ({
   organizer,
+  linkOnly = false,
 }: OrganizerMainContactProps) => {
-  const primaryContact = organizer.contact.primaryContact;
-  const value = organizer.links[primaryContact];
+  const primaryContact = organizer.contact?.primaryContact;
+  const value = primaryContact && organizer.links[primaryContact];
 
-  if (!value) return null;
+  if (!primaryContact || !value) return null;
   return (
     <span>
-      <p className="text-sm font-semibold">Main Contact:</p>
-      <div className="flex items-center gap-x-2 pt-2">
+      {!linkOnly && <p className="text-sm font-semibold">Main Contact:</p>}{" "}
+      <div className={cn("flex items-center gap-x-2 pt-2", linkOnly && "pt-0")}>
         {contactIcons[primaryContact] ?? <Globe />}
         <a
           href={contactHref(primaryContact, value)}

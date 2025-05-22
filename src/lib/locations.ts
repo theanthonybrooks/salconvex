@@ -246,23 +246,25 @@ export async function fetchMapboxSuggestionsFull(
   return data.features as MapboxSuggestion[];
 }
 
+type OrgLocationProps = Pick<Organizer, "location">;
+
 export function getOrganizerLocationString(
-  organizer: Organizer,
+  organizer: OrgLocationProps,
   abbreviated: boolean,
 ): string {
   const { location } = organizer;
 
   const parts = [
-    !abbreviated && location.locale && `${location.locale}`,
-    location.city && `${location.city}`,
-    location.city && location.stateAbbr && `${location.stateAbbr}`,
-    !location.city && location.state && `${location.state}`,
+    !abbreviated && location?.locale && `${location.locale}`,
+    location?.city && `${location.city}`,
+    location?.city && location?.stateAbbr && `${location.stateAbbr}`,
+    !location?.city && location?.state && `${location.state}`,
 
-    location.countryAbbr === "UK" ||
-    location.countryAbbr === "USA" ||
-    location.country === "United States"
-      ? location.countryAbbr
-      : location.country,
+    location?.countryAbbr === "UK" ||
+    location?.countryAbbr === "USA" ||
+    location?.country === "United States"
+      ? location?.countryAbbr
+      : location?.country,
   ];
 
   return parts.filter(Boolean).join(", ");

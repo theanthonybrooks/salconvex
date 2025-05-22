@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import CharacterCount from "@tiptap/extension-character-count";
 import Link from "@tiptap/extension-link";
@@ -736,8 +737,9 @@ export const RichTextEditor = ({
                 className={cn(
                   "rich-text__preview-wrapper prose max-w-none truncate text-foreground",
                 )}
-                dangerouslySetInnerHTML={{ __html: value }}
-              />
+              >
+                <RichTextDisplay html={value} />
+              </div>
             ) : (
               <span className="italic text-gray-400">
                 <p>{placeholder}</p>
@@ -751,7 +753,7 @@ export const RichTextEditor = ({
               View/Edit Full Text
             </div>
           )}
-          <div className="absolute bottom-1 right-1 p-1 text-right text-xs text-foreground/60">
+          <div className="absolute bottom-1 right-1 rounded bg-white p-1 text-right text-xs text-foreground/60">
             {editor.storage.characterCount.characters()}/{charLimit}
           </div>
         </div>

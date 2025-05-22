@@ -220,7 +220,18 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 <AccordionItem value="about">
                   <AccordionTrigger title="About:" className="pb-2" />
                   <AccordionContent className="text-sm">
-                    <RichTextDisplay html={event.about} />
+                    <RichTextDisplay
+                      html={event.about}
+                      className="line-clamp-5"
+                    />
+                    {event.about?.length > 200 && (
+                      <button
+                        className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                        onClick={() => setActiveTab("event")}
+                      >
+                        Read more
+                      </button>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

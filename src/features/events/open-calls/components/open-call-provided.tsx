@@ -25,21 +25,21 @@ interface OpenCallProvidedPreviewProps extends OpenCallProvidedProps {
 
 const getDisplayValue = (
   val?: number | boolean,
-  allInclusive = false,
-  noBudgetInfo = false,
+  allInclusive?: boolean,
+  noBudgetInfo?: boolean,
   currency?: string,
 ) => {
-  if (typeof val === "number" && val && !allInclusive)
+  if (typeof val === "number" && val)
     return formatCompCurrency(val, currency ?? "USD");
-  if (typeof val === "boolean" && val && !allInclusive) return "Provided";
+  if (typeof val === "boolean" && val) return "Provided";
   return (
     <span
       className={cn(
         "italic text-red-500",
-        noBudgetInfo && "text-muted-foreground",
+        // noBudgetInfo && "text-muted-foreground",
       )}
     >
-      {!allInclusive ? "(not provided)" : "-"}
+      (not provided)
     </span>
   );
 };

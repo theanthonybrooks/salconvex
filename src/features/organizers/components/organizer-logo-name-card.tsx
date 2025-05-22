@@ -5,8 +5,10 @@ import { Organizer } from "@/types/organizer";
 import Image from "next/image";
 import React from "react";
 
+type MinimalOrgCardProps = Pick<Organizer, "logo" | "name" | "location">;
+
 interface OrganizerCardProps {
-  organizer: Organizer;
+  organizer: MinimalOrgCardProps;
 }
 
 interface OrganizerCardLogoNameProps extends OrganizerCardProps {
@@ -68,7 +70,7 @@ export const OrganizerCardLogoName = ({
       )}
     >
       <Image
-        src={organizer.logo}
+        src={organizer?.logo || "/1.jpg"}
         alt="Event Logo"
         width={60}
         height={60}

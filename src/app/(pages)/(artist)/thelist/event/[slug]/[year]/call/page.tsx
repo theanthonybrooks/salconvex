@@ -25,8 +25,10 @@ const OpenCallDetail = () => {
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
   const { data, isError } = useQueryWithStatus(
-    api.events.event.getEventWithAppDetails,
-    slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
+    api.events.event.getEventWithOCDetails,
+    slugValue
+      ? { slug: slugValue, edition: Number(year), source: "ocpage" }
+      : "skip",
   );
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);

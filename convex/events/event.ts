@@ -626,13 +626,16 @@ export const getEventWithDetails = query({
   },
 });
 
-export const getEventWithAppDetails = query({
+export const getEventWithOCDetails = query({
   args: {
     slug: v.string(),
     edition: v.number(),
+    source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const source = args.source ?? "eventpage";
     const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
     let application = null;
 
     const event = await ctx.db
@@ -647,6 +650,7 @@ export const getEventWithAppDetails = query({
       .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
       .filter((q) => q.eq(q.field("basicInfo.dates.edition"), args.edition))
+      .filter((q) => q.eq(q.field("state"), "published"))
       .first();
 
     const organizer = await ctx.db.get(event.mainOrgId);
@@ -660,7 +664,8 @@ export const getEventWithAppDetails = query({
     }
 
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
-
+    if (source === "ocpage" && !openCall)
+      throw new ConvexError("Open Call not found");
     if (!openCall) return null;
 
     return {

@@ -94,6 +94,8 @@ const SubmissionFormOC2 = ({
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
+  console.log(openCall);
+
   // const noBudget
 
   // const hasRate = openCall?.compensation?.budget?.unit;
@@ -194,11 +196,15 @@ const SubmissionFormOC2 = ({
       setValue("openCall.compensation.budget.max", 0);
       setValue("openCall.compensation.budget.rate", 0);
       setValue("openCall.compensation.budget.allInclusive", false);
+      setValue(
+        "openCall.compensation.budget.currency",
+        orgCurrency?.code ?? "USD",
+      );
       // setValue("openCall.compensation.budget.currency", "USD");
       // setValue("openCall.compensation.budget.allInclusive", false);
       // setValue("openCall.compensation.budget.unit", "");
     }
-  }, [hasBudgetValues, hasBudget, setValue]);
+  }, [hasBudgetValues, hasBudget, setValue, orgCurrency]);
 
   // #endregion
 
