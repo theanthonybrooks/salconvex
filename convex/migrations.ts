@@ -118,23 +118,6 @@ export const addHasOpenCall = migrations.define({
   },
 });
 
-// export const migrateUserEmailPw = migrations.define({
-//   table: "users",
-//   migrateOne: async (ctx, doc) => {
-//     const user = doc as Doc<"users">;
-//     if (!user.email) return;
-//     const userId = user._id;
-//     const password = await ctx.db.get(userId);
-//     if (!password) return;
-//     await ctx.db.insert("userPW", {
-//       userId: userId,
-//       email: user.email,
-//       password: password.password,
-//       lastChanged: user.updatedAt ?? user.createdAt,
-//     });
-//   },
-// });
-// export const runPW = migrations.runner(internal.migrations.migrateUserEmailPw);
 export const runAHOC = migrations.runner(internal.migrations.addHasOpenCall);
 
 export const runOrgSlugs = migrations.runner(

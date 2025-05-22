@@ -100,7 +100,8 @@ export async function findUserByEmailPW(ctx: MutationCtx, email: string) {
     .withIndex("by_email", (q) => q.eq("email", email))
     .unique();
 
-  if (!userPW) throw new ConvexError("User not found");
+  if (!userPW) return null;
+  // if (!userPW) throw new ConvexError("User not found");
 
   const user = await ctx.db
     .query("users")

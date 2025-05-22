@@ -72,7 +72,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         console.log(formattedValue);
       }
     }
-    console.log(formattedValue);
+    console.log(value);
     return (
       <Button
         ref={ref}

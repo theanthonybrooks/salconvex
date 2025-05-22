@@ -72,8 +72,6 @@ const customUserSchema = {
   emailVerificationTime: v.optional(v.number()),
   createdAt: v.number(),
   updatedAt: v.optional(v.number()),
-  password: v.optional(v.string()),
-  passwordChangedBy: v.optional(v.string()),
   firstName: v.string(),
   lastName: v.string(),
   accountType: v.array(v.string()),
