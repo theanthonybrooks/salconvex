@@ -324,6 +324,9 @@ export default function HorizontalLinearStepper({
                 className={cn(
                   "flex min-w-32 items-center gap-2",
                   finalStep && "w-full sm:w-auto",
+                  finalStep &&
+                    !(disabled || pending) &&
+                    "translate-x-[3px] translate-y-[-3px] shadow-slg",
                 )}
                 disabled={disabled || pending}
                 onClick={finalStep ? onFinalSubmit : (onNextStep ?? handleNext)}
