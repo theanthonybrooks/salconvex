@@ -110,6 +110,9 @@ export const OcCustomDatePicker = ({
     pickerType === "start" ? "MMM d, yyyy" : "MMM d, yyyy @ h:mm a";
 
   //   console.log(parsedDate, value);
+  const injectedTime = parsedDate
+    ? setHours(setMinutes(setSeconds(new Date(parsedDate), 59), 59), 23)
+    : undefined;
 
   return (
     <DatePicker
@@ -122,7 +125,8 @@ export const OcCustomDatePicker = ({
       openToDate={openToDate}
       withPortal={true}
       showTimeSelect={pickerType === "end"}
-      injectTimes={[setHours(setMinutes(setSeconds(new Date(), 59), 59), 23)]}
+      // injectTimes={[setHours(setMinutes(setSeconds(new Date(), 59), 59), 23)]}
+      injectTimes={injectedTime ? [injectedTime] : []}
       minDate={
         isAdmin
           ? new Date(2010, 0, 1)

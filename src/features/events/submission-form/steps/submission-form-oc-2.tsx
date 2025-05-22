@@ -43,15 +43,16 @@ interface SubmissionFormOC2Props {
 
 const SubmissionFormOC2 = ({
   // user,
-  // isAdmin,
+  isAdmin,
   isMobile,
 
   // categoryEvent,
 
   handleCheckSchema,
   formType,
-  pastEvent,
+  pastEvent: pastEventCheck,
 }: SubmissionFormOC2Props) => {
+  const pastEvent = pastEventCheck && !isAdmin;
   const paidCall = formType === 3;
   const {
     control,

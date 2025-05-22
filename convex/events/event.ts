@@ -811,9 +811,10 @@ export const createOrUpdateEvent = mutation({
     const organization = await ctx.db.get(args.orgId);
     // console.log("organization", organization);
     // console.log(organization?.links);
+    const linksLength = Object.keys(args.links ?? {}).length;
     const links = !args.links
       ? { sameAsOrganizer: false }
-      : linksSameAsOrg
+      : linksSameAsOrg || linksLength === 1
         ? { ...organization?.links, sameAsOrganizer: true }
         : { ...args.links, sameAsOrganizer: false };
 

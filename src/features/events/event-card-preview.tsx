@@ -509,7 +509,7 @@ const EventCardPreview = ({
                 format="desktop"
                 limit={1}
                 type="event"
-              />
+            />
             </div>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>

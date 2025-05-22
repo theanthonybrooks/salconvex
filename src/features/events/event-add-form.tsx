@@ -1300,6 +1300,8 @@ export const EventOCForm = ({
                 ...orgData.links,
                 sameAsOrganizer: true,
               };
+
+        console.log(eventLinks);
         try {
           setPending(true);
 
