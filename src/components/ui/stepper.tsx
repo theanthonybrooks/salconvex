@@ -66,7 +66,7 @@ export default function HorizontalLinearStepper({
   isAdmin,
 }: StepperProps) {
   // console.log(errorMsg);
-  console.log(disabled);
+  // console.log(disabled);
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({
@@ -101,7 +101,6 @@ export default function HorizontalLinearStepper({
 
   const handleReset = () => setActiveStep(0);
   const lastStep = stepArray.length - 1;
-  console.log(activeStep, lastStep, onFinalSubmit);
 
   return (
     <div

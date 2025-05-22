@@ -611,7 +611,7 @@ export default function Pricing() {
                 .sort((a, b) => Number(a.key) - Number(b.key))
                 .map((plan) => {
                   const { key, prices, ...rest } = plan;
-                  console.log(plan);
+                  // console.log(plan);
 
                   const normalizedPrices = {
                     month: undefined,

@@ -1,8 +1,8 @@
 import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
 import { getTimezoneFormat, toDate } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
-import { format, setHours, setMinutes, setSeconds } from "date-fns";
-import { fromZonedTime } from "date-fns-tz";
+import { setHours, setMinutes, setSeconds } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { Button } from "../button";
@@ -57,10 +57,16 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     if (value) {
       try {
         const date = new Date(value);
+        // console.log({
+        //   parsedValue,
+        //   local: date.toString(),
+        //   tz: formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a"),
+        // });
+
         formattedValue =
           pickerType === "start"
-            ? format(date, "MMM d, yyyy")
-            : format(date, "MMM d, yyyy @ h:mm a");
+            ? formatInTimeZone(date, timeZone, "MMM d, yyyy")
+            : formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a");
       } catch {
         formattedValue = value; // fallback
       }
@@ -107,6 +113,8 @@ export const OcCustomDatePicker = ({
   disabled,
 }: OcCustomDatePickerProps) => {
   const parsedDate = value ? toDate(value) : null;
+  // console.log(parsedDate, value);
+
   const minToDate = minDate ? toDate(minDate) : null;
   const maxToDate = maxDate ? toDate(maxDate) : null;
   const today = new Date();
@@ -119,8 +127,7 @@ export const OcCustomDatePicker = ({
   const openToDate =
     isValidSelected && parsedDate ? parsedDate : (minToDate ?? today);
 
-  const dateFormat =
-    pickerType === "start" ? "MMM d, yyyy" : "MMM d, yyyy @ h:mm a";
+  const dateFormat = "MMM d, yyyy @ h:mm a";
 
   //   console.log(parsedDate, value);
   const injectedTime = parsedDate
@@ -135,13 +142,13 @@ export const OcCustomDatePicker = ({
         if (!date || !orgTimezone) return onChange(null);
         if (pickerType === "end") {
           const zonedDate = fromZonedTime(date, orgTimezone);
-          console.log(zonedDate);
+          // console.log(zonedDate);
           onChange(zonedDate.toISOString());
         } else if (pickerType === "start") {
           const cleanDate = new Date(date);
-          cleanDate.setHours(0, 0, 0, 0);
+          cleanDate.setHours(12, 0, 0, 0);
           const zonedDate = fromZonedTime(cleanDate, orgTimezone);
-          console.log(zonedDate);
+          // console.log(zonedDate);
           onChange(zonedDate.toISOString());
         }
       }}

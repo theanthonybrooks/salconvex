@@ -6,7 +6,7 @@ import { Scrypt } from "lucia";
 import slugify from "slugify";
 import { CustomPassword } from "./functions/customPassword";
 import { ResendOTP } from "./otp/resendOtp";
-import { findUserByEmail } from "./users";
+import { findUserByEmailPW } from "./users";
 
 export const scryptCrypto = {
   async hashSecret(password: string) {
@@ -51,19 +51,21 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         throw new ConvexError("Email is required but not provided.");
       }
 
-      const existingUser = await findUserByEmail(ctx, profile.email);
+      const result = await findUserByEmailPW(ctx, profile.email);
+      const existingUser = result?.user;
+      const existingUserPW = result?.userPW;
       console.log("existingUser: ", existingUser);
-      if (existingUser) {
+      if (existingUser && existingUserPW) {
         if (type === "credentials") {
           if (typeof profile.password !== "string") {
             throw new ConvexError("Password must be a string.");
           }
-          if (!existingUser.password) {
+          if (!existingUserPW.password) {
             throw new ConvexError("No password stored for this user.");
           }
           const isValid = await scryptCrypto.verifySecret(
             profile.password,
-            existingUser.password,
+            existingUserPW.password,
           );
 
           if (!isValid) {
@@ -93,7 +95,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           : profile.firstName + " " + profile.lastName,
         email: profile.email,
         createdAt: Date.now(),
-        password: hashedPassword,
+        // password: hashedPassword,
         firstName: profile.firstName,
         lastName: profile.lastName,
         accountType: profile.accountType,
@@ -102,6 +104,13 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         role: profile.role ?? ["user"],
         tokenIdentifier: currentId ? currentId : `temp${Date.now()}`,
         emailVerified: false,
+      });
+
+      await ctx.db.insert("userPW", {
+        userId: newUserId,
+        email: profile.email,
+        password: hashedPassword,
+        lastChanged: Date.now(),
       });
 
       console.log("newUserId: ", newUserId);

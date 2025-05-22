@@ -3,6 +3,7 @@ import { action } from "./_generated/server";
 
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
+import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
 import {
   internalMutation,
@@ -91,6 +92,22 @@ export async function findUserByEmail(ctx: MutationCtx, email: string) {
     .query("users")
     .withIndex("email", (q) => q.eq("email", email))
     .unique();
+}
+
+export async function findUserByEmailPW(ctx: MutationCtx, email: string) {
+  const userPW = await ctx.db
+    .query("userPW")
+    .withIndex("by_email", (q) => q.eq("email", email))
+    .unique();
+
+  if (!userPW) throw new ConvexError("User not found");
+
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_userId", (q) => q.eq("userId", userPW?.userId))
+    .unique();
+
+  return { userPW, user };
 }
 
 export const updateUser = mutation({
@@ -217,6 +234,7 @@ export const updateUserEmailVerification = mutation({
   },
   handler: async (ctx, args) => {
     const user = await findUserByEmail(ctx, args.email);
+    //TODO: Check if this should be null or if this is okay
     if (!user) {
       throw new ConvexError("User not found");
     }
@@ -231,11 +249,15 @@ export const updateUserEmailVerification = mutation({
 
 export async function checkPassword(
   ctx: MutationCtx,
-  userId: string,
+  userId: Id<"users">,
   password: string,
 ) {
+  // const user = await ctx.db
+  //   .query("users")
+  //   .withIndex("by_userId", (q) => q.eq("userId", userId))
+  //   .unique();
   const user = await ctx.db
-    .query("users")
+    .query("userPW")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
     .unique();
 
@@ -257,14 +279,22 @@ export const updatePassword = mutation({
     email: v.string(),
     password: v.string(),
     currentPassword: v.optional(v.string()),
-    userId: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
     method: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await findUserByEmail(ctx, args.email);
+    const result = await findUserByEmailPW(ctx, args.email);
+
+    if (!result) {
+      throw new ConvexError("User not found");
+    }
+    const user = result.user;
+
     if (!user) {
       throw new ConvexError("User not found");
     }
+
+    const userPW = result.userPW;
     const currentId = await getAuthUserId(ctx);
     const identity = await ctx.auth.getUserIdentity();
 
@@ -283,10 +313,11 @@ export const updatePassword = mutation({
     }
 
     const hashedPassword = await scryptCrypto.hashSecret(args.password);
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch(userPW._id, {
       password: hashedPassword,
-      updatedAt: Date.now(),
-      passwordChangedBy: args.method,
+      // updatedAt: Date.now(),
+      lastChanged: Date.now(),
+      changedBy: args.method,
     });
 
     if (args.method === "userUpdate") {

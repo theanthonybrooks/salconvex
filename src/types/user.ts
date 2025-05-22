@@ -4,7 +4,7 @@ export interface User {
   createdAt: number;
   email: string;
   emailVerificationTime?: number;
-  password: string;
+  // password: string;
   firstName: string;
   lastName?: string;
   name?: string;

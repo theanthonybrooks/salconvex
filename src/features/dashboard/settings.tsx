@@ -75,6 +75,7 @@ import { useTheme } from "next-themes";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
 
 export default function SettingsPage() {
   const { preloadedUserData } = useConvexPreload();
@@ -340,16 +341,13 @@ export default function SettingsPage() {
         email: user.email,
         password: data.newPassword,
         currentPassword: data.oldPassword,
-        userId: user.userId,
+        userId: user.userId as Id<"users">,
         method: "userUpdate",
       });
       // console.log("formData", formData)
       setPending(false);
       setSuccess("Password reset!");
-
-      reset();
     } catch (err: unknown) {
-      // Type assertion: Explicitly check if it's a ConvexError
       if (err instanceof ConvexError) {
         setError(err.data || "An unexpected error occurred.");
       } else if (err instanceof Error) {
@@ -359,6 +357,7 @@ export default function SettingsPage() {
       }
     } finally {
       setPending(false);
+      reset();
 
       setTimeout(() => {
         setSuccess("");
@@ -836,10 +835,11 @@ export default function SettingsPage() {
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                          <DialogTitle>Edit profile</DialogTitle>
+                          <DialogTitle>Edit password</DialogTitle>
                           <DialogDescription>
-                            Make changes to your profile here. Click save when
-                            you&apos;re done.
+                            New password must be at least 8 characters long and
+                            must include at least one number, one uppercase
+                            letter, and one lowercase letter.
                           </DialogDescription>
                           {success && <FormSuccess message={success} />}
                           {error && <FormError message={error} />}
@@ -865,6 +865,7 @@ export default function SettingsPage() {
                                 {...register("oldPassword", {
                                   required: true,
                                 })}
+                                tabIndex={1}
                               />
                               <button
                                 type="button"
@@ -900,8 +901,10 @@ export default function SettingsPage() {
                                 {...register("newPassword", {
                                   required: true,
                                 })}
+                                tabIndex={2}
                               />
                               <button
+                                tabIndex={3}
                                 type="button"
                                 onClick={() =>
                                   setShowNewPassword((prev) => !prev)

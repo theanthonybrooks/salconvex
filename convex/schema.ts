@@ -72,7 +72,7 @@ const customUserSchema = {
   emailVerificationTime: v.optional(v.number()),
   createdAt: v.number(),
   updatedAt: v.optional(v.number()),
-  password: v.string(),
+  password: v.optional(v.string()),
   passwordChangedBy: v.optional(v.string()),
   firstName: v.string(),
   lastName: v.string(),
@@ -87,6 +87,14 @@ const customUserSchema = {
 
   emailVerified: v.optional(v.boolean()),
 };
+
+const userPWSchema = v.object({
+  userId: v.id("users"),
+  password: v.string(),
+  email: v.string(),
+  lastChanged: v.number(),
+  changedBy: v.optional(v.string()),
+});
 
 const userLogSchema = {
   userId: v.string(),
@@ -481,6 +489,10 @@ export default defineSchema({
   userLog: defineTable(userLogSchema)
     .index("by_userId", ["userId"])
     .index("by_email", ["userEmail"]),
+
+  userPW: defineTable(userPWSchema)
+    .index("by_userId", ["userId"])
+    .index("by_email", ["email"]),
 
   passwordResetLog: defineTable({
     email: v.string(),

@@ -260,7 +260,7 @@ export const EventOCForm = ({
   const isStepValidZod = useMemo(() => {
     if (!currentSchema) return true;
     const result = currentSchema.safeParse(watchedValues);
-    console.log(result);
+    // console.log(result);
     return result.success;
   }, [watchedValues, currentSchema]);
   // #endregion
@@ -416,7 +416,7 @@ export const EventOCForm = ({
   const alreadyApprovedEvent = !!eventData?.approvedBy;
   const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
 
-  console.log(finalStep, acceptedTerms, isAdmin);
+  // console.log(finalStep, acceptedTerms, isAdmin);
   // #endregion
   // #endregion
   //
@@ -425,7 +425,7 @@ export const EventOCForm = ({
   // #region ------------- Console Logs --------------
   // console.log(errors);
   if (errors && Object.keys(errors).length > 0) {
-    console.log(errors);
+    console.log("errors", errors);
   }
   // console.log(
   //   isValid,
@@ -517,7 +517,7 @@ export const EventOCForm = ({
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
     if (hasUserEditedForm) {
-      console.log("hasUserEditedForm 440");
+      // console.log("hasUserEditedForm 440");
       await handleSave();
     }
     handleFirstStep();
@@ -556,10 +556,10 @@ export const EventOCForm = ({
       if (!orgData?.contact?.primaryContact) {
         unregister("organization.contact");
         unregister("organization.links");
-        console.log(getValues("organization"));
+        // console.log(getValues("organization"));
       }
       if (!hasOpenCall) {
-        console.log("heya");
+        // console.log("heya");
         unregister("openCall");
         setActiveStep((prev) => prev - 3);
       } else {
@@ -634,8 +634,8 @@ export const EventOCForm = ({
             hasOpenCall: !eventOnly ? "Fixed" : "False",
           },
         });
-        console.log("waffles");
-        console.log(currentValues, eventData);
+        // console.log("waffles");
+        // console.log(currentValues, eventData);
       }
       canClearEventData.current = true;
     }
@@ -1513,10 +1513,10 @@ export const EventOCForm = ({
   //   }
   // }, [orgData, existingOrg, getValues]);
 
-  useEffect(() => {
-    console.log("eventData", eventData);
-    // console.log("existingEvent", existingEvent);
-  }, [eventData, existingEvent]);
+  // useEffect(() => {
+  //   console.log("eventData", eventData);
+  //   // console.log("existingEvent", existingEvent);
+  // }, [eventData, existingEvent]);
 
   // useEffect(() => {
   // console.log("oc", openCallData);
@@ -1618,11 +1618,11 @@ export const EventOCForm = ({
           : new Date(lastSaved ?? 0).getTime();
       const lastChanged = lastChangedRef.current ?? 0;
       const shouldSave = now - last >= 60000 && now - lastChanged >= 15000;
-      console.log(now, last);
+      // console.log(now, last);
 
       if (shouldSave) {
         handleSave().then(() => {
-          console.log("Autosaved at", new Date().toLocaleTimeString());
+          // console.log("Autosaved at", new Date().toLocaleTimeString());
           setPending(false);
         });
       }
@@ -1643,7 +1643,7 @@ export const EventOCForm = ({
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
     if (orgChanged) {
-      console.log("resetting");
+      // console.log("resetting");
       setFurthestStep(0);
       reset({
         organization: {
@@ -1677,7 +1677,7 @@ export const EventOCForm = ({
       } else if (existingEvent?._creationTime) {
         setLastSaved(existingEvent._creationTime);
       }
-      console.log("resetting event");
+      // console.log("resetting event");
       reset({
         ...currentValues,
         event: {
@@ -1757,7 +1757,7 @@ export const EventOCForm = ({
       // console.log("hmm");
       setFurthestStep(0);
       setSelectedRow({});
-      console.log("clearing event data", eventData);
+      // console.log("clearing event data", eventData);
       reset({
         organization: {
           ...currentValues.organization,
@@ -1877,7 +1877,7 @@ export const EventOCForm = ({
   useEffect(() => {
     if (!openCallSuccess) return;
     if (ocData) {
-      console.log(ocData);
+      // console.log(ocData);
       setValue("openCall", ocData);
     }
   }, [openCallSuccess, ocData, setValue, reset]);
@@ -1927,8 +1927,8 @@ export const EventOCForm = ({
         <div ref={topRef} />
         <FormProvider {...form}>
           <form
-            onSubmit={handleSubmit((data) => {
-              console.log("submitting:", data);
+            onSubmit={handleSubmit(() => {
+              // console.log("submitting:", data);
               onSubmit();
             })}
             className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px] 3xl:max-w-[2000px]"
