@@ -100,6 +100,7 @@ const SubmissionFormOC1 = ({
   const noEndRequired = callType && !fixedType;
   const today = new Date();
   const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
+  console.log(ocEnd);
 
   // #region -------------- UseEffect ---------------
 

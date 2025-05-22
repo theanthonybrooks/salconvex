@@ -2,6 +2,7 @@ import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header
 import { getTimezoneFormat, toDate } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
 import { format, setHours, setMinutes, setSeconds } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { Button } from "../button";
@@ -119,7 +120,9 @@ export const OcCustomDatePicker = ({
       disabled={disabled}
       selected={parsedDate}
       onChange={(date) => {
-        onChange(date ? date.toISOString() : null);
+        if (!date || !orgTimezone) return onChange(null);
+        const zonedDate = fromZonedTime(date, orgTimezone);
+        onChange(zonedDate.toISOString());
       }}
       dateFormat={dateFormat}
       openToDate={openToDate}

@@ -509,7 +509,7 @@ const EventCardPreview = ({
                 format="desktop"
                 limit={1}
                 type="event"
-            />
+              />
             </div>
             <p className="flex items-center gap-x-1 text-sm">
               <span className="font-semibold">Category:</span>
@@ -579,14 +579,14 @@ const EventCardPreview = ({
                     <span className="hidden 2xl:block">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
-                        basicInfo.dates?.timezone,
+                        userPref?.timezone ?? basicInfo.dates?.timezone,
                         basicInfo.callType,
                       )}
                     </span>
                     <span className="block 2xl:hidden">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
-                        basicInfo.dates?.timezone,
+                        userPref?.timezone ?? basicInfo.dates?.timezone,
                         basicInfo.callType,
                         true,
                       )}
