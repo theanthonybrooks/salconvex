@@ -1,7 +1,7 @@
 import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
 import { getTimezoneFormat, toDate } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
-import { setHours, setMinutes, setSeconds } from "date-fns";
+import { isValid, parseISO, setHours, setMinutes, setSeconds } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
@@ -27,7 +27,7 @@ export interface OcCustomDatePickerProps {
 }
 
 interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
-  value?: string;
+  rawValue?: string;
   onClick?: () => void;
   pickerType?: OcPickerType;
   ocEnd?: string | null;
@@ -38,7 +38,8 @@ interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
 const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
   (
     {
-      value,
+      rawValue,
+
       onClick,
       className,
       pickerType,
@@ -49,30 +50,43 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     },
     ref,
   ) => {
+    console.log(rawValue);
     const endDate = ocEnd ?? new Date().toISOString();
     const timeZone = orgTimezone ?? "Europe/Berlin";
     const display =
       pickerType === "start" ? "Select start date" : "Select deadline";
     let formattedValue = "";
-    if (value) {
-      try {
-        const date = new Date(value);
-        // console.log({
-        //   parsedValue,
-        //   local: date.toString(),
-        //   tz: formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a"),
-        // });
+    if (rawValue) {
+      // try {
+      //   const date = new Date(value);
+      //   // console.log({
+      //   //   parsedValue,
+      //   //   local: date.toString(),
+      //   //   tz: formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a"),
+      //   // });
 
+      //   formattedValue =
+      //     pickerType === "start"
+      //       ? formatInTimeZone(date, timeZone, "MMM d, yyyy")
+      //       : formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a");
+      // } catch {
+      //   formattedValue = value; // fallback
+      //   console.log(formattedValue);
+      // }
+
+      const date = parseISO(rawValue); // safer parsing for ISO strings
+
+      if (isValid(date)) {
+        console.log(date, "valid");
         formattedValue =
           pickerType === "start"
             ? formatInTimeZone(date, timeZone, "MMM d, yyyy")
             : formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a");
-      } catch {
-        formattedValue = value; // fallback
-        console.log(formattedValue);
+      } else {
+        formattedValue = rawValue; // fallback
+        console.log(formattedValue, "invalid");
       }
     }
-    console.log(value);
     return (
       <Button
         ref={ref}
@@ -136,6 +150,8 @@ export const OcCustomDatePicker = ({
     ? setHours(setMinutes(setSeconds(new Date(parsedDate), 59), 59), 23)
     : undefined;
 
+  console.log(value);
+
   return (
     <DatePicker
       disabled={disabled}
@@ -174,6 +190,7 @@ export const OcCustomDatePicker = ({
       }
       customInput={
         <DateInput
+          rawValue={value ?? undefined}
           className={inputClassName}
           pickerType={pickerType}
           ocEnd={ocEnd}
