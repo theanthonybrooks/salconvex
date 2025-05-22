@@ -141,7 +141,7 @@ export const EventOCForm = ({
   const isAdmin = user?.role?.includes("admin") || false;
   const formType = Number(planKey);
   const eventOnly = formType === 1;
-  const freeCall = formType === 2;
+  // const freeCall = formType === 2;
   const paidCall = formType === 3 && !isAdmin;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
@@ -1048,7 +1048,7 @@ export const EventOCForm = ({
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
-              appFee: !freeCall ? openCallData.basicInfo.appFee : 0,
+              appFee: paidCall ? openCallData.basicInfo.appFee : 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
               callType: eventData.hasOpenCall ?? "False",
               dates: {
@@ -1151,7 +1151,7 @@ export const EventOCForm = ({
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
-              appFee: !freeCall ? openCallData.basicInfo.appFee : 0,
+              appFee: paidCall ? openCallData.basicInfo.appFee : 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
               callType: eventData.hasOpenCall ?? "False",
               dates: {
@@ -1336,7 +1336,7 @@ export const EventOCForm = ({
               eventId: eventData._id as Id<"events">,
               openCallId: openCallData?._id as Id<"openCalls">,
               basicInfo: {
-                appFee: !freeCall ? openCallData.basicInfo.appFee : 0,
+                appFee: paidCall ? openCallData.basicInfo.appFee : 0,
                 callFormat: openCallData.basicInfo.callFormat,
                 callType: eventData.hasOpenCall ?? "False",
                 dates: {
@@ -1401,11 +1401,11 @@ export const EventOCForm = ({
       }
     },
     [
+      paidCall,
       finalStep,
       alreadyPaid,
       formType,
       eventOnly,
-      freeCall,
       saveOrgFile,
       setOpen,
       hasOpenCall,
