@@ -517,7 +517,7 @@ const EventCardPreview = ({
               {getEventCategoryLabel(eventCategory)}
             </p>
             {eventCategory === "event" && eventType && (
-              <p className="flex items-center gap-x-1 text-sm">
+              <p className="flex items-start gap-x-1 text-sm">
                 <span className="font-semibold">Type:</span>
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </p>
