@@ -69,8 +69,10 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
             : formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a");
       } catch {
         formattedValue = value; // fallback
+        console.log(formattedValue);
       }
     }
+    console.log(formattedValue);
     return (
       <Button
         ref={ref}
