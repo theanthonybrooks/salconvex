@@ -42,6 +42,7 @@ import SubmissionFormOC2 from "@/features/events/submission-form/steps/submissio
 import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-1";
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
+import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
 import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
@@ -2035,6 +2036,19 @@ export const EventOCForm = ({
                   isEligibleForFree={isEligibleForFree}
                   alreadyPaid={alreadyPaid}
                 />
+                {isMobile && (
+                  <SubmissionFormRecapMobile
+                    formType={formType}
+                    isAdmin={isAdmin}
+                    setAcceptedTerms={setAcceptedTerms}
+                    setInfoVerified={setInfoVerified}
+                    infoVerified={infoVerified}
+                    acceptedTerms={acceptedTerms}
+                    submissionCost={submissionCost?.price}
+                    isEligibleForFree={isEligibleForFree}
+                    alreadyPaid={alreadyPaid}
+                  />
+                )}
               </>
             )}
 

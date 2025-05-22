@@ -86,12 +86,12 @@ export const SubmissionFormRecapDesktop = ({
     ocData?.compensation?.budget?.rate > 0;
 
   return (
-    <div className="flex flex-col gap-y-8">
+    <div className="hidden flex-col gap-y-8 lg:flex">
       <NavTabs
         tabs={tabList}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        className="form-recap hidden lg:block"
+        className="form-recap"
       >
         <div id="organizer" className="px-4">
           <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[40%_60%]">
