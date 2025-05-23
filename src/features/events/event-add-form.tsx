@@ -76,7 +76,7 @@ const steps = [
   },
   {
     id: 3,
-    label: "Event/Project Details (Continued)",
+    label: "Event/Project Details Pt.2",
     mobileLabel: "Event/Project Details",
     schema: eventDetailsSchema,
   },
@@ -300,7 +300,7 @@ export const EventOCForm = ({
 
   const pastEvent = !!openCallEnd && openCallEnd < now;
   //note-to-self: this is what's hiding the open call sections from users (non-admins). The idea being that they shouldn't be able to change anything. Perhaps the better way would be to still show it, but have it disabled/read only? It's confusing at the moment.
-  const hasOpenCall = validOCVals.includes(eventOpenCall);
+  const hasOpenCall = validOCVals.includes(eventOpenCall) && formType !== 1;
 
   const eventName = eventData?.name;
   // const eventLogo = eventData?.logo;
@@ -889,6 +889,7 @@ export const EventOCForm = ({
               : eventData.dates.prodDates;
 
           const { event } = await createOrUpdateEvent({
+            formType,
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name, { lower: true }),

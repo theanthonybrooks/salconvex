@@ -260,7 +260,7 @@ const SubmissionFormOC2 = ({
               >
                 <SelectTrigger
                   className={cn(
-                    "h-12 w-full min-w-20 border bg-transparent text-center text-base sm:h-[50px] sm:w-fit",
+                    "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                   )}
                 >
                   <SelectValue placeholder="Project Budget?*" />
@@ -288,7 +288,7 @@ const SubmissionFormOC2 = ({
 
           <div
             className={cn(
-              "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
+              "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
               !showBudgetInputs &&
                 "border-foreground/30 opacity-50 [@media(max-width:640px)]:hidden",
               pastEvent && "border-foreground/50 opacity-50",
@@ -300,7 +300,7 @@ const SubmissionFormOC2 = ({
               render={({ field }) => (
                 <SearchMappedSelect<Currency>
                   searchFields={["name", "symbol", "code"]}
-                  className="w-40 border-none bg-transparent py-2 sm:h-fit sm:w-40"
+                  className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
                   value={field.value ?? orgCurrency?.code ?? "USD"}
                   onChange={(code) => {
                     const selected = Object.values(currencies[0])
@@ -332,7 +332,7 @@ const SubmissionFormOC2 = ({
                       min={0}
                       disabled={!showBudgetInputs || pastEvent}
                       placeholder="Minimum"
-                      className="h-fit border-none !bg-transparent px-0 pb-2 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
+                      className="h-fit border-none !bg-card px-0 pb-2 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
@@ -356,7 +356,7 @@ const SubmissionFormOC2 = ({
                         },
                       }}
                       placeholder="Maximum "
-                      className="arrowless h-fit border-none !bg-transparent px-0 pb-2 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
+                      className="arrowless h-fit border-none !bg-card px-0 pb-2 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
@@ -377,7 +377,7 @@ const SubmissionFormOC2 = ({
               </Label>
               <div
                 className={cn(
-                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
+                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
                   !showBudgetInputs &&
                     "opacity-50 [@media(max-width:640px)]:hidden",
                   pastEvent && "border-foreground/50 opacity-50",
@@ -389,7 +389,7 @@ const SubmissionFormOC2 = ({
                   render={({ field }) => (
                     <SearchMappedSelect<Currency>
                       searchFields={["name", "symbol", "code"]}
-                      className="w-40 border-none bg-transparent py-2 sm:h-fit sm:w-40"
+                      className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
                       value={field.value ?? orgCurrency?.code ?? "USD"}
                       onChange={(code) => {
                         const selected = Object.values(currencies[0])
@@ -421,7 +421,7 @@ const SubmissionFormOC2 = ({
                           min={0}
                           disabled={!showBudgetInputs || pastEvent}
                           placeholder="Rate (ex: 30)"
-                          className="h-fit border-none !bg-transparent p-2 text-center focus:border-none focus:outline-none sm:text-base"
+                          className="h-fit border-none !bg-card p-2 text-center focus:border-none focus:outline-none sm:text-base"
                         />
                       )}
                     />
@@ -542,10 +542,10 @@ const SubmissionFormOC2 = ({
                     disabled={pastEvent}
                     id="openCall.compensation.categories"
                     className={cn(
-                      "h-12 border bg-transparent sm:h-[50px]",
+                      "h-12 border bg-card sm:h-[50px]",
                       // errors.event?.type && "invalid-field",
                     )}
-                    badgeClassName="py-2 lg:py-2 lg:text-sm bg-transparent"
+                    badgeClassName="py-2 lg:py-2 lg:text-sm bg-card"
                     textClassName="text-base"
                     options={[...openCallCategoryFields]}
                     onValueChange={(selected: string[] = []) => {

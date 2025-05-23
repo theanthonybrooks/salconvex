@@ -686,7 +686,7 @@ export const RichTextEditor = ({
         )}
       />
 
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2 rounded bg-white">
+      <div className="absolute bottom-4 right-4 flex flex-col gap-2 rounded bg-card">
         <p className="mr-1 text-right text-sm text-gray-500">
           {editor.storage.characterCount.characters()}/{charLimit}
         </p>
@@ -724,7 +724,7 @@ export const RichTextEditor = ({
       <>
         <div
           className={cn(
-            "relative cursor-pointer rounded border p-2",
+            "relative cursor-pointer rounded border bg-card p-2",
             readOnly && "pointer-events-none border-foreground/50 opacity-50",
           )}
           onClick={() => setOpen(true)}
@@ -753,7 +753,7 @@ export const RichTextEditor = ({
               View/Edit Full Text
             </div>
           )}
-          <div className="absolute bottom-1 right-1 rounded bg-white p-1 text-right text-xs text-foreground/60">
+          <div className="absolute bottom-1 right-1 rounded bg-card p-1 text-right text-xs text-foreground/60">
             {editor.storage.characterCount.characters()}/{charLimit}
           </div>
         </div>

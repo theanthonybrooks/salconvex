@@ -38,6 +38,7 @@ interface SubmissionFormOrgStepProps {
   setSelectedRow: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   selectedRow: Record<string, boolean>;
   furthestStep: number;
+  preloadFlag?: boolean;
 }
 
 const SubmissionFormOrgStep = ({
@@ -61,6 +62,7 @@ const SubmissionFormOrgStep = ({
   setSelectedRow,
   selectedRow,
   furthestStep,
+  preloadFlag,
 }: SubmissionFormOrgStepProps) => {
   const {
     control,
@@ -326,7 +328,7 @@ const SubmissionFormOrgStep = ({
                 category: false,
                 lastEditedAt: false,
               }}
-              initialSearchTerm={eventName}
+              initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
                   // console.log("falsito");
@@ -351,7 +353,7 @@ const SubmissionFormOrgStep = ({
             <DataTable
               columns={columns}
               data={eventsData}
-              initialSearchTerm={eventName}
+              initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
                   // console.log("falsito");
@@ -377,7 +379,7 @@ const SubmissionFormOrgStep = ({
             <DataTable
               columns={columns}
               data={eventsData}
-              initialSearchTerm={eventName}
+              initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
                   // console.log("falsito");

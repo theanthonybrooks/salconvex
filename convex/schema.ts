@@ -319,6 +319,7 @@ const eventSchema = {
   lastEditedAt: v.optional(v.number()),
   approvedBy: v.optional(v.id("users")),
   approvedAt: v.optional(v.number()),
+  formType: v.optional(v.number()),
 };
 
 const eventOrganizerSchema = {

@@ -710,6 +710,7 @@ export const getEventWithOCDetails = query({
 
 export const createOrUpdateEvent = mutation({
   args: {
+    formType: v.optional(v.number()),
     orgId: v.id("organizations"),
     _id: v.union(v.id("events"), v.string()),
     logoStorageId: v.optional(v.id("_storage")),
@@ -911,6 +912,7 @@ export const createOrUpdateEvent = mutation({
 
     console.log("inserting");
     const eventId = await ctx.db.insert("events", {
+      formType: args.formType,
       name: args.name,
       slug: args.slug,
       logo: fileUrl as string,
@@ -1059,6 +1061,7 @@ export const duplicateEvent = mutation({
 
     const eventState = "draft";
     const newEvent = await ctx.db.insert("events", {
+      formType: event.formType,
       name: eventName,
       slug: eventSlug,
       logo: event.logo,

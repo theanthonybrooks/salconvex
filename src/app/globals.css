@@ -1461,6 +1461,11 @@ div:has(> div.react-datepicker__input-container) {
   }
 }
 
+.filepond--drop-label {
+  /* background-color: hsl(var(--card)); */
+  @apply bg-card;
+}
+
 .filepond--item {
   & .filepond--file-wrapper {
     /* background: hsl(var(--background)); */

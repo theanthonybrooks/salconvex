@@ -642,17 +642,6 @@ export const openCallStep2Schema = z
         path: ["openCall", "compensation", "budget", "max"],
       });
     }
-    /*   if (
-      !allInclusive &&
-      Object.keys(data.openCall.compensation.categories).length === 0
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Open calls without all-inclusive budgets must have at least one category",
-        path: ["openCall", "compensation", "budget", "allInclusive"],
-      });
-    }*/
   });
 
 export const eventWithOCSchema = z

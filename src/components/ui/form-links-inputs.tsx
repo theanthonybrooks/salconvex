@@ -289,7 +289,7 @@ export const FormLinksInput = ({
                           value={field.value ?? ""}
                           placeholder="+1 (555) 555-5555"
                           className={cn(
-                            "flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                            "flex h-10 flex-1 rounded-md border border-gray-300 bg-card px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
                             errors?.[type]?.links?.phone && "invalid-field",
                           )}
                           onChange={field.onChange}

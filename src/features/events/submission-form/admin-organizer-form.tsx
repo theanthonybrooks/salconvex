@@ -55,6 +55,14 @@ import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
+import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
+
+const formTypeOptions = [
+  { value: 1, Icon: LuBadge },
+  { value: 2, Icon: LuBadgeCheck },
+  { value: 3, Icon: LuBadgeDollarSign },
+];
+
 const steps = [
   {
     id: 1,
@@ -71,7 +79,7 @@ const steps = [
   },
   {
     id: 3,
-    label: "Event/Project Details (Continued)",
+    label: "Event/Project Details Pt.2",
     mobileLabel: "Event/Project Details",
     schema: eventDetailsSchema,
   },
@@ -110,10 +118,10 @@ export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [activeStep, setActiveStep] = useState(0);
+  const [formType, setFormType] = useState<number>(0);
 
   const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
-  const formType = 3;
   // const freeCall = formType === 2;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
@@ -254,7 +262,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const orgData = watch("organization");
   const eventData = watch("event");
   const openCallData = watch("openCall");
+  const eventFormType = eventData?.formType;
   const hasEventId = !!eventData?._id;
+
+  console.log(formType, eventFormType);
 
   // const eventDatesWatch = watch("event.dates");
   // #endregion
@@ -268,10 +279,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     ? new Date(openCallData?.basicInfo?.dates?.ocEnd)
     : null;
 
-  console.log(eventOpenCall);
+  //   console.log(eventOpenCall);
   const pastEvent = !!openCallEnd && openCallEnd < now;
   //note-to-self: this is what's hiding the open call sections from users (non-admins). The idea being that they shouldn't be able to change anything. Perhaps the better way would be to still show it, but have it disabled/read only? It's confusing at the moment.
-  const hasOpenCall = validOCVals.includes(eventOpenCall);
+  const hasOpenCall =
+    (validOCVals.includes(eventOpenCall) && formType > 1) || formType >= 2;
 
   const eventName = eventData?.name;
   // const eventLogo = eventData?.logo;
@@ -1353,40 +1365,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   );
 
   const handleReset = () => {
-    setActiveStep(0);
-    setFurthestStep(0);
-    setSelectedRow({ 0: false });
-    setExistingOrg(null);
-    prevOrgRef.current = null;
-    isFirstRun.current = true;
-    lastChangedRef.current = null;
-    setExistingEvent(null);
-    setNewOrgEvent(true);
-    // reset();
-    reset({
-      organization: {
-        name: "",
-        logo: "",
-        location: undefined,
-      },
-      event: {
-        formType,
-        name: "",
-        logo: "/1.jpg",
-        location: undefined,
-        hasOpenCall: "False",
-      },
-      openCall: {
-        basicInfo: {
-          appFee: 0,
-        },
-        eligibility: {
-          whom: [],
-        },
-      },
-    });
-
-    // setValue("organization.name", "");
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, "", newUrl);
+    window.location.reload();
   };
 
   const updateLastChanged = useMemo(
@@ -1399,6 +1380,15 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
 
   // #region -------------UseEffects --------------
+
+  useEffect(() => {
+    if (!eventFormType || formType !== 0) return;
+    if (eventFormType) {
+      setFormType(eventFormType);
+    } else {
+      setFormType(1);
+    }
+  }, [eventFormType, formType]);
 
   useEffect(() => {
     if (!preloadData) return;
@@ -1497,30 +1487,31 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     }
   }, [isStepValidZod, hasUserEditedForm, handleCheckSchema]);
 
-  useEffect(() => {
-    if (!isValid || !hasUserEditedForm || pending || activeStep === 0) return;
-    const interval = setInterval(() => {
-      // console.log("checking");
-      const now = Date.now();
+  //NOTE: Removing autosave for admin version of form. For now. I don't want to accidentally save over a submission while viewing it.
+  // useEffect(() => {
+  //   if (!isValid || !hasUserEditedForm || pending || activeStep === 0) return;
+  //   const interval = setInterval(() => {
+  //     // console.log("checking");
+  //     const now = Date.now();
 
-      const last =
-        typeof lastSaved === "number"
-          ? lastSaved
-          : new Date(lastSaved ?? 0).getTime();
-      const lastChanged = lastChangedRef.current ?? 0;
-      const shouldSave = now - last >= 60000 && now - lastChanged >= 15000;
-      // console.log(now, last);
+  //     const last =
+  //       typeof lastSaved === "number"
+  //         ? lastSaved
+  //         : new Date(lastSaved ?? 0).getTime();
+  //     const lastChanged = lastChangedRef.current ?? 0;
+  //     const shouldSave = now - last >= 60000 && now - lastChanged >= 15000;
+  //     // console.log(now, last);
 
-      if (shouldSave) {
-        handleSave().then(() => {
-          // console.log("Autosaved at", new Date().toLocaleTimeString());
-          setPending(false);
-        });
-      }
-    }, 5000); // check every 5 seconds (adjustable)
+  //     if (shouldSave) {
+  //       handleSave().then(() => {
+  //         // console.log("Autosaved at", new Date().toLocaleTimeString());
+  //         setPending(false);
+  //       });
+  //     }
+  //   }, 5000); // check every 5 seconds (adjustable)
 
-    return () => clearInterval(interval);
-  }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
+  //   return () => clearInterval(interval);
+  // }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
 
   useEffect(() => {
     if (!existingOrg) return;
@@ -1652,7 +1643,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
   }, [activeStep, furthestStep]);
 
-  //flag:
   useEffect(() => {
     if (newOrgEvent) return;
     if (!newOrgEvent && isSelectedRowEmpty) {
@@ -1805,6 +1795,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         lastSaved={lastSavedDate}
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
+        adminMode={isAdmin}
+        formType={formType}
+        setFormType={setFormType}
+        formTypeOptions={formTypeOptions}
         cancelButton={
           <Button
             type="button"
@@ -1848,6 +1842,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 setSelectedRow={setSelectedRow}
                 selectedRow={selectedRow}
                 furthestStep={furthestStep}
+                preloadFlag={preloadFlag.current}
               />
             )}
             {/* //------ 2nd: Event Basics  ------ */}
@@ -1925,8 +1920,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   isAdmin={isAdmin}
                   setAcceptedTerms={setAcceptedTerms}
                   setInfoVerified={setInfoVerified}
-                  infoVerified={infoVerified}
-                  acceptedTerms={acceptedTerms}
+                  infoVerified={isAdmin ?? infoVerified}
+                  acceptedTerms={isAdmin ?? acceptedTerms}
                   submissionCost={submissionCost?.price}
                   isEligibleForFree={true}
                   alreadyPaid={alreadyPaid}
@@ -1937,8 +1932,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     isAdmin={isAdmin}
                     setAcceptedTerms={setAcceptedTerms}
                     setInfoVerified={setInfoVerified}
-                    infoVerified={true}
-                    acceptedTerms={true}
+                    infoVerified={isAdmin ?? infoVerified}
+                    acceptedTerms={isAdmin ?? acceptedTerms}
                     submissionCost={submissionCost?.price}
                     isEligibleForFree={true}
                     alreadyPaid={alreadyPaid}

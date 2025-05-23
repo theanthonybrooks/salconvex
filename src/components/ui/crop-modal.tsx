@@ -133,8 +133,8 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
             id="paddingSize"
             type="number"
             min={0}
-            max={1000}
-            step={10}
+            max={2000}
+            step={50}
             value={paddingSize}
             onChange={(e) => setPaddingSize(Number(e.target.value))}
             className="h-10 w-15 cursor-pointer rounded-md border border-foreground px-2 py-1 text-center text-sm shadow-sm focus:outline-none"

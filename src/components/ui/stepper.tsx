@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
 import * as React from "react";
 import { FaCheckDouble } from "react-icons/fa6";
+
 import { z } from "zod";
 
 interface StepperProps {
@@ -40,6 +41,10 @@ interface StepperProps {
   pending?: boolean;
   onCheckSchema?: () => void;
   isAdmin?: boolean;
+  adminMode?: boolean;
+  formType?: number;
+  setFormType?: React.Dispatch<React.SetStateAction<number>>;
+  formTypeOptions?: { value: number; Icon: React.ElementType }[];
 }
 
 export default function HorizontalLinearStepper({
@@ -64,6 +69,10 @@ export default function HorizontalLinearStepper({
   pending,
   onCheckSchema,
   isAdmin,
+  adminMode,
+  formType,
+  setFormType,
+  formTypeOptions,
 }: StepperProps) {
   // console.log(errorMsg);
   // console.log(disabled);
@@ -180,6 +189,51 @@ export default function HorizontalLinearStepper({
             );
           })}
         </div>
+        {/* {adminMode && (
+          <p
+            className="select-none hover:cursor-pointer"
+            onClick={() => {
+              if (!setFormType || typeof formType !== "number") return;
+              setFormType(formType <= 2 ? formType + 1 : 1);
+            }}
+          >
+            Mode:{" "}
+            {formType === 1
+              ? "Event Only"
+              : formType === 2
+                ? "Free Call"
+                : "Project"}
+          </p>
+        )} */}
+
+        {adminMode && typeof formType === "number" && setFormType && (
+          <div className="relative inset-y-0 z-10 mx-auto flex w-28 items-center justify-between overflow-hidden rounded-full border bg-card shadow-inner">
+            {/* Thumb indicator */}
+            <div
+              className={cn(
+                "absolute left-0 top-0 z-1 h-full w-1/3 bg-background transition-all duration-200 ease-out",
+                formType === 1 && "translate-x-0",
+                formType === 2 && "translate-x-full bg-orange-200",
+                formType === 3 && "translate-x-[200%] bg-emerald-200",
+              )}
+            />
+
+            {/* Icon buttons */}
+            {formTypeOptions?.map(({ value, Icon }) => (
+              <button
+                key={value}
+                onClick={() => setFormType(value)}
+                className={cn(
+                  "relative z-10 flex w-1/3 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
+                  formType === value && "text-foreground",
+                )}
+                type="button"
+              >
+                <Icon className="h-4 w-4" />
+              </button>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Scrollable Content */}

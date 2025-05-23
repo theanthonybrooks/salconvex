@@ -61,13 +61,13 @@ const SubmissionFormEventStep1 = ({
   const eventName = eventData?.name;
   const hasEventName = !!eventName && eventName.trim().length >= 3;
   const eventDates = eventData?.dates?.eventDates;
-  console.log(eventData);
+  // console.log(eventData);
   const category = eventData?.category as EventCategory;
   const diffName = !!eventName && eventName !== initialName.current;
-  console.log(eventName, initialName.current);
-  console.log(diffName);
+  // console.log(eventName, initialName.current);
+  // console.log(diffName);
   const previousEventNameValid = hasEventName && !diffName;
-  console.log(previousEventNameValid);
+  // console.log(previousEventNameValid);
   // #region ------------- Queries, Actions, and Mutations --------------
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
@@ -84,7 +84,7 @@ const SubmissionFormEventStep1 = ({
     );
   // #endregion
 
-  console.log(eventNameValid);
+  // console.log(eventNameValid);
   const nameValidTrigger = eventNameValid || previousEventNameValid;
 
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
@@ -213,10 +213,10 @@ const SubmissionFormEventStep1 = ({
                   <MultiSelect
                     id="event.type"
                     className={cn(
-                      "h-12 border bg-transparent sm:h-[50px]",
+                      "h-12 border bg-card sm:h-[50px]",
                       errors.event?.type && "invalid-field",
                     )}
-                    badgeClassName="py-2 lg:py-2 lg:text-sm bg-transparent"
+                    badgeClassName="py-2 lg:py-2 lg:text-sm bg-card"
                     textClassName="text-base"
                     options={[...eventTypeOptions]}
                     onValueChange={(value) => {
@@ -263,7 +263,7 @@ const SubmissionFormEventStep1 = ({
                     isExisting={eventNameExistsError}
                     onChange={field.onChange}
                     className={cn(
-                      "border !bg-transparent !text-base sm:h-[50px]",
+                      "border bg-card !text-base sm:h-[50px]",
                       errors.event?.name &&
                         dirtyFields.event?.name &&
                         "invalid-field",
@@ -308,7 +308,7 @@ const SubmissionFormEventStep1 = ({
                         placeholder="Event Location (if different from organization)..."
                         className="mb-3 w-full lg:mb-0"
                         inputClassName={cn(
-                          "rounded-lg border-foreground disabled:opacity-50 !bg-transparent",
+                          "rounded-lg border-foreground disabled:opacity-50 bg-card",
                           errors.event?.location && "invalid-field",
                         )}
                       />

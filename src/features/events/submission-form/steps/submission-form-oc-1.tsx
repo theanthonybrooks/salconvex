@@ -368,7 +368,7 @@ const SubmissionFormOC1 = ({
                     "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
                   )}
                 >
-                  <SelectValue placeholder="Application fee?*" />
+                  <SelectValue placeholder="Select One" />
                 </SelectTrigger>
                 <SelectContent className="min-w-auto">
                   <SelectItem fit value="true">
@@ -391,7 +391,7 @@ const SubmissionFormOC1 = ({
 
               <div
                 className={cn(
-                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground px-3",
+                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
                   !showAppFeeInput &&
                     "border-foreground/30 opacity-50 [@media(max-width:640px)]:hidden",
                 )}
@@ -402,7 +402,7 @@ const SubmissionFormOC1 = ({
                   render={({ field }) => (
                     <SearchMappedSelect<Currency>
                       searchFields={["name", "symbol", "code"]}
-                      className="max-w-28 border-none bg-transparent py-2 sm:h-fit"
+                      className="max-w-28 border-none bg-card py-2 sm:h-fit"
                       value={field.value?.code ?? "USD"}
                       onChange={(code) => {
                         const selected = Object.values(currencies[0])
@@ -437,7 +437,7 @@ const SubmissionFormOC1 = ({
                         },
                       }}
                       placeholder={hasAppFee ? "Enter Amount" : ""}
-                      className="h-fit border-none bg-transparent py-2 text-center focus:border-none focus:outline-none sm:text-base"
+                      className="h-fit border-none bg-card py-2 text-center focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
@@ -578,7 +578,7 @@ const SubmissionFormOC1 = ({
                           field={field}
                           placeholder="Link to external application form"
                           className={cn(
-                            "w-full rounded border-foreground !bg-transparent",
+                            "w-full rounded border-foreground",
                             errors?.openCall?.requirements?.applicationLink &&
                               "invalid-field",
                           )}

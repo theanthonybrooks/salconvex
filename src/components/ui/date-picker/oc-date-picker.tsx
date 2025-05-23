@@ -77,14 +77,14 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
       const date = parseISO(rawValue); // safer parsing for ISO strings
 
       if (isValid(date)) {
-        console.log(date, "valid");
+        // console.log(date, "valid");
         formattedValue =
           pickerType === "start"
             ? formatInTimeZone(date, timeZone, "MMM d, yyyy")
             : formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a");
       } else {
         formattedValue = rawValue; // fallback
-        console.log(formattedValue, "invalid");
+        // console.log(formattedValue, "invalid");
       }
     }
     return (
@@ -93,7 +93,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         onClick={onClick}
         type="button"
         className={cn(
-          "w-full cursor-pointer rounded-lg border bg-transparent text-base font-normal",
+          "w-full cursor-pointer rounded-lg border bg-card text-base font-normal",
           className,
         )}
         {...rest}
@@ -150,7 +150,7 @@ export const OcCustomDatePicker = ({
     ? setHours(setMinutes(setSeconds(new Date(parsedDate), 59), 59), 23)
     : undefined;
 
-  console.log(value);
+  // console.log(value);
 
   return (
     <DatePicker

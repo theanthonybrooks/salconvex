@@ -86,7 +86,7 @@ export const ExternalLinksInput = ({
       <div
         ref={containerRef}
         className={cn(
-          "mx-auto flex min-h-12 w-full max-w-[74dvw] cursor-pointer flex-col justify-center gap-2 rounded border border-foreground px-4 py-2 lg:min-w-[300px] lg:max-w-md",
+          "mx-auto flex min-h-12 w-full max-w-[74dvw] cursor-pointer flex-col justify-center gap-2 rounded border border-foreground bg-card px-4 py-2 lg:min-w-[300px] lg:max-w-md",
           disabled && "pointer-events-none border-foreground/30 opacity-50",
         )}
       >

@@ -399,7 +399,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             onChange={(date) =>
                               field.onChange(toDateString(date))
                             }
-                            className="w-full rounded border bg-transparent p-2 text-center"
+                            className="w-full rounded border bg-card p-2 text-center"
                             inputClassName={cn(
                               "h-12",
                               isFieldInvalid(
@@ -431,7 +431,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             onChange={(date) =>
                               field.onChange(toDateString(date))
                             }
-                            className="w-full rounded border bg-transparent p-2 text-center"
+                            className="w-full rounded border bg-card p-2 text-center"
                             inputClassName={cn(
                               "h-12",
                               isFieldInvalid(

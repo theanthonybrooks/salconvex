@@ -69,3 +69,29 @@ export async function padImageToSquare(
 
   return canvas.toDataURL("image/jpeg");
 }
+
+export async function fetchImageAsObjectURL(url: string): Promise<{
+  objectUrl: string;
+  blob: Blob;
+}> {
+  try {
+    const response = await fetch(url, { mode: "cors" });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+
+    if (!blob.type.startsWith("image/")) {
+      throw new Error("URL does not point to a valid image.");
+    }
+
+    const objectUrl = URL.createObjectURL(blob);
+
+    return { objectUrl, blob };
+  } catch (error) {
+    console.error("Image fetch error:", error);
+    throw error;
+  }
+}

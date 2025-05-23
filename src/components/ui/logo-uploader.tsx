@@ -2,10 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { CropModal } from "@/components/ui/crop-modal";
+import { fetchImageAsObjectURL } from "@/lib/imageFns";
 import { cn } from "@/lib/utils";
 import { LoaderCircle, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 type AvatarUploaderProps = {
   // onChange: (base64Image: string) => void;
@@ -54,12 +56,20 @@ export default function AvatarUploader({
     setEditMode(true);
   };
 
-  const handleUrlInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value.trim();
-    if (url) {
-      setOriginalImage(url);
-      setImageForCropping(url);
+  const handleUrlInput = async (rawUrl: string) => {
+    const url = rawUrl.trim();
+    if (!url) return;
+
+    try {
+      const { objectUrl } = await fetchImageAsObjectURL(url);
+      setOriginalImage(objectUrl);
+      setImageForCropping(objectUrl);
       setEditMode(true);
+    } catch (error) {
+      console.error("Failed to fetch image:", error);
+      toast.error(
+        "Could not load image from URL. Make sure it's a valid, public image",
+      );
     }
   };
 
@@ -145,7 +155,7 @@ export default function AvatarUploader({
               alt="Avatar preview"
               width={size}
               height={size}
-              className="rounded-full object-cover"
+              className="rounded-full bg-card object-cover"
             />
           ) : (
             <span className="text-center text-sm text-gray-400">+ Upload</span>
@@ -178,8 +188,12 @@ export default function AvatarUploader({
                   id="urlInput"
                   type="url"
                   placeholder="https://example.com/image.jpg"
-                  onBlur={handleUrlInput}
-                  className="rounded-md border px-2 py-1 text-sm shadow-sm focus:border-emerald-400 focus:outline-none disabled:border-muted-foreground disabled:text-muted-foreground lg:w-64"
+                  onBlur={(e) => handleUrlInput(e.target.value)}
+                  onPaste={(e) => {
+                    const pasted = e.clipboardData.getData("text");
+                    handleUrlInput(pasted);
+                  }}
+                  className="rounded-md border bg-card px-2 py-1 text-sm shadow-sm focus:border-emerald-400 focus:outline-none disabled:border-muted-foreground disabled:text-muted-foreground lg:w-64"
                   disabled={disabled}
                   tabIndex={tabIndex ? tabIndex + 1 : -1}
                 />
