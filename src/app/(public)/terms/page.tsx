@@ -129,9 +129,9 @@ const TermsPage = () => {
         &nbsp;
         <p className="text-sm">
           By submitting an Open Call or Project Category to be posted, you agree
-          to display and use of the submitted content by The Street Art List and
-          understand that by posting said content, The Street Art List is not
-          claiming to be the Organizer. You also agree that the submitted
+          to the display and use of the submitted content by The Street Art List
+          and understand that by posting said content, The Street Art List is
+          not claiming to be the Organizer. You also agree that the submitted
           content can be saved by The Street Art List in its database. Any
           submitted Open Call information will be retained in The Street Art
           List&apos;s archive and cannot be deleted by users once it is

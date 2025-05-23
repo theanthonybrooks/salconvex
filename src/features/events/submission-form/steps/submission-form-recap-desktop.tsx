@@ -453,28 +453,8 @@ export const SubmissionFormRecapDesktop = ({
       </NavTabs>
       <div className="space-y-6 sm:mb-6">
         {!alreadyPaid && (
-          <div className="space-y-6 border-l-2 border-foreground/10">
-            <div className="flex h-full w-full justify-end">
-              <div className="flex h-full flex-col items-end justify-center gap-4">
-                <p className="text-sm text-foreground">
-                  By continuing, you confirm that you have read and agree to the{" "}
-                  <Link
-                    href="/terms"
-                    className="text-sm underline underline-offset-2 hover:underline"
-                  >
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    href="/privacy"
-                    className="text-sm underline underline-offset-2 hover:underline"
-                  >
-                    Privacy Policy
-                  </Link>
-                </p>
-
-                <div className="flex flex-col items-end gap-2">
-                  {/* <div className="flex items-center gap-2">
+          <div className="flex flex-col items-end gap-2">
+            {/* <div className="flex items-center gap-2">
                           <Checkbox
                             name="terms"
                             id="terms"
@@ -491,32 +471,43 @@ export const SubmissionFormRecapDesktop = ({
                             call.
                           </label>
                         </div> */}
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      name="info"
-                      id="info"
-                      checked={acceptedTerms}
-                      onCheckedChange={(value) =>
-                        setAcceptedTerms(value === true)
-                      }
-                    />
-                    <label
-                      htmlFor="info"
-                      className="text-sm text-foreground hover:cursor-pointer"
-                    >
-                      I agree to the terms and verify that all information
-                      provided is accurate and complete.
-                      {/* I verify that all information provided is accurate and
+            <div className="flex items-center gap-2">
+              <Checkbox
+                name="info"
+                id="info"
+                checked={acceptedTerms}
+                onCheckedChange={(value) => setAcceptedTerms(value === true)}
+              />
+              <label
+                htmlFor="info"
+                className="text-sm text-foreground hover:cursor-pointer"
+              >
+                I have read and agree to the{" "}
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  className="text-sm underline underline-offset-2 hover:underline"
+                >
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  className="text-sm underline underline-offset-2 hover:underline"
+                >
+                  Privacy Policy
+                </Link>{" "}
+                and confirm that all information provided is accurate and
+                complete.
+                {/* I verify that all information provided is accurate and
                             complete and that I have permission to submit this as
                             the organizer (or other person with the necessary
                             authority). */}
-                    </label>
-                    {/* <pre className="text-sm text-foreground">
+              </label>
+              {/* <pre className="text-sm text-foreground">
                             {JSON.stringify(ocData, null, 2)}
                           </pre> */}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}

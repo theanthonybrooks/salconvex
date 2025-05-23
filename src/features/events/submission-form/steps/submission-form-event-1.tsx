@@ -118,7 +118,6 @@ const SubmissionFormEventStep1 = ({
       // setValue("event.hasOpenCall", "False");
     }
   }, [formType, setValue]);
-  console.log(formType);
 
   return (
     <div
@@ -145,7 +144,7 @@ const SubmissionFormEventStep1 = ({
               <p className="lg:text-xs">Category</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.category" className="sr-only">
                 Event Category
               </Label>
@@ -202,7 +201,7 @@ const SubmissionFormEventStep1 = ({
               <p className="lg:text-xs">Event Type</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Event Type
               </Label>
@@ -250,7 +249,7 @@ const SubmissionFormEventStep1 = ({
               </p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.name" className="sr-only">
                 {getEventCategoryLabelAbbr(category)} Name
               </Label>
@@ -288,7 +287,7 @@ const SubmissionFormEventStep1 = ({
                   <p className="lg:text-xs">Location</p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.name" className="sr-only">
                     {getEventCategoryLabelAbbr(category)} Location
                   </Label>
@@ -323,7 +322,7 @@ const SubmissionFormEventStep1 = ({
                     {getEventCategoryLabelAbbr(category)} Logo
                   </p>
                 </div>
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="organization.logo" className="sr-only">
                     Event/Project Logo
                   </Label>
@@ -362,7 +361,7 @@ const SubmissionFormEventStep1 = ({
                       </p>
                     </div>
 
-                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
                         {getEventCategoryLabelAbbr(category)} About
                       </Label>

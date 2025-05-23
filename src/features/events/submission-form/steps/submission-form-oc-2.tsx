@@ -245,7 +245,7 @@ const SubmissionFormOC2 = ({
           <p className="lg:text-xs">Budget</p>
         </div>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+        <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
           <Label htmlFor="hasBudget" className="sr-only">
             Project Budget
           </Label>
@@ -371,7 +371,7 @@ const SubmissionFormOC2 = ({
               <p className="text-xs">(optional)</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="hasBudget" className="sr-only">
                 Budget Rate
               </Label>
@@ -467,7 +467,7 @@ const SubmissionFormOC2 = ({
               <p className="lg:text-xs">All inclusive</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.category" className="sr-only">
                 All inclusive budget selection
               </Label>
@@ -530,7 +530,7 @@ const SubmissionFormOC2 = ({
               <p className="lg:text-xs">Categories</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Event Type
               </Label>
@@ -618,7 +618,7 @@ const SubmissionFormOC2 = ({
                   <p className="lg:text-xs">Continued</p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.type" className="sr-only">
                     Compensation Category Amounts (Optional)
                   </Label>
@@ -670,7 +670,7 @@ const SubmissionFormOC2 = ({
               <p className="lg:text-xs">More Info</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Eligibility Continued... (if not &quot;International&quot;)
               </Label>

@@ -172,7 +172,7 @@ const SubmissionFormOC1 = ({
           <p className="lg:text-xs">Call Format</p>
         </div>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+        <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
           <Label htmlFor="event.category" className="sr-only">
             Open Call Format
           </Label>
@@ -228,7 +228,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">Eligibility</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.category" className="sr-only">
                 Open Call Eligibility
               </Label>
@@ -279,7 +279,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">Eligible Nationalities</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.category" className="sr-only">
                 Open Call Eligibility
               </Label>
@@ -319,7 +319,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">More Info</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Eligibility Continued... (if not &quot;International&quot;)
               </Label>
@@ -351,7 +351,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">App Fee</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="hasAppFee" className="sr-only">
                 Application Fee
               </Label>
@@ -474,7 +474,7 @@ const SubmissionFormOC1 = ({
                   <p className="lg:text-xs">Open Call Dates</p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="openCall.basicInfo.dates" className="sr-only">
                     Open Call Dates
                   </Label>
@@ -529,7 +529,7 @@ const SubmissionFormOC1 = ({
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.type" className="sr-only">
                   Application Requirements
                 </Label>
@@ -562,7 +562,7 @@ const SubmissionFormOC1 = ({
                     {/* TODO: when internal applications are implemented, add this back in */}
                     {/* <p className="lg:text-xs">(If external)</p> */}
                   </div>
-                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                  <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label
                       htmlFor="openCall.requirements.applicationLink"
                       className="sr-only"
@@ -603,7 +603,7 @@ const SubmissionFormOC1 = ({
                     </p>
                     <p className="lg:text-xs">Application Docs</p>
                   </div>
-                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                  <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="openCall.tempFiles" className="sr-only">
                       Application Documents
                     </Label>

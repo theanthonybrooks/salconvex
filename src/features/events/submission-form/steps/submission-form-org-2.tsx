@@ -45,7 +45,7 @@ const SubmissionFormOrgStep2 = ({
             <p className="lg:text-xs">Organizer Links</p>
           </div>
 
-          <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+          <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
             <Label htmlFor="event.category" className="sr-only">
               Organizer Links
             </Label>
@@ -76,7 +76,7 @@ const SubmissionFormOrgStep2 = ({
               <p className="min-w-max font-bold lg:text-xl">Step 2</p>
               <p className="lg:text-xs">Primary Contact</p>
             </div>
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label
                 htmlFor="organization.contact.organizer"
                 className="sr-only"
@@ -118,7 +118,7 @@ const SubmissionFormOrgStep2 = ({
               <p className="lg:text-xs">Organizer - About</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="organization.about" className="sr-only">
                 Organizer - About
               </Label>

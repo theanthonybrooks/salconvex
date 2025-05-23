@@ -87,7 +87,7 @@ const SubmissionFormEventStep2 = ({
           </p>
         </div>
 
-        <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+        <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
           <Label htmlFor="event.category" className="sr-only">
             Event Links
           </Label>
@@ -125,7 +125,7 @@ const SubmissionFormEventStep2 = ({
                     </p>
                     <p className="lg:text-xs">Open Call</p>
                   </div>
-                  <div className="mx-auto mb-2 flex w-full max-w-[74dvw] flex-col gap-2 sm:mb-auto lg:min-w-[300px] lg:max-w-md">
+                  <div className="mx-auto mb-2 flex w-full flex-col gap-2 sm:mb-auto lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.hasOpenCall" className="sr-only">
                       Open Call
                     </Label>
@@ -201,7 +201,7 @@ const SubmissionFormEventStep2 = ({
                 <p className="lg:text-xs">Other Info</p>
               </div>
 
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.name" className="sr-only">
                   {getEventCategoryLabelAbbr(category)} Other Info
                 </Label>
@@ -234,7 +234,7 @@ const SubmissionFormEventStep2 = ({
                     <p className="lg:text-xs">Admin Notes</p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                  <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.name" className="sr-only">
                       Admin Notes
                     </Label>

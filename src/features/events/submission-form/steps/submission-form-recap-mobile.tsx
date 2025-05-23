@@ -488,52 +488,40 @@ export const SubmissionFormRecapMobile = ({
       </Tabs>
       <div className="flex flex-col gap-8">
         {!alreadyPaid && (
-          <div className="space-y-6 sm:mb-6">
-            <div className="flex h-full w-full justify-center">
-              <div className="mt-3 flex h-full flex-col items-end justify-center gap-6 border-t-2 border-dotted border-foreground/20 pt-6">
-                <span className="mx-auto text-balance text-center text-sm text-foreground">
-                  By continuing, you confirm that you have read and agree to the{" "}
-                  <br className="block sm:hidden" />
-                  <span className="mt-1 text-sm">
-                    <Link
-                      href="/terms"
-                      className="text-sm underline underline-offset-2 hover:underline"
-                    >
-                      Terms
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      href="/privacy"
-                      className="text-sm underline underline-offset-2 hover:underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                  </span>
-                </span>
-
-                <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      size="size-5"
-                      checkSize="size-4"
-                      name="terms"
-                      id="terms"
-                      checked={acceptedTerms}
-                      onCheckedChange={(value) => {
-                        setAcceptedTerms(value === true);
-                      }}
-                    />
-                    <label
-                      htmlFor="terms"
-                      className="text-sm text-foreground hover:cursor-pointer"
-                    >
-                      I agree to the terms and verify that all information
-                      provided is accurate and complete.
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-start gap-3">
+            <Checkbox
+              size="size-5"
+              checkSize="size-4"
+              name="terms"
+              id="terms"
+              checked={acceptedTerms}
+              onCheckedChange={(value) => {
+                setAcceptedTerms(value === true);
+              }}
+            />
+            <label
+              htmlFor="terms"
+              className="text-sm text-foreground hover:cursor-pointer"
+            >
+              I have read and agree to the{" "}
+              <Link
+                href="/terms"
+                target="_blank"
+                className="text-sm underline underline-offset-2 hover:underline"
+              >
+                Terms and Conditions
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="text-sm underline underline-offset-2 hover:underline"
+              >
+                Privacy Policy
+              </Link>{" "}
+              and confirm that all information provided is accurate and
+              complete.
+            </label>
           </div>
         )}
         {submissionCost && !alreadyPaid && paidCall && (

@@ -91,7 +91,7 @@ const SubmissionFormOrgStep = ({
     <div
       id="step-1-container"
       className={cn(
-        "flex h-full flex-col gap-4 xl:justify-center",
+        "mx-auto flex h-full w-full flex-col gap-4 sm:w-[90%] lg:w-full xl:justify-center",
         existingOrg && "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
         !firstColVisible && "xl:grid-cols-[0_10%_1fr] xl:gap-0",
       )}
@@ -99,7 +99,7 @@ const SubmissionFormOrgStep = ({
       <section
         id="first-section"
         className={cn(
-          "mx-auto flex flex-col items-center gap-y-6 self-start lg:self-center xl:justify-center",
+          "mx-auto flex w-full flex-col items-center gap-y-6 self-start lg:self-center xl:justify-center",
           !firstColVisible && "invisible",
         )}
       >
@@ -267,7 +267,7 @@ const SubmissionFormOrgStep = ({
           <Separator thickness={2} className="my-4 xl:hidden" />
           {existingOrg && (
             <div
-              className="hidden w-full flex-col items-center gap-3 hover:cursor-pointer sm:flex"
+              className="hidden w-full flex-col items-center gap-3 hover:cursor-pointer xl:flex"
               onClick={() => setFirstColVisible((prev) => !prev)}
             >
               <LucideChevronsLeftRight className="size-6 shrink-0 text-foreground/50" />
