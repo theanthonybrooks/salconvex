@@ -254,7 +254,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md",
+        "mx-auto flex w-full flex-col gap-2 sm:w-[90%] lg:min-w-[300px] lg:max-w-md",
         className,
       )}
     >

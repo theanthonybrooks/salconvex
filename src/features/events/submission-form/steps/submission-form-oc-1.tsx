@@ -153,7 +153,7 @@ const SubmissionFormOC1 = ({
     <div
       id="step-1-container"
       className={cn(
-        "flex h-full flex-col gap-4 xl:justify-center",
+        "flex h-full w-full flex-col gap-4 sm:w-[90%] lg:w-full xl:justify-center",
         "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[40%_10%_50%] xl:gap-0",
       )}

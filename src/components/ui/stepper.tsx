@@ -197,7 +197,7 @@ export default function HorizontalLinearStepper({
           typeof formType === "number" &&
           setFormType &&
           ((isMobile && firstStep) || !isMobile) && (
-            <div className="relative inset-y-0 z-10 mx-auto mt-3 flex w-40 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner md:w-28 md:p-0 lg:mt-0">
+            <div className="relative inset-y-0 z-10 mx-auto mt-3 flex w-40 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:mt-0 lg:w-28 lg:p-0">
               {/* Thumb indicator */}
               <div
                 className={cn(
@@ -219,7 +219,7 @@ export default function HorizontalLinearStepper({
                   )}
                   type="button"
                 >
-                  <Icon className="size-6 shrink-0 md:size-4" />
+                  <Icon className="size-6 shrink-0 lg:size-4" />
                 </button>
               ))}
             </div>

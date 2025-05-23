@@ -1500,7 +1500,6 @@ export const EventOCForm = ({
 
   useEffect(() => {
     if (scrollTrigger) {
-      console.log("scrolling");
       if (bottomRef.current) {
         bottomRef.current.scrollIntoView({ behavior: "smooth" });
         setScrollTrigger(false);

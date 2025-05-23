@@ -89,7 +89,7 @@ export const SubmissionFormRecapMobile = ({
     return () => clearTimeout(timeout);
   }, []);
   return (
-    <div className="flex flex-col gap-y-8 lg:hidden">
+    <div className="flex h-full flex-col justify-between gap-y-8 lg:hidden">
       <Tabs
         onValueChange={(value) => setActiveTab(value)}
         value={activeTab}
@@ -165,55 +165,6 @@ export const SubmissionFormRecapMobile = ({
                   </tr>
                 </tbody>
               </table>
-              {!alreadyPaid && (
-                <div className="space-y-6">
-                  <div className="flex h-full w-full justify-end">
-                    <div className="mt-3 flex h-full flex-col items-end justify-center gap-6 border-t-2 border-dotted border-foreground/20 pt-6">
-                      <span className="text-balance text-center text-sm text-foreground">
-                        By continuing, you confirm that you have read and agree
-                        to the <br />
-                        <span className="mt-1 text-sm">
-                          <Link
-                            href="/terms"
-                            className="underline underline-offset-2 hover:underline"
-                          >
-                            Terms
-                          </Link>{" "}
-                          and{" "}
-                          <Link
-                            href="/privacy"
-                            className="underline underline-offset-2 hover:underline"
-                          >
-                            Privacy Policy
-                          </Link>
-                        </span>
-                      </span>
-
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            size="size-5"
-                            checkSize="size-4"
-                            name="terms"
-                            id="terms"
-                            checked={acceptedTerms}
-                            onCheckedChange={(value) => {
-                              setAcceptedTerms(value === true);
-                            }}
-                          />
-                          <label
-                            htmlFor="terms"
-                            className="text-sm text-foreground hover:cursor-pointer"
-                          >
-                            I agree to the terms and verify that all information
-                            provided is accurate and complete.
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </TabsContent>
@@ -535,25 +486,74 @@ export const SubmissionFormRecapMobile = ({
           )}
         </TabsContent>
       </Tabs>
-      {submissionCost && !alreadyPaid && paidCall && (
-        <div className="mt-4 flex w-full justify-end">
-          <span className="items-baseline gap-2 text-right text-base font-medium text-foreground">
-            Submission cost for this open call is:
-            <span className={cn("flex items-start justify-end gap-2")}>
-              (USD){" "}
-              <p
-                className={cn(
-                  isEligibleForFree && "line-through",
-                  "text-4xl font-bold",
-                )}
-              >
-                ${submissionCost}
-              </p>
-              {isEligibleForFree ? 0 : ""}
+      <div className="flex flex-col gap-8">
+        {!alreadyPaid && (
+          <div className="space-y-6 sm:mb-6">
+            <div className="flex h-full w-full justify-center">
+              <div className="mt-3 flex h-full flex-col items-end justify-center gap-6 border-t-2 border-dotted border-foreground/20 pt-6">
+                <span className="mx-auto text-balance text-center text-sm text-foreground">
+                  By continuing, you confirm that you have read and agree to the{" "}
+                  <br className="block sm:hidden" />
+                  <span className="mt-1 text-sm">
+                    <Link
+                      href="/terms"
+                      className="text-sm underline underline-offset-2 hover:underline"
+                    >
+                      Terms
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/privacy"
+                      className="text-sm underline underline-offset-2 hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </span>
+                </span>
+
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      size="size-5"
+                      checkSize="size-4"
+                      name="terms"
+                      id="terms"
+                      checked={acceptedTerms}
+                      onCheckedChange={(value) => {
+                        setAcceptedTerms(value === true);
+                      }}
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm text-foreground hover:cursor-pointer"
+                    >
+                      I agree to the terms and verify that all information
+                      provided is accurate and complete.
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {submissionCost && !alreadyPaid && paidCall && (
+          <div className="mt-4 flex w-full justify-end">
+            <span className="items-baseline gap-2 text-right text-base font-medium text-foreground">
+              Submission cost for this open call is:
+              <span className={cn("flex items-start justify-end gap-2")}>
+                (USD){" "}
+                <span
+                  className={cn("mr-5 flex items-center text-4xl font-bold")}
+                >
+                  <p className={cn(isEligibleForFree && "text-emerald-600")}>
+                    ${isEligibleForFree ? 0 : submissionCost}
+                  </p>
+                </span>
+              </span>
             </span>
-          </span>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

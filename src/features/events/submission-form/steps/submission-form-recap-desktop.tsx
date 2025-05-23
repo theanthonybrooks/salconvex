@@ -86,7 +86,7 @@ export const SubmissionFormRecapDesktop = ({
   console.log(ocData);
   console.log(orgData);
   return (
-    <div className="hidden flex-col gap-y-8 lg:flex">
+    <div className="hidden h-full flex-col justify-between gap-y-8 lg:flex">
       <NavTabs
         tabs={tabList}
         activeTab={activeTab}
@@ -131,75 +131,6 @@ export const SubmissionFormRecapDesktop = ({
                 </tr>
               </tbody>
             </table>
-            {!alreadyPaid && (
-              <div className="space-y-6 border-l-2 border-foreground/10 px-8">
-                <div className="flex h-full w-full justify-end">
-                  <div className="flex h-full flex-col items-end justify-center gap-4">
-                    <p className="text-sm text-foreground">
-                      By continuing, you confirm that you have read and agree to
-                      the{" "}
-                      <Link
-                        href="/terms"
-                        className="underline underline-offset-2 hover:underline"
-                      >
-                        Terms of Service
-                      </Link>{" "}
-                      and{" "}
-                      <Link
-                        href="/privacy"
-                        className="underline underline-offset-2 hover:underline"
-                      >
-                        Privacy Policy
-                      </Link>
-                    </p>
-
-                    <div className="flex flex-col items-end gap-2">
-                      {/* <div className="flex items-center gap-2">
-                        <Checkbox
-                          name="terms"
-                          id="terms"
-                          checked={acceptedTerms}
-                          onCheckedChange={(value) => {
-                            setAcceptedTerms(value === true);
-                          }}
-                        />
-                        <label
-                          htmlFor="terms"
-                          className="text-sm text-foreground hover:cursor-pointer"
-                        >
-                          I agree and would like to post my event and/or open
-                          call.
-                        </label>
-                      </div> */}
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          name="info"
-                          id="info"
-                          checked={acceptedTerms}
-                          onCheckedChange={(value) =>
-                            setAcceptedTerms(value === true)
-                          }
-                        />
-                        <label
-                          htmlFor="info"
-                          className="text-sm text-foreground hover:cursor-pointer"
-                        >
-                          I agree to the terms and verify that all information
-                          provided is accurate and complete.
-                          {/* I verify that all information provided is accurate and
-                          complete and that I have permission to submit this as
-                          the organizer (or other person with the necessary
-                          authority). */}
-                        </label>
-                        {/* <pre className="text-sm text-foreground">
-                          {JSON.stringify(ocData, null, 2)}
-                        </pre> */}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
         <div id="event" className="px-4">
@@ -520,21 +451,93 @@ export const SubmissionFormRecapDesktop = ({
           </div>
         )}
       </NavTabs>
-      {submissionCost && !alreadyPaid && paidCall && (
-        <div className="mt-4 flex w-full justify-end">
-          <span className="items-baseline gap-2 text-lg font-semibold text-foreground">
-            Submission cost for this event/open call is:
-            <span className={cn("flex items-start justify-end gap-2")}>
-              (USD){" "}
-              <span className={cn("mr-5 flex items-center text-4xl font-bold")}>
-                <p className={cn(isEligibleForFree && "text-emerald-600")}>
-                  ${isEligibleForFree ? 0 : submissionCost}
+      <div className="space-y-6 sm:mb-6">
+        {!alreadyPaid && (
+          <div className="space-y-6 border-l-2 border-foreground/10">
+            <div className="flex h-full w-full justify-end">
+              <div className="flex h-full flex-col items-end justify-center gap-4">
+                <p className="text-sm text-foreground">
+                  By continuing, you confirm that you have read and agree to the{" "}
+                  <Link
+                    href="/terms"
+                    className="text-sm underline underline-offset-2 hover:underline"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-sm underline underline-offset-2 hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
                 </p>
+
+                <div className="flex flex-col items-end gap-2">
+                  {/* <div className="flex items-center gap-2">
+                          <Checkbox
+                            name="terms"
+                            id="terms"
+                            checked={acceptedTerms}
+                            onCheckedChange={(value) => {
+                              setAcceptedTerms(value === true);
+                            }}
+                          />
+                          <label
+                            htmlFor="terms"
+                            className="text-sm text-foreground hover:cursor-pointer"
+                          >
+                            I agree and would like to post my event and/or open
+                            call.
+                          </label>
+                        </div> */}
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      name="info"
+                      id="info"
+                      checked={acceptedTerms}
+                      onCheckedChange={(value) =>
+                        setAcceptedTerms(value === true)
+                      }
+                    />
+                    <label
+                      htmlFor="info"
+                      className="text-sm text-foreground hover:cursor-pointer"
+                    >
+                      I agree to the terms and verify that all information
+                      provided is accurate and complete.
+                      {/* I verify that all information provided is accurate and
+                            complete and that I have permission to submit this as
+                            the organizer (or other person with the necessary
+                            authority). */}
+                    </label>
+                    {/* <pre className="text-sm text-foreground">
+                            {JSON.stringify(ocData, null, 2)}
+                          </pre> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {submissionCost && !alreadyPaid && paidCall && (
+          <div className="mt-4 flex w-full justify-end">
+            <span className="items-baseline gap-2 text-lg font-semibold text-foreground">
+              Submission cost for this event/open call is:
+              <span className={cn("flex items-start justify-end gap-2")}>
+                (USD){" "}
+                <span
+                  className={cn("mr-5 flex items-center text-4xl font-bold")}
+                >
+                  <p className={cn(isEligibleForFree && "text-emerald-600")}>
+                    ${isEligibleForFree ? 0 : submissionCost}
+                  </p>
+                </span>
               </span>
             </span>
-          </span>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

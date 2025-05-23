@@ -214,8 +214,8 @@ const SubmissionFormOC2 = ({
     <div
       id="step-1-container"
       className={cn(
-        "my-auto flex h-fit w-full flex-col gap-4 xl:justify-center",
-        "mx-auto sm:max-w-max",
+        "my-auto flex h-fit w-full flex-col gap-4 sm:w-[90%] lg:w-full xl:justify-center",
+        "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none",
         allInclusive === false &&
           showBudgetInputs &&

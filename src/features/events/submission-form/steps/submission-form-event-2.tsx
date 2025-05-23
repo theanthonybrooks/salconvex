@@ -64,7 +64,7 @@ const SubmissionFormEventStep2 = ({
     <div
       id="step-2-container"
       className={cn(
-        "flex h-full flex-col gap-4 xl:justify-center",
+        "flex h-full w-full flex-col gap-4 sm:w-[90%] lg:w-full xl:justify-center",
         "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
       )}
