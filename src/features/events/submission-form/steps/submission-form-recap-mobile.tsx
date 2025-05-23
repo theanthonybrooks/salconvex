@@ -44,8 +44,7 @@ interface SubmissionFormRecapMobileProps {
   formType: number;
   isAdmin: boolean;
   setAcceptedTerms: (value: boolean) => void;
-  setInfoVerified: (value: boolean) => void;
-  infoVerified: boolean;
+
   acceptedTerms: boolean;
   isEligibleForFree: boolean;
   submissionCost: number | undefined;
@@ -56,8 +55,7 @@ export const SubmissionFormRecapMobile = ({
   formType,
   isAdmin,
   setAcceptedTerms,
-  setInfoVerified,
-  infoVerified,
+
   acceptedTerms,
   submissionCost,
   isEligibleForFree,
@@ -91,7 +89,7 @@ export const SubmissionFormRecapMobile = ({
     return () => clearTimeout(timeout);
   }, []);
   return (
-    <div className="flex max-w-[74dvw] flex-col gap-y-8 lg:hidden">
+    <div className="flex flex-col gap-y-8 lg:hidden">
       <Tabs
         onValueChange={(value) => setActiveTab(value)}
         value={activeTab}
@@ -125,7 +123,7 @@ export const SubmissionFormRecapMobile = ({
                 {tab.id === "organizer" && "Organizer"}
                 {tab.id === "event" &&
                   getEventCategoryLabel(eventData.category)}
-                {paidCall && tab.id === "openCall" && "Open Call"}
+                {!eventOnly && tab.id === "openCall" && "Open Call"}
               </span>
             </TabsTrigger>
           ))}
@@ -150,9 +148,7 @@ export const SubmissionFormRecapMobile = ({
                   </tr>
 
                   <tr>
-                    <th className="pr-4 align-top font-medium">
-                      Primary Contact
-                    </th>
+                    <th className="pr-4 align-top font-medium">Primary</th>
                     <td>
                       <OrganizerMainContact
                         organizer={orgData as OrgContactProps}
@@ -209,35 +205,9 @@ export const SubmissionFormRecapMobile = ({
                             htmlFor="terms"
                             className="text-sm text-foreground hover:cursor-pointer"
                           >
-                            I agree and would like to post my event and/or open
-                            call.
+                            I agree to the terms and verify that all information
+                            provided is accurate and complete.
                           </label>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            size="size-5"
-                            checkSize="size-4"
-                            name="info"
-                            id="info"
-                            checked={infoVerified}
-                            onCheckedChange={(value) =>
-                              setInfoVerified(value === true)
-                            }
-                          />
-                          <label
-                            htmlFor="info"
-                            className="text-sm text-foreground hover:cursor-pointer"
-                          >
-                            I verify that all information provided is accurate
-                            and complete.
-                            {/* I verify that all information provided is accurate and
-                          complete and that I have permission to submit this as
-                          the organizer (or other person with the necessary
-                          authority). */}
-                          </label>
-                          {/* <pre className="text-sm text-foreground">
-                          {JSON.stringify(ocData, null, 2)}
-                        </pre> */}
                         </div>
                       </div>
                     </div>

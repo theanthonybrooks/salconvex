@@ -159,28 +159,28 @@ export const theListNavbarMenuLinks: {
     description: "Open calls ending this week",
     sub: ["all"],
   },
-  {
-    title: "Archive",
-    href: "/thelist/archive",
-    description: "Archive of all events - past and current",
-    sub: ["all"],
-  },
-  {
-    title: "World Map",
-    href: "/map",
-    description: "Map of all street art fests, mural projects, etc",
-    sub: ["all"],
-  },
-  {
-    title: "Calendar",
-    href: "/calendar",
-    description: "View upcoming events",
-    sub: ["all"],
-  },
-  {
-    title: "Newsletter Archive",
-    href: "/newsletter",
-    description: "Archive of past newsletters",
-    sub: ["all"],
-  },
+  // {
+  //   title: "Archive",
+  //   href: "/thelist/archive",
+  //   description: "Archive of all events - past and current",
+  //   sub: ["all"],
+  // },
+  // {
+  //   title: "World Map",
+  //   href: "/map",
+  //   description: "Map of all street art fests, mural projects, etc",
+  //   sub: ["all"],
+  // },
+  // {
+  //   title: "Calendar",
+  //   href: "/calendar",
+  //   description: "View upcoming events",
+  //   sub: ["all"],
+  // },
+  // {
+  //   title: "Newsletter Archive",
+  //   href: "/newsletter",
+  //   description: "Archive of past newsletters",
+  //   sub: ["all"],
+  // },
 ];

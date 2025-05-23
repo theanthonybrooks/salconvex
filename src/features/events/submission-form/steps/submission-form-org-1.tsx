@@ -39,6 +39,7 @@ interface SubmissionFormOrgStepProps {
   selectedRow: Record<string, boolean>;
   furthestStep: number;
   preloadFlag?: boolean;
+  adminMode?: boolean;
 }
 
 const SubmissionFormOrgStep = ({
@@ -63,6 +64,7 @@ const SubmissionFormOrgStep = ({
   selectedRow,
   furthestStep,
   preloadFlag,
+  adminMode,
 }: SubmissionFormOrgStepProps) => {
   const {
     control,
@@ -265,7 +267,7 @@ const SubmissionFormOrgStep = ({
           <Separator thickness={2} className="my-4 xl:hidden" />
           {existingOrg && (
             <div
-              className="flex w-full flex-col items-center gap-3 hover:cursor-pointer"
+              className="hidden w-full flex-col items-center gap-3 hover:cursor-pointer sm:flex"
               onClick={() => setFirstColVisible((prev) => !prev)}
             >
               <LucideChevronsLeftRight className="size-6 shrink-0 text-foreground/50" />
@@ -343,10 +345,11 @@ const SubmissionFormOrgStep = ({
                 setSelectedRow(selection);
               }}
               selectedRow={selectedRow}
-              className="w-full max-w-[74dvw] overflow-x-auto sm:max-w-[90vw]"
+              className="w-full overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn(
                 "lg:hidden",
                 newOrgEvent && "opacity-80",
+                adminMode ? "max-w-full" : "max-w-[74dvw]",
               )}
               tableType="events"
             />

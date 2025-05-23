@@ -217,7 +217,6 @@ export const EventOCForm = ({
   // #endregion
   // #region ------------- State --------------
   const [acceptedTerms, setAcceptedTerms] = useState(isAdmin);
-  const [infoVerified, setInfoVerified] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [furthestStep, setFurthestStep] = useState(0);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
@@ -289,7 +288,7 @@ export const EventOCForm = ({
   // const eventDatesWatch = watch("event.dates");
   // #endregion
   // #region ------------- Variables --------------
-  const userAcceptedTerms = acceptedTerms && infoVerified;
+  const userAcceptedTerms = acceptedTerms;
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
@@ -1490,7 +1489,6 @@ export const EventOCForm = ({
     if (!alreadyPaid) return;
     if (alreadyPaid) {
       setAcceptedTerms(true);
-      setInfoVerified(true);
     }
   }, [alreadyPaid]);
 
@@ -1499,44 +1497,6 @@ export const EventOCForm = ({
       updateLastChanged();
     }
   }, [watchedValues, updateLastChanged, hasUserEditedForm]);
-
-  // useEffect(() => {
-  //   // console.log("active step: ", activeStep);
-  // }, [activeStep]);
-
-  // useEffect(() => {
-  //   // console.log("existingOrg", existingOrg);
-  // }, [existingOrg]);
-  // useEffect(() => {
-  //   if (orgData?.name !== undefined && orgData?.name !== "") {
-  // console.log("orgData", getValues("organization"));
-  // console.log("org", existingOrg);
-  //   }
-  // }, [orgData, existingOrg, getValues]);
-
-  // useEffect(() => {
-  //   console.log("eventData", eventData);
-  //   // console.log("existingEvent", existingEvent);
-  // }, [eventData, existingEvent]);
-
-  // useEffect(() => {
-  // console.log("oc", openCallData);
-  // }, [openCallData]);
-
-  // useEffect(() => {
-  //   console.log("eventLogo", eventLogo);
-  //   console.log("eventName", eventName);
-  // }, [eventLogo, eventName]);
-
-  // useEffect(() => {
-  // console.log("form valid:", isValid, "step valid:", isStepValidZod);
-  // }, [isValid, isStepValidZod]);
-
-  // useEffect(() => {
-  //   if (dirtyFields) {
-  //     console.log(dirtyFields);
-  //   }
-  // }, [dirtyFields]);
 
   useEffect(() => {
     if (scrollTrigger) {
@@ -2033,8 +1993,6 @@ export const EventOCForm = ({
                   formType={formType}
                   isAdmin={isAdmin}
                   setAcceptedTerms={setAcceptedTerms}
-                  setInfoVerified={setInfoVerified}
-                  infoVerified={infoVerified}
                   acceptedTerms={acceptedTerms}
                   submissionCost={submissionCost?.price}
                   isEligibleForFree={isEligibleForFree}
@@ -2045,8 +2003,6 @@ export const EventOCForm = ({
                     formType={formType}
                     isAdmin={isAdmin}
                     setAcceptedTerms={setAcceptedTerms}
-                    setInfoVerified={setInfoVerified}
-                    infoVerified={infoVerified}
                     acceptedTerms={acceptedTerms}
                     submissionCost={submissionCost?.price}
                     isEligibleForFree={isEligibleForFree}

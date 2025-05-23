@@ -42,8 +42,6 @@ interface SubmissionFormRecapDesktopProps {
   formType: number;
   isAdmin: boolean;
   setAcceptedTerms: (value: boolean) => void;
-  setInfoVerified: (value: boolean) => void;
-  infoVerified: boolean;
   acceptedTerms: boolean;
   isEligibleForFree: boolean;
   submissionCost: number | undefined;
@@ -54,8 +52,6 @@ export const SubmissionFormRecapDesktop = ({
   formType,
   isAdmin,
   setAcceptedTerms,
-  setInfoVerified,
-  infoVerified,
   acceptedTerms,
   submissionCost,
   isEligibleForFree,
@@ -66,6 +62,7 @@ export const SubmissionFormRecapDesktop = ({
   const {
     // getValues,
     watch,
+    formState: { errors },
   } = useFormContext<EventOCFormValues>();
   const eventData = watch("event");
   const ocData = watch("openCall");
@@ -84,7 +81,10 @@ export const SubmissionFormRecapDesktop = ({
   const hasRate =
     typeof ocData?.compensation?.budget?.rate === "number" &&
     ocData?.compensation?.budget?.rate > 0;
-
+  console.log(errors);
+  console.log(eventData);
+  console.log(ocData);
+  console.log(orgData);
   return (
     <div className="hidden flex-col gap-y-8 lg:flex">
       <NavTabs
@@ -154,7 +154,7 @@ export const SubmissionFormRecapDesktop = ({
                     </p>
 
                     <div className="flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-2">
+                      {/* <div className="flex items-center gap-2">
                         <Checkbox
                           name="terms"
                           id="terms"
@@ -170,22 +170,22 @@ export const SubmissionFormRecapDesktop = ({
                           I agree and would like to post my event and/or open
                           call.
                         </label>
-                      </div>
+                      </div> */}
                       <div className="flex items-center gap-2">
                         <Checkbox
                           name="info"
                           id="info"
-                          checked={infoVerified}
+                          checked={acceptedTerms}
                           onCheckedChange={(value) =>
-                            setInfoVerified(value === true)
+                            setAcceptedTerms(value === true)
                           }
                         />
                         <label
                           htmlFor="info"
                           className="text-sm text-foreground hover:cursor-pointer"
                         >
-                          I verify that all information provided is accurate and
-                          complete.
+                          I agree to the terms and verify that all information
+                          provided is accurate and complete.
                           {/* I verify that all information provided is accurate and
                           complete and that I have permission to submit this as
                           the organizer (or other person with the necessary

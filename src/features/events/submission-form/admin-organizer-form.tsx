@@ -48,7 +48,7 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { debounce, merge } from "lodash";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Path } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
@@ -117,6 +117,7 @@ interface AdminEventOCFormProps {
 export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
+  const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
   const [formType, setFormType] = useState<number>(0);
 
@@ -136,7 +137,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       event: {
         formType,
         name: "",
-        hasOpenCall: "Fixed",
+        hasOpenCall: formType === 1 ? "False" : "Fixed",
       },
       openCall: {
         basicInfo: {
@@ -176,6 +177,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region ------------- Actions, Mutations, Queries --------------
 
   // const paidCall = formType === 3 && !isAdmin;
+
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");
   const currentValues = getValues();
@@ -196,7 +198,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
   // #region ------------- State --------------
   const [acceptedTerms, setAcceptedTerms] = useState(isAdmin);
-  const [infoVerified, setInfoVerified] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [furthestStep, setFurthestStep] = useState(0);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
@@ -239,7 +240,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const isStepValidZod = useMemo(() => {
     if (!currentSchema) return true;
     const result = currentSchema.safeParse(watchedValues);
-    // console.log(result);
+    console.log(result);
     return result.success;
   }, [watchedValues, currentSchema]);
   // #endregion
@@ -265,12 +266,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventFormType = eventData?.formType;
   const hasEventId = !!eventData?._id;
 
-  console.log(formType, eventFormType);
-
   // const eventDatesWatch = watch("event.dates");
   // #endregion
   // #region ------------- Variables --------------
-  const userAcceptedTerms = acceptedTerms && infoVerified;
+  const userAcceptedTerms = acceptedTerms;
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
@@ -383,6 +382,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     hasUserEditedStep4 ||
     hasUserEditedStep5
   );
+  console.log(formType, hasUserEditedForm);
   const preloadFlag = useRef(false);
   const preloadOrgRef = useRef(false);
   const preloadEventRef = useRef(false);
@@ -413,7 +413,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   //
   // #region ------------- Console Logs --------------
-  // console.log(errors);
   if (errors && Object.keys(errors).length > 0) {
     console.log("errors", errors);
   }
@@ -426,7 +425,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // );
   // console.log(openCallData);
   // #endregion
-
+  // console.log(!isValid);
   //
   //
   //
@@ -453,14 +452,17 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       toast.error("Failed to submit form");
     }
   };
-  // TODO: Convert timezone on deadline to user timezone on submit to ensure that displayed time is correct.
-  // use convertOpenCallDatesToUserTimezone()
+
   const handleNextStep = async () => {
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
     if (hasUserEditedForm) {
       // console.log("hasUserEditedForm 440");
       await handleSave();
+    }
+    console.log(formType, eventData?.hasOpenCall);
+    if (formType === 1 && eventData?.hasOpenCall === "Fixed") {
+      setValue("event.hasOpenCall", "False");
     }
     handleFirstStep();
     if (activeStep === 2 && !hasOpenCall) {
@@ -513,7 +515,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   };
 
   const handleFirstStep = () => {
-    if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
+    if (activeStep === 0 && !hasUserEditedForm && furthestStep === 0) {
       const locationFromEvent = existingEvent?.location?.full
         ? existingEvent?.location?.sameAsOrganizer
           ? {
@@ -636,8 +638,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       }
       let orgResult = null;
       let orgLogoFullUrl = "/1.jpg";
-      console.log(hasUserEditedStep0);
-      if (hasUserEditedStep0) {
+      if (hasUserEditedForm) {
         console.log("user edited step 0");
         const result = await handleFileUrl({
           data: orgData,
@@ -782,7 +783,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         }
       }
       // await handleFormValues();
-      if (activeStep === 1 && hasUserEditedEventSteps) {
+      if (activeStep === 1 && hasUserEditedForm) {
         let result = {
           logoStorageId: eventData?.logoStorageId as Id<"_storage"> | undefined,
           timezone: existingEvent?.location?.timezone,
@@ -874,7 +875,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setPending(false);
         }
       }
-      if (activeStep === 2 && hasUserEditedEventSteps) {
+      if (activeStep === 2 && hasUserEditedForm) {
         let eventResult = null;
 
         try {
@@ -923,7 +924,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setPending(false);
         }
       }
-      if (activeStep === 3 && hasUserEditedStep3) {
+      if (activeStep === 3 && hasUserEditedForm) {
         let openCallFiles = null;
         let saveResults: {
           id: Id<"openCallFiles">;
@@ -1074,7 +1075,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setPending(false);
         }
       }
-      if (activeStep === 4 && hasUserEditedStep4) {
+      if (activeStep === 4 && hasUserEditedForm) {
         if (!openCallData) return;
 
         try {
@@ -1340,9 +1341,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       hasOpenCall,
       openCallData,
       createOrUpdateOpenCall,
-      hasUserEditedStep0,
-      hasUserEditedStep3,
-      hasUserEditedStep4,
+
       orgData,
       generateUploadUrl,
       getTimezone,
@@ -1350,7 +1349,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       existingOrg,
       reset,
       activeStep,
-      hasUserEditedEventSteps,
+      hasUserEditedForm,
       eventData,
       eventLinks,
       updateOrg,
@@ -1382,8 +1381,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region -------------UseEffects --------------
 
   useEffect(() => {
-    if (!eventFormType || formType !== 0) return;
-    if (eventFormType) {
+    if (eventFormType === undefined || formType !== 0) return;
+    if (eventFormType > 0 && formType === 0) {
+      console.log("event form type", eventFormType);
       setFormType(eventFormType);
     } else {
       setFormType(1);
@@ -1408,7 +1408,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     if (!alreadyPaid) return;
     if (alreadyPaid) {
       setAcceptedTerms(true);
-      setInfoVerified(true);
     }
   }, [alreadyPaid]);
 
@@ -1579,7 +1578,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     const eventChanged =
       eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged && !preloadEventRef.current) {
-      console.log("event changed");
+      preloadFlag.current = false;
+      router.push("/dashboard/admin/event");
       isFirstRun.current = true;
       if (existingEvent?.lastEditedAt) {
         setLastSaved(existingEvent.lastEditedAt);
@@ -1604,7 +1604,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     } else if (!existingEvent) {
       setLastSaved(null);
     }
-  }, [existingEvent, reset, currentValues, ocData, formType]);
+  }, [existingEvent, reset, currentValues, ocData, formType, router]);
 
   useEffect(() => {
     if (savedState.current === false && eventLastEditedAt) {
@@ -1778,6 +1778,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     <>
       <HorizontalLinearStepper
         isAdmin={isAdmin}
+        isMobile={isMobile}
         onCheckSchema={handleCheckSchema}
         errorMsg={errorMsg}
         activeStep={activeStep}
@@ -1822,6 +1823,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             {/* //------ 1st Step: Org & Event Selection ------ */}
             {activeStep === 0 && (
               <SubmissionFormOrgStep
+                adminMode={isAdmin}
                 isAdmin={isAdmin}
                 isMobile={isMobile}
                 existingOrg={existingOrg}
@@ -1919,9 +1921,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   formType={formType}
                   isAdmin={isAdmin}
                   setAcceptedTerms={setAcceptedTerms}
-                  setInfoVerified={setInfoVerified}
-                  infoVerified={isAdmin ?? infoVerified}
-                  acceptedTerms={isAdmin ?? acceptedTerms}
+                  acceptedTerms={acceptedTerms}
                   submissionCost={submissionCost?.price}
                   isEligibleForFree={true}
                   alreadyPaid={alreadyPaid}
@@ -1931,9 +1931,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     formType={formType}
                     isAdmin={isAdmin}
                     setAcceptedTerms={setAcceptedTerms}
-                    setInfoVerified={setInfoVerified}
-                    infoVerified={isAdmin ?? infoVerified}
-                    acceptedTerms={isAdmin ?? acceptedTerms}
+                    acceptedTerms={acceptedTerms}
                     submissionCost={submissionCost?.price}
                     isEligibleForFree={true}
                     alreadyPaid={alreadyPaid}

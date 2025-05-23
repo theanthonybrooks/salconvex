@@ -125,7 +125,7 @@ const SubmissionFormEventStep1 = ({
       id="step-1-container"
       className={cn(
         "flex h-full flex-col gap-4 xl:justify-center",
-        "mx-auto",
+        "mx-auto w-[90%]",
         "xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[45%_10%_45%] xl:gap-0",
       )}
     >

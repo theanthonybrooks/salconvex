@@ -189,7 +189,7 @@ export default function Footer({ className }: { className?: string }) {
             <Separator
               thickness={1}
               orientation="vertical"
-              className="my-4 border-foreground"
+              className="my-4 hidden border-foreground sm:block"
             />
             <div
               data-type="newsletter"
