@@ -445,7 +445,7 @@ const SubmissionFormOC2 = ({
                   >
                     <SelectTrigger
                       className={cn(
-                        "h-12 w-full min-w-25 border text-center text-base sm:h-[50px] sm:w-fit",
+                        "h-12 w-full min-w-25 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                       )}
                     >
                       <SelectValue placeholder="Rate Unit" />
@@ -503,7 +503,7 @@ const SubmissionFormOC2 = ({
                     >
                       <SelectTrigger
                         className={cn(
-                          "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
+                          "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                         )}
                       >
                         <SelectValue placeholder="All Inclusive Budget?" />

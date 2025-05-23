@@ -274,7 +274,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
               }}
               defaultValue={String(field.value ?? "")}
             >
-              <SelectTrigger className="h-12 w-full border text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
+              <SelectTrigger className="h-12 w-full border bg-card text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
                 <SelectValue
                   placeholder={
                     isEvent

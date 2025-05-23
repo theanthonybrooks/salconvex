@@ -527,7 +527,7 @@ const SubmissionFormOC1 = ({
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType && !freeCall ? 5 : 4}:
+                  Step {fixedType && !freeCall ? 5 : freeCall ? 3 : 4}:
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
@@ -558,7 +558,7 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 6 : 5}:
+                      Step {fixedType && !freeCall ? 6 : freeCall ? 4 : 5}:
                     </p>
                     <p className="lg:text-xs">Application Link</p>
                     {/* TODO: when internal applications are implemented, add this back in */}
@@ -601,7 +601,7 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 7 : 6}:
+                      Step {fixedType && !freeCall ? 7 : freeCall ? 5 : 6}:
                     </p>
                     <p className="lg:text-xs">Application Docs</p>
                   </div>
@@ -636,7 +636,7 @@ const SubmissionFormOC1 = ({
                   </div>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 8 : 7}:
+                      Step {fixedType && !freeCall ? 8 : freeCall ? 6 : 7}:
                     </p>
                     <p className="lg:text-xs">External Links</p>
                   </div>
