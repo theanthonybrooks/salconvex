@@ -149,6 +149,8 @@ const SubmissionFormOC1 = ({
 
   // #endregion
 
+  console.log("Open Call", openCall);
+
   return (
     <div
       id="step-1-container"

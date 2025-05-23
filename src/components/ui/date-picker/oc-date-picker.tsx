@@ -50,7 +50,6 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     },
     ref,
   ) => {
-    console.log(rawValue);
     const endDate = ocEnd ?? new Date().toISOString();
     const timeZone = orgTimezone ?? "Europe/Berlin";
     const display =

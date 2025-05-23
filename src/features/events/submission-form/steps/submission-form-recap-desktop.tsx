@@ -62,7 +62,7 @@ export const SubmissionFormRecapDesktop = ({
   const {
     // getValues,
     watch,
-    formState: { errors },
+    // formState: { errors },
   } = useFormContext<EventOCFormValues>();
   const eventData = watch("event");
   const ocData = watch("openCall");
@@ -81,10 +81,7 @@ export const SubmissionFormRecapDesktop = ({
   const hasRate =
     typeof ocData?.compensation?.budget?.rate === "number" &&
     ocData?.compensation?.budget?.rate > 0;
-  console.log(errors);
-  console.log(eventData);
-  console.log(ocData);
-  console.log(orgData);
+
   return (
     <div className="hidden h-full flex-col justify-between gap-y-8 lg:flex">
       <NavTabs
