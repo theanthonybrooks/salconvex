@@ -402,7 +402,7 @@ const SubmissionFormOC1 = ({
                   render={({ field }) => (
                     <SearchMappedSelect<Currency>
                       searchFields={["name", "symbol", "code"]}
-                      className="max-w-28 border-none py-2 sm:h-fit"
+                      className="max-w-28 border-none bg-transparent py-2 sm:h-fit"
                       value={field.value?.code ?? "USD"}
                       onChange={(code) => {
                         const selected = Object.values(currencies[0])
@@ -437,7 +437,7 @@ const SubmissionFormOC1 = ({
                         },
                       }}
                       placeholder={hasAppFee ? "Enter Amount" : ""}
-                      className="h-fit border-none py-2 text-center focus:border-none focus:outline-none sm:text-base"
+                      className="h-fit border-none bg-transparent py-2 text-center focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
                 />
@@ -578,7 +578,7 @@ const SubmissionFormOC1 = ({
                           field={field}
                           placeholder="Link to external application form"
                           className={cn(
-                            "w-full rounded border-foreground",
+                            "w-full rounded border-foreground !bg-transparent",
                             errors?.openCall?.requirements?.applicationLink &&
                               "invalid-field",
                           )}

@@ -213,10 +213,10 @@ const SubmissionFormEventStep1 = ({
                   <MultiSelect
                     id="event.type"
                     className={cn(
-                      "h-12 border sm:h-[50px]",
+                      "h-12 border bg-transparent sm:h-[50px]",
                       errors.event?.type && "invalid-field",
                     )}
-                    badgeClassName="py-2 lg:py-2 lg:text-sm "
+                    badgeClassName="py-2 lg:py-2 lg:text-sm bg-transparent"
                     textClassName="text-base"
                     options={[...eventTypeOptions]}
                     onValueChange={(value) => {
@@ -263,7 +263,7 @@ const SubmissionFormEventStep1 = ({
                     isExisting={eventNameExistsError}
                     onChange={field.onChange}
                     className={cn(
-                      "border !text-base sm:h-[50px]",
+                      "border !bg-transparent !text-base sm:h-[50px]",
                       errors.event?.name &&
                         dirtyFields.event?.name &&
                         "invalid-field",
@@ -308,7 +308,7 @@ const SubmissionFormEventStep1 = ({
                         placeholder="Event Location (if different from organization)..."
                         className="mb-3 w-full lg:mb-0"
                         inputClassName={cn(
-                          "rounded-lg border-foreground disabled:opacity-50",
+                          "rounded-lg border-foreground disabled:opacity-50 !bg-transparent",
                           errors.event?.location && "invalid-field",
                         )}
                       />

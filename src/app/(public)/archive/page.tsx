@@ -1,11 +1,9 @@
-"use client"
+"use client";
 
-import { faqs } from "@/constants/accordions"
-import { AccordionComponent } from "@/features/homepage/accordion-component"
-import Pricing from "@/features/homepage/pricing"
+import Pricing from "@/features/homepage/pricing";
 
-import { motion } from "framer-motion"
-import { Check } from "lucide-react"
+import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 
 export default function Archive() {
   const features = [
@@ -17,25 +15,26 @@ export default function Archive() {
     "Dark Mode Support",
     "Responsive Design",
     "API Integration",
-  ]
+  ];
 
   return (
     <>
       <>
-        <div className='container mx-auto px-4'>
-          <section className='relative flex flex-col items-center justify-center py-20'>
+        <div className="container mx-auto px-4">
+          <section className="relative flex flex-col items-center justify-center py-20">
             {/* Background gradient */}
-            <div className='absolute inset-0 -z-10 h-full w-full bg-white dark:bg-foreground bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]'>
-              <div className='absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-blue-400 dark:bg-blue-500 opacity-20 blur-[100px]'></div>
+            <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] dark:bg-foreground">
+              <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-blue-400 opacity-20 blur-[100px] dark:bg-blue-500"></div>
             </div>
 
-            <div className='space-y-6 text-center'>
+            <div className="space-y-6 text-center">
               {/* Main heading */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className='text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white animate-gradient-x pb-2'>
+                className="bg-linear-to-r animate-gradient-x from-gray-900 via-blue-800 to-gray-900 bg-clip-text pb-2 text-4xl font-bold tracking-tight text-transparent dark:from-white dark:via-blue-300 dark:to-white md:text-6xl lg:text-7xl"
+              >
                 Archive!
               </motion.h1>
 
@@ -44,24 +43,26 @@ export default function Archive() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className='text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto'>
+                className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400 md:text-xl"
+              >
                 The list of all things that have been, will be, and have yet to
                 be found.
               </motion.p>
             </div>
           </section>
 
-          <section className='py-12'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16'>
+          <section className="py-12">
+            <div className="mb-16 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className='space-y-4'>
-                <h2 className='text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white'>
+                className="space-y-4"
+              >
+                <h2 className="bg-linear-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-3xl font-bold text-transparent dark:from-white dark:via-blue-300 dark:to-white">
                   Everything You Need
                 </h2>
-                <p className='text-gray-600 dark:text-gray-400'>
+                <p className="text-gray-600 dark:text-gray-400">
                   Our starter kit comes packed with all the essential features
                   you need to build modern web applications. No more wasting
                   time on repetitive setups.
@@ -71,28 +72,30 @@ export default function Archive() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+              >
                 {features.map((feature) => (
                   <div
                     key={feature}
-                    className='flex items-center gap-2 text-gray-600 dark:text-gray-400'>
-                    <Check className='h-5 w-5 shrink-0 text-blue-500' />
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+                  >
+                    <Check className="h-5 w-5 shrink-0 text-blue-500" />
                     <span>{feature}</span>
                   </div>
                 ))}
               </motion.div>
             </div>
 
-            <div className='py-8'>
+            <div className="py-8">
               <Pricing />
             </div>
           </section>
 
-          <section className='pb-20'>
-            <AccordionComponent src={faqs} />
+          <section className="pb-20">
+            {/* <AccordionComponent src={faqs} /> */}
           </section>
         </div>
       </>
     </>
-  )
+  );
 }

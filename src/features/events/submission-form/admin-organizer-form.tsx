@@ -268,6 +268,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     ? new Date(openCallData?.basicInfo?.dates?.ocEnd)
     : null;
 
+  console.log(eventOpenCall);
   const pastEvent = !!openCallEnd && openCallEnd < now;
   //note-to-self: this is what's hiding the open call sections from users (non-admins). The idea being that they shouldn't be able to change anything. Perhaps the better way would be to still show it, but have it disabled/read only? It's confusing at the moment.
   const hasOpenCall = validOCVals.includes(eventOpenCall);
@@ -295,8 +296,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       : "skip",
   );
 
-  console.log(preloadData);
-  console.log(existingOrg, existingEvent);
   const {
     data: orgEventsData,
     // isPending: orgEventsPending, //use this later for some loading state for the events table. Use skeleton loaders
@@ -1352,7 +1351,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       pending,
     ],
   );
-  console.log(selectedRow);
 
   const handleReset = () => {
     setActiveStep(0);
@@ -1401,26 +1399,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
 
   // #region -------------UseEffects --------------
-  console.log(preloadData, !!preloadData);
-  useEffect(() => {
-    if (!orgData) return;
-    console.log("orgData", orgData);
-  }, [orgData]);
-
-  useEffect(() => {
-    if (!eventData) return;
-    console.log("eventData", eventData);
-  }, [eventData]);
 
   useEffect(() => {
     if (!preloadData) return;
     const { event, organization } = preloadData;
     preloadFlag.current = true;
-
-    // if (event) {
-    //   setNewOrgEvent(false);
-    //   setExistingEvent(event);
-    // }
     if (organization) {
       preloadOrgRef.current = true;
       setExistingOrg(organization);
@@ -1428,12 +1411,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         preloadEventRef.current = true;
         setExistingEvent(event);
       }
-      //   setValue("organization.name", organization.name);
-      //   setValue("organization.logo", organization.logo);
-      //   setValue(
-      //     "organization.location.full",
-      //     organization?.location?.full ?? "",
-      //   );
     }
   }, [preloadData]);
 
@@ -1583,7 +1560,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       preloadOrgRef.current &&
       preloadEventRef.current
     ) {
-      console.log("existingOrg", existingOrg);
       prevEventRef.current = existingEvent;
       reset({
         organization: {

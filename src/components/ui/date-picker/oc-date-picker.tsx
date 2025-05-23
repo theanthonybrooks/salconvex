@@ -93,7 +93,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         onClick={onClick}
         type="button"
         className={cn(
-          "w-full cursor-pointer rounded-lg border text-base font-normal",
+          "w-full cursor-pointer rounded-lg border bg-transparent text-base font-normal",
           className,
         )}
         {...rest}

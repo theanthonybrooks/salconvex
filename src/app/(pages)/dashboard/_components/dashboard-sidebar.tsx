@@ -70,7 +70,7 @@ export default function DashboardSideBar({
     hasAdminRole ? {} : "skip",
   );
   const pendingEvents = submittedEventsData?.length ?? 0;
-  console.log(pendingEvents);
+  // console.log(pendingEvents);
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"));
   const filteredNavItems = useMemo(() => {
     return navItems.filter((item) => {
