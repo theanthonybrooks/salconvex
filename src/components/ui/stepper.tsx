@@ -243,11 +243,13 @@ export default function HorizontalLinearStepper({
         </>
       ) : (
         <>
-          {errorMsg && (
-            <p className="py-4 text-center text-sm italic text-red-600 lg:hidden">
-              {errorMsg}
-            </p>
-          )}
+          {errorMsg &&
+            errorMsg !== "Required" &&
+            errorMsg !== "Invalid input" && (
+              <p className="py-4 text-center text-sm italic text-red-600 lg:hidden">
+                {errorMsg}
+              </p>
+            )}
           <div className={cn("flex items-center justify-between gap-x-4")}>
             <section className="flex items-center gap-x-2">
               <div>
@@ -298,18 +300,22 @@ export default function HorizontalLinearStepper({
               )} */}
             </section>
             {onSave !== undefined &&
-              (!errorMsg || errorMsg === "Required") &&
+              (!errorMsg ||
+                errorMsg === "Required" ||
+                errorMsg === "Invalid input") &&
               !lastSaved &&
               activeStep >= 1 && (
                 <p className="hidden text-balance text-sm italic lg:block">
                   You can save at any time and come back to it later.
                 </p>
               )}
-            {errorMsg && errorMsg !== "Required" && (
-              <p className="hidden text-sm italic text-red-600 lg:block">
-                {errorMsg}
-              </p>
-            )}
+            {errorMsg &&
+              errorMsg !== "Required" &&
+              errorMsg !== "Invalid input" && (
+                <p className="hidden text-sm italic text-red-600 lg:block">
+                  {errorMsg}
+                </p>
+              )}
 
             <section
               className={cn(
