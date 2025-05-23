@@ -596,9 +596,15 @@ export default defineSchema({
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_name_and_edition", ["name", "dates.edition"])
+    .index("by_state_hasOpenCall_approvedAt", [
+      "state",
+      "hasOpenCall",
+      "approvedAt",
+    ])
     // .index("by_mainOrgName", ["mainOrgName"])
     .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])
+    .index("by_state_approvedAt", ["state", "approvedAt"])
 
     // .index("by_eventId", ["event"])
     .index("by_eventType", ["type"])

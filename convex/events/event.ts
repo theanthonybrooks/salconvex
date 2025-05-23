@@ -422,6 +422,20 @@ export const getAllEvents = query({
   },
 });
 
+export const get5latestPublishedEvents = query({
+  handler: async (ctx) => {
+    const publishedEvents = await ctx.db
+      .query("events")
+      .withIndex("by_state_hasOpenCall_approvedAt", (q) =>
+        q.eq("state", "published").eq("hasOpenCall", "Fixed"),
+      )
+      .order("desc")
+      .take(5);
+
+    return publishedEvents;
+  },
+});
+
 export const updateEdition = mutation({
   args: {
     eventId: v.id("events"),

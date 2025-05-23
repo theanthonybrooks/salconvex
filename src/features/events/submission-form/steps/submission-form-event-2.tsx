@@ -140,7 +140,7 @@ const SubmissionFormEventStep2 = ({
                           }}
                           value={field.value ?? ""}
                         >
-                          <SelectTrigger className="h-12 w-full border text-center text-base sm:h-[50px]">
+                          <SelectTrigger className="h-12 w-full border bg-card text-center text-base sm:h-[50px]">
                             <SelectValue
                               placeholder={
                                 !freeCall

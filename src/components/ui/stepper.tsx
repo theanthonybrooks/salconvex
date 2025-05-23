@@ -309,6 +309,7 @@ export default function HorizontalLinearStepper({
                   You can save at any time and come back to it later.
                 </p>
               )}
+              
             {errorMsg &&
               errorMsg !== "Required" &&
               errorMsg !== "Invalid input" && (

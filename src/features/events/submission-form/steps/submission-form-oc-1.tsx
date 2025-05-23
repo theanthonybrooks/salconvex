@@ -192,7 +192,7 @@ const SubmissionFormOC1 = ({
                 >
                   <SelectTrigger
                     className={cn(
-                      "h-12 w-full border text-center text-base sm:h-[50px]",
+                      "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
                       errors.event?.category && "invalid-field",
                     )}
                   >
@@ -248,7 +248,7 @@ const SubmissionFormOC1 = ({
                     >
                       <SelectTrigger
                         className={cn(
-                          "h-12 w-full border text-center text-base sm:h-[50px]",
+                          "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
                           errors.event?.category && "invalid-field",
                         )}
                       >
@@ -367,7 +367,7 @@ const SubmissionFormOC1 = ({
               >
                 <SelectTrigger
                   className={cn(
-                    "h-12 w-full min-w-20 border text-center text-base sm:h-[50px] sm:w-fit",
+                    "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                   )}
                 >
                   <SelectValue placeholder="Select One" />

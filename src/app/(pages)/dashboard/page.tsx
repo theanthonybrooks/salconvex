@@ -15,6 +15,7 @@ import { countApplicationsByTimeRange } from "@/lib/applicationFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery, useQuery } from "convex/react";
+import { formatDistanceToNow } from "date-fns";
 import {
   EyeOff,
   LucideCalendarPlus2,
@@ -28,11 +29,13 @@ import {
   LucideScrollText,
   TrendingUp,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { FaGear, FaRegBookmark } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
 
 export default function Dashboard() {
+  const router = useRouter();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -43,6 +46,10 @@ export default function Dashboard() {
   const isAdmin = role?.includes("admin");
   const isArtist = accountType?.includes("artist");
   const isOrganizer = accountType?.includes("organizer");
+
+  const { data: latestFive, isPending: latestPending } = useQueryWithStatus(
+    api.events.event.get5latestPublishedEvents,
+  );
 
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
@@ -189,12 +196,14 @@ export default function Dashboard() {
                         : "0 in the last month"}
                     </p>
                     {" - "}
-                    <Link
+                    {/* TODO: Add this back */}
+
+                    {/* <Link
                       variant="subtleUnderline"
                       href="/dashboard/admin/applications"
                     >
                       <p className="mt-1 text-xs">View all</p>
-                    </Link>
+                    </Link> */}
                   </div>
                 </CardContent>
               </Card>
@@ -209,12 +218,13 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {acceptedApps?.length ?? 0}
                   </div>
-                  <Link
+                  {/* TODO: Add this back */}
+                  {/* <Link
                     variant="subtleUnderline"
                     href="/dashboard/apps/accepted"
                   >
                     <p className="mt-1 text-xs">View all</p>
-                  </Link>
+                  </Link> */}
                 </CardContent>
               </Card>
               {/* <Card>
@@ -247,12 +257,14 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {bookmarkedEvents?.length ?? 0}
                   </div>
-                  <Link
+                  {/* TODO: Add this back */}
+
+                  {/* <Link
                     variant="subtleUnderline"
                     href="/dashboard/apps/bookmarked"
                   >
                     <p className="mt-1 text-xs">View all</p>
-                  </Link>
+                  </Link> */}
                 </CardContent>
               </Card>
               <Card>
@@ -266,105 +278,20 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {hiddenEvents?.length ?? 0}
                   </div>
-                  <Link
+                  {/* TODO: Add this back */}
+
+                  {/* <Link
                     variant="subtleUnderline"
-                    href="/dashboard/apps/rejected"
+                    href="/dashboard/apps/hidden"
                   >
                     <p className="mt-1 text-xs">View all</p>
-                  </Link>
+                  </Link> */}
                 </CardContent>
               </Card>
             </div>
           </div>
         )}
-        {/* <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Engagement</CardTitle>
-            <Activity className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">89%</div>
-            <p className="mt-1 text-xs">+5% this week</p>
-          </CardContent>
-        </Card> */}
       </div>
-
-      {/* Featured Section */}
-      {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Project Growth</CardTitle>
-            <CardDescription>
-              Your project creation and completion rate
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex h-[200px] items-end gap-2">
-              {[40, 25, 45, 30, 60, 75, 65, 45, 50, 65, 70, 80].map(
-                (height, i) => (
-                  <div
-                    key={i}
-                    className="w-full rounded-md bg-primary/10 transition-colors hover:bg-primary/20"
-                    style={{ height: `${height}%` }}
-                  />
-                ),
-              )}
-            </div>
-            <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-              <span>Jan</span>
-              <span>Feb</span>
-              <span>Mar</span>
-              <span>Apr</span>
-              <span>May</span>
-              <span>Jun</span>
-              <span>Jul</span>
-              <span>Aug</span>
-              <span>Sep</span>
-              <span>Oct</span>
-              <span>Nov</span>
-              <span>Dec</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Achievements</CardTitle>
-            <CardDescription>Latest milestones reached</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="rounded-full bg-primary/10 p-2">
-                  <Star className="size-4 text-primary" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">First 1000 Users</p>
-                  <Progress value={100} />
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="rounded-full bg-primary/10 p-2">
-                  <TrendingUp className="size-4 text-primary" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">50 Projects Created</p>
-                  <Progress value={75} />
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="rounded-full bg-primary/10 p-2">
-                  <Zap className="size-4 text-primary" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">Premium Features</p>
-                  <Progress value={45} />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div> */}
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -461,46 +388,50 @@ export default function Dashboard() {
         <Card className="lg:col-span-2 min-[1400px]:col-span-3">
           <CardHeader>
             <CardTitle>Latest Updates</CardTitle>
-            <CardDescription>Recent changes and notifications</CardDescription>
+            <CardDescription>Recently added open calls</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                {
-                  title: "New Feature Released",
-                  description:
-                    "Enhanced project analytics and reporting tools are now available.",
-                  time: "2 hours ago",
-                },
-                {
-                  title: "System Update",
-                  description:
-                    "Performance improvements and bug fixes deployed.",
-                  time: "5 hours ago",
-                },
-                {
-                  title: "Community Milestone",
-                  description:
-                    "Over 1,000 projects created using Nextjs Starter Kit!",
-                  time: "1 day ago",
-                },
-              ].map((update, i) => (
-                <div key={i} className="flex justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-medium">{update.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {update.description}
-                    </p>
-                  </div>
-                  <p className="whitespace-nowrap text-xs text-muted-foreground">
-                    {update.time}
+            {!latestPending && (
+              <div className="space-y-4">
+                {latestFive && latestFive.length > 0 ? (
+                  latestFive.map((event) => (
+                    <div key={event._id} className="flex justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-medium">
+                          <Link
+                            href={`/thelist/events/${event.slug}/${new Date(event._creationTime).getFullYear()}`}
+                            className="hover:underline"
+                          >
+                            {event.name}
+                          </Link>
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          View more details about this event.
+                        </p>
+                      </div>
+                      <p className="whitespace-nowrap text-xs text-muted-foreground">
+                        {event.approvedAt
+                          ? formatDistanceToNow(new Date(event.approvedAt), {
+                              addSuffix: true,
+                            })
+                          : "Unknown time"}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm italic text-muted-foreground">
+                    No recent published events found.
                   </p>
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            )}
           </CardContent>
           <CardFooter>
-            <Button variant="ghost" className="w-full">
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => router.push("/thelist")}
+            >
               View All Updates
             </Button>
           </CardFooter>
