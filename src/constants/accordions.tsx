@@ -193,6 +193,27 @@ export const openCallFaqs: AccordionSection = {
       subtitle: "Application Fees",
       text: "Application fees (highly discouraged) are clearly identified on all open calls to clearly let artists know if they will be required to pay a fee to apply. Free open calls cannot have application fees.",
     },
+    {
+      id: "submission-costs",
+      subtitle: "Submission Costs",
+      text: (
+        <span>
+          <p>
+            Events are always fee to submit. Open calls are free for Graffiti
+            Jams, Pasteup/Sticker Projects, Street Art Festivals, and Mural
+            Projects with a budget less than $1,000.
+          </p>
+
+          <p>
+            Otherwise, the fee is on a sliding scale with breakpoints being $50
+            (up to $5,000 budget), $100 (up to $10,000 budget), $200 (up to
+            $20,000 budget), and $250 (anything above $25,000). Beyond that,
+            there are no additional fees and the first open call listing is
+            always free so you can see how the system works.
+          </p>
+        </span>
+      ),
+    },
   ],
 };
 // #endregion
@@ -285,7 +306,7 @@ export const pricingFaqs: AccordionSection = {
     {
       id: "organizers",
       subtitle: "What about for organizers?",
-      text: "For organizers, you can always list your events for free. For open calls, if the event is a graffiti jam, pasteup/sticker project, street art festival, or a mural project with a really low budget, you can always list for free. If you have a project budget, then I just ask for a MAX of a 1% listing fee (starting at $50). And the first open call listed is free so you can see what I'm offering. I'm actively working on building an application system as well, so that will be included in the 1% fee when that's released. I don't allow for organizers to charge application fees for artists to apply. Any events with that notation on The List are external links and are only to ensure that artists are aware before clicking through. ",
+      text: "Accounts for organizers are free. They don't grant access to the open call sections of the list (aside from their own or archived open calls, which are public record for everyone). Organizers only pay a one-time fee when they want to list an open call with a budget of $1,000+ and listing events is always free. For a full pricing breakdown, see the Submission Costs section below.",
     },
     {
       id: "patreon",
@@ -317,6 +338,27 @@ export const pricingFaqs: AccordionSection = {
           really not a fan of. So I&apos;m handling the subscriptions myself, so
           that I can charge less and still get enough to continue the site for
           years to come.
+        </span>
+      ),
+    },
+    {
+      id: "submission-costs",
+      subtitle: "Submission Costs",
+      text: (
+        <span>
+          <p>
+            Events are always fee to submit. Open calls are free for Graffiti
+            Jams, Pasteup/Sticker Projects, Street Art Festivals, and Mural
+            Projects with a budget less than $1,000.
+          </p>
+
+          <p>
+            Otherwise, the fee is on a sliding scale with breakpoints being $50
+            (up to $5,000 budget), $100 (up to $10,000 budget), $200 (up to
+            $20,000 budget), and $250 (anything above $25,000). Beyond that,
+            there are no additional fees and the first open call listing is
+            always free so you can see how the system works.
+          </p>
         </span>
       ),
     },
