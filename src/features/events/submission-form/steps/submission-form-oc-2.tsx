@@ -24,6 +24,7 @@ registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
 import { MultiSelect } from "@/components/multi-select";
 import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
+import { siteUrl } from "@/constants/siteInfo";
 import { getCurrencySymbol } from "@/lib/currencyFns";
 import { openCallCategoryFields } from "@/types/openCall";
 import "filepond/dist/filepond.min.css";
@@ -480,13 +481,12 @@ const SubmissionFormOC2 = ({
                   <p className="text-xs text-foreground/50">
                     What does this mean?{" "}
                     <a
-                      href="https://support.streetartlist.com/hc/en-us/articles/1500000466818-What-does-all-inclusive-mean-"
+                      href={`${siteUrl[0]}/faq#all-inclusive`}
                       target="_blank"
                       className="underline"
                     >
                       Learn more
                     </a>
-                    {/* TODO: Add a popover modal or link to the FAQ page for more information on call formats */}
                   </p>
                 </span>
                 <Controller

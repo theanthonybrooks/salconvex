@@ -526,15 +526,11 @@ export const SubmissionFormRecapDesktop = ({
             Submission cost for this event/open call is:
             <span className={cn("flex items-start justify-end gap-2")}>
               (USD){" "}
-              <p
-                className={cn(
-                  isEligibleForFree && "line-through",
-                  "text-4xl font-bold",
-                )}
-              >
-                ${submissionCost}
-              </p>
-              {isEligibleForFree ? 0 : ""}
+              <span className={cn("mr-5 flex items-center text-4xl font-bold")}>
+                <p className={cn(isEligibleForFree && "text-emerald-600")}>
+                  ${isEligibleForFree ? 0 : submissionCost}
+                </p>
+              </span>
             </span>
           </span>
         </div>

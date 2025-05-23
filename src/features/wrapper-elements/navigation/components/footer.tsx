@@ -13,6 +13,7 @@ import { useAction, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
+import { Separator } from "@/components/ui/separator";
 import { infoEmail } from "@/constants/siteInfo";
 import { isValidEmail } from "@/lib/linkFns";
 import Image from "next/image";
@@ -146,7 +147,7 @@ export default function Footer({ className }: { className?: string }) {
       <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:max-w-full xl:px-6">
         <div className="xl:grid xl:grid-cols-2 xl:gap-8">
           {/* Links */}
-          <div className="mt-5 grid gap-8 px-6 lg:grid-cols-2 xl:col-span-2 xl:mt-0">
+          <div className="mt-5 grid gap-8 px-6 lg:grid-cols-[1fr_5px_auto] xl:col-span-2 xl:mt-0">
             <div
               className={cn("hidden text-start lg:grid lg:gap-8 lg:pl-8")}
               style={{
@@ -185,9 +186,14 @@ export default function Footer({ className }: { className?: string }) {
                 </div>
               ))}
             </div>
+            <Separator
+              thickness={1}
+              orientation="vertical"
+              className="my-4 border-foreground"
+            />
             <div
               data-type="newsletter"
-              className="width-full mx-auto flex flex-col justify-center border-border md:border-l-[1px] md:pl-[5rem]"
+              className="width-full mx-auto flex flex-col justify-center px-10"
             >
               {/* <div>
                 <p className="text-sm font-semibold text-foreground">

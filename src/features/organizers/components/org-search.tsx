@@ -47,6 +47,7 @@ export const OrgSearch = ({
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   const [selectedVal, setSelectedVal] = useState<string>("");
+  const inputValRef = useRef<string | null>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -161,6 +162,25 @@ export const OrgSearch = ({
       // console.log("else");
     }
   };
+
+  // useEffect(() => {
+  //   if (!inputValRef.current && inputValue === "") return;
+  //   console.log(inputValue, inputValRef.current, value);
+  //   if (inputValue === inputValRef.current) return;
+  //   inputValRef.current = value;
+  //   setInputValue(value || "");
+  // }, [value, inputValue]);
+
+  useEffect(() => {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== inputValRef.current
+    ) {
+      setInputValue(value);
+      inputValRef.current = value;
+    }
+  }, [value]);
 
   useEffect(() => {
     const selectedEl = itemRefs.current[selectedIndex];

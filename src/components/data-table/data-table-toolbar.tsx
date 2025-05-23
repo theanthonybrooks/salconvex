@@ -1,10 +1,11 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
+import { LucideDiamondPlus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 
 import {
   eventCategories,
@@ -13,6 +14,7 @@ import {
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -21,12 +23,15 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   setRowSelection: (row: Record<string, boolean>) => void;
+  initialSearchTerm?: string;
 }
 
 export function DataTableToolbar<TData>({
   table,
   setRowSelection,
+  initialSearchTerm,
 }: DataTableToolbarProps<TData>) {
+  const router = useRouter();
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,
   );
@@ -70,6 +75,12 @@ export function DataTableToolbar<TData>({
       toast.error("Something went wrong. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (initialSearchTerm !== undefined) {
+      table.getColumn("name")?.setFilterValue(initialSearchTerm);
+    }
+  }, [initialSearchTerm, table]);
 
   return (
     <div className="flex max-w-[90vw] items-center justify-between">
@@ -121,14 +132,30 @@ export function DataTableToolbar<TData>({
               />
             )}
 
-            {isAdmin && setViewAll && (
-              <Button
-                variant="ghost"
-                onClick={() => setViewAll(!viewAll)}
-                className="hidden hover:scale-105 sm:inline-flex"
-              >
-                {viewAll ? "View Submissions" : "View  All"}
-              </Button>
+            {isAdmin && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "hidden h-10 items-center gap-1 border-dashed md:flex",
+                  )}
+                  onClick={() => router.push("/dashboard/admin/event")}
+                >
+                  <LucideDiamondPlus className="size-4" />
+                  Add New
+                </Button>
+
+                {setViewAll && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => setViewAll(!viewAll)}
+                    className="hidden hover:scale-105 sm:inline-flex"
+                  >
+                    {viewAll ? "View Submissions" : "View  All"}
+                  </Button>
+                )}
+              </>
             )}
           </div>
         )}

@@ -1,15 +1,10 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { DialogClose } from "@/components/ui/dialog";
 
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -48,12 +43,12 @@ import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { debounce, merge } from "lodash";
+import { useSearchParams } from "next/navigation";
 import { Path } from "react-hook-form";
 import slugify from "slugify";
 import { z } from "zod";
@@ -107,42 +102,19 @@ const steps = [
   },
 ];
 
-interface EventOCFormProps {
+interface AdminEventOCFormProps {
   user: User | undefined;
-  onClick: () => void;
-  shouldClose: boolean;
-  setShouldClose: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  children?: React.ReactNode;
-  hasUnsavedChanges: boolean;
-  setHasUnsavedChanges: (value: boolean) => void;
-  activeStep: number;
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  isEligibleForFree: boolean;
-  planKey: string;
 }
 
 export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
-export const EventOCForm = ({
-  user,
-  // onClick,
-  shouldClose,
-  setOpen,
-  setShouldClose,
-  // hasUnsavedChanges,
-  setHasUnsavedChanges,
-  activeStep,
-  setActiveStep,
-  isEligibleForFree,
-  planKey,
-}: EventOCFormProps) => {
+export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
+  const [activeStep, setActiveStep] = useState(0);
+
   const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
-  const formType = Number(planKey);
-  const eventOnly = formType === 1;
+  const formType = 3;
   // const freeCall = formType === 2;
-  const paidCall = formType === 3 && !isAdmin;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
@@ -196,12 +168,11 @@ export const EventOCForm = ({
   // #region ------------- Actions, Mutations, Queries --------------
 
   // const paidCall = formType === 3 && !isAdmin;
-
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get("eventId");
   const currentValues = getValues();
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
-  const getCheckoutUrl = useAction(
-    api.stripeSubscriptions.createStripeCheckoutSession,
-  );
+
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
@@ -276,7 +247,6 @@ export const EventOCForm = ({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const canCheckSchema = useRef(false);
   const canClearEventData = useRef(true);
-  const hasClosed = useRef(false);
   const isFirstRun = useRef(true);
   const savedState = useRef(false);
   // #endregion
@@ -318,7 +288,15 @@ export const EventOCForm = ({
     !errors.organization?.location?.country && Boolean(orgData?.location?.full);
   const orgLogoValid = !errors.organization?.logo && Boolean(orgData?.logo);
   const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
+  const { data: preloadData } = useQueryWithStatus(
+    api.events.event.preloadEventAndOrgById,
+    typeof eventId === "string" && isAdmin
+      ? { eventId: eventId as Id<"events"> }
+      : "skip",
+  );
 
+  console.log(preloadData);
+  console.log(existingOrg, existingEvent);
   const {
     data: orgEventsData,
     // isPending: orgEventsPending, //use this later for some loading state for the events table. Use skeleton loaders
@@ -333,7 +311,7 @@ export const EventOCForm = ({
   const eventChoiceMade = !!(existingEvent || newOrgEvent || !existingOrg);
 
   const category = eventData?.category as EventCategory;
-  const categoryEvent = category === "event" || formType === 1;
+  const categoryEvent = category === "event";
 
   const typeEvent =
     ((eventData?.type && eventData?.type?.length > 0) ||
@@ -394,6 +372,9 @@ export const EventOCForm = ({
     hasUserEditedStep4 ||
     hasUserEditedStep5
   );
+  const preloadFlag = useRef(false);
+  const preloadOrgRef = useRef(false);
+  const preloadEventRef = useRef(false);
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
   const validStep1 =
@@ -404,8 +385,6 @@ export const EventOCForm = ({
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid =
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep1;
-
-  const hasErrors = !!errors && Object.keys(errors).length > 0;
 
   const projectMaxBudget = ocData?.compensation?.budget?.max;
   const projectMinBudget = ocData?.compensation?.budget?.min;
@@ -446,69 +425,21 @@ export const EventOCForm = ({
   };
 
   const onSubmit = async () => {
-    let url: string | undefined;
-    let newTab: Window | null = null;
-    // console.log(paidCall);
-    // console.log("data", data);
-    if (paidCall && !alreadyPaid && !isAdmin) {
-      newTab = window.open("about:blank");
-    }
-
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
       await handleSave(true);
-      if (paidCall && !alreadyPaid) {
-        const result = await getCheckoutUrl({
-          planKey,
-          slidingPrice:
-            typeof submissionCost?.price === "number" &&
-            submissionCost?.price > 0
-              ? submissionCost?.price
-              : 50,
-          accountType: "organizer",
-          isEligibleForFree,
-          openCallId: openCallData?._id as Id<"openCalls">,
-        });
-        url = result.url;
-      }
-      if (!paidCall) {
-        toast.success(
-          alreadyPaid || alreadyApproved
-            ? "Successfully updated project!"
-            : "Successfully submitted event!",
-          {
-            onClick: () => toast.dismiss(),
-          },
-        );
-      }
-      // console.log("submitting: ", paidCall, isAdmin);
-      if (paidCall && !alreadyPaid && !isAdmin) {
-        if (!newTab) {
-          toast.error(
-            "Stripe redirect blocked. Please enable popups for this site.",
-          );
-          console.error("Popup was blocked");
-          return;
-        }
-        if (url) {
-          newTab.document.write(getExternalRedirectHtml(url, 1));
-          newTab.document.close();
-          newTab.location.href = url;
-          // onClick();
-          // onClick()
-        }
-      } else {
-        //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
-        // handleReset();
-        setOpen(false);
-      }
+
+      toast.success(
+        "Successfully updated project!",
+
+        {
+          onClick: () => toast.dismiss(),
+        },
+      );
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
-      if (!newTab?.closed) {
-        newTab?.document.close();
-      }
     }
   };
   // TODO: Convert timezone on deadline to user timezone on submit to ensure that displayed time is correct.
@@ -597,11 +528,9 @@ export const EventOCForm = ({
               links: {
                 ...eventLinks,
               },
-              category: !eventOnly ? eventData.category : "event",
+              category: eventData.category ?? "event",
 
-              hasOpenCall: !eventOnly
-                ? (eventData.hasOpenCall ?? "Fixed")
-                : "False",
+              hasOpenCall: eventData.hasOpenCall ?? "Unknown",
             },
           }),
         );
@@ -617,7 +546,7 @@ export const EventOCForm = ({
               ...currentValues.organization.location,
               sameAsOrganizer: true,
             },
-            category: !eventOnly ? eventData.category : "event",
+            category: eventData.category ?? "event",
 
             dates: {
               edition: new Date().getFullYear(),
@@ -630,8 +559,7 @@ export const EventOCForm = ({
             links: {
               ...eventLinks,
             },
-            //TODO: cOME BACK TO THIS!
-            hasOpenCall: !eventOnly ? "Fixed" : "False",
+            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
           },
         });
         // console.log("waffles");
@@ -766,7 +694,7 @@ export const EventOCForm = ({
           if (existingOrg) {
             setExistingOrg({
               ...existingOrg,
-              logo: orgLogoFullUrl,
+              logo: "ballsack.png",
               location: {
                 ...existingOrg.location,
                 ...orgData.location,
@@ -782,7 +710,7 @@ export const EventOCForm = ({
           setPending(false);
         }
 
-        const eventFullUrl = eventData?.logo ?? orgLogoFullUrl;
+        const eventFullUrl = eventData?.logo ?? "ballsack.png";
 
         if (existingEvent) {
           // console.log("existing event");
@@ -837,9 +765,7 @@ export const EventOCForm = ({
                 edition: new Date().getFullYear(),
                 noProdStart: false,
               },
-              hasOpenCall: !eventOnly
-                ? (eventData.hasOpenCall ?? "Fixed")
-                : "False",
+              hasOpenCall: eventData.hasOpenCall ?? "Unknown",
             },
           });
         }
@@ -895,10 +821,8 @@ export const EventOCForm = ({
             logoStorageId,
             logo: eventLogo,
             type: eventData.type || [],
-            category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly
-              ? (eventData.hasOpenCall ?? "Fixed")
-              : "False",
+            category: eventData.category ?? "event",
+            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
@@ -952,10 +876,8 @@ export const EventOCForm = ({
 
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
-            category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly
-              ? (eventData.hasOpenCall ?? "Fixed")
-              : "False",
+            category: eventData.category ?? "event",
+            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
             dates: {
               ...eventData.dates,
             },
@@ -1048,9 +970,9 @@ export const EventOCForm = ({
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
-              appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+              appFee: openCallData.basicInfo?.appFee ?? 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
-              callType: eventData.hasOpenCall ?? "False",
+              callType: eventData.hasOpenCall ?? "Unknown",
               dates: {
                 ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
                 ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
@@ -1151,7 +1073,7 @@ export const EventOCForm = ({
             eventId: eventData._id as Id<"events">,
             openCallId: openCallData?._id as Id<"openCalls">,
             basicInfo: {
-              appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+              appFee: openCallData.basicInfo?.appFee ?? 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
               callType: eventData.hasOpenCall ?? "False",
               dates: {
@@ -1311,10 +1233,8 @@ export const EventOCForm = ({
             slug: slugify(eventData.name, { lower: true }),
             logo: eventData.logo as string,
             type: eventData.type || [],
-            category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly
-              ? (eventData.hasOpenCall ?? "Fixed")
-              : "False",
+            category: eventData.category ?? "event",
+            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
             dates: {
               ...eventData.dates,
             },
@@ -1338,7 +1258,7 @@ export const EventOCForm = ({
               eventId: eventData._id as Id<"events">,
               openCallId: openCallData?._id as Id<"openCalls">,
               basicInfo: {
-                appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+                appFee: openCallData.basicInfo?.appFee ?? 0,
                 callFormat: openCallData.basicInfo.callFormat,
                 callType: eventData.hasOpenCall ?? "False",
                 dates: {
@@ -1398,18 +1318,14 @@ export const EventOCForm = ({
           toast.error("Failed to submit");
         } finally {
           setPending(false);
-          setOpen(false);
         }
       }
     },
     [
-      paidCall,
       finalStep,
       alreadyPaid,
       formType,
-      eventOnly,
       saveOrgFile,
-      setOpen,
       hasOpenCall,
       openCallData,
       createOrUpdateOpenCall,
@@ -1436,6 +1352,7 @@ export const EventOCForm = ({
       pending,
     ],
   );
+  console.log(selectedRow);
 
   const handleReset = () => {
     setActiveStep(0);
@@ -1484,6 +1401,41 @@ export const EventOCForm = ({
   // #endregion
 
   // #region -------------UseEffects --------------
+  console.log(preloadData, !!preloadData);
+  useEffect(() => {
+    if (!orgData) return;
+    console.log("orgData", orgData);
+  }, [orgData]);
+
+  useEffect(() => {
+    if (!eventData) return;
+    console.log("eventData", eventData);
+  }, [eventData]);
+
+  useEffect(() => {
+    if (!preloadData) return;
+    const { event, organization } = preloadData;
+    preloadFlag.current = true;
+
+    // if (event) {
+    //   setNewOrgEvent(false);
+    //   setExistingEvent(event);
+    // }
+    if (organization) {
+      preloadOrgRef.current = true;
+      setExistingOrg(organization);
+      if (event) {
+        preloadEventRef.current = true;
+        setExistingEvent(event);
+      }
+      //   setValue("organization.name", organization.name);
+      //   setValue("organization.logo", organization.logo);
+      //   setValue(
+      //     "organization.location.full",
+      //     organization?.location?.full ?? "",
+      //   );
+    }
+  }, [preloadData]);
 
   useEffect(() => {
     if (!alreadyPaid) return;
@@ -1498,44 +1450,6 @@ export const EventOCForm = ({
       updateLastChanged();
     }
   }, [watchedValues, updateLastChanged, hasUserEditedForm]);
-
-  // useEffect(() => {
-  //   // console.log("active step: ", activeStep);
-  // }, [activeStep]);
-
-  // useEffect(() => {
-  //   // console.log("existingOrg", existingOrg);
-  // }, [existingOrg]);
-  // useEffect(() => {
-  //   if (orgData?.name !== undefined && orgData?.name !== "") {
-  // console.log("orgData", getValues("organization"));
-  // console.log("org", existingOrg);
-  //   }
-  // }, [orgData, existingOrg, getValues]);
-
-  // useEffect(() => {
-  //   console.log("eventData", eventData);
-  //   // console.log("existingEvent", existingEvent);
-  // }, [eventData, existingEvent]);
-
-  // useEffect(() => {
-  // console.log("oc", openCallData);
-  // }, [openCallData]);
-
-  // useEffect(() => {
-  //   console.log("eventLogo", eventLogo);
-  //   console.log("eventName", eventName);
-  // }, [eventLogo, eventName]);
-
-  // useEffect(() => {
-  // console.log("form valid:", isValid, "step valid:", isStepValidZod);
-  // }, [isValid, isStepValidZod]);
-
-  // useEffect(() => {
-  //   if (dirtyFields) {
-  //     console.log(dirtyFields);
-  //   }
-  // }, [dirtyFields]);
 
   useEffect(() => {
     if (scrollTrigger) {
@@ -1642,7 +1556,9 @@ export const EventOCForm = ({
 
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
-    if (orgChanged) {
+    if (orgChanged && !preloadOrgRef.current) {
+      console.log("meow meow mcPoundTown");
+
       // console.log("resetting");
       setFurthestStep(0);
       reset({
@@ -1661,6 +1577,31 @@ export const EventOCForm = ({
   }, [existingOrg, reset, getValues, formType]);
 
   useEffect(() => {
+    if (
+      existingOrg &&
+      existingEvent &&
+      preloadOrgRef.current &&
+      preloadEventRef.current
+    ) {
+      console.log("existingOrg", existingOrg);
+      prevEventRef.current = existingEvent;
+      reset({
+        organization: {
+          ...existingOrg,
+          logo: "borg.png",
+        },
+        event: {
+          ...existingEvent,
+        },
+      });
+      setNewOrgEvent(false);
+      setSelectedRow({ 1: true });
+      preloadOrgRef.current = false;
+      preloadEventRef.current = false;
+    }
+  }, [existingOrg, existingEvent, reset, preloadOrgRef]);
+
+  useEffect(() => {
     const eventReady =
       existingEvent &&
       typeof existingEvent._id === "string" &&
@@ -1670,7 +1611,8 @@ export const EventOCForm = ({
     }
     const eventChanged =
       eventReady && existingEvent._id !== prevEventRef.current?._id;
-    if (eventChanged) {
+    if (eventChanged && !preloadEventRef.current) {
+      console.log("event changed");
       isFirstRun.current = true;
       if (existingEvent?.lastEditedAt) {
         setLastSaved(existingEvent.lastEditedAt);
@@ -1683,10 +1625,8 @@ export const EventOCForm = ({
         event: {
           formType,
           ...existingEvent,
-          category: !eventOnly ? existingEvent.category : "event",
-          hasOpenCall: !eventOnly
-            ? (existingEvent.hasOpenCall ?? "Fixed")
-            : "False",
+          category: existingEvent?.category ?? "event",
+          hasOpenCall: existingEvent?.hasOpenCall ?? "Unknown",
         },
         openCall: {
           ...(ocData ?? {}),
@@ -1697,7 +1637,7 @@ export const EventOCForm = ({
     } else if (!existingEvent) {
       setLastSaved(null);
     }
-  }, [existingEvent, reset, currentValues, ocData, eventOnly, formType]);
+  }, [existingEvent, reset, currentValues, ocData, formType]);
 
   useEffect(() => {
     if (savedState.current === false && eventLastEditedAt) {
@@ -1736,6 +1676,7 @@ export const EventOCForm = ({
     setFurthestStep((prev) => Math.max(prev, activeStep));
   }, [activeStep, furthestStep]);
 
+  //flag:
   useEffect(() => {
     if (newOrgEvent) return;
     if (!newOrgEvent && isSelectedRowEmpty) {
@@ -1753,7 +1694,7 @@ export const EventOCForm = ({
 
   //todo: if necessary, perhaps unregister open call in this?
   useEffect(() => {
-    if (clearEventDataTrigger) {
+    if (clearEventDataTrigger && !preloadFlag.current) {
       // console.log("hmm");
       setFurthestStep(0);
       setSelectedRow({});
@@ -1836,35 +1777,12 @@ export const EventOCForm = ({
   }, [eventDatesFormat, setValue, hasNoEventDates]);
 
   useEffect(() => {
-    if (hasUserEditedForm && !hasErrors) {
-      setHasUnsavedChanges(true);
-    } else {
-      setHasUnsavedChanges(false);
-    }
-  }, [setHasUnsavedChanges, hasUserEditedForm, hasErrors]);
-
-  useEffect(() => {
     if (!orgData?.name && activeStep > 0) {
       setActiveStep(0);
     }
   }, [orgData, activeStep, setActiveStep]);
 
   // 1. Create a stable callback that saves and then closes:
-  const saveAndClose = useCallback(async () => {
-    await handleSave(true);
-    setShouldClose(false);
-    setOpen(false);
-  }, [handleSave, setOpen, setShouldClose]);
-
-  // 2. Fire it only when shouldClose goes true:
-  useEffect(() => {
-    if (shouldClose && !hasClosed.current) {
-      hasClosed.current = true;
-      saveAndClose();
-    } else if (!shouldClose) {
-      hasClosed.current = false;
-    }
-  }, [shouldClose, saveAndClose]);
 
   useEffect(() => {
     if (!hasOpenCall) {
@@ -1912,16 +1830,14 @@ export const EventOCForm = ({
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
         cancelButton={
-          <DialogClose asChild>
-            <Button
-              type="button"
-              variant="salWithShadowHiddenYlw"
-              className="hidden lg:min-w-24"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-          </DialogClose>
+          <Button
+            type="button"
+            variant="salWithShadowHiddenYlw"
+            className="hidden lg:min-w-24"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
         }
       >
         <div ref={topRef} />
@@ -2036,7 +1952,7 @@ export const EventOCForm = ({
                   infoVerified={infoVerified}
                   acceptedTerms={acceptedTerms}
                   submissionCost={submissionCost?.price}
-                  isEligibleForFree={isEligibleForFree}
+                  isEligibleForFree={true}
                   alreadyPaid={alreadyPaid}
                 />
                 {isMobile && (
@@ -2045,10 +1961,10 @@ export const EventOCForm = ({
                     isAdmin={isAdmin}
                     setAcceptedTerms={setAcceptedTerms}
                     setInfoVerified={setInfoVerified}
-                    infoVerified={infoVerified}
-                    acceptedTerms={acceptedTerms}
+                    infoVerified={true}
+                    acceptedTerms={true}
                     submissionCost={submissionCost?.price}
-                    isEligibleForFree={isEligibleForFree}
+                    isEligibleForFree={true}
                     alreadyPaid={alreadyPaid}
                   />
                 )}

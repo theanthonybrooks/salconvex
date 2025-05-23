@@ -1,3 +1,4 @@
+"use client";
 import {
   Popover,
   PopoverContent,
@@ -193,10 +194,9 @@ const EventContextMenu = ({
           )}
           {isAdmin && (
             <>
-              <div
-                onClick={() => {
-                  console.log("admin functions");
-                }}
+              <Link
+                href={`/dashboard/admin/event?eventId=${eventId}`}
+                target="_blank"
                 className={cn(
                   "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
                   publicView && "hidden",
@@ -206,7 +206,7 @@ const EventContextMenu = ({
                   <Pencil className="size-4" />
                   Edit Event
                 </span>
-              </div>
+              </Link>
               <div
                 onClick={() => {
                   navigator.clipboard.writeText(eventId);

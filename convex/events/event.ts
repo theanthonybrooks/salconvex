@@ -626,6 +626,32 @@ export const getEventWithDetails = query({
   },
 });
 
+export const preloadEventAndOrgById = query({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isAdmin = user?.role?.includes("admin");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const organization = await ctx.db.get(event.mainOrgId);
+
+    const orgOwner = organization?.ownerId;
+    if (orgOwner && orgOwner !== userId && !isAdmin) {
+      return null;
+    }
+
+    return {
+      event,
+      organization,
+    };
+  },
+});
+
 export const getEventWithOCDetails = query({
   args: {
     slug: v.string(),

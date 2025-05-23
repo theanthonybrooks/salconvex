@@ -359,6 +359,11 @@ a {
     @apply no-underline hover:no-underline !important;
   }
 }
+
+[id] {
+  scroll-margin-top: 6rem;
+}
+
 /* ----------- Components ------------ */
 
 .search {

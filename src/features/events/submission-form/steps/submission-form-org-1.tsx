@@ -10,11 +10,13 @@ import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/lib/utils";
 import { EnrichedEvent } from "@/types/event";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { LucideChevronsLeftRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormOrgStepProps {
+  isAdmin: boolean;
   isMobile: boolean;
   existingOrg: Doc<"organizations"> | null;
   existingEvent: Doc<"events"> | null;
@@ -39,6 +41,7 @@ interface SubmissionFormOrgStepProps {
 }
 
 const SubmissionFormOrgStep = ({
+  isAdmin,
   isMobile,
   existingOrgs,
   existingOrg,
@@ -65,11 +68,13 @@ const SubmissionFormOrgStep = ({
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
+  const [firstColVisible, setFirstColVisible] = useState(true);
   const orgData = watch("organization");
+  const eventName = watch("event.name");
+
   const orgName = orgData?.name ?? "";
   const bottomRef = useRef<HTMLParagraphElement | null>(null);
   const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
-
   useEffect(() => {
     if (scrollTrigger) {
       if (bottomRef.current) {
@@ -84,42 +89,51 @@ const SubmissionFormOrgStep = ({
       className={cn(
         "flex h-full flex-col gap-4 xl:justify-center",
         existingOrg && "xl:grid xl:grid-cols-[40%_10%_50%] xl:gap-0",
+        !firstColVisible && "xl:grid-cols-[0_10%_1fr] xl:gap-0",
       )}
     >
       <section
         id="first-section"
-        className="mx-auto flex flex-col items-center gap-y-6 self-start lg:self-center xl:justify-center"
+        className={cn(
+          "mx-auto flex flex-col items-center gap-y-6 self-start lg:self-center xl:justify-center",
+          !firstColVisible && "invisible",
+        )}
       >
         <section className="flex flex-col items-center justify-center">
-          <div
-            id="welcome-text"
-            className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]"
-          >
-            Welcome{" "}
-            <AnimatePresence>
-              {existingOrgs && validOrgWZod && (
-                <motion.span
-                  key="back-text"
-                  initial={{ opacity: 0, rotate: -10 }}
-                  animate={{
-                    opacity: 1,
-                    rotate: [0, -10, 10, -8, 8, -5, 5, 0],
-                  }}
-                  exit={{ opacity: 0 }}
-                  transition={{
-                    duration: 0.6,
-                    ease: "easeOut",
-                  }}
-                  className="inline-block"
-                >
-                  Back
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </div>
-          <p className="hidden text-balance text-center text-xl lg:block lg:text-base">
-            To start, select from an existing organization or create a new one!
-          </p>
+          {!isAdmin && (
+            <>
+              <div
+                id="welcome-text"
+                className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]"
+              >
+                Welcome{" "}
+                <AnimatePresence>
+                  {existingOrgs && validOrgWZod && (
+                    <motion.span
+                      key="back-text"
+                      initial={{ opacity: 0, rotate: -10 }}
+                      animate={{
+                        opacity: 1,
+                        rotate: [0, -10, 10, -8, 8, -5, 5, 0],
+                      }}
+                      exit={{ opacity: 0 }}
+                      transition={{
+                        duration: 0.6,
+                        ease: "easeOut",
+                      }}
+                      className="inline-block"
+                    >
+                      Back
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </div>
+              <p className="hidden text-balance text-center text-xl lg:block lg:text-base">
+                To start, select from an existing organization or create a new
+                one!
+              </p>
+            </>
+          )}
         </section>
         <div
           className={cn(
@@ -167,7 +181,7 @@ const SubmissionFormOrgStep = ({
             )}
           </div>
 
-          {orgNameValid && (
+          {(orgNameValid || isAdmin) && (
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
@@ -209,7 +223,7 @@ const SubmissionFormOrgStep = ({
             </>
           )}
 
-          {orgLocationValid && (
+          {(orgLocationValid || isAdmin) && (
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
@@ -248,11 +262,17 @@ const SubmissionFormOrgStep = ({
         <>
           <Separator thickness={2} className="my-4 xl:hidden" />
           {existingOrg && (
-            <Separator
-              thickness={2}
-              className="mx-auto hidden xl:block"
-              orientation="vertical"
-            />
+            <div
+              className="flex w-full flex-col items-center gap-3 hover:cursor-pointer"
+              onClick={() => setFirstColVisible((prev) => !prev)}
+            >
+              <LucideChevronsLeftRight className="size-6 shrink-0 text-foreground/50" />
+              <Separator
+                thickness={2}
+                className="mx-auto hidden xl:block"
+                orientation="vertical"
+              />
+            </div>
           )}
           <section className="flex flex-col items-center justify-center gap-4">
             <div
@@ -306,6 +326,7 @@ const SubmissionFormOrgStep = ({
                 category: false,
                 lastEditedAt: false,
               }}
+              initialSearchTerm={eventName}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
                   // console.log("falsito");
@@ -330,6 +351,7 @@ const SubmissionFormOrgStep = ({
             <DataTable
               columns={columns}
               data={eventsData}
+              initialSearchTerm={eventName}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
                   // console.log("falsito");
@@ -355,6 +377,7 @@ const SubmissionFormOrgStep = ({
             <DataTable
               columns={columns}
               data={eventsData}
+              initialSearchTerm={eventName}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
                   // console.log("falsito");
@@ -374,7 +397,10 @@ const SubmissionFormOrgStep = ({
                 type: false,
                 // lastEditedAt: false,
               }}
-              className="flex w-full max-w-[45vw] overflow-x-auto"
+              className={cn(
+                "flex w-full max-w-[45vw] overflow-x-auto",
+                !firstColVisible && "max-w-full",
+              )}
               tableClassName="sm:max-h-52"
               outerContainerClassName={cn(
                 "hidden xl:block ",

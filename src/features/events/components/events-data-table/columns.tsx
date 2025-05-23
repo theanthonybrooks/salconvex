@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import { DataTableAdminActions } from "@/components/data-table/actions/data-table-admin-actions";
 import {
   ApproveEvent,
   ArchiveEvent,
@@ -357,27 +358,23 @@ export const columns: ColumnDef<Event>[] = [
                 align="end"
                 className="scrollable mini darkbar max-h-56"
               >
+                {isAdmin && <DataTableAdminActions eventId={event._id} />}
                 <DropdownMenuLabel>
                   {isAdmin ? "Event" : "Actions"}
-                </DropdownMenuLabel>
-
+                </DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
-
                 <DuplicateEvent eventId={event._id} />
-
                 {(state === "draft" || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
                 {state === "submitted" && isAdmin && (
                   <ApproveEvent eventId={event._id} />
                 )}
-
                 {state === "published" && <ArchiveEvent eventId={event._id} />}
                 {(state === "archived" ||
                   (state === "published" && isAdmin)) && (
                   <ReactivateEvent eventId={event._id} state={state} />
                 )}
-
                 {hasOC && (
                   <>
                     <DropdownMenuLabel className="mt-2 border-t-1.5 border-foreground/20">

@@ -56,9 +56,9 @@ export default function Changelog() {
 
       {changelogTasks && (
         <AccordionComponent
-          className="pt-0"
+          className="pt-5"
           src={{
-            description: "2025",
+            sectionTitle: "2025",
             iconClosed: (
               <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />
             ),

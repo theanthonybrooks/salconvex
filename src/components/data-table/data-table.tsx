@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
   };
   tableType?: TableTypes;
   pageType?: PageTypes;
+  initialSearchTerm?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue>({
   adminActions,
   tableType,
   pageType,
+  initialSearchTerm,
 }: DataTableProps<TData, TValue>) {
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
@@ -116,6 +118,15 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+  const tableRows = table.getRowModel().rows;
+  const preloadedEvent = initialSearchTerm ? tableRows[0]?.index : null;
+  const hasPreloadedEvent =
+    typeof preloadedEvent === "number" && preloadedEvent > 0;
+
+  useEffect(() => {
+    if (!hasPreloadedEvent || Object.keys(rowSelection)?.length > 0) return;
+    setRowSelection({ [preloadedEvent]: true });
+  }, [table, preloadedEvent, hasPreloadedEvent, rowSelection]);
 
   useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {
@@ -158,7 +169,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className={cn("w-full space-y-4", outerContainerClassName)}>
-      <DataTableToolbar table={table} setRowSelection={setRowSelection} />
+      <DataTableToolbar
+        table={table}
+        setRowSelection={setRowSelection}
+        initialSearchTerm={initialSearchTerm}
+      />
       <div className={cn("rounded-md border", className)}>
         <Table
           containerClassname={cn(

@@ -14,6 +14,7 @@ import {
   HomeIcon,
   LucideCircleFadingPlus,
   LucideIcon,
+  LucideListPlus,
   Settings,
   Shield,
   Upload,
@@ -106,14 +107,10 @@ export const FOOTER_LINKS: FooterSection[] = [
     section: "The List",
     items: [
       { name: "The List", href: "/thelist" },
+      { name: "Submit", href: "/pricing&submit" },
       { name: "About", href: "/about" },
-      { name: "Changelog", href: "/changelog" },
-      { name: "Collaborations", href: "/collabs" },
+      // { name: "Changelog", href: "/changelog" },
       // { name: "Careers", href: "/careers" },
-      {
-        name: "Contact",
-        href: `mailto:${infoEmail}&subject=Site%20Contact`,
-      },
     ],
   },
   {
@@ -125,6 +122,7 @@ export const FOOTER_LINKS: FooterSection[] = [
       { name: "Pricing", href: "/pricing" },
     ],
   },
+
   {
     section: "legal",
     items: [
@@ -142,6 +140,18 @@ export const FOOTER_LINKS: FooterSection[] = [
         href: path,
       }),
     ),
+  },
+  {
+    section: "Misc",
+    items: [
+      { name: "FAQ", href: "/faq" },
+      { name: "Changelog", href: "/changelog" },
+      { name: "Collaborations", href: "/collabs" },
+      {
+        name: "Contact",
+        href: `mailto:${infoEmail}&subject=Site%20Contact`,
+      },
+    ],
   },
 ];
 
@@ -240,6 +250,16 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "admin",
     desc: "Submitted Events/Open Calls",
+    sub: ["admin"],
+    userType: ["admin"],
+  },
+  {
+    label: "Submit ",
+    href: "/dashboard/admin/event",
+    icon: LucideListPlus,
+    subsection: true,
+    sectionCat: "admin",
+    desc: "Submit a new event",
     sub: ["admin"],
     userType: ["admin"],
   },
