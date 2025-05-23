@@ -1060,7 +1060,7 @@ export const EventOCForm = ({
             },
             eligibility: {
               type: openCallData.eligibility.type,
-              whom: openCallData.eligibility.whom,
+              whom: openCallData.eligibility?.whom ?? [],
               details: openCallData.eligibility.details,
             },
             compensation: {
@@ -1163,7 +1163,7 @@ export const EventOCForm = ({
             },
             eligibility: {
               type: openCallData.eligibility.type,
-              whom: openCallData.eligibility.whom,
+              whom: openCallData.eligibility?.whom ?? [],
               details: openCallData.eligibility.details,
             },
             compensation: {
@@ -1350,7 +1350,7 @@ export const EventOCForm = ({
               },
               eligibility: {
                 type: openCallData.eligibility.type,
-                whom: openCallData.eligibility.whom,
+                whom: openCallData.eligibility?.whom ?? [],
                 details: openCallData.eligibility.details,
               },
               compensation: {
