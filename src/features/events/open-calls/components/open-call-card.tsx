@@ -383,7 +383,7 @@ const OpenCallCard = ({
                     {reqsLinks?.map((link, index) => (
                       <li key={index} className="py-2">
                         <Link href={link.href} target="_blank">
-                          {link.href.split("https://").pop()}
+                          {link.title ?? link.href.split("https://").pop()}
                         </Link>
                       </li>
                     ))}
@@ -687,7 +687,7 @@ const OpenCallCard = ({
                     <li key={index} className="py-2">
                       <Link href={link.href} target="_blank">
                         {/* {link.title} */}
-                        {link.href.split("https://").pop()}
+                        {link.title ?? link.href.split("https://").pop()}
                       </Link>
                     </li>
                   ))}
