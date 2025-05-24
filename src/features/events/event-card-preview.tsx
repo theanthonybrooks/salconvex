@@ -180,9 +180,6 @@ const EventCardPreview = ({
     }
   };
 
-  console.log(userTZ, basicInfo?.dates?.timezone);
-  console.log(basicInfo?.dates?.ocEnd);
-
   return (
     <>
       {/* //---------------------- (Mobile) Layout ---------------------- */}

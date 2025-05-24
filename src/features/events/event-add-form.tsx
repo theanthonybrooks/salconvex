@@ -670,7 +670,7 @@ export const EventOCForm = ({
 
         const firstMessage = userRelevantIssues[0]?.message || "";
 
-        setErrorMsg(firstMessage || "Please fix errors before continuing.");
+        setErrorMsg(firstMessage || "");
 
         if (shouldToast) {
           toast.dismiss("form-validation-error");

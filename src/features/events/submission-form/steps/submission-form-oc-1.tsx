@@ -142,7 +142,7 @@ const SubmissionFormOC1 = ({
   useEffect(() => {
     if (!freeCall) return;
     if (freeCall) {
-      // setValue("openCall.eligibility.whom", [])
+      setValue("openCall.eligibility.whom", []);
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [freeCall, setValue]);

@@ -598,15 +598,14 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         });
 
         // Prefer first user-meaningful message
-        const firstMessage =
-          issues.find(
-            (i) =>
-              i.message &&
-              i.message !== "Required" &&
-              i.message !== "Invalid input",
-          )?.message ?? issues[0]?.message;
+        const userRelevantIssues = issues.filter(
+          (i) =>
+            i.message && !["Required", "Invalid input"].includes(i.message),
+        );
 
-        setErrorMsg(firstMessage || "Please fix errors before continuing.");
+        const firstMessage = userRelevantIssues[0]?.message || "";
+
+        setErrorMsg(firstMessage || "");
 
         if (shouldToast) {
           toast.dismiss("form-validation-error");
