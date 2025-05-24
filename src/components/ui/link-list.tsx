@@ -133,7 +133,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <span className="underline-offset-2 hover:underline">
                   {/* {event.links.facebook} */}
                   {event.links.facebook.includes("@")
-                    ? event.links.facebook
+                    ? "@" + event.links.facebook
                     : event.name}
                 </span>
               </div>
@@ -242,12 +242,20 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
               </a>
             )}
             {organizer.links?.facebook && (
-              <a href={organizer.links.facebook}>
+              <a
+                href={
+                  organizer.links.facebook.includes("@")
+                    ? `https://www.facebook.com/${organizer.links.facebook.split("@").slice(-1)[0]}`
+                    : organizer.links.facebook
+                }
+              >
                 <div className="flex items-center gap-x-2">
                   <FaFacebookF className={cn("shrink-0", iconSize)} />
 
                   <span className="underline-offset-2 hover:underline">
-                    @{organizer.links.facebook.split(".com/").slice(-1)[0]}
+                    {organizer.links.facebook.includes("@")
+                      ? "@" + organizer.links.facebook
+                      : organizer.name}
                   </span>
                 </div>
               </a>
