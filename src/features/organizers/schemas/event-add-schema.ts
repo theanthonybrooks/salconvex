@@ -202,7 +202,7 @@ const organizationSchema = z.object({
   name: z
     .string()
     .min(3, "Name must be at least 3 characters")
-    .max(35, "Max 35 characters")
+    .max(50, "Max 50 characters")
     .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
   logo: z.union([
     z
@@ -299,10 +299,10 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
         path: ["name"],
       });
     }
-    if (trimmed.length > 35) {
+    if (trimmed.length > 60) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Max 35 characters",
+        message: "Max 60 characters",
         path: ["name"],
       });
     }
