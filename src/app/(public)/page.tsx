@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +9,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Link } from "@/components/ui/custom-link";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
@@ -216,11 +216,36 @@ export default function Home() {
 
       {!hasActiveSubscription && (
         <>
-          <div className="mx-auto mt-10 flex w-full flex-col items-center justify-center gap-5 text-balance rounded-2xl border-1.5 border-foreground bg-white/60 px-8 py-20 text-center text-base sm:max-w-[60vw]">
+          {/* <div className="mx-auto mt-10 flex w-full flex-col items-center justify-center gap-5 text-balance px-8 py-20 text-center text-base sm:max-w-[70vw]">
             <h2 className="w-fit text-center font-tanker text-[2.6rem] leading-10">
-              Oh hello!
+              Welcome!
             </h2>
-            <Image
+            <p>
+              For those that are new to The Street Art List, here&apos;s a quick
+              overview of what it is and how it works.
+            </p>
+            <p>
+              The Street Art List is a platform that I started in 2019 with the
+              goal of making a public archive/database of street art-related
+              projects and events. Over the years, that list continued to grow
+              until last year when I decided to bite the bullet and code a site.
+              Needless to say, it was a huge undertaking, but was also a bit
+              rushed and I really wanted to make something better. So, for the
+              past year and a half, I&apos;ve been working on this shiny new
+              site that allows users to have an account, to bookmark, to hide
+              events, to keep track of applications, to view deadlines in their
+              local timezone, and much more! Lots of functionalities that I have
+              in the works, and I&apos;m happy to finally get to share what so
+              much of my time has gone into. If you used previous versions of
+              The List (when it was a spreadsheet), or the old version of the
+              site, I promise that this has just... so much more. Full detail
+              pages with breakdowns of the budget, mobile-friendly layouts,
+              submission forms that allow saving drafts and coming back to them
+              later. Organizer accounts. Really, just so much more. I&apos;m
+              excited to share this with you and hope you&apos;ll find it useful
+              :)
+            </p>
+            /~ <Image
               src="/hello.gif"
               alt="Hello there"
               width={300}
@@ -233,8 +258,48 @@ export default function Home() {
             Please don&apos;t try to sign up. It&apos;s in testing and not
             available. Any created accounts in the meantime will be deleted as
             I&apos;m doing a lot of changes in the database while getting
-            everything connected.
-          </div>
+            everything connected. ~/
+          </div>*/}
+
+          <Card className="mx-auto mt-10 max-w-[70dvw] border-1.5 p-6 text-left shadow-md">
+            <CardContent className="space-y-4 text-base text-foreground">
+              <h2 className="text-center font-tanker text-4xl text-foreground">
+                Welcome!
+              </h2>
+              <p>
+                For those that are new to The Street Art List, here&apos;s a
+                quick overview of what it is and how it works.
+              </p>
+              <p>
+                The Street Art List is a platform that I started in 2019 with
+                the goal of making a public archive/database of street
+                art-related projects and events. Over the years, that list
+                continued to grow until last year when I decided to bite the
+                bullet and code a site. Needless to say, it was a huge
+                undertaking, but was also a bit rushed and I really wanted to
+                make something better.
+              </p>
+              <p>
+                So, for the past year and a half, I&apos;ve been working on this
+                shiny new site that allows users to have an account, to
+                bookmark, to hide events, to keep track of applications, to view
+                deadlines in their local timezone, and much more! Lots of
+                functionalities that I have in the works, and I&apos;m happy to
+                finally get to share what so much of my time has gone into.
+              </p>
+              <p>
+                {" "}
+                If you used previous versions of The List (when it was a
+                spreadsheet), or the old version of the site, I promise that
+                this has just... so much more. Full detail pages with breakdowns
+                of the budget, mobile-friendly layouts, submission forms that
+                allow saving drafts and coming back to them later. Organizer
+                accounts. Really, just so much more. I&apos;m excited to share
+                this with you and hope you&apos;ll find it useful :)
+              </p>
+            </CardContent>
+          </Card>
+
           <Pricing />
         </>
       )}
