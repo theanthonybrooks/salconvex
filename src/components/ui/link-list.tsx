@@ -127,7 +127,10 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <FaFacebookF className={cn("shrink-0", iconSize)} />
 
                 <span className="underline-offset-2 hover:underline">
-                  {event.links.facebook}
+                  {/* {event.links.facebook} */}
+                  {event.links.facebook.includes("@")
+                    ? event.links.facebook
+                    : event.name}
                 </span>
               </div>
             </a>

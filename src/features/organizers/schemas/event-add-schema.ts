@@ -94,10 +94,16 @@ const isValidInstagram = (value: string) => {
 };
 
 // const isValidFacebook = (value: string) => /^@?[a-zA-Z0-9.]{5,}$/i.test(value); // Basic heuristic
+// const isValidFacebook = (value: string) => {
+//   // Accept either a valid handle or a full URL
+//   const handleRegex = /^@?[a-zA-Z0-9.]{5,}$/;
+//   const urlRegex = /^https:\/\/www\.facebook\.com\/[a-zA-Z0-9./_-]+$/i;
+
+//   return handleRegex.test(value) || urlRegex.test(value);
+// };
 const isValidFacebook = (value: string) => {
-  // Accept either a valid handle or a full URL
   const handleRegex = /^@?[a-zA-Z0-9.]{5,}$/;
-  const urlRegex = /^https:\/\/www\.facebook\.com\/[a-zA-Z0-9./_-]+$/i;
+  const urlRegex = /^https:\/\/www\.facebook\.com\/.+$/i;
 
   return handleRegex.test(value) || urlRegex.test(value);
 };
@@ -517,9 +523,18 @@ export const openCallBaseSchema = z.object({
     applicationLink: z
       .string()
       .min(8, "URL is too short")
-      .refine((val) => !val || isValidUrl(val), {
-        message: "Must be a valid URL (https://...)",
-      }),
+      .refine(
+        (val) => {
+          return !val || isValidUrl(val);
+        },
+        {
+          message: "Must be a valid URL (https://...)",
+        },
+      ),
+
+    // .refine((val) => !val || isValidUrl(val), {
+    //   message: "Must be a valid URL (https://...)",
+    // }),
     //   otherInfo: z.optional(z.array(z.string())), //todo: make not optional later
   }),
   documents: z.optional(

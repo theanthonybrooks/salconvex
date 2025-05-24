@@ -1,7 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { autoHttps, formatHandleInput, PlatformType } from "@/lib/linkFns";
+import {
+  autoHttps,
+  formatFacebookInput,
+  formatHandleInput,
+  PlatformType,
+} from "@/lib/linkFns";
 import { cn } from "@/lib/utils";
 import { HiArrowTurnRightDown } from "react-icons/hi2";
 
@@ -533,7 +538,13 @@ function HandleInput({
               disabled={disabled}
               placeholder={placeholder}
               className={cn("flex-1", error && "invalid-field")}
-              transform={(val) => formatHandleInput(val, platform)}
+              // transform={(val) => formatHandleInput(val, platform)}
+              transform={(val) => {
+                if (platform === "facebook") {
+                  return formatFacebookInput(val);
+                }
+                return formatHandleInput(val, platform);
+              }}
               onBlur={() => {
                 field.onBlur?.();
                 handleCheckSchema?.();
