@@ -827,6 +827,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               : eventData.dates.prodDates;
 
           const { event } = await createOrUpdateEvent({
+            formType,
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name, { lower: true }),
