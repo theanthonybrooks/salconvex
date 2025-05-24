@@ -133,7 +133,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <span className="underline-offset-2 hover:underline">
                   {/* {event.links.facebook} */}
                   {event.links.facebook.includes("@")
-                    ? "@" + event.links.facebook
+                    ? event.links.facebook
                     : event.name}
                 </span>
               </div>
@@ -254,7 +254,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
 
                   <span className="underline-offset-2 hover:underline">
                     {organizer.links.facebook.includes("@")
-                      ? "@" + organizer.links.facebook
+                      ? organizer.links.facebook
                       : organizer.name}
                   </span>
                 </div>
