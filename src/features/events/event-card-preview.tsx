@@ -68,6 +68,7 @@ const EventCardPreview = ({
   user,
   userPref,
 }: EventCardPreviewProps) => {
+  const userTZ = !!userPref?.timezone ? userPref.timezone : undefined;
   const router = useRouter();
   const {
     location,
@@ -179,6 +180,9 @@ const EventCardPreview = ({
     }
   };
 
+  console.log(userTZ, basicInfo?.dates?.timezone);
+  console.log(basicInfo?.dates?.ocEnd);
+
   return (
     <>
       {/* //---------------------- (Mobile) Layout ---------------------- */}
@@ -259,7 +263,7 @@ const EventCardPreview = ({
                 ) : (
                   formatOpenCallDeadline(
                     basicInfo.dates?.ocEnd || "",
-                    userPref?.timezone ?? basicInfo.dates?.timezone,
+                    userTZ ?? basicInfo.dates?.timezone,
                     basicInfo.callType,
                     true,
                   )
@@ -579,14 +583,14 @@ const EventCardPreview = ({
                     <span className="hidden 2xl:block">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
-                        userPref?.timezone ?? basicInfo.dates?.timezone,
+                        userTZ ?? basicInfo.dates?.timezone,
                         basicInfo.callType,
                       )}
                     </span>
                     <span className="block 2xl:hidden">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
-                        userPref?.timezone ?? basicInfo.dates?.timezone,
+                        userTZ ?? basicInfo.dates?.timezone,
                         basicInfo.callType,
                         true,
                       )}

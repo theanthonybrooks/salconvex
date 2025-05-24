@@ -204,13 +204,14 @@ export const formatOpenCallDeadline = (
   const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone);
   if (!dt.isValid) return "Invalid date";
 
-  const dateObj = dt.toJSDate();
-  const month = getFourCharMonth(dateObj);
+  // const dateObj = dt.toJSDate();
+  const month = dt.toFormat("LLLL");
   const day = dt.day;
   const year = dt.year;
   const ordinal = getOrdinalSuffix(day);
   const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`;
 
+  console.log(dt.offsetNameShort, dt.toFormat("ZZ"), month, day, year);
   if (preview) return `${month} ${day}${ordinal}, ${year}`;
 
   const time = dt.toFormat("h:mm a");
