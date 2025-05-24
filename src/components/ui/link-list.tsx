@@ -120,7 +120,11 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
           )}
           {event.links?.facebook && (
             <a
-              href={`https://www.facebook.com/${event.links.facebook.split("@").slice(-1)[0]}`}
+              href={
+                event.links.facebook.includes("@")
+                  ? `https://www.facebook.com/${event.links.facebook.split("@").slice(-1)[0]}`
+                  : event.links.facebook
+              }
               target="_blank"
             >
               <div className="flex items-center gap-x-2">
