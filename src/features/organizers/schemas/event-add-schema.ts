@@ -69,10 +69,19 @@ export const strictUrl = z
 
 // const isValidUrl = (value: string) =>
 //   /^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i.test(value);
-const isValidUrl = (value: string) =>
-  /^(https?:\/\/)(?!.*\.\.)(?!.*--)(?!.*\.$)(?!.*-$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~!$&'()*+,;=:@%-]*)?$/i.test(
-    value,
-  );
+// const isValidUrl = (value: string) =>
+//   /^(https?:\/\/)(?!.*\.\.)(?!.*--)(?!.*\.$)(?!.*-$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~!$&'()*+,;=:@%-]*)?$/i.test(
+//     value,
+//   );
+
+const isValidUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return ["http:", "https:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+};
 
 const isValidInstagram = (value: string) => {
   // Remove leading @ for validation
@@ -84,7 +93,14 @@ const isValidInstagram = (value: string) => {
   return regex.test(username);
 };
 
-const isValidFacebook = (value: string) => /^@?[a-zA-Z0-9.]{5,}$/i.test(value); // Basic heuristic
+// const isValidFacebook = (value: string) => /^@?[a-zA-Z0-9.]{5,}$/i.test(value); // Basic heuristic
+const isValidFacebook = (value: string) => {
+  // Accept either a valid handle or a full URL
+  const handleRegex = /^@?[a-zA-Z0-9.]{5,}$/;
+  const urlRegex = /^https:\/\/www\.facebook\.com\/[a-zA-Z0-9./_-]+$/i;
+
+  return handleRegex.test(value) || urlRegex.test(value);
+};
 
 // const isValidEmail = (value: string) =>
 //   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);

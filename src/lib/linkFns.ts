@@ -26,6 +26,7 @@ export function formatHandleInput(
   if (!value) return "";
 
   let cleanValue = value.trim().replace(/^\/+/, "");
+  if (!cleanValue) return "";
 
   if (
     (/\.\w{2,}/.test(cleanValue) || cleanValue.startsWith("http")) &&
@@ -85,6 +86,7 @@ function isValidChar(char: string, platform: PlatformType): boolean {
 
 export function autoHttps(url: string): string {
   const raw = url.trim();
+  if (!raw) return "";
 
   // Remove any leading malformed or valid protocol (http:/, http://, https:/, https://)
   const cleaned = raw.replace(/^https?:\/{0,2}/i, "");

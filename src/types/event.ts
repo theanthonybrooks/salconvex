@@ -13,7 +13,7 @@ export const paidEvents = ["mur", "saf", "mus", "oth"];
 
 export const eventTypeOptions = [
   { value: "gjm", label: "Graffiti Jam" },
-  { value: "mur", label: "Mural Festival" },
+  { value: "mur", label: "Mural Project" },
   { value: "saf", label: "Street Art Festival" },
   { value: "pup", label: "Paste Up/Sticker" },
   { value: "mus", label: "At music festival" },
