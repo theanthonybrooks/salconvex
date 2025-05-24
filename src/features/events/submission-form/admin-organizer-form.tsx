@@ -1380,7 +1380,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
 
   // #region -------------UseEffects --------------
-
+  console.log(eventData);
   useEffect(() => {
     if (eventFormType === undefined || formType !== 0) return;
     if (eventFormType > 0 && formType === 0) {
@@ -1520,7 +1520,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       existingOrg &&
       typeof existingOrg._id === "string" &&
       existingOrg._id.length > 0;
-    // console.log("existingOrg", existingOrg);
 
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
@@ -1534,7 +1533,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           ...existingOrg,
         },
         event: {
-          formType,
+          formType: 1,
           name: "",
         },
       });
@@ -1542,7 +1541,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, reset, getValues, formType]);
+  }, [existingOrg, reset]);
 
   useEffect(() => {
     if (
@@ -1569,6 +1568,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [existingOrg, existingEvent, reset, preloadOrgRef]);
 
   useEffect(() => {
+    if (existingEvent?._id === undefined) return;
+    if (existingEvent?._id === prevEventRef.current?._id) return;
     const eventReady =
       existingEvent &&
       typeof existingEvent._id === "string" &&
@@ -1576,6 +1577,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     if (!eventReady && !existingEvent && prevEventRef.current !== null) {
       prevEventRef.current = null;
     }
+    console.log(existingEvent?._id, prevEventRef.current?._id);
     const eventChanged =
       eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged && !preloadEventRef.current) {
@@ -1588,11 +1590,12 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         setLastSaved(existingEvent._creationTime);
       }
       // console.log("resetting event");
+      setFormType(existingEvent?.formType ?? formType);
       reset({
         ...currentValues,
         event: {
-          formType,
           ...existingEvent,
+          formType: existingEvent?.formType ?? formType,
           category: existingEvent?.category ?? "event",
           hasOpenCall: existingEvent?.hasOpenCall ?? "Unknown",
         },

@@ -113,7 +113,6 @@ export default function HorizontalLinearStepper({
   const handleReset = () => setActiveStep(0);
   const lastStep = stepArray.length - 1;
   const firstStep = activeStep === 0;
-  console.log(firstStep, isMobile);
   return (
     <div
       className={cn(
@@ -309,7 +308,7 @@ export default function HorizontalLinearStepper({
                   You can save at any time and come back to it later.
                 </p>
               )}
-              
+
             {errorMsg &&
               errorMsg !== "Required" &&
               errorMsg !== "Invalid input" && (
