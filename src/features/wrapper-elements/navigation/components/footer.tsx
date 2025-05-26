@@ -145,7 +145,7 @@ export default function Footer({ className }: { className?: string }) {
       )}
     >
       <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:max-w-full xl:px-6">
-        <div className="mx-auto sm:max-w-[80vw] xl:grid xl:grid-cols-2 xl:gap-8">
+        <div className="mx-auto xl:grid xl:grid-cols-2 xl:gap-8 3xl:max-w-[max(80vw,1500px)]">
           {/* Links */}
           <div className="mt-5 grid gap-8 px-6 lg:grid-cols-[1fr_5px_auto] xl:col-span-2 xl:mt-0">
             <div
