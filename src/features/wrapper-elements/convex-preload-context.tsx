@@ -4,7 +4,6 @@ import { Preloaded } from "convex/react";
 import { createContext, ReactNode, useContext } from "react";
 import { api } from "~/convex/_generated/api";
 
-// Define the shape of the context
 type ConvexPreloadContextType = {
   preloadedUserData: Preloaded<typeof api.users.getCurrentUser>;
   preloadedSubStatus: Preloaded<
@@ -12,17 +11,14 @@ type ConvexPreloadContextType = {
   >;
 };
 
-// Create the context with an explicit null default
 const ConvexPreloadContext = createContext<ConvexPreloadContextType | null>(
   null,
 );
 
-// Typed provider props
 type ConvexPreloadContextProviderProps = ConvexPreloadContextType & {
   children: ReactNode;
 };
 
-// Provider implementation
 export function ConvexPreloadContextProvider({
   children,
   preloadedUserData,
@@ -37,12 +33,11 @@ export function ConvexPreloadContextProvider({
   );
 }
 
-// Hook to access the context
 export function useConvexPreload() {
   const context = useContext(ConvexPreloadContext);
   if (!context)
     throw new Error(
-      "useConvexPreload must be used inside ConvexPreloadContextProvider",
+      "useConvexPreload must be inside of ConvexPreloadContextProvider",
     );
   return context;
 }

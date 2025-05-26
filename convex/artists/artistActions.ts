@@ -13,14 +13,25 @@ export const updateOrCreateArtist = mutation({
     artistNationality: v.optional(v.array(v.string())),
     artistResidency: v.object({
       full: v.optional(v.string()),
+      locale: v.optional(v.string()),
       city: v.optional(v.string()),
+      region: v.optional(v.string()),
       state: v.optional(v.string()),
       stateAbbr: v.optional(v.string()),
       country: v.string(),
       countryAbbr: v.string(),
+      continent: v.optional(v.string()),
       location: v.array(v.number()),
       timezone: v.string(),
       timezoneOffset: v.optional(v.number()),
+      currency: v.optional(
+        v.object({
+          code: v.string(),
+          name: v.string(),
+          symbol: v.string(),
+          format: v.optional(v.string()),
+        }),
+      ),
     }),
   },
   handler: async (ctx, args) => {

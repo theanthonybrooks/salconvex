@@ -38,6 +38,9 @@ export const getUserHadTrial = query({
       .query("userSubscriptions")
       .withIndex("userId", (q) => q.eq("userId", identity))
       .first();
+
+    console.log("sub", sub);
+    console.log("sub.hadTrial", sub?.hadTrial);
     return sub?.hadTrial === true;
   },
 });
@@ -89,7 +92,7 @@ export const createStripeCheckoutSession = action({
       openCallId?: Id<"openCalls"> | undefined;
     },
   ): Promise<{ url: string }> => {
-    console.log("args: ", args);
+    const isOrganizer = args.accountType === "organizer";
     const identity = await getAuthUserId(ctx);
     if (!identity) throw new Error("Not authenticated");
     const result = await ctx.runQuery(api.users.getCurrentUser, {});
@@ -101,8 +104,8 @@ export const createStripeCheckoutSession = action({
       if (!args.slidingPrice) throw new Error("Sliding price not provided");
     }
 
-    console.log("Arguments: ", args);
-    console.log("isEligibleForFree: ", args.isEligibleForFree);
+    // console.log("Arguments: ", args);
+    // console.log("isEligibleForFree: ", args.isEligibleForFree);
 
     const plan: any = await ctx.runQuery(
       internal.stripeSubscriptions.getPlanByKey,
@@ -110,7 +113,7 @@ export const createStripeCheckoutSession = action({
         key: args.planKey,
       },
     );
-    console.log(plan);
+    // console.log(plan);
     if (args.accountType === "artist") {
       if (!plan || !plan.prices || !plan.prices.month) {
         throw new Error("Plan not found or missing pricing info");
@@ -118,12 +121,12 @@ export const createStripeCheckoutSession = action({
     }
 
     const priceId =
-      args.slidingPrice && args.accountType === "organizer"
+      args.slidingPrice && isOrganizer
         ? args.slidingPrice
         : (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
           plan.prices.month.usd.stripeId;
 
-    console.log("priceId which: ", priceId);
+    // console.log("priceId which: ", priceId);
 
     if (!priceId) throw new Error("Stripe price ID not found in plan pricing");
 
@@ -139,19 +142,18 @@ export const createStripeCheckoutSession = action({
           : args.interval || "month",
     };
 
-    console.log("hadTrial: ", args.hadTrial);
-    console.log("Meta Data: ", metadata);
+    // console.log("hadTrial: ", args.hadTrial);
+    // console.log("Meta Data: ", metadata);
 
     // Determine subscription data options
     const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData =
       {
-        ...(args.hadTrial || args.slidingPrice
+        ...(args.hadTrial || (args.slidingPrice && isOrganizer)
           ? {}
           : { trial_period_days: 14 }),
       };
     //TODO: Make some sort of trial/one-off for organizers of events. Could just check if they already have an open call? Would prefer to add a flag, though.
 
-    console.log("metadata: ", metadata);
     // Create a Stripe Checkout Session.
     const session: Stripe.Checkout.Session =
       await stripe.checkout.sessions.create({
@@ -196,7 +198,7 @@ export const createStripeCheckoutSession = action({
         //TODO: Add coupon and products to production version of Stripe
       });
 
-    // console.log("checkout session created: ", session)
+    console.log("checkout session created: ", session);
 
     // Ensure session.url is not null.
     if (!session.url) throw new Error("Stripe session URL is null");

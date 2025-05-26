@@ -51,6 +51,7 @@ export const getCurrentUser = query({
   },
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
+    // if (!userId) console.log("user id not found");
     if (!userId) return null;
     const user = await ctx.db
       .query("users")
@@ -58,9 +59,10 @@ export const getCurrentUser = query({
       .unique();
 
     // console.log("userId", userId)
-    // console.log("user", user)
+    // if (!user) console.log("user not found");
 
     if (!user) return null;
+    // console.log("user", user.name);
 
     const userPref = await ctx.db
       .query("userPreferences")

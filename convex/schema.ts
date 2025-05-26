@@ -119,14 +119,25 @@ const artistSchema = {
   artistNationality: v.optional(v.array(v.string())),
   artistResidency: v.object({
     full: v.optional(v.string()),
+    locale: v.optional(v.string()),
     city: v.optional(v.string()),
+    region: v.optional(v.string()),
     state: v.optional(v.string()),
     stateAbbr: v.optional(v.string()),
     country: v.optional(v.string()),
     countryAbbr: v.optional(v.string()),
+    continent: v.optional(v.string()),
     location: v.optional(v.array(v.number())),
     timezone: v.optional(v.string()),
     timezoneOffset: v.optional(v.number()),
+    currency: v.optional(
+      v.object({
+        code: v.string(),
+        name: v.string(),
+        symbol: v.string(),
+        format: v.optional(v.string()),
+      }),
+    ),
   }),
 
   documents: v.optional(
