@@ -5,14 +5,17 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
+import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex-helpers/react/cache";
 import { useState } from "react";
-// interface AdminDashboardWrapperProps {
+import { api } from "~/convex/_generated/api";
+interface AdminDashboardWrapperProps {
+  page: string;
+}
 
-// }
-
-export function AdminDashboardWrapper() {
+export function AdminDashboardWrapper({ page }: AdminDashboardWrapperProps) {
   const { preloadedEventData, preloadedSubmissionData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -31,46 +34,98 @@ export function AdminDashboardWrapper() {
     setViewAll,
   };
 
+  const usersData = useQuery(api.users.usersWithSubscriptions);
+
+  const submissionsPage = page === "submissions";
+  // const eventsPage = page === "events";
+  const usersPage = page === "users";
+
   return (
     <>
-      <div className="hidden max-h-full w-full px-10 py-10 lg:block">
-        <DataTable
-          columns={columns}
-          data={eventsData}
-          defaultVisibility={{
-            category: viewAll ? true : false,
-            dates_edition: viewAll ? true : false,
-            type: false,
-          }}
-          onRowSelect={(row) => {
-            console.log(row);
-          }}
-          adminActions={adminActions}
-          tableType="events"
-          pageType="dashboard"
-        />
-      </div>
-      <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-        <DataTable
-          columns={columns}
-          data={eventsData}
-          defaultVisibility={{
-            type: false,
-            category: false,
-            lastEditedAt: false,
-            dates_edition: false,
-          }}
-          onRowSelect={(row) => {
-            //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.
-            console.log(row);
-          }}
-          adminActions={adminActions}
-          tableType="events"
-          pageType="dashboard"
-          className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-          outerContainerClassName={cn("lg:hidden")}
-        />
-      </div>
+      {submissionsPage && (
+        <>
+          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+            <DataTable
+              columns={columns}
+              data={eventsData}
+              defaultVisibility={{
+                category: viewAll ? true : false,
+                dates_edition: viewAll ? true : false,
+                type: false,
+              }}
+              onRowSelect={(row) => {
+                console.log(row);
+              }}
+              adminActions={adminActions}
+              tableType="events"
+              pageType="dashboard"
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
+            <DataTable
+              columns={columns}
+              data={eventsData}
+              defaultVisibility={{
+                type: false,
+                category: false,
+                lastEditedAt: false,
+                dates_edition: false,
+              }}
+              onRowSelect={(row) => {
+                //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.
+                console.log(row);
+              }}
+              adminActions={adminActions}
+              tableType="events"
+              pageType="dashboard"
+              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn("lg:hidden")}
+            />
+          </div>
+        </>
+      )}
+      {usersPage && (
+        <>
+          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+            <DataTable
+              columns={userColumns}
+              data={usersData ?? []}
+              defaultVisibility={{
+                category: viewAll ? true : false,
+                dates_edition: viewAll ? true : false,
+                type: false,
+              }}
+              onRowSelect={(row) => {
+                console.log(row);
+              }}
+              adminActions={adminActions}
+              tableType="users"
+              pageType="dashboard"
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
+            <DataTable
+              columns={userColumns}
+              data={usersData ?? []}
+              defaultVisibility={{
+                type: false,
+                category: false,
+                lastEditedAt: false,
+                dates_edition: false,
+              }}
+              onRowSelect={(row) => {
+                //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.
+                console.log(row);
+              }}
+              adminActions={adminActions}
+              tableType="users"
+              pageType="dashboard"
+              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn("lg:hidden")}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 }

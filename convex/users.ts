@@ -17,12 +17,23 @@ export const usersWithSubscriptions = query({
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();
 
-    return users.map((user) => ({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      subscription: user.subscription ?? "none",
-    }));
+    return users.map((user) => {
+      const fullName = `${user.firstName} ${user.lastName}`.trim();
+      const name =
+        fullName === user.name || !user.name
+          ? fullName
+          : `${fullName} (${user.name})`;
+
+      return {
+        _id: user._id,
+        name,
+        email: user.email,
+        subscription: user.subscription ?? "none",
+        accountType: user.accountType ?? [],
+        role: user.role ?? "user",
+        createdAt: user.createdAt,
+      };
+    });
   },
 });
 

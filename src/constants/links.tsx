@@ -10,6 +10,7 @@ import {
   LucideCircleFadingPlus,
   LucideIcon,
   LucideListPlus,
+  LucideUsers,
   Settings,
   Shield,
   User,
@@ -246,6 +247,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: ["admin"],
     userType: ["admin"],
   },
+
   {
     label: "Submit ",
     href: "/dashboard/admin/event",
@@ -266,6 +268,16 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionHead: true,
     heading: "Admin",
     desc: "Admin Panel",
+    sub: ["admin"],
+    userType: ["admin"],
+  },
+  {
+    label: "Users",
+    href: "/dashboard/admin/users",
+    icon: LucideUsers,
+    subsection: true,
+    sectionCat: "admin",
+    desc: "User List",
     sub: ["admin"],
     userType: ["admin"],
   },

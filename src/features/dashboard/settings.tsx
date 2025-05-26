@@ -66,6 +66,7 @@ import { z } from "zod";
 
 import { currencies, Currency } from "@/app/data/currencies";
 import { Timezone, timezones } from "@/app/data/timezones";
+import { Link } from "@/components/ui/custom-link";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -78,15 +79,20 @@ import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 export default function SettingsPage() {
-  const { preloadedUserData } = useConvexPreload();
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
+  const subData = usePreloadedQuery(preloadedSubStatus);
   const { signOut } = useAuthActions();
-  const user = userData?.user;
 
+  const user = userData?.user;
   const userPrefs = userData?.userPref;
-  const sessionCount = useQuery(api.users.countSessions, {
-    userId: user?.userId ?? "guest",
-  });
+  const userId = userData?.userId;
+  const activeSub = subData?.hasActiveSubscription;
+
+  const sessionCount = useQuery(
+    api.users.countSessions,
+    userId ? { userId } : "skip",
+  );
   const updatePassword = useMutation(api.users.updatePassword);
   const updateUserPrefs = useMutation(api.users.updateUserPrefs);
   const deleteSessions = useMutation(api.users.deleteSessions);
@@ -1011,14 +1017,21 @@ export default function SettingsPage() {
                       <p className="font-medium">Delete Account</p>
                       <p className="text-sm text-muted-foreground">
                         Permanently delete your account — any active
-                        subscriptions need to be canceled before this is
-                        possible
+                        subscriptions need to be{" "}
+                        <Link
+                          href="/dashboard/account/billing"
+                          variant="subtleUnderline"
+                        >
+                          canceled
+                        </Link>{" "}
+                        before this is possible
                       </p>
                     </div>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
+                          disabled={activeSub}
                           type="button"
                           variant="destructive"
                           className="w-full min-w-[150px] font-bold sm:w-auto"

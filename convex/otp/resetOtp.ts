@@ -91,7 +91,7 @@ export const ResetOTP = Resend({
     const { error } = await resend.emails.send({
       from: "The Street Art List <help@support.thestreetartlist.com>",
       to: [email],
-      subject: `${token} is your pw reset code`,
+      subject: `${token} is your reset code`,
       html: htmlContent,
     });
 

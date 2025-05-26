@@ -172,15 +172,18 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex items-center gap-3">
-        {isAdmin && pageType === "dashboard" && selectedRowCount > 0 && (
-          <Button
-            variant="ghost"
-            onClick={() => handleDeleteSelected()}
-            className="hidden hover:scale-105 sm:inline-flex"
-          >
-            Delete Selection
-          </Button>
-        )}
+        {eventAndOC &&
+          isAdmin &&
+          pageType === "dashboard" &&
+          selectedRowCount > 0 && (
+            <Button
+              variant="ghost"
+              onClick={() => handleDeleteSelected()}
+              className="hidden hover:scale-105 sm:inline-flex"
+            >
+              Delete Selection
+            </Button>
+          )}
         <DataTableViewOptions table={table} />
       </div>
     </div>

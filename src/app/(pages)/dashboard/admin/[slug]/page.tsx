@@ -42,7 +42,9 @@ export default async function AdminPage({
     case "todos":
       return <KanbanBoard userRole={user.role?.[0]} />;
     case "submissions":
-      return <AdminDashboardWrapper />;
+      return <AdminDashboardWrapper page="submissions" />;
+    case "users":
+      return <AdminDashboardWrapper page="users" />;
     case "event":
       return <AdminEventForm user={user} />;
     default:
