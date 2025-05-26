@@ -406,7 +406,7 @@ export default function Dashboard() {
                           </Link>
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          View more details about this event.
+                          {event.location.country}-{event.category}
                         </p>
                       </div>
                       <p className="whitespace-nowrap text-xs text-muted-foreground">
