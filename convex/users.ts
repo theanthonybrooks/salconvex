@@ -12,6 +12,20 @@ import {
   query,
 } from "./_generated/server";
 
+export const usersWithSubscriptions = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+
+    return users.map((user) => ({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      subscription: user.subscription ?? "none",
+    }));
+  },
+});
+
 export const isAdmin = query({
   args: {},
   handler: async (ctx) => {

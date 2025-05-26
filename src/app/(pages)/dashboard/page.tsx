@@ -12,6 +12,7 @@ import {
 import { Link } from "@/components/ui/custom-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/lib/applicationFns";
+import { getEventCategoryLabel } from "@/lib/eventFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery, useQuery } from "convex/react";
@@ -405,8 +406,9 @@ export default function Dashboard() {
                             {event.name}
                           </Link>
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          {event.location.country}-{event.category}
+                        <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                          {event.location.country}-
+                          {getEventCategoryLabel(event.category)}
                         </p>
                       </div>
                       <p className="whitespace-nowrap text-xs text-muted-foreground">

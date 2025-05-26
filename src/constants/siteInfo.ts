@@ -3,6 +3,6 @@ export const siteUrl = [
   "https://www.thestreetartlist.com",
 ] as const;
 
-export const supportEmail = "support@streetartlist.com";
-export const infoEmail = "info@streetartlist.com";
+export const supportEmail = "support@thestreetartlist.com";
+export const infoEmail = "info@thestreetartlist.com";
 export const contactEmail = "contact@thestreetartlist.com";

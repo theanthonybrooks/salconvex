@@ -73,7 +73,7 @@ export const ResetOTP = Resend({
       </head>
       <body>
           <div class="container">
-              <img src="https://streetartlist.com/forgot-pw.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
+              <img src="https://thestreetartlist.com/forgot-pw.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
               <div class="text-sm">Please enter the following code to proceed to password reset.</div>
               <div class="section">
                   <div class="subtext">Password reset code</div>
@@ -89,7 +89,7 @@ export const ResetOTP = Resend({
     `;
 
     const { error } = await resend.emails.send({
-      from: "The Street Art List <help@support.streetartlist.com>",
+      from: "The Street Art List <help@support.thestreetartlist.com>",
       to: [email],
       subject: `${token} is your pw reset code`,
       html: htmlContent,

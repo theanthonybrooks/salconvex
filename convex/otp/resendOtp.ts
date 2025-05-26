@@ -74,7 +74,7 @@ export const ResendOTP = Resend({
       <body>
           <div class="container">
           
-              <img src="https://streetartlist.com/saltext.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
+              <img src="https://thestreetartlist.com/saltext.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
               <div class="text-sm">Please enter the following code to finish signing up.</div>
               <div class="section">
                   <div class="subtext">Verification code</div>
@@ -90,7 +90,7 @@ export const ResendOTP = Resend({
     `;
 
     const { error } = await resend.emails.send({
-      from: "The Street Art List <hello@support.streetartlist.com>",
+      from: "The Street Art List <hello@support.thestreetartlist.com>",
       to: [email],
       subject: `${token} is your verification code`,
       html: htmlContent,
