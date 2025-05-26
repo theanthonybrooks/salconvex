@@ -5,17 +5,21 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
+import { applicationColumns } from "@/features/admin/dashboard/application-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
+import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
 import { useState } from "react";
 import { api } from "~/convex/_generated/api";
-interface AdminDashboardWrapperProps {
-  page: string;
+interface AdminDashboardTableWrapperProps {
+  page: TableTypes;
 }
 
-export function AdminDashboardWrapper({ page }: AdminDashboardWrapperProps) {
+export function AdminDashboardTableWrapper({
+  page,
+}: AdminDashboardTableWrapperProps) {
   const { preloadedEventData, preloadedSubmissionData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -36,9 +40,13 @@ export function AdminDashboardWrapper({ page }: AdminDashboardWrapperProps) {
 
   const usersData = useQuery(api.users.usersWithSubscriptions);
 
-  const submissionsPage = page === "submissions";
-  // const eventsPage = page === "events";
+  const submissionsPage = page === "events";
+  const appsPage = page === "applications";
   const usersPage = page === "users";
+  const applicationData = useQuery(
+    api.artists.applications.getArtistApplications2,
+  );
+  console.log(applicationData);
 
   return (
     <>
@@ -119,6 +127,48 @@ export function AdminDashboardWrapper({ page }: AdminDashboardWrapperProps) {
               }}
               adminActions={adminActions}
               tableType="users"
+              pageType="dashboard"
+              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn("lg:hidden")}
+            />
+          </div>
+        </>
+      )}
+      {appsPage && (
+        <>
+          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+            <DataTable
+              columns={applicationColumns}
+              data={applicationData ?? []}
+              defaultVisibility={{
+                dates_edition: false,
+                manualApplied: false,
+                productionEnd: false,
+                eventEnd: false,
+              }}
+              // onRowSelect={(row) => {
+              //   console.log(row);
+              // }}
+              adminActions={adminActions}
+              tableType="applications"
+              pageType="dashboard"
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
+            <DataTable
+              columns={applicationColumns}
+              data={applicationData ?? []}
+              defaultVisibility={{
+                dates_edition: false,
+                manualApplied: false,
+                productionEnd: false,
+                eventEnd: false,
+              }}
+              // onRowSelect={(row) => {
+              //   console.log(row);
+              // }}
+              adminActions={adminActions}
+              tableType="applications"
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
