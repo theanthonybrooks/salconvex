@@ -9,6 +9,7 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { usePreloadedQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
@@ -24,7 +25,7 @@ const OpenCallDetail = () => {
   const { slug, year } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
-  const { data, isError } = useQueryWithStatus(
+  const { data, isError, error } = useQueryWithStatus(
     api.events.event.getEventWithOCDetails,
     slugValue
       ? { slug: slugValue, edition: Number(year), source: "ocpage" }
@@ -33,25 +34,21 @@ const OpenCallDetail = () => {
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
-  //todo: add userPref check to get timezone if it exists. If not, use the timezone from the open call.
-
-  // window.addEventListener("beforeunload", () => {
-  //   sessionStorage.removeItem("previousSalPage");
-  // });
-
-  // window.addEventListener("pagehide", () => {
-  //   sessionStorage.removeItem("previousSalPage");
-  // });
-
-  // console.log("call data", data);
-
-  // const allEvents = useEventDetailCards();
-  // const event = allEvents.find((e) => e.id === id);
   useEffect(() => {
     if (isError) {
-      router.push("/404");
+      if (error instanceof ConvexError) {
+        if (error.data === "Open Call not found") {
+          const currentPath = window.location.pathname;
+          const newPath = currentPath.slice(0, -"/call".length);
+          router.push(newPath);
+        } else {
+          router.push("/404");
+        }
+      } else {
+        router.push("/404");
+      }
     }
-  }, [isError, router]);
+  }, [isError, router, error]);
   return (
     // <OpenCallDetailWrapper>
     <>

@@ -703,6 +703,7 @@ export const getEventWithOCDetails = query({
         .first();
     }
 
+
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
     if (source === "ocpage" && !openCall)
       throw new ConvexError("Open Call not found");

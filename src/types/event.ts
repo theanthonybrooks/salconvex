@@ -1,10 +1,6 @@
+import { ApplicationStatus } from "@/types/applications";
 import { ArtistFull } from "@/types/artist";
-import {
-  ApplicationStatus,
-  CallType,
-  OpenCall,
-  OpenCallStatus,
-} from "@/types/openCall";
+import { CallType, OpenCall, OpenCallStatus } from "@/types/openCall";
 import { Organizer } from "@/types/organizer";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 

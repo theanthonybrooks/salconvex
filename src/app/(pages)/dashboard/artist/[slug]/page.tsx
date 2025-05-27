@@ -35,8 +35,8 @@ export default async function ArtistPage({
   switch (slug) {
     case "apps":
       return <ArtistDashboardTableWrapper page="applications" />;
-    // case "bookmarks":
-    //   return <p>Bookmarks</p>;
+    case "bookmarks":
+      return <ArtistDashboardTableWrapper page="bookmarks" />;
     // case "hidden":
     //   return <p>Hidden</p>;
     default:

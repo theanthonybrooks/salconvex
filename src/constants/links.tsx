@@ -1,5 +1,6 @@
 import {
   Banana,
+  Bookmark,
   CheckSquare2,
   CreditCard,
   FileText,
@@ -305,16 +306,16 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: ["active", "trialing"],
     userType: ["artist"],
   },
-  // {
-  //   label: "Bookmarks",
-  //   href: "/dashboard/artist/bookmarks",
-  //   icon: Bookmark,
-  //   subsection: true,
-  //   sectionCat: "artist",
-  //   desc: "Saved opportunities",
-  //   sub: ["active", "trialing"],
-  //   userType: ["artist", "admin"],
-  // },
+  {
+    label: "Bookmarks",
+    href: "/dashboard/artist/bookmarks",
+    icon: Bookmark,
+    subsection: true,
+    sectionCat: "artist",
+    desc: "Saved opportunities",
+    sub: ["active", "trialing"],
+    userType: ["artist", "admin"],
+  },
   // {
   //   label: "Hidden",
   //   href: "/dashboard/artist/hidden",

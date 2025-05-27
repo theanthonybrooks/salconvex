@@ -133,6 +133,17 @@ export const getBookmarkedEventsWithDetails = query({
     if (bookmarkedIds.length === 0) return [];
 
     const events = await getAll(ctx.db, bookmarkedIds);
-    return events.filter((e) => e !== null);
+    return events
+      .filter((e) => e !== null)
+      .map((e) => ({
+        ...e,
+        edition: e.dates.edition,
+        eventStart: e.dates.eventDates[0].start ?? "",
+        eventEnd: e.dates.eventDates?.at(-1)?.end ?? "",
+        prodStart: e.dates.prodDates?.[0]?.start ?? "",
+        prodEnd: e.dates.prodDates?.at(-1)?.end ?? "",
+        bookmarkStatus: true,
+        slug: e.slug,
+      }));
   },
 });
