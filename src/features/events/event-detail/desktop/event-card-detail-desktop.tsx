@@ -206,7 +206,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
       </Card>
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex h-20 w-full items-center gap-x-4 rounded-2xl border border-dotted border-foreground/50 bg-[#fef9dd] p-4">
+        <div className="flex min-h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-[#fef9dd] p-4">
           <div className="flex w-full items-center justify-between pr-2">
             <div className="flex items-center gap-x-4 px-4">
               <Image

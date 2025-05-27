@@ -14,8 +14,9 @@ import { useArtistApplicationActions } from "@/features/artists/helpers/appActio
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
+import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
-import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
+import { OpenCallStatus } from "@/types/openCall";
 import {
   getExternalErrorHtml,
   getExternalRedirectHtml,

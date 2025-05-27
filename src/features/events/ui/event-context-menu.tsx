@@ -17,8 +17,9 @@ import {
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
-import { ApplicationStatus, OpenCallStatus } from "@/types/openCall";
+import { OpenCallStatus } from "@/types/openCall";
 
 import { Separator } from "@/components/ui/separator";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
