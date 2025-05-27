@@ -19,10 +19,7 @@ export const updateApplicationStatus = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const application = await ctx.db
-      .query("applications")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .unique();
+    const application = await ctx.db.get(args.applicationId);
     if (!application) return null;
 
     // await ctx.db.patch(application._id, {
@@ -35,6 +32,9 @@ export const updateApplicationStatus = mutation({
 
     if (args.status !== "applied") {
       patchData.responseTime = Date.now();
+    } else if (args.status === "applied") {
+      patchData.responseTime = undefined;
+      patchData.applicationTime = Date.now();
     }
 
     await ctx.db.patch(application._id, patchData);
@@ -49,10 +49,7 @@ export const updateApplicationNotes = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const application = await ctx.db
-      .query("applications")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .unique();
+    const application = await ctx.db.get(args.applicationId);
     if (!application) return null;
 
     await ctx.db.patch(application._id, {

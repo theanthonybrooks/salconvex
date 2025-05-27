@@ -3,6 +3,7 @@
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
 
+import { useRouter } from "next/navigation";
 import DashboardSideBar from "./dashboard-sidebar";
 import DashboardTopNav from "./dashbord-top-nav";
 
@@ -11,7 +12,7 @@ interface DashboardWrapperProps {
 }
 
 export function DashboardWrapper({ children }: DashboardWrapperProps) {
-  // const router = useRouter();
+  const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
 
   const userData = usePreloadedQuery(preloadedUserData);
@@ -20,11 +21,12 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
   const user = userData?.user || null;
   const role = user?.role;
 
-  // if (!userData) {
-  //   router.replace("/auth/sign-in");
-  // }
   const subData = usePreloadedQuery(preloadedSubStatus);
   const subStatus = subData?.subStatus ?? "none";
+  if (!userData) {
+    router.replace("/auth/sign-in");
+    return null;
+  }
   return (
     <>
       <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />

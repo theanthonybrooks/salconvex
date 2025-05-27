@@ -15,6 +15,7 @@ export default async function AdminPage({
   const { slug } = await params;
 
   const token = await convexAuthNextjsToken();
+  if (!token) redirect("/auth/sign-in");
   const subscription = await fetchQuery(
     api.subscriptions.getUserSubscription,
     {},
