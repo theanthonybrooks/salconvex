@@ -21,6 +21,7 @@ import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
 } from "@/utils/loading-page-html";
+import { useQuery } from "convex-helpers/react/cache";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -31,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface ApplyButtonShortProps {
@@ -155,6 +157,12 @@ export const ApplyButton = ({
   finalButton,
 }: ApplyButtonProps) => {
   console.log(publicView, slug);
+  const subscription = useQuery(
+    api.subscriptions.getUserSubscriptionStatus,
+    finalButton ? {} : "skip",
+  );
+  const noSub = !subscription?.hasActiveSubscription;
+  console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);
@@ -269,7 +277,7 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              disabled={openCall !== "active"}
+              disabled={openCall !== "active" || noSub}
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
