@@ -20,7 +20,7 @@ import {
 
 import { TbBrandPatreon } from "react-icons/tb";
 
-import { infoEmail } from "@/constants/siteInfo";
+import { infoEmail, supportEmail } from "@/constants/siteInfo";
 import { JSX } from "react";
 import { IconType } from "react-icons";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
@@ -426,7 +426,7 @@ export const dashboardNavItems: DashNavItem[] = [
   },
   {
     label: "Help & Support",
-    href: "/dashboard/help",
+    href: `mailto:${supportEmail}?subject=Help%20Request`,
     icon: HelpCircle,
     desc: "Get assistance",
     sub: ["all"],

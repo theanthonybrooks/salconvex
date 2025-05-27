@@ -279,7 +279,7 @@ const PricingCard = ({
     user ? {} : "skip",
   );
 
-  console.log("had trial:", hadTrial);
+  // console.log("had trial:", hadTrial);
 
   const hadFreeCall = useQuery(
     api.stripeSubscriptions.getOrgHadFreeCall,

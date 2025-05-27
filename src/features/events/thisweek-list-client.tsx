@@ -134,6 +134,8 @@ const ClientThisWeekList = (
 
   const skeletonGroups = useMemo(() => generateSkeletonGroups(1), []);
   const hasResults = totalResults > 0;
+  let flatIndex = 0;
+
   return (
     <>
       {isLoading ? (
@@ -202,15 +204,22 @@ const ClientThisWeekList = (
                   )}
                 </h3>
                 <div className="space-y-4 sm:space-y-6">
-                  {group.events.map((event, index) => (
-                    <EventCardPreview
-                      key={index}
-                      event={event}
-                      publicView={publicView}
-                      user={user}
-                      userPref={userPref}
-                    />
-                  ))}
+                  {group.events.map((event, index) => {
+                    const showPublic = publicView ? flatIndex < 3 : publicView;
+                    const card = (
+                      <EventCardPreview
+                        key={index}
+                        event={event}
+                        publicView={publicView}
+                        publicPreview={showPublic}
+                        user={user}
+                        userPref={userPref}
+                      />
+                    );
+
+                    flatIndex++;
+                    return card;
+                  })}
                 </div>
               </div>
             ))

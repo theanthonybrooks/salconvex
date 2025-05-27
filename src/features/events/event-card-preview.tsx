@@ -46,6 +46,7 @@ export interface EventCardPreviewProps {
   user: User | null;
   userPref: UserPref | null;
   publicView?: boolean;
+  publicPreview?: boolean;
 }
 
 // interface EventCardPreviewProps {
@@ -67,6 +68,7 @@ const EventCardPreview = ({
   publicView,
   user,
   userPref,
+  publicPreview,
 }: EventCardPreviewProps) => {
   const userTZ = !!userPref?.timezone ? userPref.timezone : undefined;
   const router = useRouter();
@@ -253,7 +255,7 @@ const EventCardPreview = ({
                 <span className={"font-semibold"}>
                   {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
                 </span>
-                {publicView ? (
+                {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     This Year
                   </span>
@@ -270,7 +272,7 @@ const EventCardPreview = ({
             {isCurrentlyOpen && (
               <p className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className="font-semibold">Budget:</span>
-                {publicView ? (
+                {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     Sign in to view
                   </span>
@@ -304,7 +306,7 @@ const EventCardPreview = ({
                 )}
               >
                 <span className="font-semibold">Eligible:</span>
-                {publicView ? (
+                {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     $3 per month
                   </span>
@@ -571,7 +573,7 @@ const EventCardPreview = ({
                         : "Status")}
                   :
                 </span>
-                {publicView ? (
+                {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     This Year
                   </span>
@@ -597,7 +599,7 @@ const EventCardPreview = ({
               </span>
               <span className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className="font-semibold">Eligible:</span>
-                {publicView ? (
+                {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     $3 per month
                   </span>
@@ -643,7 +645,7 @@ const EventCardPreview = ({
               </span>
               <div className="flex items-center gap-x-1">
                 <span className="font-semibold">Budget:</span>
-                {publicView ? (
+                {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     Get paid for your work
                   </span>
@@ -737,7 +739,7 @@ const EventCardPreview = ({
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
-            publicView={publicView}
+            publicView={publicPreview ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
             className="max-w-40 xl:hidden"
           />
@@ -749,7 +751,7 @@ const EventCardPreview = ({
             edition={event.dates.edition}
             // status={status}
             openCall={event.openCallStatus}
-            publicView={publicView}
+            publicView={publicPreview ? false : publicView}
             manualApplied={appStatus}
             // setManualApplied={setManualApplied}
             isBookmarked={bookmarked}

@@ -154,6 +154,7 @@ export const ApplyButton = ({
   edition,
   finalButton,
 }: ApplyButtonProps) => {
+  console.log(publicView, slug);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);

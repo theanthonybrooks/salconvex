@@ -211,7 +211,6 @@ export const formatOpenCallDeadline = (
   const ordinal = getOrdinalSuffix(day);
   const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`;
 
-  console.log(dt.offsetNameShort, dt.toFormat("ZZ"), month, day, year);
   if (preview) return `${month} ${day}${ordinal}, ${year}`;
 
   const time = dt.toFormat("h:mm a");
@@ -382,7 +381,7 @@ export const toYearMonth = (date: Date | null | undefined): string => {
 };
 
 export const toSeason = (date: Date | null | undefined): string => {
-  console.log("toSeason", date);
+  // console.log("toSeason", date);
   if (!date) return "";
   const year = date.getFullYear();
   const month = date.getMonth();

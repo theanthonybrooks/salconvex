@@ -555,7 +555,7 @@ export const getEventBySlug = query({
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
 
-    console.log(event);
+    // console.log(event);
 
     if (!event) throw new ConvexError("No event found");
 
@@ -567,7 +567,7 @@ export const getEventBySlug = query({
       //   .collect(),
       ctx.db.get(event.mainOrgId),
     ]);
-    console.log(organizer);
+    // console.log(organizer);
 
     // const openCall = openCalls.find(
     //   (e) => e.basicInfo.dates.edition === args.edition,

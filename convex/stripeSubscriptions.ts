@@ -39,8 +39,8 @@ export const getUserHadTrial = query({
       .withIndex("userId", (q) => q.eq("userId", identity))
       .first();
 
-    console.log("sub", sub);
-    console.log("sub.hadTrial", sub?.hadTrial);
+    // console.log("sub", sub);
+    // console.log("sub.hadTrial", sub?.hadTrial);
     return sub?.hadTrial === true;
   },
 });
