@@ -1,3 +1,4 @@
+import { ArtistDashboardTableWrapper } from "@/features/artists/dashboard/artist-dashboard-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
@@ -33,13 +34,13 @@ export default async function ArtistPage({
 
   switch (slug) {
     case "apps":
-      return <p>All applications</p>;
-    case "bookmarks":
-      return <p>Bookmarks</p>;
-    case "hidden":
-      return <p>Hidden</p>;
+      return <ArtistDashboardTableWrapper page="applications" />;
+    // case "bookmarks":
+    //   return <p>Bookmarks</p>;
+    // case "hidden":
+    //   return <p>Hidden</p>;
     default:
       //   redirect("/dashboard/admin");
-      return <p>Default Artist Pg</p>;
+      return <ArtistDashboardTableWrapper page="applications" />;
   }
 }

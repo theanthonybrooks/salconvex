@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "@/types/openCall";
+import { ApplicationStatus } from "@/types/applications";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import { query } from "~/convex/_generated/server";

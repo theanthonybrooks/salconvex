@@ -40,18 +40,6 @@ export const eligibilityTypeValues = [
 
 export type EligibilityType = (typeof eligibilityTypeValues)[number];
 
-export const applicationStatusValues = [
-  "external apply",
-  "applied",
-  "considering",
-  "to next step",
-  "accepted",
-  "rejected",
-  "pending",
-  "roster",
-  "shortlisted",
-];
-
 export const openCallCategoryFields = [
   { label: "Artist Stipend", value: "artistStipend" },
   { label: "Design Fee", value: "designFee" },
@@ -64,8 +52,6 @@ export const openCallCategoryFields = [
 
 export type OpenCallCategoryKey =
   (typeof openCallCategoryFields)[number]["value"];
-
-export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
 
 export const openCallStatusValues = ["active", "ended", "coming-soon"] as const;
 

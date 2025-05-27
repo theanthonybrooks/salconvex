@@ -54,6 +54,7 @@ interface Props {
   subtitle?: string;
   noList?: boolean;
   readOnly?: boolean;
+  inputPreview?: boolean;
 }
 
 export const ALLOWED_TAGS = [
@@ -82,6 +83,7 @@ export const RichTextEditor = ({
   subtitle,
   noList,
   readOnly,
+  inputPreview,
 }: Props) => {
   const linkDialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -731,11 +733,17 @@ export const RichTextEditor = ({
           onMouseEnter={() => setHoverPreview(true)}
           onMouseLeave={() => setHoverPreview(false)}
         >
-          <div className="scrollable justy mini max-h-20 min-h-14 text-sm text-muted-foreground">
+          <div
+            className={cn(
+              "scrollable justy mini max-h-20 min-h-14 text-sm text-muted-foreground",
+              inputPreview && "line-clamp-1 max-h-5 min-h-0",
+            )}
+          >
             {value ? (
               <div
                 className={cn(
                   "rich-text__preview-wrapper prose max-w-none truncate text-foreground",
+                  inputPreview && "max-w-10ch",
                 )}
               >
                 <RichTextDisplay html={value} />
@@ -743,19 +751,21 @@ export const RichTextEditor = ({
             ) : (
               <span className="italic text-gray-400">
                 <p>{placeholder}</p>
-                <p>{`Limit (${charLimit} characters)`}</p>
+                {!inputPreview && <p>{`Limit (${charLimit} characters)`}</p>}
               </span>
             )}
           </div>
-          {hoverPreview && value.trim().length > 0 && (
+          {!inputPreview && hoverPreview && value?.trim().length > 0 && (
             <div className="absolute bottom-1/2 left-1/2 right-0 flex h-1 w-fit -translate-x-1/2 translate-y-1/2 items-center justify-center gap-2 rounded-lg border bg-card px-6 py-4 text-center text-xs text-foreground/70 shadow-sm hover:scale-105 active:scale-95">
               <Pencil className="size-4 shrink-0" />
               View/Edit Full Text
             </div>
           )}
-          <div className="absolute bottom-1 right-1 rounded bg-card p-1 text-right text-xs text-foreground/60">
-            {editor.storage.characterCount.characters()}/{charLimit}
-          </div>
+          {!inputPreview && (
+            <div className="absolute bottom-1 right-1 rounded bg-card p-1 text-right text-xs text-foreground/60">
+              {editor.storage.characterCount.characters()}/{charLimit}
+            </div>
+          )}
         </div>
 
         {/* <Dialog open={open} onOpenChange={setOpen}> */}

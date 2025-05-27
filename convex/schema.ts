@@ -478,7 +478,7 @@ const applicationsSchema = {
   ),
   manualApplied: v.optional(v.boolean()),
   responseTime: v.optional(v.number()),
-  response: v.optional(v.string()),
+  notes: v.optional(v.string()),
 };
 
 const newsletterSchema = {

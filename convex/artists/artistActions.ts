@@ -1,5 +1,5 @@
+import { ApplicationStatus } from "@/types/applications";
 import { ArtistFull } from "@/types/artist";
-import { ApplicationStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { Doc, Id } from "~/convex/_generated/dataModel";

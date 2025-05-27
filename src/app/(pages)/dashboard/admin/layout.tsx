@@ -13,6 +13,7 @@ export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
   const token = await convexAuthNextjsToken();
+  if (!token) redirect("/auth/sign-in");
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
 
   const subscription = await fetchQuery(
@@ -22,6 +23,9 @@ export default async function DashboardLayout({
   );
 
   const user = userData?.user;
+  if (!user) {
+    redirect("/auth/sign-in");
+  }
   const subStatus = subscription?.status;
   const isAdmin = user?.role.includes("admin");
 
@@ -53,7 +57,6 @@ export default async function DashboardLayout({
   // const userSub = subStatus?.subStatus;
   // const userType = user?.user?.accountType;
 
-  if (!user) redirect("/auth/sign-in");
   // if (subStatus?.subStatus === "cancelled") {
   //   redirect("/pricing#plans")
   // }

@@ -1,6 +1,6 @@
 "use client";
 
-import { SubPage } from "@/app/(pages)/dashboard/artist/[slug]/[subpage]/page";
+import { SubPage } from "@/types/artist";
 import { useQuery } from "convex-helpers/react/cache";
 import Link from "next/link";
 import { api } from "~/convex/_generated/api";

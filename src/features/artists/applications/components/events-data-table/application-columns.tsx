@@ -3,6 +3,14 @@
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
+import { AppNotesInput } from "@/features/artists/applications/components/events-data-table/app-notes-input";
+import { AppStatusSelector } from "@/features/artists/applications/components/events-data-table/app-status-selector";
+import { cn } from "@/lib/utils";
+import {
+  ApplicationStatus,
+  NonNullApplicationStatus,
+  statusColorMap,
+} from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -15,10 +23,11 @@ interface ApplicationColumnsProps {
   productionStart: string;
   productionEnd: string;
   applicationTime: number;
-  applicationStatus: string;
+  applicationStatus: ApplicationStatus;
   manualApplied: boolean;
   responseTime: number;
-  response: string;
+  // response: string;
+  notes?: string;
   slug: string;
 }
 
@@ -54,14 +63,17 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
     cell: ({ row }) => {
       const application = row.original;
       const eventSlug = application?.slug;
-
-      console.log(application);
+      const rawStatus = application.applicationStatus;
+      const statusColor = rawStatus
+        ? statusColorMap[rawStatus as NonNullApplicationStatus]
+        : "text-muted-foreground";
 
       return (
-        <div className="truncate font-medium">
+        <div className={cn("truncate font-medium", statusColor)}>
           <Link
             href={`/thelist/event/${eventSlug}/${row.getValue("dates_edition")}/call`}
             target="_blank"
+            className="max-w-[25ch] truncate"
           >
             {row.getValue("name")}
           </Link>
@@ -134,7 +146,11 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => (
-      <span className="capitalize">{row.getValue("applicationStatus")}</span>
+      // <span className="capitalize">{row.getValue("applicationStatus")}</span>
+      <AppStatusSelector
+        applicationId={row.original._id}
+        appStatus={row.getValue("applicationStatus")}
+      />
     ),
   },
   {
@@ -147,15 +163,16 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       return <span className="text-sm">{value ? "Yes" : "No"}</span>;
     },
   },
-  {
-    accessorKey: "response",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Response" />
-    ),
-    cell: ({ row }) => (
-      <span className="capitalize">{row.getValue("response") || "-"}</span>
-    ),
-  },
+  // {
+  //   accessorKey: "response",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Response" />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <span className="capitalize">{row.getValue("response") || "-"}</span>
+  //   ),
+  // },
+
   {
     accessorKey: "responseTime",
     header: ({ column }) => (
@@ -167,6 +184,22 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
         <span className="text-sm">
           {value ? new Date(value).toLocaleString() : "-"}
         </span>
+      );
+    },
+  },
+  {
+    accessorKey: "notes",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Notes" />
+    ),
+    cell: ({ row }) => {
+      const application = row.original;
+      return (
+        // <span className="capitalize">{row.getValue("notes") || "-"}</span>
+        <AppNotesInput
+          notes={row.getValue("notes")}
+          application={application._id}
+        />
       );
     },
   },

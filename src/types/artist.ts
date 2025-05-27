@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "@/types/openCall";
+import { ApplicationStatus } from "@/types/applications";
 import { Id } from "~/convex/_generated/dataModel";
 
 export interface ArtistResidency {
@@ -45,3 +45,11 @@ export interface ListActions {
   hidden: boolean;
   bookmarked: boolean;
 }
+
+export type SubPage =
+  | "accepted"
+  | "rejected"
+  | "pending"
+  | "submitted"
+  | "bookmarks"
+  | "hidden";

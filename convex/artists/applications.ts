@@ -1,6 +1,66 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { query } from "~/convex/_generated/server";
+import { mutation, query } from "~/convex/_generated/server";
+
+export const updateApplicationStatus = mutation({
+  args: {
+    applicationId: v.id("applications"),
+    status: v.union(
+      v.literal("accepted"),
+      v.literal("rejected"),
+      v.literal("roster"),
+      v.literal("shortlisted"),
+      v.literal("to next step"),
+      v.literal("considering"),
+      v.literal("applied"),
+    ),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const application = await ctx.db
+      .query("applications")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .unique();
+    if (!application) return null;
+
+    // await ctx.db.patch(application._id, {
+    //   applicationStatus: args.status,
+    // });
+
+    const patchData: Record<string, unknown> = {
+      applicationStatus: args.status,
+    };
+
+    if (args.status !== "applied") {
+      patchData.responseTime = Date.now();
+    }
+
+    await ctx.db.patch(application._id, patchData);
+  },
+});
+
+export const updateApplicationNotes = mutation({
+  args: {
+    applicationId: v.id("applications"),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const application = await ctx.db
+      .query("applications")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .unique();
+    if (!application) return null;
+
+    await ctx.db.patch(application._id, {
+      notes: args.notes,
+    });
+  },
+});
+//"accepted" | "rejected" | "roster" | "shortlisted" | "to next step" | "external apply" | "considering" | "applied" | "pending" | null | undefined
 
 export const getArtistApplication = query({
   args: {
@@ -106,7 +166,8 @@ export const getArtistApplications2 = query({
         applicationStatus: app.applicationStatus ?? "-",
         manualApplied: app.manualApplied ?? false,
         responseTime: app.responseTime ?? 0,
-        response: app.response ?? "-",
+        // response: app.response ?? "-",
+        notes: app.notes,
       };
     });
   },

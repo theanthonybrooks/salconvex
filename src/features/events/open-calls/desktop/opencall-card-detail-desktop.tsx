@@ -300,7 +300,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       </Card>
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-[#fef9dd] p-4">
+        <div className="flex min-h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-[#fef9dd] p-4">
           <div
             className={cn(
               "flex h-14 w-20 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",
@@ -334,8 +334,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                         : "",
                 )}
               />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold capitalize">
+              <div className="flex flex-col gap-2">
+                <span className="text-balance text-xl font-bold capitalize">
                   {event?.name}
                 </span>
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
@@ -348,7 +348,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-x-4">
+            <div className="flex items-center gap-x-4 text-nowrap">
               <div className="flex flex-col items-end gap-1">
                 <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
                   Deadline: &nbsp;

@@ -5,7 +5,7 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
-import { applicationColumns } from "@/features/admin/dashboard/application-columns";
+import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
