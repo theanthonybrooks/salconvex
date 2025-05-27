@@ -124,7 +124,12 @@ export function autoHttps(url: string): string {
   const raw = url.trim();
   if (!raw) return "";
 
-  // Remove any leading malformed or valid protocol (http:/, http://, https:/, https://)
+  // Allow mailto: explicitly
+  if (/^mailto:/i.test(raw)) {
+    return raw;
+  }
+
+  // Remove malformed or valid http(s) protocol
   const cleaned = raw.replace(/^https?:\/{0,2}/i, "");
 
   return `https://${cleaned}`;

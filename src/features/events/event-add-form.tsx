@@ -725,7 +725,7 @@ export const EventOCForm = ({
         try {
           setPending(true);
           const { org } = await createNewOrg({
-            organizationName: orgData.name,
+            organizationName: orgData.name?.trim(),
             logoStorageId,
             logo,
             location: {
@@ -1244,8 +1244,8 @@ export const EventOCForm = ({
 
           const result = await updateOrg({
             orgId: orgData._id as Id<"organizations">,
-            name: orgData.name,
-            slug: slugify(orgData.name, { lower: true }),
+            name: orgData.name?.trim(),
+            slug: slugify(orgData.name?.trim(), { lower: true }),
             logo: orgData.logo as string,
             location: {
               ...orgData.location,

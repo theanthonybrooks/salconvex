@@ -53,8 +53,9 @@ export const OrgSearch = ({
   const listRef = useRef<HTMLUListElement>(null);
 
   const orgInputRef = useRef<HTMLInputElement>(null);
-  const trimmedQuery = inputValue.trim();
-  const [debouncedQuery, setDebouncedQuery] = useState(trimmedQuery);
+  // const trimmedQuery = inputValue.trim();
+  const rawQuery = inputValue;
+  const [debouncedQuery, setDebouncedQuery] = useState(rawQuery);
 
   const results = useQuery(
     api.organizer.organizations.getUserOrganizations,
@@ -199,17 +200,17 @@ export const OrgSearch = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (trimmedQuery.trim().length > 0) {
-        setDebouncedQuery(trimmedQuery);
+      if (rawQuery.trim().length > 0) {
+        setDebouncedQuery(rawQuery);
         if (hasUserInteracted) {
-          onChange(trimmedQuery);
+          onChange(rawQuery);
           // onLoadClick(null);
         }
       }
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [trimmedQuery, hasUserInteracted, onChange, onLoadClick]);
+  }, [rawQuery, hasUserInteracted, onChange, onLoadClick]);
 
   useEffect(() => {
     if (!showSuggestions || !listRef.current) return;

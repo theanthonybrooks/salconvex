@@ -387,7 +387,7 @@ export const getUserOrganizations = query({
       .unique();
     if (!user) return null;
 
-    const q = args.query.toLowerCase();
+    const q = args.query.trim().toLowerCase();
     const filterFn = (org: Doc<"organizations">) =>
       q === "" || org.name?.toLowerCase().includes(q);
 

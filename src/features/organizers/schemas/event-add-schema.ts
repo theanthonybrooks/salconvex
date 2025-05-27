@@ -83,6 +83,15 @@ const isValidUrl = (value: string) => {
   }
 };
 
+const isValidUrlWithMailto = (value: string) => {
+  try {
+    const url = new URL(value);
+    return ["http:", "https:", "mailto:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+};
+
 const isValidInstagram = (value: string) => {
   // Remove leading @ for validation
   const username = value.startsWith("@") ? value.slice(1) : value;
@@ -525,7 +534,7 @@ export const openCallBaseSchema = z.object({
       .min(8, "URL is too short")
       .refine(
         (val) => {
-          return !val || isValidUrl(val);
+          return !val || isValidUrlWithMailto(val);
         },
         {
           message: "Must be a valid URL (https://...)",

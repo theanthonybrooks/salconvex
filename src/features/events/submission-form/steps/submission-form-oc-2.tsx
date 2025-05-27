@@ -592,7 +592,7 @@ const SubmissionFormOC2 = ({
         )}
       </div>
 
-      {allInclusive === false && (hasBudgetMin || noBudget) && (
+      {(hasBudgetMin || noBudget) && (
         <>
           {showBudgetInputs && (
             <Separator
@@ -611,59 +611,61 @@ const SubmissionFormOC2 = ({
               // "xl:self-center",
             )}
           >
-            {activeCategoryFields.length > 0 && hasBudgetMin && (
-              <>
-                <div className="input-section">
-                  <p className="lg:text-xs">Categories</p>
-                  <p className="lg:text-xs">Continued</p>
-                </div>
+            {allInclusive === false &&
+              activeCategoryFields.length > 0 &&
+              hasBudgetMin && (
+                <>
+                  <div className="input-section">
+                    <p className="lg:text-xs">Categories</p>
+                    <p className="lg:text-xs">Continued</p>
+                  </div>
 
-                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                  <Label htmlFor="event.type" className="sr-only">
-                    Compensation Category Amounts (Optional)
-                  </Label>
-                  {activeCategoryFields.map(({ label, value }) => (
-                    <div
-                      key={value}
-                      className={cn(
-                        "flex items-center justify-between gap-4 rounded-md border p-3",
-                        pastEvent && "border-foreground/50 opacity-50",
-                      )}
-                    >
-                      {/* Optional: Replace with an icon specific to each category if needed */}
-                      <span className="flex-1 text-sm font-medium text-foreground">
-                        {label}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {getCurrencySymbol(
-                          openCall?.compensation?.budget?.currency ?? "USD",
+                  <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <Label htmlFor="event.type" className="sr-only">
+                      Compensation Category Amounts (Optional)
+                    </Label>
+                    {activeCategoryFields.map(({ label, value }) => (
+                      <div
+                        key={value}
+                        className={cn(
+                          "flex items-center justify-between gap-4 rounded-md border p-3",
+                          pastEvent && "border-foreground/50 opacity-50",
                         )}
-                        <Controller
-                          name={`openCall.compensation.categories.${value}`}
-                          control={control}
-                          render={({ field }) => (
-                            <DebouncedControllerNumInput
-                              disabled={pastEvent}
-                              field={{
-                                ...field,
-                                onChange: (val) => {
-                                  const num = parseFloat(val);
-                                  field.onChange(isNaN(num) ? true : num);
-                                },
-                              }}
-                              min={0}
-                              formatNumber={true}
-                              placeholder="ex. 250"
-                              className="w-25 text-right"
-                            />
+                      >
+                        {/* Optional: Replace with an icon specific to each category if needed */}
+                        <span className="flex-1 text-sm font-medium text-foreground">
+                          {label}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {getCurrencySymbol(
+                            openCall?.compensation?.budget?.currency ?? "USD",
                           )}
-                        />
+                          <Controller
+                            name={`openCall.compensation.categories.${value}`}
+                            control={control}
+                            render={({ field }) => (
+                              <DebouncedControllerNumInput
+                                disabled={pastEvent}
+                                field={{
+                                  ...field,
+                                  onChange: (val) => {
+                                    const num = parseFloat(val);
+                                    field.onChange(isNaN(num) ? true : num);
+                                  },
+                                }}
+                                min={0}
+                                formatNumber={true}
+                                placeholder="ex. 250"
+                                className="w-25 text-right"
+                              />
+                            )}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+                    ))}
+                  </div>
+                </>
+              )}
 
             <div className="input-section self-start">
               <p className="min-w-max font-bold lg:text-xl">Step 3: </p>
@@ -672,7 +674,7 @@ const SubmissionFormOC2 = ({
 
             <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
-                Eligibility Continued... (if not &quot;International&quot;)
+                Budget More Info
               </Label>
               <Controller
                 name="openCall.compensation.budget.moreInfo"
