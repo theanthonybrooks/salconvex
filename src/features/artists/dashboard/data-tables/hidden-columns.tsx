@@ -4,23 +4,23 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
+import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
+import { EventCategory, EventType } from "@/types/event";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
-interface BookmarkColumnsProps {
+interface hiddenColumnsProps {
   _id: Id<"events">;
   name: string;
   edition: number;
-  eventStart: string;
-  eventEnd: string;
-  prodStart: string;
-  prodEnd: string;
-  bookmarkStatus: boolean;
+  category: EventCategory;
+  type: EventType[];
+  hiddenStatus: boolean;
   slug: string;
 }
 
-export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
+export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
     id: "select",
     size: 30,
@@ -72,58 +72,61 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Edition" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("edition")}</span>
+      <span className="block w-full text-center text-sm">
+        {row.getValue("edition")}
+      </span>
     ),
   },
   {
-    accessorKey: "eventStart",
+    accessorKey: "category",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Event Start" />
+      <DataTableColumnHeader column={column} title="Category" />
     ),
-    cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("eventStart")}</span>
-    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-col items-center gap-1">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {getEventCategoryLabelAbbr(row.getValue("category"))}
+          </span>
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
   },
   {
-    accessorKey: "eventEnd",
+    accessorKey: "type",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Event End" />
+      <DataTableColumnHeader column={column} title="Type" />
     ),
-    cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("eventEnd")}</span>
-    ),
+    cell: ({ row }) => {
+      const types = row.getValue("type") as EventType[];
+
+      return (
+        <div className="flex flex-col items-center gap-1">
+          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+            {Array.isArray(types) && types.length > 0
+              ? types.map((type) => getEventTypeLabel(type)).join(" | ")
+              : "-"}
+          </span>
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "prodStart",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Production Start" />
-    ),
-    cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("prodStart")}</span>
-    ),
-  },
-  {
-    accessorKey: "prodEnd",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Production End" />
-    ),
-    cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("prodEnd")}</span>
-    ),
-  },
-  {
-    accessorKey: "bookmarkStatus",
+    accessorKey: "hiddenStatus",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("bookmarkStatus") as boolean;
-      // return <span className="text-sm">{value ? "Yes" : "No"}</span>;
+      const value = row.getValue("hiddenStatus") as boolean;
       return (
         <ListActionSelector
           key={row.original._id}
           eventId={row.original._id}
-          bookmarked={value}
+          hidden={value}
         />
       );
     },

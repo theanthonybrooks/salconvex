@@ -170,20 +170,25 @@ export const getFilteredEventsPublic = query({
 
           const ocEndISO = openCall?.basicInfo?.dates?.ocEnd ?? null;
 
-          if (openCall && openCall.state === "published") {
-            if (ocType === "Fixed") {
-              if (
-                ocEndISO &&
-                ocEndISO > thisWeekStartISO &&
-                ocEndISO < thisWeekEndISO
-              )
-                openCallStatus = "active";
-            }
+          if (openCall) {
+            const isFixed = ocType === "Fixed";
+            const isInWeek =
+              ocEndISO &&
+              ocEndISO > thisWeekStartISO &&
+              ocEndISO < thisWeekEndISO;
 
-            hasActiveOpenCall = openCallStatus === "active";
-          }
-          if (hasActiveOpenCall) {
-            totalOpenCalls++;
+            if (isFixed && isInWeek) {
+              if (openCall.state === "published") {
+                openCallStatus = "active";
+              } else if (openCall.state === "archived") {
+                openCallStatus = "ended";
+              }
+
+              if (openCallStatus === "active" || openCallStatus === "ended") {
+                hasActiveOpenCall = true;
+                totalOpenCalls++;
+              }
+            }
           }
         }
 

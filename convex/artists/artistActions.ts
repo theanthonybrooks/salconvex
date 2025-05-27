@@ -148,9 +148,6 @@ export const artistApplicationActions = mutation({
     const openCallId = args.openCallId;
     const hasApplied = args.manualApplied;
 
-    console.log("userId", userId);
-    console.log("openCallId", openCallId);
-    console.log("hasApplied", hasApplied);
     if (!userId) throw new ConvexError("Not authenticated");
 
     const application = await ctx.db
@@ -159,23 +156,26 @@ export const artistApplicationActions = mutation({
       .filter((q) => q.eq(q.field("artistId"), userId))
       .unique();
 
-    console.log("application", application);
-
-    if (!application) {
-      console.log("application not found");
-      await ctx.db.insert("applications", {
-        openCallId,
-        applicationTime: hasApplied ? Date.now() : undefined,
-        artistId: userId,
-        manualApplied: hasApplied ?? false,
-        ...(hasApplied ? { applicationStatus: "applied" } : {}),
-      });
+    if (hasApplied) {
+      if (!application) {
+        await ctx.db.insert("applications", {
+          openCallId,
+          applicationTime: hasApplied ? Date.now() : undefined,
+          artistId: userId,
+          manualApplied: hasApplied ?? false,
+          ...(hasApplied ? { applicationStatus: "applied" } : {}),
+        });
+      } else {
+        await ctx.db.patch(application._id, {
+          manualApplied: hasApplied ?? false,
+          applicationTime: hasApplied ? Date.now() : undefined,
+          applicationStatus: hasApplied ? "applied" : undefined,
+        });
+      }
     } else {
-      await ctx.db.patch(application._id, {
-        manualApplied: hasApplied ?? false,
-        applicationTime: hasApplied ? Date.now() : undefined,
-        applicationStatus: hasApplied ? "applied" : undefined,
-      });
+      if (application) {
+        await ctx.db.delete(application._id);
+      }
     }
   },
 });

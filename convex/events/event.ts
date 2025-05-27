@@ -10,12 +10,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import slugify from "slugify";
 import { Id } from "~/convex/_generated/dataModel";
-import {
-  internalMutation,
-  mutation,
-  MutationCtx,
-  query,
-} from "~/convex/_generated/server";
+import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
 export const globalSearch = query({
@@ -695,7 +690,14 @@ export const getEventWithOCDetails = query({
       .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
       .filter((q) => q.eq(q.field("basicInfo.dates.edition"), args.edition))
-      .filter((q) => q.eq(q.field("state"), "published"))
+      // .filter((q) => q.eq(q.field("state"), "published"))
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("state"), "published"),
+          q.eq(q.field("state"), "archived"),
+        ),
+      )
+
       .first();
 
     const organizer = await ctx.db.get(event.mainOrgId);
@@ -1220,4 +1222,3 @@ export const deleteMultipleEvents = mutation({
     };
   },
 });
-

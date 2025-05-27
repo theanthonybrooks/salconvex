@@ -153,12 +153,10 @@ export const getArtistApplications2 = query({
         name: event?.name ?? "Unknown Event",
         slug: event?.slug ?? "unknown",
         dates_edition: event?.dates.edition ?? 0,
-        eventStart: event?.dates.eventStart ?? "-",
-        eventEnd: event?.dates.eventEnd ?? "-",
-        productionStart:
-          event?.dates.prodDates?.[0]?.start ?? event?.dates.eventStart ?? "-",
-        productionEnd:
-          event?.dates.prodDates?.[0]?.end ?? event?.dates.eventEnd ?? "-",
+        eventStart: event?.dates.eventDates[0].start ?? "-",
+        eventEnd: event?.dates.eventDates?.at(-1)?.end ?? "-",
+        productionStart: event?.dates.prodDates?.[0]?.start ?? "-",
+        productionEnd: event?.dates.prodDates?.at(-1)?.end ?? "-",
         applicationTime: app.applicationTime ?? 0,
         applicationStatus: app.applicationStatus ?? "-",
         manualApplied: app.manualApplied ?? false,

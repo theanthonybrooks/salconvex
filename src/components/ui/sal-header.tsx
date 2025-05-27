@@ -21,9 +21,10 @@ const SalHeader = ({ source }: SalHeaderProps) => {
       <Image
         src={thisWeekPg ? "/thisweek_logo.png" : "/saltext.png"}
         alt="The Street Art List"
-        width={350}
+        width={300}
         height={100}
         priority={true}
+        className="[@media(max-width:724px)]:w-64"
       />
       {!thisWeekPg && (
         <>

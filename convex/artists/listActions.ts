@@ -1,13 +1,10 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { getAll } from "convex-helpers/server/relationships";
-import { v } from "convex/values";
 import { query } from "~/convex/_generated/server";
 
 export const getHiddenEvents = query({
-  args: {
-    artistId: v.id("artists"),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
@@ -40,11 +37,21 @@ export const getHiddenEvents = query({
       .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
       .collect();
 
-    const hiddenEvents = listActions
-      .filter((a) => a.hidden)
-      .map((a) => a.eventId);
+    const hiddenIds = listActions.filter((a) => a.hidden).map((a) => a.eventId);
 
-    return hiddenEvents;
+    if (hiddenIds.length === 0) return [];
+
+    const events = await getAll(ctx.db, hiddenIds);
+    return events
+      .filter((e) => e !== null)
+      .map((e) => ({
+        ...e,
+        edition: e.dates.edition,
+        category: e.category,
+        type: e.type,
+        hiddenStatus: true,
+        slug: e.slug,
+      }));
   },
 });
 

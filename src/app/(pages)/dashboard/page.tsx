@@ -197,14 +197,10 @@ export default function Dashboard() {
                         : "0 in the last month"}
                     </p>
                     {" - "}
-                    {/* TODO: Add this back */}
 
-                    {/* <Link
-                      variant="subtleUnderline"
-                      href="/dashboard/admin/applications"
-                    >
+                    <Link variant="subtleUnderline" href="/dashboard/artist/">
                       <p className="mt-1 text-xs">View all</p>
-                    </Link> */}
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -258,14 +254,13 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {bookmarkedEvents?.length ?? 0}
                   </div>
-                  {/* TODO: Add this back */}
 
-                  {/* <Link
+                  <Link
                     variant="subtleUnderline"
-                    href="/dashboard/apps/bookmarked"
+                    href="/dashboard/artist/bookmarks"
                   >
                     <p className="mt-1 text-xs">View all</p>
-                  </Link> */}
+                  </Link>
                 </CardContent>
               </Card>
               <Card>
@@ -279,14 +274,12 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {hiddenEvents?.length ?? 0}
                   </div>
-                  {/* TODO: Add this back */}
-
-                  {/* <Link
+                  <Link
                     variant="subtleUnderline"
-                    href="/dashboard/apps/hidden"
+                    href="/dashboard/artist/hidden"
                   >
                     <p className="mt-1 text-xs">View all</p>
-                  </Link> */}
+                  </Link>
                 </CardContent>
               </Card>
             </div>

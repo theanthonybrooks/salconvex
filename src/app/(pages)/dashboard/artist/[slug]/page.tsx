@@ -37,8 +37,9 @@ export default async function ArtistPage({
       return <ArtistDashboardTableWrapper page="applications" />;
     case "bookmarks":
       return <ArtistDashboardTableWrapper page="bookmarks" />;
-    // case "hidden":
-    //   return <p>Hidden</p>;
+    case "hidden":
+      return <ArtistDashboardTableWrapper page="hidden" />;
+
     default:
       //   redirect("/dashboard/admin");
       return <ArtistDashboardTableWrapper page="applications" />;
