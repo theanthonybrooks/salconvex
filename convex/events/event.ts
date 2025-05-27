@@ -10,7 +10,12 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import slugify from "slugify";
 import { Id } from "~/convex/_generated/dataModel";
-import { mutation, MutationCtx, query } from "~/convex/_generated/server";
+import {
+  internalMutation,
+  mutation,
+  MutationCtx,
+  query,
+} from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
 export const globalSearch = query({
@@ -703,7 +708,6 @@ export const getEventWithOCDetails = query({
         .first();
     }
 
-
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
     if (source === "ocpage" && !openCall)
       throw new ConvexError("Open Call not found");
@@ -1216,3 +1220,4 @@ export const deleteMultipleEvents = mutation({
     };
   },
 });
+

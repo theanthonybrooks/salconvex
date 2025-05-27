@@ -3,6 +3,7 @@ import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { endOfWeek, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 export const getFilteredEventsPublic = query({
@@ -24,8 +25,29 @@ export const getFilteredEventsPublic = query({
       sortDirection: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
     }),
     page: v.optional(v.number()),
+    source: v.union(
+      v.literal("thelist"),
+      v.literal("archive"),
+      v.literal("thisweek"),
+    ),
   },
-  handler: async (ctx, { filters, sortOptions, page }) => {
+  handler: async (ctx, { filters, sortOptions, page, source }) => {
+    const thisWeekPg = source === "thisweek";
+    const archivePg = source === "archive";
+    const theListPg = source === "thelist";
+
+    let thisWeekStartISO = "";
+    let thisWeekEndISO = "";
+
+    if (thisWeekPg) {
+      const now = new Date();
+      const monday = startOfWeek(now, { weekStartsOn: 1 });
+      const sunday = endOfWeek(now, { weekStartsOn: 1 });
+
+      thisWeekStartISO = monday.toISOString();
+      thisWeekEndISO = sunday.toISOString();
+    }
+
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
     const isAdmin = user?.role?.includes("admin");
@@ -126,20 +148,43 @@ export const getFilteredEventsPublic = query({
         const ocEnd = openCall?.basicInfo?.dates?.ocEnd
           ? new Date(openCall.basicInfo.dates.ocEnd).getTime()
           : null;
+        if (theListPg) {
+          if (openCall && openCall.state === "published") {
+            if (ocType === "Fixed") {
+              if (ocStart && now < ocStart) openCallStatus = "coming-soon";
+              else if (ocEnd && now > ocEnd) openCallStatus = "ended";
+              else openCallStatus = "active";
+            } else if (ocType === "Rolling" || ocType === "Email") {
+              openCallStatus = ocEnd && now > ocEnd ? "ended" : "active";
+            }
 
-        if (openCall && openCall.state === "published") {
-          if (ocType === "Fixed") {
-            if (ocStart && now < ocStart) openCallStatus = "coming-soon";
-            else if (ocEnd && now > ocEnd) openCallStatus = "ended";
-            else openCallStatus = "active";
-          } else if (ocType === "Rolling" || ocType === "Email") {
-            openCallStatus = ocEnd && now > ocEnd ? "ended" : "active";
+            hasActiveOpenCall = openCallStatus === "active";
+          } else if (openCall && openCall.state === "archived") {
+            openCallStatus = "ended";
           }
+          if (hasActiveOpenCall) {
+            totalOpenCalls++;
+          }
+        } else if (thisWeekPg) {
+          // if (!openCall || openCall.state !== "published") return null;
 
-          hasActiveOpenCall = openCallStatus === "active";
-        }
-        if (hasActiveOpenCall) {
-          totalOpenCalls++;
+          const ocEndISO = openCall?.basicInfo?.dates?.ocEnd ?? null;
+
+          if (openCall && openCall.state === "published") {
+            if (ocType === "Fixed") {
+              if (
+                ocEndISO &&
+                ocEndISO > thisWeekStartISO &&
+                ocEndISO < thisWeekEndISO
+              )
+                openCallStatus = "active";
+            }
+
+            hasActiveOpenCall = openCallStatus === "active";
+          }
+          if (hasActiveOpenCall) {
+            totalOpenCalls++;
+          }
         }
 
         return {
@@ -156,8 +201,11 @@ export const getFilteredEventsPublic = query({
         };
       }),
     );
+    const filtered = thisWeekPg
+      ? enriched.filter((e) => e.openCall && e.hasActiveOpenCall)
+      : enriched;
 
-    const sorted = enriched.sort((a, b) =>
+    const sorted = filtered.sort((a, b) =>
       compareEnrichedEvents(a, b, {
         sortBy: sortOptions.sortBy ?? "openCall",
         sortDirection: sortOptions.sortDirection ?? "desc",
@@ -173,6 +221,8 @@ export const getFilteredEventsPublic = query({
       results: paginated as PublicEventPreviewData[],
       total: sorted.length,
       totalOpenCalls,
+      thisWeekStartISO,
+      thisWeekEndISO,
     };
   },
 });

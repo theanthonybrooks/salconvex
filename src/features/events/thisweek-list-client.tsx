@@ -1,45 +1,40 @@
 "use client";
 
-import { BasicPagination } from "@/components/ui/pagination2";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventCardPreview from "@/features/events/event-card-preview";
-import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
 import { generateSkeletonGroups } from "@/lib/skeletonFns";
 // import { getFourCharMonth } from "@/lib/dateFns"
-import { cn, setParamIfNotDefault } from "@/lib/utils";
-import {
-  CombinedEventPreviewCardData,
-  EventCategory,
-  EventType,
-} from "@/types/event";
-import { Continents, Filters, SortOptions } from "@/types/thelist";
+import { CombinedEventPreviewCardData } from "@/types/event";
+import { SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
 // import { CombinedEventPreviewCardData } from "@/types/event";
 
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import type { MergedEventPreviewData } from "@/types/event"; // or define a local merged type inline
 import { usePreloadedQuery } from "convex/react";
+import { parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+
+import { Link } from "@/components/ui/custom-link";
+import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 // interface Props {
 
 // }
 
-const ClientEventList = (
+const ClientThisWeekList = (
   {
     // initialEvents,
     // publicView,
     // user,
   },
 ) => {
-  // inside ClientEventList()
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  // inside ClientThisWeekList()
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -54,116 +49,38 @@ const ClientEventList = (
     (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
   const userPref = userData?.userPref ?? null;
 
-  const searchParams = useSearchParams();
+  const sortOptions = useMemo<SortOptions>(
+    () => ({
+      sortBy: "openCall",
+      sortDirection: "asc",
+    }),
+    [],
+  );
 
-  const defaultFilters: Filters = {
-    showHidden: false,
-    bookmarkedOnly: false,
-    limit: 10,
-
-    eventTypes: [],
-    eventCategories: [],
-  };
-
-  const defaultSort: SortOptions = {
-    sortBy: "openCall",
-    sortDirection: "asc",
-  };
-
-  const currentFilters: Filters = {
-    showHidden: searchParams.get("h") === "true",
-    bookmarkedOnly: searchParams.get("b") === "true",
-    limit: Number(searchParams.get("l")) || defaultFilters.limit,
-    // page: Number(searchParams.get("page")) || 1,
-    eventTypes:
-      (searchParams.get("type")?.split(",") as EventType[]) ??
-      defaultFilters.eventTypes,
-    eventCategories:
-      (searchParams.get("cat")?.split(",") as EventCategory[]) ??
-      defaultFilters.eventCategories,
-    continent:
-      (searchParams.get("cont")?.split(",") as Continents[]) ??
-      defaultFilters.continent,
-  };
-
-  const currentSort: SortOptions = {
-    sortBy:
-      (searchParams.get("sb") as SortOptions["sortBy"]) ?? defaultSort.sortBy,
-    sortDirection:
-      (searchParams.get("sd") as SortOptions["sortDirection"]) ??
-      defaultSort.sortDirection,
-  };
-
-  const [filters, setFilters] = useState<Filters>(currentFilters);
-  const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
-  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
-    filters,
-    sortOptions,
-    { page },
-    "thelist",
-  );
-  void useFilteredEventsQuery(
-    filters,
-    sortOptions,
     {
-      page: page + 1,
+      showHidden: false,
+      bookmarkedOnly: false,
+      limit: 20,
+      eventTypes: [],
+      eventCategories: [],
     },
-    "thelist",
+    sortOptions,
+    { page: 1 },
+    "thisweek",
   );
+
   const total = queryResult?.total ?? 0;
-  const totalOpen = queryResult?.totalOpenCalls ?? 0;
+  const thisWeekStart = queryResult?.thisWeekStartISO
+    ? formatInTimeZone(parseISO(queryResult.thisWeekStartISO), "UTC", "MMM d")
+    : "";
+
+  const thisWeekEnd = queryResult?.thisWeekEndISO
+    ? formatInTimeZone(parseISO(queryResult.thisWeekEndISO), "UTC", "MMM d")
+    : "";
+
   const isLoading = !queryResult;
-
-  const handleResetFilters = () => {
-    setFilters(defaultFilters);
-    setSortOptions(defaultSort);
-    setPage(1);
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    setParamIfNotDefault(params, "h", filters.showHidden, false);
-    setParamIfNotDefault(params, "b", filters.bookmarkedOnly, false);
-    setParamIfNotDefault(params, "l", filters.limit, 10);
-
-    if (filters.eventTypes?.length)
-      params.set("type", filters.eventTypes.join(","));
-    else params.delete("type");
-
-    if (filters.eventCategories?.length)
-      params.set("cat", filters.eventCategories.join(","));
-    else params.delete("cat");
-
-    if (filters.continent?.length)
-      params.set("cont", filters.continent.join(","));
-    else params.delete("cont");
-
-    if (page && page !== 1) {
-      params.set("page", page.toString());
-    } else {
-      params.delete("page");
-    }
-
-    setParamIfNotDefault(params, "sb", sortOptions.sortBy, "openCall");
-    setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc");
-
-    const queryString = params.toString();
-    const baseUrl = window.location.origin + window.location.pathname;
-    sessionStorage.setItem(
-      "previousSalPage",
-      baseUrl + (queryString ? `?${queryString}` : ""),
-    );
-    window.history.replaceState(
-      null,
-      "",
-      baseUrl + (queryString ? `?${queryString}` : ""),
-    );
-  }, [filters, sortOptions, page]);
-
-  const totalPages = Math.ceil(total / filters.limit);
 
   const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
     return (queryResult?.results ?? []).map((event) => {
@@ -214,58 +131,13 @@ const ClientEventList = (
 
     return orderedGroupKeys.map((key) => groups[key]);
   }, [paginatedEvents, sortOptions, publicView]);
-  const handleFilterChange = (partial: Partial<Filters>) => {
-    setFilters((prev) => ({ ...prev, ...partial }));
-    setPage(1);
-  };
 
-  const handleSortChange = (partial: Partial<SortOptions>) => {
-    setSortOptions((prev) => ({ ...prev, ...partial }));
-    setPage(1);
-  };
-
-  const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
+  const skeletonGroups = useMemo(() => generateSkeletonGroups(1), []);
   const hasResults = totalResults > 0;
   return (
     <>
-      {!publicView && (
-        <>
-          {/* todo: make this public with some features that are only available to logged in users */}
-          <EventFilters
-            filters={filters}
-            sortOptions={sortOptions}
-            onChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            onResetFilters={handleResetFilters}
-            userPref={userPref}
-            user={user}
-            isMobile={isMobile}
-          />
-
-          {!isLoading && hasResults && (
-            <BasicPagination
-              page={page}
-              totalPages={totalPages}
-              totalOpenCalls={totalOpen}
-              totalResults={totalResults}
-              onPageChange={setPage}
-            />
-          )}
-        </>
-      )}
-
       {isLoading ? (
         <div className="mb-10 w-full max-w-[90vw] space-y-4 sm:space-y-6">
-          <div className="mx-auto mb-10 mt-6 flex w-full max-w-[min(70vw,1200px)] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0">
-            <Skeleton className="h-10 w-40 rounded-xl bg-black/20" />
-            <div className="mx-auto mb-2 flex items-center gap-x-2">
-              <Skeleton className="h-10 w-14 rounded-xl bg-black/20" />
-              <Skeleton className="h-10 w-20 rounded-xl bg-black/20" />
-              <Skeleton className="ml-8 h-10 w-8 rounded-xl bg-black/20" />
-            </div>
-
-            <div />
-          </div>
           {skeletonGroups.map((group) => (
             <div key={group.id} className="flex flex-col items-center gap-6">
               <Skeleton className="mx-auto mt-3 h-10 w-64 rounded-xl bg-black/20" />
@@ -280,7 +152,34 @@ const ClientEventList = (
           ))}
         </div>
       ) : (
-        <>
+        <div className="mb-16">
+          <div className="mb-12 flex flex-col gap-8">
+            <section>
+              <h1 className="mx-auto text-center font-tanker text-3xl lowercase tracking-wide">
+                {thisWeekStart} - {thisWeekEnd}
+              </h1>
+              <Separator
+                orientation="horizontal"
+                thickness={3}
+                className="mx-auto mt-1 max-w-[min(70vw,165px)] bg-foreground"
+              />
+            </section>
+            <section>
+              <p className="mb-4 mt-2 text-center text-sm">
+                List of street art, graffiti, & mural projects.
+                <br /> Info gathered and shared by{" "}
+                <Link
+                  href="https://instagram.com/anthonybrooksart"
+                  target="_blank"
+                  className="font-semibold"
+                >
+                  @anthonybrooksart
+                </Link>
+              </p>
+              {/* <SocialsRow className="size-8 md:size-6" contClassName="gap-8" /> */}
+            </section>
+          </div>
+
           {hasResults ? (
             groupedEvents.map((group) => (
               <div key={group.title.raw} className="mb-6">
@@ -317,7 +216,7 @@ const ClientEventList = (
             ))
           ) : (
             <div className="mb-12 mt-6 flex flex-col items-center gap-5">
-              <h1 className="text-2xl font-bold">No Results</h1>
+              <h1 className="text-2xl font-bold">Nothing this week</h1>
               <Image
                 src="/nothinghere.gif"
                 alt="No Results Found"
@@ -328,33 +227,9 @@ const ClientEventList = (
               />
             </div>
           )}
-        </>
-      )}
-
-      {!publicView && hasResults && (
-        <BasicPagination
-          page={page}
-          totalPages={totalPages}
-          totalResults={totalResults}
-          onPageChange={setPage}
-          bottomPag
-          className={cn("mb-6", !publicView && "mb-12")}
-        />
-      )}
-      {isLoading && (
-        <div
-          className={cn(
-            "mb-6 flex w-full items-center justify-center",
-            !publicView && "mb-12",
-          )}
-        >
-          <div className="mx-auto flex items-center gap-x-2">
-            <Skeleton className="h-10 w-14 rounded-xl bg-black/20" />
-            <Skeleton className="h-10 w-20 rounded-xl bg-black/20" />
-            <Skeleton className="ml-8 h-10 w-8 rounded-xl bg-black/20" />
-          </div>
         </div>
       )}
+
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
         <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
@@ -369,4 +244,4 @@ const ClientEventList = (
   );
 };
 
-export default ClientEventList;
+export default ClientThisWeekList;

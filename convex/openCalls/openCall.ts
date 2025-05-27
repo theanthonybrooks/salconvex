@@ -1,6 +1,35 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "~/convex/_generated/server";
+import { internalMutation, mutation, query } from "~/convex/_generated/server";
+
+export const archiveExpiredOpenCalls = internalMutation({
+  args: {},
+  handler: async (ctx, args) => {
+    const now = new Date().toISOString();
+    const openCalls = await ctx.db
+      .query("openCalls")
+      .withIndex("by_state", (q) => q.eq("state", "published"))
+      .collect();
+
+    for (const oc of openCalls) {
+      const ocEnd = oc.basicInfo?.dates?.ocEnd;
+      if (ocEnd && ocEnd < now) {
+        const event = await ctx.db.get(oc.eventId);
+        if (!event) continue;
+        await ctx.db.patch(oc._id, {
+          state: "archived",
+          lastUpdatedAt: Date.now(),
+        });
+        if (event.category !== "event") {
+          await ctx.db.patch(event._id, {
+            state: "archived",
+            lastEditedAt: Date.now(),
+          });
+        }
+      }
+    }
+  },
+});
 
 export const createOrUpdateOpenCall = mutation({
   args: {
