@@ -104,6 +104,8 @@ const SubmissionFormOC1 = ({
   const today = new Date();
   const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
 
+  console.log(ocEligibilityWhom);
+
   // #region -------------- UseEffect ---------------
 
   useEffect(() => {

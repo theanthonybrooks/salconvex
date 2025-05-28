@@ -704,7 +704,7 @@ export const EventOCForm = ({
       let orgLogoFullUrl = "/1.jpg";
       console.log(hasUserEditedStep0);
       if (hasUserEditedStep0) {
-        console.log("user edited step 0");
+        // console.log("user edited step 0");
         const result = await handleFileUrl({
           data: orgData,
           generateUploadUrl,
@@ -721,7 +721,7 @@ export const EventOCForm = ({
         }
         const { logoStorageId, timezone, timezoneOffset } = result;
         const logo = typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
-        console.log(result);
+        // console.log(result);
         try {
           setPending(true);
           const { org } = await createNewOrg({

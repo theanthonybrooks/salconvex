@@ -38,7 +38,7 @@ export function DebouncedControllerNumInput<
   //   return field.value?.toString() ?? "";
   // });
   const [localValue, setLocalValue] = useState(() => {
-    console.log(field.value, typeof field.value);
+    // console.log(field.value, typeof field.value);
     if (typeof field.value === "number") {
       return field.value === 0
         ? ""

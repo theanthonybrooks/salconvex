@@ -12,6 +12,16 @@ import {
   query,
 } from "./_generated/server";
 
+export const getTotalUsers = query({
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+
+    const nonAdminUsers = users.filter((user) => !user.role?.includes("admin"));
+
+    return nonAdminUsers.length;
+  },
+});
+
 export const usersWithSubscriptions = query({
   args: {},
   handler: async (ctx) => {

@@ -542,7 +542,6 @@ export default defineSchema({
   applications: defineTable(applicationsSchema)
     .index("by_openCallId", ["openCallId"])
     .index("by_artistId", ["artistId"]),
-  
 
   // Organization Tables
   organizations: defineTable(organizationSchema)

@@ -62,9 +62,14 @@ export default function Dashboard() {
     isAdmin ? {} : "skip",
   );
 
+  const { data: totalUsersData } = useQueryWithStatus(
+    api.users.getTotalUsers,
+    isAdmin ? {} : "skip",
+  );
+  const totalUsers = totalUsersData ?? 0;
   const totalEvents = allEventsData?.totalEvents ?? 0;
   const activeEvents = allEventsData?.activeEvents ?? 0;
-  const archivedEvents = allEventsData?.archivedEvents ?? 0;
+  // const archivedEvents = allEventsData?.archivedEvents ?? 0;
   // const draftEvents = allEventsData?.draftEvents ?? 0;
   const pendingEvents = submittedEventsData?.length ?? 0;
 
@@ -153,13 +158,14 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card>
+              {/* <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Archived Events
                   </CardTitle>
                   <LucideCircleOff className="size-4 text-muted-foreground" />
                 </CardHeader>
+           
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {archivedEvents ?? 0}
@@ -171,6 +177,31 @@ export default function Dashboard() {
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
+              </Card> */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Users
+                  </CardTitle>
+                  <LucideCircleOff className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{totalUsers ?? 0}</div>
+                  <Link variant="subtleUnderline" href="/dashboard/admin/users">
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+                {/* <CardContent>
+                  <div className="text-2xl font-bold">
+                    {archivedEvents ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/submissions"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent> */}
               </Card>
             </div>
           </div>
