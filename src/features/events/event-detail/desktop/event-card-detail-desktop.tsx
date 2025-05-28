@@ -53,8 +53,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     hidden: false,
   };
 
-  const { prodDates } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
-  // const prodStart = prodDates?.[0]?.start;
+  const { prodDates } = dates; 
   const prodEnd = prodDates?.[0]?.end;
   const tabList = [
     // { id: "application", label: "My Application" },

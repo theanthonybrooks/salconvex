@@ -141,6 +141,7 @@ export const FilterBase = ({
                 />
                 <input
                   type="text"
+                  autoFocus={false}
                   onChange={(e) => {
                     setDropdownOpen(true);
                     setValue(e.target.value);
@@ -153,7 +154,7 @@ export const FilterBase = ({
                 {groupedResults && dropdownOpen && (
                   <div
                     ref={dropdownRef}
-                    className="scrollable mini max-h-70 absolute left-0 top-full z-top mt-2 flex w-[calc(100vw-40px)] flex-col gap-2 rounded-lg border border-foreground bg-card px-5 py-4"
+                    className="scrollable mini absolute left-0 top-full z-top mt-2 flex max-h-70 w-[calc(100vw-40px)] flex-col gap-2 rounded-lg border border-foreground bg-card px-5 py-4"
                   >
                     {Object.values(groupedResults).every(
                       (items) => items.length === 0,

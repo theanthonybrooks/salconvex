@@ -358,20 +358,9 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       <div className="flex items-center gap-1 rounded-lg border p-2 px-3">
         <IoSearch className="size-7 shrink-0 p-1 text-foreground" />
         <Input
-          ref={inputRef}
           value={value}
+          readOnly
           onClick={() => setOpen(true)}
-          onChange={(e) => handleValueChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setOpen(false);
-            }
-            if (e.key === "Escape") {
-              setValue("");
-              setSearch("");
-              setOpen(false);
-            }
-          }}
           placeholder={cn(placeholder)}
           className="focus:outline-hidden relative z-10 w-full border-none bg-transparent p-3 text-lg selection:italic selection:text-foreground placeholder:text-foreground/40"
         />
