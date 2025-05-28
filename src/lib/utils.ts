@@ -1,19 +1,24 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const setParamIfNotDefault = <T>(
   params: URLSearchParams,
   key: string,
   value: T,
-  defaultValue: T
+  defaultValue: T,
 ) => {
   if (value === defaultValue) {
-    params.delete(key)
+    params.delete(key);
   } else {
-    params.set(key, String(value))
+    params.set(key, String(value));
   }
+};
+
+export function arraysShareValue<T>(arr1: T[], arr2: T[]): boolean {
+  const set1 = new Set(arr1);
+  return arr2.some((item) => set1.has(item));
 }

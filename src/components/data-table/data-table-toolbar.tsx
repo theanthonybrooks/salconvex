@@ -41,6 +41,7 @@ export function DataTableToolbar<TData>({
   const setViewAll = table.options.meta?.setViewAll;
   const tableType = table.options.meta?.tableType;
   const pageType = table.options.meta?.pageType;
+  const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
   const selectedRowCount = Object.keys(table.getState().rowSelection).length;
@@ -112,7 +113,7 @@ export function DataTableToolbar<TData>({
                 options={eventStates}
               />
             )}
-            {table.getColumn("openCallState") && (
+            {table.getColumn("openCallState") && !minimalView && (
               <DataTableFacetedFilter
                 column={table.getColumn("openCallState")}
                 title="Open Call"
@@ -124,7 +125,7 @@ export function DataTableToolbar<TData>({
                 )}
               />
             )}
-            {table.getColumn("category") && (
+            {table.getColumn("category") && !minimalView && (
               <DataTableFacetedFilter
                 column={table.getColumn("category")}
                 title="Category"

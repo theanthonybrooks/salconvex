@@ -64,6 +64,7 @@ export default function DashboardSideBar({
 
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
+  const userType = user?.accountType;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEvents,
@@ -78,10 +79,20 @@ export default function DashboardSideBar({
       const isAdmin = hasAdminRole && !item.label.includes("Help");
       const isGeneralItem =
         item.sub.includes("all") && !item.label.includes("Help");
+      const hasSharedType = userType?.some((type) =>
+        item.userType?.includes(type),
+      );
+      const isPublic =
+        item.userType?.includes("public") && !item.label.includes("Help");
 
-      return isAllowedBySub || isAdmin || isGeneralItem;
+      return (
+        (isAllowedBySub && hasSharedType) ||
+        isAdmin ||
+        isGeneralItem ||
+        isPublic
+      );
     });
-  }, [statusKey, hasAdminRole]);
+  }, [statusKey, hasAdminRole, userType]);
 
   useEffect(() => {
     const matchingSection = filteredNavItems.find(
@@ -157,7 +168,7 @@ export default function DashboardSideBar({
                       : "text-primary hover:bg-primary/10 hover:text-foreground",
                   )}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className="size-4" />
                   {item.label}
                 </Link>
                 {pathname !== item.href && (

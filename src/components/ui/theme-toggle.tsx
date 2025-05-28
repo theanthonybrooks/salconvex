@@ -160,17 +160,29 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
 
                       scale: 1,
                     }
-                  : {
-                      d: sunPath,
-                      rotate: 0,
-                      strokeWidth: 4,
-                      stroke: "var(--foreground-hex)",
-                      fill: "transparent",
-                      fillOpacity: 0.35,
-                      strokeOpacity: 1,
+                  : theme === "light"
+                    ? {
+                        d: sunPath,
+                        rotate: 0,
+                        strokeWidth: 4,
+                        stroke: "var(--foreground-hex)",
+                        fill: "transparent",
+                        fillOpacity: 0.35,
+                        strokeOpacity: 1,
 
-                      scale: 2.3,
-                    }
+                        scale: 2.3,
+                      }
+                    : {
+                        d: sunPath,
+                        rotate: 0,
+                        strokeWidth: 6,
+                        stroke: "var(--foreground-hex)",
+                        fill: "transparent",
+                        fillOpacity: 0.35,
+                        strokeOpacity: 1,
+
+                        scale: 1,
+                      }
             }
           />
         </m.svg>

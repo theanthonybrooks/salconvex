@@ -207,7 +207,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [existingOrg, setExistingOrg] = useState<Doc<"organizations"> | null>(
     null,
   );
-  const [newOrgEvent, setNewOrgEvent] = useState(true);
+  const [newOrgEvent, setNewOrgEvent] = useState(false);
   const [existingEvent, setExistingEvent] = useState<EnrichedEvent | null>(
     null,
   );
@@ -318,7 +318,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventsData = orgEventsData ?? [];
   // const orgHasNoEvents =
   //   orgEventsSuccess && eventsData?.length === 0 && !!existingOrg;
-  const eventChoiceMade = !!(existingEvent || newOrgEvent || !existingOrg);
+  const eventChoiceMade = !!(
+    existingEvent ||
+    (newOrgEvent && isAdmin) ||
+    !existingOrg
+  );
 
   const category = eventData?.category as EventCategory;
   const categoryEvent = category === "event";
@@ -450,6 +454,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
+    } finally {
+      setActiveStep(0);
+      router.push("/dashboard/");
     }
   };
 
@@ -460,7 +467,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       // console.log("hasUserEditedForm 440");
       await handleSave();
     }
-    console.log(formType, eventData?.hasOpenCall);
     if (formType === 1 && eventData?.hasOpenCall === "Fixed") {
       setValue("event.hasOpenCall", "False");
     }
@@ -1647,13 +1653,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [activeStep, furthestStep]);
 
   useEffect(() => {
-    if (newOrgEvent) return;
-    if (!newOrgEvent && isSelectedRowEmpty) {
-      setSelectedRow({ 0: true });
-    }
-  }, [newOrgEvent, isSelectedRowEmpty]);
-
-  useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {
       canClearEventData.current = true;
     } else if (isSelectedRowEmpty) {
@@ -1826,7 +1825,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             {/* //------ 1st Step: Org & Event Selection ------ */}
             {activeStep === 0 && (
               <SubmissionFormOrgStep
-                adminMode={isAdmin}
+                dashboardView={true}
                 isAdmin={isAdmin}
                 isMobile={isMobile}
                 existingOrg={existingOrg}

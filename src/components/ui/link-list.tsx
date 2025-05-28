@@ -78,7 +78,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
             <a href={event.links.website} target="_blank">
               <div className="flex items-center gap-x-2">
                 <Globe className={cn("shrink-0", iconSize)} />
-                <span className="underline-offset-2 hover:underline">
+                <span className="max-w-[30ch] truncate underline-offset-2 hover:underline">
                   {formatDisplayUrl(event.links.website)}
                 </span>
               </div>
@@ -202,7 +202,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
               <a href={organizer.links.website}>
                 <div className="flex items-center gap-x-2">
                   <Globe className={cn("shrink-0", iconSize)} />
-                  <span className="underline-offset-2 hover:underline">
+                  <span className="max-w-[30ch] truncate underline-offset-2 hover:underline">
                     {organizer.links.website.split("www.").slice(-1)[0]}
                   </span>
                 </div>

@@ -33,5 +33,6 @@ declare module "@tanstack/react-table" {
     tableType: TableTypes | undefined;
     pageType?: PageTypes;
     getRowData?: (row: TData) => void;
+    minimalView?: boolean;
   }
 }

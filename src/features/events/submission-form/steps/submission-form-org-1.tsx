@@ -39,7 +39,7 @@ interface SubmissionFormOrgStepProps {
   selectedRow: Record<string, boolean>;
   furthestStep: number;
   preloadFlag?: boolean;
-  adminMode?: boolean;
+  dashboardView?: boolean;
 }
 
 const SubmissionFormOrgStep = ({
@@ -64,7 +64,7 @@ const SubmissionFormOrgStep = ({
   selectedRow,
   furthestStep,
   preloadFlag,
-  adminMode,
+  dashboardView,
 }: SubmissionFormOrgStepProps) => {
   const {
     control,
@@ -104,7 +104,7 @@ const SubmissionFormOrgStep = ({
         )}
       >
         <section className="flex flex-col items-center justify-center">
-          {!isAdmin && (
+          {!isAdmin && !dashboardView && (
             <>
               <div
                 id="welcome-text"
@@ -236,9 +236,7 @@ const SubmissionFormOrgStep = ({
               <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="organization.logo" className="sr-only">
                   Organization Logo
-                  {/* <span className="text-xs italic text-muted-foreground">
-                            {required ? "(required)" : "(optional)"}
-                          </span> */}
+              
                 </Label>
                 <Controller
                   name="organization.logo"
@@ -290,38 +288,40 @@ const SubmissionFormOrgStep = ({
                 (or continue a draft)
               </p>
             </div>
-            <div className="w-full rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-5">
-              <label
-                className={cn(
-                  "flex cursor-pointer items-start gap-2 md:items-center",
-                  // existingEvent !== null &&
-                  //   "pointer-events-none opacity-50 hover:cursor-default",
-                )}
-              >
-                <Checkbox
-                  // disabled={existingEvent !== null}
-                  tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
-                  id="newEvent"
-                  className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                  checked={eventsData?.length === 0 ? true : newOrgEvent}
-                  onCheckedChange={(checked) => {
-                    setExistingEvent(null);
-                    if (eventsData?.length === 0) {
-                      setNewOrgEvent(true);
-                    } else {
-                      setNewOrgEvent(!!checked);
-                    }
-                  }}
-                />
+            {!(dashboardView && !isAdmin) && (
+              <div className="w-full rounded-lg border-2 border-dashed border-foreground/50 bg-salYellow/30 p-5">
+                <label
+                  className={cn(
+                    "flex cursor-pointer items-start gap-2 md:items-center",
+                    // existingEvent !== null &&
+                    //   "pointer-events-none opacity-50 hover:cursor-default",
+                  )}
+                >
+                  <Checkbox
+                    // disabled={existingEvent !== null}
+                    tabIndex={4} //todo: update this to check if user has existing events and if so, direct them to the search input on the data table
+                    id="newEvent"
+                    className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                    checked={eventsData?.length === 0 ? true : newOrgEvent}
+                    onCheckedChange={(checked) => {
+                      setExistingEvent(null);
+                      if (eventsData?.length === 0) {
+                        setNewOrgEvent(true);
+                      } else {
+                        setNewOrgEvent(!!checked);
+                      }
+                    }}
+                  />
 
-                <span className="hidden text-sm sm:block">
-                  I&apos;d like to create a new event/project
-                </span>
-                <span className="text-sm sm:hidden">
-                  Add a new event/project
-                </span>
-              </label>
-            </div>
+                  <span className="hidden text-sm sm:block">
+                    I&apos;d like to create a new event/project
+                  </span>
+                  <span className="text-sm sm:hidden">
+                    Add a new event/project
+                  </span>
+                </label>
+              </div>
+            )}
             <DataTable
               columns={columns}
               data={eventsData}
@@ -330,6 +330,7 @@ const SubmissionFormOrgStep = ({
                 category: false,
                 lastEditedAt: false,
               }}
+              minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
@@ -349,13 +350,14 @@ const SubmissionFormOrgStep = ({
               outerContainerClassName={cn(
                 "lg:hidden",
                 newOrgEvent && "opacity-80",
-                adminMode ? "max-w-full" : "max-w-[74dvw]",
+                dashboardView ? "max-w-full" : "max-w-[74dvw]",
               )}
               tableType="events"
             />
             <DataTable
               columns={columns}
               data={eventsData}
+              minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {
@@ -382,6 +384,7 @@ const SubmissionFormOrgStep = ({
             <DataTable
               columns={columns}
               data={eventsData}
+              minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={(event, selection) => {
                 if (newOrgEvent && Object.keys(selectedRow).length > 0) {

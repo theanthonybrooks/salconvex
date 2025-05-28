@@ -150,7 +150,7 @@ const SubmissionFormEventStep2 = ({
                             />
                           </SelectTrigger>
                           <SelectContent className="min-w-auto">
-                            {!freeCall && (
+                            {!freeCall && isAdmin && (
                               <>
                                 <SelectItem fit value="False">
                                   No, there&apos;s not an open call

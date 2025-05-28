@@ -53,7 +53,7 @@ export const Search = <T extends CommandItem>({
           )}
         >
           <FiSearch
-            className="mr-2 h-5 w-5 cursor-pointer"
+            className="mr-2 size-5 cursor-pointer"
             onClick={() => setOpen(true)}
           />
           <input
@@ -83,7 +83,7 @@ export const Search = <T extends CommandItem>({
           )}
           onClick={() => setOpen(true)}
         >
-          <TbWorldSearch className="size-8 cursor-pointer md:size-5" />
+          <TbWorldSearch className="size-8 cursor-pointer md:size-6" />
           {value && value !== "Search" && (
             <span className="flex items-center">
               &quot;

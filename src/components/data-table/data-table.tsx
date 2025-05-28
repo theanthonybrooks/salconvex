@@ -48,6 +48,7 @@ interface DataTableProps<TData, TValue> {
   tableType?: TableTypes;
   pageType?: PageTypes;
   initialSearchTerm?: string;
+  minimalView?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -64,6 +65,7 @@ export function DataTable<TData, TValue>({
   tableType,
   pageType,
   initialSearchTerm,
+  minimalView,
 }: DataTableProps<TData, TValue>) {
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
@@ -84,6 +86,7 @@ export function DataTable<TData, TValue>({
       setViewAll,
       tableType,
       pageType,
+      minimalView,
     },
 
     state: {
