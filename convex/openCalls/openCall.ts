@@ -168,6 +168,7 @@ export const createOrUpdateOpenCall = mutation({
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),
       paid: args.paid ?? false,
+      ...(args.approved ? { approvedBy: userId, approvedAt: Date.now() } : {}),
     };
 
     // Step 1: Lookup already exists — update both openCall and lookup

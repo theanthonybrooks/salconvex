@@ -929,6 +929,7 @@ export const createOrUpdateEvent = mutation({
         lastEditedAt: Date.now(),
         state: eventState,
         adminNote: args.adminNote,
+        ...(args.publish ? { approvedBy: userId, approvedAt: Date.now() } : {}),
       });
 
       const updatedEvent = await ctx.db.get(event._id);
