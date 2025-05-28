@@ -1076,7 +1076,7 @@ export const EventOCForm = ({
                 rate: 0,
                 unit: "",
                 currency: orgData.location?.currency?.code ?? "",
-                allInclusive: true,
+                allInclusive: false,
                 moreInfo: undefined,
               },
               categories: {

@@ -16,6 +16,7 @@ export const EligibilityLabel = ({
   eligible,
 }: EligibilityLabelProps) => {
   const international = type === "International";
+  const national = type === "National";
   const multipleWhom = whom.length > 1;
   const mobilePreview = format === "mobile" && preview;
   const isMobile = format === "mobile";
@@ -90,7 +91,7 @@ export const EligibilityLabel = ({
               {(international || eligible) && (
                 <CheckIcon className="size-4 shrink-0 translate-y-0.5 text-emerald-800" />
               )}
-              {!international && eligible === false && (
+              {national && eligible === false && (
                 <XIcon className="size-4 shrink-0 translate-y-1 text-red-600" />
               )}
             </div>
@@ -106,7 +107,7 @@ export const EligibilityLabel = ({
       {(international || eligible) && (
         <CheckIcon className="size-4 shrink-0 text-emerald-800" />
       )}
-      {!international && eligible === false && (
+      {national && eligible === false && (
         <XIcon className="size-4 shrink-0 text-red-600" />
       )}
     </span>

@@ -177,17 +177,19 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 />
               </span>
             </p>
-            <div className="flex flex-col items-start gap-1 text-sm">
-              <span className="space-x-1 font-semibold">
-                {getEventCategoryLabel(eventCategory)} Dates:
-              </span>
-              <EventDates
-                event={event}
-                format="desktop"
-                limit={0}
-                type="event"
-              />
-            </div>
+            {eventCategory === "event" && (
+              <div className="flex flex-col items-start gap-1 text-sm">
+                <span className="space-x-1 font-semibold">
+                  {getEventCategoryLabel(eventCategory)} Dates:
+                </span>
+                <EventDates
+                  event={event}
+                  format="desktop"
+                  limit={0}
+                  type="event"
+                />
+              </div>
+            )}
             {/*//todo: add this part */}
             {(eventCategory === "project" ||
               (eventCategory === "event" && prodEnd)) && (

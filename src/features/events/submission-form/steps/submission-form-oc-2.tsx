@@ -217,9 +217,8 @@ const SubmissionFormOC2 = ({
         "my-auto flex h-fit w-full flex-col gap-4 sm:w-[90%] lg:w-full xl:justify-center",
         "mx-auto",
         "xl:mx-0 xl:grid xl:max-w-none",
-        allInclusive === false &&
-          showBudgetInputs &&
-          "xl:grid-cols-[45%_10%_45%] xl:gap-0",
+        // allInclusive === false &&
+        showBudgetInputs && "xl:grid-cols-[45%_10%_45%] xl:gap-0",
         !showBudgetInputs && "my-auto h-fit lg:gap-0",
         // "min-w-[74vw] sm:min-w-full",
       )}

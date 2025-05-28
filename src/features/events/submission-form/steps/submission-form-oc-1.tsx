@@ -63,6 +63,7 @@ const SubmissionFormOC1 = ({
     control,
     watch,
     setValue,
+    register,
 
     // getValues,
     formState: { errors },
@@ -76,12 +77,14 @@ const SubmissionFormOC1 = ({
   const eventName = watch("event.name");
   const eventId = watch("event._id");
   const callType = watch("event.hasOpenCall");
+
   const isDraft = openCall?.state === "draft";
   const orgTimezone = organizer?.location?.timezone;
   const callFormat = openCall?.basicInfo?.callFormat;
   const fixedType = callType === "Fixed";
   const emailType = callType === "Email";
   const ocEligiblityType = openCall?.eligibility?.type;
+  const ocEligibilityWhom = openCall?.eligibility?.whom;
   const isNational = ocEligiblityType === "National";
   const isInternational = ocEligiblityType === "International";
   const eligDetails = openCall?.eligibility?.details ?? "";
@@ -102,6 +105,11 @@ const SubmissionFormOC1 = ({
   const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
 
   // #region -------------- UseEffect ---------------
+
+  useEffect(() => {
+    if (ocEligibilityWhom !== undefined) return;
+    register("openCall.eligibility.whom");
+  }, [register, ocEligibilityWhom]);
 
   useEffect(() => {
     if (!callType || fixedType) return;

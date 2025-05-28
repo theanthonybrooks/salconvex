@@ -35,18 +35,25 @@ const EventDates = ({
       end,
     })) ?? [];
   const eventSliceLimit = limit === 0 ? mappedEventDates?.length : (limit ?? 3);
-  const forEvent = type === "event";
-  const forProd = type === "production";
+  const showProdInstead =
+    preview && type === "event" && dates?.eventFormat === "noEvent";
+
+  const forEvent = type === "event" && !showProdInstead;
+  const forProd = type === "production" || showProdInstead;
+
   const isOngoing = dates?.eventFormat === "ongoing";
 
-  if (forEvent && isOngoing) {
-    return <span className="flex flex-col gap-1">Ongoing</span>;
+  if (forEvent) {
+    if (isOngoing) {
+      return <span className="flex flex-col gap-1">Ongoing</span>;
+    } else if (dates?.eventFormat === "noEvent") {
+      if (!preview) {
+        return <span className="flex flex-col gap-1">No Event Dates</span>;
+      }
+    }
   }
   if (forProd && dates?.prodFormat === "sameAsEvent") {
     return <span className="flex flex-col gap-1">Same as Event Dates</span>;
-  }
-  if (forEvent && dates?.eventFormat === "noEvent") {
-    return <span className="flex flex-col gap-1">No Event Dates</span>;
   }
 
   // if (forProd && !mappedProdDates) {
