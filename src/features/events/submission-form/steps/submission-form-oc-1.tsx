@@ -348,7 +348,7 @@ const SubmissionFormOC1 = ({
                     //   // handleCheckSchema();
                     // }}
                     placeholder="Please be as specific as possible"
-                    charLimit={750}
+                    charLimit={1200}
                   />
                 )}
               />

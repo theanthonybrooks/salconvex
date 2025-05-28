@@ -1,3 +1,4 @@
+import { infoEmail } from "@/constants/siteInfo";
 import { LucideIcon } from "lucide-react";
 
 export interface FullPageNavMenuItem {
@@ -34,13 +35,13 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: true,
         userType: ["public"],
       },
-      // {
-      //   title: "This Week",
-      //   path: "/thisweek",
-      //   category: "thelist",
-      //   public: true,
-      //   userType: ["public"],
-      // },
+      {
+        title: "This Week",
+        path: "/thisweek",
+        category: "thelist",
+        public: true,
+        userType: ["public"],
+      },
       // {
       //   title: "Archive",
       //   path: "/archive",
@@ -78,7 +79,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       },
       {
         title: "My Applications",
-        path: "/dashboard/applications",
+        path: "/dashboard/artist",
         category: "dashboard",
         public: false,
         view: "dashboard",
@@ -94,7 +95,15 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       // },
       {
         title: "Bookmarks",
-        path: "/dashboard",
+        path: "/dashboard/artist/bookmarks",
+        category: "dashboard",
+        public: false,
+        view: "dashboard",
+        userType: ["artist"],
+      },
+      {
+        title: "Hidden",
+        path: "/dashboard/artist/hidden",
         category: "dashboard",
         public: false,
         view: "dashboard",
@@ -102,7 +111,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       },
       {
         title: "Account",
-        path: "/dashboard/account",
+        path: "/dashboard/account/billing",
         category: "dashboard",
         public: false,
         view: "dashboard",
@@ -171,6 +180,13 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["admin"],
       },
       {
+        title: "Users",
+        path: "/dashboard/admin/users",
+        category: "admin",
+        public: false,
+        userType: ["admin"],
+      },
+      {
         title: "Todos",
         path: "/dashboard/admin/todos",
         category: "admin",
@@ -190,12 +206,41 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
     title: "About",
     items: [
       {
-        title: 'About "The List"',
-        path: "/about",
+        title: "FAQ",
+        path: "/faq",
+        category: "about",
+        public: true,
+        userType: ["public", "admin"],
+      },
+      {
+        title: "Changelog",
+        path: "/changelog",
         category: "about",
         public: true,
         userType: ["public"],
       },
+
+      {
+        title: "Terms",
+        path: "/terms",
+        category: "about",
+        public: true,
+        userType: ["public"],
+      },
+      {
+        title: "Privacy",
+        path: "/privacy",
+        category: "about",
+        public: true,
+        userType: ["public"],
+      },
+      // {
+      //   title: 'About "The List"',
+      //   path: "/about",
+      //   category: "about",
+      //   public: true,
+      //   userType: ["public"],
+      // },
       // {
       //   title: "Collaborators",
       //   path: "/collaborators",
@@ -205,11 +250,18 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       // },
       {
         title: "Contact",
-        path: "/contact",
+        path: `mailto:${infoEmail}&subject=Site%20Contact`,
         category: "about",
         public: true,
         userType: ["public"],
       },
+      // {
+      //   title: "Contact",
+      //   path: "/contact",
+      //   category: "about",
+      //   public: true,
+      //   userType: ["public"],
+      // },
       {
         title: "Pricing",
         path: "/pricing",
