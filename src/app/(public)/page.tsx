@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -33,6 +34,8 @@ export default function Home() {
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
 
   const [currentSlide, setCurrentSlide] = useState(1);
+  const [expanded, setExpanded] = useState(false);
+  const toggleReadMore = () => setExpanded((prev) => !prev);
   // const { scrollY } = useScroll()
   // const smoothScrollY = useSpring(scrollY, {
   //   stiffness: 100,
@@ -68,17 +71,36 @@ export default function Home() {
           maxHeight: "calc(100dvh - 8.5rem)",
         }}
       >
-        <h1
+        <div
           className={cn(
-            "absolute left-5 top-5 z-10 font-tanker lowercase tracking-wide text-background transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,0.5)] md:left-7",
-            "text-[3.75rem] leading-[3.5rem] md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
+            "absolute left-5 top-5 z-10 font-tanker lowercase tracking-wide text-background transition-transform duration-700 ease-in-out [text-shadow:0_0_10px_rgba(0,0,0,0.3)] md:left-7",
+
             currentSlide === 1
               ? "scale-100"
               : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
           )}
         >
-          CHUS
-        </h1>
+          <h1
+            className={cn(
+              "text-[3.75rem] leading-[3.5rem] md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
+              currentSlide === 1
+                ? "scale-100"
+                : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+            )}
+          >
+            CHUS
+          </h1>
+          <h2
+            className={cn(
+              "text-center text-lg md:text-3xl lg:text-4xl",
+              currentSlide === 1
+                ? "scale-100"
+                : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+            )}
+          >
+            May / June 2025
+          </h2>
+        </div>
 
         <Carousel className="h-full w-full">
           <CarouselContent>
@@ -261,42 +283,65 @@ export default function Home() {
             everything connected. ~/
           </div>*/}
 
-          <Card className="mx-auto mt-10 max-w-[70dvw] border-1.5 p-6 text-left shadow-md">
-            <CardContent className="space-y-4 text-base text-foreground">
+          <Card className="mx-auto mt-10 max-w-[90dvw] border-1.5 p-6 text-left shadow-md sm:max-w-[70dvw]">
+            <CardContent className="space-y-4 !p-0 text-base text-foreground sm:!p-6">
               <h2 className="text-center font-tanker text-4xl text-foreground">
                 Welcome!
               </h2>
-              <p>
-                For those that are new to The Street Art List, here&apos;s a
-                quick overview of what it is and how it works.
-              </p>
-              <p>
-                The Street Art List is a platform that I started in 2019 with
-                the goal of making a public archive/database of street
-                art-related projects and events. Over the years, that list
-                continued to grow until last year when I decided to bite the
-                bullet and code a site. Needless to say, it was a huge
-                undertaking, but was also a bit rushed and I really wanted to
-                make something better.
-              </p>
-              <p>
-                So, for the past year and a half, I&apos;ve been working on this
-                shiny new site that allows users to have an account, to
-                bookmark, to hide events, to keep track of applications, to view
-                deadlines in their local timezone, and much more! Lots of
-                functionalities that I have in the works, and I&apos;m happy to
-                finally get to share what so much of my time has gone into.
-              </p>
-              <p>
-                {" "}
-                If you used previous versions of The List (when it was a
-                spreadsheet), or the old version of the site, I promise that
-                this has just... so much more. Full detail pages with breakdowns
-                of the budget, mobile-friendly layouts, submission forms that
-                allow saving drafts and coming back to them later. Organizer
-                accounts. Really, just so much more. I&apos;m excited to share
-                this with you and hope you&apos;ll find it useful :)
-              </p>
+              <div
+                className={cn(
+                  !expanded && "line-clamp-3 lg:line-clamp-none",
+                  "transition-all",
+                )}
+              >
+                <p>
+                  For those that are new to The Street Art List, here&apos;s a
+                  quick overview of what it is and how it works.
+                </p>
+                &nbsp;
+                <p>
+                  The Street Art List is a platform that I started in 2019 with
+                  the goal of making a public archive/database of street
+                  art-related projects and events. Over the years, that list
+                  continued to grow until last year when I decided to bite the
+                  bullet and code a site. Needless to say, it was a huge
+                  undertaking, but was also a bit rushed and I really wanted to
+                  make something better.
+                </p>
+                &nbsp;
+                <p>
+                  So, for the past year and a half, I&apos;ve been working on
+                  this shiny new site that allows users to have an account, to
+                  bookmark, to hide events, to keep track of applications, to
+                  view deadlines in their local timezone, and much more! Lots of
+                  functionalities that I have in the works, and I&apos;m happy
+                  to finally get to share what so much of my time has gone into.
+                </p>
+                &nbsp;
+                <p>
+                  {" "}
+                  If you used previous versions of The List (when it was a
+                  spreadsheet), or the old version of the site, I promise that
+                  this has just... so much more. Full detail pages with
+                  breakdowns of the budget, mobile-friendly layouts, submission
+                  forms that allow saving drafts and coming back to them later.
+                  Organizer accounts. Really, just so much more. I&apos;m
+                  excited to share this with you and hope you&apos;ll find it
+                  useful :){" "}
+                </p>
+                &nbsp;
+                <p>
+                  P.s. Many of the new features are still in beta, so if you
+                  come across any bugs, please let me know!
+                </p>
+              </div>
+              <Button
+                variant="salWithShadowHidden"
+                onClick={toggleReadMore}
+                className="mt-3 w-full lg:hidden"
+              >
+                {expanded ? "Read Less" : "Read More"}
+              </Button>
             </CardContent>
           </Card>
 
