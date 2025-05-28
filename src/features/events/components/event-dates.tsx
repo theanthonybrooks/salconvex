@@ -21,14 +21,7 @@ const EventDates = ({
   className,
   type = "event",
 }: EventDatesProps) => {
-  console.log(
-    preview,
-    event?.dates?.eventFormat,
-    event?.dates?.eventDates,
-    type,
-  );
-  // if (!event || !event.dates) return null;
-
+  const isMobile = format === "mobile";
   const { dates } = event;
   const mappedEventDates =
     dates?.eventDates?.map(({ start, end }) => ({
@@ -42,7 +35,9 @@ const EventDates = ({
     })) ?? [];
   const eventSliceLimit = limit === 0 ? mappedEventDates?.length : (limit ?? 3);
   const showProdInstead =
-    preview && type === "event" && dates?.eventFormat === "noEvent";
+    (preview || isMobile) &&
+    type === "event" &&
+    dates?.eventFormat === "noEvent";
 
   const forEvent = type === "event" && !showProdInstead;
   const forProd = type === "production" || showProdInstead;

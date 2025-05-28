@@ -29,6 +29,7 @@ import { SalBackNavigation } from "@/features/events/components/sal-back-navigat
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { formatOpenCallDeadline, formatSingleDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +55,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     hidden: false,
   };
 
-  const { locale, city, stateAbbr, state, country, countryAbbr } = location;
+  // const { locale, city, stateAbbr, state, country, countryAbbr } = location;
   const { prodDates } = dates;
   // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
@@ -77,15 +78,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     basicInfo.callType,
   );
 
-  const locationString = `${
-    locale ? `${locale}, ` : ""
-  }${city ? city + "," : ""} ${city && stateAbbr ? stateAbbr + ", " : ""}${
-    !city && state ? state + ", " : ""
-  }${
-    countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
-      ? countryAbbr
-      : country
-  }`;
+  const locationString = getFormattedLocationString(location);
 
   const onBookmark = () => {
     toggleListAction({ bookmarked: !bookmarked });

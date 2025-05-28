@@ -156,13 +156,13 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   }, [shortcut]);
 
   useEffect(() => {
-    if (open) {
+    if (open && !isMobile) {
       setTimeout(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
       }, 0);
     }
-  }, [open]);
+  }, [open, isMobile]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -207,7 +207,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     // if searchResults?.results?.length === 0 {
     //   return;
     // }
-    console.log(searchResults, value);
+    // console.log(searchResults, value);
   }, [searchResults, value]);
   // Location search
   if (

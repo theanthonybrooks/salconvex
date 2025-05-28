@@ -253,11 +253,13 @@ export function getOrganizerLocationString(
   abbreviated: boolean,
 ): string {
   const { location } = organizer;
+  const isValidStateAbbr =
+    location?.stateAbbr && /^[A-Za-z]+$/.test(location?.stateAbbr);
 
   const parts = [
     !abbreviated && location?.locale && `${location.locale}`,
     location?.city && `${location.city}`,
-    location?.city && location?.stateAbbr && `${location.stateAbbr}`,
+    location?.city && isValidStateAbbr && `${location.stateAbbr}`,
     !location?.city && location?.state && `${location.state}`,
 
     location?.countryAbbr === "UK" ||
@@ -274,11 +276,41 @@ export function getSearchLocationString(
   countryAbbr?: string,
   stateAbbr?: string,
 ): string {
+  const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
+
   const parts = [
     city && `${city}`,
-    city && stateAbbr && `${stateAbbr}`,
+    city && isValidStateAbbr && `${stateAbbr}`,
     countryAbbr,
   ];
 
   return parts.filter(Boolean).join(", ");
+}
+
+export function getFormattedLocationString(location: {
+  full?: string;
+  locale?: string;
+  city?: string;
+  state?: string;
+  stateAbbr?: string;
+  region?: string;
+  country: string;
+  countryAbbr?: string;
+  continent?: string;
+  coordinates?: { latitude: number; longitude: number };
+}): string {
+  const { locale, city, stateAbbr, state, country, countryAbbr } = location;
+  const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
+
+  return [
+    locale,
+    city,
+    city && isValidStateAbbr ? stateAbbr : null,
+    !city && state ? state : null,
+    countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
+      ? countryAbbr
+      : country,
+  ]
+    .filter(Boolean)
+    .join(", ");
 }

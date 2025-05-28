@@ -106,7 +106,7 @@ export const MapboxInputFull = ({
   };
 
   const handleSelect = (s: MapboxSuggestion) => {
-    // console.log(s);
+    console.log(s);
     const context = s.context || [];
     const findContext = (type: string) =>
       context.find((c) => c.id.startsWith(type));
@@ -227,6 +227,7 @@ export const MapboxInputFull = ({
       symbol: "",
     };
     demonym = countryToDemonymMap[countryAbbr] ?? "";
+
     const locationDataArtist: FullLocation = {
       full,
       locale,

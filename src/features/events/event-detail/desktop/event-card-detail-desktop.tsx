@@ -27,6 +27,7 @@ import { SalBackNavigation } from "@/features/events/components/sal-back-navigat
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
 import Image from "next/image";
@@ -52,7 +53,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     hidden: false,
   };
 
-  const { locale, city, stateAbbr, state, country, countryAbbr } = location;
   const { prodDates } = dates; //use eventFormat later to add the event dates. Need to map them (and the prodDates)
   // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
@@ -64,15 +64,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const [activeTab, setActiveTab] = useState("event");
   const { toggleListAction } = useToggleListAction(event._id);
 
-  const locationString = `${
-    locale ? `${locale}, ` : ""
-  }${city ? city + "," : ""} ${city && stateAbbr ? stateAbbr + ", " : ""}${
-    !city && state ? state + ", " : ""
-  }${
-    countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
-      ? countryAbbr
-      : country
-  }`;
+  const locationString = getFormattedLocationString(location);
 
   const onBookmark = () => {
     if (!artist) {

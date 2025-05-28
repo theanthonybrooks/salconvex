@@ -131,13 +131,15 @@ const EventCardPreview = ({
   const locationParts: string[] = [];
   const hasOpenCall = openCallStatus === "active";
 
+  const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
+
   if (locale) locationParts.push(locale);
 
-  if (city && stateAbbr) {
+  if (city && isValidStateAbbr) {
     locationParts.push(`${city}, ${stateAbbr}`);
   } else if (city) {
     locationParts.push(city);
-  } else if (stateAbbr) {
+  } else if (isValidStateAbbr) {
     locationParts.push(stateAbbr);
   }
 

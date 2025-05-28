@@ -18,6 +18,7 @@ import OpenCallCard from "@/features/events/open-calls/components/open-call-card
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -54,12 +55,10 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     hidden: false,
   };
 
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
-
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
   const appUrl = requirements?.applicationLink;
-   //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
+  //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
 
   const { dates: callDates } = basicInfo;
   const { ocStart, ocEnd } = callDates;
@@ -77,9 +76,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const [activeTab, setActiveTab] = useState("opencall");
   const [hasMounted, setHasMounted] = useState(false);
 
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
+  const locationString = getFormattedLocationString(location);
 
   const { toggleListAction } = useToggleListAction(event._id);
 

@@ -15,6 +15,7 @@ import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { isValidIsoDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { EventCardProps } from "@/types/event";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -54,7 +55,6 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
   ) ?? { bookmarked: false, hidden: false };
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
 
   const { eventDates } = dates;
   const eventStart = eventDates[0].start;
@@ -63,9 +63,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const [activeTab, setActiveTab] = useState("event");
   const [hasMounted, setHasMounted] = useState(false);
 
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
+  const locationString = getFormattedLocationString(location);
 
   const hasEventDates = eventStart && eventEnd;
   const eventAbout = event?.about ?? "";
