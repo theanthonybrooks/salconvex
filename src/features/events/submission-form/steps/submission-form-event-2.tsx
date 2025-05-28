@@ -214,7 +214,7 @@ const SubmissionFormEventStep2 = ({
                       value={field.value ?? ""}
                       onChange={field.onChange}
                       placeholder="Add any other info about your project/event..."
-                      charLimit={500}
+                      charLimit={1500}
                     />
                   )}
                 />

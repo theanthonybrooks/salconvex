@@ -52,6 +52,8 @@ export default function Dashboard() {
     api.events.event.get5latestPublishedEvents,
   );
 
+  
+
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
     isAdmin ? {} : "skip",
