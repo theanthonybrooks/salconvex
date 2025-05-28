@@ -30,7 +30,11 @@ export const EligibilityLabel = ({
     type !== "International" &&
     type !== "Other"
   ) {
-    parts.push(`${type}:`);
+    if (national) {
+      parts.push(`${type}:`);
+    } else {
+      parts.push(type);
+    }
   }
   if (whom.length === 0 || type === "International" || type === "Other") {
     if (type === "International") {

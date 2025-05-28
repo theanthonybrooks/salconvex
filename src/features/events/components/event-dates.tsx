@@ -21,6 +21,12 @@ const EventDates = ({
   className,
   type = "event",
 }: EventDatesProps) => {
+  console.log(
+    preview,
+    event?.dates?.eventFormat,
+    event?.dates?.eventDates,
+    type,
+  );
   // if (!event || !event.dates) return null;
 
   const { dates } = event;

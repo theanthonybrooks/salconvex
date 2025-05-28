@@ -784,7 +784,7 @@ export default function SettingsPage() {
                         Default (SAL Yellow)
                       </SelectItem>
                       <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
+                      {/* <SelectItem value="dark">Dark</SelectItem> */}
                       <SelectItem value="white">White</SelectItem>
                       {/* <SelectItem value='orange'>Orange</SelectItem> */}
                     </SelectContent>

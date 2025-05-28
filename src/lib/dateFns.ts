@@ -141,7 +141,11 @@ export const formatEventDates = (
   }
 
   if (!startDay) {
-    return `By ${endMonthFull} ${endDay}, ${endYear}`;
+    if (!isMobile) {
+      return `By ${endMonthFull} ${endDay}, ${endYear}`;
+    } else {
+      return `By ${endMonthShort} ${endDay}, ${endYear}`;
+    }
   }
 
   if (!endDay) return "Dates unknown";

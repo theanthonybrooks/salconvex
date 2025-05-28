@@ -511,6 +511,7 @@ const EventCardPreview = ({
                 event={event}
                 format="desktop"
                 limit={1}
+                preview={true}
                 type="event"
               />
             </div>

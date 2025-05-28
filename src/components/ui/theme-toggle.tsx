@@ -79,10 +79,10 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
           theme === "default"
             ? setTheme("light")
             : theme === "light"
-              ? setTheme("dark")
-              : theme === "dark"
-                ? setTheme("white")
-                : setTheme("default")
+              ? // ? setTheme("dark")
+                // : theme === "dark"
+                setTheme("white")
+              : setTheme("default")
         }
       >
         <m.svg

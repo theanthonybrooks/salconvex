@@ -156,13 +156,13 @@ export const ApplyButton = ({
   edition,
   finalButton,
 }: ApplyButtonProps) => {
-  console.log(publicView, slug);
+  // console.log(publicView, slug);
   const subscription = useQuery(
     api.subscriptions.getUserSubscriptionStatus,
     finalButton ? {} : "skip",
   );
   const noSub = !subscription?.hasActiveSubscription;
-  console.log("noSub: ", noSub);
+  // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState(false);
