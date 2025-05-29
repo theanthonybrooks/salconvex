@@ -1231,7 +1231,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         }
       }
       if (activeStep === steps.length - 1) {
-        console.log("saving final step");
         let eventResult = null;
         const eventLinks =
           eventData.links && Object.keys(eventData.links).length > 1
@@ -1336,10 +1335,14 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           toast.error("Failed to submit");
         } finally {
           setPending(false);
+          if (isAdmin) {
+            window.location.href = "/dashboard/admin/event";
+          }
         }
       }
     },
     [
+      isAdmin,
       finalStep,
       alreadyPaid,
       formType,
