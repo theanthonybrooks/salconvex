@@ -11,10 +11,12 @@ import { useQueries } from "convex-helpers/react/cache/hooks";
 import { usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { api } from "~/convex/_generated/api";
 
 const OpenCallDetail = () => {
+  const hasRedirected = useRef(false);
+
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const userPref = userData?.userPref ?? null;
@@ -35,7 +37,9 @@ const OpenCallDetail = () => {
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
   useEffect(() => {
-    if (isError) {
+    if (isError && !hasRedirected.current) {
+      hasRedirected.current = true;
+
       if (error instanceof ConvexError) {
         if (error.data === "Open Call not found") {
           const currentPath = window.location.pathname;

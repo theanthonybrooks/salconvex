@@ -42,6 +42,7 @@ export const usersWithSubscriptions = query({
         accountType: user.accountType ?? [],
         role: user.role ?? "user",
         createdAt: user.createdAt,
+        source: user.source,
       };
     });
   },

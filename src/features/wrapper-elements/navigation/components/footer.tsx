@@ -149,7 +149,9 @@ export default function Footer({ className }: { className?: string }) {
           {/* Links */}
           <div className="mt-5 grid gap-8 px-6 lg:grid-cols-[1fr_5px_auto] xl:col-span-2 xl:mt-0">
             <div
-              className={cn("hidden text-start lg:grid lg:gap-8 lg:pl-8")}
+              className={cn(
+                "hidden text-start md:grid md:justify-items-center lg:gap-8",
+              )}
               style={{
                 gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`,
               }}
@@ -189,7 +191,7 @@ export default function Footer({ className }: { className?: string }) {
             <Separator
               thickness={1}
               orientation="vertical"
-              className="my-4 hidden border-foreground sm:block"
+              className="my-4 hidden border-foreground lg:block"
             />
             <div
               data-type="newsletter"
@@ -205,7 +207,7 @@ export default function Footer({ className }: { className?: string }) {
               </div> */}
               <form
                 onSubmit={handleSubmit(onSubscribe)}
-                className="mt-4 sm:flex sm:max-w-md md:w-full"
+                className="mt-4 sm:flex md:w-full md:max-w-md"
               >
                 <div className="flex flex-1 flex-col gap-3">
                   <Input

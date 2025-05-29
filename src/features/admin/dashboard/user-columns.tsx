@@ -14,6 +14,7 @@ interface UserColumnsProps {
   accountType: string[];
   createdAt: number;
   role: string[];
+  source?: string;
 }
 
 export const userColumns: ColumnDef<UserColumnsProps>[] = [
@@ -134,9 +135,19 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const value = row.getValue("createdAt") as number | undefined;
       return (
         <span className="text-sm">
-          {value ? new Date(value).toLocaleDateString() : "-"}
+          {value ? new Date(value).toLocaleString() : "-"}
         </span>
       );
+    },
+  },
+  {
+    accessorKey: "source",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Source" />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue("source") as string | undefined;
+      return <span className="text-sm">{value ? value : "-"}</span>;
     },
   },
 ];

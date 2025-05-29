@@ -33,6 +33,7 @@ interface OpenCallCardProps {
   openCall: OpenCall;
   userPref: UserPref | null;
   format: "mobile" | "desktop";
+  publicPreview?: boolean;
 }
 
 const OpenCallCard = ({
@@ -41,6 +42,7 @@ const OpenCallCard = ({
   openCall,
   format,
   userPref,
+  publicPreview,
 }: OpenCallCardProps) => {
   const { category: eventCategory, _id: id, location, dates } = event;
 
@@ -90,11 +92,19 @@ const OpenCallCard = ({
   const userPrefTZ = userPref?.timezone;
   const deadlineTimezone =
     userPref?.timezone && userPrefTZ !== "" ? userPref.timezone : timezone;
-  const artistNationality = artist?.artistNationality ?? [];
+  // const artistNationality = artist?.artistNationality ?? [];
+  const artistCountries = [
+    ...(artist?.artistNationality ?? []),
+    ...(artist?.artistResidency?.country
+      ? [artist.artistResidency.country]
+      : []),
+  ];
+  console.log(artistCountries);
   //compare this to the eligibility whom array
-  const artistEligible = artistNationality.some((artistNat) =>
+  const artistEligible = artistCountries.some((artistCountry) =>
     eligibilityWhom.some(
-      (whom) => artistNat.trim().toLowerCase() === whom.trim().toLowerCase(),
+      (whom) =>
+        artistCountry.trim().toLowerCase() === whom.trim().toLowerCase(),
     ),
   );
 
@@ -141,8 +151,8 @@ const OpenCallCard = ({
             <AccordionItem value="Deadline">
               <AccordionTrigger title="Deadline & Eligibility:" />
               <AccordionContent>
-                <div className="space-y-2">
-                  <div>
+                <div className="flex flex-col gap-y-2">
+                  <span>
                     <span className="font-semibold underline underline-offset-2">
                       Deadline:
                     </span>
@@ -162,7 +172,7 @@ const OpenCallCard = ({
                         </a>
                       )}
                     </span>
-                  </div>
+                  </span>
                   <span>
                     <span className="font-semibold underline underline-offset-2">
                       Eligible:
@@ -182,6 +192,7 @@ const OpenCallCard = ({
                         whom={eligibilityWhom}
                         format="mobile"
                         eligible={artistEligible}
+                        publicView={publicPreview}
                       />
                     </span>
                   </span>
@@ -422,7 +433,7 @@ const OpenCallCard = ({
           >
             <AccordionTrigger title="Deadline & Eligibility:" />
             <AccordionContent>
-              <div className="space-y-2 p-3">
+              <div className="flex flex-col gap-y-3 p-3">
                 <span>
                   <span className="font-semibold underline underline-offset-2">
                     Deadline:
@@ -463,6 +474,7 @@ const OpenCallCard = ({
                       whom={eligibilityWhom}
                       format="mobile"
                       eligible={artistEligible}
+                      publicView={publicPreview}
                     />
                   </span>
                 </span>

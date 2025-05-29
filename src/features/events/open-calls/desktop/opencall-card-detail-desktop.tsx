@@ -411,6 +411,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               openCall={openCall}
               format="desktop"
               userPref={userPref}
+              publicPreview={!hasActiveSubscription}
             />
             <div className="mt-6 flex w-full justify-end xl:hidden">
               <ApplyButton
