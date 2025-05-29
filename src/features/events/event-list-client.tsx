@@ -258,7 +258,7 @@ const ClientEventList = (
       )}
       {publicView && (
         <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:py-8">
-          <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:gap-1 lg:text-xl">
+          <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:gap-2 lg:text-xl">
             <Button
               variant="salWithShadowHiddenBg"
               className="text-lg font-bold lg:text-xl"
