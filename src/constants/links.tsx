@@ -227,7 +227,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "account",
     desc: "Manage your payments",
     sub: ["active", "trialing", "cancelled"],
-    userType: ["public"],
+    userType: ["artist", "admin"],
   },
   // {
   //   label: "Pending Applications",

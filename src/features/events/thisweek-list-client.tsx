@@ -19,9 +19,11 @@ import { usePreloadedQuery } from "convex/react";
 import { parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 
+import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 // interface Props {
 
@@ -35,6 +37,7 @@ const ClientThisWeekList = (
   },
 ) => {
   // inside ClientThisWeekList()
+  const router = useRouter();
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -242,10 +245,23 @@ const ClientThisWeekList = (
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
         <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
-          <h2 className="text-balance text-center">
-            For the full list and access to all of the other work that I do,
-            sign up!
-          </h2>
+          <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:pb-4">
+            <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:justify-center sm:gap-2 lg:text-xl">
+              <Button
+                variant="salWithShadowHiddenBg"
+                className="text-lg font-bold lg:text-xl"
+                onClick={() => {
+                  router.push("/pricing");
+                }}
+              >
+                Become a member
+              </Button>
+              <p className="sm:hidden">for the full list & open call details</p>
+              <p className="hidden sm:block">
+                to view the full list and open call details
+              </p>
+            </div>
+          </div>
           <Pricing />
         </div>
       )}
