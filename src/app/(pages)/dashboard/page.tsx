@@ -37,22 +37,23 @@ import { api } from "~/convex/_generated/api";
 
 export default function Dashboard() {
   const router = useRouter();
-  const { preloadedUserData } = useConvexPreload();
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const hasActiveSubscription = subData?.hasActiveSubscription ?? false;
+  const subStatus = subData?.subStatus ?? "none";
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");
-  const isArtist = accountType?.includes("artist");
+  const isArtist = accountType?.includes("artist") && hasActiveSubscription;
   const isOrganizer = accountType?.includes("organizer");
 
   const { data: latestFive, isPending: latestPending } = useQueryWithStatus(
     api.events.event.get5latestPublishedEvents,
   );
-
-  
 
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
@@ -338,16 +339,18 @@ export default function Dashboard() {
                 Go to The List
               </Link>
             </Button>
-            <Button
-              asChild
-              variant="salWithShadowHiddenYlw"
-              className="w-full justify-start gap-2"
-            >
-              <Link variant="standard" href="/dashboard/account/billing">
-                <PiPiggyBank className="size-5" />
-                Manage Billing
-              </Link>
-            </Button>
+            {subStatus !== "none" && (
+              <Button
+                asChild
+                variant="salWithShadowHiddenYlw"
+                className="w-full justify-start gap-2"
+              >
+                <Link variant="standard" href="/dashboard/account/billing">
+                  <PiPiggyBank className="size-5" />
+                  Manage Billing
+                </Link>
+              </Button>
+            )}
             <Button
               asChild
               variant="salWithShadowHiddenYlw"
@@ -432,10 +435,10 @@ export default function Dashboard() {
                             {event.name}
                           </Link>
                         </p>
-                        <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                          {event.location.country}-
-                          {getEventCategoryLabel(event.category)}
-                        </p>
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <p>{event.location.country}</p>-
+                          <p> {getEventCategoryLabel(event.category)}</p>
+                        </span>
                       </div>
                       <p className="whitespace-nowrap text-xs text-muted-foreground">
                         {event.approvedAt

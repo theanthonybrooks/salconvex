@@ -33,14 +33,13 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   ],
   callbacks: {
     async createOrUpdateUser(ctx, { existingUserId, profile, type, provider }) {
-      console.log("profile data:", profile);
-      console.log("provider:", provider);
-      console.log("type:", type);
-      console.log("existingUserId:", existingUserId);
+      // console.log("profile data:", profile);
+      // console.log("provider:", provider);
+      // console.log("type:", type);
+      // console.log("existingUserId:", existingUserId);
       if (existingUserId) {
         const user = await ctx.db.get(existingUserId);
         if (type === "oauth" && profile.image !== undefined && !user.image) {
-          console.log("profile.image:", profile.image);
           await ctx.db.patch(existingUserId, { image: profile.image });
         }
 
@@ -113,11 +112,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         lastChanged: Date.now(),
       });
 
-      console.log("newUserId: ", newUserId);
+      // console.log("newUserId: ", newUserId);
 
       const userAccountType = profile.accountType as string[];
 
-      console.log("userAccountType: ", userAccountType);
+      // console.log("userAccountType: ", userAccountType);
 
       if (userAccountType.includes("organizer")) {
         await ctx.db.insert("organizations", {

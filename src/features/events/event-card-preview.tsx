@@ -37,7 +37,6 @@ import {
   Info,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaBookmark, FaMapLocationDot, FaRegBookmark } from "react-icons/fa6";
 
@@ -189,14 +188,15 @@ const EventCardPreview = ({
       {/* //---------------------- (Mobile) Layout ---------------------- */}
       <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
         <div className="col-span-1 row-span-2 flex flex-col items-center justify-between pb-3 pl-2 pt-3">
-          <Link
-            href={
-              !publicView || publicPreview
-                ? `/thelist/event/${slug}${openCallStatus ? "/call" : ""}`
-                : "/pricing#plans"
-            }
-            target="_blank"
-            passHref
+          <div
+            onClick={() => {
+              router.push(
+                !publicView || publicPreview
+                  ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
+                  : "/pricing#plans",
+              );
+            }}
+            className="active:scale-95"
           >
             <Image
               src={logo}
@@ -216,7 +216,7 @@ const EventCardPreview = ({
               height={48}
               width={48}
             />
-          </Link>
+          </div>
           <div
             className={cn(
               "flex h-11 w-14 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",
@@ -486,13 +486,15 @@ const EventCardPreview = ({
 
         <div className="flex flex-col gap-y-3 pb-3 pl-3 pr-7 pt-5">
           <div className="mb-2 flex flex-col gap-y-1 p-2">
-            <Link
-              href={
-                !publicView || publicPreview
-                  ? `/thelist/event/${slug}${openCallStatus ? "/call" : ""}`
-                  : "/pricing#plans"
-              }
-              target="_blank"
+            <div
+              onClick={() => {
+                router.push(
+                  !publicView || publicPreview
+                    ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
+                    : "/pricing#plans",
+                );
+              }}
+              className="group hover:cursor-pointer"
             >
               <div className="mb-2 flex items-center gap-x-3">
                 <Image
@@ -513,10 +515,12 @@ const EventCardPreview = ({
                   height={48}
                   width={48}
                 />
-                <p className="break-words text-base font-semibold">{name}</p>
+                <p className="break-words text-base font-semibold group-hover:underline group-hover:underline-offset-2">
+                  {name}
+                </p>
                 {/* <p className='text-sm'>{locationString}</p> */}
               </div>
-            </Link>
+            </div>
             <div className="flex items-start gap-x-1 text-sm">
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className="font-semibold">Dates:</span>
