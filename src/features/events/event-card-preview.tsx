@@ -409,11 +409,17 @@ const EventCardPreview = ({
                   <TooltipTrigger>
                     <FaRegBookmark
                       className="size-7 cursor-pointer"
-                      onClick={onBookmark}
+                      onClick={() => {
+                        if (!publicView && !publicPreview) onBookmark();
+                      }}
                     />
                   </TooltipTrigger>
                   <TooltipContent align="start">
-                    <p>Bookmark {getEventCategoryLabel(eventCategory)}</p>
+                    {publicView || publicPreview ? (
+                      <p>Become a member to bookmark</p>
+                    ) : (
+                      <p>Bookmark {getEventCategoryLabel(eventCategory)}</p>
+                    )}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

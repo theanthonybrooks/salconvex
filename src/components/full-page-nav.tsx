@@ -509,6 +509,8 @@ const FullPageNav = ({
                   const filteredItems = section.items.filter((item) => {
                     const itemUserType = item?.userType;
                     const itemCategory = item?.category;
+                    const itemSub = item?.sub;
+
                     const isAdmin =
                       user?.role.includes("admin") && itemCategory === "admin";
                     const isPublic = itemUserType?.includes("public");
@@ -519,8 +521,11 @@ const FullPageNav = ({
                           userType.toLowerCase() === type.toLowerCase(),
                       ),
                     );
+                    const subMatch = itemSub?.some(
+                      (sub) => sub.toLowerCase() === subStatus?.toLowerCase(),
+                    );
 
-                    return isPublic || typeMatch || isAdmin;
+                    return isPublic || (typeMatch && subMatch) || isAdmin;
                   });
 
                   if (filteredItems.length === 0) return null;

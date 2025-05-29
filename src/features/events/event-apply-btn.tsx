@@ -21,6 +21,7 @@ import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
 } from "@/utils/loading-page-html";
+import { useQuery } from "convex-helpers/react/cache";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -31,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface ApplyButtonShortProps {
@@ -154,7 +156,13 @@ export const ApplyButton = ({
   finalButton,
   publicPreview,
 }: ApplyButtonProps) => {
-  // console.log(publicView, slug);
+  const subscription = useQuery(
+    api.subscriptions.getUserSubscriptionStatus,
+    finalButton ? {} : "skip",
+  );
+  const noSub =
+    !subscription?.hasActiveSubscription &&
+    (publicPreview || publicView || finalButton);
 
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
@@ -273,7 +281,7 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              disabled={openCall !== "active" || publicPreview}
+              disabled={openCall !== "active" || noSub}
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
@@ -351,6 +359,7 @@ export const ApplyButton = ({
 
       {!hasApplied && (
         <Button
+          disabled={noSub}
           variant="salWithShadowHiddenVert"
           size="lg"
           className={cn(
@@ -386,7 +395,7 @@ export const ApplyButton = ({
         // onHide={onHide}
         isHidden={isHidden}
         // setIsHidden={setIsHidden}
-        publicView={publicView || publicPreview}
+        publicView={publicView || noSub}
         appStatus={appStatus}
         eventCategory={eventCategory}
         openCallStatus={openCall}

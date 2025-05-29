@@ -14,6 +14,8 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { usePreloadedQuery } from "convex/react";
 import { CheckCircleIcon, EyeOff, Info, MapPin } from "lucide-react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
@@ -34,6 +36,10 @@ import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const hasActiveSubscription = subData?.hasActiveSubscription ?? false;
+
   const { data, artist, userPref, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
@@ -81,10 +87,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const locationString = getFormattedLocationString(location);
 
   const onBookmark = () => {
+    if (!hasActiveSubscription) return;
     toggleListAction({ bookmarked: !bookmarked });
   };
 
   const onHide = () => {
+    if (!hasActiveSubscription) return;
     toggleListAction({ hidden: !hidden });
   };
 
