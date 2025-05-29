@@ -257,19 +257,22 @@ const ClientEventList = (
         </>
       )}
       {publicView && (
-        <div className="mx-auto max-w-[90dvw] py-8 sm:max-w-[1200px]">
-          <h2 className="text-center font-bold tracking-wide text-foreground lg:text-xl">
+        <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:py-8">
+          <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:gap-1 lg:text-xl">
             <Button
               variant="salWithShadowHiddenBg"
-              className="font-bold lg:text-xl"
+              className="text-lg font-bold lg:text-xl"
               onClick={() => {
                 router.push("/pricing");
               }}
             >
               Become a member
             </Button>{" "}
-            to view the full list and open call details
-          </h2>
+            <p className="sm:hidden">for the full list & open call details</p>
+            <p className="hidden sm:block">
+              to view the full list and open call details
+            </p>
+          </div>
         </div>
       )}
 

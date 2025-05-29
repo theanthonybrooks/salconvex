@@ -21,7 +21,6 @@ import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
 } from "@/utils/loading-page-html";
-import { useQuery } from "convex-helpers/react/cache";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -32,7 +31,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface ApplyButtonShortProps {
@@ -70,9 +68,7 @@ export const ApplyButtonShort = ({
       ? "Coming Soon!"
       : appStatus && !publicView
         ? "Applied"
-        : openCall === "active"
-          ? "Apply"
-          : "View More";
+        : "Read More";
 
   return (
     <>
@@ -131,6 +127,7 @@ interface ApplyButtonProps {
   openCall: OpenCallStatus;
   className?: string;
   detailCard?: boolean;
+  publicPreview?: boolean;
 }
 
 export const ApplyButton = ({
@@ -155,13 +152,10 @@ export const ApplyButton = ({
   detailCard,
   edition,
   finalButton,
+  publicPreview,
 }: ApplyButtonProps) => {
   // console.log(publicView, slug);
-  const subscription = useQuery(
-    api.subscriptions.getUserSubscriptionStatus,
-    finalButton ? {} : "skip",
-  );
-  const noSub = !subscription?.hasActiveSubscription;
+
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -279,7 +273,7 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              disabled={openCall !== "active" || noSub}
+              disabled={openCall !== "active" || publicPreview}
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
@@ -392,7 +386,7 @@ export const ApplyButton = ({
         // onHide={onHide}
         isHidden={isHidden}
         // setIsHidden={setIsHidden}
-        publicView={publicView}
+        publicView={publicView || publicPreview}
         appStatus={appStatus}
         eventCategory={eventCategory}
         openCallStatus={openCall}

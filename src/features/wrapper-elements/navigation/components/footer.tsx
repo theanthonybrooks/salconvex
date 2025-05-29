@@ -193,7 +193,7 @@ export default function Footer({ className }: { className?: string }) {
             />
             <div
               data-type="newsletter"
-              className="width-full mx-auto flex flex-col justify-center px-10"
+              className="mx-auto flex w-full flex-col justify-center sm:px-10"
             >
               {/* <div>
                 <p className="text-sm font-semibold text-foreground">
@@ -250,7 +250,7 @@ export default function Footer({ className }: { className?: string }) {
                 alt="Newsletter sign up. Sign up to receive updates and news about the Street Art List."
                 width={250}
                 height={150}
-                className="mt-4"
+                className="mt-4 [@media(max-width:768px)]:w-full"
               />
             </div>
           </div>

@@ -346,7 +346,7 @@ const EventCardPreview = ({
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
-            publicView={publicView}
+            publicView={publicPreview ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
           />
         </div>
@@ -757,15 +757,16 @@ const EventCardPreview = ({
             </p>
           )}
 
-          <ApplyButtonShort
+          {/* <ApplyButtonShort
             slug={slug}
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
             publicView={publicPreview ? false : publicView}
+            publicPreview={publicPreview}
             appFee={basicInfo ? basicInfo.appFee : 0}
             className="max-w-40 xl:hidden"
-          />
+          /> */}
 
           <ApplyButton
             id={event._id}
@@ -775,6 +776,7 @@ const EventCardPreview = ({
             // status={status}
             openCall={event.openCallStatus}
             publicView={publicPreview ? false : publicView}
+            publicPreview={publicPreview}
             manualApplied={appStatus}
             // setManualApplied={setManualApplied}
             isBookmarked={bookmarked}
