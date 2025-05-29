@@ -1016,8 +1016,8 @@ export default function SettingsPage() {
                     <div>
                       <p className="font-medium">Delete Account</p>
                       <p className="text-sm text-muted-foreground">
-                        Permanently delete your account — any active
-                        subscriptions need to be{" "}
+                        Permanently delete your account — any active memberships
+                        need to be{" "}
                         <Link
                           href="/dashboard/account/billing"
                           variant="subtleUnderline"
@@ -1047,8 +1047,8 @@ export default function SettingsPage() {
                         </AlertDialogHeader>
                         <AlertDialogDescription className="text-foreground">
                           Are you sure you want to delete your account? Any
-                          active subscriptions need to be canceled before this
-                          is possible and all data will be permanently deleted.
+                          active memberships need to be canceled before this is
+                          possible and all data will be permanently deleted.
                         </AlertDialogDescription>
 
                         <AlertDialogFooter>

@@ -43,7 +43,7 @@ export default function AccountPage() {
   const handleManageSubscription = async () => {
     if (!subscription?.customerId) {
       toast.error(
-        "No subscription found. Please contact support if this is incorrect.",
+        "No membership found. Please contact support if this is incorrect.",
       );
       return;
     }
@@ -129,7 +129,7 @@ export default function AccountPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Subscription Details
+              Membership Details
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -195,7 +195,7 @@ export default function AccountPage() {
                             className="font-normal text-gray-300"
                             onClick={handleManageSubscription}
                           >
-                            Manage Subscription
+                            Manage Membership
                           </a>{" "}
                           page
                         </span>
@@ -232,12 +232,12 @@ export default function AccountPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">
-                    {isCancelled ? "Account Created:" : "Subscribed Since:"}
+                    {isCancelled ? "Account Created:" : "Member Since:"}
                   </span>
                   <span className="font-medium">
                     {subscription?.startedAt
                       ? format(new Date(subscription.startedAt), "MMM do, yyyy")
-                      : "No Subscription"}
+                      : "No Membership"}
                   </span>
                 </div>
                 {!canceledAt ? (
@@ -342,10 +342,7 @@ export default function AccountPage() {
                   </span>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-muted-foreground">
-                    {" "}
-                    Subscription ID:
-                  </span>
+                  <span className="text-muted-foreground"> Membership ID:</span>
                   <span className="block break-all text-sm font-medium">
                     {subscription?.stripeId}
                   </span>

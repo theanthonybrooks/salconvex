@@ -480,7 +480,11 @@ const EventCardPreview = ({
         <div className="flex flex-col gap-y-3 pb-3 pl-3 pr-7 pt-5">
           <div className="mb-2 flex flex-col gap-y-1 p-2">
             <Link
-              href={!publicView ? `/thelist/event/${slug}` : "/pricing#plans"}
+              href={
+                !publicView
+                  ? `/thelist/event/${slug}${openCallStatus ? "/call" : ""}`
+                  : "/pricing#plans"
+              }
               target="_blank"
             >
               <div className="mb-2 flex items-center gap-x-3">
@@ -762,7 +766,7 @@ const EventCardPreview = ({
             isHidden={hidden}
             // sethidden={sethidden}
             eventCategory={eventCategory}
-            isPreview={false}
+            isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}
             className="hidden xl:flex"
           />

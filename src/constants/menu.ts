@@ -10,6 +10,7 @@ export interface FullPageNavMenuItem {
   slug?: string;
   public?: boolean;
   view?: string;
+  sub?: string[];
 }
 
 interface FullPageNavMenuSection {
@@ -76,6 +77,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["organizer", "artist", "judge"],
+        sub: ["active", "trialing"],
       },
       {
         title: "My Applications",
@@ -84,6 +86,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["artist"],
+        sub: ["active", "trialing"],
       },
       // {
       //   title: "Projects & Events",
@@ -100,6 +103,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["artist"],
+        sub: ["active", "trialing"],
       },
       {
         title: "Hidden",
@@ -108,6 +112,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["artist"],
+        sub: ["active", "trialing"],
       },
       {
         title: "Account",
@@ -116,6 +121,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["organizer", "artist"],
+        sub: ["active", "trialing"],
       },
       {
         title: "Settings",
@@ -124,6 +130,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["organizer", "artist", "judge"],
+        sub: ["active", "trialing"],
       },
     ],
   },

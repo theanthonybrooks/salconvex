@@ -126,7 +126,7 @@ export const generalFaqs: AccordionSection = {
           </Link>{" "}
           takes a stupid amount of the support as fees AND adds a percentage on
           top, so people were paying more in different places, which I&apos;m
-          really not a fan of. So I&apos;m handling the subscriptions myself, so
+          really not a fan of. So I&apos;m handling the memberships myself, so
           that I can charge less and still get enough to continue the site for
           years to come.
         </span>
@@ -222,7 +222,7 @@ export const pricingFaqs: AccordionSection = {
   name: null,
   title: "FAQ",
   description:
-    "What do you get with a subscription? How does it work for artists vs organizers? ",
+    "What do you get with a membership? How does it work for artists vs organizers? ",
   // icon: <HelpCircle className='h-4 w-4' />,
   iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
   iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
@@ -231,7 +231,7 @@ export const pricingFaqs: AccordionSection = {
     {
       id: "trial",
       subtitle: "Is there a free trial?",
-      text: "Yes, there is a free trial. You can sign up for a free trial and then cancel at any time. The trial will last for 14 days and you can decide whether you want to continue your subscription or not at any time.",
+      text: "Yes, there is a free trial. You can sign up for a free trial and then cancel at any time. The trial will last for 14 days and you can decide whether you want to continue your membership or not at any time.",
     },
 
     {
@@ -262,7 +262,7 @@ export const pricingFaqs: AccordionSection = {
     },
     {
       id: "benefits",
-      subtitle: "What do I get if I subscribe?",
+      subtitle: "What do I get if I become a member?",
       text: (
         <>
           <p>
@@ -335,7 +335,7 @@ export const pricingFaqs: AccordionSection = {
           </Link>{" "}
           takes a stupid amount of the support as fees AND adds a percentage on
           top, so people were paying more in different places, which I&apos;m
-          really not a fan of. So I&apos;m handling the subscriptions myself, so
+          really not a fan of. So I&apos;m handling the memberships myself, so
           that I can charge less and still get enough to continue the site for
           years to come.
         </span>
@@ -365,7 +365,7 @@ export const pricingFaqs: AccordionSection = {
     {
       id: "cancel",
       subtitle: "What if I don't want to pay? Can I cancel?",
-      text: "Yep, you can cancel at any time and you'll keep the benefits of your subscription for the remainder of that billing period. You can also access your invoices and manage your subscription from the billing portal at any time.",
+      text: "Yep, you can cancel at any time and you'll keep the benefits of your membership for the remainder of that billing period. You can also access your invoices and manage your membership from the billing portal at any time.",
     },
   ],
 };

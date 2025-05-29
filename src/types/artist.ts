@@ -3,15 +3,24 @@ import { Id } from "~/convex/_generated/dataModel";
 
 export interface ArtistResidency {
   full?: string;
+  locale?: string;
   city?: string;
+  region?: string;
   state?: string;
   stateAbbr?: string;
-  region?: string;
   country: string;
   countryAbbr: string;
+  continent?: string;
+
   timezone?: string;
   timezoneOffset?: number;
   location?: number[];
+  currency?: {
+    code: string;
+    name: string;
+    symbol: string;
+    format?: string;
+  };
 }
 
 export interface Artist {

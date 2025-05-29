@@ -225,15 +225,17 @@ export const ApplyButton = ({
 
   const buttonText =
     openCall === "active"
-      ? appStatus !== null && !publicView && !isPreview
+      ? appStatus !== null && !publicView
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
-        : "Apply"
+        : isPreview
+          ? "Read More"
+          : "Apply"
       : openCall === "ended"
-        ? appStatus !== null && !publicView && !isPreview
+        ? appStatus !== null && !publicView
           ? appStatus.slice(0, 1).toUpperCase() +
             appStatus.slice(1).toLowerCase()
-          : "View More"
-        : "View More";
+          : "Read More"
+        : "Read More";
   const hasApplied = appStatus !== null;
 
   return (

@@ -225,7 +225,7 @@ TheListNavBarProps) {
               </Link>
             </>
           )}
-          {/* NOTE: Limit/hide search for users who don't have a subscription or those who aren't signed in */}
+          {/* NOTE: Limit/hide search for users who don't have a membership or those who aren't signed in */}
           {user && (
             <>
               <Search
@@ -339,7 +339,7 @@ TheListNavBarProps) {
                 {user && (
                   <div className="flex items-center gap-4">
                     <UserProfile className="size-10" subscription={subStatus} />
-                    <FullPageNav user={user} />
+                    <FullPageNav user={user} subStatus={subStatus} />
                   </div>
                 )}
               </div>
@@ -355,7 +355,7 @@ TheListNavBarProps) {
               isScrolled={isScrolled}
               user={user}
               // userPref={userPref}
-              // subStatus={subStatus}
+              subStatus={subStatus}
             />
           </div>
         </div>

@@ -149,8 +149,8 @@ export const ArtistProfileForm = ({
     const artistLocation = data?.artistResidency?.location;
     if (artistLocation?.length === 2) {
       const timezoneData = await getTimezone({
-        latitude: artistLocation[1],
-        longitude: artistLocation[0],
+        latitude: artistLocation[0],
+        longitude: artistLocation[1],
       });
       timezone = timezoneData?.zoneName;
       timezoneOffset = timezoneData?.gmtOffset;
@@ -184,19 +184,19 @@ export const ArtistProfileForm = ({
           artistLogoStorageId,
           artistNationality: data.artistNationality,
           artistResidency: {
-            // full: data.residence,
-            // city: data.locationCity,
-            // state: data.locationState,
-            // stateAbbr: data.locationStateAbbr,
-            // country: data.locationCountry ?? "",
-            // countryAbbr: data.locationCountryAbbr ?? "",
-            // location: data.locationCoordinates ?? [],
-            // timezone: timezone ?? "",
-            // timezoneOffset,
-            ...data.artistResidency,
+            full: data.artistResidency?.full,
+            locale: data.artistResidency?.locale,
+            region: data.artistResidency?.region,
+
+            city: data.artistResidency?.city,
+            state: data.artistResidency?.state,
+            stateAbbr: data.artistResidency?.stateAbbr,
+            country: data.artistResidency?.country ?? "",
+            countryAbbr: data.artistResidency?.countryAbbr ?? "",
             location: data.artistResidency?.location ?? [],
             timezone: timezone ?? "",
             timezoneOffset,
+            // ...data.artistResidency,
           },
         });
       }
@@ -291,22 +291,6 @@ export const ArtistProfileForm = ({
             name="artistResidency"
             control={control}
             render={({ field }) => (
-              // <MapboxInput
-              //   id="residence"
-              //   value={field.value}
-              //   onChange={field.onChange}
-              //   onSelect={(location) => {
-              //     setValue("residence", location.full);
-              //     setValue("locationCity", location.city);
-              //     setValue("locationState", location.state);
-              //     setValue("locationStateAbbr", location.stateAbbr);
-              //     setValue("locationCountry", location.country);
-              //     setValue("locationCountryAbbr", location.countryAbbr);
-              //     setValue("locationCoordinates", location.coordinates);
-              //   }}
-              //   tabIndex={3}
-              //   placeholder="Place of residence (city, state, country, etc)..."
-              // />
               <MapboxInputFull
                 id="artistResidency"
                 value={field.value}

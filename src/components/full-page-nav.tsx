@@ -24,7 +24,7 @@ interface FullPageNavProps {
   // className?: string
   isDashboard?: boolean;
   // userPref?: UserPref | null
-  // subStatus?: string | undefined
+  subStatus?: string | undefined;
 }
 
 const menuVariants = {
@@ -275,6 +275,7 @@ const screenOverlayVariants = {
 
 const FullPageNav = ({
   user,
+  subStatus,
   isScrolled,
   isMobile = false,
   isDashboard = false,
@@ -723,6 +724,7 @@ const FullPageNav = ({
                           const filteredItems = section.items.filter((item) => {
                             const itemUserType = item?.userType;
                             const itemCategory = item?.category;
+                            const itemSub = item?.sub;
                             const isAdmin =
                               user?.role.includes("admin") &&
                               itemCategory === "admin";
@@ -733,8 +735,14 @@ const FullPageNav = ({
                                   userType.toLowerCase() === type.toLowerCase(),
                               ),
                             );
+                            const subMatch = itemSub?.some(
+                              (sub) =>
+                                sub.toLowerCase() === subStatus?.toLowerCase(),
+                            );
 
-                            return isPublic || typeMatch || isAdmin;
+                            return (
+                              isPublic || (typeMatch && subMatch) || isAdmin
+                            );
                           });
 
                           if (filteredItems.length === 0) return null;
@@ -811,6 +819,7 @@ const FullPageNav = ({
                           .filter((item) => {
                             const itemUserType = item?.userType;
                             const itemCategory = item?.category;
+                            const itemSub = item?.sub;
                             const isAdmin =
                               user?.role.includes("admin") &&
                               itemCategory === "admin";
@@ -822,7 +831,14 @@ const FullPageNav = ({
                               ),
                             );
 
-                            return isPublic || typeMatch || isAdmin;
+                            const subMatch = itemSub?.some(
+                              (sub) =>
+                                sub.toLowerCase() === subStatus?.toLowerCase(),
+                            );
+
+                            return (
+                              isPublic || (typeMatch && subMatch) || isAdmin
+                            );
                           })
                           .map((item) => (
                             <li

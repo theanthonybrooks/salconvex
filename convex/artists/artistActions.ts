@@ -32,9 +32,16 @@ export const updateOrCreateArtist = mutation({
           format: v.optional(v.string()),
         }),
       ),
+      coordinates: v.optional(
+        v.object({
+          latitude: v.number(),
+          longitude: v.number(),
+        }),
+      ),
     }),
   },
   handler: async (ctx, args) => {
+    console.log(args.artistResidency);
     const userId = await getAuthUserId(ctx);
     let fileUrl = null;
     if (!userId) throw new ConvexError("Not authenticated");
@@ -67,7 +74,21 @@ export const updateOrCreateArtist = mutation({
         artistId: user._id,
         artistName: args.artistName,
         artistNationality: args.artistNationality,
-        artistResidency: args.artistResidency,
+        artistResidency: {
+          full: args.artistResidency?.full,
+          locale: args.artistResidency?.locale,
+          city: args.artistResidency?.city,
+          region: args.artistResidency?.region,
+          state: args.artistResidency?.state,
+          stateAbbr: args.artistResidency?.stateAbbr,
+          country: args.artistResidency?.country,
+          countryAbbr: args.artistResidency?.countryAbbr,
+          continent: args.artistResidency?.continent,
+          location: args.artistResidency?.location,
+          timezone: args.artistResidency?.timezone,
+          timezoneOffset: args.artistResidency?.timezoneOffset,
+          currency: args.artistResidency?.currency,
+        },
         updatedAt: Date.now(),
         lastUpdatedBy: userId,
         completedProfile: false,

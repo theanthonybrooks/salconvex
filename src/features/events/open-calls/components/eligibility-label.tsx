@@ -6,6 +6,7 @@ interface EligibilityLabelProps {
   format?: "desktop" | "mobile";
   preview?: boolean;
   eligible?: boolean;
+  publicView?: boolean;
 }
 
 export const EligibilityLabel = ({
@@ -14,6 +15,7 @@ export const EligibilityLabel = ({
   format,
   preview = false,
   eligible,
+  publicView,
 }: EligibilityLabelProps) => {
   const international = type === "International";
   const national = type === "National";
@@ -39,7 +41,11 @@ export const EligibilityLabel = ({
   if (whom.length === 0 || type === "International" || type === "Other") {
     if (type === "International") {
       // return "International (all)";
-      parts.push("International (all)");
+      if (mobilePreview) {
+        parts.push("International");
+      } else {
+        parts.push("International (all)");
+      }
     }
     if (type === "Other") {
       if (preview) {
@@ -92,10 +98,10 @@ export const EligibilityLabel = ({
                 ))}
               </ul>
 
-              {(international || eligible) && (
+              {(international || eligible) && !publicView && (
                 <CheckIcon className="size-4 shrink-0 translate-y-0.5 text-emerald-800" />
               )}
-              {national && eligible === false && (
+              {national && eligible === false && !publicView && (
                 <XIcon className="size-4 shrink-0 translate-y-1 text-red-600" />
               )}
             </div>
@@ -108,10 +114,10 @@ export const EligibilityLabel = ({
   return (
     <span className="flex items-center gap-1">
       {parts.join(" ")}
-      {(international || eligible) && (
+      {(international || eligible) && !publicView && (
         <CheckIcon className="size-4 shrink-0 text-emerald-800" />
       )}
-      {national && eligible === false && (
+      {national && eligible === false && !publicView && (
         <XIcon className="size-4 shrink-0 text-red-600" />
       )}
     </span>

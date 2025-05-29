@@ -110,7 +110,7 @@ export const FOOTER_LINKS: FooterSection[] = [
     ],
   },
   {
-    section: "subscription",
+    section: "membership",
     items: [
       { name: "Manage", href: "/manage", sub: ["active", "trialing"] }, //only if you're logged in
       // { name: "Documentation", href: "/docs" },

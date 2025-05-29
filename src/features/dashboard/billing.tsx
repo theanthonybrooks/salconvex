@@ -49,7 +49,7 @@ export default function BillingPage() {
 
     if (!subscription?.customerId) {
       toast.error(
-        "No subscription found. Please contact support if this is incorrect.",
+        "No membership found. Please contact support if this is incorrect.",
       );
       return;
     }
@@ -103,17 +103,17 @@ export default function BillingPage() {
     <div className="flex flex-col gap-6 p-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">
-          Subscription Overview
+          Membership Overview
         </h1>
         <p className="mt-2 text-foreground">
-          Manage your subscription or update your billing information
+          Manage your membership or update your billing information
         </p>
         <Button
           className="mt-3"
           onClick={handleManageSubscription}
           variant="salWithShadow"
         >
-          Manage Subscription
+          Manage Membership
         </Button>
       </div>
 
@@ -124,7 +124,7 @@ export default function BillingPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Subscription Details
+              Membership Details
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -188,7 +188,7 @@ export default function BillingPage() {
                             className="font-normal text-gray-300"
                             onClick={handleManageSubscription}
                           >
-                            Manage Subscription
+                            Manage Membership
                           </a>{" "}
                           page
                         </span>
@@ -240,12 +240,12 @@ export default function BillingPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">
-                    {isCancelled ? "Account Created:" : "Subscribed Since:"}
+                    {isCancelled ? "Account Created:" : "Member Since:"}
                   </span>
                   <span className="font-medium">
                     {subscription?.startedAt
                       ? format(new Date(subscription.startedAt), "MMM do, yyyy")
-                      : "No Subscription"}
+                      : "No Membership"}
                   </span>
                 </div>
                 {/* {!canceledAt ? (

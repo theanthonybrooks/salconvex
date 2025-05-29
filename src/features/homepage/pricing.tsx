@@ -72,15 +72,15 @@ const ExistingSubscription = ({ onClick }: { onClick: () => void }) => {
     <div className="mt-[1rem] flex w-full flex-col items-center justify-center gap-y-6 p-3">
       <div className="flex flex-col items-center">
         <p className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]">
-          Your Subscription
+          Your Membership
         </p>
         <p className="text-balance text-center">
-          Want to upgrade or cancel your subscription?
+          Want to upgrade or cancel your membership?
         </p>
       </div>
 
       <Button variant="salWithShadow" onClick={onClick}>
-        Manage Subscription
+        Manage Membership
       </Button>
     </div>
   );

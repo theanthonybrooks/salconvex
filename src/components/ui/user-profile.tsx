@@ -127,7 +127,7 @@ export function UserProfile({
               >
                 <DropdownMenuItem className="focus:bg-salYellow/50">
                   <PiPiggyBank className="mr-2 size-4" />
-                  <span>Manage Subscription</span>
+                  <span>Manage Membership</span>
                 </DropdownMenuItem>
               </Link>
             </>
@@ -139,7 +139,7 @@ export function UserProfile({
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">
                 <PiPiggyBank className="mr-2 size-4" />
-                <span>Renew Subscription</span>
+                <span>Renew Membership</span>
               </DropdownMenuItem>
             </Link>
           )}

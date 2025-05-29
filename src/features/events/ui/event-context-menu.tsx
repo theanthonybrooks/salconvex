@@ -190,7 +190,9 @@ const EventContextMenu = ({
                   : "text-black/80 hover:text-emerald-700",
               )}
             >
-              <Link href="/pricing">Subscribe to bookmark, hide, or apply</Link>
+              <Link href="/pricing">
+                Become a member to bookmark, hide, or apply
+              </Link>
             </div>
           )}
           {isAdmin && (

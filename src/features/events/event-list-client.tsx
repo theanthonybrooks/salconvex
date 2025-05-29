@@ -18,6 +18,7 @@ import { Continents, Filters, SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
 // import { CombinedEventPreviewCardData } from "@/types/event";
 
+import { Button } from "@/components/ui/button";
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
@@ -25,7 +26,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import type { MergedEventPreviewData } from "@/types/event"; // or define a local merged type inline
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 // interface Props {
 
@@ -39,6 +40,7 @@ const ClientEventList = (
   },
 ) => {
   // inside ClientEventList()
+  const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -254,6 +256,22 @@ const ClientEventList = (
           )}
         </>
       )}
+      {publicView && (
+        <div className="mx-auto max-w-[90dvw] py-8 sm:max-w-[1200px]">
+          <h2 className="text-center font-bold tracking-wide text-foreground lg:text-xl">
+            <Button
+              variant="salWithShadowHiddenBg"
+              className="font-bold lg:text-xl"
+              onClick={() => {
+                router.push("/pricing");
+              }}
+            >
+              Become a member
+            </Button>{" "}
+            to view the full list and open call details
+          </h2>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="mb-10 w-full max-w-[90vw] space-y-4 sm:space-y-6">
@@ -366,10 +384,10 @@ const ClientEventList = (
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
         <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
-          <h2 className="text-balance text-center">
+          {/* <h2 className="text-balance text-center">
             For the full list and access to all of the other work that I do,
             sign up!
-          </h2>
+          </h2> */}
           <Pricing />
         </div>
       )}

@@ -8,6 +8,7 @@ export type ArtistEventMetadata = {
   hidden: Id<"events">[];
   applied: Id<"events">[];
   artistNationality: string[];
+  artistCountries: string[];
   applicationData: Record<
     Id<"openCalls">,
     {
@@ -36,6 +37,12 @@ export const getArtistEventMetadata = query({
       .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
       .unique();
     if (!artist) return null;
+    const artistCountries = [
+      ...(artist?.artistNationality ?? []),
+      ...(artist?.artistResidency?.country
+        ? [artist.artistResidency.country]
+        : []),
+    ];
 
     const subscription = await ctx.db
       .query("userSubscriptions")
@@ -86,7 +93,8 @@ export const getArtistEventMetadata = query({
       bookmarked,
       hidden,
       applied,
-      artistNationality: artist.artistNationality ?? [],
+      artistNationality: artistCountries,
+      artistCountries,
       applicationData,
     };
   },

@@ -198,7 +198,7 @@ export const createStripeCheckoutSession = action({
         //TODO: Add coupon and products to production version of Stripe
       });
 
-    console.log("checkout session created: ", session);
+    // console.log("checkout session created: ", session);
 
     // Ensure session.url is not null.
     if (!session.url) throw new Error("Stripe session URL is null");

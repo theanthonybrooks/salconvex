@@ -163,14 +163,14 @@ const TermsPage = () => {
 
       <section className="mt-3">
         <h2 className="mb-3 text-center text-lg font-semibold">
-          5. Purchases &amp; Subscriptions
+          5. Purchases &amp; Memberships
         </h2>
         <p className="text-sm">
-          We offer both one-time purchases and subscription plans, some of which
+          We offer both one-time purchases and membership plans, some of which
           may include a free trial. All payments are handled securely.
-          Subscriptions will automatically renew unless canceled before the end
-          of the billing period. By purchasing a subscription, you authorize us
-          to charge your payment method on a recurring basis until canceled.
+          Memberships will automatically renew unless canceled before the end of
+          the billing period. By purchasing a membership, you authorize us to
+          charge your payment method on a recurring basis until canceled.
         </p>
       </section>
 

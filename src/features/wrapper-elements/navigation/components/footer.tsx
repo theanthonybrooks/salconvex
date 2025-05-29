@@ -103,7 +103,7 @@ export default function Footer({ className }: { className?: string }) {
   const handleManageSubscription = async () => {
     if (!subscription?.customerId) {
       toast.error(
-        "No subscription found. Please contact support if this is incorrect.",
+        "No membership found. Please contact support if this is incorrect.",
       );
       return;
     }
