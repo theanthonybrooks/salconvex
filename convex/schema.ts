@@ -486,6 +486,7 @@ const newsletterSchema = {
   firstName: v.string(),
   email: v.string(),
   newsletter: v.boolean(),
+  userPlan: v.optional(v.number()),
   timesAttempted: v.number(),
   lastAttempt: v.number(),
 };

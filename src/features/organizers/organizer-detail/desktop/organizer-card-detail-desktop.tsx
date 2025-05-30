@@ -4,6 +4,12 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MapPin } from "lucide-react";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
@@ -99,10 +105,25 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
 
             {/* //todo: ensure that this is required in the submission form */}
             {organizer.about && (
-              <div className="flex flex-col gap-2 text-sm">
-                <p className="pb-2 font-bold">About:</p>
-                <RichTextDisplay html={organizer.about} />
-              </div>
+              <Accordion type="multiple" defaultValue={["about"]}>
+                <AccordionItem value="about">
+                  <AccordionTrigger title="About:" className="pb-2" />
+                  <AccordionContent className="text-sm">
+                    <RichTextDisplay
+                      html={organizer.about}
+                      className="line-clamp-5"
+                    />
+                    {organizer.about?.length > 200 && (
+                      <button
+                        className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                        onClick={() => setActiveTab("event")}
+                      >
+                        Read more
+                      </button>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             )}
           </div>
         </div>

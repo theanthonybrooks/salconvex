@@ -9,24 +9,31 @@ export const subscribeToNewsletter = mutation({
     newsletter: v.boolean(),
   },
   handler: async (ctx, args) => {
+    let userPlan = 0;
     const userId = await getAuthUserId(ctx);
-    console.log("meow", !!userId);
     const user = userId ? await ctx.db.get(userId) : null;
-    console.log("meow2", !!user);
+    if (user) {
+      const userSub = (user.subscription ?? "none").toLowerCase();
+      if (userSub?.includes("original")) {
+        userPlan = 1;
+      } else if (userSub?.includes("banana")) {
+        userPlan = 2;
+      } else if (userSub?.includes("fatcap")) {
+        userPlan = 3;
+      }
+    }
     const newsletterSubscription = user?._id
       ? await ctx.db
           .query("newsletter")
           .withIndex("by_userId", (q) => q.eq("userId", user._id))
           .unique()
       : null;
-    console.log("meow3", !!newsletterSubscription);
     const emailSubscription = await ctx.db
       .query("newsletter")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .unique();
-    console.log("meow4", !!emailSubscription);
     if (newsletterSubscription && emailSubscription) {
-      if (newsletterSubscription.timesAttempted > 5) {
+      if (newsletterSubscription.timesAttempted > 3) {
         return {
           status: "too_many_attempts",
           emailMismatch: args.email === newsletterSubscription.email,
@@ -35,10 +42,10 @@ export const subscribeToNewsletter = mutation({
     }
 
     if (newsletterSubscription) {
-      console.log("times attempted", newsletterSubscription.timesAttempted);
       await ctx.db.patch(newsletterSubscription._id, {
         timesAttempted: newsletterSubscription.timesAttempted + 1,
         lastAttempt: Date.now(),
+        userPlan,
       });
       if (args.email !== newsletterSubscription.email) {
         return {
@@ -53,10 +60,10 @@ export const subscribeToNewsletter = mutation({
       }
     }
     if (emailSubscription) {
-      console.log("times attempted", emailSubscription.timesAttempted);
       await ctx.db.patch(emailSubscription._id, {
         timesAttempted: emailSubscription.timesAttempted + 1,
         lastAttempt: Date.now(),
+        userPlan,
       });
       if (user && user.email !== args.email) {
         return {
@@ -77,6 +84,7 @@ export const subscribeToNewsletter = mutation({
         newsletter: args.newsletter,
         timesAttempted: 1,
         lastAttempt: Date.now(),
+        userPlan,
       });
     }
   },

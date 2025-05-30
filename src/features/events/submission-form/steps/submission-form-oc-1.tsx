@@ -331,7 +331,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">More Info</p>
             </div>
 
-            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Eligibility Continued... (if not &quot;International&quot;)
               </Label>
@@ -541,7 +541,7 @@ const SubmissionFormOC1 = ({
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
-              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.type" className="sr-only">
                   Application Requirements
                 </Label>
