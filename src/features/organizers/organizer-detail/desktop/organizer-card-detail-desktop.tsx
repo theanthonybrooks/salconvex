@@ -116,7 +116,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                     {organizer.about?.length > 200 && (
                       <button
                         className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={() => setActiveTab("event")}
+                        onClick={() => setActiveTab("organizer")}
                       >
                         Read more
                       </button>
