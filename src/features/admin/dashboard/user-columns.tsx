@@ -11,6 +11,7 @@ interface UserColumnsProps {
   name: string;
   email: string;
   subscription: string;
+  subStatus: string;
   accountType: string[];
   createdAt: number;
   role: string[];
@@ -79,6 +80,32 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
           )}
         >
           {subscription || "none"}
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+  },
+  {
+    accessorKey: "subStatus",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const subStatus = row.getValue("subStatus") as string | undefined;
+      return (
+        <div
+          className={cn(
+            "rounded px-2 py-1 text-xs font-medium",
+            subStatus === "active" && "bg-green-100 text-green-800",
+            subStatus === "trialing" && "bg-yellow-100 text-yellow-800",
+            subStatus === "canceled" && "bg-red-100 text-red-800",
+            !subStatus && "italic text-muted-foreground",
+          )}
+        >
+          <p className="text-center capitalize">{subStatus || "none"}</p>
         </div>
       );
     },

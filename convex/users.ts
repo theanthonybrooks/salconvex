@@ -23,40 +23,86 @@ export const getTotalUsers = query({
   },
 });
 
+// export const usersWithSubscriptions = query({
+//   args: {},
+//   handler: async (ctx) => {
+//     let userPlan = "";
+//     const users = await ctx.db.query("users").collect();
+
+//     return users.map(async (user) => {
+//       const fullName = `${user.firstName} ${user.lastName}`.trim();
+//       const name =
+//         fullName === user.name || !user.name
+//           ? fullName
+//           : `${fullName} (${user.name})`;
+
+//       const subscription = await ctx.db
+//         .query("userSubscriptions")
+//         .withIndex("userId", (q) => q.eq("userId", user._id))
+//         .first();
+
+//       const planName =
+//         subscription?.metadata?.planName?.toLowerCase() ?? "unknown";
+//       const interval = subscription?.interval ?? "unknown";
+//       const label = subscription
+//         ? formatSubscriptionLabel(planName, interval)
+//         : null;
+//       return {
+//         _id: user._id,
+//         name,
+//         email: user.email,
+//         subscription: label ?? "none",
+//         accountType: user.accountType ?? [],
+//         role: user.role ?? "user",
+//         createdAt: user.createdAt,
+//         source: user.source,
+//       };
+//     });
+//   },
+// });
+
 export const usersWithSubscriptions = query({
   args: {},
   handler: async (ctx) => {
-    let userPlan = "";
     const users = await ctx.db.query("users").collect();
 
-    return users.map(async (user) => {
-      const fullName = `${user.firstName} ${user.lastName}`.trim();
-      const name =
-        fullName === user.name || !user.name
-          ? fullName
-          : `${fullName} (${user.name})`;
+    const results = await Promise.all(
+      users.map(async (user) => {
+        const fullName = `${user.firstName} ${user.lastName}`.trim();
+        const name =
+          fullName === user.name || !user.name
+            ? fullName
+            : `${fullName} (${user.name})`;
 
-      const subscriptions = await ctx.db
-        .query("userSubscriptions")
-        .withIndex("userId", (q) => q.eq("userId", user._id))
-        .collect();
+        const subscription = await ctx.db
+          .query("userSubscriptions")
+          .withIndex("userId", (q) => q.eq("userId", user._id))
+          .first();
 
-      const formattedSubscriptions = subscriptions.map((sub) => {
-        const planName = sub.metadata?.planName?.toLowerCase() ?? "unknown";
-        const interval = sub.interval ?? "unknown";
-        const label = formatSubscriptionLabel(planName, interval);
-      });
-      return {
-        _id: user._id,
-        name,
-        email: user.email,
-        subscription: formattedSubscriptions,
-        accountType: user.accountType ?? [],
-        role: user.role ?? "user",
-        createdAt: user.createdAt,
-        source: user.source,
-      };
-    });
+        const planName =
+          subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
+        const interval = subscription?.interval ?? "unknown";
+        console.log(planName, interval);
+
+        const label = subscription
+          ? formatSubscriptionLabel(planName, interval)
+          : null;
+
+        return {
+          _id: user._id,
+          name,
+          email: user.email,
+          subscription: label ?? "none",
+          subStatus: subscription?.status ?? "none",
+          accountType: user.accountType ?? [],
+          role: user.role ?? "user",
+          createdAt: user.createdAt,
+          source: user.source,
+        };
+      }),
+    );
+
+    return results;
   },
 });
 
