@@ -55,12 +55,12 @@ export const EligibilityLabel = ({
       }
     }
   } else if (whom.length === 1) {
-    // if (mobilePreview) {
-    //   parts.push(type);
-    // } else {
-    //   parts.push(whom[0]);
-    // }
-    parts.push(whom[0]);
+    if (mobilePreview && type !== "National") {
+      parts.push(type);
+    } else {
+      parts.push(whom[0]);
+    }
+    // parts.push(whom[0]);
   } else if (multipleWhom) {
     if (preview) {
       if (whom.length > 2) {

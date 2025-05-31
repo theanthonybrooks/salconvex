@@ -32,9 +32,16 @@ import { useEffect } from "react";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
+export type ToolbarData = {
+  totalPerMonth?: number;
+  totalPerYear?: number;
+  userCount?: number;
+};
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  toolbarData?: ToolbarData;
   defaultVisibility?: VisibilityState;
   onRowSelect?: (row: TData | null, selection: Record<string, boolean>) => void;
   className?: string;
@@ -56,6 +63,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  toolbarData,
   onRowSelect,
   defaultVisibility,
   className,
@@ -94,6 +102,7 @@ export function DataTable<TData, TValue>({
       tableType,
       pageType,
       minimalView,
+      toolbarData,
     },
 
     state: {

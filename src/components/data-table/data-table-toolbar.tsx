@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import {
   eventCategories,
   eventStates,
+  subscriptionOptions,
 } from "@/components/data-table/data-table-row-actions";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,8 @@ export function DataTableToolbar<TData>({
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,
   );
+  const toolbarData = table.options.meta?.toolbarData;
+  console.log(toolbarData);
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
   const viewAll = table.options.meta?.viewAll;
@@ -44,6 +47,7 @@ export function DataTableToolbar<TData>({
   const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
+  const usersTable = tableType === "users";
   const selectedRowCount = Object.keys(table.getState().rowSelection).length;
   const handleDeleteSelected = async () => {
     const selectedRows = table.getSelectedRowModel().rows;
@@ -158,6 +162,38 @@ export function DataTableToolbar<TData>({
                 )}
               </>
             )}
+          </div>
+        )}
+        {usersTable && (
+          <div className="flex items-center gap-3">
+            {table.getColumn("subscription") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("subscription")}
+                title="Subscription"
+                options={subscriptionOptions}
+              />
+            )}
+
+            {/* {table.getColumn("openCallState") && !minimalView && (
+              <DataTableFacetedFilter
+                column={table.getColumn("openCallState")}
+                title="Open Call"
+                options={eventStates}
+                className={cn(
+                  "2xl:flex",
+                  forDashboard && "flex",
+                  !forDashboard && "not-ipad md:hidden",
+                )}
+              />
+            )} */}
+            <p className="text-sm text-muted-foreground">Total Monthly:</p>
+            <p className="text-sm font-bold">
+              {toolbarData?.totalPerMonth?.toFixed(2) ?? 0}
+            </p>
+            <p className="text-sm text-muted-foreground">Total Annual:</p>
+            <p className="text-sm font-bold">
+              {toolbarData?.totalPerYear?.toFixed(2) ?? 0}
+            </p>
           </div>
         )}
 

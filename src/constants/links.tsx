@@ -9,6 +9,8 @@ import {
   HelpCircle,
   Home,
   HomeIcon,
+  LucideArchive,
+  LucideCalendar,
   LucideCircleFadingPlus,
   LucideIcon,
   LucideListPlus,
@@ -297,7 +299,7 @@ export const dashboardNavItems: DashNavItem[] = [
   {
     label: "My Applications",
     href: "/dashboard/artist",
-    icon: Folder,
+    icon: LucideArchive,
     section: true,
     sectionIcon: Folder,
     sectionCat: "artist",
@@ -416,7 +418,7 @@ export const dashboardNavItems: DashNavItem[] = [
   {
     label: "My Events/Projects",
     href: "/dashboard/organizer",
-    icon: Folder,
+    icon: LucideCalendar,
     section: true,
     sectionIcon: Folder,
     sectionCat: "organizer",

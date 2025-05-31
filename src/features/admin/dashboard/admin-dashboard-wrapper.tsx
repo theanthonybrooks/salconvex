@@ -20,6 +20,11 @@ interface AdminDashboardTableWrapperProps {
 export function AdminDashboardTableWrapper({
   page,
 }: AdminDashboardTableWrapperProps) {
+  // const [existingEvent, setExistingEvent] = useState<Doc<"events"> | null>(
+  //   null,
+  // );
+  // const [existingOpenCall, setExistingOpenCall] =
+  //   useState<Doc<"openCalls"> | null>(null);
   const { preloadedEventData, preloadedSubmissionData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -97,12 +102,16 @@ export function AdminDashboardTableWrapper({
           <div className="hidden max-h-full w-full px-10 py-10 lg:block">
             <DataTable
               columns={userColumns}
-              data={usersData ?? []}
+              data={usersData?.users ?? []}
               defaultVisibility={{
                 category: viewAll ? true : false,
                 dates_edition: viewAll ? true : false,
                 type: false,
                 role: false,
+              }}
+              toolbarData={{
+                totalPerMonth: usersData?.totalPerMonth ?? 0,
+                totalPerYear: usersData?.totalPerYear ?? 0,
               }}
               onRowSelect={(row) => {
                 console.log(row);
@@ -115,7 +124,7 @@ export function AdminDashboardTableWrapper({
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
               columns={userColumns}
-              data={usersData ?? []}
+              data={usersData?.users ?? []}
               defaultVisibility={{
                 type: false,
                 category: false,
@@ -125,8 +134,9 @@ export function AdminDashboardTableWrapper({
               }}
               defaultSort={{ id: "createdAt", desc: false }}
               onRowSelect={(row) => {
-                //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.
                 console.log(row);
+                // setExistingEvent(row.getValue("event"));
+                // setExistingOpenCall(row.getValue("openCall"));
               }}
               adminActions={adminActions}
               tableType="users"

@@ -27,7 +27,8 @@ export const usersWithSubscriptions = query({
   args: {},
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();
-
+    let totalPerMonth = 0;
+    let totalPerYear = 0;
     const results = await Promise.all(
       users.map(async (user) => {
         const fullName = `${user.firstName} ${user.lastName}`.trim();
@@ -44,7 +45,15 @@ export const usersWithSubscriptions = query({
         const planName =
           subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
         const interval = subscription?.interval ?? "unknown";
-        console.log(planName, interval);
+        const amount = subscription?.amount ?? 0;
+
+        if (interval === "month") {
+          totalPerMonth += amount;
+          totalPerYear += amount * 12;
+        } else if (interval === "year") {
+          totalPerYear += amount;
+          totalPerMonth += amount / 12;
+        }
 
         const label = subscription
           ? formatSubscriptionLabel(planName, interval)
@@ -63,8 +72,14 @@ export const usersWithSubscriptions = query({
         };
       }),
     );
+    totalPerMonth = totalPerMonth / 100;
+    totalPerYear = totalPerYear / 100;
 
-    return results;
+    return {
+      users: results,
+      totalPerMonth,
+      totalPerYear,
+    };
   },
 });
 

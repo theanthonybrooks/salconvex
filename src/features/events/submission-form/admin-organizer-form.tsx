@@ -1562,7 +1562,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       reset({
         organization: {
           ...existingOrg,
-          logo: "borg.png",
         },
         event: {
           ...existingEvent,

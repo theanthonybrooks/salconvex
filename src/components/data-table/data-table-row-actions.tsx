@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Banana,
   Calendar,
   Clock,
   House,
@@ -99,6 +100,40 @@ export const priorities = [
     label: "High",
     value: "high",
     icon: ArrowUp,
+  },
+];
+
+export const subscriptionOptions = [
+  {
+    value: "1a. monthly-original",
+    label: "Monthly-Original",
+    icon: Pencil,
+  },
+  {
+    value: "1b. yearly-original",
+    label: "Yearly-Original",
+    icon: Clock,
+  },
+  {
+    value: "2a. monthly-banana",
+    label: "Monthly-Banana",
+    icon: Banana,
+  },
+  {
+    value: "2b. yearly-banana",
+    label: "Yearly-Banana",
+    icon: Banana,
+  },
+
+  {
+    value: "3a. monthly-fatcap",
+    label: "Monthly-Fatcap",
+    icon: Pencil,
+  },
+  {
+    value: "3b. yearly-fatcap",
+    label: "Yearly-Fatcap",
+    icon: Clock,
   },
 ];
 

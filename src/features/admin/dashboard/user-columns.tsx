@@ -69,6 +69,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const subscription = row.getValue("subscription") as string | undefined;
+      console.log(subscription);
       return (
         <div
           className={cn(

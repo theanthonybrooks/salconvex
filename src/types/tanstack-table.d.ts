@@ -9,6 +9,7 @@
 //     getIsSomeTrue?: (columnId: string) => boolean;
 //   }
 // }
+import { ToolbarData } from "@/components/data-table/data-table";
 import { RowData } from "@tanstack/react-table";
 export const tableTypes = [
   "events",
@@ -34,5 +35,6 @@ declare module "@tanstack/react-table" {
     pageType?: PageTypes;
     getRowData?: (row: TData) => void;
     minimalView?: boolean;
+    toolbarData?: ToolbarData;
   }
 }

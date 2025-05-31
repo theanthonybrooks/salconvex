@@ -30,7 +30,8 @@ export function formatHandleInput(
 
   if (
     (/\.\w{2,}/.test(cleanValue) || cleanValue.startsWith("http")) &&
-    /\/[a-zA-Z0-9@._-]{3,}$/.test(cleanValue)
+    // /\/[a-zA-Z0-9@._-]{3,}$/.test(cleanValue)
+    /\/[a-zA-Z0-9@._-]{3,}\/?$/.test(cleanValue)
   ) {
     try {
       const url = new URL(
