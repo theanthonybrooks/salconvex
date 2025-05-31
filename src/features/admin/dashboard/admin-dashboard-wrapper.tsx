@@ -5,8 +5,8 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
-import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
+import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
 import { TableTypes } from "@/types/tanstack-table";
@@ -102,6 +102,7 @@ export function AdminDashboardTableWrapper({
                 category: viewAll ? true : false,
                 dates_edition: viewAll ? true : false,
                 type: false,
+                role: false,
               }}
               onRowSelect={(row) => {
                 console.log(row);
@@ -118,9 +119,11 @@ export function AdminDashboardTableWrapper({
               defaultVisibility={{
                 type: false,
                 category: false,
+                role: false,
                 lastEditedAt: false,
                 dates_edition: false,
               }}
+              defaultSort={{ id: "createdAt", desc: false }}
               onRowSelect={(row) => {
                 //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.
                 console.log(row);

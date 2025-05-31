@@ -3,6 +3,7 @@
 import {
   ColumnDef,
   ColumnFiltersState,
+  ColumnSort,
   SortingState,
   VisibilityState,
   flexRender,
@@ -49,6 +50,7 @@ interface DataTableProps<TData, TValue> {
   pageType?: PageTypes;
   initialSearchTerm?: string;
   minimalView?: boolean;
+  defaultSort?: ColumnSort;
 }
 
 export function DataTable<TData, TValue>({
@@ -66,6 +68,7 @@ export function DataTable<TData, TValue>({
   pageType,
   initialSearchTerm,
   minimalView,
+  defaultSort,
 }: DataTableProps<TData, TValue>) {
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
@@ -74,7 +77,11 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const initialSort = React.useMemo<SortingState>(() => {
+    return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
+  }, [defaultSort]);
+  const [sorting, setSorting] = React.useState<SortingState>(initialSort);
+
   const table = useReactTable({
     data,
     columns,
@@ -162,13 +169,6 @@ export function DataTable<TData, TValue>({
       onRowSelect?.(null, {});
     }
   }, [data, rowSelection, onRowSelect]);
-
-  // console.log(
-  //   table
-  //     .getAllLeafColumns()
-  //     .filter((col) => col.getIsVisible())
-  //     .map((col) => col.id),
-  // );
 
   return (
     <div className={cn("w-full space-y-4", outerContainerClassName)}>

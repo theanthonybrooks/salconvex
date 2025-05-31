@@ -23,44 +23,6 @@ export const getTotalUsers = query({
   },
 });
 
-// export const usersWithSubscriptions = query({
-//   args: {},
-//   handler: async (ctx) => {
-//     let userPlan = "";
-//     const users = await ctx.db.query("users").collect();
-
-//     return users.map(async (user) => {
-//       const fullName = `${user.firstName} ${user.lastName}`.trim();
-//       const name =
-//         fullName === user.name || !user.name
-//           ? fullName
-//           : `${fullName} (${user.name})`;
-
-//       const subscription = await ctx.db
-//         .query("userSubscriptions")
-//         .withIndex("userId", (q) => q.eq("userId", user._id))
-//         .first();
-
-//       const planName =
-//         subscription?.metadata?.planName?.toLowerCase() ?? "unknown";
-//       const interval = subscription?.interval ?? "unknown";
-//       const label = subscription
-//         ? formatSubscriptionLabel(planName, interval)
-//         : null;
-//       return {
-//         _id: user._id,
-//         name,
-//         email: user.email,
-//         subscription: label ?? "none",
-//         accountType: user.accountType ?? [],
-//         role: user.role ?? "user",
-//         createdAt: user.createdAt,
-//         source: user.source,
-//       };
-//     });
-//   },
-// });
-
 export const usersWithSubscriptions = query({
   args: {},
   handler: async (ctx) => {
@@ -92,8 +54,8 @@ export const usersWithSubscriptions = query({
           _id: user._id,
           name,
           email: user.email,
-          subscription: label ?? "none",
-          subStatus: subscription?.status ?? "none",
+          subscription: label ?? "4. none",
+          subStatus: subscription?.status ?? "-",
           accountType: user.accountType ?? [],
           role: user.role ?? "user",
           createdAt: user.createdAt,
