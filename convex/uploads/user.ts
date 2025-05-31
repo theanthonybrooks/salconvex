@@ -1,4 +1,4 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
+userimport { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { mutation } from "~/convex/_generated/server";
 

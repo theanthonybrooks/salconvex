@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { action } from "./_generated/server";
 
+import { formatSubscriptionLabel } from "@/lib/subscriptionFns";
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
@@ -25,20 +26,31 @@ export const getTotalUsers = query({
 export const usersWithSubscriptions = query({
   args: {},
   handler: async (ctx) => {
+    let userPlan = "";
     const users = await ctx.db.query("users").collect();
 
-    return users.map((user) => {
+    return users.map(async (user) => {
       const fullName = `${user.firstName} ${user.lastName}`.trim();
       const name =
         fullName === user.name || !user.name
           ? fullName
           : `${fullName} (${user.name})`;
 
+      const subscriptions = await ctx.db
+        .query("userSubscriptions")
+        .withIndex("userId", (q) => q.eq("userId", user._id))
+        .collect();
+
+      const formattedSubscriptions = subscriptions.map((sub) => {
+        const planName = sub.metadata?.planName?.toLowerCase() ?? "unknown";
+        const interval = sub.interval ?? "unknown";
+        const label = formatSubscriptionLabel(planName, interval);
+      });
       return {
         _id: user._id,
         name,
         email: user.email,
-        subscription: user.subscription ?? "none",
+        subscription: formattedSubscriptions,
         accountType: user.accountType ?? [],
         role: user.role ?? "user",
         createdAt: user.createdAt,
