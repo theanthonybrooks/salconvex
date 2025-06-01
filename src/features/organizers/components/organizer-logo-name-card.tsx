@@ -1,11 +1,15 @@
 import { Card } from "@/components/ui/card";
+import { Link } from "@/components/ui/custom-link";
 import { getOrganizerLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { Organizer } from "@/types/organizer";
 import Image from "next/image";
 import React from "react";
 
-type MinimalOrgCardProps = Pick<Organizer, "logo" | "name" | "location">;
+type MinimalOrgCardProps = Pick<
+  Organizer,
+  "logo" | "name" | "location" | "slug"
+>;
 
 interface OrganizerCardProps {
   organizer: MinimalOrgCardProps;
@@ -61,30 +65,33 @@ export const OrganizerCardLogoName = ({
 }: OrganizerCardLogoNameProps) => {
   const orgLocationString = getOrganizerLocationString(organizer, true);
   const isMobile = format === "mobile";
+  const slug = organizer.slug;
 
   return (
-    <div
-      className={cn(
-        "grid w-full grid-cols-[60px_minmax(0,1fr)] items-center",
-        isMobile && "grid-cols-[75px_minmax(0,1fr)]",
-      )}
-    >
-      <Image
-        src={organizer?.logo || "/1.jpg"}
-        alt="Event Logo"
-        width={60}
-        height={60}
+    <Link href={`/thelist/organizer/${slug}`} target="_blank">
+      <div
         className={cn(
-          "size-[50px] rounded-full border-1.5 border-foreground",
-          isMobile && "size-15 border-2",
+          "grid w-full grid-cols-[60px_minmax(0,1fr)] items-center",
+          isMobile && "grid-cols-[75px_minmax(0,1fr)]",
         )}
-      />
-      <div className="col-span-1">
-        <p className="line-clamp-2 text-sm font-bold">{organizer.name}</p>
-        <p className={cn("text-sm", isMobile && "font-medium")}>
-          {orgLocationString}
-        </p>
+      >
+        <Image
+          src={organizer?.logo || "/1.jpg"}
+          alt="Event Logo"
+          width={60}
+          height={60}
+          className={cn(
+            "size-[50px] rounded-full border-1.5 border-foreground",
+            isMobile && "size-15 border-2",
+          )}
+        />
+        <div className="col-span-1">
+          <p className="line-clamp-2 text-sm font-bold">{organizer.name}</p>
+          <p className={cn("text-sm", isMobile && "font-medium")}>
+            {orgLocationString}
+          </p>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
