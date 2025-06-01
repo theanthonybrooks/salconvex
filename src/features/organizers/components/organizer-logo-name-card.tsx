@@ -5,11 +5,9 @@ import { cn } from "@/lib/utils";
 import { Organizer } from "@/types/organizer";
 import Image from "next/image";
 import React from "react";
+import slugify from "slugify";
 
-type MinimalOrgCardProps = Pick<
-  Organizer,
-  "logo" | "name" | "location" | "slug"
->;
+type MinimalOrgCardProps = Pick<Organizer, "logo" | "name" | "location">;
 
 interface OrganizerCardProps {
   organizer: MinimalOrgCardProps;
@@ -65,7 +63,7 @@ export const OrganizerCardLogoName = ({
 }: OrganizerCardLogoNameProps) => {
   const orgLocationString = getOrganizerLocationString(organizer, true);
   const isMobile = format === "mobile";
-  const slug = organizer.slug;
+  const slug = slugify(organizer.name, { lower: true });
 
   return (
     <Link href={`/thelist/organizer/${slug}`} target="_blank">
