@@ -537,15 +537,15 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                             }}
                           >
                             {groupKey.startsWith("Events") ? (
-                              <div className="grid w-full grid-cols-[1.2fr_auto_1fr] items-center gap-2">
-                                <span className="flex items-center gap-1 truncate">
+                              <div className="grid w-full grid-cols-[1fr_auto_auto_1fr] items-center gap-2">
+                                <span className="flex items-center gap-1 truncate text-wrap">
                                   {item.name}
-                                  {item.ocStatus === 2 && (
-                                    <FlairBadge className="bg-green-500/20">
-                                      Open Call
-                                    </FlairBadge>
-                                  )}
                                 </span>
+                                {item.ocStatus === 2 && (
+                                  <FlairBadge className="bg-green-500/20">
+                                    Open Call
+                                  </FlairBadge>
+                                )}
                                 {item.edition ? (
                                   <span className="text-center text-xs text-stone-500">
                                     {item.edition}
