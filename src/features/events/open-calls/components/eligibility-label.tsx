@@ -37,6 +37,8 @@ export const EligibilityLabel = ({
     } else {
       parts.push(type);
     }
+  } else if (mobilePreview && type !== "International" && type !== "Other") {
+    parts.push(type);
   }
   if (whom.length === 0 || type === "International" || type === "Other") {
     if (type === "International") {
@@ -55,12 +57,12 @@ export const EligibilityLabel = ({
       }
     }
   } else if (whom.length === 1) {
-    if (mobilePreview && type !== "National") {
-      parts.push(type);
-    } else {
-      parts.push(whom[0]);
-    }
-    // parts.push(whom[0]);
+    // if (mobilePreview && type !== "National") {
+    //   parts.push(type);
+    // } else {
+    //   parts.push(whom[0]);
+    // }
+    parts.push(whom[0]);
   } else if (multipleWhom) {
     if (preview) {
       if (whom.length > 2) {

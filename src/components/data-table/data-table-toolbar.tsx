@@ -37,7 +37,6 @@ export function DataTableToolbar<TData>({
     api.events.event.deleteMultipleEvents,
   );
   const toolbarData = table.options.meta?.toolbarData;
-  console.log(toolbarData);
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
   const viewAll = table.options.meta?.viewAll;
