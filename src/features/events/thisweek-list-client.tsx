@@ -208,7 +208,7 @@ const ClientThisWeekList = (
                 </h3>
                 <div className="space-y-4 sm:space-y-6">
                   {group.events.map((event, index) => {
-                    const showPublic = publicView ? flatIndex < 3 : publicView;
+                    const showPublic = publicView ? flatIndex < 1 : publicView;
                     const card = (
                       <EventCardPreview
                         key={index}
