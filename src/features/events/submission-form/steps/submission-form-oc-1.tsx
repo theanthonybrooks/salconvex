@@ -343,6 +343,7 @@ const SubmissionFormOC1 = ({
                     //   field.onChange(val);
                     //   // handleCheckSchema();
                     // }}
+                    onBlur={field.onBlur}
                     placeholder="Please be as specific as possible"
                     charLimit={1200}
                   />
@@ -553,6 +554,7 @@ const SubmissionFormOC1 = ({
                         field.onChange(val);
                         handleCheckSchema();
                       }}
+                      onBlur={field.onBlur}
                       placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={3000}
                       purpose="openCall"

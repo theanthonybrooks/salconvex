@@ -46,6 +46,7 @@ import { toast } from "react-toastify";
 interface Props {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   charLimit?: number;
   purpose?: string;
@@ -75,6 +76,7 @@ export const ALLOWED_ATTR = ["href", "target", "rel"];
 export const RichTextEditor = ({
   value,
   onChange,
+  onBlur,
   placeholder = "Start typing…",
   charLimit = 500,
   purpose,
@@ -230,12 +232,13 @@ export const RichTextEditor = ({
       ALLOWED_ATTR,
     }).trim();
     onChange(clean === "<p></p>" ? "" : clean);
+    onBlur?.();
 
     setTimeout(() => {
       setPending(false);
       setOpen(false);
     }, 1000);
-  }, [tempContent, onChange]);
+  }, [tempContent, onChange, onBlur]);
 
   const handleDiscard = () => {
     setTempContent(value);
