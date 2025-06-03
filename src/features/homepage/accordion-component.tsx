@@ -25,7 +25,7 @@ export function AccordionComponent({
     src?.title ?? src?.sectionTitle ?? `section ${+1}`,
     { lower: true },
   );
-  console.log(sectionSlug);
+  // console.log(sectionSlug);
   const [openItem, setOpenItem] = useState<string | undefined>(
     src.firstOpen ? `${sectionSlug}-item-1` : undefined,
   );

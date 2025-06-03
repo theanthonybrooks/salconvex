@@ -548,7 +548,11 @@ const SubmissionFormOC1 = ({
                     <RichTextEditor
                       readOnly={pastEvent}
                       value={field.value ?? ""}
-                      onChange={field.onChange}
+                      // onChange={field.onChange}
+                      onChange={(val) => {
+                        field.onChange(val);
+                        handleCheckSchema();
+                      }}
                       placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={3000}
                       purpose="openCall"
