@@ -596,6 +596,7 @@ const SubmissionFormOC1 = ({
                               "invalid-field",
                           )}
                           transform={autoHttps}
+                          debounceMs={50}
                           tabIndex={2}
                           onBlur={() => {
                             field.onBlur?.();
