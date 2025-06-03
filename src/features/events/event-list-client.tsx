@@ -40,6 +40,8 @@ const ClientEventList = (
   },
 ) => {
   // inside ClientEventList()
+  const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { preloadedArtistData } = useArtistPreload();
@@ -55,7 +57,7 @@ const ClientEventList = (
   const publicView =
     (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
   const userPref = userData?.userPref ?? null;
-
+  const userTimeZone = userPref?.timezone || browserTimeZone;
   const searchParams = useSearchParams();
 
   const defaultFilters: Filters = {
@@ -203,7 +205,11 @@ const ClientEventList = (
     const list = publicView ? paginatedEvents.slice(0, 5) : paginatedEvents;
 
     for (const event of list) {
-      const title = getGroupKeyFromEvent(event, sortOptions.sortBy);
+      const title = getGroupKeyFromEvent(
+        event,
+        sortOptions.sortBy,
+        userTimeZone,
+      );
       const groupKey = title.raw;
 
       if (!groups[groupKey]) {
@@ -215,7 +221,7 @@ const ClientEventList = (
     }
 
     return orderedGroupKeys.map((key) => groups[key]);
-  }, [paginatedEvents, sortOptions, publicView]);
+  }, [paginatedEvents, sortOptions, publicView, userTimeZone]);
   const handleFilterChange = (partial: Partial<Filters>) => {
     setFilters((prev) => ({ ...prev, ...partial }));
     setPage(1);
