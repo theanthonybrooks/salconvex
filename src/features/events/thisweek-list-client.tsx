@@ -37,6 +37,8 @@ const ClientThisWeekList = (
   },
 ) => {
   // inside ClientThisWeekList()
+  const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const router = useRouter();
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -51,6 +53,7 @@ const ClientThisWeekList = (
   const publicView =
     (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
   const userPref = userData?.userPref ?? null;
+  const userTimeZone = userPref?.timezone || browserTimeZone;
 
   const sortOptions = useMemo<SortOptions>(
     () => ({
@@ -121,7 +124,11 @@ const ClientThisWeekList = (
     const list = publicView ? paginatedEvents.slice(0, 5) : paginatedEvents;
 
     for (const event of list) {
-      const title = getGroupKeyFromEvent(event, sortOptions.sortBy);
+      const title = getGroupKeyFromEvent(
+        event,
+        sortOptions.sortBy,
+        userTimeZone,
+      );
       const groupKey = title.raw;
 
       if (!groups[groupKey]) {
@@ -133,7 +140,7 @@ const ClientThisWeekList = (
     }
 
     return orderedGroupKeys.map((key) => groups[key]);
-  }, [paginatedEvents, sortOptions, publicView]);
+  }, [paginatedEvents, sortOptions, publicView, userTimeZone]);
 
   const skeletonGroups = useMemo(() => generateSkeletonGroups(1), []);
   const hasResults = totalResults > 0;
