@@ -143,13 +143,6 @@ const SubmissionFormOC1 = ({
   }, [appFee, hasAppFee, setValue]);
 
   useEffect(() => {
-    if (!ocEligiblityType) return;
-    if (!isNational) {
-      setValue("openCall.eligibility.whom", []);
-    }
-  }, [ocEligiblityType, isNational, setValue]);
-
-  useEffect(() => {
     if (!freeCall) return;
     if (freeCall) {
       setValue("openCall.eligibility.whom", []);
@@ -253,6 +246,9 @@ const SubmissionFormOC1 = ({
                       disabled={pastEvent}
                       onValueChange={(value: EligibilityType) => {
                         field.onChange(value);
+                        if (value !== "National") {
+                          setValue("openCall.eligibility.whom", []);
+                        }
                       }}
                       value={field.value || ""}
                     >
