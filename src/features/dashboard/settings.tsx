@@ -106,6 +106,7 @@ export default function SettingsPage() {
   const [selectedCurrency, setCurrency] = useState<string | undefined>(
     undefined,
   );
+  const [pwOpen, setPwOpen] = useState(false);
   const { setTheme, theme } = useTheme();
   const [selectedTheme, setThemePref] = useState<string | undefined>(undefined);
   // const [selectedLanguage, setLanguage] = useState("en")
@@ -368,7 +369,8 @@ export default function SettingsPage() {
       setTimeout(() => {
         setSuccess("");
         setError("");
-      }, 5000);
+        setPwOpen(false);
+      }, 2000);
     }
   };
 
@@ -830,7 +832,7 @@ export default function SettingsPage() {
                         </p>
                       </div>
                     </div>
-                    <Dialog>
+                    <Dialog onOpenChange={setPwOpen} open={pwOpen}>
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
