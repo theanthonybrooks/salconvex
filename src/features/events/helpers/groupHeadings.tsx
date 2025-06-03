@@ -4,6 +4,8 @@ import {
   isValidIsoDate,
   seasonalTerms,
 } from "@/lib/dateFns";
+import { toZonedTime } from "date-fns-tz";
+
 import { PublicEventPreviewData } from "@/types/event";
 
 import { format } from "date-fns";
@@ -13,6 +15,7 @@ import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa6";
 export function getGroupKeyFromEvent(
   event: PublicEventPreviewData,
   sortBy: string,
+  timeZone?: string,
 ): {
   raw: string;
   label?: JSX.Element;
@@ -46,7 +49,9 @@ export function getGroupKeyFromEvent(
     (ocStatus === "active" || ocStatus === "ended")
   ) {
     if (ocEndDate) {
-      const day = ocEndDate.getDate();
+      const zoned = timeZone ? toZonedTime(ocEndDate, timeZone) : ocEndDate;
+
+      const day = zoned.getDate();
       const month = getFourCharMonth(ocEndDate);
       const suffix = getOrdinalSuffix(day);
       const year = isPast ? format(ocEndDate, "yyyy") : undefined;
@@ -73,7 +78,10 @@ export function getGroupKeyFromEvent(
 
   if (sortBy === "eventStart" && eventStart) {
     if (eventStartDate && !isYear && !isSeason) {
-      const day = eventStartDate.getDate();
+      const zoned = timeZone
+        ? toZonedTime(eventStartDate, timeZone)
+        : eventStartDate;
+      const day = zoned.getDate();
       const month = getFourCharMonth(eventStartDate);
       const suffix = getOrdinalSuffix(day);
       const year = isPastStart ? format(eventStartDate, "yyyy") : undefined;
