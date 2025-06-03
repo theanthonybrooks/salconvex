@@ -552,7 +552,6 @@ const SubmissionFormOC1 = ({
                       // onChange={field.onChange}
                       onChange={(val) => {
                         field.onChange(val);
-                        handleCheckSchema();
                       }}
                       onBlur={field.onBlur}
                       placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}

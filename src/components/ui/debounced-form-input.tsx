@@ -2,7 +2,12 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
-import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
+import {
+  ControllerRenderProps,
+  FieldValues,
+  Path,
+  useFormContext,
+} from "react-hook-form";
 
 interface DebouncedControllerInputProps<
   TFieldValues extends FieldValues,
@@ -23,12 +28,18 @@ export function DebouncedControllerInput<
   transform,
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
+  const { setValue } = useFormContext();
   const [localValue, setLocalValue] = useState(field.value ?? "");
 
   const debouncedOnChange = useRef(
     debounce((val: string) => {
       const transformed = transform ? transform(val) : val;
-      field.onChange(transformed);
+      // field.onChange(transformed);
+      setValue(field.name, transformed as TFieldValues[TName], {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+
       setLocalValue(transformed);
     }, debounceMs),
   ).current;
@@ -63,7 +74,11 @@ export function DebouncedControllerInput<
         const pasted = e.clipboardData.getData("text");
         const transformed = transform ? transform(pasted) : pasted;
         setLocalValue(transformed);
-        field.onChange(transformed);
+        // field.onChange(transformed);
+        setValue(field.name, transformed as TFieldValues[TName], {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
       }}
       onBlur={(e) => {
         field.onBlur();
