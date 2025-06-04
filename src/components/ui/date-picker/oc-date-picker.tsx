@@ -56,25 +56,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
       pickerType === "start" ? "Select start date" : "Select deadline";
     let formattedValue = "";
     if (rawValue) {
-      // try {
-      //   const date = new Date(value);
-      //   // console.log({
-      //   //   parsedValue,
-      //   //   local: date.toString(),
-      //   //   tz: formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a"),
-      //   // });
-
-      //   formattedValue =
-      //     pickerType === "start"
-      //       ? formatInTimeZone(date, timeZone, "MMM d, yyyy")
-      //       : formatInTimeZone(date, timeZone, "MMM d, yyyy @ h:mm a");
-      // } catch {
-      //   formattedValue = value; // fallback
-      //   console.log(formattedValue);
-      // }
-
-      const date = parseISO(rawValue); // safer parsing for ISO strings
-
+      const date = parseISO(rawValue);
       if (isValid(date)) {
         // console.log(date, "valid");
         formattedValue =

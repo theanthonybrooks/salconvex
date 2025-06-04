@@ -3,6 +3,8 @@ import { CallType } from "@/types/openCall";
 import { DateTime } from "luxon";
 
 export const FAR_FUTURE = new Date("9999-12-31");
+const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 export const seasonalTerms = ["spring", "summer", "fall", "winter"];
 export const formatEventDates = (
   start: string,
@@ -59,8 +61,12 @@ export const formatEventDates = (
   }
 
   if (isYearAndMonth(start) && isYearAndMonth(end)) {
-    const startDate = new Date(start + "-01");
-    const endDate = new Date(end + "-01");
+    const startDate = DateTime.fromISO(start, { zone })
+      .plus({ hours: 12 })
+      .toJSDate();
+    const endDate = DateTime.fromISO(end, { zone })
+      .plus({ hours: 12 })
+      .toJSDate();
 
     const fullStartMonth = isMobile
       ? getFourCharMonth(startDate)
@@ -86,14 +92,18 @@ export const formatEventDates = (
   if (isYearOnly(start)) return start;
   if (!isYearOnly(start) && isYearOnly(end)) return `By ${end}`;
   if (isYearAndMonth(start)) {
-    const date = new Date(start + "-01");
+    // const date = new Date(start + "-01");
+    const date = DateTime.fromISO(start, { zone })
+      .plus({ hours: 12 })
+      .toJSDate();
     const month = date.toLocaleString("en-US", { month: "long" });
     return `${month} ${date.getFullYear()}`;
   }
   if (!isYearAndMonth(start) && isYearAndMonth(end)) {
-    const date = new Date(end + "-01");
-    const month = date.toLocaleString("en-US", { month: "long" });
-    return `By ${month} ${date.getFullYear()}`;
+    // const date = new Date(end + "-01");
+    const dt = DateTime.fromISO(end, { zone }).plus({ hours: 12 }).toJSDate();
+    const month = dt.toLocaleString("en-US", { month: "long" });
+    return `By ${month} ${dt.getFullYear()}`;
   }
 
   const startDate = new Date(start);
@@ -169,7 +179,7 @@ export const formatOcDates = (start: string, end: string) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  //TODO: Format this with the four-string length months and ensure that isMobile is also used here.
+  //TODO: Format this with the four-string length months and ensure that isMobile is also used here. Check that it's actually displaying correctly!
   const startMonth = startDate.toLocaleString("en-US", { month: "short" });
   const endMonth = endDate.toLocaleString("en-US", { month: "short" });
 
@@ -241,11 +251,7 @@ export const convertOpenCallDatesToUserTimezone = (
 };
 export const formatSingleDate = (date: number) => {
   if (!date) return "";
-  // const dt = DateTime.fromISO(date, { setZone: true }).setZone(timezone);
-  // const month = getFourCharMonth(dt);
-  // const day = dt.day;
-  // const year = dt.year;
-  // const ordinal = getOrdinalSuffix(day);
+
   const output = new Date(date).toLocaleString("en-US");
 
   // return `${month} ${day}${ordinal}, ${year}`;
@@ -369,27 +375,25 @@ export const toDate = (
     return new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)); // Local time
   }
 
-  const date = new Date(value);
-  // console.log(date);
-  return isNaN(date.getTime()) ? null : date;
+  const dt = DateTime.fromISO(value, { zone });
+  if (!dt.isValid) return null;
+  return dt.toJSDate();
 };
 
 export const toYearMonth = (date: Date | null | undefined): string => {
   if (!date) return "";
-  // return date.toISOString().slice(0, 7); // "YYYY-MM" but also gave the wrong month sometimes. Need to test this more.
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  // console.log(year, month);
-  // console.log(`${year}-${month}`);
-  return `${year}-${month}`; // Local YYYY-MM
+
+  const dt = DateTime.fromJSDate(date, { zone });
+  return dt.toFormat("yyyy-MM");
 };
 
 export const toSeason = (date: Date | null | undefined): string => {
   // console.log("toSeason", date);
   if (!date) return "";
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const quarter = Math.floor(month / 3) + 1;
+  const dt = DateTime.fromJSDate(date, { zone });
+  const year = dt.year;
+  const month = dt.month;
+  const quarter = Math.floor((month - 1) / 3) + 1;
 
   const seasonMap: Record<number, string> = {
     1: "Spring",
@@ -403,22 +407,18 @@ export const toSeason = (date: Date | null | undefined): string => {
 
 export const toYear = (date: Date | null | undefined): string => {
   if (!date) return "";
-  return date.getFullYear().toString();
+  // return date.getFullYear().toString();
+  const dt = DateTime.fromJSDate(date, { zone });
+  return dt.toFormat("yyyy");
 };
-
-// export const toDateString = (date: Date | null | undefined): string => {
-//   if (!date) return "";
-//   return date.toISOString().slice(0, 10);
-// };
 
 export const toDateString = (date: Date | null | undefined): string => {
   if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  // console.log(year, month, day);
-  // console.log(`${year}-${month}-${day}`);
-  return `${year}-${month}-${day}`; // Local YYYY-MM-DD
+  console.log(zone);
+
+  const dt = DateTime.fromJSDate(date, { zone });
+  console.log(dt);
+  return dt.toFormat("yyyy-MM-dd");
 };
 
 export const fromSeason = (input: string): Date | null => {
@@ -437,7 +437,8 @@ export const fromSeason = (input: string): Date | null => {
   };
 
   const month = monthMap[season];
-  return new Date(year, month, 1);
+  const dt = DateTime.fromObject({ year, month: month + 1, day: 1 }, { zone });
+  return dt.toJSDate();
 };
 
 export const parseEventDate = (

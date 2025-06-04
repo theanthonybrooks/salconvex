@@ -111,7 +111,7 @@ export const CustomDatePicker = ({
           ? "MMM d, yyyy"
           : "MMMM yyyy";
 
-  //   console.log(parsedDate, value);
+  console.log(parsedDate, value);
 
   return (
     <DatePicker
