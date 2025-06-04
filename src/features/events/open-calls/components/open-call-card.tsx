@@ -99,7 +99,7 @@ const OpenCallCard = ({
       ? [artist.artistResidency.country]
       : []),
   ];
-  console.log(artistCountries);
+  // console.log(artistCountries);
   //compare this to the eligibility whom array
   const artistEligible = artistCountries.some((artistCountry) =>
     eligibilityWhom.some(
