@@ -1,4 +1,9 @@
-import { getOrdinalSuffix, isValidIsoDate, seasonalTerms } from "@/lib/dateFns";
+import {
+  getFourCharMonthFromLuxon,
+  getOrdinalSuffix,
+  isValidIsoDate,
+  seasonalTerms,
+} from "@/lib/dateFns";
 
 import { PublicEventPreviewData } from "@/types/event";
 
@@ -68,7 +73,7 @@ export function getGroupKeyFromEvent(
       });
 
       const day = dt.day;
-      const month = dt.toFormat("LLLL").slice(0, 4);
+      const month = getFourCharMonthFromLuxon(dt);
       const suffix = getOrdinalSuffix(day);
       const year = isPast ? dt.toFormat("yyyy") : undefined;
       return {
@@ -98,7 +103,7 @@ export function getGroupKeyFromEvent(
       });
       const day = dt.day;
       // const month = getFourCharMonth(dt.toJSDate());
-      const month = dt.toFormat("LLLL").slice(0, 4);
+      const month = getFourCharMonthFromLuxon(dt);
 
       const suffix = getOrdinalSuffix(day);
       const year = isPastStart ? dt.toFormat("yyyy") : undefined;
