@@ -106,8 +106,12 @@ export const formatEventDates = (
     return `By ${month} ${dt.getFullYear()}`;
   }
 
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  const startDate = DateTime.fromISO(start, { zone })
+    .plus({ hours: 12 })
+    .toJSDate();
+  const endDate = DateTime.fromISO(end, { zone })
+    .plus({ hours: 12 })
+    .toJSDate();
 
   const isStartDateValid = !isNaN(startDate.getTime());
   const isEndDateValid = !isNaN(endDate.getTime());
