@@ -4,18 +4,18 @@ import {
   isValidIsoDate,
   seasonalTerms,
 } from "@/lib/dateFns";
-import { toZonedTime } from "date-fns-tz";
 
 import { PublicEventPreviewData } from "@/types/event";
 
-import { format } from "date-fns";
+import { DateTime } from "luxon";
 import { JSX } from "react";
 import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa6";
 
 export function getGroupKeyFromEvent(
   event: PublicEventPreviewData,
   sortBy: string,
-  timeZone?: string,
+  timeZone: string,
+  hasTZPref: boolean,
 ): {
   raw: string;
   label?: JSX.Element;
@@ -30,15 +30,34 @@ export function getGroupKeyFromEvent(
   // const isPublished = event.tabs.opencall?.state === "published";
   const callType = basicInfo?.callType;
   const ocEnd = basicInfo?.dates?.ocEnd;
-  const ocEndDate = ocEnd && isValidIsoDate(ocEnd) ? new Date(ocEnd) : null;
+  const ocEndDate =
+    ocEnd && isValidIsoDate(ocEnd)
+      ? DateTime.fromISO(ocEnd, { zone: timeZone }).toJSDate()
+      : null;
+  const ocEndTZ = basicInfo?.dates?.timezone;
+
   const ocStatus = event.openCallStatus;
   // const eventFormat = event.dates.eventFormat;
   const eventStart = event.dates?.eventDates[0]?.start;
   const eventOCStatus = event.hasOpenCall;
   const eventStartDate =
     eventStart && isValidIsoDate(eventStart) ? new Date(eventStart) : null;
-  const isPast = !!ocEndDate && ocEndDate < new Date();
-  const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
+  const ocEndDT =
+    ocEnd && isValidIsoDate(ocEnd)
+      ? DateTime.fromISO(ocEnd, {
+          zone: hasTZPref ? timeZone : (ocEndTZ ?? "Europe/Berlin"),
+        })
+      : null;
+
+  const eventStartDT =
+    eventStart && isValidIsoDate(eventStart)
+      ? DateTime.fromISO(eventStart, { zone: timeZone }).plus({ hours: 12 })
+      : null;
+
+  const isPast = ocEndDT ? ocEndDT < DateTime.now() : false;
+  const isPastStart = eventStartDT ? eventStartDT < DateTime.now() : false;
+  // const isPast = !!ocEndDate && ocEndDate < new Date();
+  // const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
   const isYear = eventStart.trim().length === 4;
   const isSeason = seasonalTerms.includes(eventStart.trim());
 
@@ -49,13 +68,14 @@ export function getGroupKeyFromEvent(
     (ocStatus === "active" || ocStatus === "ended")
   ) {
     if (ocEndDate) {
-      const zoned = timeZone ? toZonedTime(ocEndDate, timeZone) : ocEndDate;
+      const dt = DateTime.fromISO(ocEnd, {
+        zone: hasTZPref ? timeZone : (ocEndTZ ?? "Europe/Berlin"),
+      });
 
-      const day = zoned.getDate();
-      const month = getFourCharMonth(ocEndDate);
+      const day = dt.day;
+      const month = getFourCharMonth(dt.toJSDate());
       const suffix = getOrdinalSuffix(day);
-      const year = isPast ? format(ocEndDate, "yyyy") : undefined;
-
+      const year = isPast ? dt.toFormat("yyyy") : undefined;
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },
@@ -78,17 +98,13 @@ export function getGroupKeyFromEvent(
 
   if (sortBy === "eventStart" && eventStart) {
     if (eventStartDate && !isYear && !isSeason) {
-      const zoned = timeZone
-        ? toZonedTime(eventStartDate, timeZone)
-        : eventStartDate;
-      const day = zoned.getDate();
-      const month = getFourCharMonth(eventStartDate);
+      const dt = DateTime.fromISO(eventStart, { zone: timeZone }).plus({
+        hours: 12,
+      });
+      const day = dt.day;
+      const month = getFourCharMonth(dt.toJSDate());
       const suffix = getOrdinalSuffix(day);
-      const year = isPastStart ? format(eventStartDate, "yyyy") : undefined;
-
-      if (event.name === "asdfasfd ") {
-        console.log(event.name, eventStart, isSeason, isYear);
-      }
+      const year = isPastStart ? dt.toFormat("yyyy") : undefined;
 
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,

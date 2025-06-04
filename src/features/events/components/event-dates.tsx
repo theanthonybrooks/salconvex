@@ -33,7 +33,7 @@ const EventDates = ({
       start,
       end,
     })) ?? [];
-  console.log(mappedEventDates, mappedProdDates);
+
   const eventSliceLimit = limit === 0 ? mappedEventDates?.length : (limit ?? 3);
   const showProdInstead =
     (preview || isMobile) &&

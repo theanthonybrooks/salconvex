@@ -58,6 +58,7 @@ const ClientEventList = (
     (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
+  const hasTZPref = !!userPref?.timezone;
   const searchParams = useSearchParams();
 
   const defaultFilters: Filters = {
@@ -209,6 +210,7 @@ const ClientEventList = (
         event,
         sortOptions.sortBy,
         userTimeZone,
+        hasTZPref,
       );
       const groupKey = title.raw;
 
@@ -221,7 +223,7 @@ const ClientEventList = (
     }
 
     return orderedGroupKeys.map((key) => groups[key]);
-  }, [paginatedEvents, sortOptions, publicView, userTimeZone]);
+  }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);
   const handleFilterChange = (partial: Partial<Filters>) => {
     setFilters((prev) => ({ ...prev, ...partial }));
     setPage(1);
