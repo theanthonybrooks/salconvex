@@ -116,7 +116,6 @@ export const ArtistProfileForm = ({
   useEffect(() => {
     if (hasUnsavedChanges) return;
     if (!hasUnsavedChanges && isDirty) {
-      console.log("hasUnsavedChanges", isDirty);
       setHasUnsavedChanges(true);
     }
   }, [hasUnsavedChanges, isDirty, setHasUnsavedChanges]);

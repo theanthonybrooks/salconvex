@@ -50,6 +50,8 @@ export const UpdateUserSchema = z.object({
   organizationName: z.string().optional(),
 });
 
+
+
 export const ResendOtpSchema = z.object({
   email: z.string().email({ message: "Email is required" }),
 });

@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -69,7 +70,9 @@ import { Timezone, timezones } from "@/app/data/timezones";
 import { Link } from "@/components/ui/custom-link";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import { ArtistProfileForm } from "@/features/artists/components/artist-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { cn } from "@/lib/utils";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { usePreloadedQuery } from "convex/react";
 import { useTheme } from "next-themes";
@@ -85,6 +88,9 @@ export default function SettingsPage() {
   const { signOut } = useAuthActions();
 
   const user = userData?.user;
+  const userType = user?.accountType;
+  const isArtist = userType?.includes("artist");
+
   const userPrefs = userData?.userPref;
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
@@ -93,6 +99,7 @@ export default function SettingsPage() {
     api.users.countSessions,
     userId ? { userId } : "skip",
   );
+
   const updatePassword = useMutation(api.users.updatePassword);
   const updateUserPrefs = useMutation(api.users.updateUserPrefs);
   const deleteSessions = useMutation(api.users.deleteSessions);
@@ -568,120 +575,127 @@ export default function SettingsPage() {
                 </div> */}
               </CardContent>
             </Card>
+            <div
+              className={cn(
+                isArtist && activeSub && "grid gap-6 md:grid-cols-2",
+              )}
+            >
+              {isArtist && activeSub && <ArtistProfileForm user={user} />}
 
-            {/* Preferences */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Preferences</CardTitle>
-                <CardDescription>
-                  Manage your account preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* <div className='flex items-center justify-between'>
-                 //TODO: Add language selection in the future 
-                   <div className='space-y-0.5'>
-                    <Label>Language</Label>
-                    <p className='text-sm text-muted-foreground'>
-                      Select your preferred language
-                    </p>
-                  </div> 
-                  <Select defaultValue='en' onChange={() => setLanguage(value)}>
-                    <SelectTrigger className='w-[180px]'>
-                      <SelectValue placeholder='Select language' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='en'>English</SelectItem>
-                      <SelectItem value='fr'>French</SelectItem>
-                      <SelectItem value='de'>German</SelectItem>
-                      // <SelectItem value='es'>Spanish</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Separator />*/}
-                <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
-                  <div className="space-y-0.5">
-                    <Label>Timezone</Label>
-                    <span className="flex items-center gap-x-1">
+              {/* Preferences */}
+              <Card className={cn(isArtist && activeSub && "self-start")}>
+                <CardHeader>
+                  <CardTitle>Preferences</CardTitle>
+                  <CardDescription>
+                    Manage your account preferences
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* <div className='flex items-center justify-between'>
+                   //TODO: Add language selection in the future 
+                     <div className='space-y-0.5'>
+                      <Label>Language</Label>
+                      <p className='text-sm text-muted-foreground'>
+                        Select your preferred language
+                      </p>
+                    </div> 
+                    <Select defaultValue='en' onChange={() => setLanguage(value)}>
+                      <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Select language' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='en'>English</SelectItem>
+                        <SelectItem value='fr'>French</SelectItem>
+                        <SelectItem value='de'>German</SelectItem>
+                        // <SelectItem value='es'>Spanish</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Separator />*/}
+                  <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="space-y-0.5">
+                      <Label>Timezone</Label>
+                      <span className="flex items-center gap-x-1">
+                        <p className="text-sm text-muted-foreground">
+                          Set your local timezone
+                        </p>
+                        <p className="hidden text-xs italic text-muted-foreground lg:block">
+                          (if you want it used to display deadlines)
+                        </p>
+                      </span>
+                    </div>
+
+                    <SearchMappedSelect<Timezone>
+                      searchFields={[
+                        "name",
+                        "region",
+                        "abbreviation",
+                        "gmtOffset",
+                        "gmtAbbreviation",
+                        "iana",
+                      ]}
+                      value={selectedTimezone ?? "Europe/Berlin"}
+                      onChange={setTimezone}
+                      // className='w-full sm:w-[280px]'
+                      data={timezones[0]}
+                      getItemLabel={(timezone) =>
+                        `${timezone.gmtAbbreviation}  - ${timezone.name} (${
+                          timezone.abbreviation
+                        }${
+                          timezone.dstAbbreviation
+                            ? `/${timezone.dstAbbreviation}`
+                            : ""
+                        })`
+                      }
+                      getItemDisplay={(timezone) =>
+                        `(${
+                          timezone.region !== "North America"
+                            ? timezone.gmtAbbreviation
+                            : timezone.abbreviation
+                        })  - ${timezone.name}`
+                      }
+                      getItemValue={(timezone) => timezone.iana[0]}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="space-y-0.5">
+                      <Label>Currency</Label>
                       <p className="text-sm text-muted-foreground">
-                        Set your local timezone
+                        Set your preferred currency
                       </p>
-                      <p className="hidden text-xs italic text-muted-foreground lg:block">
-                        (if you want it used to display deadlines)
-                      </p>
-                    </span>
-                  </div>
+                    </div>
+                    {/* <Select defaultValue='est'>
+                      <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Select timezone' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.map((option) => (
+                          <SelectItem value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select> */}
 
-                  <SearchMappedSelect<Timezone>
-                    searchFields={[
-                      "name",
-                      "region",
-                      "abbreviation",
-                      "gmtOffset",
-                      "gmtAbbreviation",
-                      "iana",
-                    ]}
-                    value={selectedTimezone ?? "Europe/Berlin"}
-                    onChange={setTimezone}
-                    // className='w-full sm:w-[280px]'
-                    data={timezones[0]}
-                    getItemLabel={(timezone) =>
-                      `${timezone.gmtAbbreviation}  - ${timezone.name} (${
-                        timezone.abbreviation
-                      }${
-                        timezone.dstAbbreviation
-                          ? `/${timezone.dstAbbreviation}`
-                          : ""
-                      })`
-                    }
-                    getItemDisplay={(timezone) =>
-                      `(${
-                        timezone.region !== "North America"
-                          ? timezone.gmtAbbreviation
-                          : timezone.abbreviation
-                      })  - ${timezone.name}`
-                    }
-                    getItemValue={(timezone) => timezone.iana[0]}
-                  />
-                </div>
-                <Separator />
-                <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
-                  <div className="space-y-0.5">
-                    <Label>Currency</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Set your preferred currency
-                    </p>
+                    <SearchMappedSelect<Currency>
+                      className="sm:w-[120px]"
+                      value={selectedCurrency ?? "USD"}
+                      onChange={setCurrency}
+                      data={currencies[0]}
+                      getItemLabel={(currency) =>
+                        `${currency.symbol} (${currency.code}) - ${currency.name}`
+                      }
+                      searchFields={["name", "symbol", "code"]}
+                      getItemDisplay={(currency) =>
+                        `${currency.symbol} (${currency.code})`
+                      }
+                      getItemValue={(currency) => currency.code}
+                    />
                   </div>
-                  {/* <Select defaultValue='est'>
-                    <SelectTrigger className='w-[180px]'>
-                      <SelectValue placeholder='Select timezone' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select> */}
-
-                  <SearchMappedSelect<Currency>
-                    className="sm:w-[120px]"
-                    value={selectedCurrency ?? "USD"}
-                    onChange={setCurrency}
-                    data={currencies[0]}
-                    getItemLabel={(currency) =>
-                      `${currency.symbol} (${currency.code}) - ${currency.name}`
-                    }
-                    searchFields={["name", "symbol", "code"]}
-                    getItemDisplay={(currency) =>
-                      `${currency.symbol} (${currency.code})`
-                    }
-                    getItemValue={(currency) => currency.code}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </TabsContent>
 

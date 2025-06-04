@@ -12,6 +12,7 @@ import type * as actions_getTimezone from "../actions/getTimezone.js";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
+import type * as artists_artistProfile from "../artists/artistProfile.js";
 import type * as artists_getArtistEventMetadata from "../artists/getArtistEventMetadata.js";
 import type * as artists_listActions from "../artists/listActions.js";
 import type * as auth from "../auth.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
   "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
+  "artists/artistProfile": typeof artists_artistProfile;
   "artists/getArtistEventMetadata": typeof artists_getArtistEventMetadata;
   "artists/listActions": typeof artists_listActions;
   auth: typeof auth;
