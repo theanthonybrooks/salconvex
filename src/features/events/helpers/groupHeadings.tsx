@@ -102,7 +102,9 @@ export function getGroupKeyFromEvent(
         hours: 12,
       });
       const day = dt.day;
-      const month = getFourCharMonth(dt.toJSDate());
+      // const month = getFourCharMonth(dt.toJSDate());
+      const month = dt.toFormat("LLLL").slice(0, 4); // e.g., "May "
+
       const suffix = getOrdinalSuffix(day);
       const year = isPastStart ? dt.toFormat("yyyy") : undefined;
 
