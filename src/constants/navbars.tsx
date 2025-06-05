@@ -69,7 +69,7 @@ export const landingPageNavbarMenuLinksTheList: {
     title: "The Archive - (Old Site)",
     // href: "/archive",
     href: "https://thestreetartlist.helioho.st/archive",
-    description: "View all current open calls & events.",
+    description: "Archive of all events - past and current",
     sub: ["all"],
   },
   // {
