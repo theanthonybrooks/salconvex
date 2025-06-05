@@ -172,7 +172,22 @@ export const compareEnrichedEvents = (
       const aYear = aDate.getFullYear();
       const bYear = bDate.getFullYear();
 
-      if (aYear !== bYear) return -1;
+      if (aYear !== bYear) {
+        // Prefer this year first, then descending by year
+        const thisYear = new Date().getFullYear();
+        if (aYear === thisYear && bYear !== thisYear) return -1;
+        if (bYear === thisYear && aYear !== thisYear) return 1;
+        return bYear - aYear; // Descending order
+      }
+
+      // If same year, compare by month/day ascending
+      const aMonth = aDate.getMonth();
+      const bMonth = bDate.getMonth();
+      if (aMonth !== bMonth) return aMonth - bMonth;
+
+      const aDay = aDate.getDate();
+      const bDay = bDate.getDate();
+      return aDay - bDay;
     }
 
     if (priorityA.priority === 6 || priorityA.priority === 8) {

@@ -132,6 +132,10 @@ export function AdminDashboardTableWrapper({
                 lastEditedAt: false,
                 dates_edition: false,
               }}
+              toolbarData={{
+                totalPerMonth: usersData?.totalPerMonth ?? 0,
+                totalPerYear: usersData?.totalPerYear ?? 0,
+              }}
               defaultSort={{ id: "createdAt", desc: false }}
               onRowSelect={(row) => {
                 console.log(row);
