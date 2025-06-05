@@ -2,6 +2,7 @@ import { ApplicationStatus } from "@/types/applications";
 import { ArtistFull } from "@/types/artist";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
+import slugify from "slugify";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
 
@@ -67,6 +68,9 @@ export const updateOrCreateArtist = mutation({
         imageStorageId: args.artistLogoStorageId,
       });
     }
+    const artistSlug = args.artistName
+      ? slugify(args.artistName, { lower: true })
+      : null;
 
     if (!artist) {
       // If they don't exist, create a new "artist"
@@ -92,6 +96,7 @@ export const updateOrCreateArtist = mutation({
         updatedAt: Date.now(),
         lastUpdatedBy: userId,
         completedProfile: false,
+        artistSlug: artistSlug ?? undefined,
       });
       return { artistId };
     }
@@ -106,6 +111,9 @@ export const updateOrCreateArtist = mutation({
     if ("artistNationality" in args)
       patch.artistNationality = args.artistNationality;
     if ("artistResidency" in args) patch.artistResidency = args.artistResidency;
+
+    if (artistSlug && artist?.artistSlug !== artistSlug)
+      patch.artistSlug = artistSlug;
 
     await ctx.db.patch(artist._id, patch);
   },

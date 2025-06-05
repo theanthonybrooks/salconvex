@@ -615,7 +615,12 @@ export default function SettingsPage() {
                   <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="space-y-0.5">
                       <Label>Timezone</Label>
-                      <span className="flex items-center gap-x-1">
+                      <span
+                        className={cn(
+                          "flex items-center gap-x-1",
+                          isArtist && activeSub && "flex-col items-start",
+                        )}
+                      >
                         <p className="text-sm text-muted-foreground">
                           Set your local timezone
                         </p>

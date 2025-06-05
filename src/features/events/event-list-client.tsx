@@ -168,6 +168,10 @@ const ClientEventList = (
     );
   }, [filters, sortOptions, page]);
 
+  useEffect(() => {
+    window.scroll({ top: 0 });
+  }, [page]);
+
   const totalPages = Math.ceil(total / filters.limit);
 
   const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
