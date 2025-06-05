@@ -92,13 +92,15 @@ export const compareEnrichedEvents = (
   if (sortBy === "openCall") {
     const getPriority = (item: EnrichedEventsCardData) => {
       const now = new Date();
-      now.setHours(0, 0, 0, 0);
+      // now.setHours(0, 0, 0, 0);
 
       const hasOpenCall = item.hasActiveOpenCall;
       const callType = item.tabs.opencall?.basicInfo?.callType;
       const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd;
       const ocState = item.tabs.opencall?.state;
-      const isPublished = ocState === "published";
+      const isPublished = ocState === "published" && item.state === "published";
+      const isArchivedOC = ocState === "archived" && item.state === "published";
+      const isApproved = isPublished || isArchivedOC;
       const ocStatus = item.openCallStatus;
       const isRolling = callType === "Rolling";
       const startDate = item.dates.eventDates[0].start;
@@ -107,6 +109,7 @@ export const compareEnrichedEvents = (
       const isPast = ocEnd < now;
       const eventStartDate = parseEventDate(startDate) ?? FAR_FUTURE;
       const eventFormat = item.dates.eventFormat;
+
       // if (item.name === "asdfasfd") {
       //   console.log(
       //     item.name,
@@ -126,7 +129,7 @@ export const compareEnrichedEvents = (
         else priority = 3;
       } else if (ocStatus === "coming-soon") {
         priority = 4;
-      } else if (!hasOpenCall && !!callType && isPublished) {
+      } else if (!hasOpenCall && !!callType && isApproved) {
         priority = 5;
       } else if (eventFormat === "ongoing") {
         priority = 6;

@@ -204,9 +204,9 @@ export const getFilteredEventsPublic = query({
                 hasActiveOpenCall = true;
                 totalOpenCalls++;
               }
+              console.log(ocEnd, ocEndISO, now, openCallStatus);
             }
           }
-          console.log(ocEnd, ocEndISO, now, openCallStatus);
         }
 
         return {
