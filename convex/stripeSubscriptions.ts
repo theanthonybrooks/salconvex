@@ -1,5 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import Stripe from "stripe";
 import { Id } from "~/convex/_generated/dataModel";
 import { api, internal } from "./_generated/api";
@@ -242,15 +242,25 @@ export const subscriptionStoreWebhook = mutation({
   handler: async (ctx, args) => {
     // Extract event type from webhook payload
     let eventType = args.body.type;
+    let createdTimestamp: number | undefined =
+      args.body.data.created ?? args.body.data.object.created;
+    const createdAt = new Date(
+      (createdTimestamp ?? Date.now()) * 1000,
+    ).toISOString();
+    let modifiedTimestamp: number | undefined =
+      args.body.data.modified_at ??
+      args.body.data.object.created ??
+      args.body.created;
+    const modifiedAt = new Date(
+      (modifiedTimestamp ?? Date.now()) * 1000,
+    ).toISOString();
     // console.log("Event type store webhook:", eventType)
     // Store webhook event
     await ctx.db.insert("stripeWebhookEvents", {
       type: eventType,
       stripeEventId: args.body.data.object.id,
-      createdAt: new Date(args.body.data.object.created * 1000).toISOString(),
-      modifiedAt: args.body.data.modified_at
-        ? new Date(args.body.data.modified_at * 1000).toISOString()
-        : new Date(args.body.data.object.created * 1000).toISOString(),
+      createdAt,
+      modifiedAt,
       data: args.body.data,
     });
 
@@ -519,12 +529,15 @@ export const subscriptionStoreWebhook = mutation({
           .first();
 
         const base = args.body.data;
+        const discount = base.object?.discount?.coupon?.percent_off;
+        // const couponCode = base.object?.discount?.coupon?.name;
         const currentAmount = base.object.plan?.amount;
         const currentInterval = base.object.plan?.interval;
         const prevInterval = updatedSub?.interval;
         const prevAmount = base.previous_attributes?.plan?.amount;
 
         let amount: number | undefined;
+        let discountAmount: number | undefined;
         let nextAmount: number | undefined;
         let interval: string | undefined;
         let nextInterval: string | undefined;
@@ -548,6 +561,12 @@ export const subscriptionStoreWebhook = mutation({
           interval = currentInterval;
         }
 
+        if (discount && amount) {
+          discountAmount = amount;
+          amount = amount - amount * (discount / 100);
+          console.log(discountAmount, discount, amount);
+        }
+
         if (updatedSub) {
           const updates: any = {
             status: base.object.status,
@@ -563,6 +582,7 @@ export const subscriptionStoreWebhook = mutation({
             interval: interval,
             intervalNext: nextInterval,
             amount: amount,
+            discount: discountAmount,
             amountNext: nextAmount,
             currentPeriodEnd: base.object.current_period_end
               ? new Date(base.object.current_period_end * 1000).getTime()
@@ -587,6 +607,7 @@ export const subscriptionStoreWebhook = mutation({
           await ctx.db.patch(updatedSub._id, updates);
         }
         break;
+
       case "customer.subscription.deleted":
         // Find existing subscription
         const deletedSub = await ctx.db
@@ -607,6 +628,24 @@ export const subscriptionStoreWebhook = mutation({
               : undefined,
           });
         }
+        break;
+
+      case "customer.discount.deleted":
+        const affectedSub = await ctx.db
+          .query("userSubscriptions")
+          .withIndex("customerId", (q) =>
+            q.eq("customerId", args.body.data.object.customer),
+          )
+          .first();
+
+        if (affectedSub) {
+          await ctx.db.patch(affectedSub._id, {
+            discount: undefined,
+            promoCode: undefined,
+            promoAppliedAt: undefined,
+          });
+        }
+
         break;
       case "invoice.payment_succeeded":
         // Find existing subscription
@@ -744,53 +783,122 @@ export const paymentWebhook = httpAction(async (ctx, request) => {
   }
 });
 
-// ... the rest of your file remains unchanged.
+// Add to your stripeSubscriptions.ts file
+export const applyCouponToSubscription = action({
+  args: {
+    couponCode: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userCode = args.couponCode?.toUpperCase();
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
-/**
- * Query: Get the current user's Stripe subscription status.
- */
-// export const getUserStripeSubscriptionStatus = query({
-//   handler: async (ctx: any) => {
-//     const identity = await ctx.auth.getUserIdentity()
-//     if (!identity) return { hasActiveSubscription: false }
+    const result = await ctx.runQuery(
+      api.subscriptions.getUserSubscriptionStatus,
+      {},
+    );
 
-//     const user = await ctx.db
-//       .query("users")
-//       .withIndex("by_token", (q: any) =>
-//         q.eq("tokenIdentifier", identity.subject)
-//       )
-//       .unique()
-//     if (!user) return { hasActiveSubscription: false }
+    if (!result) throw new Error("User not found");
+    const { subscription, hasActiveSubscription } = result;
+    const interval = subscription?.interval;
+    const subAmount = subscription?.amount ?? 0;
+    const stripeSubscriptionId = subscription?.stripeId;
 
-//     const subscription = await ctx.db
-//       .query("userSubscriptions")
-//       .withIndex("userId", (q: any) => q.eq("userId", user.tokenIdentifier))
-//       .first()
-//     const isActive = subscription?.status === "active"
-//     return { hasActiveSubscription: isActive }
-//   },
-// })
+    if (!subscription || !stripeSubscriptionId || !hasActiveSubscription)
+      throw new Error("Active subscription not found");
 
-/**
- * Query: Get detailed Stripe subscription info for the current user.
- */
-// export const getUserStripeSubscription = query({
-//   handler: async (ctx: any) => {
-//     const identity = await ctx.auth.getUserIdentity()
-//     if (!identity) return null
+    // Lookup the promotion_code by coupon code string
+    const promoCodes = await stripe.promotionCodes.list({
+      code: userCode,
+      active: true,
+    });
 
-//     const user = await ctx.db
-//       .query("users")
-//       .withIndex("by_token", (q: any) =>
-//         q.eq("tokenIdentifier", identity.subject)
-//       )
-//       .unique()
-//     if (!user) return null
+    const promoCode = promoCodes.data[0];
+    if (!promoCode) throw new ConvexError("Invalid or expired coupon code");
+    const metaData = promoCode.coupon?.metadata;
+    const metaMinAmount = metaData?.MIN_AMT ? Number(metaData?.MIN_AMT) : null;
+    const metaMaxAmount = metaData?.MAX_AMT ? Number(metaData?.MAX_AMT) : null;
+    const metaExcludedAmount = metaData?.EXCL_AMT
+      ? Number(metaData?.EXCL_AMT)
+      : null;
+    console.log(metaMinAmount, metaMaxAmount, metaExcludedAmount, subAmount);
+    // Check if a discount is already applied
+    const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    if (stripeSub.discount) {
+      throw new ConvexError("Subscription already has a discount applied.");
+    }
 
-//     const subscription = await ctx.db
-//       .query("userSubscriptions")
-//       .withIndex("userId", (q: any) => q.eq("userId", user.tokenIdentifier))
-//       .first()
-//     return subscription
-//   },
-// })
+    const coupon = await stripe.coupons.retrieve(promoCode.coupon.id);
+    const allowedProductIds = coupon.applies_to?.products;
+    // console.log(coupon);
+    // console.log(allowedProductIds);
+    // console.log(stripeSub);
+    if (allowedProductIds && allowedProductIds?.length > 0) {
+      const subscribedProductIds = stripeSub.items.data.map((item) => {
+        const product = item.price.product;
+        return typeof product === "string" ? product : product.id;
+      });
+
+      const isAllowed = subscribedProductIds.some((productId) =>
+        allowedProductIds.includes(productId),
+      );
+
+      if (!isAllowed) {
+        throw new Error("This coupon is not valid for your selected plan.");
+      }
+    }
+    console.log(metaData?.interval, interval);
+    if (metaData?.interval && metaData?.interval !== interval) {
+      throw new ConvexError(
+        "This promotion code cannot be used with your current subscription interval",
+      );
+    }
+    if (metaExcludedAmount && subAmount === metaExcludedAmount) {
+      throw new ConvexError(
+        "This promotion code cannot be used with your current subscription tier.",
+      );
+    }
+
+    if (
+      (metaMinAmount && subAmount < metaMinAmount) ||
+      (metaMaxAmount && subAmount > metaMaxAmount)
+    ) {
+      throw new ConvexError(
+        "This promotion code cannot be used with your current subscription tier.",
+      );
+    }
+
+    // Update the subscription to apply the promo
+    await stripe.subscriptions.update(stripeSubscriptionId, {
+      promotion_code: promoCode.id,
+    });
+
+    await ctx.runMutation(api.stripeSubscriptions.markCouponApplied, {
+      promoCode: `${userCode}: (${promoCode.id})`,
+    });
+
+    return { success: true };
+  },
+});
+
+// in stripeSubscriptions.ts
+export const markCouponApplied = mutation({
+  args: {
+    promoCode: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("User not found");
+    const subscription = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+    if (!subscription) throw new Error("Subscription not found");
+    await ctx.db.patch(subscription._id, {
+      promoAppliedAt: Date.now(),
+      promoCode: args.promoCode,
+    });
+  },
+});
