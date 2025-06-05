@@ -43,13 +43,21 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: true,
         userType: ["public"],
       },
-      // {
-      //   title: "Archive",
-      //   path: "/archive",
-      //   category: "thelist",
-      //   public: true,
-      //   userType: ["public"],
-      // },
+      {
+        title: "Archive",
+        // path: "/archive",
+        path: "https://thestreetartlist.helioho.st/archive",
+        category: "thelist",
+        public: true,
+        userType: ["public"],
+      },
+      {
+        title: "Map",
+        path: "https://thestreetartlist.helioho.st/map",
+        category: "thelist",
+        public: true,
+        userType: ["public"],
+      },
       // {
       //   title: "Calendar",
       //   path: "/calendar",
