@@ -589,12 +589,11 @@ const EventCardPreview = ({
               <span className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className={"font-semibold"}>
                   {/* {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}: */}
-                  {hasOpenCall &&
-                    (basicInfo.callType === "Fixed"
-                      ? "Deadline"
-                      : basicInfo?.callType === "Email"
-                        ? "Email by"
-                        : "Status")}
+                  {basicInfo.callType === "Fixed"
+                    ? "Deadline"
+                    : basicInfo?.callType === "Email"
+                      ? "Email by"
+                      : "Status"}
                   :
                 </span>
                 {publicView && !publicPreview ? (

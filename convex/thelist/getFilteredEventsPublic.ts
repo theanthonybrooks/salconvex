@@ -192,11 +192,11 @@ export const getFilteredEventsPublic = query({
             const isFixed = ocType === "Fixed";
             const isInWeek =
               ocEndISO && ocEndISO > weekStartISO && ocEndISO < weekEndISO;
-
+            const isEnded = ocEnd && now > ocEnd;
             if (isFixed && isInWeek) {
-              if (openCall.state === "published") {
+              if (openCall.state === "published" && !isEnded) {
                 openCallStatus = "active";
-              } else if (openCall.state === "archived") {
+              } else if (openCall.state === "archived" || isEnded) {
                 openCallStatus = "ended";
               }
 
@@ -206,6 +206,7 @@ export const getFilteredEventsPublic = query({
               }
             }
           }
+          console.log(ocEnd, ocEndISO, now, openCallStatus);
         }
 
         return {
