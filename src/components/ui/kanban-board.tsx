@@ -4,7 +4,7 @@ import { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
 
@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
+import { debounce } from "lodash";
 
 type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done";
 
@@ -124,10 +125,24 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
 }) => {
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  let rawCards = null;
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce inside useEffect only
+  useEffect(() => {
+    const handler = debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 300);
+
+    handler(searchTerm.trim());
+
+    return () => {
+      handler.cancel(); // prevent memory leaks
+    };
+  }, [searchTerm]);
+
   const searchResults = useQuery(
     api.kanban.cards.searchCards,
-    searchTerm.trim() !== ""
+    debouncedSearch !== ""
       ? {
           purpose,
           searchTerm,
@@ -138,7 +153,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
   const rawResults =
     useQuery(
       api.kanban.cards.getCards,
-      searchTerm.trim() === "" ? { purpose } : "skip",
+      debouncedSearch === "" ? { purpose } : "skip",
     ) ||
     ([] as {
       _id: Id<"todoKanban">;
@@ -150,11 +165,8 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
       purpose: string;
       completedAt?: number;
     }[]);
-  if (searchResults) {
-    rawCards = searchResults;
-  } else {
-    rawCards = rawResults;
-  }
+  const rawCards = searchResults ?? rawResults;
+
   const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 };
 
   const cards = rawCards
@@ -203,7 +215,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
     : baseColumns;
 
   return (
-    <div className="flex w-full flex-col gap-3 p-6">
+    <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
       <Input
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
