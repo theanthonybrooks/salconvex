@@ -131,7 +131,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
   useEffect(() => {
     const handler = debounce((value: string) => {
       setDebouncedSearch(value);
-    }, 300);
+    }, 100);
 
     handler(searchTerm.trim());
 
@@ -216,12 +216,22 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
 
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
-      <Input
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search"
-        className="w-full max-w-md"
-      />
+      <div className="flex items-center gap-3">
+        <Input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search"
+          className="w-full max-w-md"
+        />
+        {debouncedSearch !== "" && (
+          <p
+            className="text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95"
+            onClick={() => setSearchTerm("")}
+          >
+            Clear Search
+          </p>
+        )}
+      </div>
       <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
         {orderedColumns.map((column) => (
           <Column
