@@ -183,7 +183,7 @@ export const getFilteredEventsPublic = query({
           if (hasActiveOpenCall) {
             totalOpenCalls++;
           }
-        } else if (thisWeekPg) {
+        } else if (thisWeekPg || nextWeekPg) {
           // if (!openCall || openCall.state !== "published") return null;
 
           const ocEndISO = openCall?.basicInfo?.dates?.ocEnd ?? null;
@@ -204,7 +204,6 @@ export const getFilteredEventsPublic = query({
                 hasActiveOpenCall = true;
                 totalOpenCalls++;
               }
-              console.log(ocEnd, ocEndISO, now, openCallStatus);
             }
           }
         }
@@ -223,9 +222,10 @@ export const getFilteredEventsPublic = query({
         };
       }),
     );
-    const filtered = thisWeekPg
-      ? enriched.filter((e) => e.openCall && e.hasActiveOpenCall)
-      : enriched;
+    const filtered =
+      thisWeekPg || nextWeekPg
+        ? enriched.filter((e) => e.openCall && e.hasActiveOpenCall)
+        : enriched;
 
     const sorted = filtered.sort((a, b) =>
       compareEnrichedEvents(a, b, {
