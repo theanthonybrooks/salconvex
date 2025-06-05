@@ -160,10 +160,16 @@ export const ApplyButton = ({
     api.subscriptions.getUserSubscriptionStatus,
     finalButton ? {} : "skip",
   );
+  const hasSub = subscription?.hasActiveSubscription;
+
   const noSub =
     !subscription?.hasActiveSubscription &&
     (publicPreview || publicView || finalButton);
 
+  const isAdmin = useQuery(
+    api.users.isAdmin,
+    hasSub && finalButton ? {} : "skip",
+  );
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -281,7 +287,7 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              disabled={openCall !== "active" || noSub}
+              disabled={(openCall !== "active" && !isAdmin) || noSub}
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
