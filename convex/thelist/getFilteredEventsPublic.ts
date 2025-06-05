@@ -3,7 +3,7 @@ import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { endOfWeek, startOfWeek } from "date-fns";
+import { addWeeks, endOfWeek, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 export const getFilteredEventsPublic = query({
@@ -29,24 +29,42 @@ export const getFilteredEventsPublic = query({
       v.literal("thelist"),
       v.literal("archive"),
       v.literal("thisweek"),
+      v.literal("nextweek"),
     ),
   },
   handler: async (ctx, { filters, sortOptions, page, source }) => {
     const thisWeekPg = source === "thisweek";
+    const nextWeekPg = source === "nextweek";
     const archivePg = source === "archive";
     const theListPg = source === "thelist";
 
-    let thisWeekStartISO = "";
-    let thisWeekEndISO = "";
+    // let thisWeekStartISO = "";
+    // let thisWeekEndISO = "";
 
-    if (thisWeekPg) {
-      const now = new Date();
-      const monday = startOfWeek(now, { weekStartsOn: 1 });
-      const sunday = endOfWeek(now, { weekStartsOn: 1 });
+    // if (thisWeekPg) {
+    //   const now = new Date();
+    //   const monday = startOfWeek(now, { weekStartsOn: 1 });
+    //   const sunday = endOfWeek(now, { weekStartsOn: 1 });
 
-      thisWeekStartISO = monday.toISOString();
-      thisWeekEndISO = sunday.toISOString();
-    }
+    //   thisWeekStartISO = monday.toISOString();
+    //   thisWeekEndISO = sunday.toISOString();
+    // }
+
+    const now = new Date();
+    const baseWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const baseWeekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+    const targetWeekOffset = source === "nextweek" ? 1 : 0;
+
+    const weekStart = startOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
+      weekStartsOn: 1,
+    });
+    const weekEnd = endOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
+      weekStartsOn: 1,
+    });
+
+    const weekStartISO = weekStart.toISOString();
+    const weekEndISO = weekEnd.toISOString();
 
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
@@ -173,9 +191,7 @@ export const getFilteredEventsPublic = query({
           if (openCall) {
             const isFixed = ocType === "Fixed";
             const isInWeek =
-              ocEndISO &&
-              ocEndISO > thisWeekStartISO &&
-              ocEndISO < thisWeekEndISO;
+              ocEndISO && ocEndISO > weekStartISO && ocEndISO < weekEndISO;
 
             if (isFixed && isInWeek) {
               if (openCall.state === "published") {
@@ -226,8 +242,8 @@ export const getFilteredEventsPublic = query({
       results: paginated as PublicEventPreviewData[],
       total: sorted.length,
       totalOpenCalls,
-      thisWeekStartISO,
-      thisWeekEndISO,
+      weekStartISO,
+      weekEndISO,
     };
   },
 });

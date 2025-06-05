@@ -2,7 +2,7 @@ import { Filters, Pagination, SortOptions } from "@/types/thelist";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "~/convex/_generated/api";
 
-export const sourceOptions = ["thelist", "archive", "thisweek"] as const;
+export const sourceOptions = ["thelist", "archive", "thisweek", "nextweek"] as const;
 export type Source = (typeof sourceOptions)[number];
 
 export const useFilteredEventsQuery = (

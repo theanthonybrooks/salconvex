@@ -22,9 +22,10 @@ import { formatInTimeZone } from "date-fns-tz";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
 import { Separator } from "@/components/ui/separator";
+import { LucideUploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 // interface Props {
 
 // }
@@ -55,7 +56,7 @@ const ClientThisWeekList = (
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
-
+  const [source, setSource] = useState<"thisweek" | "nextweek">("thisweek");
   const sortOptions = useMemo<SortOptions>(
     () => ({
       sortBy: "openCall",
@@ -75,16 +76,16 @@ const ClientThisWeekList = (
     },
     sortOptions,
     { page: 1 },
-    "thisweek",
+    source,
   );
 
   const total = queryResult?.total ?? 0;
-  const thisWeekStart = queryResult?.thisWeekStartISO
-    ? formatInTimeZone(parseISO(queryResult.thisWeekStartISO), "UTC", "MMM d")
+  const thisWeekStart = queryResult?.weekStartISO
+    ? formatInTimeZone(parseISO(queryResult.weekStartISO), "UTC", "MMM d")
     : "";
 
-  const thisWeekEnd = queryResult?.thisWeekEndISO
-    ? formatInTimeZone(parseISO(queryResult.thisWeekEndISO), "UTC", "MMM d")
+  const thisWeekEnd = queryResult?.weekEndISO
+    ? formatInTimeZone(parseISO(queryResult.weekEndISO), "UTC", "MMM d")
     : "";
 
   const isLoading = !queryResult;
@@ -177,6 +178,30 @@ const ClientThisWeekList = (
                 thickness={3}
                 className="mx-auto mt-1 max-w-[min(70vw,165px)] bg-foreground"
               />
+              {isAdmin && (
+                <div className="flex items-center justify-center gap-3 pt-4">
+                  <Button
+                    variant="salWithShadowHiddenBg"
+                    onClick={() => setSource("thisweek")}
+                    disabled={source === "thisweek"}
+                  >
+                    This Week
+                  </Button>
+                  <Button
+                    variant="salWithShadowHiddenBg"
+                    onClick={() => setSource("nextweek")}
+                    disabled={source === "nextweek"}
+                  >
+                    Next Week
+                  </Button>
+                  <Button
+                    variant="salWithShadowHiddenBg"
+                    onClick={() => console.log("clicked")}
+                  >
+                    <LucideUploadCloud className="size-5" />
+                  </Button>
+                </div>
+              )}
             </section>
             <section>
               <p className="mb-4 mt-2 text-center text-sm">
