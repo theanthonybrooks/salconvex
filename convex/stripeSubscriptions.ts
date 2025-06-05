@@ -630,6 +630,23 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
+      case "customer.discount.created":
+        const discountedSub = await ctx.db
+          .query("userSubscriptions")
+          .withIndex("customerId", (q) =>
+            q.eq("customerId", args.body.data.object.customer),
+          )
+          .first();
+        if (discountedSub) {
+          await ctx.db.patch(discountedSub._id, {
+            discount: discountedSub.amount,
+            promoCode: args.body.data.object.discount.coupon.name,
+            promoAppliedAt: new Date(
+              args.body.data.object.coupon.created * 1000,
+            ).getTime(),
+          });
+        }
+        break;
       case "customer.discount.deleted":
         const affectedSub = await ctx.db
           .query("userSubscriptions")

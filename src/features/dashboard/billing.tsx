@@ -18,6 +18,7 @@ export default function BillingPage() {
   // const userData = useQuery(api.users.getCurrentUser, {})
   // const user = userData?.user // This avoids destructuring null or undefined
   const [promoCode, setPromoCode] = useState("");
+  const [promoAttempts, setPromoAttempts] = useState(0);
   const subscription = useQuery(api.subscriptions.getUserSubscription);
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
   const applyCoupon = useAction(
@@ -108,6 +109,13 @@ export default function BillingPage() {
 
   const handleApplyCoupon = async () => {
     if (!promoCode) return;
+    if (promoAttempts >= 5) {
+      toast.error(
+        "You have exceeded the maximum number of coupon attempts. Try again later.",
+      );
+      setPromoCode("");
+      return;
+    }
     try {
       await applyCoupon({ couponCode: promoCode });
       toast.success("Coupon applied successfully");
@@ -137,6 +145,7 @@ export default function BillingPage() {
       }
     } finally {
       setPromoCode("");
+      setPromoAttempts((prev) => prev + 1);
     }
   };
 
@@ -176,6 +185,7 @@ export default function BillingPage() {
                 <Input
                   placeholder="Enter Promo Code"
                   value={promoCode}
+                  disabled={promoAttempts >= 5}
                   onChange={(e) => setPromoCode(e.target.value)}
                   className="flex-1 uppercase placeholder:normal-case"
                 />
@@ -184,6 +194,7 @@ export default function BillingPage() {
                     type="submit"
                     variant="salWithShadowHidden"
                     className="w-fit"
+                    disabled={promoAttempts >= 5}
                   >
                     Apply Promo Code
                   </Button>
