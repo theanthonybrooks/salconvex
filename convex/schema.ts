@@ -701,8 +701,14 @@ export default defineSchema({
     public: v.boolean(),
     lastUpdatedBy: v.string(),
     priority: v.optional(v.string()),
+    purpose: v.optional(v.string()),
   })
+    .searchIndex("search_by_title", {
+      searchField: "title",
+      filterFields: ["column", "order", "priority", "public", "purpose"],
+    })
     .index("by_column_completedAt", ["column", "completedAt"])
+    .index("by_purpose", ["purpose"])
     .index("by_column_order", ["column", "order"]),
 
   userPlans: defineTable({

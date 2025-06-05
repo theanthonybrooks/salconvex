@@ -3,10 +3,34 @@ import { mutation, query } from "../_generated/server";
 
 type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done";
 
+export const searchCards = query({
+  args: {
+    purpose: v.optional(v.string()),
+    searchTerm: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let q = ctx.db
+      .query("todoKanban")
+      .withSearchIndex("search_by_title", (q) => {
+        let filter = q.search("title", args.searchTerm ?? "");
+        if (args.purpose) {
+          filter = filter.eq("purpose", args.purpose);
+        }
+        return filter;
+      });
+    return await q.collect();
+  },
+});
+
 export const getCards = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("todoKanban").collect();
+  args: {
+    purpose: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("todoKanban")
+      .withIndex("by_purpose", (q) => q.eq("purpose", args.purpose))
+      .collect();
   },
 });
 
@@ -24,6 +48,7 @@ export const addCard = mutation({
     priority: v.optional(v.string()),
     userId: v.string(),
     isPublic: v.boolean(),
+    purpose: v.string(),
   },
   handler: async (ctx, args) => {
     const { column, order, title, userId, priority, isPublic } = args;
@@ -37,6 +62,7 @@ export const addCard = mutation({
         order: 0,
         priority,
         public: isPublic,
+        purpose: args.purpose,
         completedAt: Date.now(),
       });
     }
@@ -63,6 +89,7 @@ export const addCard = mutation({
         order: 0,
         priority,
         public: isPublic,
+        purpose: args.purpose,
       });
     }
 
@@ -82,6 +109,7 @@ export const addCard = mutation({
       lastUpdatedBy: userId,
       order: newOrder,
       public: isPublic,
+      purpose: args.purpose,
     });
   },
 });
@@ -98,6 +126,7 @@ export const moveCard = mutation({
     ),
     beforeId: v.optional(v.id("todoKanban")),
     userId: v.string(),
+    purpose: v.string(),
   },
   handler: async (ctx, args) => {
     const { id, column, beforeId, userId } = args;
@@ -180,6 +209,7 @@ export const editCard = mutation({
       ),
     ),
     isPublic: v.optional(v.boolean()),
+    purpose: v.string(),
   },
   handler: async (ctx, args) => {
     if (args.column === "done") {

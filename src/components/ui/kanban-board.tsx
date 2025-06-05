@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
 
@@ -33,6 +34,7 @@ interface Card {
   column: ColumnType;
   priority?: string;
   isPublic: boolean;
+  purpose: string;
 }
 
 interface MoveCardArgs {
@@ -40,6 +42,7 @@ interface MoveCardArgs {
   column: ColumnType;
   beforeId?: Id<"todoKanban"> | undefined;
   userId: string;
+  purpose: string;
 }
 
 interface AddCardArgs {
@@ -49,6 +52,7 @@ interface AddCardArgs {
   order?: "start" | "end";
   priority?: string;
   isPublic: boolean;
+  purpose: string;
 }
 
 interface DeleteCardArgs {
@@ -64,6 +68,7 @@ interface ColumnProps {
   column: ColumnType;
   cards: Card[];
   userRole: string;
+  purpose: string;
   moveCard: (args: MoveCardArgs) => void;
   addCard: (args: AddCardArgs) => void;
   deleteCard: (args: DeleteCardArgs) => void;
@@ -75,6 +80,7 @@ interface CardProps {
   column: ColumnType;
   priority?: string;
   isPublic: boolean;
+  purpose: string;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
   deleteCard: (args: DeleteCardArgs) => void;
@@ -91,6 +97,7 @@ interface DropIndicatorProps {
 
 interface KanbanBoardProps {
   userRole?: string;
+  purpose?: string;
 }
 
 const getColumnColor = (column: ColumnType) => {
@@ -106,13 +113,33 @@ const getColumnColor = (column: ColumnType) => {
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userRole = "user",
+  purpose = "todo",
 }) => {
-  return <Board userRole={userRole} />;
+  return <Board userRole={userRole} purpose={purpose} />;
 };
 
-const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
-  const rawCards =
-    useQuery(api.kanban.cards.getCards) ||
+const Board: React.FC<{ userRole: string; purpose: string }> = ({
+  userRole,
+  purpose,
+}) => {
+  const [activeColumn, setActiveColumn] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  let rawCards = null;
+  const searchResults = useQuery(
+    api.kanban.cards.searchCards,
+    searchTerm.trim() !== ""
+      ? {
+          purpose,
+          searchTerm,
+        }
+      : "skip",
+  );
+
+  const rawResults =
+    useQuery(
+      api.kanban.cards.getCards,
+      searchTerm.trim() === "" ? { purpose } : "skip",
+    ) ||
     ([] as {
       _id: Id<"todoKanban">;
       title: string;
@@ -120,14 +147,21 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
       order: number;
       priority?: string;
       public: boolean;
+      purpose: string;
       completedAt?: number;
     }[]);
+  if (searchResults) {
+    rawCards = searchResults;
+  } else {
+    rawCards = rawResults;
+  }
   const priorityLevels: Record<string, number> = { high: 1, medium: 2, low: 3 };
 
   const cards = rawCards
     .map(({ _id, public: isPublic, ...rest }) => ({
       id: _id,
       isPublic,
+      purpose,
       ...rest,
     }))
     .sort((a, b) => {
@@ -152,8 +186,6 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   const moveCard = useMutation(api.kanban.cards.moveCard);
   const deleteCard = useMutation(api.kanban.cards.deleteCard);
 
-  const [activeColumn, setActiveColumn] = useState<string | null>(null);
-
   const columnDisplayNames: Record<ColumnType, string> = {
     proposed: "Proposed",
     backlog: "Considering",
@@ -163,29 +195,39 @@ const Board: React.FC<{ userRole: string }> = ({ userRole }) => {
   };
 
   const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"];
-  const hasProposed = cards.some((card) => card.column === "proposed");
+  const hasProposed =
+    cards.some((card) => card.column === "proposed") || purpose === "design";
 
   const orderedColumns: ColumnType[] = hasProposed
     ? ["proposed", ...baseColumns]
     : baseColumns;
 
   return (
-    <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto p-6">
-      {orderedColumns.map((column) => (
-        <Column
-          key={column}
-          title={columnDisplayNames[column]}
-          column={column}
-          headingColor={getColumnColor(column)}
-          cards={cards.filter((card) => card.column === column)}
-          userRole={userRole}
-          moveCard={moveCard}
-          addCard={addCard}
-          deleteCard={deleteCard}
-          activeColumn={activeColumn}
-          setActiveColumn={setActiveColumn}
-        />
-      ))}
+    <div className="flex w-full flex-col gap-3 p-6">
+      <Input
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search"
+        className="w-full max-w-md"
+      />
+      <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
+        {orderedColumns.map((column) => (
+          <Column
+            key={column}
+            title={columnDisplayNames[column]}
+            column={column}
+            headingColor={getColumnColor(column)}
+            cards={cards.filter((card) => card.column === column)}
+            userRole={userRole}
+            moveCard={moveCard}
+            addCard={addCard}
+            purpose={purpose}
+            deleteCard={deleteCard}
+            activeColumn={activeColumn}
+            setActiveColumn={setActiveColumn}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -199,6 +241,7 @@ const Column: React.FC<
     setActiveColumn: (col: string | null) => void;
   }
 > = ({
+  purpose,
   title,
   headingColor,
   column,
@@ -243,6 +286,7 @@ const Column: React.FC<
       column,
       beforeId,
       userId: "admin",
+      purpose,
     });
   };
 
@@ -315,6 +359,7 @@ const Column: React.FC<
           </h3>
           {userRole === "admin" && (
             <AddCard
+              purpose={purpose}
               column={column}
               addCard={addCard}
               userRole={userRole}
@@ -365,6 +410,7 @@ const Card: React.FC<CardProps> = ({
   deleteCard,
   priority,
   isPublic,
+  purpose,
 }) => {
   const [newPriority, setNewPriority] = useState(priority || "medium");
   const [isHovered, setIsHovered] = useState(false);
@@ -395,6 +441,7 @@ const Card: React.FC<CardProps> = ({
         priority: updatedPriority,
         userId: "admin",
         isPublic,
+        purpose,
       });
 
       return updatedPriority;
@@ -415,6 +462,7 @@ const Card: React.FC<CardProps> = ({
             column,
             priority,
             isPublic,
+            purpose,
           })
         }
         className={`relative grid cursor-grab grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground active:cursor-grabbing ${getColumnColor(
@@ -426,6 +474,7 @@ const Card: React.FC<CardProps> = ({
         {isHovered && (
           <div className="absolute right-0 top-0 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
+              purpose={purpose}
               mode="edit"
               onClick={() => setIsEditing(true)}
               onClose={() => {
@@ -448,6 +497,7 @@ const Card: React.FC<CardProps> = ({
                   id: id as Id<"todoKanban">,
                   ...data,
                   userId: "admin",
+                  purpose,
                 });
                 setNewPriority(data.priority);
               }}
@@ -495,12 +545,14 @@ const AddCard: React.FC<{
 
   setActiveColumn: (col: string | null) => void;
   userRole: string;
-}> = ({ column, addCard, userRole }) => {
+  purpose: string;
+}> = ({ column, addCard, userRole, purpose }) => {
   if (userRole !== "admin") return null;
 
   return (
     <TaskDialog
       mode="add"
+      purpose={purpose}
       trigger={
         <motion.button
           layout
@@ -520,6 +572,7 @@ const AddCard: React.FC<{
         addCard({
           ...data,
           userId: "admin",
+          purpose,
         });
       }}
     />
@@ -540,12 +593,14 @@ type BaseTaskDialogSharedProps = {
 };
 
 type AddTaskDialogProps = {
+  purpose: string;
   mode: "add";
   initialValues?: BaseTaskValues & { order: "start" | "end" };
   onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
 } & BaseTaskDialogSharedProps;
 
 type EditTaskDialogProps = {
+  purpose: string;
   mode: "edit";
   initialValues?: BaseTaskValues;
   onSubmit: (values: BaseTaskValues) => void;
