@@ -173,6 +173,7 @@ export function SearchMappedMultiSelect<T>({
             )}
           </Button>
         </PopoverTrigger>
+
         <PopoverContent
           align="end"
           className="relative w-full min-w-[280px] border-1.5 p-0"
@@ -192,6 +193,7 @@ export function SearchMappedMultiSelect<T>({
               value={searchQuery}
               onValueChange={setSearchQuery}
               className="pr-18 text-base sm:text-sm"
+              translate="no"
             />
             {values?.length > 0 && (
               <span className="group absolute right-3 top-2 flex cursor-pointer items-center gap-1 hover:scale-105">
@@ -203,7 +205,10 @@ export function SearchMappedMultiSelect<T>({
               </span>
             )}
 
-            <CommandList className="scrollable mini darkbar max-h-36">
+            <CommandList
+              className="scrollable mini darkbar max-h-36"
+              translate="no"
+            >
               {Object.entries(filteredData).map(([group, items]) => (
                 <CommandGroup
                   key={group}

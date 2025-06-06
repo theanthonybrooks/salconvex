@@ -2,7 +2,6 @@ import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { api } from "~/convex/_generated/api";
@@ -12,8 +11,6 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname");
   const token = await convexAuthNextjsToken();
   if (!token) redirect("/auth/sign-in");
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
@@ -22,8 +19,7 @@ export default async function HomeLayout({
   const isAdmin = user?.role.includes("admin");
 
   if (!isAdmin) {
-    const redirectPath = pathname?.replace(/\/call\/?$/, "");
-    redirect(redirectPath ?? "/thelist");
+    redirect("/thelist");
   }
 
   return (
