@@ -77,7 +77,7 @@ export const updateOrCreateArtist = mutation({
       const artistId = await ctx.db.insert("artists", {
         artistId: user._id,
         artistName: args.artistName,
-        artistNationality: args.artistNationality,
+        artistNationality: args.artistNationality ?? [],
         artistResidency: {
           full: args.artistResidency?.full,
           locale: args.artistResidency?.locale,
