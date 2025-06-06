@@ -195,16 +195,27 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           >
             <RecapCover dateRange={displayRange} />
           </div>
-          {queryResult?.results?.map((event, index) => (
-            <div
-              key={event._id}
-              ref={(el) => {
-                refs.current[index + 1] = el;
-              }}
-            >
-              <RecapPost key={event._id} event={event} index={index} />
-            </div>
-          ))}
+          {queryResult?.results
+            ?.slice()
+            .sort((a, b) => {
+              const aDate = new Date(
+                a.openCall?.basicInfo?.dates?.ocEnd ?? 0,
+              ).getTime();
+              const bDate = new Date(
+                b.openCall?.basicInfo?.dates?.ocEnd ?? 0,
+              ).getTime();
+              return aDate - bDate;
+            })
+            .map((event, index) => (
+              <div
+                key={event._id}
+                ref={(el) => {
+                  refs.current[index + 1] = el;
+                }}
+              >
+                <RecapPost key={event._id} event={event} index={index} />
+              </div>
+            ))}
           {queryResult?.results && (
             <div
               ref={(el) => {

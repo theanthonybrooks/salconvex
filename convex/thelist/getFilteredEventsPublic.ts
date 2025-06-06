@@ -58,14 +58,14 @@ export const getFilteredEventsPublic = query({
     const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 12);
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
 
-    const checkWeekStartISO = shiftedWeekStart.toISOString();
-    const checkWeekEndISO = shiftedWeekEnd.toISOString();
+    const weekStartISO = shiftedWeekStart.toISOString();
+    const weekEndISO = shiftedWeekEnd.toISOString();
 
-    const weekStartISO = weeweekStart.toISOString();
-    const weekEndISO = weeweekEnd.toISOString();
+    // const weekStartISO = weeweekStart.toISOString();
+    // const weekEndISO = weeweekEnd.toISOString();
 
     console.log(weekStartISO, weekEndISO);
-    console.log(checkWeekStartISO, checkWeekEndISO);
+    console.log(weekStartISO, weekEndISO);
 
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
@@ -192,9 +192,7 @@ export const getFilteredEventsPublic = query({
           if (openCall) {
             const isFixed = ocType === "Fixed";
             const isInWeek =
-              ocEndISO &&
-              ocEndISO > checkWeekStartISO &&
-              ocEndISO < checkWeekEndISO;
+              ocEndISO && ocEndISO > weekStartISO && ocEndISO < weekEndISO;
             const isEnded = ocEnd && now > ocEnd;
             if (isFixed && isInWeek) {
               if (openCall.state === "published" && !isEnded) {
