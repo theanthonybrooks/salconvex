@@ -245,6 +245,9 @@ export default function DashboardSideBar({
                         activeSection === section.sectionCat
                           ? "cursor-default font-bold"
                           : "cursor-pointer",
+                        activeSection === section.sectionCat &&
+                          collapsedSidebar &&
+                          "bg-primary/10",
                       )}
                       onClick={
                         // openSection === section.sectionCat &&
