@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 import { api } from "~/convex/_generated/api";
 
-export default async function HomeLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;

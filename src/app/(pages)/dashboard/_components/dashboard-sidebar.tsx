@@ -16,6 +16,8 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
+import { RiExpandLeftRightLine } from "react-icons/ri";
+
 import { api } from "~/convex/_generated/api";
 
 // const sectionVariants = {
@@ -40,6 +42,12 @@ const sectionVariants = {
     overflow: "hidden",
     transition: { duration: 0.5, ease: "easeInOut" },
   },
+  collapsedSidebar: {
+    height: 0,
+    opacity: 0,
+    overflow: "hidden",
+    transition: { duration: 0 },
+  },
   expanded: {
     height: "auto",
     opacity: 1,
@@ -61,6 +69,8 @@ export default function DashboardSideBar({
 }: DashboardSideBarProps) {
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [collapsedSidebar, setCollapsedSidebar] = useState(false);
 
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
@@ -95,27 +105,37 @@ export default function DashboardSideBar({
   }, [statusKey, hasAdminRole, userType]);
 
   useEffect(() => {
+    // const matchingSection = filteredNavItems.find(
+    //   (item) => item.href && pathname.includes(item.href),
+    // )?.sectionCat;
     const matchingSection = filteredNavItems.find(
-      (item) =>
-        item.sectionCat && pathname.includes(`dashboard/${item.sectionCat}`),
+      (item) => item.href === pathname,
     )?.sectionCat;
 
     if (matchingSection) {
       setOpenSection(matchingSection);
+      setActiveSection(matchingSection);
     }
   }, [pathname, filteredNavItems]);
 
-  useEffect(() => {
-    if (!openSection) {
-      const matchingSection = filteredNavItems.find(
-        (item) =>
-          item.sectionCat && pathname.includes(`dashboard/${item.sectionCat}`),
-      )?.sectionCat;
-      if (matchingSection) {
-        setOpenSection(matchingSection);
-      }
-    }
-  }, [openSection, pathname, filteredNavItems]);
+  // useEffect(() => {
+  //   if (!openSection) return;
+  //   if (collapsedSidebar) {
+  //     setCollapsedSidebar(false);
+  //   }
+  // }, [openSection, collapsedSidebar]);
+
+  // useEffect(() => {
+  //   if (!openSection) {
+  //     const matchingSection = filteredNavItems.find(
+  //       (item) =>
+  //         item.sectionCat && pathname.includes(`dashboard/${item.sectionCat}`),
+  //     )?.sectionCat;
+  //     if (matchingSection) {
+  //       setOpenSection(matchingSection);
+  //     }
+  //   }
+  // }, [openSection, pathname, filteredNavItems]);
 
   // const handleSectionToggle = (sectionCat: string) => {
   //   setOpenSection((prev) => {
@@ -127,11 +147,30 @@ export default function DashboardSideBar({
   // }
 
   const handleSectionToggle = (sectionCat: string) => {
-    setOpenSection((prev) => (prev === sectionCat ? null : sectionCat));
+    setOpenSection((prev) => {
+      if (collapsedSidebar && prev !== sectionCat) setCollapsedSidebar(false);
+      return prev === sectionCat ? null : sectionCat;
+    });
+  };
+
+  const handleCollapseSidebar = () => {
+    setCollapsedSidebar((prev) => !prev);
+    setOpenSection(null);
   };
 
   return (
-    <div className="hidden h-screen max-h-[calc(100vh-80px)] w-64 overflow-hidden border-r bg-background min-[1024px]:block">
+    <div
+      className={cn(
+        "relative hidden h-screen max-h-[calc(100vh-80px)] w-64 border-r bg-background min-[1024px]:block",
+        collapsedSidebar && "w-fit",
+      )}
+    >
+      <div
+        className="absolute bottom-5 right-0 translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
+        onClick={handleCollapseSidebar}
+      >
+        <RiExpandLeftRightLine className="size-4" />
+      </div>
       {/* <div className='flex h-full flex-col justify-between'> */}
       {/* <div className='flex min-h-[72px] shrink-0 items-center border-b px-4'>
           <Link
@@ -151,8 +190,14 @@ export default function DashboardSideBar({
           // groupName={"Heading"}
           className="mx-4 mb-5"
           placeholder="Find what you're looking for!"
+          iconOnly={collapsedSidebar}
         />
-        <div className="scrollable mini overflow-y-auto px-4">
+        <div
+          className={cn(
+            "scrollable mini invis overflow-y-auto",
+            !collapsedSidebar && "px-4",
+          )}
+        >
           {/* Render main navigation items (excluding sections) */}
           {filteredNavItems
             .filter((item) => !item.sectionCat)
@@ -168,8 +213,10 @@ export default function DashboardSideBar({
                       : "text-primary hover:bg-primary/10 hover:text-foreground",
                   )}
                 >
-                  <item.icon className="size-4" />
-                  {item.label}
+                  <item.icon
+                    className={cn("size-4", collapsedSidebar && "size-5")}
+                  />
+                  {!collapsedSidebar && <> {item.label}</>}
                 </Link>
                 {pathname !== item.href && (
                   <Separator thickness={2} className="border-foreground/20" />
@@ -180,110 +227,142 @@ export default function DashboardSideBar({
           {/* Render sections */}
           {filteredNavItems
             .filter((item) => item.sectionHead)
-            .map((section, index, arr) => (
-              <div key={section.sectionCat} className="space-y-2">
-                {/* Section header */}
-                <section
-                  className={cn(
-                    pathname.includes("dashboard/" + section.sectionCat) &&
-                      "hover:bg-primary/10",
-                  )}
-                >
-                  <div
+            .map((section, index, arr) => {
+              return (
+                <div key={section.sectionCat} className="space-y-2">
+                  {/* Section header */}
+                  <section
                     className={cn(
-                      "flex flex-col gap-2 py-4 pl-5 pr-3 text-sm transition-colors",
-                      pathname.includes("dashboard/" + section.sectionCat)
-                        ? "font-bold"
-                        : "text-primary hover:bg-primary/10 hover:text-foreground",
-                      openSection === section.sectionCat &&
-                        pathname.includes("dashboard/" + section.sectionCat)
-                        ? "cursor-default"
-                        : "cursor-pointer",
+                      pathname.includes(section.href) && "hover:bg-primary/10",
                     )}
-                    onClick={
-                      openSection === section.sectionCat &&
-                      pathname.includes("dashboard/" + section.sectionCat)
-                        ? () => {}
-                        : () => handleSectionToggle(section.sectionCat!)
-                    }
                   >
-                    <div className="space-between flex justify-between gap-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="flex items-center gap-2">
-                          {section?.sectionIcon && (
-                            <section.sectionIcon className="h-4 w-4" />
-                          )}
+                    <div
+                      className={cn(
+                        "flex flex-col gap-2 py-4 pl-5 pr-3 text-sm transition-colors",
+                        pathname.includes(section.href)
+                          ? "font-bold"
+                          : "text-primary hover:bg-primary/10 hover:text-foreground",
+                        activeSection === section.sectionCat
+                          ? "cursor-default font-bold"
+                          : "cursor-pointer",
+                      )}
+                      onClick={
+                        // openSection === section.sectionCat &&
+                        // pathname.includes("dashboard/" + section.sectionCat)
+                        //   ? () => {}
+                        //   : () => handleSectionToggle(section.sectionCat!)
+                        () => handleSectionToggle(section.sectionCat!)
+                      }
+                    >
+                      <div className="space-between flex justify-between gap-2">
+                        <div className="relative flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-2">
+                            {section?.sectionIcon && (
+                              <section.sectionIcon
+                                className={cn(
+                                  "size-4",
+                                  collapsedSidebar && "size-5",
+                                )}
+                              />
+                            )}
 
-                          {section.heading}
-                        </span>
-
-                        {section.heading === "Admin" && pendingEvents > 0 && (
-                          <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
-                            {pendingEvents}
+                            {!collapsedSidebar && <> {section.heading}</>}
                           </span>
+
+                          {section.heading === "Events" &&
+                            pendingEvents > 0 && (
+                              <span
+                                className={cn(
+                                  "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                                  collapsedSidebar &&
+                                    "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
+                                )}
+                              >
+                                {pendingEvents}
+                              </span>
+                            )}
+                        </div>
+
+                        {!collapsedSidebar && (
+                          <>
+                            {openSection === section.sectionCat ? (
+                              <ChevronDown className="size-4" />
+                            ) : (
+                              <ChevronRight className="size-4" />
+                            )}
+                          </>
                         )}
                       </div>
-
-                      {openSection === section.sectionCat ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
                     </div>
-                  </div>
-                  {index !== arr.length - 1 && (
-                    <Separator thickness={2} className="w-full" />
-                  )}
-                </section>
+                    {index !== arr.length - 1 && (
+                      <Separator thickness={2} className="w-full" />
+                    )}
+                  </section>
 
-                <AnimatePresence>
-                  {openSection === section.sectionCat && (
-                    <motion.div
-                      initial="collapsed"
-                      animate="expanded"
-                      exit="collapsed"
-                      variants={sectionVariants}
-                    >
-                      {filteredNavItems
-                        .filter(
-                          (navItem) =>
-                            navItem.sectionCat === section.sectionCat,
-                        )
-                        .map((sectionItem, index, arr) => (
-                          <div key={sectionItem.href} className="pl-4">
-                            <Link
-                              prefetch={true}
-                              href={sectionItem.href}
-                              className={clsx(
-                                "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
-                                pathname === sectionItem.href
-                                  ? "bg-primary/10 pl-3 text-primary hover:bg-primary/20"
-                                  : "pl-3 text-primary hover:bg-primary/10 hover:text-foreground",
-                              )}
-                            >
-                              <span className="flex items-center gap-2">
-                                <sectionItem.icon className="size-4" />
-                                {sectionItem.label}
-                              </span>
-                              {sectionItem.label === "Submissions" &&
-                                pendingEvents > 0 && (
-                                  <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
-                                    {pendingEvents}
+                  {!collapsedSidebar && (
+                    <AnimatePresence>
+                      {openSection === section.sectionCat && (
+                        <motion.div
+                          initial={collapsedSidebar ? false : "collapsed"}
+                          animate={collapsedSidebar ? false : "expanded"}
+                          exit={
+                            collapsedSidebar ? "collapsedSidebar" : "collapsed"
+                          }
+                          variants={sectionVariants}
+                        >
+                          {filteredNavItems
+                            .filter(
+                              (navItem) =>
+                                navItem.sectionCat === section.sectionCat,
+                            )
+                            .map((sectionItem, index, arr) => (
+                              <div key={sectionItem.href} className="pl-4">
+                                <Link
+                                  prefetch={true}
+                                  href={sectionItem.href}
+                                  className={clsx(
+                                    "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                                    pathname === sectionItem.href
+                                      ? "bg-primary/10 pl-3 text-primary hover:bg-primary/20"
+                                      : "pl-3 text-primary hover:bg-primary/10 hover:text-foreground",
+                                  )}
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <sectionItem.icon
+                                      className={cn(
+                                        "size-4",
+                                        collapsedSidebar && "size-5",
+                                      )}
+                                    />
+
+                                    {!collapsedSidebar && (
+                                      <> {sectionItem.label}</>
+                                    )}
                                   </span>
-                                )}
-                            </Link>
-                            {/* TODO: ensure that this is the correct separator to be checking the length on.  */}
-                            {index === arr.length - 1 &&
-                              filteredNavItems.length > 2 && (
-                                <Separator thickness={2} className="w-full" />
-                              )}
-                          </div>
-                        ))}
-                    </motion.div>
+                                  {sectionItem.label === "Submissions" &&
+                                    pendingEvents > 0 && (
+                                      <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
+                                        {pendingEvents}
+                                      </span>
+                                    )}
+                                </Link>
+
+                                {index === arr.length - 1 &&
+                                  filteredNavItems.length > 2 && (
+                                    <Separator
+                                      thickness={2}
+                                      className="w-full"
+                                    />
+                                  )}
+                              </div>
+                            ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   )}
-                </AnimatePresence>
-              </div>
-            ))}
+                </div>
+              );
+            })}
         </div>
 
         {/* Help Items */}
@@ -295,14 +374,17 @@ export default function DashboardSideBar({
                 prefetch={true}
                 href={item.href}
                 className={clsx(
-                  "flex items-center gap-2 py-5 pl-8 pr-3 text-center text-sm transition-colors",
+                  "flex items-center justify-center gap-2 py-5 text-center text-sm transition-colors",
                   pathname === item.href
                     ? "bg-primary/10 text-primary hover:bg-primary/20"
                     : "text-primary hover:bg-primary/10 hover:text-foreground",
+                  // collapsedSidebar && "pl-0",
                 )}
               >
-                <item.icon className="h-4 w-4" />
-                {item.label}
+                <item.icon
+                  className={cn("size-4", collapsedSidebar && "size-5")}
+                />
+                {!collapsedSidebar && <> {item.label}</>}
               </Link>
             </React.Fragment>
           ))}

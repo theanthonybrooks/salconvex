@@ -51,7 +51,6 @@ export function AdminDashboardTableWrapper({
   const applicationData = useQuery(
     api.artists.applications.getArtistApplications2,
   );
-  console.log(applicationData);
 
   return (
     <>
