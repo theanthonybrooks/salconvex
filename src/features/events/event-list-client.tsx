@@ -207,7 +207,7 @@ const ClientEventList = (
     > = {};
     const orderedGroupKeys: string[] = [];
 
-    const list = publicView ? paginatedEvents.slice(0, 5) : paginatedEvents;
+    const list = publicView ? paginatedEvents.slice(0, 6) : paginatedEvents;
 
     for (const event of list) {
       const title = getGroupKeyFromEvent(
@@ -228,6 +228,10 @@ const ClientEventList = (
 
     return orderedGroupKeys.map((key) => groups[key]);
   }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);
+  const totalCards = groupedEvents.reduce(
+    (sum, group) => sum + group.events.length,
+    0,
+  );
   const handleFilterChange = (partial: Partial<Filters>) => {
     setFilters((prev) => ({ ...prev, ...partial }));
     setPage(1);
@@ -339,15 +343,25 @@ const ClientEventList = (
                 <div className="space-y-4 sm:space-y-6">
                   {group.events.map((event, index) => {
                     const showPublic = publicView ? flatIndex < 1 : publicView;
+                    const isMaskedCard =
+                      publicView && flatIndex === totalCards - 1;
+
                     const card = (
-                      <EventCardPreview
+                      <div
                         key={index}
-                        event={event}
-                        publicView={publicView}
-                        publicPreview={showPublic}
-                        user={user}
-                        userPref={userPref}
-                      />
+                        className={cn(
+                          isMaskedCard && "masked-card pointer-events-none",
+                        )}
+                      >
+                        <EventCardPreview
+                          key={index}
+                          event={event}
+                          publicView={publicView}
+                          publicPreview={showPublic}
+                          user={user}
+                          userPref={userPref}
+                        />
+                      </div>
                     );
 
                     flatIndex++;
@@ -399,10 +413,11 @@ const ClientEventList = (
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
         <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
-          {/* <h2 className="text-balance text-center">
-            For the full list and access to all of the other work that I do,
-            sign up!
-          </h2> */}
+          <h2 className="text-balance text-center">
+            Become a member to view the full list and apply to open calls.
+            <br />
+            All plans have a two week free trial that you can cancel at any time
+          </h2>
           <Pricing />
         </div>
       )}
