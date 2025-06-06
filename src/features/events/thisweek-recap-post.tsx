@@ -1,4 +1,7 @@
-import { RecapCover } from "@/features/events/ui/thisweek-recap/recap-cover";
+import {
+  RecapCover,
+  RecapEndCover,
+} from "@/features/events/ui/thisweek-recap/recap-cover";
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { formatCondensedDateRange } from "@/lib/dateFns";
@@ -107,7 +110,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
             .replace(/\/$/, "")
         : "";
-      const organization = igHandle ? `| @${igHandle}` : "";
+      const organization = igHandle ? `| ${igHandle}` : "";
 
       if (!grouped[dateKey]) grouped[dateKey] = [];
       grouped[dateKey].push(`${name} ${organization}`.trim());
@@ -171,6 +174,15 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             <RecapPost key={event._id} event={event} index={index} />
           </div>
         ))}
+        {queryResult?.results && (
+          <div
+            ref={(el) => {
+              refs.current[queryResult.results.length + 1] = el;
+            }}
+          >
+            <RecapEndCover />
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-y-6">
         <div className="flex items-center gap-2">
