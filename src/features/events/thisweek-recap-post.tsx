@@ -13,7 +13,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
 import JSZip from "jszip";
-import { Clipboard, Image as ImageIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Clipboard,
+  Image as ImageIcon,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 interface ThisweekRecapPostProps {
@@ -21,7 +27,7 @@ interface ThisweekRecapPostProps {
 }
 
 const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
-  // Inside your component
+  const router = useRouter();
   const refs = useRef<(HTMLDivElement | null)[]>([]);
   const [copiedText, setCopiedText] = useState(false);
   const [copiedAlt, setCopiedAlt] = useState(false);
@@ -155,88 +161,108 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   }, [queryResult, displayRange]);
 
   return (
-    <div className="grid grid-cols-2 gap-6">
-      <div className="flex flex-col gap-y-6">
-        <div
-          ref={(el) => {
-            refs.current[0] = el;
-          }}
+    <>
+      <div className="flex items-center gap-2">
+        <Button
+          onClick={() => router.push("/admin/thisweek")}
+          variant="salWithShadowHiddenBg"
+          disabled={source === "thisweek"}
         >
-          <RecapCover dateRange={displayRange} />
-        </div>
-        {queryResult?.results?.map((event, index) => (
-          <div
-            key={event._id}
-            ref={(el) => {
-              refs.current[index + 1] = el;
-            }}
-          >
-            <RecapPost key={event._id} event={event} index={index} />
-          </div>
-        ))}
-        {queryResult?.results && (
-          <div
-            ref={(el) => {
-              refs.current[queryResult.results.length + 1] = el;
-            }}
-          >
-            <RecapEndCover />
-          </div>
-        )}
+          {source === "nextweek" && <ArrowLeft className="size-4" />} This Week
+        </Button>
+        <p>or</p>
+        <Button
+          onClick={() => router.push("/admin/nextweek")}
+          variant="salWithShadowHiddenBg"
+          disabled={source === "nextweek"}
+        >
+          Next Week {source === "thisweek" && <ArrowRight className="size-4" />}
+        </Button>
       </div>
-      <div className="flex flex-col gap-y-6">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="salWithShadowHiddenBg"
-            onClick={handleDownloadAll}
-            className="flex flex-1 items-center gap-1"
-          >
-            Download <ImageIcon className="size-4" />
-          </Button>
-          <Button
-            variant="salWithShadowHiddenBg"
-            onClick={handleCopyText}
-            className="flex flex-1 items-center gap-1"
-          >
-            {copiedText ? "Copied!" : "Copy Text"}{" "}
-            <Clipboard className="size-4" />
-          </Button>
-          <Button
-            variant="salWithShadowHiddenBg"
-            onClick={handleCopyAlt}
-            className="flex flex-1 items-center gap-1"
-          >
-            {copiedAlt ? "Copied!" : "Copy Alt"}
-            <Clipboard className="size-4" />
-          </Button>
-        </div>
-        <Textarea
-          value={captionText}
-          onChange={(e) => {
-            setCaptionText(e.target.value);
-            setCharCount(e.target.value.length);
-          }}
-          rows={28}
-          className="whitespace-pre-wrap bg-card font-mono"
-        />
-        <p className="text-right text-sm text-foreground/60">
-          {charCount}/3000 characters
-        </p>
 
-        <Textarea
-          value={altText}
-          onChange={(e) => {
-            setAltText(e.target.value);
-            setAltCharCount(e.target.value.length);
-          }}
-          rows={5}
-          className="whitespace-pre-wrap bg-card font-mono"
-        />
-        <p className="text-right text-sm text-foreground/60">
-          {altCharCount}/100 characters
-        </p>
+      <div className="grid grid-cols-2 gap-6 py-6">
+        <div className="flex flex-col gap-y-6">
+          <div
+            ref={(el) => {
+              refs.current[0] = el;
+            }}
+          >
+            <RecapCover dateRange={displayRange} />
+          </div>
+          {queryResult?.results?.map((event, index) => (
+            <div
+              key={event._id}
+              ref={(el) => {
+                refs.current[index + 1] = el;
+              }}
+            >
+              <RecapPost key={event._id} event={event} index={index} />
+            </div>
+          ))}
+          {queryResult?.results && (
+            <div
+              ref={(el) => {
+                refs.current[queryResult.results.length + 1] = el;
+              }}
+            >
+              <RecapEndCover />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-y-6">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="salWithShadowHiddenBg"
+              onClick={handleDownloadAll}
+              className="flex flex-1 items-center gap-1"
+            >
+              Download <ImageIcon className="size-4" />
+            </Button>
+            <Button
+              variant="salWithShadowHiddenBg"
+              onClick={handleCopyText}
+              className="flex flex-1 items-center gap-1"
+            >
+              {copiedText ? "Copied!" : "Copy Text"}{" "}
+              <Clipboard className="size-4" />
+            </Button>
+            <Button
+              variant="salWithShadowHiddenBg"
+              onClick={handleCopyAlt}
+              className="flex flex-1 items-center gap-1"
+            >
+              {copiedAlt ? "Copied!" : "Copy Alt"}
+              <Clipboard className="size-4" />
+            </Button>
+          </div>
+          <Textarea
+            value={captionText}
+            onChange={(e) => {
+              setCaptionText(e.target.value);
+              setCharCount(e.target.value.length);
+            }}
+            rows={28}
+            className="whitespace-pre-wrap bg-card font-mono"
+          />
+          <p className="text-right text-sm text-foreground/60">
+            {charCount}/3000 characters
+          </p>
+
+          <Textarea
+            value={altText}
+            onChange={(e) => {
+              setAltText(e.target.value);
+              setAltCharCount(e.target.value.length);
+            }}
+            rows={5}
+            className="whitespace-pre-wrap bg-card font-mono"
+          />
+          <p className="text-right text-sm text-foreground/60">
+            {altCharCount}/100 characters
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
