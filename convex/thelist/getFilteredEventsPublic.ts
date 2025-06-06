@@ -3,7 +3,7 @@ import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { addWeeks, endOfWeek, startOfWeek } from "date-fns";
+import { addHours, addWeeks, endOfWeek, startOfWeek, subHours } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 export const getFilteredEventsPublic = query({
@@ -35,36 +35,37 @@ export const getFilteredEventsPublic = query({
   handler: async (ctx, { filters, sortOptions, page, source }) => {
     const thisWeekPg = source === "thisweek";
     const nextWeekPg = source === "nextweek";
-    const archivePg = source === "archive";
     const theListPg = source === "thelist";
-
-    // let thisWeekStartISO = "";
-    // let thisWeekEndISO = "";
-
-    // if (thisWeekPg) {
-    //   const now = new Date();
-    //   const monday = startOfWeek(now, { weekStartsOn: 1 });
-    //   const sunday = endOfWeek(now, { weekStartsOn: 1 });
-
-    //   thisWeekStartISO = monday.toISOString();
-    //   thisWeekEndISO = sunday.toISOString();
-    // }
 
     const now = new Date();
     const baseWeekStart = startOfWeek(now, { weekStartsOn: 1 });
-    const baseWeekEnd = endOfWeek(now, { weekStartsOn: 1 });
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
+    const weeweekStart = startOfWeek(
+      addWeeks(baseWeekStart, targetWeekOffset),
+      {
+        weekStartsOn: 1,
+      },
+    );
 
-    const weekStart = startOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
+    const weeweekEnd = endOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
       weekStartsOn: 1,
     });
-    const weekEnd = endOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
-      weekStartsOn: 1,
-    });
 
-    const weekStartISO = weekStart.toISOString();
-    const weekEndISO = weekEnd.toISOString();
+    const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
+    const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
+
+    const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 12);
+    const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
+
+    const checkWeekStartISO = shiftedWeekStart.toISOString();
+    const checkWeekEndISO = shiftedWeekEnd.toISOString();
+
+    const weekStartISO = weeweekStart.toISOString();
+    const weekEndISO = weeweekEnd.toISOString();
+
+    console.log(weekStartISO, weekEndISO);
+    console.log(checkWeekStartISO, checkWeekEndISO);
 
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
@@ -191,7 +192,9 @@ export const getFilteredEventsPublic = query({
           if (openCall) {
             const isFixed = ocType === "Fixed";
             const isInWeek =
-              ocEndISO && ocEndISO > weekStartISO && ocEndISO < weekEndISO;
+              ocEndISO &&
+              ocEndISO > checkWeekStartISO &&
+              ocEndISO < checkWeekEndISO;
             const isEnded = ocEnd && now > ocEnd;
             if (isFixed && isInWeek) {
               if (openCall.state === "published" && !isEnded) {

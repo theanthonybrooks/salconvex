@@ -10,6 +10,7 @@ import { useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
 import JSZip from "jszip";
@@ -104,12 +105,15 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   useEffect(() => {
     if (!queryResult?.results?.length) return;
 
-    const grouped: Record<string, string[]> = {};
+    const grouped: Record<string, { events: string[]; timeZone: string }> = {};
 
     for (const event of queryResult.results) {
       const name = event.name;
       const dueDate = event.openCall?.basicInfo.dates?.ocEnd ?? "";
-      const dateKey = new Date(dueDate).toISOString().slice(0, 10);
+      const timeZone =
+        event?.openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
+      const dateKey = formatInTimeZone(dueDate, timeZone, "yyyy-MM-dd");
+
       const instagram = event.links?.instagram;
       const igHandle = instagram
         ? instagram
@@ -118,8 +122,10 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
         : "";
       const organization = igHandle ? `| ${igHandle}` : "";
 
-      if (!grouped[dateKey]) grouped[dateKey] = [];
-      grouped[dateKey].push(`${name} ${organization}`.trim());
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = { events: [], timeZone };
+      }
+      grouped[dateKey].events.push(`${name} ${organization}`.trim());
     }
 
     const sortedDates = Object.keys(grouped).sort();
@@ -130,12 +136,12 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     let counter = 1;
     for (const date of sortedDates) {
-      const formattedDate = new Date(date).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-      });
+      const { events, timeZone } = grouped[date];
+
+      const formattedDate = formatInTimeZone(date, timeZone, "MMMM d");
+
       content += `${formattedDate}:\n`;
-      for (const item of grouped[date]) {
+      for (const item of events) {
         content += `${counter}. ${item}\n`;
         counter++;
       }
