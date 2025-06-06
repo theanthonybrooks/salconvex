@@ -1,8 +1,7 @@
-import { ArtistPreloadContextProvider } from "@/features/wrapper-elements/artist-preload-context";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery, preloadQuery } from "convex/nextjs";
+import { fetchQuery } from "convex/nextjs";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -16,15 +15,10 @@ export default async function HomeLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
   const token = await convexAuthNextjsToken();
-  const preloadedArtistData = await preloadQuery(
-    api.artists.getArtistEventMetadata.getArtistEventMetadata,
-    {},
-    { token },
-  );
+  if (!token) redirect("/auth/sign-in");
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
 
   const user = userData?.user;
-
   const isAdmin = user?.role.includes("admin");
 
   if (!isAdmin) {
@@ -34,13 +28,13 @@ export default async function HomeLayout({
 
   return (
     //<ClientAuthWrapper>
-    <ArtistPreloadContextProvider preloadedArtistData={preloadedArtistData}>
+    <>
       <NavbarWrapper type="thelist" />
       <main className="flex w-full flex-1 flex-col items-center px-4 pt-32">
         {children}
       </main>
       <Footer />
-    </ArtistPreloadContextProvider>
+    </>
     // </ClientAuthWrapper>
   );
 }
