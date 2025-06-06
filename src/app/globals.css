@@ -1574,8 +1574,8 @@ div:has(> div.react-datepicker__input-container) {
 /* #endregion */
 
 .masked-card {
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
-  mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 75%);
+  mask-image: linear-gradient(to bottom, black 0%, transparent 75%);
   mask-mode: alpha;
   -webkit-mask-mode: alpha;
   mask-repeat: no-repeat;

@@ -16,7 +16,10 @@ export const RegisterSchema = z
     email: z.string().email({ message: "Email is required" }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters." })
+      .min(8, {
+        message:
+          "Password must contain at least one uppercase letter, one number, and one symbol.",
+      })
       .regex(passwordValidation, {
         message:
           "Password must contain at least one uppercase letter, one number, and one symbol.",
@@ -49,8 +52,6 @@ export const UpdateUserSchema = z.object({
   name: z.string().optional(),
   organizationName: z.string().optional(),
 });
-
-
 
 export const ResendOtpSchema = z.object({
   email: z.string().email({ message: "Email is required" }),

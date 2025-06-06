@@ -350,7 +350,8 @@ const ClientEventList = (
                       <div
                         key={index}
                         className={cn(
-                          isMaskedCard && "masked-card pointer-events-none",
+                          isMaskedCard &&
+                            "masked-card pointer-events-none blur-[1px]",
                         )}
                       >
                         <EventCardPreview
@@ -412,7 +413,7 @@ const ClientEventList = (
       )}
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
-        <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
+        <div className="mx-auto mb-20 max-w-[90vw] -translate-y-14">
           <h2 className="text-balance text-center">
             Become a member to view the full list and apply to open calls.
             <br />
