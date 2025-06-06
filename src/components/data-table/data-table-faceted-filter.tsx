@@ -111,7 +111,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined,
                       );
-                      console.log(filterValues);
+                      // console.log(filterValues);
                     }}
                     // onSelect={() => {
                     //   const newSelectedValues = new Set(selectedValues);
@@ -132,7 +132,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       className={cn(
                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                         isSelected
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-card text-foreground"
                           : "opacity-50 [&_svg]:invisible",
                       )}
                     >

@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const UpdateArtistSchema = z.object({
   artistName: z.string().optional(),
-  artistNationality: z.array(z.string()).optional(),
+  artistNationality: z
+    .array(z.string())
+    .min(1, "Please select at least one nationality")
+    .max(3, "You can select up to 3 nationalities"),
   artistResidency: z
     .object({
       full: z.string(),

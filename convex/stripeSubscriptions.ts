@@ -479,7 +479,7 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
 
-        console.log("should be able to do logic for one-time here");
+        // console.log("should be able to do logic for one-time here");
 
         const existingUser = await ctx.db
           .query("users")

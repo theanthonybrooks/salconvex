@@ -94,6 +94,13 @@ export const ArtistProfileForm = ({ user }: ArtistProfileFormProps) => {
   ) => {
     let timezone: string | undefined;
     let timezoneOffset: number | undefined;
+    const artistNationality = data?.artistNationality ?? [];
+    if (artistNationality.length === 0 && data?.artistResidency?.country) {
+      artistNationality.push(data.artistResidency.country);
+    } else if (artistNationality.length === 0) {
+      toast.error("Please select at least one nationality");
+      return;
+    }
     const artistLocation = data?.artistResidency?.location;
     if (artistLocation?.length === 2) {
       const timezoneData = await getTimezone({
@@ -102,7 +109,6 @@ export const ArtistProfileForm = ({ user }: ArtistProfileFormProps) => {
       });
       timezone = timezoneData?.zoneName;
       timezoneOffset = timezoneData?.gmtOffset;
-      //could also get dst, abbreviation (CEST, CET, etc)
     }
 
     try {
@@ -172,28 +178,41 @@ export const ArtistProfileForm = ({ user }: ArtistProfileFormProps) => {
             </span>
 
             <div className="flex flex-col gap-2">
-              <Label>Nationality (max 3)</Label>
+              <Label>Nationality (max 3)*</Label>
               <Controller
                 name="artistNationality"
                 control={control}
-                render={({ field }) => (
-                  <SearchMappedMultiSelect<Country>
-                    values={field.value ?? []}
-                    onChange={field.onChange}
-                    data={sortedGroupedCountries}
-                    selectLimit={3}
-                    placeholder="Select up to 3 nationalities"
-                    getItemLabel={(country) => country.name.common}
-                    getItemValue={(country) => country.name.common}
-                    searchFields={[
-                      "name.common",
-                      "name.official",
-                      "cca3",
-                      "altSpellings",
-                    ]}
-                    tabIndex={2}
-                    className="h-12 bg-card text-base hover:bg-card"
-                  />
+                rules={{
+                  required: "Nationality is required",
+                  validate: (value) =>
+                    (value && value?.length > 0) ||
+                    "Please select at least one nationality",
+                }}
+                render={({ field, fieldState }) => (
+                  <>
+                    <SearchMappedMultiSelect<Country>
+                      values={field.value ?? []}
+                      onChange={field.onChange}
+                      data={sortedGroupedCountries}
+                      selectLimit={3}
+                      placeholder="Select up to 3 nationalities"
+                      getItemLabel={(country) => country.name.common}
+                      getItemValue={(country) => country.name.common}
+                      searchFields={[
+                        "name.common",
+                        "name.official",
+                        "cca3",
+                        "altSpellings",
+                      ]}
+                      tabIndex={2}
+                      className="h-12 bg-card text-base hover:bg-card"
+                    />
+                    {fieldState.error && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </>
                 )}
               />
             </div>

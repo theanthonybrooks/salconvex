@@ -38,19 +38,19 @@ export const getFilteredEventsPublic = query({
     const theListPg = source === "thelist";
 
     const now = new Date();
-    const baseWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+    // const baseWeekStart = startOfWeek(now, { weekStartsOn: 1 });
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
-    const weeweekStart = startOfWeek(
-      addWeeks(baseWeekStart, targetWeekOffset),
-      {
-        weekStartsOn: 1,
-      },
-    );
+    // const weeweekStart = startOfWeek(
+    //   addWeeks(baseWeekStart, targetWeekOffset),
+    //   {
+    //     weekStartsOn: 1,
+    //   },
+    // );
 
-    const weeweekEnd = endOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
-      weekStartsOn: 1,
-    });
+    // const weeweekEnd = endOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
+    //   weekStartsOn: 1,
+    // });
 
     const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
@@ -64,8 +64,8 @@ export const getFilteredEventsPublic = query({
     // const weekStartISO = weeweekStart.toISOString();
     // const weekEndISO = weeweekEnd.toISOString();
 
-    console.log(weekStartISO, weekEndISO);
-    console.log(weekStartISO, weekEndISO);
+    // console.log(weekStartISO, weekEndISO);
+    // console.log(weekStartISO, weekEndISO);
 
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;

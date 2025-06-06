@@ -117,7 +117,7 @@ const artistSchema = {
   artistId: v.id("users"),
   artistName: v.optional(v.string()),
   artistSlug: v.optional(v.string()),
-  artistNationality: v.optional(v.array(v.string())),
+  artistNationality: v.array(v.string()),
   artistResidency: v.object({
     full: v.optional(v.string()),
     locale: v.optional(v.string()),
