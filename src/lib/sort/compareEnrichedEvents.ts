@@ -140,7 +140,7 @@ export const compareEnrichedEvents = (
       }
 
       // if (item.name === "asdfasfd ") {
-      //   console.log(item.name, priority);
+      // console.log(item.name, priority);
       // } else if (item.name === "something newer") {
       //   console.log(item.name, priority);
       // }
@@ -169,6 +169,7 @@ export const compareEnrichedEvents = (
       const aDate = priorityA.ocEndDate ?? FAR_FUTURE;
       const bDate = priorityB.ocEndDate ?? FAR_FUTURE;
 
+      console.log(aDate.getTime(), bDate.getTime());
       const aYear = aDate.getFullYear();
       const bYear = bDate.getFullYear();
 
@@ -187,7 +188,10 @@ export const compareEnrichedEvents = (
 
       const aDay = aDate.getDate();
       const bDay = bDate.getDate();
-      return aDay - bDay;
+      if (aDay !== bDay) return aDay - bDay;
+
+      // Same day — now compare by full timestamp
+      return aDate.getTime() - bDate.getTime();
     }
 
     if (priorityA.priority === 6 || priorityA.priority === 8) {
