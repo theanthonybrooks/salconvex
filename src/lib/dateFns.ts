@@ -213,6 +213,7 @@ export const formatOpenCallDeadline = (
   timezone: string,
   callType: CallType,
   preview?: boolean,
+  weeklyRecap?: boolean,
 ) => {
   if (callType === "Invite") return "Invite-only";
   if (callType === "Rolling") return "Rolling Open Call";
@@ -232,6 +233,9 @@ export const formatOpenCallDeadline = (
   if (preview) return `${month} ${day}${ordinal}, ${year}`;
 
   const time = dt.toFormat("h:mm a");
+  if (weeklyRecap)
+    return `${month} ${day}${ordinal} @ ${time} (${timeZoneFormat})`;
+
   return `${month} ${day}${ordinal}, ${year} @ ${time} (${timeZoneFormat})`;
 };
 
@@ -489,3 +493,26 @@ export const parseEventDate = (
 
   return null;
 };
+
+export function formatCondensedDateRange(
+  startIso: string,
+  endIso: string,
+  tz: string = "UTC",
+): string {
+  const start = DateTime.fromISO(startIso, { zone: tz });
+  const end = DateTime.fromISO(endIso, { zone: tz });
+
+  if (!start.isValid || !end.isValid) return "";
+
+  const startMonth = getFourCharMonthFromLuxon(start);
+  const endMonth = getFourCharMonthFromLuxon(end);
+
+  const startDay = start.day;
+  const endDay = end.day;
+
+  if (startMonth === endMonth) {
+    return `${startMonth} ${startDay}–${endDay}`;
+  }
+
+  return `${startMonth} ${startDay} – ${endMonth} ${endDay}`;
+}

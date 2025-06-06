@@ -16,12 +16,12 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import type { MergedEventPreviewData } from "@/types/event"; // or define a local merged type inline
 import { usePreloadedQuery } from "convex/react";
-import { parseISO } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
 import { Separator } from "@/components/ui/separator";
+
+import { formatCondensedDateRange } from "@/lib/dateFns";
 import { LucideUploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -80,13 +80,14 @@ const ClientThisWeekList = (
   );
 
   const total = queryResult?.total ?? 0;
-  const thisWeekStart = queryResult?.weekStartISO
-    ? formatInTimeZone(parseISO(queryResult.weekStartISO), "UTC", "MMM d")
-    : "";
-
-  const thisWeekEnd = queryResult?.weekEndISO
-    ? formatInTimeZone(parseISO(queryResult.weekEndISO), "UTC", "MMM d")
-    : "";
+  const displayRange =
+    queryResult?.weekStartISO && queryResult?.weekEndISO
+      ? formatCondensedDateRange(
+          queryResult.weekStartISO,
+          queryResult.weekEndISO,
+          "UTC",
+        )
+      : "";
 
   const isLoading = !queryResult;
 
@@ -171,7 +172,7 @@ const ClientThisWeekList = (
           <div className="mb-12 flex flex-col gap-8">
             <section>
               <h1 className="mx-auto text-center font-tanker text-3xl lowercase tracking-wide">
-                {thisWeekStart} - {thisWeekEnd}
+                {displayRange}
               </h1>
               <Separator
                 orientation="horizontal"
@@ -196,7 +197,13 @@ const ClientThisWeekList = (
                   </Button>
                   <Button
                     variant="salWithShadowHiddenBg"
-                    onClick={() => console.log("clicked")}
+                    onClick={() =>
+                      router.push(
+                        source === "thisweek"
+                          ? "/admin/thisweek"
+                          : "/admin/nextweek",
+                      )
+                    }
                   >
                     <LucideUploadCloud className="size-5" />
                   </Button>
