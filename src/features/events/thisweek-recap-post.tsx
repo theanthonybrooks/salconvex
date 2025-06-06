@@ -20,6 +20,9 @@ interface ThisweekRecapPostProps {
 const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   // Inside your component
   const refs = useRef<(HTMLDivElement | null)[]>([]);
+  const [copiedText, setCopiedText] = useState(false);
+  const [copiedAlt, setCopiedAlt] = useState(false);
+
   const [captionText, setCaptionText] = useState("");
   const [altText, setAltText] = useState("");
   const [charCount, setCharCount] = useState(0);
@@ -76,11 +79,17 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   };
 
   const handleCopyText = () => {
-    navigator.clipboard.writeText(captionText);
+    navigator.clipboard.writeText(captionText).then(() => {
+      setCopiedText(true);
+      setTimeout(() => setCopiedText(false), 2000);
+    });
   };
 
   const handleCopyAlt = () => {
-    navigator.clipboard.writeText(altText);
+    navigator.clipboard.writeText(altText).then(() => {
+      setCopiedAlt(true);
+      setTimeout(() => setCopiedAlt(false), 2000);
+    });
   };
 
   useEffect(() => {
@@ -136,7 +145,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   useEffect(() => {
     if (!queryResult?.results?.length) return;
 
-    const altText = `Weekly post for ${displayRange}. The links for everything included here are on The Street Art List website (link in bio or www.thestreetartlist.com) and the IG handles are provided for events that have them. `;
+    const altText = `Weekly post for ${displayRange}. The links are on The Street Art List website (thestreetartlist.com)`;
 
     setAltText(altText);
     setAltCharCount(altText.length);
@@ -177,14 +186,16 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             onClick={handleCopyText}
             className="flex flex-1 items-center gap-1"
           >
-            Copy Text <Clipboard className="size-4" />
+            {copiedText ? "Copied!" : "Copy Text"}{" "}
+            <Clipboard className="size-4" />
           </Button>
           <Button
             variant="salWithShadowHiddenBg"
             onClick={handleCopyAlt}
             className="flex flex-1 items-center gap-1"
           >
-            Copy Alt <Clipboard className="size-4" />
+            {copiedAlt ? "Copied!" : "Copy Alt"}
+            <Clipboard className="size-4" />
           </Button>
         </div>
         <Textarea
@@ -196,7 +207,9 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           rows={28}
           className="whitespace-pre-wrap bg-card font-mono"
         />
-        <p className="text-sm text-muted-foreground">{charCount} characters</p>
+        <p className="text-right text-sm text-foreground/60">
+          {charCount}/3000 characters
+        </p>
 
         <Textarea
           value={altText}
@@ -207,8 +220,8 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           rows={5}
           className="whitespace-pre-wrap bg-card font-mono"
         />
-        <p className="text-sm text-muted-foreground">
-          {altCharCount} characters
+        <p className="text-right text-sm text-foreground/60">
+          {altCharCount}/100 characters
         </p>
       </div>
     </div>

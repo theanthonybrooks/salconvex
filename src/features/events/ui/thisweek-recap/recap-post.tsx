@@ -66,14 +66,16 @@ const RecapPost = ({ event, index }: RecapPostProps) => {
             <li>
               <span className="flex items-center gap-1 text-lg">
                 <TiMinus className="size-4" />
-                <b> When:</b>
-                <EventDates
-                  event={event}
-                  format="desktop"
-                  limit={1}
-                  preview={true}
-                  type="event"
-                />
+                <span className="flex items-start gap-1">
+                  <b> When:</b>
+                  <EventDates
+                    event={event}
+                    format="desktop"
+                    limit={1}
+                    preview={true}
+                    type="event"
+                  />
+                </span>
               </span>
             </li>
             <li>
