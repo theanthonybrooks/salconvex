@@ -47,6 +47,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
   const [success, setSuccess] = useState<string | undefined>("");
 
   const searchParams = useSearchParams();
+  const callBackSrc = sessionStorage.getItem("src");
+  const prevSalPage = sessionStorage.getItem("previousSalPage");
+  const isNewUser = callBackSrc === "newUser";
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
@@ -61,10 +64,8 @@ const SignInCard: React.FC<SignInCardProps> = ({
     signIn("password", formData)
       .then(() => {
         setSuccess("Successfully signed in!");
-        const callBackSrc = sessionStorage.getItem("src");
-        const prevSalPage = sessionStorage.getItem("previousSalPage");
 
-        if (callBackSrc && callBackSrc === "newUser") {
+        if (isNewUser) {
           sessionStorage.removeItem("src");
           router.replace("/pricing");
         } else if (prevSalPage) {

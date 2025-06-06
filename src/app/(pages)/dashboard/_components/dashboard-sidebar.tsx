@@ -166,7 +166,7 @@ export default function DashboardSideBar({
       )}
     >
       <div
-        className="absolute bottom-5 right-0 translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
+        className="absolute right-0 top-[11%] translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
         onClick={handleCollapseSidebar}
       >
         <RiExpandLeftRightLine className="size-4" />
