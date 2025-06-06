@@ -323,7 +323,6 @@ const ClientEventList = (
             groupedEvents.map((group, index) => {
               const isEndedGroup = !!group.title.parts?.year;
 
-              // Check if this is the FIRST group with a year
               const isFirstEnded =
                 isEndedGroup &&
                 !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);

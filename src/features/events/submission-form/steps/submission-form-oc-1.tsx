@@ -500,6 +500,7 @@ const SubmissionFormOC1 = ({
                         placeholder="Start Date"
                         orgTimezone={orgTimezone}
                         showTimeZone={false}
+                        isAdmin={isAdmin}
                       />
                     )}
                   />
@@ -524,6 +525,7 @@ const SubmissionFormOC1 = ({
                         ocEnd={ocEnd}
                         orgTimezone={orgTimezone}
                         placeholder="Deadline"
+                        isAdmin={isAdmin}
                       />
                     )}
                   />

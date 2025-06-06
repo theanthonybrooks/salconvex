@@ -19,7 +19,7 @@ export interface OcCustomDatePickerProps {
   minDate?: Date | string;
   maxDate?: Date | string;
   tabIndex?: number;
-  isAdmin?: boolean;
+  isAdmin: boolean;
   ocEnd?: string | null;
   orgTimezone?: string;
   disabled?: boolean;
