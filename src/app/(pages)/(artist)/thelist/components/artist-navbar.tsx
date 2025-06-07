@@ -232,9 +232,19 @@ TheListNavBarProps) {
                 iconOnly
                 title={"Search"}
                 source={dashboardNavItems}
-                className="flex"
+                className="hidden lg:flex"
                 // groupName={"Heading"}
 
+                placeholder="Search..."
+                user={user}
+              />
+              <Search
+                iconOnly
+                isMobile={isMobile}
+                title={"Search"}
+                source={dashboardNavItems}
+                // groupName={"Heading"}
+                className="lg:hidden"
                 placeholder="Search..."
                 user={user}
               />
