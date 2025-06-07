@@ -44,6 +44,7 @@ TheListNavBarProps) {
   const { scrollY, scrollYProgress } = useScroll();
   const [canGoToTop, setCanGoToTop] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
@@ -225,36 +226,25 @@ TheListNavBarProps) {
               </Link>
             </>
           )}
-          {/* NOTE: Limit/hide search for users who don't have a membership or those who aren't signed in */}
           {user && (
             <>
               <Search
                 iconOnly
                 title={"Search"}
                 source={dashboardNavItems}
-                className="hidden lg:flex"
+                className="flex"
                 // groupName={"Heading"}
 
                 placeholder="Search..."
                 user={user}
               />
-              {/* <Search
-                iconOnly
-                isMobile={isMobile}
-                title={"Search"}
-                source={dashboardNavItems}
-                // groupName={"Heading"}
-                className="lg:hidden"
-                placeholder="Search..."
-                user={user}
-              /> */}
             </>
           )}
 
           {!isMobile && (
             <div className="flex items-center gap-2">
               <Link href="/pricing?submit">
-                <Button className="h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background active:scale-95">
+                <Button className="hidden h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background active:scale-95 lg:inline-flex">
                   Submit
                 </Button>
               </Link>

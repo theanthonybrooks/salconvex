@@ -224,7 +224,9 @@ export const formatOpenCallDeadline = (
   if (!dt.isValid) return "Invalid date";
 
   // const dateObj = dt.toJSDate();
-  const month = dt.toFormat("LLLL");
+  // const month = dt.toFormat("LLLL");
+  const month = getFourCharMonthFromLuxon(dt);
+
   const day = dt.day;
   const year = dt.year;
   const ordinal = getOrdinalSuffix(day);

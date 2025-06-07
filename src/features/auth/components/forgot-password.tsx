@@ -86,7 +86,7 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
       });
       if (isNewUser) {
         // console.log("isNewUser", isNewUser)
-        setError("No user with that email exists.");
+        setError("No user with that email exists. If you think this is a mistake, please contact us.");
         return;
       }
     } catch (queryError) {

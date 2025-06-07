@@ -22,6 +22,7 @@ import { Link } from "@/components/ui/custom-link";
 import { Separator } from "@/components/ui/separator";
 
 import { formatCondensedDateRange } from "@/lib/dateFns";
+import { cn } from "@/lib/utils";
 import { LucideUploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -146,6 +147,10 @@ const ClientThisWeekList = (
     return orderedGroupKeys.map((key) => groups[key]);
   }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);
 
+  const totalCards = groupedEvents.reduce(
+    (sum, group) => sum + group.events.length,
+    0,
+  );
   const skeletonGroups = useMemo(() => generateSkeletonGroups(1), []);
   const hasResults = totalResults > 0;
   let flatIndex = 0;
@@ -250,15 +255,26 @@ const ClientThisWeekList = (
                 <div className="space-y-4 sm:space-y-6">
                   {group.events.map((event, index) => {
                     const showPublic = publicView ? flatIndex < 1 : publicView;
+                    const isMaskedCard =
+                      publicView && flatIndex === totalCards - 1;
+
                     const card = (
-                      <EventCardPreview
+                      <div
                         key={index}
-                        event={event}
-                        publicView={publicView}
-                        publicPreview={showPublic}
-                        user={user}
-                        userPref={userPref}
-                      />
+                        className={cn(
+                          isMaskedCard &&
+                            "masked-card pointer-events-none blur-[1px]",
+                        )}
+                      >
+                        <EventCardPreview
+                          key={index}
+                          event={event}
+                          publicView={publicView}
+                          publicPreview={showPublic}
+                          user={user}
+                          userPref={userPref}
+                        />
+                      </div>
                     );
 
                     flatIndex++;

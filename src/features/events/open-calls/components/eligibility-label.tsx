@@ -28,7 +28,7 @@ export const EligibilityLabel = ({
   const parts: string[] = [];
 
   if (
-    (isDesktop || !mobilePreview) &&
+    (isDesktop || mobilePreview) &&
     type !== "International" &&
     type !== "Other"
   ) {
@@ -37,8 +37,6 @@ export const EligibilityLabel = ({
     } else {
       parts.push(type);
     }
-  } else if (mobilePreview && type !== "International" && type !== "Other") {
-    parts.push(type);
   }
   if (whom.length === 0 || type === "International" || type === "Other") {
     if (type === "International") {
