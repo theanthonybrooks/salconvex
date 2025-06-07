@@ -24,3 +24,4 @@ export const DataTableAdminActions = ({ eventId }: DataTableAdminProps) => {
     </>
   );
 };
+

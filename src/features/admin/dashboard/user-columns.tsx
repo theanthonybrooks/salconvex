@@ -1,9 +1,11 @@
 "use client";
 
+import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
+import { Link } from "@/components/ui/custom-link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+import { FaEnvelope } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface UserColumnsProps {
@@ -227,13 +230,21 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
                 {/* <DuplicateEvent eventId={event._id} /> */}
-                <p>Delete User</p>
-                <DropdownMenuSeparator />
+                <DeleteUser userId={user._id} />
+                <DropdownMenuItem>
+                  <Link
+                    href={`mailto:${user.email}`}
+                    target="_blank"
+                    className="flex items-center gap-x-2"
+                  >
+                    <FaEnvelope className="size-4" /> Contact
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(user._id)}
                   className="flex items-center gap-x-2"
                 >
-                  <LucideClipboardCopy className="size-4" /> Event ID
+                  <LucideClipboardCopy className="size-4" /> User ID
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
