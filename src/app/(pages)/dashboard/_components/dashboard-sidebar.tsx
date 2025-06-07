@@ -118,35 +118,7 @@ export default function DashboardSideBar({
     }
   }, [pathname, filteredNavItems]);
 
-  // useEffect(() => {
-  //   if (!openSection) return;
-  //   if (collapsedSidebar) {
-  //     setCollapsedSidebar(false);
-  //   }
-  // }, [openSection, collapsedSidebar]);
-
-  // useEffect(() => {
-  //   if (!openSection) {
-  //     const matchingSection = filteredNavItems.find(
-  //       (item) =>
-  //         item.sectionCat && pathname.includes(`dashboard/${item.sectionCat}`),
-  //     )?.sectionCat;
-  //     if (matchingSection) {
-  //       setOpenSection(matchingSection);
-  //     }
-  //   }
-  // }, [openSection, pathname, filteredNavItems]);
-
-  // const handleSectionToggle = (sectionCat: string) => {
-  //   setOpenSection((prev) => {
-  //     if (prev === sectionCat) {
-  //       return null // Allow closing the section
-  //     }
-  //     return sectionCat // Open the new section
-  //   })
-  // }
-
-  const handleSectionToggle = (sectionCat: string) => {
+  const handleSectionToggle = (sectionCat: string | null) => {
     setOpenSection((prev) => {
       if (collapsedSidebar && prev !== sectionCat) setCollapsedSidebar(false);
       return prev === sectionCat ? null : sectionCat;
@@ -212,6 +184,10 @@ export default function DashboardSideBar({
                       ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
                       : "text-primary hover:bg-primary/10 hover:text-foreground",
                   )}
+                  onClick={() => {
+                    handleSectionToggle(null);
+                    setActiveSection(null);
+                  }}
                 >
                   <item.icon
                     className={cn("size-4", collapsedSidebar && "size-5")}
