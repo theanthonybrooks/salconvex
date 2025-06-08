@@ -166,7 +166,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
           <p>{success}</p>
         </div>
       )}
-      <CardContent className="grid gap-y-4">
+      <CardContent className="grid gap-y-4 px-4 sm:px-6">
         <Button
           variant="salWithShadowHidden"
           size="lg"

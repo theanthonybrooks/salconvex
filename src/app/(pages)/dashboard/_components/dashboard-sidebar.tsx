@@ -138,28 +138,17 @@ export default function DashboardSideBar({
       )}
     >
       <div
-        className="absolute right-0 top-[11%] translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
+        className="absolute right-0 top-[11%] z-10 translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
         onClick={handleCollapseSidebar}
       >
         <RiExpandLeftRightLine className="size-4" />
       </div>
-      {/* <div className='flex h-full flex-col justify-between'> */}
-      {/* <div className='flex min-h-[72px] shrink-0 items-center border-b px-4'>
-          <Link
-            prefetch={true}
-            className='flex items-center gap-2 font-semibold hover:cursor-pointer'
-            href='/'>
-            <Image src={image} alt={alt} width={width} height={height} />
-            <Image src={image2} alt={alt2} width={width2} height={height2} />
-          </Link>
-        </div> */}
 
       <nav className="grid h-full max-h-[calc(100vh-55px)] grid-rows-[60px_1fr_65px] space-y-1 overflow-hidden pt-4">
         <Search
           title={"Search"}
           source={dashboardNavItems}
           user={user}
-          // groupName={"Heading"}
           className="mx-4 mb-5"
           placeholder="Find what you're looking for!"
           iconOnly={collapsedSidebar}

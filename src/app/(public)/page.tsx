@@ -20,6 +20,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { cn } from "@/lib/utils";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -165,13 +166,19 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-row gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
+              className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-col gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
             >
               <span className="flex items-center gap-2">
                 <i className="text-base">Marching Band Mural </i>
                 {/* <span className="block sm:hidden">-</span>{" "} */}
                 <span className="block text-xs">by</span>{" "}
                 <span className="font-bold">CHUS</span>
+              </span>
+              <span className="flex items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground">Italy (2024)</p>
+                <span className="flex items-center gap-1 text-xs italic">
+                  View more details <ArrowRight className="size-4" />
+                </span>
               </span>
             </motion.span>
           </PopoverTrigger>
@@ -238,51 +245,6 @@ export default function Home() {
 
       {!hasActiveSubscription && (
         <>
-          {/* <div className="mx-auto mt-10 flex w-full flex-col items-center justify-center gap-5 text-balance px-8 py-20 text-center text-base sm:max-w-[70vw]">
-            <h2 className="w-fit text-center font-tanker text-[2.6rem] leading-10">
-              Welcome!
-            </h2>
-            <p>
-              For those that are new to The Street Art List, here&apos;s a quick
-              overview of what it is and how it works.
-            </p>
-            <p>
-              The Street Art List is a platform that I started in 2019 with the
-              goal of making a public archive/database of street art-related
-              projects and events. Over the years, that list continued to grow
-              until last year when I decided to bite the bullet and code a site.
-              Needless to say, it was a huge undertaking, but was also a bit
-              rushed and I really wanted to make something better. So, for the
-              past year and a half, I&apos;ve been working on this shiny new
-              site that allows users to have an account, to bookmark, to hide
-              events, to keep track of applications, to view deadlines in their
-              local timezone, and much more! Lots of functionalities that I have
-              in the works, and I&apos;m happy to finally get to share what so
-              much of my time has gone into. If you used previous versions of
-              The List (when it was a spreadsheet), or the old version of the
-              site, I promise that this has just... so much more. Full detail
-              pages with breakdowns of the budget, mobile-friendly layouts,
-              submission forms that allow saving drafts and coming back to them
-              later. Organizer accounts. Really, just so much more. I&apos;m
-              excited to share this with you and hope you&apos;ll find it useful
-              :)
-            </p>
-            /~ <Image
-              src="/hello.gif"
-              alt="Hello there"
-              width={300}
-              height={300}
-              className="mx-auto my-4 max-w-[70vw] rounded-full border-2"
-            />
-            If you&apos;ve found this page, welcome! You&apos;re a bit early as
-            it&apos;s still in development and will soon be in beta for the
-            public. I&apos;ll post on IG and announce the release soon 😉.
-            Please don&apos;t try to sign up. It&apos;s in testing and not
-            available. Any created accounts in the meantime will be deleted as
-            I&apos;m doing a lot of changes in the database while getting
-            everything connected. ~/
-          </div>*/}
-
           <Card className="mx-auto mt-10 max-w-[90dvw] border-1.5 p-6 text-left shadow-md sm:max-w-[70dvw]">
             <CardContent className="space-y-4 !p-0 text-base text-foreground sm:!p-6">
               <h2 className="text-center font-tanker text-4xl text-foreground">

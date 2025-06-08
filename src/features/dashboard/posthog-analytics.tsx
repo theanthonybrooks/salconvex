@@ -25,7 +25,8 @@ const AnalyticsPage = () => {
         frameBorder="0"
         allowFullScreen
         src="https://eu.posthog.com/embedded/QJtpgS7V02f2NdbP3vTqo9qy1tX_zA"
-        style={{ height: "4000px" }}
+        // style={{ height: "4000px" }}
+        className="h-[4000px] xl:h-[2000px]"
       ></iframe>
     </div>
   );

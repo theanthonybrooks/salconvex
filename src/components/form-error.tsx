@@ -8,8 +8,8 @@ interface FormErrorProps {
 export const FormError = ({ message }: FormErrorProps) => {
   if (!message) return null;
   return (
-    <div className="flex items-center justify-center gap-x-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-      <FaExclamationTriangle className="size-8 shrink-0 pl-3" />
+    <div className="flex items-center justify-center gap-x-3 rounded-md bg-destructive/15 p-4 text-sm text-destructive">
+      <FaExclamationTriangle className="size-10 shrink-0" />
       <span className="text-center"> {message}</span>
     </div>
   );

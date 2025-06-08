@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { supportEmail } from "@/constants/siteInfo";
 import { ForgotPasswordSchema, ResetPasswordSchema } from "@/schemas/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,7 +29,7 @@ import { Eye, EyeOff, InfoIcon, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
@@ -47,7 +48,7 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
   // const [newPassword, setNewPassword] = useState<string>("")
   const [otp, setOtp] = useState<string>("");
   const [success, setSuccess] = useState<string | undefined>("");
-  const [error, setError] = useState<string | undefined>("");
+  const [error, setError] = useState<ReactNode | undefined>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -86,7 +87,32 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
       });
       if (isNewUser) {
         // console.log("isNewUser", isNewUser)
-        setError("No user with that email exists. If you think this is a mistake, please contact us.");
+        // setError("No user with that email exists. If you think this is a mistake, please contact us.");
+        setError(
+          <>
+            <span className="hidden md:block">
+              No user found with that email address. <br />
+              If you think this is a mistake,{" "}
+              <Link
+                href={`mailto:${supportEmail}?subject=Forgot password`}
+                className="font-medium underline underline-offset-2 hover:underline-offset-4"
+              >
+                contact us
+              </Link>
+            </span>
+            <span className="block md:hidden">
+              No user found with that email. <br />
+              If this is a mistake,{" "}
+              <Link
+                href={`mailto:${supportEmail}?subject=Forgot password`}
+                className="font-medium underline underline-offset-2 hover:underline-offset-4"
+              >
+                contact us
+              </Link>
+            </span>
+          </>,
+        );
+
         return;
       }
     } catch (queryError) {
@@ -191,7 +217,7 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
             )}
           </CardDescription>
         </CardHeader>
-        <CardContent className="px-10 pb-0">
+        <CardContent className="pb-0 sm:px-10">
           <Separator thickness={2} className="mb-4 border-foreground" />
           <form
             onSubmit={forgotForm.handleSubmit(handleForgotSubmit)}

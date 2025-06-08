@@ -456,7 +456,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             disabled={isPending}
                             {...field}
                             placeholder={
-                              !showPassword ? "********" : "Password!"
+                              !showPassword ? "*********" : "ex. Password1!"
                             }
                             type={showPassword ? "text" : "password"}
                             inputHeight="sm"

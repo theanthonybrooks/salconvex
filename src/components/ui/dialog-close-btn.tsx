@@ -11,8 +11,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, ButtonSize, ButtonVariant } from "@/components/ui/button";
+import { findScrollableParent } from "@/lib/scrollFns";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface DialogCloseBtnProps {
   open?: boolean;
@@ -49,14 +51,46 @@ export const DialogCloseBtn = ({
   triggerVariant = "salWithShadowHiddenYlw",
   triggerSize = "lg",
 }: DialogCloseBtnProps) => {
+  const [hidden, setHidden] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!triggerRef.current) return;
+
+    const scrollContainer = findScrollableParent(
+      triggerRef.current?.parentElement || null,
+    );
+
+    const onScroll = () => {
+      const scrollPos =
+        scrollContainer instanceof Window
+          ? window.scrollY
+          : scrollContainer.scrollTop;
+
+      setHidden((prev) => {
+        const shouldBeHidden = scrollPos > 100;
+        return prev !== shouldBeHidden ? shouldBeHidden : prev;
+      });
+    };
+
+    scrollContainer.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {type === "icon" ? (
           <Button
+            ref={triggerRef}
             variant="icon"
             className={cn(
               "absolute right-5 top-4 z-10 !w-max text-lg font-bold text-foreground hover:text-red-600 focus:text-red-600",
+              hidden && "pointer-events-none opacity-0",
+
               triggerClassName,
             )}
             aria-label="Close modal"

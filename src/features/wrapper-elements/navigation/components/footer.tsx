@@ -147,7 +147,7 @@ export default function Footer({ className }: { className?: string }) {
       <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:max-w-full xl:px-6">
         <div className="mx-auto xl:grid xl:grid-cols-2 xl:gap-8 3xl:max-w-[max(80vw,1500px)]">
           {/* Links */}
-          <div className="mt-5 grid gap-8 px-6 lg:grid-cols-[1fr_5px_auto] xl:col-span-2 xl:mt-0">
+          <div className="mt-5 grid gap-8 px-6 xl:col-span-2 xl:mt-0 xl:grid-cols-[1fr_5px_auto]">
             <div
               className={cn(
                 "hidden text-start md:grid md:justify-items-center lg:gap-8",
@@ -191,11 +191,11 @@ export default function Footer({ className }: { className?: string }) {
             <Separator
               thickness={1}
               orientation="vertical"
-              className="my-4 hidden border-foreground lg:block"
+              className="my-4 hidden border-foreground xl:block"
             />
             <div
               data-type="newsletter"
-              className="mx-auto flex w-full flex-col justify-center sm:px-10"
+              className="mx-auto flex w-full flex-col justify-center sm:px-10 lg:hidden xl:flex"
             >
               {/* <div>
                 <p className="text-sm font-semibold text-foreground">
