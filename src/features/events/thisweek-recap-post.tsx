@@ -130,7 +130,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     const sortedDates = Object.keys(grouped).sort();
 
-    let content = `A quick rundown of what's ending in the next 7 days. The links for everything are on The Street Art List website (link in bio).\n`;
+    let content = `A quick rundown of what's ending in the next 7 days. The links for everything are on The Street Art List website (link in bio).\n\n`;
     content += `DM or email at hey@thestreetartlist.com with any feedback or things that you think would be useful to include. Also, use the submission form on the site for any open calls that I haven't included!\n\n`;
     content += `P.S. - Any questions related to the events should be asked to the organizers directly. I'm but a messenger and can't help if you ask.\n\n`;
 
@@ -168,7 +168,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="mt-10 flex items-center gap-2">
         <Button
           onClick={() => router.push("/admin/thisweek")}
           variant="salWithShadowHiddenBg"
@@ -226,7 +226,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-y-6 sm:px-4">
+        <div className="flex flex-col gap-y-6 sm:px-4 xl:px-0">
           <div className="flex flex-col items-center gap-2 sm:flex-row">
             <Button
               variant="salWithShadowHiddenBg"
