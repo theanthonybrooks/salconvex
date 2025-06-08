@@ -187,14 +187,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
       </div>
 
       <div className="scrollable mini flex w-full max-w-[90vw] flex-col-reverse gap-6 py-6 sm:grid sm:grid-cols-2">
-        <div className="flex flex-col gap-y-6">
-          <div
+        <div className="mx-auto flex w-fit flex-col gap-y-6">
+          <RecapCover
+            dateRange={displayRange}
             ref={(el) => {
               refs.current[0] = el;
             }}
-          >
-            <RecapCover dateRange={displayRange} />
-          </div>
+          />
+
           {queryResult?.results
             ?.slice()
             .sort((a, b) => {
@@ -207,23 +207,21 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
               return aDate - bDate;
             })
             .map((event, index) => (
-              <div
-                key={event._id}
+              <RecapPost
                 ref={(el) => {
                   refs.current[index + 1] = el;
                 }}
-              >
-                <RecapPost key={event._id} event={event} index={index} />
-              </div>
+                key={event._id}
+                event={event}
+                index={index}
+              />
             ))}
           {queryResult?.results && (
-            <div
+            <RecapEndCover
               ref={(el) => {
                 refs.current[queryResult.results.length + 1] = el;
               }}
-            >
-              <RecapEndCover />
-            </div>
+            />
           )}
         </div>
         <div className="flex flex-col gap-y-6 sm:px-4 xl:px-0">

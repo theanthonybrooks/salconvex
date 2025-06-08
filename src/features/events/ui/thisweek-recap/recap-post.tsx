@@ -6,6 +6,7 @@ import { getFormattedLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { PublicEventPreviewData } from "@/types/event";
 import Image from "next/image";
+import { forwardRef } from "react";
 import { TiMinus } from "react-icons/ti";
 
 interface RecapPostProps {
@@ -13,7 +14,8 @@ interface RecapPostProps {
   index: number;
 }
 
-const RecapPost = ({ event, index }: RecapPostProps) => {
+const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
+  const { event, index } = props;
   const { openCall } = event;
   const eligibility = event.hasActiveOpenCall
     ? openCall?.eligibility
@@ -25,7 +27,10 @@ const RecapPost = ({ event, index }: RecapPostProps) => {
     compensation?.budget?.min > 0;
 
   return (
-    <div className="relative h-[500px] w-[500px] bg-[#feee1f] bg-cover bg-center">
+    <div
+      ref={ref}
+      className="relative h-[500px] w-[500px] bg-[#feee1f] bg-cover bg-center"
+    >
       <section className="post-header">
         <p className="absolute -left-9 top-24 -rotate-90 text-base font-black">
           @TheStreetArtList
@@ -125,6 +130,8 @@ const RecapPost = ({ event, index }: RecapPostProps) => {
       </section>
     </div>
   );
-};
+});
+
+RecapPost.displayName = "RecapPost";
 
 export default RecapPost;
