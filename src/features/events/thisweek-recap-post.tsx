@@ -186,7 +186,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 py-6">
+      <div className="scrollable mini flex w-full max-w-[90vw] flex-col-reverse gap-6 py-6 sm:grid sm:grid-cols-2">
         <div className="flex flex-col gap-y-6">
           <div
             ref={(el) => {
@@ -226,19 +226,19 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-y-6">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-y-6 sm:px-4">
+          <div className="flex flex-col items-center gap-2 sm:flex-row">
             <Button
               variant="salWithShadowHiddenBg"
               onClick={handleDownloadAll}
-              className="flex flex-1 items-center gap-1"
+              className="flex w-full flex-1 items-center gap-1"
             >
               Download <ImageIcon className="size-4" />
             </Button>
             <Button
               variant="salWithShadowHiddenBg"
               onClick={handleCopyText}
-              className="flex flex-1 items-center gap-1"
+              className="flex w-full flex-1 items-center gap-1"
             >
               {copiedText ? "Copied!" : "Copy Text"}{" "}
               <Clipboard className="size-4" />
@@ -246,7 +246,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             <Button
               variant="salWithShadowHiddenBg"
               onClick={handleCopyAlt}
-              className="flex flex-1 items-center gap-1"
+              className="flex w-full flex-1 items-center gap-1"
             >
               {copiedAlt ? "Copied!" : "Copy Alt"}
               <Clipboard className="size-4" />
@@ -259,7 +259,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
               setCharCount(e.target.value.length);
             }}
             rows={28}
-            className="whitespace-pre-wrap bg-card font-mono"
+            className="mx-auto max-w-[90vw] whitespace-pre-wrap bg-card font-mono"
           />
           <p className="text-right text-sm text-foreground/60">
             {charCount}/3000 characters
@@ -272,7 +272,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
               setAltCharCount(e.target.value.length);
             }}
             rows={5}
-            className="whitespace-pre-wrap bg-card font-mono"
+            className="mx-auto max-w-[90vw] whitespace-pre-wrap bg-card font-mono"
           />
           <p className="text-right text-sm text-foreground/60">
             {altCharCount}/100 characters
