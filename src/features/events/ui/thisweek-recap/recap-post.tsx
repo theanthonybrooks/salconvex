@@ -43,9 +43,9 @@ const RecapPost = ({ event, index }: RecapPostProps) => {
       </section>
       <section className="absolute left-[15%] top-[40%] flex flex-col">
         <section className="post-title max-w-[36ch]">
-          <h2 className="main-title">{event?.name}</h2>
-          <h2 className="behind2">{event?.name}</h2>
-          <h2 className="behind2 invisible">{event?.name}</h2>
+          <h2 className="main-titles">{event?.name}</h2>
+          {/* <h2 className="behind2">{event?.name}</h2>
+          <h2 className="behind2 invisible">{event?.name}</h2> */}
         </section>
         <section className="post-details">
           <ul className="flex flex-col gap-y-2">

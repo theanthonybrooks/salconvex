@@ -1,4 +1,4 @@
-import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-wrapper";
+import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-table-wrapper";
 
 export default async function AdminPage() {
   // redirect("/dashboard/admin/todos");

@@ -36,14 +36,14 @@ export const RecapEndCover = () => {
     <div className="relative w-[500px] bg-[#feee1f] bg-cover bg-center">
       <section className="post-header">
         <Image
-          className="-z-1 h-full w-full p-10 pl-12"
+          className="-z-1 h-full w-full -translate-y-6 p-10 pl-12"
           src="/branding/weekly-back-cover.png"
           alt="Open Calls Ending this Week Background"
           height={400}
           width={400}
         />
       </section>
-      <section className="absolute bottom-0 flex w-full -translate-y-6 flex-col text-center font-bold">
+      <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
         TheStreetArtList.com
       </section>
     </div>

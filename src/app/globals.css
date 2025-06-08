@@ -1514,11 +1514,11 @@ div:has(> div.react-datepicker__input-container) {
   position: relative;
   display: inline-block;
   width: 500px;
-  margin-bottom: 1em;
+  margin-bottom: 4em;
 
   h2 {
     z-index: 1;
-    color: #feee1f;
+    /* color: #feee1f; */
     font-size: var(--h2-size);
     font-weight: 900;
     position: absolute;

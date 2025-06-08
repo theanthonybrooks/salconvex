@@ -1,5 +1,5 @@
 import { KanbanBoard } from "@/components/ui/kanban-board";
-import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-wrapper";
+import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-table-wrapper";
 import AnalyticsPage from "@/features/dashboard/posthog-analytics";
 import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
@@ -46,6 +46,7 @@ export default async function AdminPage({
       return <KanbanBoard userRole={user.role?.[0]} purpose="design" />;
     case "submissions":
       return <AdminDashboardTableWrapper page="events" />;
+
     case "users":
       return <AdminDashboardTableWrapper page="users" />;
     case "event":

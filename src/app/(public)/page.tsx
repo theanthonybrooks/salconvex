@@ -20,7 +20,6 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { cn } from "@/lib/utils";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,6 +35,7 @@ export default function Home() {
 
   const [currentSlide, setCurrentSlide] = useState(1);
   const [expanded, setExpanded] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const toggleReadMore = () => setExpanded((prev) => !prev);
   // const { scrollY } = useScroll()
   // const smoothScrollY = useSpring(scrollY, {
@@ -94,9 +94,7 @@ export default function Home() {
           <h2
             className={cn(
               "text-center text-lg md:text-3xl lg:text-4xl",
-              currentSlide === 1
-                ? "scale-100"
-                : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+              currentSlide === 1 ? "scale-100" : "hidden",
             )}
           >
             May / June 2025
@@ -167,6 +165,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
               className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-col gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
+              onClick={() => setPopoverOpen((prev) => !prev)}
             >
               <span className="flex items-center gap-2">
                 <i className="text-base">Marching Band Mural </i>
@@ -174,10 +173,20 @@ export default function Home() {
                 <span className="block text-xs">by</span>{" "}
                 <span className="font-bold">CHUS</span>
               </span>
-              <span className="flex items-center justify-between gap-2">
+              <span
+                className={cn(
+                  "flex items-center justify-between gap-2",
+                  currentSlide !== 1 && "hidden",
+                )}
+              >
                 <p className="text-xs text-muted-foreground">Italy (2024)</p>
-                <span className="flex items-center gap-1 text-xs italic">
-                  View more details <ArrowRight className="size-4" />
+
+                <span className="flex items-center gap-1 text-xs italic underline-offset-2 hover:underline">
+                  {popoverOpen ? (
+                    <p> View less </p>
+                  ) : (
+                    <p>View more details... </p>
+                  )}
                 </span>
               </span>
             </motion.span>
