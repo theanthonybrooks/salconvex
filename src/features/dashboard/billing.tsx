@@ -166,8 +166,8 @@ export default function BillingPage() {
       {subStatus === "past_due" && (
         <span className="mt-2 flex items-center gap-4 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
           <FaExclamationTriangle className="color-red-600 size-10 shrink-0" />
-          Your payment method is past due. Please update your payment method to
-          resume access to the full membership features.
+          There was a problem with your last payment. Please update your payment
+          method to resume access to the full membership features.
         </span>
       )}
 
