@@ -194,7 +194,7 @@ export const ApplyButton = ({
     try {
       setPending(true);
 
-      if (!appStatus) {
+      if (!appStatus && openCall === "active") {
         await toggleAppActions({
           openCallId: openCallId as Id<"openCalls">,
           manualApplied: true,
@@ -323,7 +323,7 @@ export const ApplyButton = ({
               </AlertDialogTitle>
               <AlertDialogDescription className="text-foreground">
                 <span className="flex flex-col gap-y-2">
-                  {!appStatus ? (
+                  {!appStatus && openCall === "active" && (
                     <>
                       <span>
                         This application is located on another website. By
@@ -336,11 +336,20 @@ export const ApplyButton = ({
                         end up not applying.
                       </span>
                     </>
-                  ) : (
+                  )}
+                  {appStatus && (
                     <>
                       <span>
                         You&apos;ve already applied for this open call. Do you
                         still want to proceed to the external application?
+                      </span>
+                    </>
+                  )}
+                  {!appStatus && openCall === "ended" && (
+                    <>
+                      <span>
+                        This application is closed. You can&apos;t apply for
+                        this open call, though you can still view it.
                       </span>
                     </>
                   )}
@@ -355,7 +364,7 @@ export const ApplyButton = ({
                 onClick={onApply}
                 className="flex items-center gap-x-1 sm:w-40"
               >
-                {!appStatus ? "Apply" : "Continue"}{" "}
+                {!appStatus && openCall === "active" ? "Apply" : "Continue"}{" "}
                 {pending && <LoaderCircle className="size-4 animate-spin" />}
               </AlertDialogPrimaryAction>
             </AlertDialogFooter>
