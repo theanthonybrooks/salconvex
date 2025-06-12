@@ -6,6 +6,10 @@ import {
   Clock,
   House,
   List,
+  LucideBaby,
+  LucideBadgeAlert,
+  LucideBadgeCheck,
+  LucideBadgeX,
   PaintBucket,
   Pencil,
   Scroll,
@@ -134,6 +138,29 @@ export const subscriptionOptions = [
     value: "3b. yearly-fatcap",
     label: "Yearly-Fatcap",
     icon: Clock,
+  },
+];
+
+export const subscriptionStatusOptions = [
+  {
+    value: "active",
+    label: "Active",
+    icon: LucideBadgeCheck,
+  },
+  {
+    value: "trialing",
+    label: "Trialing",
+    icon: LucideBaby,
+  },
+  {
+    value: "past_due",
+    label: "Past Due",
+    icon: LucideBadgeAlert,
+  },
+  {
+    value: "canceled",
+    label: "Canceled",
+    icon: LucideBadgeX,
   },
 ];
 

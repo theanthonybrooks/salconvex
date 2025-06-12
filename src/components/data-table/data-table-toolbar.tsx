@@ -11,6 +11,7 @@ import {
   eventCategories,
   eventStates,
   subscriptionOptions,
+  subscriptionStatusOptions,
 } from "@/components/data-table/data-table-row-actions";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { cn } from "@/lib/utils";
@@ -170,6 +171,13 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("subscription")}
                 title="Subscription"
                 options={subscriptionOptions}
+              />
+            )}
+            {table.getColumn("subStatus") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("subStatus")}
+                title="Status"
+                options={subscriptionStatusOptions}
               />
             )}
 

@@ -42,10 +42,17 @@ export const usersWithSubscriptions = query({
           .withIndex("userId", (q) => q.eq("userId", user._id))
           .first();
 
+        const activeSub =
+          subscription?.status === "active" ||
+          subscription?.status === "trialing";
+
         const planName =
           subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
+        const cancelAt = subscription?.cancelAt;
+        const currentStatus = cancelAt ? "canceled" : subscription?.status;
         const interval = subscription?.interval ?? "unknown";
-        const amount = subscription?.amount ?? 0;
+        const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;
+        const amount = subAmount ?? 0;
 
         if (interval === "month") {
           totalPerMonth += amount;
@@ -64,7 +71,7 @@ export const usersWithSubscriptions = query({
           name,
           email: user.email,
           subscription: label ?? "4. none",
-          subStatus: subscription?.status ?? "-",
+          subStatus: currentStatus ?? "-",
           accountType: user.accountType ?? [],
           role: user.role ?? "user",
           createdAt: user.createdAt,
