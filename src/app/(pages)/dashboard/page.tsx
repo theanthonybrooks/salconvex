@@ -13,7 +13,6 @@ import { Link } from "@/components/ui/custom-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/lib/applicationFns";
 import { getEventCategoryLabel } from "@/lib/eventFns";
-import { invalidOCVals } from "@/types/openCall";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery, useQuery } from "convex/react";
@@ -430,7 +429,7 @@ export default function Dashboard() {
                       <div>
                         <p className="text-sm font-medium">
                           <Link
-                            href={`/thelist/event/${event.slug}/${new Date(event._creationTime).getFullYear()}${!invalidOCVals.includes(event.hasOpenCall) ? "/call" : ""}}`}
+                            href={`/thelist/event/${event.slug}/${new Date(event._creationTime).getFullYear()}/call`}
                             className="hover:underline"
                           >
                             {event.name}
