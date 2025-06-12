@@ -139,14 +139,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Account Type" />
     ),
     cell: ({ row }) => {
-      const accountType = row.getValue("accountType") as string | undefined;
+      const accountType = row.getValue("accountType") as string[];
       return (
         <div className="capitalize">
-          {accountType?.includes("artist")
-            ? "Artist"
-            : accountType?.includes("organizer")
-              ? "organizer"
-              : "-"}
+          {accountType && accountType.length > 0
+            ? accountType.map((type) => type.split("|")[0]).join(", ")
+            : "-"}
         </div>
       );
     },
