@@ -279,10 +279,16 @@ const ClientEventList = (
               variant="salWithShadowHiddenBg"
               className="text-lg font-bold lg:text-xl"
               onClick={() => {
-                router.push("/pricing");
+                if (subStatus?.subStatus === "past_due") {
+                  router.push("/dashboard/billing");
+                } else {
+                  router.push("/pricing");
+                }
               }}
             >
-              Become a member
+              {subStatus?.subStatus === "past_due"
+                ? "Fix your payment method"
+                : "Become a member"}
             </Button>{" "}
             <p className="sm:hidden">for the full list & open call details</p>
             <p className="hidden sm:block">

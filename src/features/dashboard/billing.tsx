@@ -11,6 +11,7 @@ import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
 import { CreditCard } from "lucide-react";
 import { useState } from "react";
+import { FaExclamationTriangle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
@@ -36,6 +37,8 @@ export default function BillingPage() {
   const cancelAtTime = subscription?.cancelAt
     ? new Date(subscription.cancelAt)
     : undefined;
+
+  const subStatus = subscription?.status;
 
   let interval: string | undefined;
   // let nextInterval: string | undefined
@@ -160,6 +163,15 @@ export default function BillingPage() {
           your subscription.
         </p>
       </div>
+      {subStatus === "past_due" && (
+        <div className="flex items-center gap-4">
+          <FaExclamationTriangle className="size-10 shrink-0" />
+          <p className="mt-2 rounded-lg border-1.5 border-red-900 bg-red-50 p-3 text-red-600">
+            Your payment method is past due. Please update your payment method
+            to resume access to the full membership features.
+          </p>
+        </div>
+      )}
 
       {/* Account Information Grid */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -170,7 +182,9 @@ export default function BillingPage() {
             onClick={handleManageSubscription}
             variant="salWithShadow"
           >
-            Manage Membership
+            {subStatus === "past_due"
+              ? "Fix payment method"
+              : "Manage Membership"}
           </Button>
           {!subPromoCode && (
             <form
