@@ -113,7 +113,9 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <FaInstagram className={cn("shrink-0", iconSize)} />
 
                 <span className="underline-offset-2 hover:underline">
-                  {event.links.instagram}
+                  {event.links.instagram.includes("@") && submitRecap
+                    ? event.links.instagram.split("@").slice(-1)[0]
+                    : event.links.instagram}
                 </span>
               </div>
             </a>
@@ -133,7 +135,9 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <span className="underline-offset-2 hover:underline">
                   {/* {event.links.facebook} */}
                   {event.links.facebook.includes("@")
-                    ? event.links.facebook
+                    ? submitRecap
+                      ? event.links.facebook.split("@").slice(-1)[0]
+                      : event.links.facebook
                     : event.name}
                 </span>
               </div>
