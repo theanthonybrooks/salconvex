@@ -278,6 +278,13 @@ export const updateOrganization = mutation({
     if (!organization) {
       throw new ConvexError("Organization not found");
     }
+    const sanitizedLinks = {
+      ...args.links,
+      email:
+        args.links?.email?.trim() === "none@mail.com"
+          ? undefined
+          : args.links?.email,
+    };
 
     await ctx.db.patch(organization._id, {
       name: args.name,
@@ -294,17 +301,7 @@ export const updateOrganization = mutation({
         organizer: args.contact?.organizer,
         primaryContact: args.contact?.primaryContact || "",
       },
-      links: {
-        website: args.links?.website,
-        instagram: args.links?.instagram,
-        facebook: args.links?.facebook,
-        threads: args.links?.threads,
-        email: args.links?.email,
-        vk: args.links?.vk,
-        phone: args.links?.phone,
-        linkAggregate: args.links?.linkAggregate,
-        other: args.links?.other,
-      },
+      links: sanitizedLinks,
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
     });

@@ -860,11 +860,18 @@ export const createOrUpdateEvent = mutation({
     //   : linksSameAsOrg || linksLength === 1
     //     ? { ...organization?.links, sameAsOrganizer: true }
     //     : { ...args.links, sameAsOrganizer: false };
+
     const links = !args.links
       ? { sameAsOrganizer: false }
       : linksSameAsOrg || (args.finalStep && linksLength === 1)
         ? { ...organization?.links, sameAsOrganizer: true }
         : { ...args.links, sameAsOrganizer: false };
+
+    const sanitizedLinks = {
+      ...links,
+      email:
+        links?.email?.trim() === "none@mail.com" ? undefined : links?.email,
+    };
 
     function isValidEventId(id: string): id is Id<"events"> {
       return typeof id === "string" && id.trim() !== "";
@@ -918,7 +925,7 @@ export const createOrUpdateEvent = mutation({
           ...args.location,
         },
         about: args.about,
-        links,
+        links: sanitizedLinks,
         otherInfo: args.otherInfo,
         active: args.active || true,
         lastEditedAt: Date.now(),
@@ -955,7 +962,7 @@ export const createOrUpdateEvent = mutation({
         ...args.location,
       },
       about: args.about,
-      links,
+      links: sanitizedLinks,
       otherInfo: args.otherInfo,
       active: args.active || true,
       mainOrgId: args.orgId,

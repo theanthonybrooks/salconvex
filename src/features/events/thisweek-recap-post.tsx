@@ -148,7 +148,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
       content += "\n";
     }
 
-    content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me @anthonybrooksart. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me @anthonybrooksart.\n\n`;
+    content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me @anthonybrooksart.\n\n`;
 
     content += `#opencall #muralfest #publicartopencall #muralfestival #graffitijam #graffiti #streetartfestival #muralproject #callforartist #streetartopencall #urbanart #arteurbana #muralproject #eoi #callforartist #rfq #rfp #artistopencall\n`;
     content += `#artistopportunities #artistopportunity #streetartopencall #streetartcalls`;

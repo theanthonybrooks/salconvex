@@ -53,7 +53,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     hidden: false,
   };
 
-  const { prodDates } = dates; 
+  const { prodDates } = dates;
   const prodEnd = prodDates?.[0]?.end;
   const tabList = [
     // { id: "application", label: "My Application" },
@@ -91,7 +91,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
       <SalBackNavigation format="desktop" />
       <Card
         className={cn(
-          "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",
+          "row-start-2 hidden w-full max-w-[300px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",
         )}
       >
         <div className="col-span-full mb-4 grid w-full max-w-[calc(100%-12px)] grid-cols-[75px_auto] gap-x-3 pt-2">
@@ -169,7 +169,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   <AccordionContent className="text-sm">
                     <RichTextDisplay
                       html={event.about}
-                      className="line-clamp-5"
+                      className="line-clamp-5 break-words"
                     />
                     {event.about?.length > 200 && (
                       <button
