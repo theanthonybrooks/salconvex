@@ -443,7 +443,7 @@ const OpenCallCard = ({
               <div className="flex flex-col gap-y-3 p-3">
                 <span>
                   <span className="font-semibold underline underline-offset-2">
-                    Deadline:
+                    {openCallStatus === "ended" ? "Ended" : "Deadline"}:
                   </span>
                   <br />{" "}
                   <span className="flex items-center gap-x-2">

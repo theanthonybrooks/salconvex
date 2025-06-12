@@ -280,14 +280,14 @@ const ClientEventList = (
               className="text-lg font-bold lg:text-xl"
               onClick={() => {
                 if (subStatus?.subStatus === "past_due") {
-                  router.push("/dashboard/billing");
+                  router.push("/dashboard/account/billing");
                 } else {
                   router.push("/pricing");
                 }
               }}
             >
               {subStatus?.subStatus === "past_due"
-                ? "Fix your payment method"
+                ? "Resume your membership"
                 : "Become a member"}
             </Button>{" "}
             <p className="sm:hidden">for the full list & open call details</p>

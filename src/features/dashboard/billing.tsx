@@ -164,13 +164,11 @@ export default function BillingPage() {
         </p>
       </div>
       {subStatus === "past_due" && (
-        <div className="flex items-center gap-4">
-          <FaExclamationTriangle className="size-10 shrink-0" />
-          <p className="mt-2 rounded-lg border-1.5 border-red-900 bg-red-50 p-3 text-red-600">
-            Your payment method is past due. Please update your payment method
-            to resume access to the full membership features.
-          </p>
-        </div>
+        <span className="mt-2 flex items-center gap-4 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
+          <FaExclamationTriangle className="color-red-600 size-10 shrink-0" />
+          Your payment method is past due. Please update your payment method to
+          resume access to the full membership features.
+        </span>
       )}
 
       {/* Account Information Grid */}
@@ -183,7 +181,7 @@ export default function BillingPage() {
             variant="salWithShadow"
           >
             {subStatus === "past_due"
-              ? "Fix payment method"
+              ? "Resume Membership"
               : "Manage Membership"}
           </Button>
           {!subPromoCode && (

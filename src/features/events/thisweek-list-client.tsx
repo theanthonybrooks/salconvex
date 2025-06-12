@@ -308,10 +308,16 @@ const ClientThisWeekList = (
                 variant="salWithShadowHiddenBg"
                 className="text-lg font-bold lg:text-xl"
                 onClick={() => {
-                  router.push("/pricing");
+                  if (subStatus?.subStatus === "past_due") {
+                    router.push("/dashboard/account/billing");
+                  } else {
+                    router.push("/pricing");
+                  }
                 }}
               >
-                Become a member
+                {subStatus?.subStatus === "past_due"
+                  ? "Resume your membership"
+                  : "Become a member"}
               </Button>
               <p className="sm:hidden">for the full list & open call details</p>
               <p className="hidden sm:block">
