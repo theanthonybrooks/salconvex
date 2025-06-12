@@ -18,6 +18,7 @@ import {
   OpenCallProvided,
   OpenCallProvidedPreview,
 } from "@/features/events/open-calls/components/open-call-provided";
+import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
@@ -143,6 +144,12 @@ const OpenCallCard = ({
 
   const isMobile = format === "mobile";
 
+  const openCallStatus = getOpenCallStatus(
+    ocStart ? new Date(ocStart) : null,
+    ocEnd ? new Date(ocEnd) : null,
+    basicInfo.callType,
+  );
+
   return (
     <>
       {isMobile ? (
@@ -154,7 +161,7 @@ const OpenCallCard = ({
                 <div className="flex flex-col gap-y-2">
                   <span>
                     <span className="font-semibold underline underline-offset-2">
-                      Deadline:
+                      {openCallStatus === "ended" ? "Ended" : "Deadline"}:
                     </span>
                     <br />{" "}
                     <span className="flex items-center gap-x-2">
