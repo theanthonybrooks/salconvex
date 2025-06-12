@@ -354,7 +354,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             <div className="flex items-center gap-x-4 text-nowrap">
               <div className="flex flex-col items-end gap-1">
                 <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
-                  Deadline: &nbsp;
+                  {openCallStatus === "ended" ? "Ended" : "Deadline"}: &nbsp;
                   {formatOpenCallDeadline(
                     ocEnd || "",
                     deadlineTimezone,
