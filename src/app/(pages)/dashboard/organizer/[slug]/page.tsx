@@ -1,4 +1,5 @@
 import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
+import { OrganizerDashboardTableWrapper } from "@/features/organizer/dashboard/org-dashboard-table-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 
@@ -19,6 +20,17 @@ export default async function OrganizerPage({
     { token },
   );
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
+
+  const orgEventsData = await fetchQuery(
+    api.events.event.getUserEvents,
+    {},
+    {
+      token,
+    },
+  );
+
+  console.log(orgEventsData);
+
   const user = userData?.user;
   const subStatus = subscription?.status;
 
@@ -37,15 +49,14 @@ export default async function OrganizerPage({
   }
 
   switch (slug) {
-    // case "events":
-    //   return <OrganizerDashboardTableWrapper page="applications" />;
-    // case "bookmarks":
+    case "add-edit":
+      return <AdminEventForm user={user} />; // case "bookmarks":
     //   return <OrganizerDashboardTableWrapper page="bookmarks" />;
     // case "hidden":
     //   return <OrganizerDashboardTableWrapper page="hidden" />;
 
     default:
       //   redirect("/dashboard/admin");
-      return <AdminEventForm user={user} />;
+      return <OrganizerDashboardTableWrapper orgEventsData={orgEventsData} />;
   }
 }

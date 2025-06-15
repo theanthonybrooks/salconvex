@@ -154,8 +154,6 @@ export function DataTable<TData, TValue>({
     } else {
       setRowSelection({});
     }
-
-    // console.log("selected row", selectedRow);
   }, [selectedRow]);
 
   useEffect(() => {

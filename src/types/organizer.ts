@@ -68,6 +68,13 @@ export type Organizer = {
   lastUpdatedBy?: string;
 };
 
+export type OrgEventData = EventData & {
+  organizationName: string;
+  mainOrgId: Id<"organizations">;
+  openCallState: string | null;
+  openCallId: Id<"openCalls"> | null;
+};
+
 export interface OrganizerCardProps {
   data: { events: EventData[] | null; organizer: Organizer };
   artist?: ArtistFull | null; //todo:make this required

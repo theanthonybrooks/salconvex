@@ -13,6 +13,7 @@ import { ToolbarData } from "@/components/data-table/data-table";
 import { RowData } from "@tanstack/react-table";
 export const tableTypes = [
   "events",
+  "orgEvents",
   "organizations",
   "applications",
   "openCalls",

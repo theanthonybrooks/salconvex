@@ -422,6 +422,82 @@ export const getAllEvents = query({
   },
 });
 
+export const getUserEvents = query({
+  handler: async (ctx) => {
+    let organizations = [];
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    // const isAdmin = user.role.includes("admin");
+
+    organizations = await ctx.db
+      .query("organizations")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
+      .collect();
+    if (organizations?.length === 0) return [];
+    // console.log(organizations);
+
+    const orgIds = organizations.map((org) => org._id);
+    const orgNameMap = new Map(
+      organizations.map((org) => [org._id.toString(), org.name]),
+    );
+
+    // console.log(orgIds);
+    const events = (
+      await Promise.all(
+        orgIds.map((orgId) =>
+          ctx.db
+            .query("events")
+            .withIndex("by_mainOrgId_lastEditedAt", (q) =>
+              q.eq("mainOrgId", orgId),
+            )
+            .collect(),
+        ),
+      )
+    ).flat();
+
+    // console.log(events);
+
+    // Query openCalls for all orgs
+    const openCalls = (
+      await Promise.all(
+        orgIds.map((orgId) =>
+          ctx.db
+            .query("openCalls")
+            .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", orgId))
+            .collect(),
+        ),
+      )
+    ).flat();
+
+    // console.log(openCalls);
+
+    const openCallMap = new Map(
+      openCalls.map((oc) => [oc.eventId.toString(), oc]),
+    );
+
+    const enrichedEvents = events.map((event) => {
+      const openCall = openCallMap.get(event._id.toString());
+
+      return {
+        ...event,
+        openCallState: openCall?.state ?? null,
+        openCallId: openCall?._id ?? null,
+        organizationName: orgNameMap.get(event.mainOrgId.toString()) ?? "",
+        mainOrgId: event.mainOrgId,
+      };
+    });
+
+    return enrichedEvents;
+  },
+});
+
 export const get5latestPublishedEvents = query({
   handler: async (ctx) => {
     const publishedEvents = await ctx.db
@@ -935,11 +1011,11 @@ export const createOrUpdateEvent = mutation({
       });
 
       const updatedEvent = await ctx.db.get(event._id);
-      console.log("updatedEvent", updatedEvent);
+      // console.log("updatedEvent", updatedEvent);
       return { event: updatedEvent };
     }
 
-    console.log("inserting");
+    // console.log("inserting");
     const eventId = await ctx.db.insert("events", {
       formType: args.formType,
       name: args.name,

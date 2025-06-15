@@ -169,7 +169,7 @@ export const compareEnrichedEvents = (
       const aDate = priorityA.ocEndDate ?? FAR_FUTURE;
       const bDate = priorityB.ocEndDate ?? FAR_FUTURE;
 
-      console.log(aDate.getTime(), bDate.getTime());
+      // console.log(aDate.getTime(), bDate.getTime());
       const aYear = aDate.getFullYear();
       const bYear = bDate.getFullYear();
 
