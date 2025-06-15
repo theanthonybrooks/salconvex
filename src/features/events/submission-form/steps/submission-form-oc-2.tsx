@@ -594,7 +594,7 @@ const SubmissionFormOC2 = ({
         )}
       </div>
 
-      {(hasBudgetMin || noBudget) && (
+      {(hasBudgetMin || hasRate || noBudget) && (
         <>
           {showBudgetInputs && (
             <Separator
