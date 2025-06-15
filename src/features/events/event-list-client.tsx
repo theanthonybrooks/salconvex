@@ -334,7 +334,7 @@ const ClientEventList = (
                 !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);
               return (
                 <div key={group.title.raw} className="mb-6">
-                  {isFirstEnded && (
+                  {isFirstEnded && sortOptions.sortBy === "openCall" && (
                     <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
                       Ended Calls
                     </h2>
