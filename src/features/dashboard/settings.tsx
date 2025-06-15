@@ -719,7 +719,7 @@ export default function SettingsPage() {
                       value={String(selectedAutoApply)}
                       onValueChange={(value) => setAutoApply(value === "true")}
                     >
-                      <SelectTrigger className="w-full border-1.5 border-foreground/20 !text-base sm:h-10 sm:w-[180px]">
+                      <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
                         <SelectValue placeholder="Select One" />
                       </SelectTrigger>
                       <SelectContent>
