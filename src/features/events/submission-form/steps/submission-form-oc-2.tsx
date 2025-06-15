@@ -147,6 +147,7 @@ const SubmissionFormOC2 = ({
     }
 
     prevBudgetMaxRef.current = budgetMax;
+    budgetMaxRef.current = budgetMax;
 
     const timeout = setTimeout(() => {
       handleCheckSchema();
@@ -170,6 +171,7 @@ const SubmissionFormOC2 = ({
     const max = budgetMaxRef.current;
 
     if (typeof min !== "number") return;
+    if (min <= 0) return;
     if (typeof max === "number" && max >= min) return;
 
     const timeout = setTimeout(() => {

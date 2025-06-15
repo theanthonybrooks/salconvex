@@ -1,6 +1,7 @@
 import { formatCompCurrency } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { OpenCall, openCallCategoryFields } from "@/types/openCall";
+import { X } from "lucide-react";
 import { FaPaintRoller, FaUserCheck } from "react-icons/fa6";
 import { IoAirplane } from "react-icons/io5";
 import {
@@ -39,7 +40,8 @@ const getDisplayValue = (
         // noBudgetInfo && "text-muted-foreground",
       )}
     >
-      (not provided)
+      {/* (not provided) */}
+      <X className="inline-block size-4" />
     </span>
   );
 };
@@ -51,27 +53,32 @@ export const OpenCallProvided = ({
   currency,
 }: OpenCallProvidedProps) => {
   return (
-    <div className="flex flex-col justify-between pr-[1px]">
-      {openCallCategoryFields.map(({ value, label }, index) => (
-        <div
-          key={value}
-          className={cn(
-            "flex items-center justify-between border-b border-dashed border-foreground/20 px-2 py-1",
-            index % 2 === 0 ? "bg-transparent" : "bg-transparent",
-          )}
-        >
-          <p className="font-medium">{label}:</p>
-          <p className="text-right">
-            {getDisplayValue(
-              categories?.[value],
-              allInclusive,
-              noBudgetInfo,
-              currency,
+    <>
+      <div className="flex flex-col justify-between pr-[1px]">
+        {openCallCategoryFields.map(({ value, label }, index) => (
+          <div
+            key={value}
+            className={cn(
+              "flex items-center justify-between border-b border-dashed border-foreground/20 px-2 py-1",
+              index % 2 === 0 ? "bg-transparent" : "bg-transparent",
             )}
-          </p>
-        </div>
-      ))}
-    </div>
+          >
+            <p className="font-medium">{label}:</p>
+            <p className="text-right">
+              {getDisplayValue(
+                categories?.[value],
+                allInclusive,
+                noBudgetInfo,
+                currency,
+              )}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-1 w-full text-right text-xs text-red-500">
+        ( <X className="inline-block size-3" />= not provided )
+      </p>
+    </>
   );
 };
 

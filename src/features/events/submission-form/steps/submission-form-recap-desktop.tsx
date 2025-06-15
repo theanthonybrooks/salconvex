@@ -17,10 +17,6 @@ import { EligibilityLabel } from "@/features/events/open-calls/components/eligib
 import { OpenCallProvided } from "@/features/events/open-calls/components/open-call-provided";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OrganizerCardLogoName } from "@/features/organizers/components/organizer-logo-name-card";
-import {
-  OrganizerMainContact,
-  OrgContactProps,
-} from "@/features/organizers/components/organizer-main-contact";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
 import {
   formatCurrency,
@@ -114,10 +110,13 @@ export const SubmissionFormRecapDesktop = ({
                     Primary Contact
                   </th>
                   <td>
-                    <OrganizerMainContact
+                    {/* <OrganizerMainContact
                       organizer={orgData as OrgContactProps}
                       linkOnly
-                    />
+                    /> */}
+                    <p className="capitalize">
+                      {orgData?.contact?.primaryContact}
+                    </p>{" "}
                   </td>
                 </tr>
 
