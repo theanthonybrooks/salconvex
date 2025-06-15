@@ -398,6 +398,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 setSearchType={setSearchType}
                 value={value}
                 shortcut={shortcut}
+                hasShortcut={false}
                 placeholder={placeholder}
                 onChange={onChange}
                 onSortChange={onSortChange}
