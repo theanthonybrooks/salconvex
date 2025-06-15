@@ -71,6 +71,7 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
           setValue={setValue}
           value={value}
           shortcut={shortcut}
+          hasShortcut={false}
           placeholder={placeholder}
           onChange={onChange}
           onSortChange={onSortChange}

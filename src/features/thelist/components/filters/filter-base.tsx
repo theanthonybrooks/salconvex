@@ -54,6 +54,7 @@ export interface FilterBaseProps {
   setSearchType: Dispatch<SetStateAction<SearchType>>;
   value: string;
   shortcut: string;
+  hasShortcut: boolean;
   placeholder: string;
   groupedResults?: Record<string, TheListFilterCommandItem[]>;
   onChange: (newFilters: Partial<Filters>) => void;
@@ -78,6 +79,7 @@ export const FilterBase = ({
   onResetFilters,
   className,
   shortcut,
+  hasShortcut,
   groupedResults,
   // user,
 }: FilterBaseProps) => {
@@ -451,8 +453,9 @@ export const FilterBase = ({
               </Label>
               <div
                 className={cn(
-                  "relative flex w-36 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                  "relative flex w-52 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
                   className,
+                  !hasShortcut && "w-36",
                 )}
               >
                 <FiSearch
@@ -471,12 +474,17 @@ export const FilterBase = ({
                   placeholder={placeholder}
                   //   defaultValue={value}
                   value={value}
-                  className="w-full max-w-64 truncate bg-transparent pr-10 placeholder:text-foreground/30"
+                  className={cn(
+                    "w-full max-w-64 truncate bg-transparent placeholder:text-foreground/30",
+                    hasShortcut && "pr-10",
+                  )}
                 />
 
-                <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex">
-                  <FiCommand /> + {shortcut}
-                </span>
+                {hasShortcut && (
+                  <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex">
+                    <FiCommand /> + {shortcut}
+                  </span>
+                )}
               </div>
             </section>
             <section className="flex flex-col gap-2">
