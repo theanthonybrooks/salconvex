@@ -239,6 +239,7 @@ export const updateUser = mutation({
 
 export const updateUserPrefs = mutation({
   args: {
+    autoApply: v.optional(v.boolean()),
     currency: v.optional(v.string()),
     timezone: v.optional(v.string()),
     theme: v.optional(v.string()),
@@ -266,6 +267,7 @@ export const updateUserPrefs = mutation({
     // console.log("userPref", userPref)
 
     await ctx.db.patch(userPref._id, {
+      autoApply: args.autoApply,
       currency: args.currency,
       timezone: args.timezone,
       theme: args.theme,

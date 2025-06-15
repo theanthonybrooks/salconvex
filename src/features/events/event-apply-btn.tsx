@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
+import { UserPref } from "@/types/user";
 import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
@@ -130,6 +131,7 @@ interface ApplyButtonProps {
   className?: string;
   detailCard?: boolean;
   publicPreview?: boolean;
+  userPref?: UserPref;
 }
 
 export const ApplyButton = ({
@@ -137,6 +139,7 @@ export const ApplyButton = ({
   openCallId,
   slug,
   appUrl,
+  userPref,
   //isExternalApply, //todo: think about this. Could just use appUrl if it exists to gather the same assumption and user outcome.
 
   manualApplied: appStatus,
@@ -156,6 +159,7 @@ export const ApplyButton = ({
   finalButton,
   publicPreview,
 }: ApplyButtonProps) => {
+  const autoApply = userPref?.autoApply ?? true;
   const subscription = useQuery(
     api.subscriptions.getUserSubscriptionStatus,
     finalButton ? {} : "skip",
@@ -194,7 +198,7 @@ export const ApplyButton = ({
     try {
       setPending(true);
 
-      if (!appStatus && openCall === "active") {
+      if (!appStatus && openCall === "active" && autoApply) {
         await toggleAppActions({
           openCallId: openCallId as Id<"openCalls">,
           manualApplied: true,

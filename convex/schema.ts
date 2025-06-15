@@ -789,8 +789,10 @@ export default defineSchema({
 
   userPreferences: defineTable({
     userId: v.id("users"),
+    autoApply: v.optional(v.boolean()),
     currency: v.optional(v.string()),
     timezone: v.optional(v.string()),
+
     language: v.optional(v.string()),
     theme: v.optional(v.string()),
   }).index("by_userId", ["userId"]),

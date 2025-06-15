@@ -113,6 +113,7 @@ export default function SettingsPage() {
   const [selectedCurrency, setCurrency] = useState<string | undefined>(
     undefined,
   );
+  const [selectedAutoApply, setAutoApply] = useState<boolean>(true);
   const [pwOpen, setPwOpen] = useState(false);
   const { setTheme, theme } = useTheme();
   const [selectedTheme, setThemePref] = useState<string | undefined>(undefined);
@@ -128,6 +129,7 @@ export default function SettingsPage() {
   const [hoverSave, setHoverSave] = useState(false);
 
   const prevPrefs = useRef({
+    autoApply: selectedAutoApply,
     timezone: selectedTimezone,
     currency: selectedCurrency,
     theme: selectedTheme,
@@ -313,6 +315,7 @@ export default function SettingsPage() {
       }
       try {
         await updateUserPrefs({
+          autoApply: data.autoApply ?? true,
           currency: data.currency ?? "",
           timezone: data.timezone ?? "",
           language: data.language ?? "",
@@ -409,6 +412,7 @@ export default function SettingsPage() {
       setTimezone(userPrefs.timezone ?? "GMT");
       setCurrency(userPrefs.currency ?? "USD");
       setThemePref(userPrefs.theme ?? "light");
+      setAutoApply(userPrefs.autoApply ?? true);
       // setTheme(userPrefs.theme ?? "light")
     }
   }, [userPrefs]);
@@ -418,19 +422,22 @@ export default function SettingsPage() {
       const hasChanged =
         prevPrefs.current.timezone !== selectedTimezone ||
         prevPrefs.current.currency !== selectedCurrency ||
-        prevPrefs.current.theme !== selectedTheme;
+        prevPrefs.current.theme !== selectedTheme ||
+        prevPrefs.current.autoApply !== selectedAutoApply;
 
       if (hasChanged) {
         handleUpdateUserPrefs({
           currency: selectedCurrency,
           timezone: selectedTimezone,
           theme: selectedTheme,
+          autoApply: selectedAutoApply,
         });
 
         prevPrefs.current = {
           timezone: selectedTimezone,
           currency: selectedCurrency,
           theme: selectedTheme,
+          autoApply: selectedAutoApply,
         };
       }
     }, 500);
@@ -440,6 +447,7 @@ export default function SettingsPage() {
     selectedTheme,
     selectedTimezone,
     selectedCurrency,
+    selectedAutoApply,
     handleUpdateUserPrefs,
   ]);
 
@@ -697,6 +705,28 @@ export default function SettingsPage() {
                       }
                       getItemValue={(currency) => currency.code}
                     />
+                  </div>
+                  <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="space-y-0.5">
+                      <Label>Auto Apply</Label>
+
+                      <p className="text-xs text-muted-foreground">
+                        Set whether or not to automatically mark open calls as
+                        &quot;Applied&quot; when you click the Apply button
+                      </p>
+                    </div>
+                    <Select
+                      value={String(selectedAutoApply)}
+                      onValueChange={(value) => setAutoApply(value === "true")}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select One" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="false">Off</SelectItem>
+                        <SelectItem value="true">On</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>

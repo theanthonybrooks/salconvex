@@ -88,6 +88,7 @@ export const UpdatePasswordSchema = z.object({
 });
 
 export const UpdateUserPrefsSchema = z.object({
+  autoApply: z.boolean().optional(),
   currency: z.string().optional(),
   timezone: z.string().optional(),
   language: z.string().optional(),

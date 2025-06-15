@@ -22,6 +22,7 @@ export interface User {
 export interface UserPref {
   timezone?: string;
   currency?: string;
+  autoApply?: boolean;
   theme?: string;
 }
 
