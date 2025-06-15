@@ -56,7 +56,11 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
 
   return (
     <>
-      {event && event.links && event.links.sameAsOrganizer !== true && (
+      {((event && event.links && !submitRecap) ||
+        (event &&
+          event.links &&
+          event.links.sameAsOrganizer !== true &&
+          submitRecap)) && (
         <div
           className={cn(
             "flex flex-col gap-y-2",
@@ -184,9 +188,11 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
           )}
         </div>
       )}
-      {organizer &&
-        organizer.links &&
-        (!event || event?.links?.sameAsOrganizer === true) &&
+      {((organizer && organizer.links) ||
+        (organizer &&
+          organizer.links &&
+          submitRecap &&
+          (!event || event?.links?.sameAsOrganizer === true))) &&
         Object.keys(organizer.links || {}).length > 0 && (
           <div
             className={cn("flex flex-col gap-y-2 p-3", submitRecap && "p-0")}
