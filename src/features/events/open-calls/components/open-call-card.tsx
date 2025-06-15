@@ -519,19 +519,20 @@ const OpenCallCard = ({
                 <div className="flex flex-col gap-2">
                   {!noBudgetInfo && (
                     <>
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="font-semibold underline underline-offset-2">
-                          {hasBudgetRange ? "Budget Range" : "Budget"}:
-                        </span>
-                        {hasBudget &&
-                          formatCurrency(
+                      {hasBudget && (
+                        <div className="flex flex-col items-start gap-1">
+                          <span className="font-semibold underline underline-offset-2">
+                            {hasBudgetRange ? "Budget Range" : "Budget"}:
+                          </span>
+                          {formatCurrency(
                             budgetMin,
                             budgetMax,
                             currency,
                             false,
                             allInclusive,
                           )}
-                      </div>
+                        </div>
+                      )}
                       {hasRate && (
                         <div className="flex flex-col items-start gap-1">
                           <span className="font-semibold underline underline-offset-2">
