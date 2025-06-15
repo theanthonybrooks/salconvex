@@ -229,10 +229,15 @@ export const getFilteredEventsPublic = query({
         : enriched;
 
     const sorted = filtered.sort((a, b) =>
-      compareEnrichedEvents(a, b, {
-        sortBy: sortOptions.sortBy ?? "openCall",
-        sortDirection: sortOptions.sortDirection ?? "desc",
-      }),
+      compareEnrichedEvents(
+        a,
+        b,
+        {
+          sortBy: sortOptions.sortBy ?? "openCall",
+          sortDirection: sortOptions.sortDirection ?? "desc",
+        },
+        source,
+      ),
     );
 
     const pg = page ?? 1;

@@ -33,7 +33,6 @@ import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js
 import type * as plans from "../plans.js";
 import type * as stripeSubscriptions from "../stripeSubscriptions.js";
 import type * as subscriptions from "../subscriptions.js";
-import type * as thelist_getFilteredEvents from "../thelist/getFilteredEvents.js";
 import type * as thelist_getFilteredEventsPublic from "../thelist/getFilteredEventsPublic.js";
 import type * as uploads_files from "../uploads/files.js";
 import type * as uploads_user from "../uploads/user.js";
@@ -79,7 +78,6 @@ declare const fullApi: ApiFromModules<{
   plans: typeof plans;
   stripeSubscriptions: typeof stripeSubscriptions;
   subscriptions: typeof subscriptions;
-  "thelist/getFilteredEvents": typeof thelist_getFilteredEvents;
   "thelist/getFilteredEventsPublic": typeof thelist_getFilteredEventsPublic;
   "uploads/files": typeof uploads_files;
   "uploads/user": typeof uploads_user;

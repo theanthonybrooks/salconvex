@@ -11,8 +11,11 @@ export const archiveExpiredOpenCalls = internalMutation({
       .withIndex("by_state", (q) => q.eq("state", "published"))
       .collect();
 
+    console.log(now);
+
     for (const oc of openCalls) {
       const ocEnd = oc.basicInfo?.dates?.ocEnd;
+
       if (ocEnd && ocEnd < now) {
         const event = await ctx.db.get(oc.eventId);
         if (!event) continue;

@@ -14,14 +14,22 @@ export type EnrichedEventsCardData = EventData & {
   slug: string;
 };
 
+export type EventSortPageTypes =
+  | "thelist"
+  | "archive"
+  | "thisweek"
+  | "nextweek";
+
 export const compareEnrichedEvents = (
   a: EnrichedEventsCardData,
   b: EnrichedEventsCardData,
   sortOptions: SortOptions,
+  pageType: EventSortPageTypes,
 ): number => {
+  console.log(pageType);
   const { sortBy, sortDirection } = sortOptions;
   const directionMultiplier = sortDirection === "asc" ? 1 : -1;
-
+  const thisWeekPg = pageType === "thisweek" || pageType === "nextweek";
   if (sortBy === "eventStart") {
     const getPriority = (item: EnrichedEventsCardData) => {
       const now = new Date();
@@ -130,6 +138,8 @@ export const compareEnrichedEvents = (
       } else if (ocStatus === "coming-soon") {
         priority = 4;
       } else if (!hasOpenCall && !!callType && isApproved) {
+        priority = 5;
+      } else if (thisWeekPg && isPast) {
         priority = 5;
       } else if (eventFormat === "ongoing") {
         priority = 6;
