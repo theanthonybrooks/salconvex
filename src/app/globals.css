@@ -554,6 +554,7 @@ input {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  font-size: 16px;
 }
 
 input:not(:placeholder-shown):not(:valid):not(:read-only) {

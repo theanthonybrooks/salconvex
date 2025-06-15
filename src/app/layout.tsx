@@ -27,6 +27,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl[0]),
+  // viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   title: {
     default: "The Street Art List",
     template: `%s | The Street Art List`,
@@ -102,7 +103,7 @@ export default async function RootLayout({
             >
               <ConvexQueryCacheProvider>
                 <ThemedProvider>
-                  <PostHogProvider > {children}</PostHogProvider>
+                  <PostHogProvider> {children}</PostHogProvider>
                   <ToastContainer
                     position="top-right"
                     autoClose={5000}
