@@ -53,8 +53,6 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
   }
 
   const iconSize = submitRecap ? "size-3.5" : "size-5";
-  console.log(event?.links);
-  console.log(organizer?.links);
 
   return (
     <>

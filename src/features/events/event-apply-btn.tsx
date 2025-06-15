@@ -131,7 +131,7 @@ interface ApplyButtonProps {
   className?: string;
   detailCard?: boolean;
   publicPreview?: boolean;
-  userPref?: UserPref;
+  userPref?: UserPref | null;
 }
 
 export const ApplyButton = ({
@@ -329,16 +329,27 @@ export const ApplyButton = ({
                 <span className="flex flex-col gap-y-2">
                   {!appStatus && openCall === "active" && (
                     <>
-                      <span>
-                        This application is located on another website. By
-                        clicking apply, a new tab will open, you will be
-                        redirected and the application will be marked as
-                        &quot;applied&quot; in your dashboard here.
-                      </span>
-                      <span className="text-xs italic">
-                        You can always change the application appStatus if you
-                        end up not applying.
-                      </span>
+                      {autoApply && (
+                        <>
+                          <span>
+                            This application is located on another website. By
+                            clicking apply, a new tab will open, you will be
+                            redirected and the application will be marked as
+                            &quot;applied&quot; in your dashboard here.
+                          </span>
+                          <span className="text-xs italic">
+                            You can disable this in your account settings if you
+                            don&apos;t want this to happen
+                          </span>
+                        </>
+                      )}
+                      {!autoApply && (
+                        <span>
+                          This application is located on another website. By
+                          clicking apply, a new tab will open and you will be
+                          redirected
+                        </span>
+                      )}
                     </>
                   )}
                   {appStatus && (

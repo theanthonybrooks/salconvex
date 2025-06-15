@@ -174,7 +174,8 @@ export const ArtistProfileForm = ({ user }: ArtistProfileFormProps) => {
           </div>
           <div className="relative mt-3 flex flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pt-8 text-foreground/75 lg:pt-4">
             <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
-              Eligibility Details:
+              <p className="hidden sm:block"> Eligibility Details:</p>
+              <p className="sm:hidden"> Eligibility:</p>
             </span>
 
             <div className="flex flex-col gap-2">

@@ -273,6 +273,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               </p>
             )}
             <ApplyButton
+              userPref={userPref}
               id={event._id}
               openCallId={openCallId}
               slug={slug}
@@ -415,6 +416,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             />
             <div className="mt-6 flex w-full justify-end xl:hidden">
               <ApplyButton
+                userPref={userPref}
                 id={event._id}
                 openCallId={openCallId}
                 slug={slug}

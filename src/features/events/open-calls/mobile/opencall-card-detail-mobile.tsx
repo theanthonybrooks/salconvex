@@ -256,6 +256,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               userPref={userPref}
             />
             <ApplyButton
+              userPref={userPref}
               id={event._id}
               openCallId={openCallId}
               slug={slug}

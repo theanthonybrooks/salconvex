@@ -65,7 +65,6 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { currencies, Currency } from "@/app/data/currencies";
 import { Timezone, timezones } from "@/app/data/timezones";
 import { Link } from "@/components/ui/custom-link";
 import AvatarUploader from "@/components/ui/logo-uploader";
@@ -671,14 +670,15 @@ export default function SettingsPage() {
                     />
                   </div>
                   <Separator />
-                  <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                  {/* //TODO: Add this back in when I implement the currency conversion logic */}
+                  {/*     <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="space-y-0.5">
                       <Label>Currency</Label>
                       <p className="text-sm text-muted-foreground">
                         Set your preferred currency
                       </p>
                     </div>
-                    {/* <Select defaultValue='est'>
+                    /~ <Select defaultValue='est'>
                       <SelectTrigger className='w-[180px]'>
                         <SelectValue placeholder='Select timezone' />
                       </SelectTrigger>
@@ -689,7 +689,7 @@ export default function SettingsPage() {
                           </SelectItem>
                         ))}
                       </SelectContent>
-                    </Select> */}
+                    </Select> ~/
 
                     <SearchMappedSelect<Currency>
                       className="sm:w-[120px]"
@@ -705,21 +705,21 @@ export default function SettingsPage() {
                       }
                       getItemValue={(currency) => currency.code}
                     />
-                  </div>
+                  </div>*/}
                   <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="space-y-0.5">
-                      <Label>Auto Apply</Label>
+                      <Label>Auto-Apply</Label>
 
                       <p className="text-xs text-muted-foreground">
-                        Set whether or not to automatically mark open calls as
-                        &quot;Applied&quot; when you click the Apply button
+                        Automatically mark open calls as &quot;Applied&quot;
+                        after clicking Apply
                       </p>
                     </div>
                     <Select
                       value={String(selectedAutoApply)}
                       onValueChange={(value) => setAutoApply(value === "true")}
                     >
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-full border-1.5 border-foreground/20 !text-base sm:h-10 sm:w-[180px]">
                         <SelectValue placeholder="Select One" />
                       </SelectTrigger>
                       <SelectContent>
@@ -827,7 +827,7 @@ export default function SettingsPage() {
                       setTheme(value);
                     }}
                   >
-                    <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
                       <SelectValue placeholder="Select color" />
                     </SelectTrigger>
                     <SelectContent>
