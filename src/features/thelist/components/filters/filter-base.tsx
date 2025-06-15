@@ -614,9 +614,9 @@ export const FilterBase = ({
                   <SelectValue placeholder="Limit" />
                 </SelectTrigger>
                 <SelectContent className="min-w-auto z-top">
-                  <SelectItem fit value="1">
+                  {/* <SelectItem fit value="1">
                     1
-                  </SelectItem>
+                  </SelectItem> */}
                   <SelectItem fit value="5">
                     5
                   </SelectItem>

@@ -66,7 +66,7 @@ export const OrganizerCardLogoName = ({
   const slug = slugify(organizer.name, { lower: true });
 
   return (
-    <Link href={`/thelist/organizer/${slug}`} target="_blank">
+    <Link href={`/thelist/organizer/${slug}`}>
       <div
         className={cn(
           "grid w-full grid-cols-[60px_minmax(0,1fr)] items-center",
