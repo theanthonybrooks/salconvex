@@ -980,7 +980,20 @@ export const createOrUpdateEvent = mutation({
         throw new ConvexError("You don't have permission to update this event");
       console.log("patching");
 
+      const existingFormType =
+        typeof event.formType === "number" && event.formType > 0
+          ? event.formType
+          : 0;
+
+      const updatedFormType =
+        args.formType && args.formType >= existingFormType
+          ? args.formType
+          : existingFormType;
+
+      // console.log(existingFormType, updatedFormType);
+
       await ctx.db.patch(event._id, {
+        formType: updatedFormType,
         name: args.name,
         slug: args.slug,
         logo: fileUrl || args.logo,

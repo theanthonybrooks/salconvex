@@ -137,7 +137,7 @@ export const createOrUpdateOpenCall = mutation({
     }
 
     const isAdmin = user?.role?.includes("admin");
-    console.log(args.approved, args.finalStep, args.state);
+    // console.log(args.approved, args.finalStep, args.state);
     const ocState = isAdmin
       ? args.finalStep && args.approved
         ? "published"
@@ -176,8 +176,8 @@ export const createOrUpdateOpenCall = mutation({
       .query("eventOpenCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .unique();
-    console.log("ocId", args.openCallId);
-    console.log("lookup", lookup);
+    // console.log("ocId", args.openCallId);
+    // console.log("lookup", lookup);
 
     if (lookup) {
       await ctx.db.patch(lookup.openCallId, openCallData);
@@ -186,15 +186,15 @@ export const createOrUpdateOpenCall = mutation({
         state: ocState,
         lastEdited: Date.now(),
       });
-      console.log("lookup updated", lookup, openCallData);
+      // console.log("lookup updated", lookup, openCallData);
       return openCallData;
     }
 
     // Step 2: If user provided openCallId, validate and use it
     if (args.openCallId) {
-      console.log("args.openCallId", args.openCallId);
+      // console.log("args.openCallId", args.openCallId);
       const existing = await ctx.db.get(args.openCallId);
-      console.log("existing", existing);
+      // console.log("existing", existing);
       if (existing) {
         await ctx.db.patch(args.openCallId, openCallData);
 
@@ -204,7 +204,7 @@ export const createOrUpdateOpenCall = mutation({
           edition: args.basicInfo.dates.edition,
           state: ocState,
         });
-        console.log("existing updated", existing, openCallData);
+        // console.log("existing updated", existing, openCallData);
         return openCallData;
       }
 

@@ -1245,6 +1245,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setPending(true);
 
           const { event } = await createOrUpdateEvent({
+            formType,
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name, { lower: true }),
@@ -1388,7 +1389,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
 
   // #region -------------UseEffects --------------
-  console.log(eventData);
+  // console.log(eventData);
   useEffect(() => {
     console.log(formType, hasUserEditedForm);
   }, [formType, hasUserEditedForm]);
