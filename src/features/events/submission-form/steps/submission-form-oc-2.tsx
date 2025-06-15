@@ -81,7 +81,8 @@ const SubmissionFormOC2 = ({
 
   const budgetMin = openCall?.compensation?.budget?.min;
   const budgetMax = openCall?.compensation?.budget?.max;
-  // const budgetRate = openCall?.compensation?.budget?.rate;
+  const budgetRate = openCall?.compensation?.budget?.rate;
+  const budgetUnit = openCall?.compensation?.budget?.unit;
   const validBudgetMin =
     typeof budgetMin === "number" && budgetMin > (paidCall ? 1 : 0);
   // const validBudgetRate = typeof budgetRate === "number" && budgetRate > 0;
@@ -89,6 +90,8 @@ const SubmissionFormOC2 = ({
   const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
   const hasBudgetMin = hasBudget?.trim() === "true" && validBudgetMin;
   const noBudget = hasBudget?.trim() === "false";
+  const hasRate =
+    typeof budgetRate === "number" && budgetRate > 0 && budgetUnit !== "";
   const allInclusive = openCall?.compensation?.budget?.allInclusive;
   const prevBudgetMaxRef = useRef<number | undefined>(undefined);
   const budgetMaxRef = useRef(budgetMax);
@@ -522,7 +525,7 @@ const SubmissionFormOC2 = ({
           </div>
         </>
 
-        {(hasBudgetMin || noBudget) && (
+        {(hasBudgetMin || hasRate || noBudget) && (
           <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
