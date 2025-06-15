@@ -15,6 +15,7 @@ export default async function HomeLayout({
 }) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
+  console.log(pathname);
   const token = await convexAuthNextjsToken();
   const preloadedArtistData = await preloadQuery(
     api.artists.getArtistEventMetadata.getArtistEventMetadata,
@@ -28,15 +29,33 @@ export default async function HomeLayout({
     {},
     { token },
   );
-
+  let owner = false;
   const user = userData?.user;
-  const isArtist = user?.accountType.includes("artist");
+  // const isArtist = user?.accountType.includes("artist");
+  const isOrganizer = user?.accountType.includes("organizer");
   const hasSub = subscription?.hasActiveSubscription;
+  const onlyOrganizer = isOrganizer && !hasSub;
   const isAdmin = user?.role.includes("admin");
   const ocPage = pathname?.endsWith("/call");
 
+  const pathnameParts = pathname?.split("/") ?? [];
+  const eventIndex = pathnameParts.indexOf("event");
+
+  const eventSlug = pathnameParts[eventIndex + 1];
+  const editionRaw = pathnameParts[eventIndex + 2];
+  const edition = parseInt(editionRaw, 10);
+
   if (!isAdmin) {
-    if ((!isArtist || !hasSub) && ocPage) {
+    if (onlyOrganizer) {
+      const testicles = await fetchQuery(
+        api.organizer.organizations.checkIfOrgOwner,
+        { eventSlug, edition },
+        { token },
+      );
+      console.log(testicles);
+      owner = testicles;
+    }
+    if ((!user || !hasSub) && ocPage && !owner) {
       const redirectPath = pathname?.replace(/\/call\/?$/, "");
       redirect(redirectPath ?? "/thelist");
     }

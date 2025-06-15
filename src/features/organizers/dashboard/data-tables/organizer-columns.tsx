@@ -29,6 +29,7 @@ import { CheckCircle2, Circle, DollarSign, MoreHorizontal } from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 
 export const orgColumnLabels: Record<string, string> = {
+  orgName: "Organizer",
   name: "Name",
   dates_edition: "Edition",
   state: "State",
@@ -83,6 +84,27 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
 
   {
+    accessorKey: "orgName",
+    // size: "100%",
+    minSize: 120,
+    maxSize: 300,
+
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Organizer" />
+    ),
+    cell: ({ row }) => {
+      console.log(row.original?.organizationName);
+      // const isAdmin = table.options.meta?.isAdmin;
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[20ch] truncate pl-1 font-medium capitalize sm:max-w-[500px] sm:pl-0">
+            <OrgEventActions event={row.original} field="orgName" />
+          </span>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "name",
     // size: "100%",
     minSize: 120,
@@ -96,7 +118,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[20ch] truncate pl-1 font-medium capitalize sm:max-w-[500px] sm:pl-0">
-            <OrgEventActions event={row.original} />
+            <OrgEventActions event={row.original} field="eventName" />
           </span>
         </div>
       );

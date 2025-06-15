@@ -724,7 +724,7 @@ export default function SettingsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="false">Off</SelectItem>
-                        <SelectItem value="true">On</SelectItem>
+                        <SelectItem value="true">On (Default)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

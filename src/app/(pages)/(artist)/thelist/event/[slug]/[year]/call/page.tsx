@@ -36,6 +36,8 @@ const OpenCallDetail = () => {
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
+  console.log(data, isError, error);
+
   useEffect(() => {
     if (isError && !hasRedirected.current) {
       hasRedirected.current = true;

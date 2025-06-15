@@ -523,3 +523,38 @@ export const getOrganizerBySlug = query({
     return { organizer: organizer as Organizer, events };
   },
 });
+
+export const checkIfOrgOwner = query({
+  args: {
+    eventSlug: v.string(),
+    edition: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return false;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!user) return false;
+
+    const event = await ctx.db
+      .query("events")
+      .withIndex("by_slug", (q) => q.eq("slug", args.eventSlug))
+      .filter((q) => q.eq(q.field("dates.edition"), args.edition))
+      .first();
+
+    if (!event) return false;
+
+    const eventMainOrg = event.mainOrgId;
+
+    const org = await ctx.db
+      .query("organizations")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
+      .first();
+
+    if (!org) return false;
+    return org._id === eventMainOrg;
+  },
+});
