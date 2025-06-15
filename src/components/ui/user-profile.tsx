@@ -17,9 +17,14 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { cn } from "@/lib/utils";
 import { usePreloadedQuery } from "convex/react";
 // import { SignOutButton, useUser } from "@clerk/nextjs";
-import { LogOut, LucideLayoutDashboard, Settings, Users } from "lucide-react";
+import {
+  HelpCircle,
+  LogOut,
+  LucideLayoutDashboard,
+  Settings,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
-import { BiSupport } from "react-icons/bi";
 import { FaUserNinja } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
 
@@ -159,7 +164,7 @@ export function UserProfile({
           className="underline-offset-2 hover:cursor-pointer hover:underline"
         >
           <DropdownMenuItem className="focus:bg-salYellow/50">
-            <BiSupport className="mr-2 size-4" />
+            <HelpCircle className="mr-2 size-4" />
             <span>Help & Support</span>
           </DropdownMenuItem>
         </Link>

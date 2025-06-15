@@ -550,11 +550,11 @@ const OpenCallCard = ({
                   )}
 
                   {noBudgetInfo && <p className="text-sm">No Info</p>}
-                  {budget.allInclusive && hasBudget && !hasCategories && (
+                  {/* {budget.allInclusive && hasBudget && !hasCategories && (
                     <span className="text-sm font-bold italic text-red-600">
                       All-inclusive budget (no additional compensation)
                     </span>
-                  )}
+                  )} */}
                   <OpenCallProvidedPreview
                     id={id}
                     categories={categories}
