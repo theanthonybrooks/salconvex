@@ -55,7 +55,7 @@ export const saveOrgFile = mutation({
         // Delete the uploaded file to avoid waste
         await ctx.storage.delete(file.storageId);
 
-        console.log(`Duplicate skipped: ${file.fileName}`);
+        // console.log(`Duplicate skipped: ${file.fileName}`);
         // uploadedRecords.push({
         //   id: duplicate._id,
         //   url: duplicate.fileUrl,

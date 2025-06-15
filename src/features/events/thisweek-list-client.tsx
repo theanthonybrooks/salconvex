@@ -232,57 +232,73 @@ const ClientThisWeekList = (
           </div>
 
           {hasResults ? (
-            groupedEvents.map((group) => (
-              <div key={group.title.raw} className="mb-6">
-                <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
-                  {group.title.parts ? (
-                    <>
-                      {group.title.parts.month}
-                      <span className="flex items-start">
-                        {group.title.parts.day}
-                        <p className="align-super text-sm">
-                          {group.title.parts.suffix}
-                        </p>
-                      </span>
-                      {group.title.parts.year && ` (${group.title.parts.year})`}
-                    </>
-                  ) : group.title.label ? (
-                    group.title.label
-                  ) : (
-                    group.title.raw
+            groupedEvents.map((group, index) => {
+              const isEndedGroup = !!group.title.parts?.year;
+
+              const isFirstEnded =
+                isEndedGroup &&
+                !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);
+
+              return (
+                <div key={group.title.raw} className="mb-6">
+                  {isFirstEnded && (
+                    <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
+                      Ended Calls
+                    </h2>
                   )}
-                </h3>
-                <div className="space-y-4 sm:space-y-6">
-                  {group.events.map((event, index) => {
-                    const showPublic = publicView ? flatIndex < 1 : publicView;
-                    const isMaskedCard =
-                      publicView && flatIndex === totalCards - 1;
+                  <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
+                    {group.title.parts ? (
+                      <>
+                        {group.title.parts.month}
+                        <span className="flex items-start">
+                          {group.title.parts.day}
+                          <p className="align-super text-sm">
+                            {group.title.parts.suffix}
+                          </p>
+                        </span>
+                        {group.title.parts.year &&
+                          ` (${group.title.parts.year})`}
+                      </>
+                    ) : group.title.label ? (
+                      group.title.label
+                    ) : (
+                      group.title.raw
+                    )}
+                  </h3>
+                  <div className="space-y-4 sm:space-y-6">
+                    {group.events.map((event, index) => {
+                      const showPublic = publicView
+                        ? flatIndex < 1
+                        : publicView;
+                      const isMaskedCard =
+                        publicView && flatIndex === totalCards - 1;
 
-                    const card = (
-                      <div
-                        key={index}
-                        className={cn(
-                          isMaskedCard &&
-                            "masked-card pointer-events-none blur-[1px]",
-                        )}
-                      >
-                        <EventCardPreview
+                      const card = (
+                        <div
                           key={index}
-                          event={event}
-                          publicView={publicView}
-                          publicPreview={showPublic}
-                          user={user}
-                          userPref={userPref}
-                        />
-                      </div>
-                    );
+                          className={cn(
+                            isMaskedCard &&
+                              "masked-card pointer-events-none blur-[1px]",
+                          )}
+                        >
+                          <EventCardPreview
+                            key={index}
+                            event={event}
+                            publicView={publicView}
+                            publicPreview={showPublic}
+                            user={user}
+                            userPref={userPref}
+                          />
+                        </div>
+                      );
 
-                    flatIndex++;
-                    return card;
-                  })}
+                      flatIndex++;
+                      return card;
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="mb-12 mt-6 flex flex-col items-center gap-5">
               <h1 className="text-2xl font-bold">Nothing this week</h1>

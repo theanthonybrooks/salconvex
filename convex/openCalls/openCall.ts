@@ -136,6 +136,12 @@ export const createOrUpdateOpenCall = mutation({
       existingOpenCall = await ctx.db.get(args.openCallId);
     }
 
+    const ocDocs = [
+      ...(existingOpenCall?.documents ?? []),
+      ...(args.documents ?? []),
+    ];
+
+    console.log(ocDocs);
     const isAdmin = user?.role?.includes("admin");
     // console.log(args.approved, args.finalStep, args.state);
     const ocState = isAdmin
