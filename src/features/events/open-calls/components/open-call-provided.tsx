@@ -1,3 +1,4 @@
+import { siteUrl } from "@/constants/siteInfo";
 import { formatCompCurrency } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { OpenCall, openCallCategoryFields } from "@/types/openCall";
@@ -52,6 +53,29 @@ export const OpenCallProvided = ({
   noBudgetInfo,
   currency,
 }: OpenCallProvidedProps) => {
+  if (allInclusive)
+    return (
+      <span className="text-red-500">
+        <p className="font-bold">All inclusive budget:</p>
+        <p className="italic text-red-500">
+          The project budget is intended to be used for any and all costs
+          related to the project and any additional costs will be the
+          responsibility of the artist.
+        </p>
+        <br />
+        <p className="text-xs text-foreground/50">
+          What does this mean?{" "}
+          <a
+            href={`${siteUrl[0]}/faq#all-inclusive`}
+            target="_blank"
+            className="underline"
+          >
+            Learn more
+          </a>
+        </p>
+      </span>
+    );
+
   return (
     <>
       <div className="flex flex-col justify-between pr-[1px]">

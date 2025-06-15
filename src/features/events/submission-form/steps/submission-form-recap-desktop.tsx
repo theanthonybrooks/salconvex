@@ -336,23 +336,25 @@ export const SubmissionFormRecapDesktop = ({
                   <tr>
                     <th className="pr-4 align-top font-medium">Budget</th>
                     <td>
-                      {hasBudget &&
-                        formatCurrency(
-                          ocData?.compensation?.budget?.min,
-                          ocData?.compensation?.budget?.max,
-                          ocData?.compensation?.budget?.currency,
-                          false,
-                          ocData?.compensation?.budget?.allInclusive,
-                        )}
-
-                      {hasRate &&
-                        formatRate(
-                          ocData?.compensation?.budget?.rate,
-                          ocData?.compensation?.budget?.unit,
-                          ocData?.compensation?.budget?.currency,
-                          true,
-                        )}
-                      {!hasBudget && !hasRate && <em>No Budget Provided</em>}
+                      <div className="flex items-center gap-2">
+                        {hasBudget &&
+                          formatCurrency(
+                            ocData?.compensation?.budget?.min,
+                            ocData?.compensation?.budget?.max,
+                            ocData?.compensation?.budget?.currency,
+                            false,
+                            ocData?.compensation?.budget?.allInclusive,
+                          )}
+                        {hasRate && hasBudget && <p>&</p>}
+                        {hasRate &&
+                          formatRate(
+                            ocData?.compensation?.budget?.rate,
+                            ocData?.compensation?.budget?.unit,
+                            ocData?.compensation?.budget?.currency,
+                            true,
+                          )}
+                        {!hasBudget && !hasRate && <em>No Budget Provided</em>}
+                      </div>
                     </td>
                   </tr>
                   <tr>

@@ -26,7 +26,7 @@ import { api } from "~/convex/_generated/api";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl[1]),
+  metadataBase: new URL(siteUrl[0]),
   // viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   title: {
     default: "The Street Art List",
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
   openGraph: {
     description:
       "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
-    images: [`${siteUrl[1]}/The-Street-Art-List.png`],
-    url: new URL(siteUrl[1]),
+    images: [`${siteUrl[0]}/The-Street-Art-List.png`],
+    url: new URL(siteUrl[0]),
   },
   twitter: {
     card: "summary_large_image",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     siteId: "",
     creator: "@imanthonybrooks",
     creatorId: "",
-    images: [`${siteUrl[1]}/The-Street-Art-List.png`],
+    images: [`${siteUrl[0]}/The-Street-Art-List.png`],
   },
 };
 

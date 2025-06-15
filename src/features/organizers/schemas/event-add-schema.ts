@@ -656,11 +656,23 @@ export const openCallStep2Schema = z
   .superRefine((data, ctx) => {
     // const allInclusive = data.openCall.compensation.budget.allInclusive;
     const budgetRate = data.openCall.compensation.budget.rate;
+    const budgetUnit = data.openCall.compensation.budget.unit;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
     const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
     const missingBudget =
       typeof budgetMin === "number" && budgetMin <= 1 && budgetRate === 0;
+
+    const missingUnit =
+      typeof budgetRate === "number" && budgetRate > 0 && budgetUnit === "";
+
+    if (missingUnit) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Rate unit is required",
+        path: ["openCall", "compensation", "budget", "unit"],
+      });
+    }
     const paidCall = data.event.formType === 3;
     if (missingBudget && paidCall) {
       ctx.addIssue({
@@ -669,6 +681,7 @@ export const openCallStep2Schema = z
         path: ["openCall", "compensation", "budget"],
       });
     }
+
     if (budgetLg && data.event.formType === 2) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

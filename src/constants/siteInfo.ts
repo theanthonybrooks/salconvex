@@ -1,6 +1,6 @@
 export const siteUrl = [
-  "https://www.streetartlist.com",
   "https://www.thestreetartlist.com",
+  "https://www.streetartlist.com",
 ] as const;
 
 export const supportEmail = "support@thestreetartlist.com";
