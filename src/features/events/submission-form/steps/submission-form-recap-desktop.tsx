@@ -75,6 +75,7 @@ export const SubmissionFormRecapDesktop = ({
     ...(!eventOnly ? [{ id: "openCall", label: "Open Call" }] : []),
   ];
   const [activeTab, setActiveTab] = useState("organizer");
+
   const hasBudget =
     typeof ocData?.compensation?.budget?.min === "number" &&
     ocData?.compensation?.budget?.min > 0;
@@ -234,7 +235,11 @@ export const SubmissionFormRecapDesktop = ({
                     Links
                   </th>
                   <td className="last-child">
-                    <LinkList event={eventData} purpose="recap" />
+                    <LinkList
+                      event={eventData}
+                      organizer={orgData}
+                      purpose="recap"
+                    />
                   </td>
                 </tr>
               </tbody>
@@ -348,7 +353,7 @@ export const SubmissionFormRecapDesktop = ({
                           ocData?.compensation?.budget?.currency,
                           true,
                         )}
-                      {!hasBudget && <em>No Budget Provided</em>}
+                      {!hasBudget && !hasRate && <em>No Budget Provided</em>}
                     </td>
                   </tr>
                   <tr>

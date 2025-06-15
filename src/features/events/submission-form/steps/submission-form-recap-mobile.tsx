@@ -389,7 +389,7 @@ export const SubmissionFormRecapMobile = ({
                         ocData?.compensation?.budget?.currency,
                         true,
                       )}
-                    {!hasBudget && <em>No Budget Provided</em>}
+                    {!hasBudget && !hasRate && <em>No Budget Provided</em>}
                   </span>
                 </section>
                 <div className="space-y-6 pt-2">

@@ -165,7 +165,12 @@ export default function HorizontalLinearStepper({
                         activeStep < index,
                       "opacity-50": skipped?.has(index),
                     },
+                    isAdmin && "cursor-pointer hover:scale-105 active:scale-95",
                   )}
+                  onClick={() => {
+                    if (!isAdmin) return;
+                    setActiveStep(index);
+                  }}
                 >
                   {activeStep > index && !skipped?.has(index) ? (
                     <Check className="size-6" />

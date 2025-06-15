@@ -53,10 +53,12 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
   }
 
   const iconSize = submitRecap ? "size-3.5" : "size-5";
+  console.log(event?.links);
+  console.log(organizer?.links);
 
   return (
     <>
-      {event && event.links && (
+      {event && event.links && event.links.sameAsOrganizer !== true && (
         <div
           className={cn(
             "flex flex-col gap-y-2",
@@ -186,6 +188,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
       )}
       {organizer &&
         organizer.links &&
+        (!event || event?.links?.sameAsOrganizer === true) &&
         Object.keys(organizer.links || {}).length > 0 && (
           <div
             className={cn("flex flex-col gap-y-2 p-3", submitRecap && "p-0")}
@@ -207,7 +210,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <div className="flex items-center gap-x-2">
                   <Globe className={cn("shrink-0", iconSize)} />
                   <span className="max-w-[30ch] truncate underline-offset-2 hover:underline">
-                    {organizer.links.website.split("www.").slice(-1)[0]}
+                    {formatDisplayUrl(organizer.links.website)}
                   </span>
                 </div>
               </a>
@@ -217,7 +220,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <div className="flex items-center gap-x-2">
                   <FaLink className={cn("shrink-0", iconSize)} />
                   <span className="underline-offset-2 hover:underline">
-                    {organizer.links.linkAggregate.split("www.").slice(-1)[0]}
+                    {formatDisplayUrl(organizer.links.linkAggregate)}{" "}
                   </span>
                 </div>
               </a>
@@ -235,12 +238,17 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
               </a>
             )}
             {organizer.links?.instagram && (
-              <a href={organizer.links.instagram}>
+              <a
+                href={`https://www.instagram.com/${organizer.links.instagram.split("@").slice(-1)[0]}`}
+                target="_blank"
+              >
                 <div className="flex items-center gap-x-2">
                   <FaInstagram className={cn("shrink-0", iconSize)} />
 
                   <span className="underline-offset-2 hover:underline">
-                    @{organizer.links.instagram.split(".com/").slice(-1)[0]}
+                    {organizer.links.instagram.includes("@") && submitRecap
+                      ? organizer.links.instagram.split("@").slice(-1)[0]
+                      : organizer.links.instagram}
                   </span>
                 </div>
               </a>
@@ -258,14 +266,19 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
 
                   <span className="underline-offset-2 hover:underline">
                     {organizer.links.facebook.includes("@")
-                      ? organizer.links.facebook
+                      ? submitRecap
+                        ? organizer.links.facebook.split("@").slice(-1)[0]
+                        : organizer.links.facebook
                       : organizer.name}
                   </span>
                 </div>
               </a>
             )}
             {organizer.links?.threads && (
-              <a href={organizer.links.threads}>
+              <a
+                href={`https://www.threads.com/@${organizer.links.threads.split("@").slice(-1)[0]}`}
+                target="_blank"
+              >
                 <div className="flex items-center gap-x-2">
                   <FaThreads className={cn("shrink-0", iconSize)} />
 
@@ -276,7 +289,10 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
               </a>
             )}
             {organizer.links?.vk && (
-              <a href={organizer.links.vk}>
+              <a
+                href={`https://www.vk.com/${organizer.links.vk.split("@").slice(-1)[0]}`}
+                target="_blank"
+              >
                 <div className="flex items-center gap-x-2">
                   <FaVk className={cn("shrink-0", iconSize)} />
 

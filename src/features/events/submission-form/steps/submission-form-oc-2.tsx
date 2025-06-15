@@ -363,165 +363,163 @@ const SubmissionFormOC2 = ({
             </div>
           </div>
         </div>
-        {validBudgetMin && (
-          <>
-            <div className="input-section">
-              <p className="lg:text-xs">Rate:</p>
-              <p className="text-xs">(optional)</p>
-            </div>
 
-            <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="hasBudget" className="sr-only">
-                Budget Rate
-              </Label>
-              <div
-                className={cn(
-                  "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
-                  !showBudgetInputs &&
-                    "opacity-50 [@media(max-width:640px)]:hidden",
-                  pastEvent && "border-foreground/50 opacity-50",
+        <>
+          <div className="input-section">
+            <p className="lg:text-xs">Rate:</p>
+            <p className="text-xs">(optional)</p>
+          </div>
+
+          <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+            <Label htmlFor="hasBudget" className="sr-only">
+              Budget Rate
+            </Label>
+            <div
+              className={cn(
+                "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
+                !showBudgetInputs &&
+                  "opacity-50 [@media(max-width:640px)]:hidden",
+                pastEvent && "border-foreground/50 opacity-50",
+              )}
+            >
+              <Controller
+                name="openCall.compensation.budget.currency"
+                control={control}
+                render={({ field }) => (
+                  <SearchMappedSelect<Currency>
+                    searchFields={["name", "symbol", "code"]}
+                    className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
+                    value={field.value ?? orgCurrency?.code ?? "USD"}
+                    onChange={(code) => {
+                      const selected = Object.values(currencies[0])
+                        .flat()
+                        .find((cur) => cur.code === code);
+
+                      if (selected) field.onChange(selected.code);
+                    }}
+                    data={currencies[0]}
+                    getItemLabel={(c) => `${c.symbol} (${c.code}) - ${c.name}`}
+                    getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
+                    getItemValue={(c) => c.code}
+                    disabled={!showBudgetInputs || pastEvent}
+                  />
                 )}
-              >
-                <Controller
-                  name="openCall.compensation.budget.currency"
-                  control={control}
-                  render={({ field }) => (
-                    <SearchMappedSelect<Currency>
-                      searchFields={["name", "symbol", "code"]}
-                      className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
-                      value={field.value ?? orgCurrency?.code ?? "USD"}
-                      onChange={(code) => {
-                        const selected = Object.values(currencies[0])
-                          .flat()
-                          .find((cur) => cur.code === code);
-
-                        if (selected) field.onChange(selected.code);
-                      }}
-                      data={currencies[0]}
-                      getItemLabel={(c) =>
-                        `${c.symbol} (${c.code}) - ${c.name}`
-                      }
-                      getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
-                      getItemValue={(c) => c.code}
-                      disabled={!showBudgetInputs || pastEvent}
-                    />
-                  )}
-                />
-                <div className="flex w-full flex-col">
-                  <div className="flex w-full items-center gap-1">
-                    <Controller
-                      name="openCall.compensation.budget.rate"
-                      control={control}
-                      render={({ field }) => (
-                        <DebouncedControllerNumInput
-                          field={field}
-                          formatNumber={true}
-                          value={field.value ?? 0}
-                          min={0}
-                          disabled={!showBudgetInputs || pastEvent}
-                          placeholder="Rate (ex: 30)"
-                          className="h-fit border-none !bg-card p-2 text-center focus:border-none focus:outline-none sm:text-base"
-                        />
-                      )}
-                    />
-                  </div>
+              />
+              <div className="flex w-full flex-col">
+                <div className="flex w-full items-center gap-1">
+                  <Controller
+                    name="openCall.compensation.budget.rate"
+                    control={control}
+                    render={({ field }) => (
+                      <DebouncedControllerNumInput
+                        field={field}
+                        formatNumber={true}
+                        value={field.value ?? 0}
+                        min={0}
+                        disabled={!showBudgetInputs || pastEvent}
+                        placeholder="Rate (ex: 30)"
+                        className="h-fit border-none !bg-card p-2 text-center focus:border-none focus:outline-none sm:text-base"
+                      />
+                    )}
+                  />
                 </div>
               </div>
+            </div>
 
-              <p className="m-auto px-2"> per </p>
+            <p className="m-auto px-2"> per </p>
 
+            <Controller
+              name="openCall.compensation.budget.unit"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  disabled={pastEvent}
+                  // onValueChange={(value: "ft²" | "m²" | "") => {
+                  //   setHasRate(value);
+                  // }}
+                  onValueChange={field.onChange}
+                  value={field.value ?? ""}
+                >
+                  <SelectTrigger
+                    className={cn(
+                      "h-12 w-full min-w-25 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
+                    )}
+                  >
+                    <SelectValue placeholder="Rate Unit" />
+                  </SelectTrigger>
+                  <SelectContent className="min-w-auto">
+                    <SelectItem fit value="ft²">
+                      ft²
+                    </SelectItem>
+                    <SelectItem fit value="m²">
+                      m²
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="input-section">
+            <p className="lg:text-xs">All inclusive</p>
+          </div>
+
+          <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+            <Label htmlFor="event.category" className="sr-only">
+              All inclusive budget selection
+            </Label>
+            <div className="flex flex-col justify-between sm:flex-row sm:items-center">
+              <span className="mb-2 sm:mb-0">
+                <p className="text-sm text-foreground">
+                  {isMobile
+                    ? "Is the budget all-inclusive?"
+                    : " Is the budget for this open call all-inclusive?"}
+                </p>
+                <p className="text-xs text-foreground/50">
+                  What does this mean?{" "}
+                  <a
+                    href={`${siteUrl[0]}/faq#all-inclusive`}
+                    target="_blank"
+                    className="underline"
+                  >
+                    Learn more
+                  </a>
+                </p>
+              </span>
               <Controller
-                name="openCall.compensation.budget.unit"
+                name="openCall.compensation.budget.allInclusive"
                 control={control}
                 render={({ field }) => (
                   <Select
                     disabled={pastEvent}
-                    // onValueChange={(value: "ft²" | "m²" | "") => {
-                    //   setHasRate(value);
-                    // }}
-                    onValueChange={field.onChange}
-                    value={field.value ?? ""}
+                    onValueChange={(val: string) =>
+                      field.onChange(val === "true")
+                    }
+                    value={String(field.value) ?? ""}
+                    // value={field.value ? String(field.value) : ""}
                   >
                     <SelectTrigger
                       className={cn(
-                        "h-12 w-full min-w-25 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
+                        "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                       )}
                     >
-                      <SelectValue placeholder="Rate Unit" />
+                      <SelectValue placeholder="All Inclusive Budget?" />
                     </SelectTrigger>
                     <SelectContent className="min-w-auto">
-                      <SelectItem fit value="ft²">
-                        ft²
+                      <SelectItem fit value="true">
+                        Yes
                       </SelectItem>
-                      <SelectItem fit value="m²">
-                        m²
+                      <SelectItem fit value="false">
+                        No
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 )}
               />
             </div>
+          </div>
+        </>
 
-            <div className="input-section">
-              <p className="lg:text-xs">All inclusive</p>
-            </div>
-
-            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="event.category" className="sr-only">
-                All inclusive budget selection
-              </Label>
-              <div className="flex flex-col justify-between sm:flex-row sm:items-center">
-                <span className="mb-2 sm:mb-0">
-                  <p className="text-sm text-foreground">
-                    {isMobile
-                      ? "Is the budget all-inclusive?"
-                      : " Is the budget for this open call all-inclusive?"}
-                  </p>
-                  <p className="text-xs text-foreground/50">
-                    What does this mean?{" "}
-                    <a
-                      href={`${siteUrl[0]}/faq#all-inclusive`}
-                      target="_blank"
-                      className="underline"
-                    >
-                      Learn more
-                    </a>
-                  </p>
-                </span>
-                <Controller
-                  name="openCall.compensation.budget.allInclusive"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      disabled={pastEvent}
-                      onValueChange={(val: string) =>
-                        field.onChange(val === "true")
-                      }
-                      value={String(field.value) ?? ""}
-                      // value={field.value ? String(field.value) : ""}
-                    >
-                      <SelectTrigger
-                        className={cn(
-                          "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
-                        )}
-                      >
-                        <SelectValue placeholder="All Inclusive Budget?" />
-                      </SelectTrigger>
-                      <SelectContent className="min-w-auto">
-                        <SelectItem fit value="true">
-                          Yes
-                        </SelectItem>
-                        <SelectItem fit value="false">
-                          No
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-            </div>
-          </>
-        )}
         {(hasBudgetMin || noBudget) && (
           <>
             <div className="input-section">

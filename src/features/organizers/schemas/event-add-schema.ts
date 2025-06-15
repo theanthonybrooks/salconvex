@@ -437,28 +437,27 @@ export const step1Schema = z
     }
   });
 
-export const orgDetailsSchema = z
-  .object({
-    organization: organizationSchema.extend({
-      contact: z.object({
-        organizer: z.optional(z.string()),
-        primaryContact: z.string().min(3, "Primary Contact is required"),
-      }),
-      links: linksSchemaStrict,
-      about: z.optional(z.string()),
+export const orgDetailsSchema = z.object({
+  organization: organizationSchema.extend({
+    contact: z.object({
+      organizer: z.optional(z.string()),
+      primaryContact: z.string().min(3, "Primary Contact is required"),
     }),
-  })
-  .superRefine((data, ctx) => {
-    const email = data.organization.links?.email;
+    links: linksSchemaStrict,
+    about: z.optional(z.string()),
+  }),
+});
+// .superRefine((data, ctx) => {
+//   const email = data.organization.links?.email;
 
-    if (!email || email.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Email is required",
-        path: ["organization", "links", "email"],
-      });
-    }
-  });
+//   if (!email || email.trim() === "") {
+//     ctx.addIssue({
+//       code: z.ZodIssueCode.custom,
+//       message: "Email is required",
+//       path: ["organization", "links", "email"],
+//     });
+//   }
+// });
 
 export const eventOnlySchema = z.object({
   organization: organizationSchema,
@@ -656,15 +655,17 @@ export const openCallStep2Schema = z
   })
   .superRefine((data, ctx) => {
     // const allInclusive = data.openCall.compensation.budget.allInclusive;
+    const budgetRate = data.openCall.compensation.budget.rate;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
     const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
-    const missingBudget = typeof budgetMin === "number" && budgetMin <= 1;
+    const missingBudget =
+      typeof budgetMin === "number" && budgetMin <= 1 && budgetRate === 0;
     const paidCall = data.event.formType === 3;
     if (missingBudget && paidCall) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Minimum budget is required for paid calls",
+        message: "Minimum budget or rate is required for paid calls",
         path: ["openCall", "compensation", "budget"],
       });
     }
