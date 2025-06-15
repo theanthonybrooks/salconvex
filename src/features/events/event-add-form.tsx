@@ -1307,11 +1307,12 @@ export const EventOCForm = ({
                 sameAsOrganizer: true,
               };
 
-        console.log(eventLinks);
+        // console.log(eventLinks);
         try {
           setPending(true);
 
           const { event } = await createOrUpdateEvent({
+            formType,
             _id: eventData._id || "",
             name: eventData.name,
             slug: slugify(eventData.name, { lower: true }),
