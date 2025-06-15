@@ -221,11 +221,25 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
     title: "About",
     items: [
       {
+        title: "Pricing",
+        path: "/pricing",
+        category: "thelist",
+        public: true,
+        userType: ["public"],
+      },
+      {
         title: "FAQ",
         path: "/faq",
         category: "about",
         public: true,
         userType: ["public", "admin"],
+      },
+      {
+        title: "Contact",
+        path: `mailto:${infoEmail}&subject=Site%20Contact`,
+        category: "about",
+        public: true,
+        userType: ["public"],
       },
       {
         title: "Changelog",
@@ -263,13 +277,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       //   public: true,
       //   userType: ["public"],
       // },
-      {
-        title: "Contact",
-        path: `mailto:${infoEmail}&subject=Site%20Contact`,
-        category: "about",
-        public: true,
-        userType: ["public"],
-      },
+
       // {
       //   title: "Contact",
       //   path: "/contact",
@@ -277,13 +285,6 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       //   public: true,
       //   userType: ["public"],
       // },
-      {
-        title: "Pricing",
-        path: "/pricing",
-        category: "thelist",
-        public: true,
-        userType: ["public"],
-      },
     ],
   },
   // {

@@ -87,11 +87,10 @@ export default function DashboardSideBar({
     return navItems.filter((item) => {
       const isAllowedBySub = item.sub.includes(statusKey);
       const isAdmin = hasAdminRole && !item.label.includes("Help");
-      const isGeneralItem =
-        item.sub.includes("all") && !item.label.includes("Help");
       const hasSharedType = userType?.some((type) =>
         item.userType?.includes(type),
       );
+      const isGeneralItem = hasSharedType && !item.label.includes("Help");
       const isPublic =
         item.userType?.includes("public") && !item.label.includes("Help");
 
