@@ -90,7 +90,11 @@ export default function DashboardSideBar({
       const hasSharedType = userType?.some((type) =>
         item.userType?.includes(type),
       );
-      const isGeneralItem = hasSharedType && !item.label.includes("Help");
+
+      const isGeneralItem =
+        hasSharedType &&
+        item.sub.includes("all") &&
+        !item.label.includes("Help");
       const isPublic =
         item.userType?.includes("public") && !item.label.includes("Help");
 

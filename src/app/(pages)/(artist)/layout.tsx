@@ -52,7 +52,6 @@ export default async function HomeLayout({
         { eventSlug, edition },
         { token },
       );
-      console.log(testicles);
       owner = testicles;
     }
     if ((!user || !hasSub) && ocPage && !owner) {
