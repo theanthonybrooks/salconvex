@@ -5,7 +5,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   ArchiveEvent,
   DeleteEvent,
-  DuplicateEvent,
   GoToEvent,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
@@ -16,7 +15,6 @@ import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -27,13 +25,7 @@ import { cn } from "@/lib/utils";
 import { EventType, SubmissionFormState } from "@/types/event";
 import { SubmissionFormState as OpenCallState } from "@/types/openCall";
 import { OrgEventData } from "@/types/organizer";
-import {
-  CheckCircle2,
-  Circle,
-  DollarSign,
-  LucideClipboardCopy,
-  MoreHorizontal,
-} from "lucide-react";
+import { CheckCircle2, Circle, DollarSign, MoreHorizontal } from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 
 export const orgColumnLabels: Record<string, string> = {
@@ -340,7 +332,6 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
               >
                 <DropdownMenuLabel>{"Actions"}</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
-                <DuplicateEvent eventId={event._id} />
                 {(state === "draft" || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
@@ -351,12 +342,12 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                 )}
                 <GoToEvent slug={slug} edition={edition} />
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
+                {/* <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}
                   className="flex items-center gap-x-2"
                 >
                   <LucideClipboardCopy className="size-4" /> Event ID
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 {/* {isAdmin && <DataTableOrgInfo orgId={event.mainOrgId} />} */}
               </DropdownMenuContent>
             </DropdownMenu>

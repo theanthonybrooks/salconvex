@@ -10,8 +10,9 @@ interface OrgEventActionsProps {
 
 export const OrgEventActions = ({ event }: OrgEventActionsProps) => {
   const router = useRouter();
-  const hasOpenCall = validOCVals.includes(event.hasOpenCall ?? "");
-  console.log(event.state, event.openCallState);
+  const hasOpenCall =
+    validOCVals.includes(event.hasOpenCall ?? "") &&
+    event.openCallState === "published";
   return (
     <p
       onClick={() => {
