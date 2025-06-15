@@ -15,7 +15,7 @@ export default async function HomeLayout({
 }) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
-  console.log(pathname);
+  // console.log(pathname);
   const token = await convexAuthNextjsToken();
   const preloadedArtistData = await preloadQuery(
     api.artists.getArtistEventMetadata.getArtistEventMetadata,

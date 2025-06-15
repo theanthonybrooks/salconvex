@@ -386,7 +386,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     hasUserEditedStep4 ||
     hasUserEditedStep5
   );
-  console.log(formType, hasUserEditedForm);
+
   const preloadFlag = useRef(false);
   const preloadOrgRef = useRef(false);
   const preloadEventRef = useRef(false);
@@ -1390,6 +1390,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region -------------UseEffects --------------
   console.log(eventData);
   useEffect(() => {
+    console.log(formType, hasUserEditedForm);
+  }, [formType, hasUserEditedForm]);
+  useEffect(() => {
     if (eventFormType === undefined || formType !== 0) return;
     if (eventFormType > 0 && formType === 0) {
       console.log("event form type", eventFormType);
@@ -1589,7 +1592,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged && !preloadEventRef.current) {
       preloadFlag.current = false;
-      router.push("/dashboard/admin/event");
+      // if (prevEventRef.current) {
+      //   router.push("/dashboard/admin/event");
+      // }
       isFirstRun.current = true;
       if (existingEvent?.lastEditedAt) {
         setLastSaved(existingEvent.lastEditedAt);

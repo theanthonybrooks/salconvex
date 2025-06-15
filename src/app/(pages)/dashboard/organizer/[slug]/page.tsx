@@ -29,7 +29,7 @@ export default async function OrganizerPage({
     },
   );
 
-  console.log(orgEventsData);
+  // console.log(orgEventsData);
 
   const user = userData?.user;
   const subStatus = subscription?.status;
