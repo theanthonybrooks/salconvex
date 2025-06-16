@@ -25,6 +25,14 @@ const contactHref = (type: string, value: string) => {
       return `mailto:${value}`;
     case "phone":
       return `tel:${value}`;
+    case "instagram":
+      return `https://instagram.com/${value.replace("@", "")}`;
+    case "facebook":
+      return `https://facebook.com/${value.replace("@", "")}`;
+    case "threads":
+      return `https://threads.net/${value.replace("@", "")}`;
+    case "vk":
+      return `https://vk.com/${value.replace("@", "")}`;
     default:
       return value;
   }
