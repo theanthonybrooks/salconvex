@@ -4,8 +4,6 @@ import {
   ColumnDef,
   ColumnFiltersState,
   ColumnSort,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -13,7 +11,9 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
 
@@ -38,6 +38,15 @@ export type ToolbarData = {
   totalPerYear?: number;
   userCount?: number;
 };
+
+export const selectableTableTypes = [
+  "events",
+  "orgEvents",
+  "organizations",
+  "users",
+  // "applications",
+  "openCalls",
+];
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -250,6 +259,7 @@ export function DataTable<TData, TValue>({
                     }
                   }
                 }
+
                 return (
                   <TableRow
                     key={row.id}
@@ -274,13 +284,10 @@ export function DataTable<TData, TValue>({
                           cell.column.getIndex() > 1
                             ? "border-l border-border"
                             : undefined,
-                          // cell.column.getIndex() ===
-                          //   cell.row.getVisibleCells().length - 1 &&
-                          //   cell.row.getVisibleCells().length > 5 &&
-                          //   "border-none",
-                          {
-                            /*  note-to-self:  ^ was specifically there for the context menu in the last column  */
-                          },
+                          tableType &&
+                            !selectableTableTypes.includes(tableType) &&
+                            cell.column.getIndex() >= 1 &&
+                            "border-l border-border",
                         )}
                       >
                         {flexRender(
