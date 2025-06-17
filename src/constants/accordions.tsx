@@ -1,4 +1,5 @@
 import { Link } from "@/components/ui/custom-link";
+import { supportEmail } from "@/constants/siteInfo";
 import { cn } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import { JSX } from "react";
@@ -248,7 +249,7 @@ export const pricingFaqs: AccordionSection = {
           <br />
           <br /> If you&apos;re still unable to pay that,{" "}
           <Link
-            href="mailto:support@streetartlist.com"
+            href={`mailto:${supportEmail}?subject=Subscription%20Support`}
             className="underline underline-offset-2"
           >
             contact me
