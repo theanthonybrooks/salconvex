@@ -205,7 +205,6 @@ export const getBookmarkedEventsWithDetails = query({
         bookmarkNote: metadata?.bookmarkNote ?? "",
         applicationStatus,
       });
-      console.log(applicationStatus, eventIntent, "eventIntent");
     }
     return result;
   },

@@ -129,7 +129,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
-              tableType="bookmarks"
+              tableType="hidden"
               pageType="dashboard"
             />
           </div>
@@ -144,7 +144,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
-              tableType="bookmarks"
+              tableType="hidden"
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}

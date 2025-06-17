@@ -23,6 +23,8 @@ export const applicationColumnLabels: Record<string, string> = {
   productionEnd: "Production End",
   applicationTime: "Applied At",
   applicationStatus: "Status",
+  responseTime: "Response Time",
+  notes: "Notes",
   // manualApplied: "Manual Entry",
 };
 

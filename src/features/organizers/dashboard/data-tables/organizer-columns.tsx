@@ -31,7 +31,7 @@ import { FaRegFloppyDisk } from "react-icons/fa6";
 export const orgEventColumnLabels: Record<string, string> = {
   orgName: "Org Name",
   name: "Event Name",
-  edition: "Edition",
+  dates_edition: "Edition",
   state: "State",
   openCallState: "Open Call",
   lastEditedAt: "Last Edited",
@@ -104,7 +104,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       <DataTableColumnHeader column={column} title="Organizer" />
     ),
     cell: ({ row }) => {
-      console.log(row.original?.organizationName);
+      // console.log(row.original?.organizationName);
       // const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex space-x-2">
@@ -343,7 +343,6 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
-      // const dumbFuck = row.table.fuckoff
       // console.log(table.options)
 
       return (

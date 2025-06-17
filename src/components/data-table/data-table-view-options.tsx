@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { userColumnLabels } from "@/features/admin/dashboard/user-columns";
 import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumnLabels } from "@/features/artists/dashboard/data-tables/bookmark-columns";
 import { hiddenColumnLabels } from "@/features/artists/dashboard/data-tables/hidden-columns";
@@ -26,11 +27,13 @@ export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
   const tableType = table.options.meta?.tableType;
+  console.log(tableType);
   const bookMarks = tableType === "bookmarks";
   const applications = tableType === "applications";
   const hidden = tableType === "hidden";
   const events = tableType === "events";
   const orgEvents = tableType === "orgEvents";
+  const usersTable = tableType === "users";
 
   return (
     <DropdownMenu>
@@ -63,9 +66,11 @@ export function DataTableViewOptions<TData>({
                     ? orgEventColumnLabels[column.id]
                     : applications
                       ? applicationColumnLabels[column.id]
-                      : hidden
-                        ? hiddenColumnLabels[column.id]
-                        : column.id;
+                      : usersTable
+                        ? userColumnLabels[column.id]
+                        : hidden
+                          ? hiddenColumnLabels[column.id]
+                          : column.id;
               return (
                 <DropdownMenuCheckboxItem
                   key={column.id}

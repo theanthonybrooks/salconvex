@@ -20,6 +20,17 @@ import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import { FaEnvelope } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
+export const userColumnLabels: Record<string, string> = {
+  name: "Name",
+  email: "Email",
+  subscription: "Subscription",
+  subStatus: "Sub Status",
+  accountType: "Account Type",
+  createdAt: "Created",
+  role: "Role",
+  source: "Source",
+};
+
 interface UserColumnsProps {
   _id: Id<"users">;
   name: string;
@@ -83,7 +94,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const subscription = row.getValue("subscription") as string | undefined;
-      console.log(subscription);
+      // console.log(subscription);
       return (
         <div
           className={cn(
