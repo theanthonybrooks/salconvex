@@ -13,6 +13,18 @@ import { ApplicationStatus } from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
+export const bookmarkColumnLabels: Record<string, string> = {
+  name: "Event Name",
+  edition: "Edition",
+  eventStart: "Event Start",
+  eventEnd: "Event End",
+  prodStart: "Production Start",
+  prodEnd: "Production End",
+  bookmarkStatus: "Status",
+  eventIntent: "Intent",
+  bookmarkNote: "Notes",
+};
+
 interface BookmarkColumnsProps {
   _id: Id<"events">;
   name: string;

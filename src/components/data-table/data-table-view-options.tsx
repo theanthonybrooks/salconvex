@@ -12,7 +12,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
+import { bookmarkColumnLabels } from "@/features/artists/dashboard/data-tables/bookmark-columns";
+import { hiddenColumnLabels } from "@/features/artists/dashboard/data-tables/hidden-columns";
 import { columnLabels } from "@/features/events/components/events-data-table/columns";
+import { orgEventColumnLabels } from "@/features/organizers/dashboard/data-tables/organizer-columns";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -21,6 +25,13 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
+  const tableType = table.options.meta?.tableType;
+  const bookMarks = tableType === "bookmarks";
+  const applications = tableType === "applications";
+  const hidden = tableType === "hidden";
+  const events = tableType === "events";
+  const orgEvents = tableType === "orgEvents";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,28 +44,40 @@ export function DataTableViewOptions<TData>({
           View
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px]">
+      <DropdownMenuContent align="end" className="min-w-[150px]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {table
-          .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== "undefined" && column.getCanHide(),
-          )
-          .map((column) => {
-            const label = columnLabels[column.id] || column.id;
-            return (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              >
-                {label}
-              </DropdownMenuCheckboxItem>
-            );
-          })}
+        <div className="scrollable mini darkbar flex max-h-[50dvh] flex-col gap-y-0.5">
+          {table
+            .getAllColumns()
+            .filter(
+              (column) =>
+                typeof column.accessorFn !== "undefined" && column.getCanHide(),
+            )
+            .map((column) => {
+              const label = events
+                ? columnLabels[column.id]
+                : bookMarks
+                  ? bookmarkColumnLabels[column.id]
+                  : orgEvents
+                    ? orgEventColumnLabels[column.id]
+                    : applications
+                      ? applicationColumnLabels[column.id]
+                      : hidden
+                        ? hiddenColumnLabels[column.id]
+                        : column.id;
+              return (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {label}
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -10,6 +10,14 @@ import { EventCategory, EventType } from "@/types/event";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
+export const hiddenColumnLabels: Record<string, string> = {
+  name: "Event Name",
+  edition: "Edition",
+  category: "Category",
+  type: "Type",
+  hiddenStatus: "Status",
+};
+
 interface hiddenColumnsProps {
   _id: Id<"events">;
   name: string;

@@ -14,6 +14,18 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
+export const applicationColumnLabels: Record<string, string> = {
+  name: "Event Name",
+  dates_edition: "Edition",
+  eventStart: "Event Start",
+  eventEnd: "Event End",
+  productionStart: "Production Start",
+  productionEnd: "Production End",
+  applicationTime: "Applied At",
+  applicationStatus: "Status",
+  // manualApplied: "Manual Entry",
+};
+
 interface ApplicationColumnsProps {
   _id: Id<"applications">;
   name: string;
@@ -24,7 +36,7 @@ interface ApplicationColumnsProps {
   productionEnd: string;
   applicationTime: number;
   applicationStatus: ApplicationStatus;
-  manualApplied: boolean;
+  // manualApplied: boolean;
   responseTime: number;
   // response: string;
   notes?: string;
@@ -153,16 +165,16 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       />
     ),
   },
-  {
-    accessorKey: "manualApplied",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Manual Entry" />
-    ),
-    cell: ({ row }) => {
-      const value = row.getValue("manualApplied") as boolean;
-      return <span className="text-sm">{value ? "Yes" : "No"}</span>;
-    },
-  },
+  // {
+  //   accessorKey: "manualApplied",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Manual Entry" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const value = row.getValue("manualApplied") as boolean;
+  //     return <span className="text-sm">{value ? "Yes" : "No"}</span>;
+  //   },
+  // },
   // {
   //   accessorKey: "response",
   //   header: ({ column }) => (

@@ -28,6 +28,17 @@ import { OrgEventData } from "@/types/organizer";
 import { CheckCircle2, Circle, DollarSign, MoreHorizontal } from "lucide-react";
 import { FaRegFloppyDisk } from "react-icons/fa6";
 
+export const orgEventColumnLabels: Record<string, string> = {
+  orgName: "Org Name",
+  name: "Event Name",
+  edition: "Edition",
+  state: "State",
+  openCallState: "Open Call",
+  lastEditedAt: "Last Edited",
+  category: "Category",
+  type: "Event Type",
+};
+
 export const orgColumnLabels: Record<string, string> = {
   orgName: "Organizer",
   name: "Name",
