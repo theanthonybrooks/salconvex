@@ -88,6 +88,10 @@ export function DataTable<TData, TValue>({
   minimalView,
   defaultSort,
 }: DataTableProps<TData, TValue>) {
+  const isSelectable = tableType
+    ? selectableTableTypes.includes(tableType)
+    : false;
+
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] =
@@ -121,7 +125,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
       columnFilters,
     },
-    enableRowSelection: true,
+    enableRowSelection: isSelectable,
     onRowSelectionChange: (updater) => {
       const newSelection =
         typeof updater === "function" ? updater(rowSelection) : updater;
@@ -151,6 +155,7 @@ export function DataTable<TData, TValue>({
   const preloadedEvent = initialSearchTerm ? tableRows[0]?.index : null;
   const hasPreloadedEvent =
     typeof preloadedEvent === "number" && preloadedEvent > 0;
+  const hasRows = table.getRowModel().rows?.length > 0;
 
   useEffect(() => {
     if (!hasPreloadedEvent || Object.keys(rowSelection)?.length > 0) return;
@@ -200,7 +205,7 @@ export function DataTable<TData, TValue>({
             " rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)] scrollable, short-screen",
             tableClassName,
           )}
-          className={cn("table-fixed")}
+          className={cn(hasRows && "table-fixed")}
         >
           <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_0.5px_0_0_rgba(0,0,0,1)]">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -219,7 +224,7 @@ export function DataTable<TData, TValue>({
                             header.column.columnDef.header,
                             header.getContext(),
                           )}
-                      {header.column.getCanResize() && (
+                      {header.column.getCanResize() && hasRows && (
                         <div
                           onMouseDown={header.getResizeHandler()}
                           onTouchStart={header.getResizeHandler()}
@@ -236,7 +241,7 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {hasRows ? (
               table.getRowModel().rows.map((row) => {
                 let bgStatusClass = "";
 
