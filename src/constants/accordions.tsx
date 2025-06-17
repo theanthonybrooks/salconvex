@@ -201,7 +201,7 @@ export const openCallFaqs: AccordionSection = {
           <p>
             Events are always fee to submit. Open calls are free for Graffiti
             Jams, Pasteup/Sticker Projects, Street Art Festivals, and Mural
-            Projects with a budget less than $1,000.
+            Projects with a budget of $1,000 or less.
           </p>
 
           <p>

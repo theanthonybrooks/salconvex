@@ -160,6 +160,8 @@ const listActionsSchema = {
   artistId: v.id("users"),
   hidden: v.optional(v.boolean()),
   bookmarked: v.optional(v.boolean()),
+  eventIntent: v.optional(v.string()),
+  bookmarkNote: v.optional(v.string()),
 };
 
 const organizationSchema = {

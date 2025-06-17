@@ -12,11 +12,13 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { isValidIsoDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { EventCardProps } from "@/types/event";
+import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -24,6 +26,12 @@ import { useEffect, useState } from "react";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
   const router = useRouter();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const isAdmin = userData?.user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const {
     data,
     artist,
@@ -91,7 +99,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   }, []);
 
   const onBookmark = () => {
-    if (!artist) {
+    if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
@@ -99,7 +107,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   };
 
   const onHide = () => {
-    if (!artist) {
+    if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
@@ -126,7 +134,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
           />
 
           <div className="flex flex-col items-center space-y-4">
-            {bookmarked ? (
+            {bookmarked && hasActiveSubscription ? (
               <FaBookmark
                 className="mt-3 size-8 cursor-pointer text-red-500"
                 onClick={onBookmark}

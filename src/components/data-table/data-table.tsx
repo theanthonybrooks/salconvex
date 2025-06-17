@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
+import { positiveApplicationStatuses } from "@/types/applications";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import { useEffect } from "react";
 import { DataTablePagination } from "./data-table-pagination";
@@ -215,45 +216,69 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  onClick={row.getToggleSelectedHandler()}
-                  data-state={row.getIsSelected() && "selected"}
-                  className={cn(
-                    "bg-white/50 hover:cursor-pointer hover:bg-salYellow/10 data-[state=selected]:bg-salPink/30",
-                  )}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      style={{
-                        minWidth: cell.column.columnDef.minSize,
-                        maxWidth: cell.column.columnDef.maxSize,
-                      }}
-                      width={cell.column.columnDef.size ?? undefined}
-                      key={cell.id}
-                      className={cn(
-                        "px-3",
-                        cell.column.getIndex() > 1
-                          ? "border-l border-border"
-                          : undefined,
-                        // cell.column.getIndex() ===
-                        //   cell.row.getVisibleCells().length - 1 &&
-                        //   cell.row.getVisibleCells().length > 5 &&
-                        //   "border-none",
-                        {
-                          /*  note-to-self:  ^ was specifically there for the context menu in the last column  */
-                        },
-                      )}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                let bgStatusClass = "";
+
+                if (tableType === "bookmarks") {
+                  const { eventIntent } = row.original as {
+                    eventIntent: string | null;
+                  };
+
+                  if (eventIntent !== null) {
+                    if (eventIntent === "planned") {
+                      bgStatusClass = "bg-yellow-100";
+                    } else if (eventIntent === "missed") {
+                      bgStatusClass = "bg-stone-100 text-foreground/50";
+                    } else if (eventIntent === "rejected") {
+                      bgStatusClass = "bg-red-100 text-red-700";
+                    } else if (
+                      positiveApplicationStatuses.includes(eventIntent)
+                    ) {
+                      bgStatusClass = "bg-green-100";
+                    }
+                  }
+                }
+                return (
+                  <TableRow
+                    key={row.id}
+                    onClick={row.getToggleSelectedHandler()}
+                    data-state={row.getIsSelected() && "selected"}
+                    className={cn(
+                      "bg-white/50 hover:cursor-pointer hover:bg-salYellow/10 data-[state=selected]:bg-salPink/30",
+                      tableType === "bookmarks" && bgStatusClass,
+                    )}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        style={{
+                          minWidth: cell.column.columnDef.minSize,
+                          maxWidth: cell.column.columnDef.maxSize,
+                        }}
+                        width={cell.column.columnDef.size ?? undefined}
+                        key={cell.id}
+                        className={cn(
+                          "px-3",
+                          cell.column.getIndex() > 1
+                            ? "border-l border-border"
+                            : undefined,
+                          // cell.column.getIndex() ===
+                          //   cell.row.getVisibleCells().length - 1 &&
+                          //   cell.row.getVisibleCells().length > 5 &&
+                          //   "border-none",
+                          {
+                            /*  note-to-self:  ^ was specifically there for the context menu in the last column  */
+                          },
+                        )}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell

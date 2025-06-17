@@ -26,17 +26,26 @@ import { EventCard } from "@/features/events/components/events-card";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
+import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const router = useRouter();
-  const { data, artist, className } = props; //note: removed artist from props. Add back when needed
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const isAdmin = userData?.user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
+  const { data, artist, className } = props;
+  //note: removed artist from props. Add back when needed
   const { event, organizer } = data;
   const {
     logo: eventLogo,
@@ -66,7 +75,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const locationString = getFormattedLocationString(location);
 
   const onBookmark = () => {
-    if (!artist) {
+    if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
@@ -74,7 +83,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   };
 
   const onHide = () => {
-    if (!artist) {
+    if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
@@ -222,7 +231,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
               </div>
             </div>
             <div className="flex items-center gap-x-4">
-              {hidden ? (
+              {hidden && hasActiveSubscription ? (
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger>
@@ -248,7 +257,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   </Tooltip>
                 </TooltipProvider>
               )}
-              {bookmarked ? (
+              {bookmarked && hasActiveSubscription ? (
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger>

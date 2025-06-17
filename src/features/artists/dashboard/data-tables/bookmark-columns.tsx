@@ -4,7 +4,12 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
+import {
+  BookmarkListActionSelector,
+  BookmarkNotesInput,
+} from "@/features/artists/dashboard/data-tables/bookmark-list-actions";
 import { cn } from "@/lib/utils";
+import { ApplicationStatus } from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -18,6 +23,9 @@ interface BookmarkColumnsProps {
   prodEnd: string;
   bookmarkStatus: boolean;
   slug: string;
+  bookmarkNote: string;
+  eventIntent: string;
+  applicationStatus: string | null;
 }
 
 export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
@@ -72,7 +80,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Edition" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("edition")}</span>
+      <span className="block text-sm">{row.getValue("edition")}</span>
     ),
   },
   {
@@ -81,7 +89,9 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Event Start" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("eventStart")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("eventStart")}
+      </span>
     ),
   },
   {
@@ -90,7 +100,9 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Event End" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("eventEnd")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("eventEnd")}
+      </span>
     ),
   },
   {
@@ -99,7 +111,9 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Production Start" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("prodStart")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("prodStart")}
+      </span>
     ),
   },
   {
@@ -108,7 +122,9 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Production End" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("prodEnd")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("prodEnd")}
+      </span>
     ),
   },
   {
@@ -124,6 +140,41 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
           key={row.original._id}
           eventId={row.original._id}
           bookmarked={value}
+        />
+      );
+    },
+  },
+  {
+    accessorKey: "eventIntent",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Intent" />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue("eventIntent") as string;
+      const appStatus = row.original.applicationStatus as ApplicationStatus;
+
+      return (
+        <BookmarkListActionSelector
+          key={row.original._id}
+          eventId={row.original._id}
+          initialValue={value}
+          appStatus={appStatus}
+        />
+      );
+    },
+  },
+  {
+    accessorKey: "bookmarkNote",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Notes" />
+    ),
+    cell: ({ row }) => {
+      const bookmark = row.original;
+      // return <span className="text-sm">{value ? "Yes" : "No"}</span>;
+      return (
+        <BookmarkNotesInput
+          notes={row.getValue("bookmarkNote")}
+          bookmark={bookmark._id}
         />
       );
     },

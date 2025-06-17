@@ -773,6 +773,7 @@ const EventCardPreview = ({
           />
 
           <ApplyButton
+            user={user}
             id={event._id}
             openCallId={opencall ? opencall._id : ""}
             slug={slug}

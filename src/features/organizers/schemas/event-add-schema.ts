@@ -659,7 +659,7 @@ export const openCallStep2Schema = z
     const budgetUnit = data.openCall.compensation.budget.unit;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
-    const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
+    const budgetLg = typeof budgetMax === "number" && budgetMax > 1000;
     const missingBudget =
       typeof budgetMin === "number" && budgetMin <= 1 && budgetRate === 0;
 
@@ -685,7 +685,7 @@ export const openCallStep2Schema = z
     if (budgetLg && data.event.formType === 2) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Budget max must be less than 1000 for free calls",
+        message: "Budget max must be 1,000 or less for free calls",
         path: ["openCall", "compensation", "budget", "max"],
       });
     }

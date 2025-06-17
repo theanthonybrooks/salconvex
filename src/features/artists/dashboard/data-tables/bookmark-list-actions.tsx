@@ -1,0 +1,102 @@
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import {
+  ApplicationStatus,
+  positiveApplicationStatuses,
+} from "@/types/applications";
+import { useMutation } from "convex/react";
+import { useState } from "react";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+
+interface BookmarkListActionSelectorProps {
+  eventId: Id<"events">;
+  initialValue?: string;
+  appStatus?: ApplicationStatus;
+}
+
+export const BookmarkListActionSelector = ({
+  eventId,
+  initialValue,
+  appStatus,
+}: BookmarkListActionSelectorProps) => {
+  const [value, setValue] = useState(initialValue);
+
+  const updateListAction = useMutation(api.artists.listActions.updateBookmark);
+  const disabledValue =
+    typeof appStatus === "string" &&
+    !positiveApplicationStatuses.includes(appStatus ?? "");
+
+  const handleChange = (intent: string) => {
+    updateListAction({
+      eventId,
+      intent,
+    });
+  };
+
+  return (
+    <Select
+      disabled={disabledValue}
+      value={value}
+      onValueChange={(newValue) => {
+        setValue(newValue);
+        handleChange(newValue);
+      }}
+    >
+      <SelectTrigger
+        className={cn("mx-auto w-fit min-w-30 font-medium capitalize")}
+      >
+        <SelectValue placeholder={"Select..."} />
+      </SelectTrigger>
+      <SelectContent>
+        {!["planned", "missed", "-"].includes(initialValue ?? "") &&
+          initialValue && (
+            <SelectItem
+              value={initialValue}
+              className="capitalize text-foreground/30"
+              disabled
+            >
+              {initialValue}
+            </SelectItem>
+          )}
+
+        <SelectItem value="planned">Planned</SelectItem>
+        <SelectItem value="missed">Missed</SelectItem>
+        <SelectItem value="-">-</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+};
+
+interface AppNotesInputProps {
+  notes: string;
+  bookmark: Id<"events">;
+}
+
+export const BookmarkNotesInput = ({ notes, bookmark }: AppNotesInputProps) => {
+  const updateBookmarkNotes = useMutation(
+    api.artists.listActions.updateBookmark,
+  );
+  const handleChange = async (value: string) => {
+    await updateBookmarkNotes({
+      eventId: bookmark,
+      notes: value,
+    });
+  };
+
+  return (
+    <RichTextEditor
+      value={notes}
+      onChange={handleChange}
+      inputPreview
+      placeholder="(optional)"
+    />
+  );
+};

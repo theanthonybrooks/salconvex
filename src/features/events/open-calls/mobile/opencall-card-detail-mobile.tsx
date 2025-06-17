@@ -17,13 +17,24 @@ import { EventCard } from "@/features/events/components/events-card";
 import OpenCallCard from "@/features/events/open-calls/components/open-call-card";
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
+import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
+  const router = useRouter();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const {
     data,
     artist,
@@ -81,11 +92,19 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const { toggleListAction } = useToggleListAction(event._id);
 
   const onBookmark = () => {
-    toggleListAction({ bookmarked: !bookmarked });
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ bookmarked: !bookmarked });
+    }
   };
 
   const onHide = () => {
-    toggleListAction({ hidden: !hidden });
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+    } else {
+      toggleListAction({ hidden: !hidden });
+    }
   };
 
   useEffect(() => {
@@ -254,8 +273,10 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               openCall={openCall}
               format="mobile"
               userPref={userPref}
+              publicPreview={!hasActiveSubscription}
             />
             <ApplyButton
+              user={user}
               userPref={userPref}
               id={event._id}
               openCallId={openCallId}

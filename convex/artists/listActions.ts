@@ -1,6 +1,11 @@
+import {
+  ApplicationStatus,
+  positiveApplicationStatuses,
+} from "@/types/applications";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { getAll } from "convex-helpers/server/relationships";
-import { query } from "~/convex/_generated/server";
+import { v } from "convex/values";
+import { mutation, query } from "~/convex/_generated/server";
 
 export const getHiddenEvents = query({
   args: {},
@@ -133,24 +138,107 @@ export const getBookmarkedEventsWithDetails = query({
       .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
       .collect();
 
-    const bookmarkedIds = listActions
-      .filter((a) => a.bookmarked)
-      .map((a) => a.eventId);
+    const bookmarkedMap = new Map(
+      listActions
+        .filter((a) => a.bookmarked)
+        .map((a) => [
+          a.eventId,
+          {
+            eventIntent: a.eventIntent,
+            bookmarkNote: a.bookmarkNote,
+          },
+        ]),
+    );
 
+    const bookmarkedIds = Array.from(bookmarkedMap.keys());
     if (bookmarkedIds.length === 0) return [];
 
     const events = await getAll(ctx.db, bookmarkedIds);
-    return events
-      .filter((e) => e !== null)
-      .map((e) => ({
-        ...e,
-        edition: e.dates.edition,
-        eventStart: e.dates.eventDates[0].start ?? "",
-        eventEnd: e.dates.eventDates?.at(-1)?.end ?? "",
-        prodStart: e.dates.prodDates?.[0]?.start ?? "",
-        prodEnd: e.dates.prodDates?.at(-1)?.end ?? "",
+    const nonNullEvents = events.filter(
+      (e): e is NonNullable<typeof e> => e !== null,
+    );
+
+    const result = [];
+    for (const event of nonNullEvents) {
+      const metadata = bookmarkedMap.get(event._id);
+      let applicationStatus: string | null = null;
+      let eventIntent: string = "";
+
+      if (metadata?.eventIntent) eventIntent = metadata.eventIntent;
+
+      const openCall = await ctx.db
+        .query("openCalls")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .first();
+
+      if (openCall) {
+        const application = await ctx.db
+          .query("applications")
+          .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))
+          .filter((q) => q.eq(q.field("artistId"), user._id))
+          .unique();
+
+        if (application) {
+          applicationStatus =
+            application.applicationStatus as ApplicationStatus;
+          if (
+            application.applicationStatus &&
+            positiveApplicationStatuses.includes(application.applicationStatus)
+          ) {
+            eventIntent = application.applicationStatus;
+          } else if (application.applicationStatus === "rejected") {
+            eventIntent = "rejected";
+          }
+        }
+      }
+
+      result.push({
+        ...event,
+        edition: event.dates.edition,
+        eventStart: event.dates.eventDates[0].start ?? "-",
+        eventEnd: event.dates.eventDates?.at(-1)?.end ?? "-",
+        prodStart: event.dates.prodDates?.[0]?.start ?? "-",
+        prodEnd: event.dates.prodDates?.at(-1)?.end ?? "-",
         bookmarkStatus: true,
-        slug: e.slug,
-      }));
+        slug: event.slug,
+        eventIntent,
+        bookmarkNote: metadata?.bookmarkNote ?? "",
+        applicationStatus,
+      });
+      console.log(applicationStatus, eventIntent, "eventIntent");
+    }
+    return result;
+  },
+});
+
+export const updateBookmark = mutation({
+  args: {
+    eventId: v.id("events"),
+    notes: v.optional(v.string()),
+    intent: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    console.log(args);
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) return null;
+
+    const bookmark = await ctx.db
+      .query("listActions")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .filter((q) => q.eq(q.field("artistId"), user._id))
+      .unique();
+    if (!bookmark) return null;
+    await ctx.db.patch(bookmark._id, {
+      ...(args.notes !== undefined && { bookmarkNote: args.notes }),
+      ...(args.intent !== undefined && {
+        eventIntent: args.intent !== "-" ? args.intent : undefined,
+      }),
+    });
   },
 });

@@ -36,10 +36,13 @@ import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
-  const { preloadedSubStatus } = useConvexPreload();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
-  const hasActiveSubscription = subData?.hasActiveSubscription ?? false;
-
+  const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const { data, artist, userPref, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
@@ -273,6 +276,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               </p>
             )}
             <ApplyButton
+              user={user}
               userPref={userPref}
               id={event._id}
               openCallId={openCallId}
@@ -416,6 +420,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             />
             <div className="mt-6 flex w-full justify-end xl:hidden">
               <ApplyButton
+                user={user}
                 userPref={userPref}
                 id={event._id}
                 openCallId={openCallId}

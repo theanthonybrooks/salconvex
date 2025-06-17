@@ -26,7 +26,7 @@ export const compareEnrichedEvents = (
   sortOptions: SortOptions,
   pageType: EventSortPageTypes,
 ): number => {
-  console.log(pageType);
+  // console.log(pageType);
   const { sortBy, sortDirection } = sortOptions;
   const directionMultiplier = sortDirection === "asc" ? 1 : -1;
   const thisWeekPg = pageType === "thisweek" || pageType === "nextweek";

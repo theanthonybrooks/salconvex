@@ -37,21 +37,9 @@ export const getFilteredEventsPublic = query({
     const nextWeekPg = source === "nextweek";
     const theListPg = source === "thelist";
 
-    const now = new Date();
-    // const baseWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+    // const now = new Date();
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
-    // const weeweekStart = startOfWeek(
-    //   addWeeks(baseWeekStart, targetWeekOffset),
-    //   {
-    //     weekStartsOn: 1,
-    //   },
-    // );
-
-    // const weeweekEnd = endOfWeek(addWeeks(baseWeekStart, targetWeekOffset), {
-    //   weekStartsOn: 1,
-    // });
-
     const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 
@@ -60,12 +48,6 @@ export const getFilteredEventsPublic = query({
 
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
-
-    // const weekStartISO = weeweekStart.toISOString();
-    // const weekEndISO = weeweekEnd.toISOString();
-
-    // console.log(weekStartISO, weekEndISO);
-    // console.log(weekStartISO, weekEndISO);
 
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
@@ -87,34 +69,16 @@ export const getFilteredEventsPublic = query({
             .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
             .collect()
         : [];
-    // const applicationData = user?._id
-    //   ? await ctx.db
-    //       .query("artists")
-    //       .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
-    //       .collect()
-    //   : [];
-    // console.log(listActions);
-    // console.log(applicationData);
     const bookmarkedIds = listActions
       .filter((a) => a.bookmarked)
       .map((a) => a.eventId);
 
     const hiddenIds = listActions.filter((a) => a.hidden).map((a) => a.eventId);
-
-    // After enriching events and before sorting
-
-    // Continue with the rest of your function logic
-    // You can use user and artistData safely now, knowing they might be null/empty
-    // const artistData = await ctx.db
-    //   .query("artists")
-    //   .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
-
     let events = await ctx.db
       .query("events")
       .withIndex("by_state", (q) => q.eq("state", "published"))
       .collect();
 
-    // Apply filters
     // User/Artist filters
 
     if (filters.bookmarkedOnly) {

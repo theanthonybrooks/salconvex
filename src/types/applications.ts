@@ -22,6 +22,17 @@ export const applicationStatusValues = [
   "shortlisted",
 ];
 
+export const positiveApplicationStatuses = [
+  "external apply",
+  "applied",
+  "considering",
+  "to next step",
+  "accepted",
+  "pending",
+  "roster",
+  "shortlisted",
+];
+
 export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
 
 export type NonNullApplicationStatus = Exclude<ApplicationStatus, null>;

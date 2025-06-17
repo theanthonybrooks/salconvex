@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
-import { UserPref } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
@@ -132,6 +132,7 @@ interface ApplyButtonProps {
   detailCard?: boolean;
   publicPreview?: boolean;
   userPref?: UserPref | null;
+  user?: User | null;
 }
 
 export const ApplyButton = ({
@@ -139,6 +140,7 @@ export const ApplyButton = ({
   openCallId,
   slug,
   appUrl,
+  user,
   userPref,
   //isExternalApply, //todo: think about this. Could just use appUrl if it exists to gather the same assumption and user outcome.
 
@@ -164,16 +166,12 @@ export const ApplyButton = ({
     api.subscriptions.getUserSubscriptionStatus,
     finalButton ? {} : "skip",
   );
-  const hasSub = subscription?.hasActiveSubscription;
 
   const noSub =
     !subscription?.hasActiveSubscription &&
     (publicPreview || publicView || finalButton);
 
-  const isAdmin = useQuery(
-    api.users.isAdmin,
-    hasSub && finalButton ? {} : "skip",
-  );
+  const isAdmin = user?.role?.includes("admin") || false;
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -291,7 +289,9 @@ export const ApplyButton = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              disabled={(openCall !== "active" && !isAdmin) || noSub}
+              disabled={
+                (openCall !== "active" && !isAdmin) || (noSub && !isAdmin)
+              }
               variant="salWithShadowHiddenLeft"
               size="lg"
               className={cn(
@@ -389,7 +389,7 @@ export const ApplyButton = ({
 
       {!hasApplied && (
         <Button
-          disabled={noSub}
+          disabled={noSub && !isAdmin}
           variant="salWithShadowHiddenVert"
           size="lg"
           className={cn(
@@ -420,6 +420,7 @@ export const ApplyButton = ({
       )}
 
       <EventContextMenu
+        user={user}
         eventId={id}
         openCallId={openCallId}
         // onHide={onHide}

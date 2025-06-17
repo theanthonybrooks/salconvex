@@ -33,6 +33,8 @@ export function ArtistDashboardTableWrapper({
     api.artists.listActions.getHiddenEvents,
     hiddenPage ? {} : "skip",
   );
+  
+  console.log(bookmarkData);
   return (
     <>
       {appsPage && (

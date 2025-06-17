@@ -79,6 +79,8 @@ const EventContextMenu = ({
     });
   };
 
+  const nonAdminPublicView = publicView && !isAdmin;
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -90,7 +92,7 @@ const EventContextMenu = ({
               "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 sm:h-11 sm:px-3 [&_svg]:size-6",
 
               appStatus !== null &&
-                !publicView &&
+                !nonAdminPublicView &&
                 "border-foreground/50 bg-background text-foreground/50 hover:shadow-slga",
             )}
           >
@@ -112,7 +114,7 @@ const EventContextMenu = ({
             onClick={onHide}
             className={cn(
               "cursor-pointer rounded px-4 py-2 text-black/80 hover:bg-salPinkLtHover hover:text-red-700",
-              publicView && "hidden",
+              nonAdminPublicView && "hidden",
             )}
           >
             {isHidden ? (
@@ -135,12 +137,12 @@ const EventContextMenu = ({
               </span>
             )}
           </div>
-          {openCallStatus === "active" && (
+          {(openCallStatus === "active" || isAdmin) && (
             <div
               onClick={onApply}
               className={cn(
                 "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                publicView && "hidden",
+                nonAdminPublicView && "hidden",
                 appStatus
                   ? "text-black/80 hover:text-emerald-700"
                   : "text-emerald-700 hover:text-black/80",
@@ -164,7 +166,7 @@ const EventContextMenu = ({
               onClick={onBookmark}
               className={cn(
                 "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                publicView && "hidden",
+                nonAdminPublicView && "hidden",
               )}
             >
               {isBookmarked ? (
@@ -180,7 +182,7 @@ const EventContextMenu = ({
               )}
             </div>
           )}
-          {publicView && (
+          {nonAdminPublicView && (
             <div
               className={cn(
                 "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
@@ -202,7 +204,7 @@ const EventContextMenu = ({
                 target="_blank"
                 className={cn(
                   "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                  publicView && "hidden",
+                  nonAdminPublicView && "hidden",
                 )}
               >
                 <span className="flex items-center gap-x-1 text-sm">
@@ -216,7 +218,7 @@ const EventContextMenu = ({
                 }}
                 className={cn(
                   "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                  publicView && "hidden",
+                  nonAdminPublicView && "hidden",
                 )}
               >
                 <span className="flex items-center gap-x-1 text-sm">
