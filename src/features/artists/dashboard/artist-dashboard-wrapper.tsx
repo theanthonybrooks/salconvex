@@ -54,6 +54,7 @@ export function ArtistDashboardTableWrapper({
               // }}
               tableType="applications"
               pageType="dashboard"
+              defaultSort={{ id: `applicationTime`, desc: true }}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -73,6 +74,7 @@ export function ArtistDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
+              defaultSort={{ id: `applicationTime`, desc: true }}
             />
           </div>
         </>
@@ -93,6 +95,7 @@ export function ArtistDashboardTableWrapper({
               // }}
               tableType="bookmarks"
               pageType="dashboard"
+              defaultSort={{ id: "prodStart", desc: false }}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -112,6 +115,7 @@ export function ArtistDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
+              defaultSort={{ id: "prodStart", desc: false }}
             />
           </div>
         </>
@@ -131,6 +135,7 @@ export function ArtistDashboardTableWrapper({
               // }}
               tableType="hidden"
               pageType="dashboard"
+              defaultSort={{ id: "name", desc: false }}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -148,6 +153,7 @@ export function ArtistDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
+              defaultSort={{ id: "name", desc: false }}
             />
           </div>
         </>

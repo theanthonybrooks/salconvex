@@ -13,8 +13,6 @@ interface OrganizerDashboardTableWrapperProps {
 export function OrganizerDashboardTableWrapper({
   orgEventsData,
 }: OrganizerDashboardTableWrapperProps) {
-  console.log(orgEventsData);
-
   return (
     <>
       <div className="hidden max-h-full w-full px-10 py-10 lg:block">
@@ -26,11 +24,9 @@ export function OrganizerDashboardTableWrapper({
             dates_edition: true,
             type: false,
           }}
-          onRowSelect={(row) => {
-            console.log(row);
-          }}
           tableType="orgEvents"
           pageType="dashboard"
+          defaultSort={{ id: "lastEditedAt", desc: true }}
         />
       </div>
       <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -43,13 +39,11 @@ export function OrganizerDashboardTableWrapper({
             lastEditedAt: false,
             dates_edition: false,
           }}
-          onRowSelect={(row) => {
-            console.log(row);
-          }}
           tableType="orgEvents"
           pageType="dashboard"
           className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
           outerContainerClassName={cn("lg:hidden")}
+          defaultSort={{ id: "lastEditedAt", desc: true }}
         />
       </div>
     </>

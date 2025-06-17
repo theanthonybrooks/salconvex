@@ -71,6 +71,7 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="events"
               pageType="dashboard"
+              defaultSort={{ id: `lastEditedAt`, desc: true }}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -92,6 +93,7 @@ export function AdminDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
+              defaultSort={{ id: `lastEditedAt`, desc: true }}
             />
           </div>
         </>
@@ -118,6 +120,7 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="users"
               pageType="dashboard"
+              defaultSort={{ id: `createdAt`, desc: true }}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -135,7 +138,7 @@ export function AdminDashboardTableWrapper({
                 totalPerMonth: usersData?.totalPerMonth ?? 0,
                 totalPerYear: usersData?.totalPerYear ?? 0,
               }}
-              defaultSort={{ id: "createdAt", desc: false }}
+              defaultSort={{ id: `createdAt`, desc: true }}
               onRowSelect={(row) => {
                 console.log(row);
                 // setExistingEvent(row.getValue("event"));

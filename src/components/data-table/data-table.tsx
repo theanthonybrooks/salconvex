@@ -27,7 +27,13 @@ import {
 } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
-import { positiveApplicationStatuses } from "@/types/applications";
+import {
+  ApplicationStatus,
+  NonNullApplicationStatus,
+  positiveApplicationStatuses,
+  statusBgColorMap,
+  statusColorMap,
+} from "@/types/applications";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import { useEffect } from "react";
 import { DataTablePagination } from "./data-table-pagination";
@@ -102,7 +108,9 @@ export function DataTable<TData, TValue>({
   const initialSort = React.useMemo<SortingState>(() => {
     return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
   }, [defaultSort]);
+
   const [sorting, setSorting] = React.useState<SortingState>(initialSort);
+  console.log(sorting);
 
   const table = useReactTable({
     data,
@@ -263,6 +271,19 @@ export function DataTable<TData, TValue>({
                       bgStatusClass = "bg-green-100";
                     }
                   }
+                } else if (tableType === "applications") {
+                  const { applicationStatus } = row.original as {
+                    applicationStatus: ApplicationStatus | null;
+                  };
+                  const statusColor =
+                    statusBgColorMap[
+                      applicationStatus as NonNullApplicationStatus
+                    ];
+                  const textColor =
+                    statusColorMap[
+                      applicationStatus as NonNullApplicationStatus
+                    ];
+                  bgStatusClass = `${statusColor} ${textColor}`;
                 }
 
                 return (
@@ -272,7 +293,7 @@ export function DataTable<TData, TValue>({
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
                       "bg-white/50 hover:cursor-pointer hover:bg-salYellow/10 data-[state=selected]:bg-salPink/30",
-                      tableType === "bookmarks" && bgStatusClass,
+                      bgStatusClass,
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (

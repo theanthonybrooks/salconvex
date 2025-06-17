@@ -236,7 +236,6 @@ const SubmissionFormOrgStep = ({
               <div className="mx-auto flex w-full max-w-sm flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="organization.logo" className="sr-only">
                   Organization Logo
-              
                 </Label>
                 <Controller
                   name="organization.logo"
@@ -353,6 +352,7 @@ const SubmissionFormOrgStep = ({
                 dashboardView ? "max-w-full" : "max-w-[74dvw]",
               )}
               tableType="events"
+              defaultSort={{ id: "lastEditedAt", desc: true }}
             />
             <DataTable
               columns={columns}
@@ -380,6 +380,7 @@ const SubmissionFormOrgStep = ({
                 newOrgEvent && "opacity-80",
               )}
               tableType="events"
+              defaultSort={{ id: "lastEditedAt", desc: true }}
             />
             <DataTable
               columns={columns}
@@ -415,6 +416,7 @@ const SubmissionFormOrgStep = ({
                 newOrgEvent && "opacity-80",
               )}
               tableType="events"
+              defaultSort={{ id: "lastEditedAt", desc: true }}
             />
 
             <p

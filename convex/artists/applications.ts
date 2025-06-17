@@ -13,6 +13,7 @@ export const updateApplicationStatus = mutation({
       v.literal("to next step"),
       v.literal("considering"),
       v.literal("applied"),
+      v.literal("remove"),
     ),
     notes: v.optional(v.string()),
   },
@@ -21,6 +22,11 @@ export const updateApplicationStatus = mutation({
     if (!userId) return null;
     const application = await ctx.db.get(args.applicationId);
     if (!application) return null;
+
+    if (args.status === "remove") {
+      await ctx.db.delete(application._id);
+      return null;
+    }
 
     // await ctx.db.patch(application._id, {
     //   applicationStatus: args.status,

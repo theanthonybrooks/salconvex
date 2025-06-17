@@ -5,11 +5,7 @@ import { Link } from "@/components/ui/custom-link";
 import { AppNotesInput } from "@/features/artists/applications/components/events-data-table/app-notes-input";
 import { AppStatusSelector } from "@/features/artists/applications/components/events-data-table/app-status-selector";
 import { cn } from "@/lib/utils";
-import {
-  ApplicationStatus,
-  NonNullApplicationStatus,
-  statusColorMap,
-} from "@/types/applications";
+import { ApplicationStatus } from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -78,13 +74,9 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
     cell: ({ row }) => {
       const application = row.original;
       const eventSlug = application?.slug;
-      const rawStatus = application.applicationStatus;
-      const statusColor = rawStatus
-        ? statusColorMap[rawStatus as NonNullApplicationStatus]
-        : "text-muted-foreground";
 
       return (
-        <div className={cn("truncate text-center font-medium", statusColor)}>
+        <div className={cn("truncate text-center font-medium")}>
           <Link
             href={`/thelist/event/${eventSlug}/${row.getValue("dates_edition")}/call`}
             target="_blank"
@@ -189,6 +181,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       <AppStatusSelector
         applicationId={row.original._id}
         appStatus={row.getValue("applicationStatus")}
+        key={row.original._id}
       />
     ),
   },
