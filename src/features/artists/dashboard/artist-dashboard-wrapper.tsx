@@ -33,7 +33,7 @@ export function ArtistDashboardTableWrapper({
     api.artists.listActions.getHiddenEvents,
     hiddenPage ? {} : "skip",
   );
-  
+
   console.log(bookmarkData);
   return (
     <>
@@ -84,8 +84,8 @@ export function ArtistDashboardTableWrapper({
               columns={bookmarkColumns}
               data={bookmarkData ?? []}
               defaultVisibility={{
-                dates_edition: false,
-                productionEnd: false,
+                edition: false,
+                prodEnd: false,
                 eventEnd: false,
               }}
               // onRowSelect={(row) => {
@@ -100,9 +100,10 @@ export function ArtistDashboardTableWrapper({
               columns={bookmarkColumns}
               data={bookmarkData ?? []}
               defaultVisibility={{
-                dates_edition: false,
-                productionEnd: false,
+                edition: false,
+                prodEnd: false,
                 eventEnd: false,
+                eventStart: false,
               }}
               // onRowSelect={(row) => {
               //   console.log(row);
@@ -122,8 +123,7 @@ export function ArtistDashboardTableWrapper({
               columns={hiddenColumns}
               data={hiddenData ?? []}
               defaultVisibility={{
-                dates_edition: false,
-                productionEnd: false,
+                edition: false,
                 eventEnd: false,
               }}
               // onRowSelect={(row) => {
@@ -138,8 +138,7 @@ export function ArtistDashboardTableWrapper({
               columns={hiddenColumns}
               data={hiddenData ?? []}
               defaultVisibility={{
-                dates_edition: false,
-                productionEnd: false,
+                edition: false,
                 eventEnd: false,
               }}
               // onRowSelect={(row) => {
