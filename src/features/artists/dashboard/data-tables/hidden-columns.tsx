@@ -54,6 +54,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "name",
+    minSize: 120,
+    maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Name" />
     ),
@@ -76,6 +78,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    minSize: 80,
+    maxSize: 80,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
@@ -87,13 +91,15 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "category",
+    minSize: 100,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex flex-col items-center gap-1">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+          <span className="min-w-20 max-w-[500px] truncate text-center font-medium capitalize">
             {getEventCategoryLabelAbbr(row.getValue("category"))}
           </span>
         </div>
@@ -106,6 +112,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "type",
+    minSize: 150,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />
     ),
@@ -125,6 +133,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "hiddenStatus",
+    minSize: 160,
+    maxSize: 160,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),

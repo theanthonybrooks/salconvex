@@ -27,7 +27,6 @@ export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
   const tableType = table.options.meta?.tableType;
-  console.log(tableType);
   const bookMarks = tableType === "bookmarks";
   const applications = tableType === "applications";
   const hidden = tableType === "hidden";

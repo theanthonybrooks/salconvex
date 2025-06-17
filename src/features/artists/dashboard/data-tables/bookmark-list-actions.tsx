@@ -51,7 +51,7 @@ export const BookmarkListActionSelector = ({
       }}
     >
       <SelectTrigger
-        className={cn("mx-auto w-fit min-w-30 font-medium capitalize")}
+        className={cn("mx-auto w-fit min-w-40 font-medium capitalize")}
       >
         <SelectValue placeholder={"Select..."} />
       </SelectTrigger>

@@ -188,9 +188,10 @@ export function DataTable<TData, TValue>({
       <div className={cn("rounded-md border", className)}>
         <Table
           containerClassname={cn(
-            "rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)] scrollable,",
+            " rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)] scrollable, short-screen",
             tableClassName,
           )}
+          className={cn("table-fixed")}
         >
           <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_0.5px_0_0_rgba(0,0,0,1)]">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -200,7 +201,8 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className={cn("px-3 hover:bg-white/50")}
+                      className={cn("group relative px-3 hover:bg-white/50")}
+                      style={{ width: header.getSize() }}
                     >
                       {header.isPlaceholder
                         ? null
@@ -208,6 +210,16 @@ export function DataTable<TData, TValue>({
                             header.column.columnDef.header,
                             header.getContext(),
                           )}
+                      {header.column.getCanResize() && (
+                        <div
+                          onMouseDown={header.getResizeHandler()}
+                          onTouchStart={header.getResizeHandler()}
+                          className={cn(
+                            "absolute right-0 top-0 h-full w-[5px] cursor-col-resize touch-none select-none",
+                            header.column.getIsResizing() && "bg-primary",
+                          )}
+                        />
+                      )}
                     </TableHead>
                   );
                 })}
@@ -251,10 +263,11 @@ export function DataTable<TData, TValue>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         style={{
+                          width: cell.column.getSize(),
                           minWidth: cell.column.columnDef.minSize,
                           maxWidth: cell.column.columnDef.maxSize,
                         }}
-                        width={cell.column.columnDef.size ?? undefined}
+                        // width={cell.column.columnDef.size ?? undefined}
                         key={cell.id}
                         className={cn(
                           "px-3",

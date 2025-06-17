@@ -71,6 +71,8 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "name",
+    minSize: 120,
+    maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Name" />
     ),
@@ -97,51 +99,73 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "dates_edition",
+    minSize: 80,
+    maxSize: 80,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("dates_edition")}</span>
+      <span className="text-center text-sm">
+        {row.getValue("dates_edition")}
+      </span>
     ),
   },
   {
     accessorKey: "eventStart",
+    minSize: 120,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Start" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("eventStart")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("eventStart")}
+      </span>
     ),
   },
   {
     accessorKey: "eventEnd",
+    minSize: 120,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event End" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("eventEnd")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("eventEnd")}
+      </span>
     ),
   },
   {
     accessorKey: "productionStart",
+    minSize: 150,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Production Start" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("productionStart")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("productionStart")}
+      </span>
     ),
   },
   {
     accessorKey: "productionEnd",
+    minSize: 150,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Production End" />
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("productionEnd")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("productionEnd")}
+      </span>
     ),
   },
   {
     accessorKey: "applicationTime",
+    minSize: 150,
+    maxSize: 180,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Applied At" />
     ),
@@ -156,6 +180,8 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "applicationStatus",
+    minSize: 180,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
@@ -195,7 +221,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
     cell: ({ row }) => {
       const value = row.getValue("responseTime") as number;
       return (
-        <span className="text-sm">
+        <span className="block text-center text-sm">
           {value ? new Date(value).toLocaleString() : "-"}
         </span>
       );

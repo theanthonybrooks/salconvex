@@ -189,7 +189,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         <div className="flex justify-center">
           <div
             className={cn(
-              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
+              "flex w-max min-w-30 items-center justify-center gap-1 rounded border p-2 px-4",
               state === "draft" && "bg-orange-200",
               state === "submitted" && "bg-blue-200",
               state === "published" && "bg-green-200",
@@ -229,7 +229,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         <div className="flex justify-center">
           <div
             className={cn(
-              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
+              "flex w-max min-w-30 items-center justify-center gap-1 rounded border p-2 px-4",
               !ocState && "border-transparent",
               ocState === "draft" && "bg-orange-200",
               ocState === "pending" && "bg-indigo-100",
@@ -295,7 +295,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex justify-center space-x-2">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+          <span className="min-w-20 max-w-[500px] truncate text-center font-medium capitalize">
             {getEventCategoryLabelAbbr(row.getValue("category"))}
           </span>
         </div>

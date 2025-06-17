@@ -69,6 +69,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "name",
+    minSize: 120,
+    maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -78,6 +80,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "email",
+    minSize: 150,
+    maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
@@ -89,6 +93,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "subscription",
+    minSize: 120,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Subscription" />
     ),
@@ -116,6 +122,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "subStatus",
+    minSize: 100,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
@@ -146,6 +154,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
   {
     accessorKey: "accountType",
+    minSize: 120,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Account Type" />
     ),
@@ -163,6 +173,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
   {
     accessorKey: "role",
+    minSize: 100,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" />
     ),
@@ -170,7 +181,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const role = row.getValue("role") as string | undefined;
       return (
-        <div className="capitalize">
+        <div className="text-center capitalize">
           {role?.includes("admin")
             ? "Admin"
             : role?.includes("user")
@@ -182,6 +193,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "createdAt",
+    minSize: 120,
+    maxSize: 180,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
@@ -196,6 +209,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "source",
+    minSize: 120,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Source" />
     ),
@@ -206,9 +221,9 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     id: "actions",
-    size: 48,
-    maxSize: 48,
-    minSize: 48,
+
+    maxSize: 40,
+    minSize: 40,
     enableResizing: false,
     cell: ({ row }) => {
       const user = row.original;

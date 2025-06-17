@@ -349,6 +349,12 @@ body {
   }
 }
 
+.short-screen {
+  @media (max-height: 500px) {
+    max-height: calc(85dvh - 12rem) !important;
+  }
+}
+
 h3 {
   font-size: 1rem;
   font-weight: bold;

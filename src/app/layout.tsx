@@ -83,7 +83,7 @@ export default async function RootLayout({
         <body
           className={cn(
             GeistSans.className,
-            "scrollable darkbar font-spaceGrotesk antialiased",
+            "scrollable justy darkbar font-spaceGrotesk antialiased",
             // "white:font-sans",
 
             // "default:font-spaceGrotesk",

@@ -66,6 +66,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "name",
+    minSize: 120,
+    maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Name" />
     ),
@@ -88,15 +90,21 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    minSize: 80,
+    maxSize: 80,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
     cell: ({ row }) => (
-      <span className="block text-sm">{row.getValue("edition")}</span>
+      <span className="block text-center text-sm">
+        {row.getValue("edition")}
+      </span>
     ),
   },
   {
     accessorKey: "eventStart",
+    minSize: 120,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Start" />
     ),
@@ -108,6 +116,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "eventEnd",
+    minSize: 120,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event End" />
     ),
@@ -119,6 +129,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "prodStart",
+    minSize: 150,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Production Start" />
     ),
@@ -130,6 +142,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "prodEnd",
+    minSize: 150,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Production End" />
     ),
@@ -141,6 +155,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "bookmarkStatus",
+    minSize: 180,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
@@ -158,6 +174,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "eventIntent",
+    minSize: 180,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Intent" />
     ),
@@ -177,6 +195,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "bookmarkNote",
+    minSize: 120,
+    maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Notes" />
     ),

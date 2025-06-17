@@ -52,7 +52,11 @@ export const AppStatusSelector = ({
       }}
     >
       <SelectTrigger
-        className={cn("w-fit font-medium", statusColor, textColor)}
+        className={cn(
+          "mx-auto w-fit min-w-40 font-medium",
+          statusColor,
+          textColor,
+        )}
       >
         <SelectValue />
       </SelectTrigger>

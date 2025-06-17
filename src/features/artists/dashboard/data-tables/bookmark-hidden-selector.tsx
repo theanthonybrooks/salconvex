@@ -51,7 +51,7 @@ export const ListActionSelector = ({
         );
       }}
     >
-      <SelectTrigger className={cn("mx-auto w-fit font-medium")}>
+      <SelectTrigger className={cn("mx-auto w-fit min-w-40 font-medium")}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

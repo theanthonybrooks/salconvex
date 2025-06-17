@@ -104,7 +104,7 @@ export const columns: ColumnDef<Event>[] = [
     accessorKey: "name",
     // size: "100%",
     minSize: 120,
-    maxSize: 300,
+    // maxSize: 400,
 
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
@@ -126,9 +126,9 @@ export const columns: ColumnDef<Event>[] = [
   {
     id: "dates_edition",
     accessorFn: (row) => row.dates.edition,
-    size: 60,
-    minSize: 60,
-    maxSize: 60,
+
+    minSize: 90,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
@@ -168,7 +168,6 @@ export const columns: ColumnDef<Event>[] = [
 
   {
     accessorKey: "state",
-    size: 130,
     minSize: 130,
     maxSize: 130,
     header: ({ column }) => (
@@ -208,7 +207,7 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     accessorKey: "openCallState",
-    size: 130,
+
     minSize: 130,
     maxSize: 130,
     header: ({ column }) => (
@@ -257,7 +256,7 @@ export const columns: ColumnDef<Event>[] = [
 
   {
     accessorKey: "lastEditedAt",
-    size: 180,
+
     minSize: 180,
     maxSize: 180,
     header: ({ column }) => (
@@ -278,7 +277,7 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     accessorKey: "category",
-    size: 80,
+
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -287,7 +286,7 @@ export const columns: ColumnDef<Event>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex justify-center space-x-2">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+          <span className="min-w-20 max-w-[500px] truncate text-center font-medium capitalize">
             {getEventCategoryLabelAbbr(row.getValue("category"))}
           </span>
         </div>
@@ -300,7 +299,6 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     accessorKey: "type",
-    size: 120,
     minSize: 120,
     maxSize: 240,
     header: ({ column }) => (
@@ -322,9 +320,9 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     id: "actions",
-    size: 48,
-    maxSize: 48,
-    minSize: 48,
+
+    maxSize: 40,
+    minSize: 40,
     enableResizing: false,
     cell: ({ row, table }) => {
       const event = row.original as Event;
