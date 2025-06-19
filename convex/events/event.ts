@@ -597,7 +597,7 @@ export const checkEventNameExists = query({
       .collect();
 
     for (const event of existingEvents) {
-      const sameEvent = !!(args.eventId && args.eventId === event._id);
+      const sameEvent = args.eventId && args.eventId === event._id;
       console.log(args.eventId, event._id);
       const sameOrg =
         args.organizationId && args.organizationId === event.mainOrgId;
@@ -612,7 +612,8 @@ export const checkEventNameExists = query({
         sameEdition,
       );
 
-      if (sameEvent || (!sameEdition && sameOrg)) continue;
+      if (sameEvent === true || (sameEdition === false && sameOrg === true))
+        continue;
 
       // console.log("throwing error");
       throw new ConvexError(

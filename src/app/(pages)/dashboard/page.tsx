@@ -429,7 +429,7 @@ export default function Dashboard() {
                       <div>
                         <p className="text-sm font-medium">
                           <Link
-                            href={`/thelist/event/${event.slug}/${new Date(event._creationTime).getFullYear()}/call`}
+                            href={`/thelist/event/${event.slug}/${event.dates.edition}/call`}
                             className="hover:underline"
                           >
                             {event.name}
