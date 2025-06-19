@@ -53,7 +53,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   // },
   {
     accessorKey: "name",
-    minSize: 120,
+    minSize: 200,
     maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Name" />
