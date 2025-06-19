@@ -280,6 +280,7 @@ const FullPageNav = ({
   isMobile = false,
   isDashboard = false,
 }: FullPageNavProps) => {
+  const isAdmin = user?.role.includes("admin");
   const footerText = footerCRText();
   // const { theme } = useTheme()
   const pathname = usePathname();
@@ -504,6 +505,7 @@ const FullPageNav = ({
                 )}
               >
                 {mainMenuItems.map((section) => {
+                  // console.log(mainMenuItems, "section: ", section);
                   const isExpanded =
                     activeCategory === section.title && !freshOpen;
                   const filteredItems = section.items.filter((item) => {
@@ -511,8 +513,7 @@ const FullPageNav = ({
                     const itemCategory = item?.category;
                     const itemSub = item?.sub;
 
-                    const isAdmin =
-                      user?.role.includes("admin") && itemCategory === "admin";
+                    const adminMatch = isAdmin && itemCategory === "admin";
                     const isPublic = itemUserType?.includes("public");
 
                     const typeMatch = user?.accountType?.some((type) =>
@@ -525,7 +526,7 @@ const FullPageNav = ({
                       (sub) => sub.toLowerCase() === subStatus?.toLowerCase(),
                     );
 
-                    return isPublic || (typeMatch && subMatch) || isAdmin;
+                    return isPublic || (typeMatch && subMatch) || adminMatch;
                   });
 
                   if (filteredItems.length === 0) return null;
@@ -730,9 +731,16 @@ const FullPageNav = ({
                             const itemUserType = item?.userType;
                             const itemCategory = item?.category;
                             const itemSub = item?.sub;
-                            const isAdmin =
-                              user?.role.includes("admin") &&
-                              itemCategory === "admin";
+                            const adminMatch =
+                              isAdmin && itemCategory === "admin";
+
+                            console.log(
+                              section.title,
+                              item,
+                              itemCategory,
+                              itemSub,
+                              adminMatch,
+                            );
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
@@ -745,8 +753,10 @@ const FullPageNav = ({
                                 sub.toLowerCase() === subStatus?.toLowerCase(),
                             );
 
+                            console.log(itemSub, subStatus);
+
                             return (
-                              isPublic || (typeMatch && subMatch) || isAdmin
+                              isPublic || (typeMatch && subMatch) || adminMatch
                             );
                           });
 
@@ -825,9 +835,8 @@ const FullPageNav = ({
                             const itemUserType = item?.userType;
                             const itemCategory = item?.category;
                             const itemSub = item?.sub;
-                            const isAdmin =
-                              user?.role.includes("admin") &&
-                              itemCategory === "admin";
+                            const adminMatch =
+                              isAdmin && itemCategory === "admin";
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
@@ -842,7 +851,7 @@ const FullPageNav = ({
                             );
 
                             return (
-                              isPublic || (typeMatch && subMatch) || isAdmin
+                              isPublic || (typeMatch && subMatch) || adminMatch
                             );
                           })
                           .map((item) => (

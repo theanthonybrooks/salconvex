@@ -124,7 +124,7 @@ export default function NavBar({
                     subscription={subStatus}
                   />
                 )}
-                <FullPageNav user={user} />
+                <FullPageNav user={user} subStatus={subStatus} />
               </div>
             </>
           )}
