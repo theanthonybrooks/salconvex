@@ -152,7 +152,7 @@ export default function NavBar({
                 user={user}
                 isDashboard={true}
                 // userPref={userPref}
-                // subStatus={subStatus}
+                subStatus={subStatus}
               />
             </>
           </div>

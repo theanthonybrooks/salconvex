@@ -387,7 +387,7 @@ NavBarProps) {
               isScrolled={isScrolled}
               user={user}
               // userPref={userPref}
-              // subStatus={subStatus}
+              subStatus={subStatus}
             />
           </div>
         </div>
