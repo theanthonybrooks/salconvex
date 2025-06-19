@@ -58,6 +58,8 @@ export const updateOrCreateArtist = mutation({
       throw new ConvexError("User not found");
     }
 
+    const userHasArtistType = user.accountType.includes("artist");
+
     const artist = await ctx.db
       .query("artists")
       .withIndex("by_artistId", (q) => q.eq("artistId", userId))
@@ -73,6 +75,11 @@ export const updateOrCreateArtist = mutation({
       : null;
 
     if (!artist) {
+      if (!userHasArtistType) {
+        await ctx.db.patch(user._id, {
+          accountType: [...user.accountType, "artist"],
+        });
+      }
       // If they don't exist, create a new "artist"
       const artistId = await ctx.db.insert("artists", {
         artistId: user._id,

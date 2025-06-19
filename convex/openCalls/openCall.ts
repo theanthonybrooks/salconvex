@@ -139,6 +139,9 @@ export const createOrUpdateOpenCall = mutation({
       existingOpenCall = await ctx.db.get(args.openCallId);
     }
 
+    console.log(existingOpenCall);
+    console.log(args.documents);
+
     const ocDocs = [
       ...(existingOpenCall?.documents ?? []),
       ...(args.documents ?? []),

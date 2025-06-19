@@ -632,6 +632,7 @@ const SubmissionFormOC1 = ({
                           onChange={field.onChange}
                           purpose="both"
                           maxFileSize="5MB"
+                          maxFiles={10}
                           disabled={pastEvent}
                         />
                       )}

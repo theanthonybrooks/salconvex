@@ -213,7 +213,7 @@ export const createStripeCheckoutSession = action({
 export const getUserAccountPortalUrl = action({
   handler: async (ctx: any) => {
     const identity = await getAuthUserId(ctx);
-    console.log("identity: ", identity);
+    // console.log("identity: ", identity);
     if (!identity) throw new Error("Not authenticated");
 
     const user = await ctx.db
@@ -839,7 +839,7 @@ export const applyCouponToSubscription = action({
     const metaExcludedAmount = metaData?.EXCL_AMT
       ? Number(metaData?.EXCL_AMT)
       : null;
-    console.log(metaMinAmount, metaMaxAmount, metaExcludedAmount, subAmount);
+    // console.log(metaMinAmount, metaMaxAmount, metaExcludedAmount, subAmount);
     // Check if a discount is already applied
     const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
     if (stripeSub.discount) {
@@ -865,7 +865,7 @@ export const applyCouponToSubscription = action({
         throw new Error("This coupon is not valid for your selected plan.");
       }
     }
-    console.log(metaData?.interval, interval);
+    // console.log(metaData?.interval, interval);
     if (metaData?.interval && metaData?.interval !== interval) {
       throw new ConvexError(
         "This promotion code cannot be used with your current subscription interval",

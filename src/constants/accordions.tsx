@@ -249,7 +249,7 @@ export const pricingFaqs: AccordionSection = {
           <br />
           <br /> If you&apos;re still unable to pay that,{" "}
           <Link
-            href={`mailto:${supportEmail}?subject=Subscription%20Support`}
+            href={`mailto:${supportEmail}?subject=Membership%20Support`}
             className="underline underline-offset-2"
           >
             contact me
