@@ -71,17 +71,20 @@ export default function Changelog() {
           }}
         />
       )}
-      <p className="text-sm">
-        The Street Art List has been an ongoing project since 2019 with several
-        iterations over the years. This specific version was started in 2024 and
-        is actively under development with new features and improvements being
-        added regularly.{" "}
-      </p>
-      <p className="text-sm">
-        In early 2025, I decided that it&apos;s probably a good time to add a
-        changelog to the site so starting now, there will be a record of changes
-        :)
-      </p>
+      <section className="mx-auto mt-6 max-w-[90vw] sm:max-w-[70vw]">
+        <h2 className="font-bold">A bit of backstory:</h2>
+        <p className="text-sm">
+          The Street Art List has been an ongoing project since 2019 with
+          several iterations over the years. This specific version was started
+          in 2024 and is actively under development with new features and
+          improvements being added regularly.{" "}
+        </p>
+        <p className="text-sm">
+          In early 2025, I decided that it&apos;s probably a good time to add a
+          changelog to the site so starting now, there will be a record of
+          changes :)
+        </p>
+      </section>
     </div>
   );
 }
