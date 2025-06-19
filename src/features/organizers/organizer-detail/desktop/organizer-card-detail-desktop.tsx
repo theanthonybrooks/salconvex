@@ -4,14 +4,14 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MapPin } from "lucide-react";
 
+import { Link } from "@/components/ui/custom-link";
+import NavTabs from "@/components/ui/nav-tabs";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Link } from "@/components/ui/custom-link";
-import NavTabs from "@/components/ui/nav-tabs";
+} from "@/components/ui/state-accordion-test";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
@@ -112,7 +112,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                   <AccordionContent className="text-sm">
                     <RichTextDisplay
                       html={organizer.about}
-                      className="line-clamp-5"
+                      className="line-clamp-5 break-words"
                     />
                     {organizer.about?.length > 200 && (
                       <button

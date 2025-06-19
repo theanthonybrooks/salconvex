@@ -543,15 +543,12 @@ export const getOrganizerBySlug = query({
         .withIndex("by_userId", (q) => q.eq("userId", userId))
         .unique();
 
-      console.log("user: ", user);
       if (!user) return null;
 
       const orgOwner = organizer?.ownerId;
-      console.log("orgOwner: ", orgOwner);
       if (orgOwner && orgOwner === user._id) {
         userIsOrganizer = true;
       }
-      console.log("userIsOrganizer: ", userIsOrganizer);
     }
 
     // console.log(organizer);
