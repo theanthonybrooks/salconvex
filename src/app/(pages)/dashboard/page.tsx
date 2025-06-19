@@ -425,7 +425,10 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {latestFive && latestFive.length > 0 ? (
                   latestFive.map((event) => (
-                    <div key={event._id} className="flex justify-between gap-4">
+                    <div
+                      key={event._id}
+                      className="flex flex-col justify-between gap-1 sm:flex-row sm:gap-4"
+                    >
                       <div>
                         <p className="text-sm font-medium">
                           <Link

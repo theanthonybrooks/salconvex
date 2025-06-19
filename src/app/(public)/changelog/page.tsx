@@ -79,6 +79,7 @@ export default function Changelog() {
           in 2024 and is actively under development with new features and
           improvements being added regularly.{" "}
         </p>
+        <br />
         <p className="text-sm">
           In early 2025, I decided that it&apos;s probably a good time to add a
           changelog to the site so starting now, there will be a record of
