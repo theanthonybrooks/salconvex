@@ -536,7 +536,7 @@ export const getOrganizerBySlug = query({
       .query("organizations")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
-    console.log("userId: ", userId);
+    // console.log("userId: ", userId);
     if (userId) {
       const user = await ctx.db
         .query("users")

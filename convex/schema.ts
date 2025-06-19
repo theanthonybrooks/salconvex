@@ -572,6 +572,7 @@ export default defineSchema({
         "location.countryAbbr",
         "location.country",
         "location.continent",
+        "isComplete",
       ],
     })
     .searchIndex("search_by_handle", {
@@ -592,6 +593,7 @@ export default defineSchema({
         "location.countryAbbr",
         "location.country",
         "location.continent",
+        "state",
       ],
     })
     .searchIndex("search_by_name", {
@@ -608,6 +610,7 @@ export default defineSchema({
         "type",
         "category",
         "links.instagram",
+        "state",
       ],
     })
     .index("by_name", ["name"])

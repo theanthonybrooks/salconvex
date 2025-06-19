@@ -81,7 +81,9 @@ export const globalSearch = query({
     if (searchType === "events") {
       const events = await ctx.db
         .query("events")
-        .withSearchIndex("search_by_name", (q) => q.search("name", term))
+        .withSearchIndex("search_by_name", (q) =>
+          q.search("name", term).eq("state", "published"),
+        )
         .take(20);
 
       return { results: attachOpenCallStatusFlag(events), label: "Events" };
@@ -95,7 +97,6 @@ export const globalSearch = query({
         )
 
         .take(20);
-      console.log(results);
       return { results, label: "Organizers" };
     }
 
@@ -104,13 +105,13 @@ export const globalSearch = query({
         ctx.db
           .query("events")
           .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term),
+            q.search("location.full", term).eq("state", "published"),
           )
           .take(20),
         ctx.db
           .query("organizations")
           .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term),
+            q.search("location.full", term).eq("isComplete", true),
           )
           .take(20),
       ]);
@@ -128,22 +129,26 @@ export const globalSearch = query({
       const [eventName, orgName, eventLoc, orgLoc] = await Promise.all([
         ctx.db
           .query("events")
-          .withSearchIndex("search_by_name", (q) => q.search("name", term))
+          .withSearchIndex("search_by_name", (q) =>
+            q.search("name", term).eq("state", "published"),
+          )
           .take(20),
         ctx.db
           .query("organizations")
-          .withSearchIndex("search_by_name", (q) => q.search("name", term))
+          .withSearchIndex("search_by_name", (q) =>
+            q.search("name", term).eq("isComplete", true),
+          )
           .take(20),
         ctx.db
           .query("events")
           .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term),
+            q.search("location.full", term).eq("state", "published"),
           )
           .take(20),
         ctx.db
           .query("organizations")
           .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term),
+            q.search("location.full", term).eq("isComplete", true),
           )
           .take(20),
       ]);
