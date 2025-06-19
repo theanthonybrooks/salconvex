@@ -90,8 +90,12 @@ export const globalSearch = query({
     if (searchType === "orgs") {
       const results = await ctx.db
         .query("organizations")
-        .withSearchIndex("search_by_name", (q) => q.search("name", term))
+        .withSearchIndex("search_by_name", (q) =>
+          q.search("name", term).eq("isComplete", true),
+        )
+
         .take(20);
+      console.log(results);
       return { results, label: "Organizers" };
     }
 
@@ -580,6 +584,7 @@ export const checkEventNameExists = query({
     edition: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    console.log(args);
     const eventSlug = slugify(args.name, { lower: true });
     const existingEvents = await ctx.db
       .query("events")
@@ -588,9 +593,19 @@ export const checkEventNameExists = query({
 
     for (const event of existingEvents) {
       const sameEvent = !!(args.eventId && args.eventId === event._id);
+      console.log(args.eventId, event._id);
       const sameOrg =
         args.organizationId && args.organizationId === event.mainOrgId;
       const sameEdition = args.edition && args.edition === event.dates.edition;
+
+      console.log(
+        "sameEvent: ",
+        sameEvent,
+        "sameOrg: ",
+        sameOrg,
+        "sameEdition: ",
+        sameEdition,
+      );
 
       if (sameEvent || (!sameEdition && sameOrg)) continue;
 
@@ -744,6 +759,7 @@ export const getEventWithOCDetails = query({
     source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // console.log(args);
     const source = args.source ?? "eventpage";
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");

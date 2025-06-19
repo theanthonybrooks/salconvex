@@ -16,6 +16,7 @@ import { SalBackNavigation } from "@/features/events/components/sal-back-navigat
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
 import Image from "next/image";
 import { useState } from "react";
@@ -187,54 +188,58 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
             {groupedEvents &&
               Object.entries(groupedEvents)
                 .sort((a, b) => b[0].localeCompare(a[0])) // Optional: sort editions descending
-                .map(([edition, editionEvents]) => (
-                  <div key={edition} className="mb-4">
-                    <h3 className="mb-2 font-semibold underline underline-offset-2">
-                      {edition}
-                    </h3>
-                    <ul className="list-outside list-none px-2">
-                      {editionEvents.map((event) => (
-                        <li key={event._id} className="text-sm">
-                          <div className="flex items-center gap-x-2">
-                            <Link
-                              href={`/thelist/event/${event.slug}/${event.dates.edition}`}
-                              target="_blank"
-                            >
-                              <p className="text-sm">
-                                <span className="font-bold capitalize">
-                                  {event.name}
-                                </span>
+                .map(([edition, editionEvents]) => {
+                  return (
+                    <div key={edition} className="mb-4">
+                      <h3 className="mb-2 font-semibold underline underline-offset-2">
+                        {edition}
+                      </h3>
+                      <ul className="list-outside list-none px-2">
+                        {editionEvents.map((event) => {
+                          return (
+                            <li key={event._id} className="text-sm">
+                              <div className="flex items-center gap-x-2">
+                                <Link
+                                  href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) ? "/call" : ""}`}
+                                >
+                                  <p className="text-sm">
+                                    <span className="font-bold capitalize">
+                                      {event.name}
+                                    </span>
 
-                                {" - "}
-                                <span className="font-light italic">
-                                  {event.dates.eventFormat !== "noEvent"
-                                    ? formatEventDates(
-                                        event.dates.eventDates[0].start,
-                                        event.dates.eventDates[
-                                          event.dates.eventDates.length - 1
-                                        ].end,
-                                        event.dates.eventFormat === "ongoing",
-                                        "desktop",
-                                      )
-                                    : event.dates.prodDates
-                                      ? formatEventDates(
-                                          event.dates.prodDates[0].start,
-                                          event.dates.prodDates[
-                                            event.dates.prodDates.length - 1
-                                          ].end,
-                                          false,
-                                          "desktop",
-                                        )
-                                      : event.dates.edition}
-                                </span>
-                              </p>
-                            </Link>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                                    {" - "}
+                                    <span className="font-light italic">
+                                      {event.dates.eventFormat !== "noEvent"
+                                        ? formatEventDates(
+                                            event.dates.eventDates[0].start,
+                                            event.dates.eventDates[
+                                              event.dates.eventDates.length - 1
+                                            ].end,
+                                            event.dates.eventFormat ===
+                                              "ongoing",
+                                            "desktop",
+                                          )
+                                        : event.dates.prodDates
+                                          ? formatEventDates(
+                                              event.dates.prodDates[0].start,
+                                              event.dates.prodDates[
+                                                event.dates.prodDates.length - 1
+                                              ].end,
+                                              false,
+                                              "desktop",
+                                            )
+                                          : event.dates.edition}
+                                    </span>
+                                  </p>
+                                </Link>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
           </div>
           <div id="organizer">
             <OrganizerCard

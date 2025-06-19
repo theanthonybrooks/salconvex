@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/components/ui/custom-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
+import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -195,8 +196,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                           <li key={event._id} className="text-sm">
                             <div className="flex items-center gap-x-2">
                               <Link
-                                href={`/thelist/event/${event.slug}/${event.dates.edition}`}
-                                target="_blank"
+                                href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) ? "/call" : ""}`}
                               >
                                 <p className="text-sm">
                                   <span className="font-bold capitalize">

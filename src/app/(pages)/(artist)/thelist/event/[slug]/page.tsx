@@ -4,20 +4,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
-import { useQuery } from "convex-helpers/react/cache";
-import { useParams } from "next/navigation";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const router = useRouter();
   const { slug } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
-  const data = useQuery(
+  const { data, isError } = useQueryWithStatus(
     api.events.event.getEventBySlug,
     slugValue ? { slug: slugValue } : "skip",
   );
 
-  console.log(data);
+  // console.log(data);
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
@@ -34,6 +38,11 @@ const Event = () => {
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
+  useEffect(() => {
+    if (isError) {
+      router.push("/404");
+    }
+  }, [isError, router]);
 
   return (
     <>

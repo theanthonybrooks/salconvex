@@ -184,6 +184,7 @@ export const createNewOrg = mutation({
       hadFreeCall: false,
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
+      isComplete: false,
     });
 
     const newOrg = await ctx.db.get(orgId);
@@ -199,6 +200,34 @@ export const getOrgById = query({
     const org = await ctx.db.get(args.orgId);
     if (!org) return null;
     return org;
+  },
+});
+
+export const markOrganizationComplete = mutation({
+  args: {
+    orgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    console.log(args);
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!user) {
+      throw new ConvexError("User not authenticated");
+    }
+
+    const org = await ctx.db.get(args.orgId);
+    if (!org) return null;
+
+    await ctx.db.patch(org._id, {
+      isComplete: true,
+      updatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
   },
 });
 
@@ -259,6 +288,7 @@ export const updateOrganization = mutation({
     lastUpdatedBy: v.optional(v.string()),
     name: v.string(),
     slug: v.string(),
+    isComplete: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -286,6 +316,8 @@ export const updateOrganization = mutation({
           : args.links?.email,
     };
 
+    const orgIsComplete = organization.isComplete ?? args.isComplete ?? false;
+
     await ctx.db.patch(organization._id, {
       name: args.name,
       slug: args.slug,
@@ -304,6 +336,7 @@ export const updateOrganization = mutation({
       links: sanitizedLinks,
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
+      isComplete: orgIsComplete,
     });
 
     const updatedOrg = await ctx.db.get(organization._id);
@@ -496,16 +529,41 @@ export const getOrganizerBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
     let events = null;
+    let userIsOrganizer = false;
     const organizer = await ctx.db
       .query("organizations")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
+    console.log("userId: ", userId);
+    if (userId) {
+      const user = await ctx.db
+        .query("users")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .unique();
+
+      console.log("user: ", user);
+      if (!user) return null;
+
+      const orgOwner = organizer?.ownerId;
+      console.log("orgOwner: ", orgOwner);
+      if (orgOwner && orgOwner === user._id) {
+        userIsOrganizer = true;
+      }
+      console.log("userIsOrganizer: ", userIsOrganizer);
+    }
 
     // console.log(organizer);
 
     if (!organizer) throw new ConvexError("No organizer found");
 
+    if (organizer.isComplete === false) {
+      if (userIsOrganizer) {
+        throw new ConvexError("Organizer is not complete");
+      }
+      throw new ConvexError("No organizer found");
+    }
     const rawEvents = await ctx.db
       .query("events")
       .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", organizer._id))

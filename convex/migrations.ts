@@ -118,6 +118,17 @@ export const addHasOpenCall = migrations.define({
   },
 });
 
+export const markAllOrgsComplete = migrations.define({
+  table: "organizations",
+  migrateOne: async (ctx, doc) => {
+    await ctx.db.patch(doc._id, { isComplete: true });
+  },
+});
+
+export const runMAOC = migrations.runner(
+  internal.migrations.markAllOrgsComplete,
+);
+
 export const runAHOC = migrations.runner(internal.migrations.addHasOpenCall);
 
 export const runOrgSlugs = migrations.runner(

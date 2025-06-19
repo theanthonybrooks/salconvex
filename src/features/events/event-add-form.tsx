@@ -204,12 +204,16 @@ export const EventOCForm = ({
   );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
   const createOrUpdateOpenCall = useMutation(
     api.openCalls.openCall.createOrUpdateOpenCall,
   );
   const updateEventLastEditedAt = useMutation(
     api.events.event.updateEventLastEditedAt,
+  );
+  const markOrganizationComplete = useMutation(
+    api.organizer.organizations.markOrganizationComplete,
   );
   const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
@@ -456,6 +460,11 @@ export const EventOCForm = ({
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
+      if (existingOrg?.isComplete === false) {
+        await markOrganizationComplete({
+          orgId: existingOrg._id,
+        });
+      }
       await handleSave(true);
       if (paidCall && !alreadyPaid) {
         const result = await getCheckoutUrl({

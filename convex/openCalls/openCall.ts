@@ -11,7 +11,7 @@ export const archiveExpiredOpenCalls = internalMutation({
       .withIndex("by_state", (q) => q.eq("state", "published"))
       .collect();
 
-    console.log(now);
+    // console.log(now);
 
     for (const oc of openCalls) {
       const ocEnd = oc.basicInfo?.dates?.ocEnd;
@@ -139,8 +139,12 @@ export const createOrUpdateOpenCall = mutation({
       existingOpenCall = await ctx.db.get(args.openCallId);
     }
 
-    console.log(existingOpenCall);
-    console.log(args.documents);
+    console.log(
+      "existingOpenCall id & docs: ",
+      existingOpenCall?._id,
+      existingOpenCall?.documents,
+    );
+    console.log("args.documents: ", args.documents);
 
     const ocDocs = [
       ...(existingOpenCall?.documents ?? []),

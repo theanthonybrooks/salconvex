@@ -125,6 +125,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           slug: slugify(profile.organizationName as string, { lower: true }),
           logo: "/1.jpg",
           hadFreeCall: false,
+          isComplete: false,
           events: [],
         });
       }

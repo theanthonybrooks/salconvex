@@ -192,6 +192,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const updateEventLastEditedAt = useMutation(
     api.events.event.updateEventLastEditedAt,
   );
+  const markOrganizationComplete = useMutation(
+    api.organizer.organizations.markOrganizationComplete,
+  );
   const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -442,6 +445,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
+      if (existingOrg?.isComplete === false) {
+        await markOrganizationComplete({
+          orgId: existingOrg._id,
+        });
+      }
       await handleSave(true);
 
       toast.success(
@@ -1394,9 +1402,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     console.log(formType, hasUserEditedForm);
   }, [formType, hasUserEditedForm]);
   useEffect(() => {
-    if (eventFormType === undefined || formType !== 0) return;
+    if (eventFormType === undefined || eventFormType === 0 || formType !== 0)
+      return;
     if (eventFormType > 0 && formType === 0) {
-      console.log("event form type", eventFormType);
       setFormType(eventFormType);
     } else {
       setFormType(1);

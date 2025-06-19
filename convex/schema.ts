@@ -166,6 +166,7 @@ const listActionsSchema = {
 
 const organizationSchema = {
   isPlaceholderName: v.optional(v.boolean()),
+  isComplete: v.boolean(),
   ownerId: v.id("users"),
   // organizationName: v.optional(v.string()),
   name: v.string(),
@@ -558,6 +559,7 @@ export default defineSchema({
         "location.country",
         "location.continent",
         "links.instagram",
+        "isComplete",
       ],
     })
     .searchIndex("search_by_location", {

@@ -19,9 +19,8 @@ export const DataTableAdminActions = ({ eventId }: DataTableAdminProps) => {
         }}
         className="flex items-center gap-x-2"
       >
-        <LucidePencil className="size-4" /> View
+        <LucidePencil className="size-4" /> Edit
       </DropdownMenuItem>
     </>
   );
 };
-

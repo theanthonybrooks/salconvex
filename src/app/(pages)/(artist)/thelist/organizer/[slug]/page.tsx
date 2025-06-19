@@ -1,18 +1,23 @@
 "use client";
 
+import { Link } from "@/components/ui/custom-link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supportEmail } from "@/constants/siteInfo";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCardDetailDesktop } from "@/features/organizers/organizer-detail/desktop/organizer-card-detail-desktop";
 import { OrganizerCardDetailMobile } from "@/features/organizers/organizer-detail/mobile/organizer-card-detail-mobile";
-import { useQuery } from "convex-helpers/react/cache";
-import { useParams } from "next/navigation";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache";
+import { ConvexError } from "convex/values";
+import { useParams, useRouter } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
+  const router = useRouter();
   const { slug } = useParams();
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
-
-  const data = useQuery(
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const { data, isError, error } = useQueryWithStatus(
     api.organizer.organizations.getOrganizerBySlug,
     slugValue ? { slug: slugValue } : "skip",
   );
@@ -23,6 +28,54 @@ const Event = () => {
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
+
+  if (isError) {
+    if (error instanceof ConvexError) {
+      console.log("Error fetching event:", error.data);
+      if (error.data === "No organizer found") {
+        return (
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-lg font-bold">Organizer not found</p>
+            <p>
+              If you think this is an error, please{" "}
+              <Link
+                href={`mailto:${supportEmail}?Subject=Missing Organization`}
+              >
+                contact support
+              </Link>
+              .
+            </p>
+          </div>
+        );
+      } else if (error.data === "Organizer is not complete") {
+        return (
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-lg font-bold">
+              You haven&apos;t added any events or open calls yet.
+            </p>
+            <p className="text-sm">
+              Please{" "}
+              <Link href="/pricing?submit" className="font-bold">
+                do so
+              </Link>{" "}
+              to make your organization&apos;s profile public.
+            </p>
+            <p className="text-sm">
+              If you think this is an error, please{" "}
+              <Link
+                href={`mailto:${supportEmail}?Subject=Missing Organization`}
+              >
+                contact support
+              </Link>
+              .
+            </p>
+          </div>
+        );
+      }
+    } else {
+      router.push("/thelist");
+    }
+  }
 
   return (
     <>

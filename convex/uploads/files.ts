@@ -55,6 +55,27 @@ export const saveOrgFile = mutation({
         // Delete the uploaded file to avoid waste
         await ctx.storage.delete(file.storageId);
 
+        if (args.openCallId) {
+          const openCall = await ctx.db.get(args.openCallId);
+          if (openCall) {
+            const existingDoc = openCall.documents?.find(
+              (doc) => doc.title === file.fileName,
+            );
+            if (!existingDoc) {
+              await ctx.db.patch(openCall._id, {
+                documents: [
+                  ...(openCall.documents ?? []),
+                  {
+                    id: duplicate._id,
+                    title: file.fileName,
+                    href: duplicate.fileUrl,
+                  },
+                ],
+              });
+            }
+          }
+        }
+
         // console.log(`Duplicate skipped: ${file.fileName}`);
         // uploadedRecords.push({
         //   id: duplicate._id,
