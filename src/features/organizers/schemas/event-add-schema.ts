@@ -308,10 +308,10 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
         path: ["name"],
       });
     }
-    if (trimmed.length > 60) {
+    if (trimmed.length > 90) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Max 60 characters",
+        message: "Max 90 characters",
         path: ["name"],
       });
     }

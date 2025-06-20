@@ -144,7 +144,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           </span>
         )}
         <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
-          <div className="col-span-1 flex items-center justify-center">
+          <div className="col-span-1 flex items-start justify-center">
             <Image
               src={eventLogo}
               alt="Event Logo"
