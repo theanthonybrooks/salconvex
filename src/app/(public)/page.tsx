@@ -15,11 +15,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -44,6 +47,8 @@ export default function Home() {
   //   mass: 0.4,
   // })
   // const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     const errorDesc = searchParams.get("err");
@@ -158,22 +163,44 @@ export default function Home() {
           </div>
         </Carousel>
 
-        <Popover>
+        <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
           <PopoverTrigger asChild>
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-col gap-1 rounded-3xl bg-white px-8 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-10"
-              onClick={() => setPopoverOpen((prev) => !prev)}
+              className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-col gap-1 rounded-3xl bg-white px-6 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-6"
+              // onClick={() => setPopoverOpen((prev) => !prev)}
             >
-              <span className="flex items-center gap-2">
-                <i className="text-base">Marching Band Mural </i>
-                {/* <span className="block sm:hidden">-</span>{" "} */}
-                <span className="block text-xs">by</span>{" "}
-                <span className="font-bold">CHUS</span>
-              </span>
-              <span
+              <div className="flex flex-col items-center gap-2 sm:flex-row">
+                <span className="flex items-center gap-2">
+                  <i className="text-base">Marching Band Mural </i>
+                  {/* <span className="block sm:hidden">-</span>{" "} */}
+                  <span className="block text-xs">by</span>{" "}
+                  <span className="font-bold">CHUS</span>
+                </span>
+                <Separator
+                  thickness={2}
+                  orientation={isMobile ? "horizontal" : "vertical"}
+                  className={cn("mx-1 h-5", currentSlide !== 1 && "hidden")}
+                />
+                <span
+                  className={cn(
+                    "flex items-center gap-1 text-sm hover:cursor-pointer hover:font-semibold",
+                    currentSlide !== 1 && "hidden",
+                  )}
+                >
+                  {popoverOpen ? (
+                    <>View less... </>
+                  ) : (
+                    <>
+                      View more
+                      <Plus className="size-4" />
+                    </>
+                  )}
+                </span>
+              </div>
+              {/* <span
                 className={cn(
                   "flex items-center justify-between gap-2",
                   currentSlide !== 1 && "hidden",
@@ -188,7 +215,7 @@ export default function Home() {
                     <p>View more details... </p>
                   )}
                 </span>
-              </span>
+              </span> */}
             </motion.span>
           </PopoverTrigger>
           <PopoverContent className="w-80 border-1.5" align="center">
