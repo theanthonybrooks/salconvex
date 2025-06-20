@@ -213,6 +213,7 @@ const organizationSchema = z.object({
     .min(3, "Name must be at least 3 characters")
     .max(50, "Max 50 characters")
     .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+  slug: z.optional(z.string()),
   logo: z.union([
     z
       .instanceof(Blob)
@@ -232,6 +233,7 @@ export const eventBase = z.object({
   _id: z.optional(z.string()),
   // name: z.optional(z.string()),
   name: z.string(),
+  slug: z.optional(z.string()),
   hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
 
   //TODO: Add message for "Event category is required"

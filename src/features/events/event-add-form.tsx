@@ -906,7 +906,8 @@ export const EventOCForm = ({
             formType,
             _id: eventData._id || "",
             name: eventData.name,
-            slug: slugify(eventData.name, { lower: true }),
+            slug:
+              existingEvent?.slug ?? slugify(eventData.name, { lower: true }),
             logoStorageId,
             logo: eventLogo,
             type: eventData.type || [],
@@ -963,7 +964,8 @@ export const EventOCForm = ({
           const { event } = await createOrUpdateEvent({
             _id: eventData._id || "",
             name: eventData.name,
-            slug: slugify(eventData.name, { lower: true }),
+            slug:
+              existingEvent?.slug ?? slugify(eventData.name, { lower: true }),
 
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
@@ -1254,7 +1256,9 @@ export const EventOCForm = ({
           const result = await updateOrg({
             orgId: orgData._id as Id<"organizations">,
             name: orgData.name?.trim(),
-            slug: slugify(orgData.name?.trim(), { lower: true }),
+            slug:
+              existingOrg?.slug ??
+              slugify(orgData.name?.trim(), { lower: true }),
             logo: orgData.logo as string,
             location: {
               ...orgData.location,
@@ -1324,7 +1328,8 @@ export const EventOCForm = ({
             formType,
             _id: eventData._id || "",
             name: eventData.name,
-            slug: slugify(eventData.name, { lower: true }),
+            slug:
+              existingEvent?.slug ?? slugify(eventData.name, { lower: true }),
             logo: eventData.logo as string,
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
