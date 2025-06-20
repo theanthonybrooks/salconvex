@@ -516,14 +516,6 @@ const FullPageNav = ({
                     const adminMatch = isAdmin && itemCategory === "admin";
                     const isPublic = itemUserType?.includes("public");
 
-                    console.log(
-                      section.title,
-                      item,
-                      itemCategory,
-                      itemSub,
-                      adminMatch,
-                    );
-
                     const typeMatch = user?.accountType?.some((type) =>
                       itemUserType?.some(
                         (userType) =>
@@ -533,8 +525,6 @@ const FullPageNav = ({
                     const subMatch = itemSub?.some(
                       (sub) => sub.toLowerCase() === subStatus?.toLowerCase(),
                     );
-
-                    console.log(itemSub, subStatus);
 
                     return isPublic || (typeMatch && subMatch) || adminMatch;
                   });
