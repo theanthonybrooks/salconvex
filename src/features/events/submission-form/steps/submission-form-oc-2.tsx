@@ -686,7 +686,7 @@ const SubmissionFormOC2 = ({
                     value={field.value ?? ""}
                     onChange={field.onChange}
                     placeholder="Please list any other compensation-related info here"
-                    charLimit={1000}
+                    charLimit={2000}
                     readOnly={pastEvent}
                   />
                 )}

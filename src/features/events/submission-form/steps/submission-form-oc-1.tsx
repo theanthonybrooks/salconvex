@@ -557,7 +557,7 @@ const SubmissionFormOC1 = ({
                       }}
                       onBlur={field.onBlur}
                       placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
-                      charLimit={3000}
+                      charLimit={5000}
                       purpose="openCall"
                       asModal={true}
                       title={eventName}
