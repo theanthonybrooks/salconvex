@@ -430,6 +430,7 @@ export const EventOCForm = ({
   if (errors && Object.keys(errors).length > 0) {
     console.log("errors", errors);
   }
+
   // console.log(
   //   isValid,
   //   validOrgWZod,
@@ -711,7 +712,7 @@ export const EventOCForm = ({
       }
       let orgResult = null;
       let orgLogoFullUrl = "/1.jpg";
-      console.log(hasUserEditedStep0);
+      // console.log(hasUserEditedStep0);
       if (hasUserEditedStep0) {
         // console.log("user edited step 0");
         const result = await handleFileUrl({
@@ -939,8 +940,8 @@ export const EventOCForm = ({
           eventResult = event;
 
           setExistingEvent(eventResult);
-          console.log(event);
-          console.log(currentValues.event);
+          // console.log(event);
+          // console.log(currentValues.event);
 
           reset(
             merge({}, currentValues, {
@@ -1082,13 +1083,14 @@ export const EventOCForm = ({
             },
             compensation: {
               budget: {
-                min: 0,
-                max: undefined,
-                rate: 0,
-                unit: "",
+                min: openCallData.compensation?.budget?.min ?? 0,
+                max: openCallData.compensation?.budget?.max ?? 0,
+                rate: openCallData.compensation?.budget?.rate ?? 0,
+                unit: openCallData.compensation?.budget?.unit ?? "",
                 currency: orgData.location?.currency?.code ?? "",
-                allInclusive: false,
-                moreInfo: undefined,
+                allInclusive:
+                  openCallData.compensation?.budget?.allInclusive ?? false,
+                moreInfo: openCallData.compensation?.budget?.moreInfo,
               },
               categories: {
                 artistStipend:
@@ -1505,6 +1507,15 @@ export const EventOCForm = ({
   // #endregion
 
   // #region -------------UseEffects --------------
+
+  useEffect(() => {
+    if (eventData?.formType) {
+      if (formType > eventData.formType) {
+        setValue("event.formType", formType);
+      }
+      // console.log(eventData.formType, formType);
+    }
+  }, [eventData, formType, setValue]);
 
   useEffect(() => {
     if (!alreadyPaid) return;

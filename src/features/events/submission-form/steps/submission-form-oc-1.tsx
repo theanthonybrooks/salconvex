@@ -16,7 +16,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { autoHttps } from "@/lib/linkFns";
 import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { CallFormat, EligibilityType } from "@/types/openCall";
@@ -34,6 +33,7 @@ registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 import { ExternalLinksInput } from "@/features/events/open-calls/components/external-links-input";
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
+import { autoHttps } from "@/lib/linkFns";
 import "filepond/dist/filepond.min.css";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -68,6 +68,9 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+  const [appLinkFormat, setAppLinkFormat] = useState<"https://" | "mailto:">(
+    "https://",
+  );
   const pastEvent = pastEventCheck && !isAdmin;
   const freeCall = formType === 2;
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
@@ -94,6 +97,11 @@ const SubmissionFormOC1 = ({
     eligDetails.trim().length > 10 || isInternational || isNational;
   const hasAppRequiredDetails = appDetails?.trim().length > 10 || isAdmin;
   const appLink = openCall?.requirements?.applicationLink ?? "";
+  const appLinkFormatForm =
+    openCall?.requirements?.applicationLinkFormat ?? "missing";
+
+  console.log(appLinkFormatForm, appLinkFormat, appLink);
+
   const hasAppLink = appLink?.trim().length > 10;
   const appFee = openCall?.basicInfo?.appFee;
   const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
@@ -196,7 +204,6 @@ const SubmissionFormOC1 = ({
                   <SelectTrigger
                     className={cn(
                       "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
-                      errors.event?.category && "invalid-field",
                     )}
                   >
                     <SelectValue placeholder="Call Format (select one)" />
@@ -255,7 +262,6 @@ const SubmissionFormOC1 = ({
                       <SelectTrigger
                         className={cn(
                           "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
-                          errors.event?.category && "invalid-field",
                         )}
                       >
                         <SelectValue placeholder="Eligiblity type (select one)" />
@@ -584,30 +590,96 @@ const SubmissionFormOC1 = ({
                     >
                       Application Link
                     </Label>
-                    <Controller
-                      name="openCall.requirements.applicationLink"
-                      control={control}
-                      render={({ field }) => (
-                        <DebouncedControllerInput
-                          disabled={pastEvent}
-                          field={field}
-                          placeholder="Link to external application form"
-                          className={cn(
-                            "w-full rounded border-foreground",
-                            errors?.openCall?.requirements?.applicationLink &&
-                              "invalid-field",
-                          )}
-                          transform={autoHttps}
-                          debounceMs={50}
-                          tabIndex={2}
-                          onBlur={() => {
-                            field.onBlur?.();
-                            handleCheckSchema?.();
-                            // console.log("Blur me", field + type)
-                          }}
-                        />
-                      )}
-                    />
+                    <div className="flex items-center gap-2">
+                      <Controller
+                        name="openCall.requirements.applicationLinkFormat"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <Select
+                              disabled={pastEvent}
+                              onValueChange={(
+                                value: "mailto:" | "https://",
+                              ) => {
+                                field.onChange(value);
+                                setAppLinkFormat(value);
+                              }}
+                              value={field.value}
+                            >
+                              <SelectTrigger
+                                className={cn(
+                                  "w-20 rounded border bg-card text-center text-base sm:h-11",
+                                )}
+                              >
+                                <SelectValue placeholder="Call Format (select one)" />
+                              </SelectTrigger>
+                              <SelectContent className="min-w-auto">
+                                <SelectItem fit value="mailto:">
+                                  Email
+                                </SelectItem>
+                                <SelectItem fit value="https://">
+                                  URL
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          );
+                        }}
+                      />
+                      <Controller
+                        name="openCall.requirements.applicationLink"
+                        control={control}
+                        render={({ field }) => {
+                          console.log(appLinkFormat === "https://");
+                          return (
+                            <DebouncedControllerInput
+                              transform={
+                                appLinkFormat === "https://"
+                                  ? autoHttps
+                                  : undefined
+                              }
+                              disabled={pastEvent}
+                              field={field}
+                              placeholder="Link to external application form"
+                              className={cn(
+                                "w-full rounded border-foreground",
+                                errors?.openCall?.requirements
+                                  ?.applicationLink && "invalid-field",
+                              )}
+                              debounceMs={50}
+                              tabIndex={2}
+                              onBlur={() => {
+                                field.onBlur?.();
+                                handleCheckSchema?.();
+                                field.onChange(field.value || appLinkFormat);
+                                // console.log("Blur me", field + type)
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </div>
+                    {appLinkFormat === "mailto:" && (
+                      <Controller
+                        name="openCall.requirements.applicationLinkSubject"
+                        control={control}
+                        render={({ field }) => (
+                          <DebouncedControllerInput
+                            disabled={pastEvent}
+                            field={field}
+                            placeholder="Email Subject (optional)"
+                            className={cn("w-full rounded border-foreground")}
+                            debounceMs={50}
+                            tabIndex={2}
+                            onBlur={() => {
+                              field.onBlur?.();
+                              handleCheckSchema?.();
+                              field.onChange(field.value);
+                              // console.log("Blur me", field + type)
+                            }}
+                          />
+                        )}
+                      />
+                    )}
                   </div>
                 </>
               )}

@@ -27,13 +27,11 @@ export const EligibilityLabel = ({
   if (!type || !whom) return null;
   const parts: string[] = [];
 
-  if (
-    (isDesktop || mobilePreview) &&
-    type !== "International" &&
-    type !== "Other"
-  ) {
+  if (type !== "International" && type !== "Other") {
     if (national) {
-      parts.push(`${type}:`);
+      if (!mobilePreview) {
+        parts.push(`${type}:`);
+      }
     } else {
       parts.push(type);
     }

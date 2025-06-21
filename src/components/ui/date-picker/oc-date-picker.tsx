@@ -31,7 +31,7 @@ interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
   onClick?: () => void;
   pickerType?: OcPickerType;
   ocEnd?: string | null;
-  orgTimezone?: string;
+  timeZone: string;
   showTimeZone?: boolean;
 }
 
@@ -44,14 +44,14 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
       className,
       pickerType,
       ocEnd,
-      orgTimezone,
+      timeZone,
       showTimeZone,
       ...rest
     },
     ref,
   ) => {
     const endDate = ocEnd ?? new Date().toISOString();
-    const timeZone = orgTimezone ?? "Europe/Berlin";
+
     const display =
       pickerType === "start" ? "Select start date" : "Select deadline";
     let formattedValue = "";
@@ -68,6 +68,9 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         // console.log(formattedValue, "invalid");
       }
     }
+    // console.log("endDate", endDate, ocEnd);
+    // console.log("timeZone", timeZone);
+    // console.log("formattedValue", formattedValue);
     return (
       <Button
         ref={ref}
@@ -81,7 +84,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
       >
         <span className="flex items-center gap-2">
           {formattedValue || display}
-          {orgTimezone && showTimeZone && (
+          {timeZone && showTimeZone && (
             // <p className="text-sm xl:hidden">
             <p className="text-sm">({getTimezoneFormat(endDate, timeZone)})</p>
           )}
@@ -109,8 +112,10 @@ export const OcCustomDatePicker = ({
   orgTimezone,
   disabled,
 }: OcCustomDatePickerProps) => {
+  const userTimezone =
+    orgTimezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const parsedDate = value ? toDate(value) : null;
-  // console.log(parsedDate, value);
 
   const minToDate = minDate ? toDate(minDate) : null;
   const maxToDate = maxDate ? toDate(maxDate) : null;
@@ -127,26 +132,25 @@ export const OcCustomDatePicker = ({
   const dateFormat = "MMM d, yyyy @ h:mm a";
 
   //   console.log(parsedDate, value);
+
   const injectedTime = parsedDate
     ? setHours(setMinutes(setSeconds(new Date(parsedDate), 59), 59), 23)
     : undefined;
-
-  // console.log(value);
 
   return (
     <DatePicker
       disabled={disabled}
       selected={parsedDate}
       onChange={(date) => {
-        if (!date || !orgTimezone) return onChange(null);
+        if (!date || !userTimezone) return onChange(null);
         if (pickerType === "end") {
-          const zonedDate = fromZonedTime(date, orgTimezone);
+          const zonedDate = fromZonedTime(date, userTimezone);
           // console.log(zonedDate);
           onChange(zonedDate.toISOString());
         } else if (pickerType === "start") {
           const cleanDate = new Date(date);
           cleanDate.setHours(12, 0, 0, 0);
-          const zonedDate = fromZonedTime(cleanDate, orgTimezone);
+          const zonedDate = fromZonedTime(cleanDate, userTimezone);
           // console.log(zonedDate);
           onChange(zonedDate.toISOString());
         }
@@ -155,7 +159,6 @@ export const OcCustomDatePicker = ({
       openToDate={openToDate}
       withPortal={true}
       showTimeSelect={pickerType === "end"}
-      // injectTimes={[setHours(setMinutes(setSeconds(new Date(), 59), 59), 23)]}
       injectTimes={injectedTime ? [injectedTime] : []}
       minDate={
         isAdmin
@@ -175,7 +178,7 @@ export const OcCustomDatePicker = ({
           className={inputClassName}
           pickerType={pickerType}
           ocEnd={ocEnd}
-          orgTimezone={orgTimezone}
+          timeZone={userTimezone}
           showTimeZone={showTimeZone}
         />
       }

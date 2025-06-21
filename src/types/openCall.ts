@@ -110,6 +110,8 @@ export interface OpenCall {
     }[];
     otherInfo?: string[];
     applicationLink?: string;
+    applicationLinkFormat?: "https://" | "mailto:";
+    applicationLinkSubject?: string;
   };
   documents?: {
     id?: Id<"openCallFiles">;

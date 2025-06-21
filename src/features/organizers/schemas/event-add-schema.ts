@@ -83,14 +83,14 @@ const isValidUrl = (value: string) => {
   }
 };
 
-const isValidUrlWithMailto = (value: string) => {
-  try {
-    const url = new URL(value);
-    return ["http:", "https:", "mailto:"].includes(url.protocol);
-  } catch {
-    return false;
-  }
-};
+// const isValidUrlWithMailto = (value: string) => {
+//   try {
+//     const url = new URL(value);
+//     return ["http:", "https:", "mailto:"].includes(url.protocol);
+//   } catch {
+//     return false;
+//   }
+// };
 
 const isValidInstagram = (value: string) => {
   // Remove leading @ for validation
@@ -117,8 +117,8 @@ const isValidFacebook = (value: string) => {
   return handleRegex.test(value) || urlRegex.test(value);
 };
 
-// const isValidEmail = (value: string) =>
-//   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const isValidEmail = (value: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 const isValidPhone = (value: string) => /^\+?[0-9\s\-().]{7,}$/i.test(value);
 
@@ -530,17 +530,11 @@ export const openCallBaseSchema = z.object({
           }),
       }),
     ),
-    applicationLink: z
-      .string()
-      .min(8, "URL is too short")
-      .refine(
-        (val) => {
-          return !val || isValidUrlWithMailto(val);
-        },
-        {
-          message: "Must be a valid URL (https://...)",
-        },
-      ),
+    applicationLink: z.string().min(8, "URL is too short"),
+    applicationLinkFormat: z.optional(
+      z.union([z.literal("https://"), z.literal("mailto:")]),
+    ),
+    applicationLinkSubject: z.optional(z.string()),
 
     // .refine((val) => !val || isValidUrl(val), {
     //   message: "Must be a valid URL (https://...)",
@@ -606,6 +600,8 @@ export const openCallStep1Schema = z
     openCall: openCallBaseSchema,
   })
   .superRefine((data, ctx) => {
+    const appLinkFormat = data.openCall?.requirements?.applicationLinkFormat;
+    const appLink = data.openCall?.requirements?.applicationLink;
     if (data.openCall?.eligibility?.type.trim()) {
       const trimmed = data.openCall?.eligibility?.type.trim();
       if (
@@ -639,6 +635,28 @@ export const openCallStep1Schema = z
         message: "Fixed calls must have a start and end date",
         path: ["openCall", "basicInfo", "dates"],
       });
+    }
+    if (appLinkFormat === "mailto:") {
+      console.log(appLinkFormat, appLink, "mail");
+      if (!appLink || !isValidEmail(appLink)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Must be a valid email address",
+          path: ["openCall", "requirements", "applicationLink"],
+        });
+      }
+    }
+
+    if (appLinkFormat === "https://") {
+      console.log(appLinkFormat, appLink, "link");
+      console.log(isValidUrl(appLink));
+      if (!appLink || !isValidUrl(appLink)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Must be a valid website URL (https://...)",
+          path: ["openCall", "requirements", "applicationLink"],
+        });
+      }
     }
   });
 

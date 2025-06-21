@@ -479,7 +479,7 @@ const OpenCallCard = ({
                     <EligibilityLabel
                       type={eligibilityType}
                       whom={eligibilityWhom}
-                      format="mobile"
+                      format="desktop"
                       eligible={artistEligible}
                       publicView={publicPreview}
                     />

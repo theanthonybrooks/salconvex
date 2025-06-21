@@ -321,6 +321,7 @@ export const SubmissionFormRecapDesktop = ({
                       <EligibilityLabel
                         type={ocData?.eligibility?.type as EligibilityType}
                         whom={ocData?.eligibility?.whom ?? []}
+                        format="desktop"
                       />
                     </td>
                   </tr>
