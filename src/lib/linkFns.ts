@@ -160,7 +160,6 @@ export function autoHttps(url: string): string {
   const raw = url.trim();
   if (!raw) return "";
 
-  console.log(raw);
 
   // Allow mailto: explicitly
   if (/^mailto:/i.test(raw)) {

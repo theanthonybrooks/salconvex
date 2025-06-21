@@ -31,18 +31,20 @@ export function DebouncedControllerInput<
   const { setValue } = useFormContext();
   const [localValue, setLocalValue] = useState(field.value ?? "");
 
-  console.log(transform);
+  const latestTransform = useRef(transform);
+  useEffect(() => {
+    latestTransform.current = transform;
+  }, [transform]);
 
   const debouncedOnChange = useRef(
     debounce((val: string) => {
-      const transformed = transform ? transform(val) : val;
-      // field.onChange(transformed);
-      console.log(transformed);
+      const transformed = latestTransform.current
+        ? latestTransform.current(val)
+        : val;
       setValue(field.name, transformed as TFieldValues[TName], {
         shouldValidate: true,
         shouldDirty: true,
       });
-
       setLocalValue(transformed);
     }, debounceMs),
   ).current;

@@ -71,6 +71,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
   const appUrl = requirements?.applicationLink;
+  const appLinkFormat = requirements?.applicationLinkFormat;
+  const mailLink = appLinkFormat === "mailto:";
+  const mailSubject = requirements?.applicationLinkSubject;
+  const outputAppLink = mailLink
+    ? `mailto:${appUrl}${mailSubject ? `?subject=${mailSubject}` : ""}`
+    : appUrl;
 
   const [activeTab, setActiveTab] = useState("openCall");
 
@@ -281,7 +287,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               id={event._id}
               openCallId={openCallId}
               slug={slug}
-              appUrl={appUrl}
+              appUrl={outputAppLink}
               edition={event.dates.edition}
               openCall={openCallStatus}
               manualApplied={appStatus}
@@ -425,7 +431,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 id={event._id}
                 openCallId={openCallId}
                 slug={slug}
-                appUrl={appUrl}
+                appUrl={outputAppLink}
                 edition={event.dates.edition}
                 openCall={openCallStatus}
                 manualApplied={appStatus}

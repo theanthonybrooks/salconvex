@@ -68,9 +68,9 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const [appLinkFormat, setAppLinkFormat] = useState<"https://" | "mailto:">(
-    "https://",
-  );
+  const appLinkFormat =
+    watch("openCall.requirements.applicationLinkFormat") ?? "https://";
+
   const pastEvent = pastEventCheck && !isAdmin;
   const freeCall = formType === 2;
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
@@ -602,7 +602,6 @@ const SubmissionFormOC1 = ({
                                 value: "mailto:" | "https://",
                               ) => {
                                 field.onChange(value);
-                                setAppLinkFormat(value);
                               }}
                               value={field.value}
                             >
@@ -629,14 +628,11 @@ const SubmissionFormOC1 = ({
                         name="openCall.requirements.applicationLink"
                         control={control}
                         render={({ field }) => {
-                          console.log(appLinkFormat === "https://");
+                          const urlLink = appLinkFormat === "https://";
+                          console.log(urlLink);
                           return (
                             <DebouncedControllerInput
-                              transform={
-                                appLinkFormat === "https://"
-                                  ? autoHttps
-                                  : undefined
-                              }
+                              transform={urlLink ? autoHttps : undefined}
                               disabled={pastEvent}
                               field={field}
                               placeholder="Link to external application form"

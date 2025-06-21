@@ -84,6 +84,14 @@ export const SubmissionFormRecapMobile = ({
   const hasRate =
     typeof ocData?.compensation?.budget?.rate === "number" &&
     ocData?.compensation?.budget?.rate > 0;
+  const appLink = ocData?.requirements?.applicationLink;
+  const appLinkFormat = ocData?.requirements?.applicationLinkFormat;
+  const mailLink = appLinkFormat === "mailto:";
+  const mailSubject = ocData?.requirements?.applicationLinkSubject;
+  const outputAppLink = mailLink
+    ? `mailto:${appLink}${mailSubject ? `?subject=${mailSubject}` : ""}`
+    : appLink;
+
   useEffect(() => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
     return () => clearTimeout(timeout);
@@ -395,12 +403,12 @@ export const SubmissionFormRecapMobile = ({
                 <div className="space-y-6 pt-2">
                   <div className="flex flex-col gap-3">
                     <p className="text-sm font-medium">Application Link:</p>
-                    <Link
-                      href={ocData?.requirements?.applicationLink ?? "/thelist"}
-                      target="_blank"
-                    >
-                      {ocData?.requirements?.applicationLink}
+                    <Link href={outputAppLink ?? "/thelist"} target="_blank">
+                      {appLink}
                     </Link>
+                    {mailLink && mailSubject && (
+                      <p className="text-sm">Subject: {mailSubject}</p>
+                    )}
                   </div>
                   <Accordion type="multiple" defaultValue={[]}>
                     <AccordionItem value="compensation">

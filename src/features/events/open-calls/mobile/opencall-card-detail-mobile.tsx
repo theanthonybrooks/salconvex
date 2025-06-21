@@ -69,6 +69,12 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const { basicInfo, requirements, _id: openCallId } = openCall;
 
   const appUrl = requirements?.applicationLink;
+  const appLinkFormat = requirements?.applicationLinkFormat;
+  const mailLink = appLinkFormat === "mailto:";
+  const mailSubject = requirements?.applicationLinkSubject;
+  const outputAppLink = mailLink
+    ? `mailto:${appUrl}${mailSubject ? `?subject=${mailSubject}` : ""}`
+    : appUrl;
   //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
 
   const { dates: callDates } = basicInfo;
@@ -281,7 +287,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               id={event._id}
               openCallId={openCallId}
               slug={slug}
-              appUrl={appUrl}
+              appUrl={outputAppLink}
               edition={event.dates.edition}
               // appStatus={appStatus}
               openCall={openCallStatus}
