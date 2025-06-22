@@ -122,6 +122,8 @@ const OpenCallCard = ({
     eventEnd &&
     isValidIsoDate(eventEnd);
 
+  const eventTimeline = event.timeLine;
+
   const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
     stateAbbr ? stateAbbr + ", " : ""
   }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
@@ -426,6 +428,16 @@ const OpenCallCard = ({
                 </AccordionContent>
               </AccordionItem>
             )}
+            {eventTimeline && (
+              <AccordionItem value="timeline">
+                <AccordionTrigger title="Timeline:" />
+                <AccordionContent>
+                  <div className="flex flex-col space-y-3 p-3">
+                    <RichTextDisplay html={eventTimeline} className="text-sm" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
           </Accordion>
         </Card>
       ) : (
@@ -706,7 +718,6 @@ const OpenCallCard = ({
                   {reqsLinks?.map((link, index) => (
                     <li key={index} className="py-2">
                       <Link href={link.href} target="_blank">
-                        {/* {link.title} */}
                         {link.title ?? link.href.split("https://").pop()}
                       </Link>
                     </li>
@@ -727,6 +738,19 @@ const OpenCallCard = ({
                       </li>
                     ))}
                   </ol>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+          {eventTimeline && (
+            <AccordionItem
+              value="eventTimeline"
+              className="rounded-lg border-2 bg-white/30 px-4"
+            >
+              <AccordionTrigger title="Timeline:" />
+              <AccordionContent>
+                <div className="flex flex-col space-y-3 p-3">
+                  <RichTextDisplay html={eventTimeline} className="text-sm" />
                 </div>
               </AccordionContent>
             </AccordionItem>

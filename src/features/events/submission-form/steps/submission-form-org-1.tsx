@@ -101,6 +101,7 @@ const SubmissionFormOrgStep = ({
         className={cn(
           "mx-auto flex w-full flex-col items-center gap-y-6 self-start lg:self-center xl:justify-center",
           !firstColVisible && "invisible",
+          !orgDataValid && "my-auto",
         )}
       >
         <section className="flex flex-col items-center justify-center">

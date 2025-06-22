@@ -73,14 +73,14 @@ const SubmissionFormEventStep2 = ({
         className={cn(
           "flex w-full grid-cols-[20%_auto] flex-col lg:grid lg:gap-x-4 lg:gap-y-4",
           "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-          "lg:pb-10 xl:py-10 4xl:my-auto",
+          "mx-auto max-w-[60dvw] xl:max-w-full xl:py-10 4xl:my-auto",
 
           // "xl:self-center",
         )}
       >
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">
-            Step {categoryEvent && !eventOnly ? 9 : 8}:{" "}
+            Step {categoryEvent && !eventOnly ? 10 : 9}:{" "}
           </p>
           <p className="lg:text-xs">
             {getEventCategoryLabelAbbr(category)} Links
@@ -111,8 +111,7 @@ const SubmissionFormEventStep2 = ({
           className={cn(
             "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
             "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-            "lg:pt-10 xl:py-10 4xl:my-auto",
-            // "xl:self-center",
+            "mx-auto max-w-[60dvw] xl:max-w-full xl:py-10 4xl:my-auto", // "xl:self-center",
           )}
         >
           {canNameEvent && (
@@ -121,7 +120,7 @@ const SubmissionFormEventStep2 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent ? 10 : 9}:
+                      Step {categoryEvent ? 11 : 10}:
                     </p>
                     <p className="lg:text-xs">Open Call</p>
                   </div>
@@ -195,7 +194,7 @@ const SubmissionFormEventStep2 = ({
               )}
               <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {categoryEvent && !eventOnly ? 11 : eventOnly ? 9 : 10}
+                  Step {categoryEvent && !eventOnly ? 12 : eventOnly ? 10 : 11}
                   :{" "}
                 </p>
                 <p className="lg:text-xs">Other Info</p>

@@ -119,6 +119,9 @@ const SubmissionFormEventStep1 = ({
     }
   }, [formType, setValue]);
 
+  const timeLineStartingText =
+    "<ol><li><p>Open Call:</p></li><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>";
+
   return (
     <div
       id="step-1-container"
@@ -487,6 +490,34 @@ const SubmissionFormEventStep1 = ({
                   </label>
                 </>
               )}
+
+            <div className="input-section h-full">
+              <p className="min-w-max font-bold lg:text-xl">
+                Step {categoryEvent && !eventOnly ? 9 : 8}:{" "}
+              </p>
+              <p className="lg:text-xs">
+                {getEventCategoryLabelAbbr(category)} Timeline
+              </p>
+            </div>
+
+            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.timeline" className="sr-only">
+                {getEventCategoryLabelAbbr(category)} Timeline
+              </Label>
+              <Controller
+                name="event.timeLine"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value ?? timeLineStartingText}
+                    onChange={field.onChange}
+                    placeholder="Important dates: open call, production, judging/selection, etc"
+                    charLimit={1000}
+                    noList={false}
+                  />
+                )}
+              />
+            </div>
           </div>
         </>
       )}

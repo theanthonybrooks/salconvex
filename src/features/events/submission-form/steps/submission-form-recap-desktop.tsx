@@ -258,7 +258,10 @@ export const SubmissionFormRecapDesktop = ({
                 className="my-4 mx-auto border-foreground/"
               /> */}
             <div className="space-y-6 border-l-2 border-foreground/10 px-8 pt-2">
-              <Accordion type="multiple" defaultValue={["About", "OtherInfo"]}>
+              <Accordion
+                type="multiple"
+                defaultValue={["About", "OtherInfo", "Timeline"]}
+              >
                 {eventData.about && (
                   <AccordionItem value="About">
                     {/* <p className="mb-1 text-sm font-medium">About</p> */}
@@ -266,6 +269,17 @@ export const SubmissionFormRecapDesktop = ({
                     <AccordionContent>
                       <RichTextDisplay
                         html={eventData.about || ""}
+                        className="text-sm"
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                {eventData.timeLine && (
+                  <AccordionItem value="Timeline">
+                    <AccordionTrigger title="Timeline" />
+                    <AccordionContent>
+                      <RichTextDisplay
+                        html={eventData.timeLine || ""}
                         className="text-sm"
                       />
                     </AccordionContent>

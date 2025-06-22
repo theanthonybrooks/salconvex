@@ -310,6 +310,17 @@ export const SubmissionFormRecapMobile = ({
                       </AccordionContent>
                     </AccordionItem>
                   )}
+                  {eventData.timeLine && (
+                    <AccordionItem value="Timeline">
+                      <AccordionTrigger title="Timeline" />
+                      <AccordionContent>
+                        <RichTextDisplay
+                          html={eventData.timeLine || ""}
+                          className="text-sm"
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
                   {eventData.otherInfo && (
                     <AccordionItem value="OtherInfo">
                       {/* <p className="mb-1 text-sm font-medium">About</p> */}

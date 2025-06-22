@@ -182,7 +182,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                 <FaYoutube className={cn("shrink-0", iconSize)} />
 
                 <span className="underline-offset-2 hover:underline">
-                  YouTube
+                  {submitRecap ? event.links.youTube : "YouTube"}
                 </span>
               </div>
             </a>
@@ -330,7 +330,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                   <FaYoutube className={cn("shrink-0", iconSize)} />
 
                   <span className="underline-offset-2 hover:underline">
-                    YouTube
+                    {submitRecap ? organizer.links.youTube : "YouTube"}{" "}
                   </span>
                 </div>
               </a>

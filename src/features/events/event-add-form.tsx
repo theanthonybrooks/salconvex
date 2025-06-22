@@ -930,6 +930,7 @@ export const EventOCForm = ({
               timezoneOffset: timezoneOffset,
             },
             about: eventData.about,
+            timeLine: eventData.timeLine,
             links: eventData.links,
             otherInfo: eventData.otherInfo || undefined,
             adminNote: eventData.adminNote || undefined,
@@ -983,6 +984,7 @@ export const EventOCForm = ({
             about: eventData.about,
             links: eventData.links,
             otherInfo: eventData.otherInfo || undefined,
+            timeLine: eventData.timeLine,
             adminNote: eventData.adminNote || undefined,
             active: eventData.active,
             orgId: orgData._id as Id<"organizations">,
@@ -1355,6 +1357,7 @@ export const EventOCForm = ({
             about: eventData.about,
             links: eventLinks,
             otherInfo: eventData.otherInfo || undefined,
+            timeLine: eventData.timeLine,
             adminNote: eventData.adminNote || undefined,
 
             active: eventData.active,
