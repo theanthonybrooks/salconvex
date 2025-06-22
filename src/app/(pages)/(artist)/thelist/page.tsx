@@ -2,7 +2,7 @@ import SalHeader from "@/components/ui/sal-header";
 import ClientEventList from "@/features/events/event-list-client";
 
 export const metadata = {
-  title: "The List | The Street Art List",
+  title: "The List",
   description: "See the latest mural open calls and public art opportunities.",
   openGraph: {
     title: "The List | The Street Art List",

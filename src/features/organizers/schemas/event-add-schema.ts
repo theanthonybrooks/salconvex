@@ -275,6 +275,7 @@ export const eventBase = z.object({
   }),
   links: linksSchemaLoose,
   otherInfo: z.string().optional(),
+  timeLine: z.string().optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
   adminNote: z.string().optional(),
@@ -531,9 +532,10 @@ export const openCallBaseSchema = z.object({
       }),
     ),
     applicationLink: z.string().min(8, "URL is too short"),
-    applicationLinkFormat: z.optional(
-      z.union([z.literal("https://"), z.literal("mailto:")]),
-    ),
+    applicationLinkFormat: z.union([
+      z.literal("https://"),
+      z.literal("mailto:"),
+    ]),
     applicationLinkSubject: z.optional(z.string()),
 
     // .refine((val) => !val || isValidUrl(val), {

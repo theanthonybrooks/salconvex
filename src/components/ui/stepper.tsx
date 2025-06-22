@@ -116,7 +116,7 @@ export default function HorizontalLinearStepper({
   return (
     <div
       className={cn(
-        "flex h-full max-h-[90dvh] w-full flex-col pt-8 lg:max-h-[85dvh] lg:pb-2 lg:pt-4",
+        "flex h-full max-h-[90dvh] w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[85dvh]",
         className,
       )}
     >

@@ -2,7 +2,7 @@ import SalHeader from "@/components/ui/sal-header";
 import ClientThisWeekList from "@/features/events/thisweek-list-client";
 
 export const metadata = {
-  title: "This Week | The Street Art List",
+  title: "This Week",
   description:
     "See the latest mural open calls and public art opportunities ending this week.",
   openGraph: {

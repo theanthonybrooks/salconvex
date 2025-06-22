@@ -1048,6 +1048,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               destination: "reqsDestination",
               links: openCallData.requirements.links,
               applicationLink: openCallData.requirements.applicationLink,
+              applicationLinkFormat:
+                openCallData.requirements.applicationLinkFormat,
+              applicationLinkSubject:
+                openCallData.requirements.applicationLinkSubject,
               otherInfo: undefined,
             },
             documents,
@@ -1144,6 +1148,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               destination: undefined,
               links: openCallData.requirements.links,
               applicationLink: openCallData.requirements.applicationLink,
+              applicationLinkFormat:
+                openCallData.requirements.applicationLinkFormat,
+              applicationLinkSubject:
+                openCallData.requirements.applicationLinkSubject,
               otherInfo: undefined,
             },
             documents: undefined,
@@ -1331,6 +1339,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
                 links: openCallData.requirements.links,
                 applicationLink: openCallData.requirements.applicationLink,
+                applicationLinkFormat:
+                  openCallData.requirements.applicationLinkFormat,
+                applicationLinkSubject:
+                  openCallData.requirements.applicationLinkSubject,
                 otherInfo: undefined,
               },
               documents: undefined,

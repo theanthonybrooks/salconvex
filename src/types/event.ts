@@ -141,6 +141,7 @@ export interface EventData {
     other?: string;
   };
   otherInfo?: string;
+  timeLine?: string;
   state: SubmissionFormState;
   active?: boolean;
   lastEditedAt?: number;

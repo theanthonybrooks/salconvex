@@ -325,6 +325,7 @@ const eventSchema = {
     }),
   ),
   otherInfo: v.optional(v.string()),
+  timeLine: v.optional(v.string()),
   // state: v.string(), //draft, submitted, published, archived
   state: v.union(
     v.literal("draft"),
@@ -421,9 +422,8 @@ const openCallSchema = {
       }),
     ),
     applicationLink: v.string(),
-    applicationLinkFormat: v.optional(
-      v.union(v.literal("https://"), v.literal("mailto:")),
-    ),
+    applicationLinkFormat: v.union(v.literal("https://"), v.literal("mailto:")),
+
     applicationLinkSubject: v.optional(v.string()),
     otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
   }),

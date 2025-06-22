@@ -125,6 +125,20 @@ export const markAllOrgsComplete = migrations.define({
   },
 });
 
+export const addAppLinkFormat = migrations.define({
+  table: "openCalls",
+  migrateOne: async (ctx, doc) => {
+    await ctx.db.patch(doc._id, {
+      requirements: {
+        ...doc.requirements,
+        applicationLinkFormat: "https://",
+      },
+    });
+  },
+});
+
+export const runAALF = migrations.runner(internal.migrations.addAppLinkFormat);
+
 export const runMAOC = migrations.runner(
   internal.migrations.markAllOrgsComplete,
 );

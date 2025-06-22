@@ -100,6 +100,11 @@ export const createOrUpdateOpenCall = mutation({
         }),
       ),
       applicationLink: v.string(),
+      applicationLinkFormat: v.union(
+        v.literal("https://"),
+        v.literal("mailto:"),
+      ),
+      applicationLinkSubject: v.optional(v.string()),
       otherInfo: v.optional(v.array(v.string())),
     }),
     documents: v.optional(

@@ -910,6 +910,7 @@ export const createOrUpdateEvent = mutation({
       }),
     ),
     otherInfo: v.optional(v.string()),
+    timeLine: v.optional(v.string()),
     active: v.optional(v.boolean()),
     state: v.optional(
       v.union(
@@ -1039,6 +1040,7 @@ export const createOrUpdateEvent = mutation({
         about: args.about,
         links: sanitizedLinks,
         otherInfo: args.otherInfo,
+        timeLine: args.timeLine,
         active: args.active || true,
         lastEditedAt: Date.now(),
         state: eventState,
