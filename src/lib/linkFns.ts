@@ -3,6 +3,7 @@ export type PlatformType =
   | "instagram"
   | "threads"
   | "vk"
+  | "youTube"
   | "email"
   | "website"
   | "generic";
@@ -12,6 +13,7 @@ export const platformDomains: Record<PlatformType, string[]> = {
   threads: ["threads.com"],
   facebook: ["facebook.com"],
   vk: ["vk.com"],
+  youTube: ["youtube.com"],
   email: [],
   website: [],
   generic: [],
@@ -106,35 +108,7 @@ export function formatFacebookInput(input: string): string {
 
   return formatHandle(trimmed);
 
-  // try {
-  //   const url = new URL(
-  //     trimmed.startsWith("http") ? trimmed : `https://${trimmed}`,
-  //   );
 
-  //   // Ensure it's a facebook.com link
-  //   // if (!url.hostname.includes("facebook.com")) return "";
-  //   const hostnameOk = url.hostname.endsWith("facebook.com");
-
-  //   const pathParts = url.pathname.split("/").filter(Boolean);
-  //   const hasQueryParams = !!url.search;
-  //   const isCleanHandle =
-  //     hostnameOk &&
-  //     pathParts.length === 1 &&
-  //     !hasQueryParams &&
-  //     /^[a-zA-Z0-9.]{5,50}$/.test(pathParts[0]) &&
-  //     !pathParts[0].includes("..") &&
-  //     !pathParts[0].endsWith(".");
-
-  //   if (isCleanHandle) {
-  //     return `@${pathParts[0]}`;
-  //   } else {
-  //     return url.href;
-  //   }
-  // } catch {
-  //   // If it's not a URL, treat as a raw handle
-  //   const clean = trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
-  //   return clean;
-  // }
 }
 
 function isValidChar(char: string, platform: PlatformType): boolean {
@@ -159,7 +133,6 @@ function isValidChar(char: string, platform: PlatformType): boolean {
 export function autoHttps(url: string): string {
   const raw = url.trim();
   if (!raw) return "";
-
 
   // Allow mailto: explicitly
   if (/^mailto:/i.test(raw)) {

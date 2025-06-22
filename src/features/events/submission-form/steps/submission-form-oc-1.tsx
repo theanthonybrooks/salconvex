@@ -607,10 +607,10 @@ const SubmissionFormOC1 = ({
                             >
                               <SelectTrigger
                                 className={cn(
-                                  "w-20 rounded border bg-card text-center text-base sm:h-11",
+                                  "w-24 rounded border bg-card text-center text-base sm:h-11",
                                 )}
                               >
-                                <SelectValue placeholder="Call Format (select one)" />
+                                <SelectValue placeholder="(Type)" />
                               </SelectTrigger>
                               <SelectContent className="min-w-auto">
                                 <SelectItem fit value="mailto:">

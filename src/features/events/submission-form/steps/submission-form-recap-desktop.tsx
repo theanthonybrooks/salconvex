@@ -56,10 +56,11 @@ export const SubmissionFormRecapDesktop = ({
   const eventOnly = formType === 1;
   const paidCall = formType === 3;
   const {
-    // getValues,
+    getValues,
     watch,
     // formState: { errors },
   } = useFormContext<EventOCFormValues>();
+  const currentValues = getValues();
   const eventData = watch("event");
   const ocData = watch("openCall");
   const orgData = watch("organization");
@@ -69,6 +70,7 @@ export const SubmissionFormRecapDesktop = ({
     // { id: "openCall", label: "Open Call" },
     { id: "event", label: getEventCategoryLabel(eventData.category) },
     ...(!eventOnly ? [{ id: "openCall", label: "Open Call" }] : []),
+    ...(isAdmin ? [{ id: "admin", label: "Admin" }] : []),
   ];
   const [activeTab, setActiveTab] = useState("organizer");
 
@@ -461,6 +463,13 @@ export const SubmissionFormRecapDesktop = ({
             </div>
           </div>
         )}
+        {isAdmin && (
+          <div id="admin" className="px-4">
+            <pre className="text-sm text-foreground">
+              {JSON.stringify(currentValues, null, 2)}
+            </pre>
+          </div>
+        )}
       </NavTabs>
       <div className="space-y-6 sm:mb-6">
         {!alreadyPaid && (
@@ -516,9 +525,6 @@ export const SubmissionFormRecapDesktop = ({
                             the organizer (or other person with the necessary
                             authority). */}
               </label>
-              {/* <pre className="text-sm text-foreground">
-                            {JSON.stringify(ocData, null, 2)}
-                          </pre> */}
             </div>
           </div>
         )}

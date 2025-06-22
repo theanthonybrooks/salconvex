@@ -1,20 +1,33 @@
-// const ThisWeekPage = () => {
-//   return (
-//     <div className="flex h-full w-full flex-col items-center justify-center">
-//       <h1 className="font-tanker text-[5rem] lowercase tracking-wide">
-//         This Week
-//       </h1>
-//       <p className="text-center text-lg text-foreground">
-//         Coming soon! (unironically)
-//       </p>
-//     </div>
-//   );
-// };
-
-// export default ThisWeekPage;
-
 import SalHeader from "@/components/ui/sal-header";
 import ClientThisWeekList from "@/features/events/thisweek-list-client";
+
+export const metadata = {
+  title: "This Week | The Street Art List",
+  description:
+    "See the latest mural open calls and public art opportunities ending this week.",
+  openGraph: {
+    title: "This Week | The Street Art List",
+    description:
+      "See the latest mural open calls and public art opportunities ending this week.",
+    url: "https://thestreetartlist.com/thisweek",
+    type: "website",
+    images: [
+      {
+        url: "/public/thisweek_logo.png",
+        width: 1200,
+        height: 630,
+        alt: "This Week's Street Art Opportunities",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "This Week | The Street Art List",
+    description:
+      "See the latest mural open calls and public art opportunities ending this week.",
+    images: ["/public/thisweek_logo.png"],
+  },
+};
 
 const ThisWeekPage = async () => {
   return (

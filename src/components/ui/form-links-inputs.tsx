@@ -24,6 +24,7 @@ import {
   FaPlus,
   FaThreads,
   FaVk,
+  FaYoutube,
 } from "react-icons/fa6";
 import PhoneInput, { Country } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -63,6 +64,12 @@ const handleFields: {
     icon: <FaVk className={cn("size-5 shrink-0")} />,
     platform: "vk",
     placeholder: "@eventname",
+  },
+  {
+    key: "youTube",
+    icon: <FaYoutube className={cn("size-5 shrink-0")} />,
+    platform: "youTube",
+    placeholder: "youtube.com/...",
   },
 ];
 
@@ -542,6 +549,8 @@ function HandleInput({
               transform={(val) => {
                 if (platform === "facebook") {
                   return formatFacebookInput(val);
+                } else if (platform === "youTube") {
+                  return autoHttps(val);
                 }
                 return formatHandleInput(val, platform);
               }}

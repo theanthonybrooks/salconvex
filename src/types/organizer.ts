@@ -61,6 +61,7 @@ export type Organizer = {
     phone?: string;
     address?: string;
     linkAggregate?: string;
+    youTube?: string;
     other?: string;
   };
   hadFreeCall: boolean;

@@ -137,6 +137,7 @@ export interface EventData {
     phone?: string;
     address?: string;
     linkAggregate?: string;
+    youTube?: string;
     other?: string;
   };
   otherInfo?: string;

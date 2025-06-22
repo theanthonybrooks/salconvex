@@ -65,10 +65,8 @@ export const SubmissionFormRecapMobile = ({
 
   const eventOnly = formType === 1;
   const paidCall = formType === 3;
-  const {
-    // getValues,
-    watch,
-  } = useFormContext<EventOCFormValues>();
+  const { getValues, watch } = useFormContext<EventOCFormValues>();
+  const currentValues = getValues();
   const eventData = watch("event");
   const ocData = watch("openCall");
   const orgData = watch("organization");
@@ -76,6 +74,7 @@ export const SubmissionFormRecapMobile = ({
     { id: "organizer", label: "Organizer" },
     { id: "event", label: getEventCategoryLabel(eventData.category) },
     ...(!eventOnly ? [{ id: "openCall", label: "Open Call" }] : []),
+    ...(isAdmin ? [{ id: "admin", label: "Admin" }] : []),
   ];
   const [activeTab, setActiveTab] = useState("organizer");
   const hasBudget =
@@ -104,7 +103,12 @@ export const SubmissionFormRecapMobile = ({
         defaultValue={activeTab}
         className="flex w-full flex-col justify-center"
       >
-        <TabsList className="relative flex h-12 w-full justify-around rounded-xl border-1.5 border-foreground bg-salYellow/20">
+        <TabsList
+          className={cn(
+            "relative flex h-12 w-full justify-around rounded-xl border-1.5 border-foreground bg-salYellow/20",
+            isAdmin && "scrollable invis max-w-[75dvw]",
+          )}
+        >
           {tabList.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -132,6 +136,7 @@ export const SubmissionFormRecapMobile = ({
                 {tab.id === "event" &&
                   getEventCategoryLabel(eventData.category)}
                 {!eventOnly && tab.id === "openCall" && "Open Call"}
+                {isAdmin && tab.id === "admin" && "Admin"}
               </span>
             </TabsTrigger>
           ))}
@@ -492,6 +497,11 @@ export const SubmissionFormRecapMobile = ({
               </div>
             </div>
           )}
+        </TabsContent>
+        <TabsContent value="admin">
+          <pre className="scrollable mini max-w-[75dvw] text-sm text-foreground">
+            {JSON.stringify(currentValues, null, 2)}
+          </pre>
         </TabsContent>
       </Tabs>
       <div className="flex flex-col gap-8">

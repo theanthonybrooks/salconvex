@@ -11,6 +11,7 @@ import {
   FaRegEnvelope,
   FaThreads,
   FaVk,
+  FaYoutube,
 } from "react-icons/fa6";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
 
@@ -175,6 +176,17 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
               </div>
             </a>
           )}
+          {event.links?.youTube && !listPreview && (
+            <a href={event.links.youTube} target="_blank">
+              <div className="flex items-center gap-x-2">
+                <FaYoutube className={cn("shrink-0", iconSize)} />
+
+                <span className="underline-offset-2 hover:underline">
+                  YouTube
+                </span>
+              </div>
+            </a>
+          )}
           {event.links?.other && !listPreview && (
             <a href={event.links.other} target="_blank">
               <div className="flex items-center gap-x-2">
@@ -188,11 +200,10 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
           )}
         </div>
       )}
-      {((organizer && organizer.links) ||
-        (organizer &&
-          organizer.links &&
-          submitRecap &&
-          (!event || event?.links?.sameAsOrganizer === true))) &&
+      {organizer &&
+        organizer.links &&
+        (!submitRecap ||
+          (submitRecap && event?.links?.sameAsOrganizer === true)) &&
         Object.keys(organizer.links || {}).length > 0 && (
           <div
             className={cn("flex flex-col gap-y-2 p-3", submitRecap && "p-0")}
@@ -302,6 +313,24 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
 
                   <span className="underline-offset-2 hover:underline">
                     @{organizer.links.vk.split(".com/").slice(-1)[0]}
+                  </span>
+                </div>
+              </a>
+            )}
+            {organizer.links?.youTube && (
+              <a
+                href={
+                  organizer.links.youTube.includes("https://")
+                    ? organizer.links.youTube
+                    : `https://${organizer.links.youTube}`
+                }
+                target="_blank"
+              >
+                <div className="flex items-center gap-x-2">
+                  <FaYoutube className={cn("shrink-0", iconSize)} />
+
+                  <span className="underline-offset-2 hover:underline">
+                    YouTube
                   </span>
                 </div>
               </a>

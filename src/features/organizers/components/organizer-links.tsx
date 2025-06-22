@@ -8,6 +8,7 @@ import {
   FaRegEnvelope,
   FaThreads,
   FaVk,
+  FaYoutube,
 } from "react-icons/fa6";
 
 const iconSize = "size-5";
@@ -21,6 +22,7 @@ const linkDisplayOrder: (keyof Organizer["links"])[] = [
   "facebook",
   "threads",
   "vk",
+  "youTube",
 ];
 
 const organizerLinkIcons: Record<keyof Organizer["links"], React.ReactNode> = {
@@ -32,6 +34,7 @@ const organizerLinkIcons: Record<keyof Organizer["links"], React.ReactNode> = {
   facebook: <FaFacebookF className={iconSize} />,
   threads: <FaThreads className={iconSize} />,
   vk: <FaVk className={iconSize} />,
+  youTube: <FaYoutube className={iconSize} />,
   address: null,
   other: null,
 };
