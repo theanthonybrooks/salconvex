@@ -1225,7 +1225,14 @@ export const EventOCForm = ({
                 openCallData.requirements.applicationLinkSubject,
               otherInfo: undefined,
             },
-            documents: undefined,
+            documents: openCallData.documents as
+              | {
+                  id: Id<"openCallFiles">;
+                  title: string;
+                  href: string;
+                }[]
+              | undefined,
+
             paid: openCallData.paid ?? false,
           });
           let lastEditedResult = null;
@@ -1422,7 +1429,14 @@ export const EventOCForm = ({
                   openCallData.requirements.applicationLinkSubject,
                 otherInfo: undefined,
               },
-              documents: undefined,
+              documents: openCallData.documents as
+                | {
+                    id: Id<"openCallFiles">;
+                    title: string;
+                    href: string;
+                  }[]
+                | undefined,
+
               state: publish ? "published" : "submitted",
               finalStep,
               approved: publish,

@@ -68,6 +68,7 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+  console.log(watch("openCall.eligibility.whom"));
   const appLinkFormat =
     watch("openCall.requirements.applicationLinkFormat") ?? "https://";
 
@@ -97,10 +98,6 @@ const SubmissionFormOC1 = ({
     eligDetails.trim().length > 10 || isInternational || isNational;
   const hasAppRequiredDetails = appDetails?.trim().length > 10 || isAdmin;
   const appLink = openCall?.requirements?.applicationLink ?? "";
-  const appLinkFormatForm =
-    openCall?.requirements?.applicationLinkFormat ?? "missing";
-
-  console.log(appLinkFormatForm, appLinkFormat, appLink);
 
   const hasAppLink = appLink?.trim().length > 10;
   const appFee = openCall?.basicInfo?.appFee;
@@ -153,7 +150,7 @@ const SubmissionFormOC1 = ({
   useEffect(() => {
     if (!freeCall) return;
     if (freeCall) {
-      setValue("openCall.eligibility.whom", []);
+    // setValue("openCall.eligibility.whom", []);
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [freeCall, setValue]);

@@ -56,11 +56,10 @@ export const SubmissionFormRecapDesktop = ({
   const eventOnly = formType === 1;
   const paidCall = formType === 3;
   const {
-    getValues,
+    // getValues,
     watch,
     // formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const currentValues = getValues();
   const eventData = watch("event");
   const ocData = watch("openCall");
   const orgData = watch("organization");
@@ -479,32 +478,41 @@ export const SubmissionFormRecapDesktop = ({
         )}
         {isAdmin && (
           <div id="admin" className="px-4">
-            <pre className="text-sm text-foreground">
-              {JSON.stringify(currentValues, null, 2)}
-            </pre>
+            <Accordion
+              type="multiple"
+              defaultValue={["Organizer", "Event", "OpenCall"]}
+            >
+              <AccordionItem value="Organizer">
+                <AccordionTrigger title="Organizer Data:" />
+                <AccordionContent>
+                  <pre className="scrollable mini text-wrap text-sm text-foreground">
+                    {JSON.stringify(orgData, null, 2)}
+                  </pre>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="Event">
+                <AccordionTrigger title="Event Data:" />
+                <AccordionContent>
+                  <pre className="scrollable mini text-wrap text-sm text-foreground">
+                    {JSON.stringify(eventData, null, 2)}
+                  </pre>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="OpenCall">
+                <AccordionTrigger title="Open Call Data:" />
+                <AccordionContent>
+                  <pre className="scrollable mini text-sm text-foreground">
+                    {JSON.stringify(ocData, null, 2)}
+                  </pre>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         )}
       </NavTabs>
       <div className="space-y-6 sm:mb-6">
         {!alreadyPaid && (
           <div className="flex flex-col items-end gap-2">
-            {/* <div className="flex items-center gap-2">
-                          <Checkbox
-                            name="terms"
-                            id="terms"
-                            checked={acceptedTerms}
-                            onCheckedChange={(value) => {
-                              setAcceptedTerms(value === true);
-                            }}
-                          />
-                          <label
-                            htmlFor="terms"
-                            className="text-sm text-foreground hover:cursor-pointer"
-                          >
-                            I agree and would like to post my event and/or open
-                            call.
-                          </label>
-                        </div> */}
             <div className="flex items-center gap-2">
               <Checkbox
                 name="info"
@@ -534,10 +542,6 @@ export const SubmissionFormRecapDesktop = ({
                 </Link>{" "}
                 and confirm that all information provided is accurate and
                 complete.
-                {/* I verify that all information provided is accurate and
-                            complete and that I have permission to submit this as
-                            the organizer (or other person with the necessary
-                            authority). */}
               </label>
             </div>
           </div>

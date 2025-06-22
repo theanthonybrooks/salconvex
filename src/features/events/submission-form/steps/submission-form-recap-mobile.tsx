@@ -65,8 +65,11 @@ export const SubmissionFormRecapMobile = ({
 
   const eventOnly = formType === 1;
   const paidCall = formType === 3;
-  const { getValues, watch } = useFormContext<EventOCFormValues>();
-  const currentValues = getValues();
+  const {
+    // getValues,
+    watch,
+  } = useFormContext<EventOCFormValues>();
+  // const currentValues = getValues();
   const eventData = watch("event");
   const ocData = watch("openCall");
   const orgData = watch("organization");
@@ -510,9 +513,35 @@ export const SubmissionFormRecapMobile = ({
           )}
         </TabsContent>
         <TabsContent value="admin">
-          <pre className="scrollable mini max-w-[75dvw] text-sm text-foreground">
-            {JSON.stringify(currentValues, null, 2)}
-          </pre>
+          <Accordion
+            type="multiple"
+            defaultValue={["Organizer", "Event", "OpenCall"]}
+          >
+            <AccordionItem value="Organizer">
+              <AccordionTrigger title="Organizer Data:" />
+              <AccordionContent>
+                <pre className="scrollable mini text-wrap text-sm text-foreground">
+                  {JSON.stringify(orgData, null, 2)}
+                </pre>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="Event">
+              <AccordionTrigger title="Event Data:" />
+              <AccordionContent>
+                <pre className="scrollable mini text-wrap text-sm text-foreground">
+                  {JSON.stringify(eventData, null, 2)}
+                </pre>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="OpenCall">
+              <AccordionTrigger title="Open Call Data:" />
+              <AccordionContent>
+                <pre className="scrollable mini text-wrap text-sm text-foreground">
+                  {JSON.stringify(ocData, null, 2)}
+                </pre>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </TabsContent>
       </Tabs>
       <div className="flex flex-col gap-8">

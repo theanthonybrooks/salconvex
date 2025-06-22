@@ -639,7 +639,6 @@ export const openCallStep1Schema = z
       });
     }
     if (appLinkFormat === "mailto:") {
-      console.log(appLinkFormat, appLink, "mail");
       if (!appLink || !isValidEmail(appLink)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

@@ -203,7 +203,8 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
       {organizer &&
         organizer.links &&
         (!submitRecap ||
-          (submitRecap && event?.links?.sameAsOrganizer === true)) &&
+          (submitRecap &&
+            (!event || event?.links?.sameAsOrganizer === true))) &&
         Object.keys(organizer.links || {}).length > 0 && (
           <div
             className={cn("flex flex-col gap-y-2 p-3", submitRecap && "p-0")}

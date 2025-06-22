@@ -94,6 +94,7 @@ const SubmissionFormEventStep1 = ({
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasEventFormat = !!eventData?.dates?.eventFormat;
+
   const eventDateFormatRequired = !!(
     hasEventFormat &&
     eventDatesFormat &&
@@ -106,6 +107,8 @@ const SubmissionFormEventStep1 = ({
     eventDatesFormat &&
     ["noEvent"].includes(eventDatesFormat)
   );
+
+  const prodSameAsEvent = eventData?.dates?.prodFormat === "sameAsEvent";
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const orgData = watch("organization");
@@ -120,7 +123,9 @@ const SubmissionFormEventStep1 = ({
   }, [formType, setValue]);
 
   const timeLineStartingText =
-    "<ol><li><p>Open Call:</p></li><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>";
+    formType > 1
+      ? "<ol><li><p>Open Call:</p></li><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>"
+      : "<ol><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>";
 
   return (
     <div
@@ -439,55 +444,56 @@ const SubmissionFormEventStep1 = ({
                     type="production"
                     watchPath="event"
                   />
-                  <div />
-                  <label
-                    className={cn(
-                      "mx-auto flex cursor-pointer items-center gap-2 py-2",
-                    )}
-                  >
-                    <Controller
-                      name="event.dates.noProdStart"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <Checkbox
-                            disabled={
-                              isOngoing ||
-                              !hasEventFormat ||
-                              (blankEventDates && eventDateFormatRequired)
-                            }
-                            tabIndex={4}
-                            id="noProdStart"
-                            className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
-                            checked={field.value || false}
-                            onCheckedChange={(checked) => {
-                              field.onChange(checked);
-                              if (checked) {
-                                setValue("event.dates.prodDates", [
-                                  {
-                                    start: "",
-                                    end: currentValues.event.dates?.prodDates
-                                      ? currentValues.event.dates.prodDates[0]
-                                          ?.end
-                                      : "",
-                                  },
-                                ]);
+                  {!prodSameAsEvent && (
+                    <label
+                      className={cn(
+                        "col-start-2 mx-auto flex cursor-pointer items-center gap-2 py-2",
+                      )}
+                    >
+                      <Controller
+                        name="event.dates.noProdStart"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <Checkbox
+                              disabled={
+                                isOngoing ||
+                                !hasEventFormat ||
+                                (blankEventDates && eventDateFormatRequired)
                               }
-                              // if (blankProdStart) {
-                              //   setNoProdStart(true);
-                              // } else if (hasProdDateAndFormat) {
-                              //   setNoProdStart(false);
-                              // }
-                            }}
-                          />
-                        );
-                      }}
-                    />
+                              tabIndex={4}
+                              id="noProdStart"
+                              className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                              checked={field.value || false}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                if (checked) {
+                                  setValue("event.dates.prodDates", [
+                                    {
+                                      start: "",
+                                      end: currentValues.event.dates?.prodDates
+                                        ? currentValues.event.dates.prodDates[0]
+                                            ?.end
+                                        : "",
+                                    },
+                                  ]);
+                                }
+                                // if (blankProdStart) {
+                                //   setNoProdStart(true);
+                                // } else if (hasProdDateAndFormat) {
+                                //   setNoProdStart(false);
+                                // }
+                              }}
+                            />
+                          );
+                        }}
+                      />
 
-                    <span className={cn("text-sm")}>
-                      The beginning production date is flexible/open
-                    </span>
-                  </label>
+                      <span className={cn("text-sm")}>
+                        The beginning production date is flexible/open
+                      </span>
+                    </label>
+                  )}
                 </>
               )}
 
