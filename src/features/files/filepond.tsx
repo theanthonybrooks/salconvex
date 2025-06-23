@@ -50,6 +50,7 @@ type FilePondInputProps = {
   maxFiles?: number;
   purpose: "docs" | "images" | "both";
   disabled?: boolean;
+  currentFileList?: string[];
 };
 
 export function FilePondInput({
@@ -60,6 +61,7 @@ export function FilePondInput({
   maxFiles = 5,
   purpose,
   disabled,
+  currentFileList,
 }: FilePondInputProps) {
   //   const UserAcceptedFileTypes = purpose === "docs" ? DOC_TYPES : ["image/*"];
   const docsOnly = purpose === "docs";
@@ -107,6 +109,14 @@ export function FilePondInput({
           const label = FILE_TYPE_LABELS[file.type] ?? file.type;
 
           // console.log(file.type, allowedSize, sizeMB, label);
+          if (currentFileList?.includes(file.name)) {
+            toast.error(`${file.name} already exists in your file list`, {
+              toastId: "filename-duplicate",
+            });
+
+            return false;
+          }
+
           if (sizeMB > allowedSize) {
             toast.error(
               `${file.name} exceeds the ${allowedSize}MB limit for ${label}s`,

@@ -391,6 +391,7 @@ const openCallSchema = {
   }),
   compensation: v.object({
     budget: v.object({
+      hasBudget: v.optional(v.boolean()),
       min: v.number(),
       max: v.optional(v.number()),
       rate: v.number(),

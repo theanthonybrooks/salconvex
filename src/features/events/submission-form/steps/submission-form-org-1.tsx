@@ -329,6 +329,9 @@ const SubmissionFormOrgStep = ({
                 type: false,
                 category: false,
                 lastEditedAt: false,
+                // dates_edition: false,
+                state: false,
+                openCallState: false,
               }}
               minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
@@ -354,6 +357,7 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
               defaultSort={{ id: "lastEditedAt", desc: true }}
+              pageSize={5}
             />
             <DataTable
               columns={columns}

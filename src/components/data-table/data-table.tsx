@@ -74,6 +74,8 @@ interface DataTableProps<TData, TValue> {
   initialSearchTerm?: string;
   minimalView?: boolean;
   defaultSort?: ColumnSort;
+  pageSize?: number;
+  isMobile?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -93,6 +95,8 @@ export function DataTable<TData, TValue>({
   initialSearchTerm,
   minimalView,
   defaultSort,
+  pageSize = 10,
+  isMobile,
 }: DataTableProps<TData, TValue>) {
   const isSelectable = tableType
     ? selectableTableTypes.includes(tableType)
@@ -118,12 +122,19 @@ export function DataTable<TData, TValue>({
 
     meta: {
       isAdmin,
+      isMobile,
       viewAll,
       setViewAll,
       tableType,
       pageType,
       minimalView,
       toolbarData,
+    },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize,
+      },
     },
 
     state: {
@@ -198,6 +209,10 @@ export function DataTable<TData, TValue>({
       onRowSelect?.(null, {});
     }
   }, [data, rowSelection, onRowSelect]);
+
+  useEffect(() => {
+    table.setPageSize(pageSize);
+  }, [table, pageSize]);
 
   return (
     <div className={cn("w-full space-y-4", outerContainerClassName)}>

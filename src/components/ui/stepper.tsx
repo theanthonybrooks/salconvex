@@ -255,11 +255,11 @@ export default function HorizontalLinearStepper({
               </p>
             )}
           <div className={cn("flex items-center justify-between gap-x-4")}>
-            <section className="flex items-center gap-x-2">
+            <section className="hidden items-center gap-x-2 lg:flex">
               <div>
                 {activeStep >= 1 && activeStep !== stepArray.length - 1 && (
                   <>
-                    <Button
+                    {/* <Button
                       variant="salWithShadowHidden"
                       className={cn(
                         "bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:hidden",
@@ -273,7 +273,7 @@ export default function HorizontalLinearStepper({
                       onClick={onSave}
                     >
                       Save
-                    </Button>
+                    </Button> */}
 
                     <Button
                       variant="salWithShadowHidden"
@@ -327,6 +327,7 @@ export default function HorizontalLinearStepper({
                 "flex min-w-24 items-center justify-end gap-2",
                 adminFinalStep &&
                   "w-full flex-col justify-center sm:w-auto sm:flex-row sm:justify-end",
+                firstStep && isMobile && "w-full",
               )}
             >
               {lastSaved && activeStep >= 1 && (
@@ -377,6 +378,7 @@ export default function HorizontalLinearStepper({
                 }
                 className={cn(
                   "flex min-w-32 items-center gap-2",
+                  firstStep && isMobile && "flex-1",
                   finalStep && "w-full sm:w-auto",
                   finalStep &&
                     !(disabled || pending) &&
@@ -394,7 +396,7 @@ export default function HorizontalLinearStepper({
                   ) : (
                     "Finish"
                   )
-                ) : activeStep === 0 ? (
+                ) : firstStep ? (
                   "Continue"
                 ) : (
                   "Next"

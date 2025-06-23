@@ -70,6 +70,7 @@ export const createOrUpdateOpenCall = mutation({
     }),
     compensation: v.object({
       budget: v.object({
+        hasBudget: v.boolean(),
         min: v.number(),
         max: v.optional(v.number()),
         rate: v.number(),
@@ -113,6 +114,7 @@ export const createOrUpdateOpenCall = mutation({
           id: v.id("openCallFiles"),
           title: v.string(),
           href: v.string(),
+          archived: v.optional(v.boolean()),
         }),
       ),
     ),
@@ -144,19 +146,18 @@ export const createOrUpdateOpenCall = mutation({
       existingOpenCall = await ctx.db.get(args.openCallId);
     }
 
-    console.log(
-      "existingOpenCall id & docs: ",
-      existingOpenCall?._id,
-      existingOpenCall?.documents,
-    );
-    console.log("args.documents: ", args.documents);
-
-    const ocDocs = [
+    const allDocs = [
       ...(existingOpenCall?.documents ?? []),
       ...(args.documents ?? []),
     ];
 
-    console.log(ocDocs);
+    const seen = new Set();
+    const ocDocs = allDocs.filter((doc) => {
+      if (seen.has(doc.id)) return false;
+      seen.add(doc.id);
+      return true;
+    });
+
     const isAdmin = user?.role?.includes("admin");
     // console.log(args.approved, args.finalStep, args.state);
     const ocState = isAdmin
@@ -181,10 +182,7 @@ export const createOrUpdateOpenCall = mutation({
         ...args.requirements,
         links: args.requirements.links ?? [],
       },
-      documents: [
-        ...(existingOpenCall?.documents ?? []),
-        ...(args.documents ?? []),
-      ],
+      documents: ocDocs,
       state: ocState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),

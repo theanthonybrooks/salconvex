@@ -22,6 +22,7 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const tablePageSize = table.getState().pagination.pageSize;
   const minimalView = table.options.meta?.minimalView;
   // const tableType = table.options.meta?.tableType;
   // const forEvents = tableType === "events";
@@ -47,7 +48,7 @@ export function DataTablePagination<TData>({
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={tablePageSize} />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 30, 40, 50].map((pageSize) => (

@@ -6,7 +6,7 @@ import { FilePreviewer } from "@/components/ui/popover-file-preview";
 import { getMimeTypeFromHref } from "@/lib/fileFns";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
-import { Book, Download, X } from "lucide-react";
+import { Book, BookDashed, Download, X } from "lucide-react";
 import { useState } from "react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -109,11 +109,14 @@ export function OpenCallFilesTable({
                 Archive
               </th>
             )}
-            {!mobileEditing && !isPublic && !disabled && (
-              <th className={cn("w-10 px-2 py-1 text-center")}>
-                {!isMobile && "Delete"}
-              </th>
-            )}
+            {!mobileEditing &&
+              !isPublic &&
+              !disabled &&
+              (isDraft || isAdmin) && (
+                <th className={cn("w-10 px-2 py-1 text-center")}>
+                  {!isMobile && "Delete"}
+                </th>
+              )}
             {isPublic && (
               <th className={cn("w-10 px-2 py-1 text-center")}>
                 {!isMobile && "Download"}
@@ -184,39 +187,44 @@ export function OpenCallFilesTable({
                   </td>
                 )}
                 {!isDraft && !isMobile && !isPublic && (
-                  <td className="px-2 py-2 text-center">
-                    <Book
-                      className={cn(
-                        "mx-auto size-4 cursor-pointer text-amber-800 opacity-70 transition hover:scale-110 hover:opacity-100",
-                        (isDraft || doc?.archived) &&
-                          !isAdmin &&
-                          "pointer-events-none invisible",
+                  <td
+                    className="px-2 py-2 text-center"
+                    onClick={() => {
+                      deleteFile({
+                        fileId: doc.id as Id<"openCallFiles">,
+                        eventId: eventId as Id<"events">,
+                        archive: doc?.archived ?? false,
+                      });
+                    }}
+                  >
+                    <div className="cursor-pointer text-amber-800 opacity-70 transition hover:scale-110">
+                      {!doc?.archived && !isDraft && (
+                        <Book className={cn("mx-auto size-4")} />
                       )}
-                      onClick={() =>
-                        deleteFile({
-                          fileId: doc.id as Id<"openCallFiles">,
-                          eventId: eventId as Id<"events">,
-                          archive: true,
-                        })
-                      }
-                    />
+                      {doc?.archived && (
+                        <BookDashed className="mx-auto size-4" />
+                      )}
+                    </div>
                   </td>
                 )}
-                {!mobileEditing && !isPublic && !disabled && (
-                  <td className="px-2 py-2 text-center">
-                    <X
-                      className={cn(
-                        "mx-auto size-4 cursor-pointer text-red-600 opacity-70 transition hover:scale-110 hover:opacity-100",
-                      )}
-                      onClick={() =>
-                        deleteFile({
-                          fileId: doc.id as Id<"openCallFiles">,
-                          eventId: eventId as Id<"events">,
-                        })
-                      }
-                    />
-                  </td>
-                )}
+                {!mobileEditing &&
+                  !isPublic &&
+                  !disabled &&
+                  (isDraft || isAdmin) && (
+                    <td className="px-2 py-2 text-center">
+                      <X
+                        className={cn(
+                          "mx-auto size-4 cursor-pointer text-red-600 opacity-70 transition hover:scale-110 hover:opacity-100",
+                        )}
+                        onClick={() =>
+                          deleteFile({
+                            fileId: doc.id as Id<"openCallFiles">,
+                            eventId: eventId as Id<"events">,
+                          })
+                        }
+                      />
+                    </td>
+                  )}
                 {isPublic && (
                   <td className="px-2 py-2 text-center">
                     <a

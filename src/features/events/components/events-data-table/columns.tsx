@@ -339,7 +339,7 @@ export const columns: ColumnDef<Event>[] = [
       // console.log(table.options)
 
       return (
-        <div className={cn("hidden justify-center md:flex", isAdmin && "flex")}>
+        <div className={cn("flex justify-center", isAdmin && "flex")}>
           <ConfirmingDropdown>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -360,6 +360,7 @@ export const columns: ColumnDef<Event>[] = [
                   {isAdmin ? "Event" : "Actions"}
                 </DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
+                <GoToEvent slug={slug} edition={edition} />
                 <DuplicateEvent eventId={event._id} />
                 {(state === "draft" || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
@@ -395,15 +396,18 @@ export const columns: ColumnDef<Event>[] = [
                       isAdmin && <ApproveBoth openCallId={openCallId} />}
                   </>
                 )}
-                <GoToEvent slug={slug} edition={edition} />
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(event._id)}
-                  className="flex items-center gap-x-2"
-                >
-                  <LucideClipboardCopy className="size-4" /> Event ID
-                </DropdownMenuItem>
-                {isAdmin && <DataTableOrgInfo orgId={event.mainOrgId} />}
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => navigator.clipboard.writeText(event._id)}
+                      className="flex items-center gap-x-2"
+                    >
+                      <LucideClipboardCopy className="size-4" /> Event ID
+                    </DropdownMenuItem>
+                    <DataTableOrgInfo orgId={event.mainOrgId} />
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </ConfirmingDropdown>

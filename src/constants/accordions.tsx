@@ -187,7 +187,14 @@ export const openCallFaqs: AccordionSection = {
     {
       id: "all-inclusive",
       subtitle: "All-inclusive budgets",
-      text: "Term used to describe whether the project budget is provided with no other additional support (ie no design fee, no equipment, etc). If not &quot;All-inclusive&quot;, then the project budget is provided with additional support beyond the artist stipend.",
+      text: (
+        <p>
+          Term used to describe whether the project budget is provided with no
+          other additional support (ie no design fee, no equipment, etc). If not
+          &quot;All-inclusive&quot;, then the project budget is provided with
+          additional support beyond the artist stipend.
+        </p>
+      ),
     },
     {
       id: "app-fees",

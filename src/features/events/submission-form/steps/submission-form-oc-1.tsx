@@ -68,7 +68,6 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  console.log(watch("openCall.eligibility.whom"));
   const appLinkFormat =
     watch("openCall.requirements.applicationLinkFormat") ?? "https://";
 
@@ -150,7 +149,7 @@ const SubmissionFormOC1 = ({
   useEffect(() => {
     if (!freeCall) return;
     if (freeCall) {
-    // setValue("openCall.eligibility.whom", []);
+      // setValue("openCall.eligibility.whom", []);
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [freeCall, setValue]);
@@ -172,7 +171,8 @@ const SubmissionFormOC1 = ({
         className={cn(
           "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
           "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-          "mx-auto max-w-[60dvw] xl:max-w-full xl:py-10 4xl:my-auto",
+          "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
+          "lg:max-w-[60dvw]",
           // "xl:self-center",
         )}
       >
@@ -468,7 +468,8 @@ const SubmissionFormOC1 = ({
           className={cn(
             "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
             "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-            "mx-auto max-w-[60dvw] xl:max-w-full xl:py-10 4xl:my-auto", // "xl:self-center",
+            "mx-auto xl:max-w-full xl:py-10 4xl:my-auto", // "xl:self-center",
+            "lg:max-w-[60dvw]",
           )}
         >
           {" "}
@@ -700,6 +701,9 @@ const SubmissionFormOC1 = ({
                           maxFileSize="5MB"
                           maxFiles={10}
                           disabled={pastEvent}
+                          currentFileList={openCall?.documents?.map(
+                            (doc) => doc.title,
+                          )}
                         />
                       )}
                     />

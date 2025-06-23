@@ -23,9 +23,11 @@ import { Controller, useFormContext } from "react-hook-form";
 registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
 import { MultiSelect } from "@/components/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { siteUrl } from "@/constants/siteInfo";
 import { getCurrencySymbol } from "@/lib/currencyFns";
+import { convertBooleanToString } from "@/lib/selectFns";
 import { openCallCategoryFields } from "@/types/openCall";
 import "filepond/dist/filepond.min.css";
 
@@ -64,9 +66,7 @@ const SubmissionFormOC2 = ({
     // getValues,
     // formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
-    paidCall ? "true" : "",
-  );
+
   const openCall = watch("openCall");
   const organizer = watch("organization");
   const selectedCategories = watch("openCall.compensation.categories") ?? {};
@@ -75,8 +75,17 @@ const SubmissionFormOC2 = ({
   );
 
   const orgCurrency = organizer?.location?.currency;
+  const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
   // const eventName = watch("event.name");
   // const eventId = watch("event._id");
+  const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
+    typeof existingHasBudget === "boolean"
+      ? convertBooleanToString(existingHasBudget)
+      : paidCall
+        ? "true"
+        : "",
+  );
+
   const showBudgetInputs = hasBudget?.trim() === "true";
 
   const budgetMin = openCall?.compensation?.budget?.min;
@@ -93,28 +102,13 @@ const SubmissionFormOC2 = ({
   const hasRate =
     typeof budgetRate === "number" && budgetRate > 0 && budgetUnit !== "";
   const allInclusive = openCall?.compensation?.budget?.allInclusive;
+  const unknownBudget = openCall?.compensation?.budget?.unknownBudget;
   const prevBudgetMaxRef = useRef<number | undefined>(undefined);
   const budgetMaxRef = useRef(budgetMax);
   // const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
-  // console.log(openCall);
-
-  // const noBudget
-
-  // const hasRate = openCall?.compensation?.budget?.unit;
-  // #region -------------- UseEffect ---------------
-
-  // useEffect(() => {
-  //   if (!budgetLg) return;
-  //   if (budgetLg) {
-  //     setError("openCall.compensation.budget.max", {
-  //       type: "manual",
-  //       message: "Budget max must be less than 1000 for free calls",
-  //     });
-  //   }
-  // }, [budgetLg, setError]);
 
   useEffect(() => {
     if (!paidCall) return;
@@ -232,8 +226,9 @@ const SubmissionFormOC2 = ({
         className={cn(
           "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
           "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-          "mx-auto max-w-[60dvw] xl:max-w-full xl:py-10 4xl:my-auto",
+          "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
           !showBudgetInputs && "lg:gap-y-4 lg:pb-5 xl:pb-5",
+          "lg:max-w-[60dvw]",
           showBudgetInputs && "self-start",
 
           // "xl:self-center",
@@ -255,29 +250,36 @@ const SubmissionFormOC2 = ({
           </Label>
           {!paidCall && (
             <>
-              <Select
-                onValueChange={(value: "true" | "false" | "") => {
-                  setHasBudget(value);
-                }}
-                value={hasBudget}
-                disabled={pastEvent}
-              >
-                <SelectTrigger
-                  className={cn(
-                    "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
-                  )}
-                >
-                  <SelectValue placeholder="Project Budget?*" />
-                </SelectTrigger>
-                <SelectContent className="min-w-auto">
-                  <SelectItem fit value="true">
-                    Yes
-                  </SelectItem>
-                  <SelectItem fit value="false">
-                    No
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="openCall.compensation.budget.hasBudget"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value: "true" | "false") => {
+                      field.onChange(value === "true");
+                      setHasBudget(value);
+                    }}
+                    value={String(field.value) ?? ""}
+                    disabled={pastEvent}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
+                      )}
+                    >
+                      <SelectValue placeholder="Project Budget?*" />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-auto">
+                      <SelectItem fit value="true">
+                        Yes
+                      </SelectItem>
+                      <SelectItem fit value="false">
+                        No
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
 
               <div className="hidden items-center justify-center px-2 sm:flex">
                 <ArrowRight
@@ -370,105 +372,137 @@ const SubmissionFormOC2 = ({
         </div>
 
         <>
-          <div className="input-section">
-            <p className="lg:text-xs">Rate:</p>
-            <p className="text-xs">(optional)</p>
-          </div>
-
-          <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
-            <Label htmlFor="hasBudget" className="sr-only">
-              Budget Rate
-            </Label>
-            <div
+          {isAdmin && hasBudget === "true" && (
+            <label
               className={cn(
-                "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
-                !showBudgetInputs &&
-                  "opacity-50 [@media(max-width:640px)]:hidden",
-                pastEvent && "border-foreground/50 opacity-50",
+                "col-start-2 mx-auto flex cursor-pointer items-center gap-2 py-2",
               )}
             >
               <Controller
-                name="openCall.compensation.budget.currency"
+                name="openCall.compensation.budget.unknownBudget"
                 control={control}
-                render={({ field }) => (
-                  <SearchMappedSelect<Currency>
-                    searchFields={["name", "symbol", "code"]}
-                    className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
-                    value={field.value ?? orgCurrency?.code ?? "USD"}
-                    onChange={(code) => {
-                      const selected = Object.values(currencies[0])
-                        .flat()
-                        .find((cur) => cur.code === code);
-
-                      if (selected) field.onChange(selected.code);
-                    }}
-                    data={currencies[0]}
-                    getItemLabel={(c) => `${c.symbol} (${c.code}) - ${c.name}`}
-                    getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
-                    getItemValue={(c) => c.code}
-                    disabled={!showBudgetInputs || pastEvent}
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Checkbox
+                      tabIndex={4}
+                      id="noProdStart"
+                      className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
+                      checked={field.value || false}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                      }}
+                    />
+                  );
+                }}
               />
-              <div className="flex w-full flex-col">
-                <div className="flex w-full items-center gap-1">
+              <span className={cn("text-sm")}>
+                The budget amount is unknown (ie. not provided)
+              </span>
+            </label>
+          )}
+          {hasBudget === "true" && (
+            <>
+              <div className="input-section">
+                <p className="lg:text-xs">Rate:</p>
+                <p className="text-xs">(optional)</p>
+              </div>
+
+              <div className="mx-auto flex w-full flex-col gap-2 sm:flex-row lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="hasBudget" className="sr-only">
+                  Budget Rate
+                </Label>
+                <div
+                  className={cn(
+                    "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
+                    !showBudgetInputs &&
+                      "opacity-50 [@media(max-width:640px)]:hidden",
+                    pastEvent && "border-foreground/50 opacity-50",
+                  )}
+                >
                   <Controller
-                    name="openCall.compensation.budget.rate"
+                    name="openCall.compensation.budget.currency"
                     control={control}
                     render={({ field }) => (
-                      <DebouncedControllerNumInput
-                        field={field}
-                        formatNumber={true}
-                        value={field.value ?? 0}
-                        min={0}
+                      <SearchMappedSelect<Currency>
+                        searchFields={["name", "symbol", "code"]}
+                        className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
+                        value={field.value ?? orgCurrency?.code ?? "USD"}
+                        onChange={(code) => {
+                          const selected = Object.values(currencies[0])
+                            .flat()
+                            .find((cur) => cur.code === code);
+
+                          if (selected) field.onChange(selected.code);
+                        }}
+                        data={currencies[0]}
+                        getItemLabel={(c) =>
+                          `${c.symbol} (${c.code}) - ${c.name}`
+                        }
+                        getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
+                        getItemValue={(c) => c.code}
                         disabled={!showBudgetInputs || pastEvent}
-                        placeholder="Rate (ex: 30)"
-                        className="h-fit border-none !bg-card p-2 text-center focus:border-none focus:outline-none sm:text-base"
                       />
                     )}
                   />
+                  <div className="flex w-full flex-col">
+                    <div className="flex w-full items-center gap-1">
+                      <Controller
+                        name="openCall.compensation.budget.rate"
+                        control={control}
+                        render={({ field }) => (
+                          <DebouncedControllerNumInput
+                            field={field}
+                            formatNumber={true}
+                            value={field.value ?? 0}
+                            min={0}
+                            disabled={!showBudgetInputs || pastEvent}
+                            placeholder="Rate (ex: 30)"
+                            className="h-fit border-none !bg-card p-2 text-center focus:border-none focus:outline-none sm:text-base"
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                <p className="m-auto px-2"> per </p>
+
+                <Controller
+                  name="openCall.compensation.budget.unit"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      disabled={pastEvent}
+                      // onValueChange={(value: "ft²" | "m²" | "") => {
+                      //   setHasRate(value);
+                      // }}
+                      onValueChange={field.onChange}
+                      value={field.value ?? ""}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "h-12 w-full min-w-25 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
+                        )}
+                      >
+                        <SelectValue placeholder="Rate Unit" />
+                      </SelectTrigger>
+                      <SelectContent className="min-w-auto">
+                        <SelectItem fit value="ft²">
+                          ft²
+                        </SelectItem>
+                        <SelectItem fit value="m²">
+                          m²
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
-            </div>
-
-            <p className="m-auto px-2"> per </p>
-
-            <Controller
-              name="openCall.compensation.budget.unit"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  disabled={pastEvent}
-                  // onValueChange={(value: "ft²" | "m²" | "") => {
-                  //   setHasRate(value);
-                  // }}
-                  onValueChange={field.onChange}
-                  value={field.value ?? ""}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-12 w-full min-w-25 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
-                    )}
-                  >
-                    <SelectValue placeholder="Rate Unit" />
-                  </SelectTrigger>
-                  <SelectContent className="min-w-auto">
-                    <SelectItem fit value="ft²">
-                      ft²
-                    </SelectItem>
-                    <SelectItem fit value="m²">
-                      m²
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </div>
-
+            </>
+          )}
           <div className="input-section">
             <p className="lg:text-xs">All inclusive</p>
           </div>
-
           <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
             <Label htmlFor="event.category" className="sr-only">
               All inclusive budget selection
@@ -525,7 +559,7 @@ const SubmissionFormOC2 = ({
           </div>
         </>
 
-        {(hasBudgetMin || hasRate || noBudget) && (
+        {(hasBudgetMin || hasRate || noBudget || unknownBudget) && (
           <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">Step 2: </p>
@@ -607,7 +641,8 @@ const SubmissionFormOC2 = ({
             className={cn(
               "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
               "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
-              "mx-auto max-w-[60dvw] xl:max-w-full xl:py-10 4xl:my-auto",
+              "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
+              "lg:max-w-[60dvw]",
               !showBudgetInputs && "lg:gap-y-0 lg:pt-0 xl:pt-0",
 
               // "xl:self-center",

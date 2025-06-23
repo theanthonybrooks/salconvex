@@ -37,5 +37,6 @@ declare module "@tanstack/react-table" {
     getRowData?: (row: TData) => void;
     minimalView?: boolean;
     toolbarData?: ToolbarData;
+    isMobile?: boolean;
   }
 }

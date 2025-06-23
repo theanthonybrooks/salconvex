@@ -1015,6 +1015,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             },
             compensation: {
               budget: {
+                hasBudget: false,
                 min: 0,
                 max: undefined,
                 rate: 0,
@@ -1122,6 +1123,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             },
             compensation: {
               budget: {
+                hasBudget: openCallData.compensation.budget.hasBudget ?? false,
                 min: openCallData.compensation.budget.min,
                 max: openCallData.compensation.budget.max,
                 rate: openCallData.compensation.budget.rate,
@@ -1312,6 +1314,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               },
               compensation: {
                 budget: {
+                  hasBudget:
+                    openCallData.compensation.budget.hasBudget ?? false,
                   min: openCallData.compensation.budget.min,
                   max: openCallData.compensation.budget.max,
                   rate: openCallData.compensation.budget.rate,

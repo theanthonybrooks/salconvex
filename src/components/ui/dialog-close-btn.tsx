@@ -27,6 +27,7 @@ interface DialogCloseBtnProps {
   onPrimaryAction?: () => void | string;
   className?: string;
   actionClassName?: string;
+  cancelTitle?: string;
   primaryActionClassName?: string;
   primaryActionTitle?: string;
   triggerTitle?: string;
@@ -41,6 +42,7 @@ export const DialogCloseBtn = ({
   className,
   actionTitle = "Discard",
   onAction,
+  cancelTitle = "Cancel",
   onPrimaryAction,
   primaryActionTitle = "Return to homepage",
   actionClassName,
@@ -120,7 +122,9 @@ export const DialogCloseBtn = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => {}}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => {}}>
+            {cancelTitle}
+          </AlertDialogCancel>
 
           <AlertDialogAction
             onClick={onAction}

@@ -563,6 +563,8 @@ export const openCallBaseSchema = z.object({
 
 export const openCallCompensationSchema = z.object({
   budget: z.object({
+    hasBudget: z.optional(z.boolean()),
+    unknownBudget: z.optional(z.boolean()),
     min: z.number(),
     max: z.optional(z.number()),
     rate: z.number(),
@@ -649,8 +651,6 @@ export const openCallStep1Schema = z
     }
 
     if (appLinkFormat === "https://") {
-      console.log(appLinkFormat, appLink, "link");
-      console.log(isValidUrl(appLink));
       if (!appLink || !isValidUrl(appLink)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -676,16 +676,24 @@ export const openCallStep2Schema = z
   })
   .superRefine((data, ctx) => {
     // const allInclusive = data.openCall.compensation.budget.allInclusive;
+    const unknownBudget = data.openCall.compensation.budget.unknownBudget;
+    const hasBudget = data.openCall.compensation.budget.hasBudget;
     const budgetRate = data.openCall.compensation.budget.rate;
     const budgetUnit = data.openCall.compensation.budget.unit;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
     const budgetLg = typeof budgetMax === "number" && budgetMax > 1000;
     const missingBudget =
-      typeof budgetMin === "number" && budgetMin <= 1 && budgetRate === 0;
+      hasBudget &&
+      typeof budgetMin === "number" &&
+      budgetMin <= 1 &&
+      budgetRate === 0;
 
     const missingUnit =
-      typeof budgetRate === "number" && budgetRate > 0 && budgetUnit === "";
+      hasBudget &&
+      typeof budgetRate === "number" &&
+      budgetRate > 0 &&
+      budgetUnit === "";
 
     if (missingUnit) {
       ctx.addIssue({
@@ -695,10 +703,10 @@ export const openCallStep2Schema = z
       });
     }
     const paidCall = data.event.formType === 3;
-    if (missingBudget && paidCall) {
+    if (missingBudget && !unknownBudget && (paidCall || hasBudget === true)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Minimum budget or rate is required for paid calls",
+        message: "Minimum budget or rate is required",
         path: ["openCall", "compensation", "budget"],
       });
     }

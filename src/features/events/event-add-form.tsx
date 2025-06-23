@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { DialogClose } from "@/components/ui/dialog";
-
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
 import React, {
@@ -35,6 +32,7 @@ import {
   step1Schema,
 } from "@/features/organizers/schemas/event-add-schema";
 
+import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
 import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
@@ -46,6 +44,7 @@ import { SubmissionFormRecapMobile } from "@/features/events/submission-form/ste
 import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
+import { cn } from "@/lib/utils";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
@@ -130,7 +129,7 @@ export const EventOCForm = ({
   shouldClose,
   setOpen,
   setShouldClose,
-  // hasUnsavedChanges,
+  hasUnsavedChanges,
   setHasUnsavedChanges,
   activeStep,
   setActiveStep,
@@ -445,9 +444,9 @@ export const EventOCForm = ({
   //
   //
   // #region -------------Used Function --------------
-  const onCancel = () => {
-    setActiveStep(0);
-  };
+  // const onCancel = () => {
+  //   setActiveStep(0);
+  // };
 
   const onSubmit = async () => {
     let url: string | undefined;
@@ -1085,6 +1084,7 @@ export const EventOCForm = ({
             },
             compensation: {
               budget: {
+                hasBudget: openCallData.compensation?.budget?.hasBudget ?? false,
                 min: openCallData.compensation?.budget?.min ?? 0,
                 max: openCallData.compensation?.budget?.max ?? 0,
                 rate: openCallData.compensation?.budget?.rate ?? 0,
@@ -1193,6 +1193,7 @@ export const EventOCForm = ({
             },
             compensation: {
               budget: {
+                hasBudget: openCallData.compensation.budget.hasBudget ?? false,
                 min: openCallData.compensation.budget.min,
                 max: openCallData.compensation.budget.max,
                 rate: openCallData.compensation.budget.rate,
@@ -1396,6 +1397,7 @@ export const EventOCForm = ({
               },
               compensation: {
                 budget: {
+                  hasBudget: openCallData.compensation.budget.hasBudget ?? false,
                   min: openCallData.compensation.budget.min,
                   max: openCallData.compensation.budget.max,
                   rate: openCallData.compensation.budget.rate,
@@ -1915,6 +1917,7 @@ export const EventOCForm = ({
     <>
       <HorizontalLinearStepper
         isAdmin={isAdmin}
+        isMobile={isMobile}
         onCheckSchema={handleCheckSchema}
         errorMsg={errorMsg}
         activeStep={activeStep}
@@ -1933,16 +1936,40 @@ export const EventOCForm = ({
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
         cancelButton={
-          <DialogClose asChild>
-            <Button
-              type="button"
-              variant="salWithShadowHiddenYlw"
-              className="hidden lg:min-w-24"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-          </DialogClose>
+          <DialogCloseBtn
+            className="w-full"
+            title={
+              hasUnsavedChanges
+                ? "Discard unsaved changes?"
+                : "Exit submission form?"
+            }
+            description={
+              activeStep > 0
+                ? hasUnsavedChanges
+                  ? "Sure? You can always start the submission process at a later time. Save your event to a draft in your dashboard."
+                  : "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
+                : "Sure? You can always start the submission process at a later time. "
+            }
+            actionTitle={hasUnsavedChanges ? "Discard" : "Cancel"}
+            cancelTitle={hasUnsavedChanges ? "Cancel" : "Back"}
+            primaryActionTitle="Save & Exit"
+            onAction={() => {
+              setOpen(false);
+            }}
+            onPrimaryAction={
+              activeStep > 0 && hasUnsavedChanges
+                ? () => {
+                    handleSave();
+                    setOpen(false);
+                  }
+                : undefined
+            }
+            // triggerVariant="salWithShadowHiddenPink"
+            triggerTitle="Cancel"
+            triggerSize="default"
+            triggerClassName={cn(activeStep === 0 && isMobile && "flex-1")}
+            type="button"
+          />
         }
       >
         <div ref={topRef} />

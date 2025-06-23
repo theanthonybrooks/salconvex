@@ -73,7 +73,7 @@ export const AccountSubscribeForm = ({
 
   const unsavedAlertDescription = isArtist
     ? "All unsaved changes will be lost. Please save first"
-    : "Please save to ensure your changes are saved";
+    : "Please save to ensure your changes aren't lost";
 
   const unsavedAlertTitle = isArtist
     ? "Discard unsaved changes?"
