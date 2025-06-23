@@ -866,6 +866,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             about: eventData.about,
             links: eventData.links,
             otherInfo: eventData.otherInfo || undefined,
+            timeLine: eventData.timeLine,
             adminNote: eventData.adminNote || undefined,
             active: eventData.active,
             orgId: orgData._id as Id<"organizations">,
@@ -915,6 +916,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             about: eventData.about,
             links: eventData.links,
             otherInfo: eventData.otherInfo || undefined,
+            timeLine: eventData.timeLine,
             adminNote: eventData.adminNote || undefined,
             active: eventData.active,
             orgId: orgData._id as Id<"organizations">,
@@ -1289,6 +1291,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             about: eventData.about,
             links: eventLinks,
             otherInfo: eventData.otherInfo || undefined,
+            timeLine: eventData.timeLine,
             adminNote: eventData.adminNote || undefined,
 
             active: eventData.active,
