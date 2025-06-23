@@ -44,6 +44,8 @@ export const getFilteredEventsPublic = query({
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 
     const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 12);
+
+    console.log(endDay);
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
 
     const weekStartISO = shiftedWeekStart.toISOString();

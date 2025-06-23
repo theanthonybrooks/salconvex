@@ -765,7 +765,6 @@ export const getEventWithOCDetails = query({
     source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // console.log(args);
     const source = args.source ?? "eventpage";
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");

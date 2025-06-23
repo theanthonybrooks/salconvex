@@ -245,6 +245,12 @@ const ClientEventList = (
   const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
   const hasResults = totalResults > 0;
   let flatIndex = 0;
+
+  useEffect(() => {
+    if (page && page > 1) {
+      document.title = `${document.title} - Pg.${page}`;
+    }
+  }, [page]);
   return (
     <>
       {!publicView && (

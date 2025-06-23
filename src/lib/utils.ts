@@ -22,3 +22,7 @@ export function arraysShareValue<T>(arr1: T[], arr2: T[]): boolean {
   const set1 = new Set(arr1);
   return arr2.some((item) => set1.has(item));
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
