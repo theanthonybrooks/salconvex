@@ -1084,7 +1084,8 @@ export const EventOCForm = ({
             },
             compensation: {
               budget: {
-                hasBudget: openCallData.compensation?.budget?.hasBudget ?? false,
+                hasBudget:
+                  openCallData.compensation?.budget?.hasBudget ?? false,
                 min: openCallData.compensation?.budget?.min ?? 0,
                 max: openCallData.compensation?.budget?.max ?? 0,
                 rate: openCallData.compensation?.budget?.rate ?? 0,
@@ -1289,6 +1290,7 @@ export const EventOCForm = ({
             },
             about: orgData.about,
             links: orgData.links,
+            isComplete: true,
           });
 
           if (!result) {
@@ -1397,7 +1399,8 @@ export const EventOCForm = ({
               },
               compensation: {
                 budget: {
-                  hasBudget: openCallData.compensation.budget.hasBudget ?? false,
+                  hasBudget:
+                    openCallData.compensation.budget.hasBudget ?? false,
                   min: openCallData.compensation.budget.min,
                   max: openCallData.compensation.budget.max,
                   rate: openCallData.compensation.budget.rate,
