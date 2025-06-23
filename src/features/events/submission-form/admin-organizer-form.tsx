@@ -968,7 +968,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           openCallFiles = result;
 
           saveResults = await saveOrgFile({
-            files: result, // this is your array from handleOrgFileUrl
+            files: result,
             reason: "docs",
             organizationId: orgData._id as Id<"organizations">,
             eventId: eventData._id as Id<"events">,
@@ -1156,7 +1156,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 openCallData.requirements.applicationLinkSubject,
               otherInfo: undefined,
             },
-            documents: undefined,
+            documents: openCallData.documents as
+              | {
+                  id: Id<"openCallFiles">;
+                  title: string;
+                  href: string;
+                }[]
+              | undefined,
             paid: openCallData.paid ?? false,
           });
           let lastEditedResult = null;
@@ -1349,7 +1355,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   openCallData.requirements.applicationLinkSubject,
                 otherInfo: undefined,
               },
-              documents: undefined,
+              documents: openCallData.documents as
+                | {
+                    id: Id<"openCallFiles">;
+                    title: string;
+                    href: string;
+                  }[]
+                | undefined,
               state: publish ? "published" : "submitted",
               finalStep,
               approved: publish,
