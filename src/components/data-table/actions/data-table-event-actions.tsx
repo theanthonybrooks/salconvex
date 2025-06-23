@@ -34,7 +34,7 @@ export const GoToEvent = ({ slug, edition }: ToEventActionProps) => {
   return (
     <DropdownMenuItem
       onClick={() => {
-        window.location.href = `/thelist/event/${slug}/${edition}`;
+        window.location.href = `/thelist/event/${slug}/${edition}/call`;
       }}
       className="flex items-center gap-x-1"
     >

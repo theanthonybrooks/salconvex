@@ -243,7 +243,7 @@ export const OrgSearch = ({
             handleKeyDown(e);
           }}
           placeholder={placeholder}
-          maxLength={35}
+          maxLength={50}
           tabIndex={tabIndex}
           className={cn(
             "h-full w-full rounded border p-2 pl-8 pr-10 lg:pl-14 lg:pr-14",
