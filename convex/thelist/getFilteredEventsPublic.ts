@@ -3,7 +3,13 @@ import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { addHours, addWeeks, endOfWeek, startOfWeek, subHours } from "date-fns";
+import {
+  addHours,
+  addMinutes,
+  addWeeks,
+  endOfWeek,
+  startOfWeek,
+} from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 export const getFilteredEventsPublic = query({
@@ -41,7 +47,11 @@ export const getFilteredEventsPublic = query({
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
     // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
-    const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 0);
+    // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 0);
+    const startDay = addMinutes(
+      startOfWeek(new Date(), { weekStartsOn: 1 }),
+      0,
+    );
     // const startDay = addHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 4);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 
@@ -50,6 +60,7 @@ export const getFilteredEventsPublic = query({
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
     // console.log(
     //   startDay,
+    //   // startDayMin,
     //   endDay,
     //   "shiftedWeek: ",
     //   shiftedWeekStart,

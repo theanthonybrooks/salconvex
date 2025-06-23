@@ -501,7 +501,7 @@ export function formatCondensedDateRange(
   endIso: string,
   // tz: string = "UTC",
 ): string {
-  const start = DateTime.fromISO(startIso, { zone: "America/Chicago" });
+  const start = DateTime.fromISO(startIso, { zone: "UTC" });
   const end = DateTime.fromISO(endIso, { zone: "Etc/GMT+12" });
 
   if (!start.isValid || !end.isValid) return "";
