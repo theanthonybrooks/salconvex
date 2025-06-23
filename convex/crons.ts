@@ -11,7 +11,13 @@ crons.daily(
 
 crons.hourly(
   "archive expired open calls",
-  { minuteUTC: 0 }, // runs at the top of every hour
+  { minuteUTC: 0 },
+  internal.openCalls.openCall.archiveExpiredOpenCalls,
+);
+
+crons.hourly(
+  "archive expired open calls (30)",
+  { minuteUTC: 30 },
   internal.openCalls.openCall.archiveExpiredOpenCalls,
 );
 

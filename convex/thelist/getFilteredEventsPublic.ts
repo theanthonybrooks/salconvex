@@ -50,8 +50,6 @@ export const getFilteredEventsPublic = query({
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
 
-    console.log(weekStartISO, weekEndISO);
-
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
     const isAdmin = user?.role?.includes("admin");

@@ -317,7 +317,12 @@ export const updateOrganization = mutation({
           : args.links?.email,
     };
 
-    const orgIsComplete = organization.isComplete ?? args.isComplete ?? false;
+    let orgIsComplete = false;
+    if (organization.isComplete === false) {
+      if (args.isComplete === true) {
+        orgIsComplete = true;
+      }
+    }
 
     await ctx.db.patch(organization._id, {
       name: args.name,
