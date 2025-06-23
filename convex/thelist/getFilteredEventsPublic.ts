@@ -40,12 +40,21 @@ export const getFilteredEventsPublic = query({
     // const now = new Date();
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
-    const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
+    // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
+    const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 0);
+    // const startDay = addHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 4);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 
-    const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 36);
+    const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 0);
 
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
+    console.log(
+      startDay,
+      endDay,
+      "shiftedWeek: ",
+      shiftedWeekStart,
+      shiftedWeekEnd,
+    );
 
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
