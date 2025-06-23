@@ -460,11 +460,9 @@ export const EventOCForm = ({
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
-      if (existingOrg?.isComplete === false) {
-        await markOrganizationComplete({
-          orgId: existingOrg._id,
-        });
-      }
+      console.log("hi mom");
+      console.log(existingOrg?.isComplete);
+
       await handleSave(true);
       if (paidCall && !alreadyPaid) {
         const result = await getCheckoutUrl({
@@ -1346,6 +1344,12 @@ export const EventOCForm = ({
         try {
           setPending(true);
 
+          if (existingOrg?.isComplete === false) {
+            await markOrganizationComplete({
+              orgId: existingOrg._id,
+            });
+          }
+
           const { event } = await createOrUpdateEvent({
             formType,
             _id: eventData._id || "",
@@ -1491,6 +1495,7 @@ export const EventOCForm = ({
       setExistingEvent,
       handleCheckSchema,
       pending,
+      markOrganizationComplete,
     ],
   );
 

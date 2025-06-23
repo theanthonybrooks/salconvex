@@ -445,11 +445,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
-      if (existingOrg?.isComplete === false) {
-        await markOrganizationComplete({
-          orgId: existingOrg._id,
-        });
-      }
+
       await handleSave(true);
 
       toast.success(
@@ -1272,6 +1268,12 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         try {
           setPending(true);
 
+          if (existingOrg?.isComplete === false) {
+            await markOrganizationComplete({
+              orgId: existingOrg._id,
+            });
+          }
+
           const { event } = await createOrUpdateEvent({
             formType,
             _id: eventData._id || "",
@@ -1393,6 +1395,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       hasOpenCall,
       openCallData,
       createOrUpdateOpenCall,
+      markOrganizationComplete,
 
       orgData,
       generateUploadUrl,
