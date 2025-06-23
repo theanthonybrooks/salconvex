@@ -220,6 +220,10 @@ export const OrgSearch = ({
     }, 100);
   }, [showSuggestions]);
 
+  const sortedResults = results
+    ? [...results].sort((a, b) => a.name.localeCompare(b.name))
+    : [];
+
   return (
     <div className="relative mx-auto w-full lg:max-w-md" ref={containerRef}>
       <section className={cn("relative z-[2] h-12 lg:h-auto", className)}>
@@ -282,7 +286,7 @@ export const OrgSearch = ({
             ref={listRef}
             className="scrollable mini absolute z-1 mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
           >
-            {results.map((org, idx) => (
+            {sortedResults.map((org, idx) => (
               <li
                 key={org._id}
                 ref={(el) => {
