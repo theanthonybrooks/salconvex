@@ -64,7 +64,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
       ? formatCondensedDateRange(
           queryResult.weekStartISO,
           queryResult.weekEndISO,
-          "UTC",
         )
       : "";
   const handleDownloadAll = async () => {

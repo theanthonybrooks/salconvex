@@ -499,10 +499,10 @@ export const parseEventDate = (
 export function formatCondensedDateRange(
   startIso: string,
   endIso: string,
-  tz: string = "UTC",
+  // tz: string = "UTC",
 ): string {
-  const start = DateTime.fromISO(startIso, { zone: tz });
-  const end = DateTime.fromISO(endIso, { zone: tz });
+  const start = DateTime.fromISO(startIso, { zone: "UTC" });
+  const end = DateTime.fromISO(endIso, { zone: "Etc/GMT+12" });
 
   if (!start.isValid || !end.isValid) return "";
 

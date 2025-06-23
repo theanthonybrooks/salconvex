@@ -43,13 +43,14 @@ export const getFilteredEventsPublic = query({
     const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 
-    const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 12);
+    const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 36);
 
-    console.log(endDay);
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
 
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
+
+    console.log(weekStartISO, weekEndISO);
 
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
