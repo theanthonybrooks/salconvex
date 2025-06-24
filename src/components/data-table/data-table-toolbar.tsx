@@ -121,7 +121,7 @@ export function DataTableToolbar<TData>({
           className="mx-auto h-12 w-full max-w-[74dvw] sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {eventAndOC && (
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 [@media(max-width:768px)]:flex-col">
             {table.getColumn("state") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
