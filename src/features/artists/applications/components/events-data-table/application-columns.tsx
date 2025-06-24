@@ -173,6 +173,11 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
     accessorKey: "applicationStatus",
     minSize: 180,
     maxSize: 200,
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(value);
+    },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),

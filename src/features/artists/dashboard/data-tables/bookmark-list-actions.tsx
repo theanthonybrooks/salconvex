@@ -20,19 +20,22 @@ interface BookmarkListActionSelectorProps {
   eventId: Id<"events">;
   initialValue?: string;
   appStatus?: ApplicationStatus;
+  isPast?: boolean;
 }
 
 export const BookmarkListActionSelector = ({
   eventId,
   initialValue,
   appStatus,
+  isPast,
 }: BookmarkListActionSelectorProps) => {
   const [value, setValue] = useState(initialValue);
 
   const updateListAction = useMutation(api.artists.listActions.updateBookmark);
   const disabledValue =
-    typeof appStatus === "string" &&
-    !positiveApplicationStatuses.includes(appStatus ?? "");
+    (typeof appStatus === "string" &&
+      !positiveApplicationStatuses.includes(appStatus ?? "")) ||
+    positiveApplicationStatuses.includes(appStatus ?? "");
 
   const handleChange = (intent: string) => {
     updateListAction({
@@ -56,7 +59,9 @@ export const BookmarkListActionSelector = ({
         <SelectValue placeholder={"Select..."} />
       </SelectTrigger>
       <SelectContent>
-        {!["planned", "missed", "-"].includes(initialValue ?? "") &&
+        {!["planned", "missed", "nextYear", "contact", "-"].includes(
+          initialValue ?? "",
+        ) &&
           initialValue && (
             <SelectItem
               value={initialValue}
@@ -67,7 +72,9 @@ export const BookmarkListActionSelector = ({
             </SelectItem>
           )}
 
-        <SelectItem value="planned">Planned</SelectItem>
+        {!isPast && <SelectItem value="planned">Planned</SelectItem>}
+        <SelectItem value="nextYear">Next Year</SelectItem>
+        <SelectItem value="contact">Contact</SelectItem>
         <SelectItem value="missed">Missed</SelectItem>
         <SelectItem value="-">-</SelectItem>
       </SelectContent>

@@ -8,12 +8,15 @@ import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 
 import {
+  appStatusOptions,
+  bookmarkIntents,
   eventCategories,
   eventStates,
   subscriptionOptions,
   subscriptionStatusOptions,
 } from "@/components/data-table/data-table-row-actions";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -33,6 +36,8 @@ export function DataTableToolbar<TData>({
   setRowSelection,
   initialSearchTerm,
 }: DataTableToolbarProps<TData>) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   const router = useRouter();
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,
@@ -47,6 +52,8 @@ export function DataTableToolbar<TData>({
   const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
+  const appsTable = tableType === "applications";
+  const bookmarksTable = tableType === "bookmarks";
   const usersTable = tableType === "users";
   const selectedRowCount = Object.keys(table.getState().rowSelection).length;
   const handleDeleteSelected = async () => {
@@ -88,9 +95,14 @@ export function DataTableToolbar<TData>({
   }, [initialSearchTerm, table]);
 
   return (
-    <div className="flex max-w-[90vw] items-center justify-between">
+    <div
+      className={cn(
+        "flex max-w-[90vw] items-center justify-between",
+        forDashboard && "mx-auto",
+      )}
+    >
       <div className="mx-auto flex w-full flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
-        {isAdmin && setViewAll && (
+        {/* {isAdmin && setViewAll && (
           <Button
             variant="ghost"
             onClick={() => setViewAll(!viewAll)}
@@ -98,7 +110,7 @@ export function DataTableToolbar<TData>({
           >
             {viewAll ? "View Submissions" : "View  All"}
           </Button>
-        )}
+        )} */}
 
         <Input
           placeholder="Search..."
@@ -106,12 +118,14 @@ export function DataTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="mx-auto h-10 w-full max-w-[74dvw] sm:w-[150px] lg:w-[200px]"
+          className="mx-auto h-12 w-full max-w-[74dvw] sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {eventAndOC && (
           <div className="flex items-center justify-between gap-3">
             {table.getColumn("state") && (
               <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
                 column={table.getColumn("state")}
                 title="State"
                 options={eventStates}
@@ -119,6 +133,8 @@ export function DataTableToolbar<TData>({
             )}
             {table.getColumn("openCallState") && !minimalView && (
               <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
                 column={table.getColumn("openCallState")}
                 title="Open Call"
                 options={eventStates}
@@ -131,6 +147,8 @@ export function DataTableToolbar<TData>({
             )}
             {table.getColumn("category") && !minimalView && (
               <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
                 column={table.getColumn("category")}
                 title="Category"
                 options={eventCategories}
@@ -153,9 +171,9 @@ export function DataTableToolbar<TData>({
 
                 {setViewAll && (
                   <Button
-                    variant="ghost"
+                    variant="salWithShadowHidden"
                     onClick={() => setViewAll(!viewAll)}
-                    className="hidden hover:scale-105 sm:inline-flex"
+                    className="h-10 sm:h-10"
                   >
                     {viewAll ? "View Submissions" : "View  All"}
                   </Button>
@@ -168,6 +186,8 @@ export function DataTableToolbar<TData>({
           <div className="flex items-center gap-3">
             {table.getColumn("subscription") && (
               <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
                 column={table.getColumn("subscription")}
                 title="Subscription"
                 options={subscriptionOptions}
@@ -175,6 +195,8 @@ export function DataTableToolbar<TData>({
             )}
             {table.getColumn("subStatus") && (
               <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
                 column={table.getColumn("subStatus")}
                 title="Status"
                 options={subscriptionStatusOptions}
@@ -183,6 +205,8 @@ export function DataTableToolbar<TData>({
 
             {/* {table.getColumn("openCallState") && !minimalView && (
               <DataTableFacetedFilter
+              isMobile={isMobile}
+              forDashboard={forDashboard}
                 column={table.getColumn("openCallState")}
                 title="Open Call"
                 options={eventStates}
@@ -201,6 +225,32 @@ export function DataTableToolbar<TData>({
             <p className="text-sm font-bold">
               {toolbarData?.totalPerYear?.toFixed(2) ?? 0}
             </p>
+          </div>
+        )}
+        {appsTable && (
+          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:px-5">
+            {table.getColumn("applicationStatus") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("applicationStatus")}
+                title="Status"
+                options={appStatusOptions}
+              />
+            )}
+          </div>
+        )}
+        {bookmarksTable && (
+          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:px-5">
+            {table.getColumn("eventIntent") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("eventIntent")}
+                title="Intent"
+                options={bookmarkIntents}
+              />
+            )}
           </div>
         )}
 

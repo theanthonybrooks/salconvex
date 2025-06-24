@@ -9,6 +9,34 @@ interface DashboardLayoutProps {
   children: ReactNode;
 }
 
+export const metadata = {
+  title: "Dashboard",
+  description:
+    "View your account information, track your applications, bookmarks, and events/open calls, and manage your membership.",
+  openGraph: {
+    title: "Dashboard | The Street Art List",
+    description:
+      "View your account information, track your applications, bookmarks, and events/open calls, and manage your membership.",
+    url: "https://thestreetartlist.com/dashboard",
+    type: "website",
+    images: [
+      {
+        url: "/public/saltext.png",
+        width: 1200,
+        height: 630,
+        alt: "Dashboard",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dashboard | The Street Art List",
+    description:
+      "View your account information, track your applications, bookmarks, and events/open calls, and manage your membership.",
+    images: ["/public/saltext.png"],
+  },
+};
+
 export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {

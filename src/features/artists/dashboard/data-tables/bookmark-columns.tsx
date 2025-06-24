@@ -10,11 +10,13 @@ import {
 import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
+import { formatInTimeZone } from "date-fns-tz";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const bookmarkColumnLabels: Record<string, string> = {
   name: "Event Name",
   edition: "Edition",
+  deadline: "Deadline",
   eventStart: "Event Start",
   eventEnd: "Event End",
   prodStart: "Production Start",
@@ -27,6 +29,9 @@ export const bookmarkColumnLabels: Record<string, string> = {
 interface BookmarkColumnsProps {
   _id: Id<"events">;
   name: string;
+  deadline: string;
+  isPast: boolean;
+  timeZone: string;
   edition: number;
   eventStart: string;
   eventEnd: string;
@@ -99,6 +104,38 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
         {row.getValue("edition")}
       </span>
     ),
+  },
+  {
+    accessorKey: "deadline",
+    minSize: 120,
+    maxSize: 120,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Deadline" />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue("deadline") as string;
+      const timeZone = row.original.timeZone;
+      const now = new Date();
+      const deadlineDate = new Date(value);
+      // Difference in milliseconds
+      const diffMs = deadlineDate.getTime() - now.getTime();
+
+      const isLessThan24Hours =
+        diffMs > 0 && diffMs < 24 * 60 * 60 * 1000 && now < deadlineDate;
+
+      const isPast = row.original.isPast as boolean;
+      return (
+        <span
+          className={cn(
+            "block text-center text-sm",
+            isLessThan24Hours && "text-red-500",
+            isPast && "text-foreground/50 line-through",
+          )}
+        >
+          {formatInTimeZone(value, timeZone, "yyyy-MM-dd")}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "eventStart",
@@ -181,6 +218,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
     cell: ({ row }) => {
       const value = row.getValue("eventIntent") as string;
       const appStatus = row.original.applicationStatus as ApplicationStatus;
+      const isPast = row.original.isPast as boolean;
 
       return (
         <BookmarkListActionSelector
@@ -188,6 +226,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
           eventId={row.original._id}
           initialValue={value}
           appStatus={appStatus}
+          isPast={isPast}
         />
       );
     },

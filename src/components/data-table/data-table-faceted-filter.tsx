@@ -25,6 +25,8 @@ import { FaCheck } from "react-icons/fa";
 interface DataTableFacetedFilterProps<TData, TValue> {
   className?: string;
   column?: Column<TData, TValue>;
+  forDashboard?: boolean;
+  isMobile?: boolean;
   title?: string;
   options: {
     label: string;
@@ -38,10 +40,11 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
   className,
+  forDashboard,
+  isMobile,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -51,6 +54,8 @@ export function DataTableFacetedFilter<TData, TValue>({
           className={cn(
             "hidden h-10 items-center gap-1 border-dashed md:flex",
             className,
+            forDashboard && "flex",
+            isMobile && "w-full",
           )}
         >
           <PlusCircle className="size-4" />
@@ -92,7 +97,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent
         className="w-fit min-w-[--radix-popover-trigger-width] border-1.5 p-0"
-        align="start"
+        align={isMobile ? "center" : "start"}
       >
         <Command>
           <CommandInput placeholder={title} />
@@ -110,7 +115,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       } else {
                         selectedValues.add(option.value);
                       }
-                      // console.log(selectedValues);
+                      console.log(selectedValues);
                       const filterValues = Array.from(selectedValues);
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined,

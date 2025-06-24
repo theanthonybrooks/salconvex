@@ -114,6 +114,12 @@ export const getBookmarkedEventsWithDetails = query({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
     if (!user) return null;
+    const userPreferences = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+
+    const userTimeZone = userPreferences?.timezone;
 
     const isAdmin = user.role.includes("admin");
 
@@ -163,6 +169,8 @@ export const getBookmarkedEventsWithDetails = query({
       const metadata = bookmarkedMap.get(event._id);
       let applicationStatus: string | null = null;
       let eventIntent: string = "";
+      let deadline: string = "-";
+      let isPast: boolean = false;
 
       if (metadata?.eventIntent) eventIntent = metadata.eventIntent;
 
@@ -172,6 +180,11 @@ export const getBookmarkedEventsWithDetails = query({
         .first();
 
       if (openCall) {
+        deadline = openCall.basicInfo.dates.ocEnd ?? "-";
+        const now = new Date();
+        const deadlineDate = new Date(deadline);
+        isPast = now > deadlineDate;
+
         const application = await ctx.db
           .query("applications")
           .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))
@@ -189,6 +202,8 @@ export const getBookmarkedEventsWithDetails = query({
           } else if (application.applicationStatus === "rejected") {
             eventIntent = "rejected";
           }
+        } else if (!application && isPast && eventIntent === "planned") {
+          eventIntent = "missed";
         }
       }
 
@@ -199,6 +214,9 @@ export const getBookmarkedEventsWithDetails = query({
         eventEnd: event.dates.eventDates?.at(-1)?.end ?? "-",
         prodStart: event.dates.prodDates?.[0]?.start ?? "-",
         prodEnd: event.dates.prodDates?.at(-1)?.end ?? "-",
+        deadline,
+        isPast,
+        timeZone: userTimeZone || openCall?.basicInfo.dates.timezone || "UTC",
         bookmarkStatus: true,
         slug: event.slug,
         eventIntent,
@@ -217,7 +235,7 @@ export const updateBookmark = mutation({
     intent: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    console.log(args);
+    // console.log(args);
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 

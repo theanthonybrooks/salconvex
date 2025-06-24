@@ -2,6 +2,42 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
 
+export const getTotalNumberOfOpenCalls = query({
+  handler: async (ctx) => {
+    const openCalls = await ctx.db.query("openCalls").collect();
+
+    let active = 0,
+      archived = 0,
+      draft = 0,
+      pending = 0;
+
+    for (const openCall of openCalls) {
+      switch (openCall.state) {
+        case "submitted":
+          active++;
+          break;
+        case "archived":
+          archived++;
+          break;
+        case "draft":
+          draft++;
+          break;
+        case "pending":
+          pending++;
+          break;
+      }
+    }
+
+    return {
+      totalOpenCalls: openCalls.length,
+      activeOpenCalls: active,
+      archivedOpenCalls: archived,
+      draftOpenCalls: draft,
+      pendingOpenCalls: pending,
+    };
+  },
+});
+
 export const archiveExpiredOpenCalls = internalMutation({
   args: {},
   handler: async (ctx, args) => {

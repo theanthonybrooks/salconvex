@@ -437,15 +437,27 @@ a {
 .scrollable::-webkit-scrollbar-thumb:hover {
   transform: scaleX(2); /* doubles the width from 2px to ~4px */
 }
+
 .scrollable.mini::-webkit-scrollbar {
-  width: 4px;
   height: 4px;
 }
-.scrollable.mini.darkbar::-webkit-scrollbar-thumb {
+
+.scrollable.miniy::-webkit-scrollbar,
+.scrollable.mini::-webkit-scrollbar {
+  width: 4px;
+  height: 0.75em;
+  @media (max-width: 768px) {
+    height: 4px;
+    background: hsl(var(--primary) / 0.3);
+  }
+}
+.scrollable.mini.darkbar::-webkit-scrollbar-thumb,
+.scrollable.miniy.darkbar::-webkit-scrollbar-thumb {
   background: hsl(var(--primary) / 0.65);
 }
 
-.scrollable.mini::-webkit-scrollbar-thumb {
+.scrollable.mini::-webkit-scrollbar-thumb,
+.scrollable.miniy::-webkit-scrollbar-thumb {
   /* background: rgb(224, 220, 217); */
   background: hsl(var(--primary) / 0.15);
   border: none;

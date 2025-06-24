@@ -34,7 +34,6 @@ export function ArtistDashboardTableWrapper({
     hiddenPage ? {} : "skip",
   );
 
-  console.log(bookmarkData);
   return (
     <>
       {appsPage && (
@@ -55,6 +54,7 @@ export function ArtistDashboardTableWrapper({
               tableType="applications"
               pageType="dashboard"
               defaultSort={{ id: `applicationTime`, desc: true }}
+              pageSize={50}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -88,6 +88,7 @@ export function ArtistDashboardTableWrapper({
               defaultVisibility={{
                 edition: false,
                 prodEnd: false,
+                eventStart: false,
                 eventEnd: false,
               }}
               // onRowSelect={(row) => {
@@ -95,7 +96,8 @@ export function ArtistDashboardTableWrapper({
               // }}
               tableType="bookmarks"
               pageType="dashboard"
-              defaultSort={{ id: "prodStart", desc: false }}
+              defaultSort={{ id: "deadline", desc: true }}
+              pageSize={50}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -115,7 +117,7 @@ export function ArtistDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
-              defaultSort={{ id: "prodStart", desc: false }}
+              defaultSort={{ id: "deadline", desc: true }}
             />
           </div>
         </>
@@ -136,6 +138,7 @@ export function ArtistDashboardTableWrapper({
               tableType="hidden"
               pageType="dashboard"
               defaultSort={{ id: "name", desc: false }}
+              pageSize={50}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">

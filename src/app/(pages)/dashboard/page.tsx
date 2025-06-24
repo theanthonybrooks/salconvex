@@ -55,6 +55,11 @@ export default function Dashboard() {
     api.events.event.get5latestPublishedEvents,
   );
 
+  const { data: totalOpenCallsData } = useQueryWithStatus(
+    api.openCalls.openCall.getTotalNumberOfOpenCalls,
+    isAdmin ? {} : "skip",
+  );
+
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
     isAdmin ? {} : "skip",
@@ -70,6 +75,7 @@ export default function Dashboard() {
     isAdmin ? {} : "skip",
   );
   const totalUsers = totalUsersData ?? 0;
+  const totalOpenCalls = totalOpenCallsData?.totalOpenCalls ?? 0;
   const totalEvents = allEventsData?.totalEvents ?? 0;
   const activeEvents = allEventsData?.activeEvents ?? 0;
   // const archivedEvents = allEventsData?.archivedEvents ?? 0;
@@ -109,7 +115,7 @@ export default function Dashboard() {
         {isAdmin && (
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="scrollable justx grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
@@ -119,6 +125,25 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{pendingEvents ?? 0}</div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/submissions"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Open Calls (incl. pending/drafts)
+                  </CardTitle>
+                  <LucideCircleEqual className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {totalOpenCalls ?? 0}
+                  </div>
                   <Link
                     variant="subtleUnderline"
                     href="/dashboard/admin/submissions"

@@ -3,16 +3,21 @@
 import {
   Banana,
   Calendar,
+  CalendarHeart,
+  CircleCheck,
   Clock,
   House,
   List,
   LucideBaby,
+  LucideBadge,
   LucideBadgeAlert,
   LucideBadgeCheck,
   LucideBadgeX,
+  Mail,
   PaintBucket,
   Pencil,
   Scroll,
+  X,
 } from "lucide-react";
 
 import { ArrowDown, ArrowRight, ArrowUp, CheckCircle } from "lucide-react";
@@ -35,6 +40,72 @@ export const labels = [
   {
     value: "documentation",
     label: "Documentation",
+  },
+];
+
+export const bookmarkIntents = [
+  {
+    value: "planned",
+    label: "Planned",
+    icon: Calendar,
+  },
+  {
+    value: "missed",
+    label: "Missed",
+    icon: Clock,
+  },
+  {
+    value: "nextYear",
+    label: "Next Year",
+    icon: CalendarHeart,
+  },
+  {
+    value: "contact",
+    label: "Contact",
+    icon: Mail,
+  },
+  {
+    value: "rejected",
+    label: "Rejected",
+    icon: Banana,
+  },
+  {
+    value: "applied",
+    label: "Applied",
+    icon: CircleCheck,
+  },
+  {
+    value: "-",
+    label: "None",
+    icon: X,
+  },
+];
+
+export const appStatusOptions = [
+  {
+    value: "applied",
+    label: "Applied",
+    icon: LucideBadge,
+  },
+  {
+    value: "accepted",
+    label: "Accepted",
+    icon: LucideBadgeCheck,
+  },
+  {
+    value: "rejected",
+    label: "Rejected",
+    icon: LucideBadgeAlert,
+  },
+  {
+    value: "roster",
+    label: "Roster",
+    icon: LucideBadgeCheck,
+  },
+  {
+    value: "shortlisted",
+    label: "Shortlisted",
+    icon: LucideBadgeCheck,
   },
 ];
 

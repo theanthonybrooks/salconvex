@@ -72,6 +72,7 @@ export function AdminDashboardTableWrapper({
               tableType="events"
               pageType="dashboard"
               defaultSort={{ id: `lastEditedAt`, desc: true }}
+              pageSize={50}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
@@ -121,6 +122,7 @@ export function AdminDashboardTableWrapper({
               tableType="users"
               pageType="dashboard"
               defaultSort={{ id: `createdAt`, desc: true }}
+              pageSize={50}
             />
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
