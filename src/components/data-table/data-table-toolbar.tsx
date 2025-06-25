@@ -183,7 +183,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {usersTable && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:flex-col">
             {table.getColumn("subscription") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -217,14 +217,18 @@ export function DataTableToolbar<TData>({
                 )}
               />
             )} */}
-            <p className="text-sm text-muted-foreground">Total Monthly:</p>
-            <p className="text-sm font-bold">
-              {toolbarData?.totalPerMonth?.toFixed(2) ?? 0}
-            </p>
-            <p className="text-sm text-muted-foreground">Total Annual:</p>
-            <p className="text-sm font-bold">
-              {toolbarData?.totalPerYear?.toFixed(2) ?? 0}
-            </p>
+            <span className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">Total Monthly:</p>
+              <p className="text-sm font-bold">
+                {toolbarData?.totalPerMonth?.toFixed(2) ?? 0}
+              </p>
+            </span>
+            <span className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">Total Annual:</p>
+              <p className="text-sm font-bold">
+                {toolbarData?.totalPerYear?.toFixed(2) ?? 0}
+              </p>
+            </span>
           </div>
         )}
         {appsTable && (
