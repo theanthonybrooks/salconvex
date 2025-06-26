@@ -44,6 +44,13 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["public"],
       },
       {
+        title: "Calendar",
+        path: "/calendar",
+        category: "thelist",
+        public: true,
+        userType: ["public"],
+      },
+      {
         title: "Archive",
         // path: "/archive",
         path: "https://thestreetartlist.helioho.st/archive",

@@ -53,18 +53,19 @@ export const landingPageNavbarMenuLinksTheList: {
     sub: ["all"],
   },
   {
+    title: "Calendar",
+    href: "/calendar",
+    description: "View upcoming events.",
+    sub: ["all"],
+  },
+  {
     title: "World Map - (Old Site)",
     // href: "/map",
     href: "https://thestreetartlist.helioho.st/map",
     description: "Map of all street art fests, mural projects, etc",
     sub: ["all"],
   },
-  {
-    title: "Calendar",
-    href: "/calendar",
-    description: "View upcoming events.",
-    sub: ["all"],
-  },
+
   {
     title: "The Archive - (Old Site)",
     // href: "/archive",

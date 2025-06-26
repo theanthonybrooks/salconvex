@@ -282,7 +282,7 @@ TheListNavBarProps) {
                         onPointerLeave={(event) => event.preventDefault()}
                       >
                         {/* TODO: put this back to xl:grid-cols-3 when I add more menu items */}
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-2">
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-3 xl:max-w-[700px] xl:grid-cols-3">
                           {filteredNavbarMenuTheList.map((component) => (
                             <ListItem
                               key={component.title}
