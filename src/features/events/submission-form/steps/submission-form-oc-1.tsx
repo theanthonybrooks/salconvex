@@ -348,6 +348,9 @@ const SubmissionFormOC1 = ({
                     onBlur={field.onBlur}
                     placeholder="Please be as specific as possible"
                     charLimit={1200}
+                    inputPreviewClassName={cn(
+                      errors?.openCall?.eligibility?.details && "invalid-field",
+                    )}
                   />
                 )}
               />
@@ -564,6 +567,10 @@ const SubmissionFormOC1 = ({
                       asModal={true}
                       title={eventName}
                       subtitle="Application Requirements"
+                      inputPreviewClassName={cn(
+                        errors?.openCall?.requirements?.requirements &&
+                          "invalid-field",
+                      )}
                     />
                   )}
                 />

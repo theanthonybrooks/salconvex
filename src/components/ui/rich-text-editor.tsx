@@ -58,6 +58,7 @@ interface Props {
   noList?: boolean;
   readOnly?: boolean;
   inputPreview?: boolean;
+  inputPreviewClassName?: string;
 }
 
 export const ALLOWED_TAGS = [
@@ -88,6 +89,7 @@ export const RichTextEditor = ({
   noList,
   readOnly,
   inputPreview,
+  inputPreviewClassName,
 }: Props) => {
   const linkDialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -733,6 +735,7 @@ export const RichTextEditor = ({
           className={cn(
             "relative cursor-pointer rounded border bg-card p-2",
             readOnly && "pointer-events-none border-foreground/50 opacity-50",
+            inputPreviewClassName,
           )}
           onClick={() => setOpen(true)}
           onMouseEnter={() => setHoverPreview(true)}

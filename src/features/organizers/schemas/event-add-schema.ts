@@ -624,7 +624,7 @@ export const openCallStep1Schema = z
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "More info is required (min 15 characters)",
+          message: "More eligibility info is required (min 15 characters)",
           path: ["openCall", "eligibility", "details"],
         });
       }

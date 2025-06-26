@@ -1,9 +1,11 @@
 import { DataTable } from "@/components/data-table/data-table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "@/components/ui/custom-link";
 import { Label } from "@/components/ui/label";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
+import { supportEmail } from "@/constants/siteInfo";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
@@ -180,8 +182,18 @@ const SubmissionFormOrgStep = ({
             {(orgValidationError ||
               (errors.organization?.name && orgName.length > 3)) && (
               <span className="mt-2 w-full text-center text-sm text-red-600">
-                {errors.organization?.name?.message ||
-                  "Organization already exists. Contact support for assistance"}
+                {errors.organization?.name?.message || (
+                  <p>
+                    Organization already exists.{" "}
+                    <Link
+                      href={`mailto:${supportEmail}?subject=${orgName} Access`}
+                      className="underline"
+                    >
+                      Contact support
+                    </Link>{" "}
+                    for assistance and/or access.
+                  </p>
+                )}
               </span>
             )}
           </div>
