@@ -123,8 +123,8 @@ export default function Dashboard() {
         {isAdmin && (
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
-            <div className="scrollable justx flex flex-col gap-4 sm:flex-row">
-              <Card className="min-w-50">
+            <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -143,7 +143,7 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -167,7 +167,7 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -189,7 +189,7 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -208,7 +208,7 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              {/* <Card className="min-w-50">
+              {/* <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Archived Events
@@ -229,7 +229,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card> */}
 
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -256,7 +256,7 @@ export default function Dashboard() {
                   </Link>
                 </CardContent> */}
               </Card>
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -269,7 +269,10 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {totalNewsletterSubs}
                   </div>
-                  <Link variant="subtleUnderline" href="/dashboard/admin/users">
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/newsletter"
+                  >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
@@ -292,7 +295,7 @@ export default function Dashboard() {
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Artist Dashboard:</h3>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Total Applications
@@ -317,7 +320,7 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="min-w-50">
+              <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Accepted Applications
@@ -337,7 +340,7 @@ export default function Dashboard() {
                   </Link> */}
                 </CardContent>
               </Card>
-              {/* <Card className="min-w-50">
+              {/* <Card className="min-w-50 flex-1">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Pending Applications
