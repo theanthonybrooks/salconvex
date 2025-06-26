@@ -220,12 +220,12 @@ export default function Home() {
           </PopoverTrigger>
           <PopoverContent className="w-80 border-1.5" align="center">
             <div className="grid gap-4">
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <h3 className="italic">Marching Band Mural</h3>
                 <p className="text-base text-muted-foreground">
                   Pieve Santo Stefano, Tuscany (IT)
                 </p>
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">More info:</h4>
                 <p className="text-base text-muted-foreground">

@@ -28,6 +28,7 @@ import {
   LucideClipboardList,
   LucideFolderHeart,
   LucideScrollText,
+  Megaphone,
   TrendingUp,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -115,13 +116,15 @@ export default function Dashboard() {
         {isAdmin && (
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
-            <div className="scrollable justx grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    New Submissions
-                  </CardTitle>
-                  <LucideCircleFadingPlus className="size-4 text-muted-foreground" />
+            <div className="scrollable justx flex flex-col gap-4 sm:flex-row">
+              <Card className="min-w-50">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      New Submissions
+                    </CardTitle>
+                    <LucideCircleFadingPlus className="my-auto size-4 text-muted-foreground" />
+                  </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{pendingEvents ?? 0}</div>
@@ -133,12 +136,17 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Open Calls (incl. pending/drafts)
-                  </CardTitle>
-                  <LucideCircleEqual className="size-4 text-muted-foreground" />
+              <Card className="min-w-50">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Total Open Calls
+                    </CardTitle>
+                    <Megaphone className="size-4 text-muted-foreground" />
+                  </span>
+                  <p className="text-xs italic text-muted-foreground">
+                    (incl. pending/drafts)
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -152,12 +160,17 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Events (incl. pending/drafts)
-                  </CardTitle>
-                  <LucideCircleEqual className="size-4 text-muted-foreground" />
+              <Card className="min-w-50">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Total Events
+                    </CardTitle>
+                    <LucideCircleEqual className="size-4 text-muted-foreground" />
+                  </span>
+                  <p className="text-xs italic text-muted-foreground">
+                    (incl. pending/drafts)
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{totalEvents ?? 0}</div>
@@ -169,12 +182,14 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Active Events
-                  </CardTitle>
-                  <LucideCircleCheck className="size-4 text-muted-foreground" />
+              <Card className="min-w-50">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Active Events
+                    </CardTitle>
+                    <LucideCircleCheck className="size-4 text-muted-foreground" />
+                  </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{activeEvents ?? 0}</div>
@@ -186,7 +201,7 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card>
-              {/* <Card>
+              {/* <Card className="min-w-50">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Archived Events
@@ -206,12 +221,14 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card> */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Users
-                  </CardTitle>
-                  <LucideCircleOff className="size-4 text-muted-foreground" />
+              <Card className="min-w-50">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Total Users
+                    </CardTitle>
+                    <LucideCircleOff className="size-4 text-muted-foreground" />
+                  </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{totalUsers ?? 0}</div>
@@ -238,7 +255,7 @@ export default function Dashboard() {
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Artist Dashboard:</h3>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
+              <Card className="min-w-50">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Total Applications
@@ -263,7 +280,7 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="min-w-50">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Accepted Applications
@@ -283,7 +300,7 @@ export default function Dashboard() {
                   </Link> */}
                 </CardContent>
               </Card>
-              {/* <Card>
+              {/* <Card className="min-w-50">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Pending Applications

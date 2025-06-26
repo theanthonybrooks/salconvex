@@ -121,7 +121,7 @@ export function DataTableToolbar<TData>({
           className="mx-auto h-12 w-full max-w-[74dvw] sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {eventAndOC && (
-          <div className="flex items-center justify-between gap-3 [@media(max-width:768px)]:flex-col">
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
             {table.getColumn("state") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -183,7 +183,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {usersTable && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:flex-col">
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
             {table.getColumn("subscription") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
