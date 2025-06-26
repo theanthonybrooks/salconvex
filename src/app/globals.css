@@ -823,6 +823,16 @@ button:active {
   background-color: hsl(var(--background));
   border-bottom: 1px solid var(--border);
   padding-block: 0.5rem;
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  & .fc-toolbar-chunk:nth-of-type(3) {
+    display: flex;
+  }
 }
 
 .fc-toolbar-title {

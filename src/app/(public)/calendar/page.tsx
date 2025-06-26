@@ -58,7 +58,7 @@ const Calendar = () => {
 
   const eventsData = useQuery(api.events.event.getEventsForCalendar);
   const events = eventsData?.events ?? [];
-  console.log(events);
+  // console.log(events);
 
   // const events = [
   //   {
@@ -144,7 +144,7 @@ const Calendar = () => {
       </h1>
 
       <div className="w-full max-w-[90dvw] grid-cols-[15%_minmax(0,1fr)] gap-x-10 xl:grid">
-        <div className="col-span-1 h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3 xl:mt-[85px]">
+        <div className="col-span-1 hidden h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3 lg:block xl:mt-[85px]">
           <p className="px-3 pb-2 text-xl font-bold">Filters</p>
           <Separator className="mb-4" thickness={2} />
           <div className="flex flex-col gap-y-2 px-4 opacity-30">

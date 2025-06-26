@@ -1,5 +1,6 @@
 "use client";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
 import type {
   EventClickArg,
   EventInput,
@@ -7,6 +8,7 @@ import type {
 } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
 import FullCalendar from "@fullcalendar/react";
 
 type Props = {
@@ -16,10 +18,11 @@ type Props = {
 };
 
 const Calendar = ({ events, onEventClick, onMoreLinkClick }: Props) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   return (
     <FullCalendar
-      plugins={[dayGridPlugin, interactionPlugin]}
-      initialView="dayGridMonth"
+      plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+      initialView={isMobile ? "listWeek" : "dayGridMonth"}
       events={events}
       eventClick={onEventClick}
       moreLinkClick={onMoreLinkClick}
