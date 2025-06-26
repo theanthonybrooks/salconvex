@@ -15,6 +15,7 @@ import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import { ExternalLink, Plus } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
@@ -146,25 +147,23 @@ const Calendar = () => {
         <div className="col-span-1 h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3 xl:mt-[85px]">
           <p className="px-3 pb-2 text-xl font-bold">Filters</p>
           <Separator className="mb-4" thickness={2} />
-          <div className="flex flex-col gap-y-2 px-4">
+          <div className="flex flex-col gap-y-2 px-4 opacity-30">
             <section className="flex items-center justify-between">
               <p className="text-sm">Category</p> <Plus className="size-4" />
             </section>
-            <div className="flex flex-col gap-y-2">
-              <section className="flex items-center justify-between">
-                <p className="text-sm">Event Type</p>{" "}
-                <Plus className="size-4" />
-              </section>
-              <section className="flex items-center justify-between">
-                <p className="text-sm">Category</p> <Plus className="size-4" />
-              </section>
-              <section className="flex items-center justify-between">
-                <p className="text-sm">Active</p> <Plus className="size-4" />
-              </section>
-            </div>
+
+            <section className="flex items-center justify-between">
+              <p className="text-sm">Event Type</p> <Plus className="size-4" />
+            </section>
+            <section className="flex items-center justify-between">
+              <p className="text-sm">Category</p> <Plus className="size-4" />
+            </section>
+            <section className="flex items-center justify-between">
+              <p className="text-sm">Active</p> <Plus className="size-4" />
+            </section>
           </div>
           <p className="my-2 text-center text-lg font-bold text-foreground">
-            Coming soon!
+            Filters coming soon!
           </p>
         </div>
         <LazyCalendar
@@ -189,31 +188,46 @@ const Calendar = () => {
             <div className="mt-2 space-y-2">
               {visibleEvents.map((event) => (
                 <div
+                  className="flex cursor-pointer flex-row items-center gap-4 rounded-md border-1.5 border-foreground/30 bg-white/50 p-3 hover:bg-white/70 hover:shadow-sm"
                   key={event.id || event.title + event.startStr}
-                  className="event-card-link cursor-pointer rounded-md border-1.5 border-foreground/30 bg-white/50 p-3 hover:bg-white/70 hover:shadow-sm"
-                  onClick={() => {
-                    // setShowModal(false);
-
-                    if (event.extendedProps.hasOpenCall && activeArtist) {
-                      router.push(
-                        `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/`,
-                      );
-                    } else {
-                      router.push(
-                        `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}`,
-                      );
-                    }
-                  }}
                 >
-                  <span className="flex items-center justify-between">
-                    <p className="text-base font-semibold">{event.title}</p>
-                    <ExternalLink size={16} />
-                  </span>
-
-                  <RichTextDisplay
-                    html={event.extendedProps.description ?? "No description"}
-                    className="line-clamp-2 text-sm text-foreground"
+                  <Image
+                    src={event.extendedProps.logo ?? "/1.jpg"}
+                    // src="/1.jpg"
+                    alt={event.title}
+                    width={50}
+                    height={50}
+                    className="rounded-full"
                   />
+                  <div
+                    key={event.id || event.title + event.startStr}
+                    className="event-card-link w-full"
+                    onClick={() => {
+                      // setShowModal(false);
+
+                      if (event.extendedProps.hasOpenCall && activeArtist) {
+                        router.push(
+                          `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/`,
+                        );
+                      } else {
+                        router.push(
+                          `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}`,
+                        );
+                      }
+                    }}
+                  >
+                    <span className="flex items-center justify-between">
+                      <p className="text-base font-semibold capitalize">
+                        {event.title}
+                      </p>
+                      <ExternalLink size={16} />
+                    </span>
+
+                    <RichTextDisplay
+                      html={event.extendedProps.description ?? "No description"}
+                      className="line-clamp-2 text-sm text-foreground"
+                    />
+                  </div>
                 </div>
               ))}
             </div>

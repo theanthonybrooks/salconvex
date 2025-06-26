@@ -59,12 +59,12 @@ export const landingPageNavbarMenuLinksTheList: {
     description: "Map of all street art fests, mural projects, etc",
     sub: ["all"],
   },
-  // {
-  //   title: "Calendar",
-  //   href: "/calendar",
-  //   description: "View upcoming events.",
-  //   sub: ["all"],
-  // },
+  {
+    title: "Calendar",
+    href: "/calendar",
+    description: "View upcoming events.",
+    sub: ["all"],
+  },
   {
     title: "The Archive - (Old Site)",
     // href: "/archive",

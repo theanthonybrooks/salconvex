@@ -659,6 +659,7 @@ export const getEventsForCalendar = query({
           title: event.name,
           date: event.dates.eventDates[0].start,
           extendedProps: {
+            logo: event.logo,
             description: event.about,
             slug: event.slug,
             hasOpenCall,
