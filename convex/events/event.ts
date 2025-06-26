@@ -636,6 +636,43 @@ export const getPublishedEvents = query({
   },
 });
 
+export const getEventsForCalendar = query({
+  handler: async (ctx) => {
+    let hasOpenCall = false;
+    const events = await ctx.db
+
+      .query("events")
+      .withIndex("by_state", (q) => q.eq("state", "published"))
+      .collect();
+
+    const results = await Promise.all(
+      events.map(async (event) => {
+        const openCallStatus = await ctx.db
+          .query("openCalls")
+          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+          .unique();
+
+        if (openCallStatus?.state === "published") {
+          hasOpenCall = true;
+        }
+        return {
+          title: event.name,
+          date: event.dates.eventDates[0].start,
+          extendedProps: {
+            description: event.about,
+            slug: event.slug,
+            hasOpenCall,
+            edition: event.dates.edition,
+          },
+        };
+      }),
+    );
+    return {
+      events: results,
+    };
+  },
+});
+
 export const getEventBySlug = query({
   args: {
     slug: v.string(),

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { LazyCalendar } from "@/features/calendar/lazy-calendar";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 
 import { useQuery } from "convex-helpers/react/cache";
@@ -46,78 +47,82 @@ const Calendar = () => {
     return "no-modal";
   };
 
-  const events = [
-    {
-      title: "Client Meeting",
-      date: "2025-04-10",
-      extendedProps: {
-        description: "Zoom call with client about mural project.",
-        slug: "Urban-Walls-Residency-1",
-        hasOpenCall: true,
-        edition: 2025,
-      },
-    },
-    {
-      title: "Client Meeting 1",
-      date: "2025-04-10",
-      extendedProps: {
-        description: "Zoom call with client about mural project.",
-        slug: "Urban-Walls-Residency-1",
-        hasOpenCall: true,
-        edition: 2025,
-      },
-    },
-    {
-      title: "Client Meeting 2",
-      date: "2025-04-10",
-      extendedProps: {
-        description: "Zoom call with client about mural project.",
-        slug: "Urban-Walls-Residency-1",
-        hasOpenCall: false,
-        edition: 2025,
-      },
-    },
-    {
-      title: "Client Meeting 3",
-      date: "2025-04-10",
-      extendedProps: {
-        description: "Zoom call with client about mural project.",
-        slug: "Urban-Walls-Residency-1",
-        hasOpenCall: true,
-        edition: 2025,
-      },
-    },
-    {
-      title: "Client Meeting 4",
-      date: "2025-04-10",
-      extendedProps: {
-        description: "Zoom call with client about mural project.",
-        slug: "Urban-Walls-Residency-1",
-        hasOpenCall: false,
-        edition: 2025,
-      },
-    },
-    {
-      title: "Urban Walls Residency",
-      date: "2025-04-10",
-      extendedProps: {
-        description: "Zoom call with client about mural project.",
-        slug: "Urban-Walls-Residency-1",
-        hasOpenCall: true,
-        edition: 2026,
-      },
-    },
-    {
-      title: "Studio Day",
-      date: "2025-04-12",
-      extendedProps: {
-        description: "Painting all day — no meetings.",
-        slug: "mural-fest",
-        hasOpenCall: false,
-        edition: 2025,
-      },
-    },
-  ];
+  const eventsData = useQuery(api.events.event.getEventsForCalendar);
+  const events = eventsData?.events ?? [];
+  console.log(events);
+
+  // const events = [
+  //   {
+  //     title: "Client Meeting",
+  //     date: "2025-04-10",
+  //     extendedProps: {
+  //       description: "Zoom call with client about mural project.",
+  //       slug: "Urban-Walls-Residency-1",
+  //       hasOpenCall: true,
+  //       edition: 2025,
+  //     },
+  //   },
+  //   {
+  //     title: "Client Meeting 1",
+  //     date: "2025-04-10",
+  //     extendedProps: {
+  //       description: "Zoom call with client about mural project.",
+  //       slug: "Urban-Walls-Residency-1",
+  //       hasOpenCall: true,
+  //       edition: 2025,
+  //     },
+  //   },
+  //   {
+  //     title: "Client Meeting 2",
+  //     date: "2025-04-10",
+  //     extendedProps: {
+  //       description: "Zoom call with client about mural project.",
+  //       slug: "Urban-Walls-Residency-1",
+  //       hasOpenCall: false,
+  //       edition: 2025,
+  //     },
+  //   },
+  //   {
+  //     title: "Client Meeting 3",
+  //     date: "2025-04-10",
+  //     extendedProps: {
+  //       description: "Zoom call with client about mural project.",
+  //       slug: "Urban-Walls-Residency-1",
+  //       hasOpenCall: true,
+  //       edition: 2025,
+  //     },
+  //   },
+  //   {
+  //     title: "Client Meeting 4",
+  //     date: "2025-04-10",
+  //     extendedProps: {
+  //       description: "Zoom call with client about mural project.",
+  //       slug: "Urban-Walls-Residency-1",
+  //       hasOpenCall: false,
+  //       edition: 2025,
+  //     },
+  //   },
+  //   {
+  //     title: "Urban Walls Residency",
+  //     date: "2025-04-10",
+  //     extendedProps: {
+  //       description: "Zoom call with client about mural project.",
+  //       slug: "Urban-Walls-Residency-1",
+  //       hasOpenCall: true,
+  //       edition: 2026,
+  //     },
+  //   },
+  //   {
+  //     title: "Studio Day",
+  //     date: "2025-04-12",
+  //     extendedProps: {
+  //       description: "Painting all day — no meetings.",
+  //       slug: "mural-fest",
+  //       hasOpenCall: false,
+  //       edition: 2025,
+  //     },
+  //   },
+  // ];
 
   useEffect(() => {
     sessionStorage.setItem("previousSalPage", "/calendar");
@@ -201,9 +206,11 @@ const Calendar = () => {
                     <p className="text-base font-semibold">{event.title}</p>
                     <ExternalLink size={16} />
                   </span>
-                  <p className="text-sm text-foreground">
-                    {event.extendedProps.description || "No description"}
-                  </p>
+
+                  <RichTextDisplay
+                    html={event.extendedProps.description ?? "No description"}
+                    className="line-clamp-2 text-sm text-foreground"
+                  />
                 </div>
               ))}
             </div>
