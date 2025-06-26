@@ -25,6 +25,7 @@ export const userColumnLabels: Record<string, string> = {
   email: "Email",
   subscription: "Subscription",
   subStatus: "Sub Status",
+  cancelComment: "Cancel Comment",
   accountType: "Account Type",
   createdAt: "Created",
   role: "Role",
@@ -37,6 +38,7 @@ interface UserColumnsProps {
   email: string;
   subscription: string;
   subStatus: string;
+  cancelComment: string | null;
   accountType: string[];
   createdAt: number;
   role: string[];
@@ -149,6 +151,22 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
       return filterValue.includes(row.getValue(columnId));
+    },
+  },
+  {
+    accessorKey: "cancelComment",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Cancel Comment" />
+    ),
+    cell: ({ row }) => {
+      const cancelComment = row.getValue("cancelComment") as string | null;
+      return (
+        <div className="truncate text-sm text-muted-foreground">
+          {cancelComment || "-"}
+        </div>
+      );
     },
   },
 

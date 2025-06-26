@@ -50,6 +50,9 @@ export const usersWithSubscriptions = query({
           subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
         const cancelAt = subscription?.cancelAt;
         const currentStatus = cancelAt ? "canceled" : subscription?.status;
+        const cancelComment = cancelAt
+          ? subscription?.customerCancellationComment
+          : null;
         const interval = subscription?.interval ?? "unknown";
         const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;
         const amount = subAmount ?? 0;
@@ -73,6 +76,7 @@ export const usersWithSubscriptions = query({
           subscription: label ?? "4. none",
           subStatus: currentStatus ?? "-",
           accountType: user.accountType ?? [],
+          cancelComment: cancelComment ?? null,
           role: user.role ?? "user",
           createdAt: user.createdAt,
           source: user.source,
