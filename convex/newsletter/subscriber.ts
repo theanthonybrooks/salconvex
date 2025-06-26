@@ -1,6 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { mutation } from "~/convex/_generated/server";
+import { mutation, query } from "~/convex/_generated/server";
 
 export const subscribeToNewsletter = mutation({
   args: {
@@ -87,5 +87,31 @@ export const subscribeToNewsletter = mutation({
         userPlan,
       });
     }
+  },
+});
+
+export const getNewsletterSubscribers = query({
+  args: {},
+  handler: async (ctx) => {
+    let totalSubscribers = 0;
+    const subscribers = await ctx.db.query("newsletter").collect();
+    const results = await Promise.all(
+      subscribers.map(async (subscriber) => {
+        totalSubscribers += 1;
+        return {
+          _id: subscriber._id,
+          name: subscriber.firstName,
+          email: subscriber.email,
+          userPlan: subscriber.userPlan,
+          timesAttempted: subscriber.timesAttempted,
+          lastAttempt: subscriber.lastAttempt,
+          createdAt: subscriber._creationTime,
+        };
+      }),
+    );
+    return {
+      subscribers: results,
+      totalSubscribers,
+    };
   },
 });

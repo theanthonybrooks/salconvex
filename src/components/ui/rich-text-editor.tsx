@@ -1,4 +1,6 @@
-// TODO: Add a floating menu on new lines. Use the purpose of the menu to determine whether to show it or not, and what options to show. This will be super useful for the open call requirements, especially. Also add some bubble menu options when you select text. Basic formatting like bold, italic, underline, as well as the ability to make selected text into a link.
+// TODO: Add a floating menu on new lines. Use the purpose of the menu to determine whether to show it or not, and what options to show. This will be super useful for the open call requirements, especially. https://tiptap.dev/docs/editor/extensions/functionality/floatingmenu
+
+// TODO: Add this:https://tiptap.dev/docs/editor/extensions/functionality/table-of-contents#install later. It's a plugin that adds a table of contents to the editor.
 
 //note-to-self: is the "Editable" toggle useful for this? Perhaps it could be used to show/hide text. I already have something that displays it, though, so I'm not really sure.
 

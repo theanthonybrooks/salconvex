@@ -5,6 +5,7 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
+import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
@@ -44,10 +45,13 @@ export function AdminDashboardTableWrapper({
   };
 
   const usersData = useQuery(api.users.usersWithSubscriptions);
-
+  const newsletterData = useQuery(
+    api.newsletter.subscriber.getNewsletterSubscribers,
+  );
   const submissionsPage = page === "events";
   const appsPage = page === "applications";
   const usersPage = page === "users";
+  const newsletterPage = page === "newsletter";
   const applicationData = useQuery(
     api.artists.applications.getArtistApplications2,
   );
@@ -95,6 +99,70 @@ export function AdminDashboardTableWrapper({
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
               defaultSort={{ id: `lastEditedAt`, desc: true }}
+            />
+          </div>
+        </>
+      )}
+      {newsletterPage && (
+        <>
+          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+            <DataTable
+              columns={newsletterColumns}
+              data={newsletterData?.subscribers ?? []}
+              defaultVisibility={
+                {
+                  // category: viewAll ? true : false,
+                  // dates_edition: viewAll ? true : false,
+                  // type: false,
+                  // role: false,
+                }
+              }
+              toolbarData={
+                {
+                  // totalPerMonth: usersData?.totalPerMonth ?? 0,
+                  // totalPerYear: usersData?.totalPerYear ?? 0,
+                }
+              }
+              onRowSelect={(row) => {
+                console.log(row);
+              }}
+              adminActions={adminActions}
+              tableType="newsletter"
+              pageType="dashboard"
+              defaultSort={{ id: `createdAt`, desc: true }}
+              pageSize={50}
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
+            <DataTable
+              columns={newsletterColumns}
+              data={newsletterData?.subscribers ?? []}
+              defaultVisibility={
+                {
+                  // type: false,
+                  // category: false,
+                  // role: false,
+                  // lastEditedAt: false,
+                  // dates_edition: false,
+                }
+              }
+              toolbarData={
+                {
+                  // totalPerMonth: usersData?.totalPerMonth ?? 0,
+                  // totalPerYear: usersData?.totalPerYear ?? 0,
+                }
+              }
+              defaultSort={{ id: `createdAt`, desc: true }}
+              onRowSelect={(row) => {
+                console.log(row);
+                // setExistingEvent(row.getValue("event"));
+                // setExistingOpenCall(row.getValue("openCall"));
+              }}
+              adminActions={adminActions}
+              tableType="newsletter"
+              pageType="dashboard"
+              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn("lg:hidden")}
             />
           </div>
         </>

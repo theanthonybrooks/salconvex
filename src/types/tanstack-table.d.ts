@@ -20,6 +20,7 @@ export const tableTypes = [
   "users",
   "bookmarks",
   "hidden",
+  "newsletter",
 ] as const;
 
 export const pageTypes = ["form", "dashboard"] as const;

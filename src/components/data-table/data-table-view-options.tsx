@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { newsletterColumnLabels } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumnLabels } from "@/features/admin/dashboard/user-columns";
 import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumnLabels } from "@/features/artists/dashboard/data-tables/bookmark-columns";
@@ -33,6 +34,7 @@ export function DataTableViewOptions<TData>({
   const events = tableType === "events";
   const orgEvents = tableType === "orgEvents";
   const usersTable = tableType === "users";
+  const newsletterTable = tableType === "newsletter";
 
   return (
     <DropdownMenu>
@@ -69,7 +71,9 @@ export function DataTableViewOptions<TData>({
                         ? userColumnLabels[column.id]
                         : hidden
                           ? hiddenColumnLabels[column.id]
-                          : column.id;
+                          : newsletterTable
+                            ? newsletterColumnLabels[column.id]
+                            : column.id;
               return (
                 <DropdownMenuCheckboxItem
                   key={column.id}

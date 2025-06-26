@@ -24,12 +24,13 @@ import {
   LucideCircleCheckBig,
   LucideCircleEqual,
   LucideCircleFadingPlus,
-  LucideCircleOff,
   LucideClipboardList,
   LucideFolderHeart,
   LucideScrollText,
   Megaphone,
+  Newspaper,
   TrendingUp,
+  Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FaGear, FaRegBookmark } from "react-icons/fa6";
@@ -75,7 +76,13 @@ export default function Dashboard() {
     api.users.getTotalUsers,
     isAdmin ? {} : "skip",
   );
+
+  const { data: totalNewsletterSubsData } = useQueryWithStatus(
+    api.newsletter.subscriber.getNewsletterSubscribers,
+    isAdmin ? {} : "skip",
+  );
   const totalUsers = totalUsersData ?? 0;
+  const totalNewsletterSubs = totalNewsletterSubsData?.totalSubscribers ?? 0;
   const totalOpenCalls = totalOpenCallsData?.totalOpenCalls ?? 0;
   const totalEvents = allEventsData?.totalEvents ?? 0;
   const activeEvents = allEventsData?.activeEvents ?? 0;
@@ -221,17 +228,47 @@ export default function Dashboard() {
                   </Link>
                 </CardContent>
               </Card> */}
+
               <Card className="min-w-50">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
                       Total Users
                     </CardTitle>
-                    <LucideCircleOff className="size-4 text-muted-foreground" />
+                    <Users className="size-4 text-muted-foreground" />
                   </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{totalUsers ?? 0}</div>
+                  <Link variant="subtleUnderline" href="/dashboard/admin/users">
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+                {/* <CardContent>
+                  <div className="text-2xl font-bold">
+                    {archivedEvents ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/submissions"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent> */}
+              </Card>
+              <Card className="min-w-50">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Total Newsletter Subs
+                    </CardTitle>
+                    <Newspaper className="size-4 text-muted-foreground" />
+                  </span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {totalNewsletterSubs}
+                  </div>
                   <Link variant="subtleUnderline" href="/dashboard/admin/users">
                     <p className="mt-1 text-xs">View all</p>
                   </Link>

@@ -53,6 +53,8 @@ export default async function AdminPage({
       return <AdminEventForm user={user} />;
     case "applications":
       return <AdminDashboardTableWrapper page="applications" />;
+    case "newsletter":
+      return <AdminDashboardTableWrapper page="newsletter" />;
     default:
       redirect("/dashboard/admin");
   }

@@ -122,10 +122,10 @@ const SubmissionFormEventStep1 = ({
     }
   }, [formType, setValue]);
 
-  const timeLineStartingText =
-    formType > 1
-      ? "<ol><li><p>Open Call:</p></li><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>"
-      : "<ol><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>";
+  // const timeLineStartingText =
+  //   formType > 1
+  //     ? "<ol><li><p>Open Call:</p></li><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>"
+  //     : "<ol><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>";
 
   return (
     <div
@@ -517,7 +517,7 @@ const SubmissionFormEventStep1 = ({
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
-                    value={field.value ?? timeLineStartingText}
+                    value={field.value ?? ""}
                     onChange={field.onChange}
                     placeholder="Important dates: open call, production, judging/selection, etc"
                     charLimit={1000}
