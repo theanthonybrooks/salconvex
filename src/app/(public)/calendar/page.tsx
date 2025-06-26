@@ -8,23 +8,31 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { LazyCalendar } from "@/features/calendar/lazy-calendar";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 
 import { useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 import { ExternalLink, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 const Calendar = () => {
-  const userData = useQuery(api.users.getCurrentUser, {});
+  const router = useRouter();
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const hasActiveSubscription = subStatus?.hasActiveSubscription;
+  // const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
+  const activeArtist =
+    user?.accountType?.includes("artist") && hasActiveSubscription;
 
   // const handleDateClick = (arg: { eventStr: string }) => {
   //   console.log("Clicked date:", arg.eventStr);
   // };
-  const router = useRouter();
 
   // const [calendarLoaded, setCalendarLoaded] = useState(false);
   const [visibleEvents, setVisibleEvents] = useState<EventApi[]>([]);
@@ -186,15 +194,10 @@ const Calendar = () => {
                   onClick={() => {
                     // setShowModal(false);
 
-                    if (event.extendedProps.hasOpenCall) {
-                      if (user?.accountType?.includes("artist")) {
-                        router.push(
-                          `/thelist/event/${event.extendedProps.slug}/call/${event.extendedProps.edition}`,
-                        );
-                      } else {
-                        router.push("/pricing");
-                        return;
-                      }
+                    if (event.extendedProps.hasOpenCall && activeArtist) {
+                      router.push(
+                        `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/`,
+                      );
                     } else {
                       router.push(
                         `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}`,
