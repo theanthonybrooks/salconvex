@@ -903,8 +903,12 @@ button:active {
     font-weight: 600; /* bold or semi-bold */
     font-size: 0.9rem;
     max-width: 16ch;
+
     overflow: hidden;
     text-overflow: ellipsis;
+    @media (max-width: 1300px) {
+      max-width: 12ch;
+    }
   }
 }
 
