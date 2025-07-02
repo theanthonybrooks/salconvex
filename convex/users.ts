@@ -163,6 +163,8 @@ export const getCurrentUser = query({
 export const isNewUser = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
+    const emailFormatted = args.email.toLowerCase().trim();
+    console.log("emailFormatted forgotPassword", emailFormatted);
     const user = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", args.email))
@@ -172,16 +174,21 @@ export const isNewUser = query({
 });
 
 export async function findUserByEmail(ctx: MutationCtx, email: string) {
+  const emailFormatted = email.toLowerCase().trim();
+  console.log("emailFormatted in findUserByEmail", emailFormatted);
   return await ctx.db
     .query("users")
-    .withIndex("email", (q) => q.eq("email", email))
+    .withIndex("email", (q) => q.eq("email", emailFormatted))
     .unique();
 }
 
 export async function findUserByEmailPW(ctx: MutationCtx, email: string) {
+  const emailFormatted = email.toLowerCase().trim();
+  console.log("emailFormatted", emailFormatted);
+
   const userPW = await ctx.db
     .query("userPW")
-    .withIndex("by_email", (q) => q.eq("email", email))
+    .withIndex("by_email", (q) => q.eq("email", emailFormatted))
     .unique();
 
   if (!userPW) return null;

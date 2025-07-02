@@ -5,7 +5,10 @@ const passwordValidation = new RegExp(
 );
 
 export const LoginSchema = z.object({
-  email: z.string().email({ message: "Email is required" }),
+  email: z
+    .string()
+    .email({ message: "Email is required" })
+    .transform((val) => val.toLowerCase()),
   password: z.string().min(8, { message: "Password is required" }),
 });
 
@@ -13,7 +16,10 @@ export const RegisterSchema = z
   .object({
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
-    email: z.string().email({ message: "Email is required" }),
+    email: z
+      .string()
+      .email({ message: "Email is required" })
+      .transform((val) => val.toLowerCase()),
     password: z
       .string()
       .min(8, {
@@ -48,22 +54,34 @@ export const RegisterSchema = z
 export const UpdateUserSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
-  email: z.string().email({ message: "Email is required" }),
+  email: z
+    .string()
+    .email({ message: "Email is required" })
+    .transform((val) => val.toLowerCase()),
   name: z.string().optional(),
   organizationName: z.string().optional(),
 });
 
 export const ResendOtpSchema = z.object({
-  email: z.string().email({ message: "Email is required" }),
+  email: z
+    .string()
+    .email({ message: "Email is required" })
+    .transform((val) => val.toLowerCase()),
 });
 
 export const VerifyOtpSchema = z.object({
-  email: z.string().email({ message: "Email is required" }),
+  email: z
+    .string()
+    .email({ message: "Email is required" })
+    .transform((val) => val.toLowerCase()),
   otp: z.string().min(6, { message: "OTP must be 6 digits" }),
 });
 
 export const ForgotPasswordSchema = z.object({
-  email: z.string().email({ message: "Email is required" }),
+  email: z
+    .string()
+    .email({ message: "Email is required" })
+    .transform((val) => val.toLowerCase()),
 });
 
 export const ResetPasswordSchema = z.object({
