@@ -135,7 +135,7 @@ export default function Dashboard() {
             <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       New Submissions
                     </CardTitle>
@@ -155,7 +155,7 @@ export default function Dashboard() {
               </Card>
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Total Open Calls
                     </CardTitle>
@@ -180,7 +180,7 @@ export default function Dashboard() {
               </Card>
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Active Open Calls
                     </CardTitle>
@@ -202,7 +202,7 @@ export default function Dashboard() {
               </Card>
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Total Events
                     </CardTitle>
@@ -225,7 +225,7 @@ export default function Dashboard() {
               </Card>
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Active Events
                     </CardTitle>
@@ -267,7 +267,7 @@ export default function Dashboard() {
 
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Total Users
                     </CardTitle>
@@ -299,7 +299,7 @@ export default function Dashboard() {
               </Card>
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Total Newsletter Subs
                     </CardTitle>
@@ -340,7 +340,7 @@ export default function Dashboard() {
             <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Total Applications
                     </CardTitle>
@@ -408,7 +408,7 @@ export default function Dashboard() {
               </Card> */}
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Bookmarked Events
                     </CardTitle>
@@ -431,7 +431,7 @@ export default function Dashboard() {
               </Card>
               <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
-                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                  <span className="flex items-center justify-between gap-2">
                     <CardTitle className="text-sm font-medium">
                       Hidden Events
                     </CardTitle>
