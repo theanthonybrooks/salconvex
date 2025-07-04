@@ -20,6 +20,7 @@ import { usePreloadedQuery, useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import {
   EyeOff,
+  LucideCalendar,
   LucideCalendarPlus2,
   LucideCircleCheck,
   LucideCircleEqual,
@@ -473,6 +474,18 @@ export default function Dashboard() {
                 Go to The List
               </Link>
             </Button>
+            {isOrganizer && (
+              <Button
+                asChild
+                variant="salWithShadowHiddenYlw"
+                className="w-full justify-start gap-2"
+              >
+                <Link variant="standard" href="/dashboard/organizer/events">
+                  <LucideCalendar className="size-5" />
+                  My Events
+                </Link>
+              </Button>
+            )}
             {hasActiveSubscription && (
               <Button
                 asChild
