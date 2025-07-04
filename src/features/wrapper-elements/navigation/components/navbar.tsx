@@ -40,6 +40,7 @@ export default function NavBar({
 }: // userPref,
 NavBarProps) {
   const isAdmin = user?.role?.includes("admin");
+  const isOrganizer = user?.accountType?.includes("organizer");
   const pathname = usePathname();
   const { scrollY } = useScroll();
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -61,6 +62,7 @@ NavBarProps) {
     (link) =>
       link.sub.includes(statusKey) ||
       link.sub.includes("all") ||
+      (link.userType?.includes("organizer") && isOrganizer) ||
       (link.sub.includes("public") &&
         (subStatus === "none" || subStatus === "canceled")),
   );

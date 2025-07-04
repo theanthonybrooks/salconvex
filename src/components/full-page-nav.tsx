@@ -281,6 +281,7 @@ const FullPageNav = ({
   isDashboard = false,
 }: FullPageNavProps) => {
   const isAdmin = user?.role.includes("admin");
+  const isOrganizer = user?.accountType?.includes("organizer");
   const footerText = footerCRText();
   // const { theme } = useTheme()
   const pathname = usePathname();
@@ -515,6 +516,8 @@ const FullPageNav = ({
 
                     const adminMatch = isAdmin && itemCategory === "admin";
                     const isPublic = itemUserType?.includes("public");
+                    const organizerMatch =
+                      isOrganizer && itemUserType?.includes("organizer");
 
                     const typeMatch = user?.accountType?.some((type) =>
                       itemUserType?.some(
@@ -526,7 +529,12 @@ const FullPageNav = ({
                       (sub) => sub.toLowerCase() === subStatus?.toLowerCase(),
                     );
 
-                    return isPublic || (typeMatch && subMatch) || adminMatch;
+                    return (
+                      isPublic ||
+                      (typeMatch && subMatch) ||
+                      adminMatch ||
+                      organizerMatch
+                    );
                   });
 
                   if (filteredItems.length === 0) return null;
@@ -733,6 +741,9 @@ const FullPageNav = ({
                             const itemSub = item?.sub;
                             const adminMatch =
                               isAdmin && itemCategory === "admin";
+                            const organizerMatch =
+                              isOrganizer &&
+                              itemUserType?.includes("organizer");
 
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
@@ -747,7 +758,10 @@ const FullPageNav = ({
                             );
 
                             return (
-                              isPublic || (typeMatch && subMatch) || adminMatch
+                              isPublic ||
+                              (typeMatch && subMatch) ||
+                              adminMatch ||
+                              organizerMatch
                             );
                           });
 
@@ -828,6 +842,10 @@ const FullPageNav = ({
                             const itemSub = item?.sub;
                             const adminMatch =
                               isAdmin && itemCategory === "admin";
+                            const organizerMatch =
+                              isOrganizer &&
+                              itemUserType?.includes("organizer");
+
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
@@ -842,7 +860,10 @@ const FullPageNav = ({
                             );
 
                             return (
-                              isPublic || (typeMatch && subMatch) || adminMatch
+                              isPublic ||
+                              (typeMatch && subMatch) ||
+                              adminMatch ||
+                              organizerMatch
                             );
                           })
                           .map((item) => (

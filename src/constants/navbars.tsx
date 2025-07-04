@@ -42,6 +42,7 @@ export const landingPageNavbarLinks: {
   isIcon?: boolean;
   target?: string;
   sub: string[];
+  userType?: string[];
 }[] = [
   // {
   //   title: "The List",
@@ -78,7 +79,9 @@ export const landingPageNavbarLinks: {
     href: "/dashboard",
     description: "Access your personal dashboard.",
     sub: ["active", "trialing"],
+    userType: ["artist", "organizer"],
   },
+
   // {
   //   title: "Billing",
   //   href: "/dashboard/billing",

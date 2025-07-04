@@ -135,7 +135,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["organizer", "artist"],
+        userType: ["artist"],
         sub: ["active", "trialing"],
       },
       {
