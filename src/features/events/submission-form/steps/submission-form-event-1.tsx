@@ -501,7 +501,7 @@ const SubmissionFormEventStep1 = ({
 
             <div className="input-section h-full">
               <p className="min-w-max font-bold lg:text-xl">
-                Step {categoryEvent && !eventOnly ? 9 : 8}:{" "}
+                Step {categoryEvent && !eventOnly ? 9 : isOngoing ? 7 : 8}:{" "}
               </p>
               <p className="lg:text-xs">
                 {getEventCategoryLabelAbbr(category)} Timeline

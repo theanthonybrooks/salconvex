@@ -46,6 +46,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { api } from "../../../../convex/_generated/api";
@@ -124,6 +125,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         const isNewOrg = await convex.query(
           api.organizer.organizations.isNewOrg,
           {
+            email: values.email.trim(),
             organizationName: values.organizationName.trim(),
           },
         );
@@ -135,8 +137,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           return;
         }
       }
-    } catch (queryError) {
-      console.error("Error checking for existing user:", queryError);
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        // toast.error(error.data ?? "Organization Exists");
+        setError(error.data ?? "Organization Exists");
+      } else {
+        toast.error("An error occurred while checking for organization.");
+      }
+      return;
     }
 
     const formData = {

@@ -54,7 +54,6 @@ export default async function HomeLayout({
       );
       owner = isOwner;
     }
-    console.log("owner", owner, "hasSub", hasSub);
     if ((!user || !hasSub) && ocPage && !owner) {
       const redirectPath = pathname?.replace(/\/call\/?$/, "");
       redirect(redirectPath ?? "/thelist");

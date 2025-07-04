@@ -587,6 +587,8 @@ export default defineSchema({
     })
     .index("by_name", ["name"])
     .index("by_slug", ["slug"])
+    .index("by_complete", ["isComplete"])
+    .index("by_complete_with_ownerId", ["isComplete", "ownerId"])
     .index("by_ownerId", ["ownerId"]),
 
   events: defineTable(eventSchema)

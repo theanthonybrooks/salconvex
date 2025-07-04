@@ -6,6 +6,7 @@ import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
+import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
 import {
   internalMutation,
   mutation,
@@ -164,10 +165,9 @@ export const isNewUser = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     const emailFormatted = args.email.toLowerCase().trim();
-    console.log("emailFormatted forgotPassword", emailFormatted);
     const user = await ctx.db
       .query("users")
-      .withIndex("email", (q) => q.eq("email", args.email))
+      .withIndex("email", (q) => q.eq("email", emailFormatted))
       .unique();
     return user === null;
   },
@@ -175,7 +175,6 @@ export const isNewUser = query({
 
 export async function findUserByEmail(ctx: MutationCtx, email: string) {
   const emailFormatted = email.toLowerCase().trim();
-  console.log("emailFormatted in findUserByEmail", emailFormatted);
   return await ctx.db
     .query("users")
     .withIndex("email", (q) => q.eq("email", emailFormatted))
@@ -184,8 +183,6 @@ export async function findUserByEmail(ctx: MutationCtx, email: string) {
 
 export async function findUserByEmailPW(ctx: MutationCtx, email: string) {
   const emailFormatted = email.toLowerCase().trim();
-  console.log("emailFormatted", emailFormatted);
-
   const userPW = await ctx.db
     .query("userPW")
     .withIndex("by_email", (q) => q.eq("email", emailFormatted))
@@ -482,11 +479,23 @@ export const deleteUnconfirmedUsers = internalMutation({
 export const deleteAccount = mutation({
   args: {
     method: v.string(),
-    userId: v.optional(v.string()),
+
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    console.log("args", args);
+    let userId: Id<"users"> | undefined = undefined;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email ?? ""))
+      .unique();
+    if (user) {
+      userId = user._id;
+    }
     await performDeleteAccount(ctx, args);
+    if (userId) {
+      await updateOrgOwnerBeforeDelete(ctx, userId as Id<"users">);
+    }
   },
 });
 
@@ -563,7 +572,6 @@ async function performDeleteAccount(
     queryValue = userId;
   }
 
-  // Query the user based on the provided key.
   const user = await ctx.db
     .query("users")
     .withIndex(queryKey === "email" ? "email" : "by_userId", (q) =>
@@ -685,7 +693,26 @@ async function deleteRelatedDocuments(
     q.eq("userId", userId),
   );
 
-  // 3. Delete authAccounts and then their verification codes.
+  // 3. Delete user organizations if incomplete
+  const incompleteOrgs = await ctx.db
+    .query("organizations")
+    .withIndex("by_complete_with_ownerId", (q: any) =>
+      q.eq("isComplete", false).eq("ownerId", userId),
+    )
+    .collect();
+
+  for (const org of incompleteOrgs) {
+    try {
+      const orgDoc = await ctx.db.get(org._id);
+      if (orgDoc) {
+        await ctx.db.delete(org._id);
+      }
+    } catch (error) {
+      console.error("Error deleting organization:", error);
+    }
+  }
+
+  // 4. Delete authAccounts and then their verification codes.
   const authAccounts = await ctx.db
     .query("authAccounts")
     .withIndex("userIdAndProvider", (q: any) => q.eq("userId", userId))
@@ -703,6 +730,14 @@ async function deleteRelatedDocuments(
     await deleteInBatches("authVerificationCodes", "accountId", (q: any) =>
       q.eq("accountId", account._id),
     );
+  }
+  // 4.1 Delete User Password
+  const userPW = await ctx.db
+    .query("userPW")
+    .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+    .unique();
+  if (userPW) {
+    await ctx.db.delete(userPW._id);
   }
 
   // 4. Delete authSessions and then their refresh tokens.

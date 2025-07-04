@@ -55,6 +55,7 @@ const SubmissionFormEventStep2 = ({
   const category = watch("event.category");
   const eventOnly = formType === 1;
   const freeCall = formType === 2;
+  const isOngoing = watch("event.dates.eventFormat") === "ongoing";
 
   // #region ------------- Queries, Actions, and Mutations --------------
 
@@ -80,7 +81,7 @@ const SubmissionFormEventStep2 = ({
       >
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">
-            Step {categoryEvent && !eventOnly ? 10 : 9}:{" "}
+            Step {categoryEvent && !eventOnly ? 10 : isOngoing ? 8 : 9}:{" "}
           </p>
           <p className="lg:text-xs">
             {getEventCategoryLabelAbbr(category)} Links
@@ -122,7 +123,7 @@ const SubmissionFormEventStep2 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent ? 11 : 10}:
+                      Step {categoryEvent ? 11 : isOngoing ? 9 : 10}:
                     </p>
                     <p className="lg:text-xs">Open Call</p>
                   </div>
@@ -196,7 +197,14 @@ const SubmissionFormEventStep2 = ({
               )}
               <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {categoryEvent && !eventOnly ? 12 : eventOnly ? 10 : 11}
+                  Step{" "}
+                  {categoryEvent && !eventOnly
+                    ? 12
+                    : eventOnly
+                      ? isOngoing
+                        ? 9
+                        : 10
+                      : 11}
                   :{" "}
                 </p>
                 <p className="lg:text-xs">Other Info</p>

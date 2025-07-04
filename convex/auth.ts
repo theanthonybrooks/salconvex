@@ -4,6 +4,10 @@ import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { Scrypt } from "lucia";
 import slugify from "slugify";
+import {
+  checkOrgStatus,
+  updateOrgOwner,
+} from "~/convex/organizer/organizations";
 import { CustomPassword } from "./functions/customPassword";
 import { ResendOTP } from "./otp/resendOtp";
 import { findUserByEmailPW } from "./users";
@@ -119,15 +123,27 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       // console.log("userAccountType: ", userAccountType);
 
       if (userAccountType.includes("organizer")) {
-        await ctx.db.insert("organizations", {
-          ownerId: newUserId,
-          name: profile.organizationName,
-          slug: slugify(profile.organizationName as string, { lower: true }),
-          logo: "/1.jpg",
-          hadFreeCall: false,
-          isComplete: false,
-          events: [],
-        });
+        const existingOrgResult = await checkOrgStatus(
+          ctx,
+          profile.organizationName as string,
+          profile.email,
+        );
+
+        const newOrg = existingOrgResult.isNew;
+
+        if (newOrg) {
+          await ctx.db.insert("organizations", {
+            ownerId: newUserId,
+            name: profile.organizationName,
+            slug: slugify(profile.organizationName as string, { lower: true }),
+            logo: "/1.jpg",
+            hadFreeCall: false,
+            isComplete: false,
+            events: [],
+          });
+        } else if (existingOrgResult?.orgId) {
+          await updateOrgOwner(ctx, existingOrgResult.orgId, newUserId);
+        }
       }
 
       await ctx.db.insert("userPreferences", {
@@ -160,4 +176,3 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     },
   },
 });
-

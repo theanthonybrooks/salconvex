@@ -1344,7 +1344,7 @@ export const EventOCForm = ({
         try {
           setPending(true);
 
-          if (existingOrg?.isComplete === false) {
+          if (existingOrg && existingOrg.isComplete !== true) {
             await markOrganizationComplete({
               orgId: existingOrg._id,
             });
