@@ -479,18 +479,22 @@ export const deleteUnconfirmedUsers = internalMutation({
 export const deleteAccount = mutation({
   args: {
     method: v.string(),
-
+    userId: v.optional(v.string()),
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     console.log("args", args);
     let userId: Id<"users"> | undefined = undefined;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("email", (q) => q.eq("email", args.email ?? ""))
-      .unique();
-    if (user) {
-      userId = user._id;
+    if (args.userId) {
+      userId = args.userId as Id<"users">;
+    } else if (args.email) {
+      const user = await ctx.db
+        .query("users")
+        .withIndex("email", (q) => q.eq("email", args.email ?? ""))
+        .unique();
+      if (user) {
+        userId = user._id;
+      }
     }
     await performDeleteAccount(ctx, args);
     if (userId) {
@@ -553,7 +557,7 @@ async function performDeleteAccount(
 
   const config = methodConfigs[method];
 
-  let queryKey: "email" | "userId";
+  let queryKey: "email" | "_id";
   let queryValue: string;
 
   if (config.requiresEmail) {
@@ -568,13 +572,13 @@ async function performDeleteAccount(
     if (!userId) {
       throw new ConvexError("Unauthenticated call to mutation");
     }
-    queryKey = "userId";
+    queryKey = "_id";
     queryValue = userId;
   }
 
   const user = await ctx.db
     .query("users")
-    .withIndex(queryKey === "email" ? "email" : "by_userId", (q) =>
+    .withIndex(queryKey === "email" ? "email" : "by_id", (q) =>
       q.eq(queryKey, queryValue),
     )
     .unique();

@@ -93,49 +93,20 @@ export const isNewOrg = query({
     organizationName: v.string(),
     email: v.optional(v.string()),
   },
-  /*  handler: async (ctx, args) => {
-    let orgDomain: string | undefined;
-    const emailDomain = args.email?.split("@")[1]?.toLowerCase();
 
-    const slug = slugify(args.organizationName, { lower: true });
-    const existingOrg = await ctx.db
-      .query("organizations")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
-      .unique();
-    if (existingOrg) {
-      const orgOwnerId = existingOrg.ownerId;
-      const orgEmail = existingOrg.links?.email?.toLowerCase();
-      orgDomain = orgEmail?.split("@")[1].toLowerCase();
-      const orgOwner = await ctx.db
-        .query("users")
-        .withIndex("by_userId", (q) => q.eq("userId", orgOwnerId))
-        .unique();
-      const orgOwnerIsAdmin = orgOwner?.role?.includes("admin");
-      console.log("orgDomain", orgDomain);
-      console.log("emailDomain", emailDomain);
-      console.log("orgOwnerIsAdmin", orgOwnerIsAdmin);
-      console.log("org Domain is email domain", orgDomain === emailDomain);
-      if (orgDomain === emailDomain) {
-        if (orgOwnerIsAdmin) {
-          return true;
-        } else {
-          throw new ConvexError(
-            // "Contact your org admin to add your email to the organization.",
-            "An admin already exists for this organization. Please contact us for additional admins.",
-          );
-        }
-      }
-    }
-
-    return existingOrg === null;
-  },*/
   handler: async (ctx, args) => {
+    console.log("args", args);
     const results = await checkOrgStatus(
       ctx,
       args.organizationName,
       args.email,
     );
     const { isNew, orgOwnerIsAdmin, orgDomain, emailDomain } = results;
+
+    console.log("isNew", isNew);
+    console.log("orgOwnerIsAdmin", orgOwnerIsAdmin);
+    console.log("orgDomain", orgDomain);
+    console.log("emailDomain", emailDomain);
 
     if (orgDomain === emailDomain) {
       if (orgOwnerIsAdmin) {
