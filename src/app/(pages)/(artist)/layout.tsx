@@ -47,13 +47,14 @@ export default async function HomeLayout({
 
   if (!isAdmin) {
     if (onlyOrganizer) {
-      const testicles = await fetchQuery(
+      const isOwner = await fetchQuery(
         api.organizer.organizations.checkIfOrgOwner,
         { eventSlug, edition },
         { token },
       );
-      owner = testicles;
+      owner = isOwner;
     }
+    console.log("owner", owner, "hasSub", hasSub);
     if ((!user || !hasSub) && ocPage && !owner) {
       const redirectPath = pathname?.replace(/\/call\/?$/, "");
       redirect(redirectPath ?? "/thelist");
