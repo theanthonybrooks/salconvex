@@ -43,6 +43,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
+
   const { data, artist, userPref, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
@@ -119,7 +120,11 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         className,
       )}
     >
-      <SalBackNavigation format="desktop" />
+      <SalBackNavigation
+        format="desktop"
+        user={user}
+        activeSub={hasActiveSubscription}
+      />
 
       <Card
         className={cn(

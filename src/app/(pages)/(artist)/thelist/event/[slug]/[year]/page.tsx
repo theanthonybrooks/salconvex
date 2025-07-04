@@ -9,11 +9,20 @@ import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { usePreloadedQuery } from "convex/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const router = useRouter();
@@ -64,7 +73,11 @@ const Event = () => {
 
   return (
     <>
-      <SalBackNavigation format="mobile" />
+      <SalBackNavigation
+        format="mobile"
+        user={user}
+        activeSub={hasActiveSubscription}
+      />
 
       {!data ? (
         // <p>Event: {data?.event.name}</p>

@@ -17,8 +17,13 @@ import { api } from "~/convex/_generated/api";
 const OpenCallDetail = () => {
   const hasRedirected = useRef(false);
 
-  const { preloadedUserData } = useConvexPreload();
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const userPref = userData?.userPref ?? null;
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -65,7 +70,11 @@ const OpenCallDetail = () => {
   return (
     // <OpenCallDetailWrapper>
     <>
-      <SalBackNavigation format="mobile" />
+      <SalBackNavigation
+        format="mobile"
+        user={user}
+        activeSub={hasActiveSubscription}
+      />
 
       {!data ? (
         // <p>Event: {data?.event.name}</p>

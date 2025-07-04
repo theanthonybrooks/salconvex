@@ -510,6 +510,18 @@ export const getUserEvents = query({
 
 export const get5latestPublishedEvents = query({
   handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = userId ? await ctx.db.get(userId) : null;
+    const userSub = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+    const hasActiveSubscription =
+      userSub?.status === "active" || userSub?.status === "trialing";
+    const isAdmin = user?.role?.includes("admin");
+    if (!hasActiveSubscription && !isAdmin) return null;
+
     const publishedEvents = await ctx.db
       .query("events")
       .withIndex("by_state_hasOpenCall_approvedAt", (q) =>

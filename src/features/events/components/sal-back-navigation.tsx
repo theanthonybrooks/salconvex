@@ -1,19 +1,26 @@
 import { useSalBackNavigation } from "@/hooks/use-back-navigation";
 import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
 import { IoIosArrowRoundBack } from "react-icons/io";
 
 interface SalBackNavigationProps {
   className?: string;
   format: "desktop" | "mobile";
+  user: User | null;
+  activeSub?: boolean;
 }
 
 export const SalBackNavigation = ({
   className,
   format = "desktop",
+  user,
+  activeSub,
 }: SalBackNavigationProps) => {
-  const onBackClick = useSalBackNavigation();
   const desktopMode = format === "desktop";
   const navText = "back to The List";
+  const isOrganizerOnly =
+    user?.accountType?.includes("organizer") && !activeSub;
+  const onBackClick = useSalBackNavigation("/thelist", isOrganizerOnly);
 
   return (
     <>
@@ -25,7 +32,8 @@ export const SalBackNavigation = ({
             className,
           )}
         >
-          <IoIosArrowRoundBack className="size-6" /> {navText}
+          <IoIosArrowRoundBack className="size-6" />{" "}
+          {isOrganizerOnly ? "Back to my dashboard" : navText}
         </div>
       ) : (
         <div
@@ -35,7 +43,8 @@ export const SalBackNavigation = ({
             className,
           )}
         >
-          <IoIosArrowRoundBack className="size-6" /> {navText}
+          <IoIosArrowRoundBack className="size-6" />{" "}
+          {isOrganizerOnly ? "Back to my dashboard" : navText}
         </div>
       )}
     </>

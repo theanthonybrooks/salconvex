@@ -4,13 +4,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries, useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
 
 const Event = () => {
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const router = useRouter();
   const { slug } = useParams();
@@ -46,7 +55,11 @@ const Event = () => {
 
   return (
     <>
-      <SalBackNavigation format="mobile" />
+      <SalBackNavigation
+        format="mobile"
+        user={user}
+        activeSub={hasActiveSubscription}
+      />
       {!data ? (
         // <p>Event: {data?.event.name}</p>
         <div className="flex min-h-screen w-full max-w-[min(90vw,1400px)] flex-col gap-6 pb-10 xl:grid xl:grid-cols-[300px_auto] xl:grid-rows-[60px_auto] xl:gap-y-0">

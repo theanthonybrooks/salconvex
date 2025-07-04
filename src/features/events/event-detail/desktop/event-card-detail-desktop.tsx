@@ -41,7 +41,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
-  const isAdmin = userData?.user?.role?.includes("admin") || false;
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
   const { data, artist, className } = props;
@@ -97,7 +99,11 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         className,
       )}
     >
-      <SalBackNavigation format="desktop" />
+      <SalBackNavigation
+        format="desktop"
+        user={user}
+        activeSub={hasActiveSubscription}
+      />
       <Card
         className={cn(
           "row-start-2 hidden w-full max-w-[300px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",

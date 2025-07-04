@@ -14,15 +14,24 @@ import {
 } from "@/components/ui/state-accordion-test";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventDates } from "@/lib/dateFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
+import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useState } from "react";
 
 export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin") || false;
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const { data, className } = props;
   const { events, organizer } = data;
   const {
@@ -65,7 +74,11 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
         className,
       )}
     >
-      <SalBackNavigation format="desktop" />
+      <SalBackNavigation
+        format="desktop"
+        user={user}
+        activeSub={hasActiveSubscription}
+      />
 
       <Card
         className={cn(
