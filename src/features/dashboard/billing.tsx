@@ -172,200 +172,201 @@ export default function BillingPage() {
       )}
 
       {/* Account Information Grid */}
-      <div className="grid gap-6">
-        {/* Subscription Details Card */}
-        <div className="flex flex-col gap-6">
-          <Button
-            className="mt-3 w-full max-w-lg"
-            onClick={handleManageSubscription}
-            variant="salWithShadow"
-          >
-            {subStatus === "past_due"
-              ? "Resume Membership"
-              : "Manage Membership"}
-          </Button>
-          {!subPromoCode && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleApplyCoupon();
-              }}
-              className="space-y-2"
+      {subscription && (
+        <div className="grid gap-6">
+          {/* Subscription Details Card */}
+          <div className="flex flex-col gap-6">
+            <Button
+              className="mt-3 w-full max-w-lg"
+              onClick={handleManageSubscription}
+              variant="salWithShadow"
             >
-              <p>Have a promo code? Enter it below:</p>
-              <div className="flex items-center gap-3">
-                <Input
-                  placeholder="Enter Promo Code"
-                  value={promoCode}
-                  disabled={promoAttempts >= 5}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  className="flex-1 uppercase placeholder:normal-case"
-                />
-                {promoCode && promoCode.trim().length > 3 && (
-                  <Button
-                    type="submit"
-                    variant="salWithShadowHidden"
-                    className="w-fit"
+              {subStatus === "past_due"
+                ? "Resume Membership"
+                : "Manage Membership"}
+            </Button>
+            {!subPromoCode && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleApplyCoupon();
+                }}
+                className="space-y-2"
+              >
+                <p>Have a promo code? Enter it below:</p>
+                <div className="flex items-center gap-3">
+                  <Input
+                    placeholder="Enter Promo Code"
+                    value={promoCode}
                     disabled={promoAttempts >= 5}
-                  >
-                    Apply Promo Code
-                  </Button>
-                )}
-              </div>
-            </form>
-          )}
-          <Card className="w-full max-w-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="size-5" />
-                Membership Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!subscription ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-4 w-[180px]" />
-                  <Skeleton className="h-4 w-[150px]" />
-                  <Skeleton className="h-4 w-[200px]" />
-                  <Skeleton className="h-4 w-[170px]" />
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    className="flex-1 uppercase placeholder:normal-case"
+                  />
+                  {promoCode && promoCode.trim().length > 3 && (
+                    <Button
+                      type="submit"
+                      variant="salWithShadowHidden"
+                      className="w-fit"
+                      disabled={promoAttempts >= 5}
+                    >
+                      Apply Promo Code
+                    </Button>
+                  )}
                 </div>
-              ) : (
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Status:</span>
-                    <span className="font-medium capitalize">
-                      {subscription?.status === "active" ? (
-                        <span className="rounded bg-green-100 px-3 py-1 font-medium text-green-700">
-                          Active
-                        </span>
-                      ) : subscription?.status === "past_due" ? (
-                        <span className="rounded bg-red-100 px-3 py-1 font-medium text-red-700">
-                          Past Due
-                        </span>
-                      ) : subscription?.status === "canceled" ? (
-                        <span className="rounded bg-red-100 px-3 py-1 font-medium text-red-700">
-                          Canceled
-                        </span>
-                      ) : subscription?.status === "unpaid" ? (
-                        <span className="rounded bg-yellow-100 px-3 py-1 font-medium text-yellow-700">
-                          Unpaid
-                        </span>
-                      ) : subscription?.status === "trialing" ? (
-                        <span className="rounded bg-yellow-100 px-3 py-1 font-medium text-yellow-700">
-                          2 Week Free Trial
-                        </span>
-                      ) : (
-                        <span className="rounded bg-gray-100 px-3 py-1 font-medium text-gray-700">
-                          No Plan
-                        </span>
-                      )}
-                    </span>
+              </form>
+            )}
+            <Card className="w-full max-w-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="size-5" />
+                  Membership Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!subscription ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-4 w-[180px]" />
+                    <Skeleton className="h-4 w-[150px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                    <Skeleton className="h-4 w-[170px]" />
                   </div>
-
-                  <div className="mt-0 flex items-start justify-between">
-                    <span className="whitespace-nowrap text-muted-foreground">
-                      Plan Amount:
-                    </span>
-                    <span className="flex flex-col items-end justify-start font-medium">
-                      <span className="flex items-center gap-2">
-                        $
-                        {subscription?.amount
-                          ? (subscription.amount / 100).toFixed(0)
-                          : 0}
-                        <p
-                          className={
-                            cn(
-                              subscription?.discount &&
-                                "text-red-600 line-through",
-                            ) || ""
-                          }
-                        >
-                          {subscription?.discount && (
-                            <>${(subscription.discount / 100).toFixed(0)}</>
-                          )}
-                        </p>
-                      </span>
-                      {nextAmount !== undefined && (
-                        <>
-                          <span className="text-sm font-light italic text-gray-400">
-                            {" "}
-                            {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
-                            (${nextAmount}/{interval} starting{" "}
-                            {format(currentPeriodEnd, "MMM do yyyy")})
+                ) : (
+                  <div className="grid gap-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Status:</span>
+                      <span className="font-medium capitalize">
+                        {subscription?.status === "active" ? (
+                          <span className="rounded bg-green-100 px-3 py-1 font-medium text-green-700">
+                            Active
                           </span>
-                          <span className="mt-1 text-balance text-end text-sm font-light italic text-gray-400">
-                            Can be changed before start date via the{" "}
-                            <a
-                              href="#"
-                              className="font-normal text-foreground/70 underline"
-                              onClick={handleManageSubscription}
-                            >
-                              Manage Membership
-                            </a>{" "}
-                            page
+                        ) : subscription?.status === "past_due" ? (
+                          <span className="rounded bg-red-100 px-3 py-1 font-medium text-red-700">
+                            Past Due
+                          </span>
+                        ) : subscription?.status === "canceled" ? (
+                          <span className="rounded bg-red-100 px-3 py-1 font-medium text-red-700">
+                            Canceled
+                          </span>
+                        ) : subscription?.status === "unpaid" ? (
+                          <span className="rounded bg-yellow-100 px-3 py-1 font-medium text-yellow-700">
+                            Unpaid
+                          </span>
+                        ) : subscription?.status === "trialing" ? (
+                          <span className="rounded bg-yellow-100 px-3 py-1 font-medium text-yellow-700">
+                            2 Week Free Trial
+                          </span>
+                        ) : (
+                          <span className="rounded bg-gray-100 px-3 py-1 font-medium text-gray-700">
+                            No Plan
+                          </span>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="mt-0 flex items-start justify-between">
+                      <span className="whitespace-nowrap text-muted-foreground">
+                        Plan Amount:
+                      </span>
+                      <span className="flex flex-col items-end justify-start font-medium">
+                        <span className="flex items-center gap-2">
+                          $
+                          {subscription?.amount
+                            ? (subscription.amount / 100).toFixed(0)
+                            : 0}
+                          <p
+                            className={
+                              cn(
+                                subscription?.discount &&
+                                  "text-red-600 line-through",
+                              ) || ""
+                            }
+                          >
+                            {subscription?.discount && (
+                              <>${(subscription.discount / 100).toFixed(0)}</>
+                            )}
+                          </p>
+                        </span>
+                        {nextAmount !== undefined && (
+                          <>
+                            <span className="text-sm font-light italic text-gray-400">
+                              {" "}
+                              {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
+                              (${nextAmount}/{interval} starting{" "}
+                              {format(currentPeriodEnd, "MMM do yyyy")})
+                            </span>
+                            <span className="mt-1 text-balance text-end text-sm font-light italic text-gray-400">
+                              Can be changed before start date via the{" "}
+                              <a
+                                href="#"
+                                className="font-normal text-foreground/70 underline"
+                                onClick={handleManageSubscription}
+                              >
+                                Manage Membership
+                              </a>{" "}
+                              page
+                            </span>
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
+                        Account Interval:
+                      </span>
+                      <span className="font-medium capitalize">
+                        {subscription?.interval + "ly"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Auto Renew:</span>
+                      <span className="font-medium">
+                        {isCanceled || !subscription
+                          ? "-"
+                          : subscription?.cancelAtPeriodEnd
+                            ? "No"
+                            : "Yes"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      {!cancelAtTime && (
+                        <>
+                          <span className="text-muted-foreground">
+                            Next Due Date:
+                          </span>
+                          <span className="font-medium">
+                            {isCanceled
+                              ? "Canceled"
+                              : format(currentPeriodEnd, "MMM do, yyyy")}
                           </span>
                         </>
                       )}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      Account Interval:
-                    </span>
-                    <span className="font-medium capitalize">
-                      {subscription?.interval + "ly"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Auto Renew:</span>
-                    <span className="font-medium">
-                      {isCanceled
-                        ? "-"
-                        : subscription?.cancelAtPeriodEnd
-                          ? "No"
-                          : "Yes"}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    {!cancelAtTime && (
-                      <>
-                        <span className="text-muted-foreground">
-                          Next Due Date:
-                        </span>
-                        <span className="font-medium">
-                          {isCanceled
-                            ? "Canceled"
-                            : format(currentPeriodEnd, "MMM do, yyyy")}
-                        </span>
-                      </>
-                    )}
-                    {cancelAtTime && !isCanceled && (
-                      <>
-                        <span className="text-muted-foreground">
-                          Cancels on:
-                        </span>
-                        <span className="font-medium text-red-500">
-                          {format(cancelAtTime, "MMM do, yyyy")}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      {isCanceled ? "Account Created:" : "Member Since:"}
-                    </span>
-                    <span className="font-medium">
-                      {subscription?.startedAt
-                        ? format(
-                            new Date(subscription.startedAt),
-                            "MMM do, yyyy",
-                          )
-                        : "No Membership"}
-                    </span>
-                  </div>
-                  {/* {!canceledAt ? (
+                      {cancelAtTime && !isCanceled && (
+                        <>
+                          <span className="text-muted-foreground">
+                            Cancels on:
+                          </span>
+                          <span className="font-medium text-red-500">
+                            {format(cancelAtTime, "MMM do, yyyy")}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
+                        {isCanceled ? "Account Created:" : "Member Since:"}
+                      </span>
+                      <span className="font-medium">
+                        {subscription?.startedAt
+                          ? format(
+                              new Date(subscription.startedAt),
+                              "MMM do, yyyy",
+                            )
+                          : "No Membership"}
+                      </span>
+                    </div>
+                    {/* {!canceledAt ? (
                     <div className='flex items-center justify-between'>
                       <span className='text-muted-foreground'>Last Updated:</span>
                       <span className='font-medium'>
@@ -378,27 +379,35 @@ export default function BillingPage() {
                       </span>
                     </div>
                   ) :  */}
-                  {canceledAt && (
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-muted-foreground">
-                        Cancellation Date:
-                      </span>
-                      <span className="font-medium text-red-500">
-                        {subscription?.canceledAt
-                          ? format(
-                              new Date(subscription.canceledAt),
-                              "MMM do, yyyy @ h:mm a",
-                            )
-                          : "N/A"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    {canceledAt && (
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-muted-foreground">
+                          Cancellation Date:
+                        </span>
+                        <span className="font-medium text-red-500">
+                          {subscription?.canceledAt
+                            ? format(
+                                new Date(subscription.canceledAt),
+                                "MMM do, yyyy @ h:mm a",
+                              )
+                            : "N/A"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
+      {!subscription && (
+        <span className="mt-2 flex items-center gap-4 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
+          <FaExclamationTriangle className="color-red-600 size-10 shrink-0" />
+          You don&apos;t currently have a membership. Please contact support if
+          this is incorrect.
+        </span>
+      )}
     </div>
   );
 }

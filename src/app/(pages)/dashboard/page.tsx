@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
+import { supportEmail } from "@/constants/siteInfo";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/lib/applicationFns";
 import { getEventCategoryLabel } from "@/lib/eventFns";
@@ -34,6 +35,7 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { FaExclamationTriangle } from "react-icons/fa";
 import { FaGear, FaRegBookmark } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
@@ -44,6 +46,7 @@ export default function Dashboard() {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
+  const subStatus = subData?.subStatus ?? "none";
   const hasActiveSubscription = subData?.hasActiveSubscription ?? false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userId = userData?.userId ?? "guest";
@@ -97,7 +100,6 @@ export default function Dashboard() {
   const { applications, listActions } = artistData ?? {};
   const bookmarkedEvents = listActions?.filter((la) => la.bookmarked === true);
   const hiddenEvents = listActions?.filter((la) => la.hidden === true);
-
   const lastMonthCount = countApplicationsByTimeRange(
     applications ?? [],
     "month",
@@ -120,6 +122,46 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
+      {!hasActiveSubscription && (
+        <>
+          {subStatus === "past_due" && (
+            <div className="mt-2 inline-flex items-center gap-1 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
+              <FaExclamationTriangle className="color-red-600 mr-2 size-10 shrink-0" />
+
+              <p>
+                Your membership is past due. Please{" "}
+                <Link
+                  className="underline underline-offset-2"
+                  href="/dashboard/account/billing"
+                >
+                  check your payment method
+                </Link>{" "}
+                and try again or{" "}
+                <Link
+                  className="underline underline-offset-2"
+                  href={`mailto:${supportEmail}?Subject=Past Due Subscription`}
+                >
+                  contact support
+                </Link>{" "}
+                if you think this is an error.
+              </p>
+            </div>
+          )}
+          {subStatus === "canceled" && (
+            <span className="mt-2 inline-flex items-center gap-1 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
+              <FaExclamationTriangle className="color-red-600 mr-2 size-10 shrink-0" />
+              Your membership has been canceled. Please
+              <Link
+                className="underline underline-offset-2"
+                href={`mailto:${supportEmail}?Subject=Canceled Subscription`}
+              >
+                contact support
+              </Link>
+              if this is incorrect.
+            </span>
+          )}
+        </>
+      )}
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-2 text-foreground">

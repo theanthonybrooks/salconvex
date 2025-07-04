@@ -25,15 +25,15 @@ export const getStripeCustomerPortalUrl = async (
 
 export const getUserSubscriptionStatus = query({
   handler: async (ctx) => {
-    const identity = await getAuthUserId(ctx);
+    const userId = await getAuthUserId(ctx);
 
-    if (!identity) {
+    if (!userId) {
       return { hasActiveSubscription: false };
     }
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity))
+      .withIndex("by_id", (q) => q.eq("_id", userId))
       .unique();
 
     if (!user) {
@@ -42,7 +42,7 @@ export const getUserSubscriptionStatus = query({
 
     const subscription = await ctx.db
       .query("userSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", user.tokenIdentifier))
+      .withIndex("userId", (q) => q.eq("userId", user._id))
       .first();
 
     const hasActiveSubscription =
