@@ -1266,11 +1266,11 @@ export const EventOCForm = ({
         }
       }
       if (activeStep === steps.length - 2) {
-        console.log("saving org details");
+        // console.log("saving org details");
 
         try {
           setPending(true);
-          console.log("orgData presave", orgData);
+          // console.log("orgData presave", orgData);
 
           const result = await updateOrg({
             orgId: orgData._id as Id<"organizations">,

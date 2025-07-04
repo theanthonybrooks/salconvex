@@ -507,6 +507,7 @@ export default defineSchema({
   users: defineTable(customUserSchema)
     .index("email", ["email"])
     .index("by_userId", ["userId"])
+    .index("by_role", ["role"])
     .index("by_token", ["tokenIdentifier"])
     .index("by_createdAt", ["createdAt"]),
 

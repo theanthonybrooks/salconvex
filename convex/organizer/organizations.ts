@@ -31,6 +31,11 @@ export async function updateOrgOwnerBeforeDelete(
   userId: Id<"users">,
 ) {
   if (!userId) return;
+  const adminUser = await ctx.db
+    .query("users")
+    .withIndex("by_role", (q) => q.eq("role", ["admin"]))
+    .first();
+  const adminUserId = adminUser?._id as Id<"users">;
   const userOrgs = await ctx.db
     .query("organizations")
     .withIndex("by_complete_with_ownerId", (q) =>
@@ -38,12 +43,7 @@ export async function updateOrgOwnerBeforeDelete(
     )
     .collect();
   for (const org of userOrgs) {
-    await updateOrgOwner(
-      ctx,
-      org._id,
-      "mh74phva5yrxhg9ga6x1g1csk97cp2vc" as Id<"users">,
-      userId,
-    );
+    await updateOrgOwner(ctx, org._id, adminUserId, userId);
   }
 }
 
