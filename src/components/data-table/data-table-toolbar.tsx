@@ -87,6 +87,10 @@ export function DataTableToolbar<TData>({
       toast.error("Something went wrong. Please try again.");
     }
   };
+  const handleClearParams = () => {
+    const path = window.location.pathname;
+    router.replace(path, { scroll: false });
+  };
 
   useEffect(() => {
     if (initialSearchTerm !== undefined) {
@@ -261,7 +265,10 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              table.resetColumnFilters();
+              handleClearParams();
+            }}
             className="hidden h-8 px-2 sm:inline-flex sm:gap-1 lg:px-3"
           >
             Reset
