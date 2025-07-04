@@ -542,10 +542,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                 <span className="flex items-center gap-1 truncate text-wrap">
                                   {item.name}
                                 </span>
-                                {item.ocStatus === 2 && (
+                                {item.ocStatus === 2 ? (
                                   <FlairBadge className="bg-green-500/20">
                                     Open Call
                                   </FlairBadge>
+                                ) : (
+                                  <span />
                                 )}
                                 {item.edition ? (
                                   <span className="text-center text-xs text-stone-500">

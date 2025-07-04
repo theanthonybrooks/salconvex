@@ -95,10 +95,25 @@ export const getFilteredEventsPublic = query({
       .map((a) => a.eventId);
 
     const hiddenIds = listActions.filter((a) => a.hidden).map((a) => a.eventId);
-    let events = await ctx.db
-      .query("events")
-      .withIndex("by_state", (q) => q.eq("state", "published"))
-      .collect();
+    let events = [];
+    if (thisWeekPg || nextWeekPg) {
+      const publishedEvents = await ctx.db
+        .query("events")
+        .withIndex("by_state", (q) => q.eq("state", "published"))
+        .collect();
+
+      const archivedEvents = await ctx.db
+        .query("events")
+        .withIndex("by_state", (q) => q.eq("state", "archived"))
+        .collect();
+
+      events = [...publishedEvents, ...archivedEvents];
+    } else {
+      events = await ctx.db
+        .query("events")
+        .withIndex("by_state", (q) => q.eq("state", "published"))
+        .collect();
+    }
 
     // User/Artist filters
 

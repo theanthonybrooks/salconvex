@@ -38,17 +38,19 @@ export const globalSearch = query({
     ) => {
       const callMap = new Map<
         Id<"events">,
-        { ocStart?: string; ocEnd?: string }[]
+        { ocStart?: string; ocEnd?: string; callType?: string }[]
       >();
 
       for (const oc of allOpenCalls) {
         const { eventId, basicInfo } = oc;
         const dates = basicInfo?.dates;
-        if (!dates) continue;
+        const rollingCall = basicInfo?.callType === "Rolling";
+        if (!dates && !rollingCall) continue;
         if (!callMap.has(eventId)) callMap.set(eventId, []);
         callMap.get(eventId)!.push({
           ocStart: dates.ocStart ?? undefined,
           ocEnd: dates.ocEnd ?? undefined,
+          callType: basicInfo?.callType,
         });
       }
 
@@ -57,17 +59,16 @@ export const globalSearch = query({
         if (!calls || calls.length === 0) return { ...e, ocStatus: 0 };
 
         let status = 1;
-        for (const { ocStart, ocEnd } of calls) {
+        for (const { ocStart, ocEnd, callType } of calls) {
           const start = ocStart ? Date.parse(ocStart) : NaN;
           const end = ocEnd ? Date.parse(ocEnd) : NaN;
+          const rollingCall = callType === "Rolling";
 
           if (!isNaN(start) && start > now) {
             status = Math.max(status, 3); // future
           } else if (
-            !isNaN(start) &&
-            !isNaN(end) &&
-            start <= now &&
-            end >= now
+            (!isNaN(start) && !isNaN(end) && start <= now && end >= now) ||
+            rollingCall
           ) {
             status = 2; // active overrides
             break;

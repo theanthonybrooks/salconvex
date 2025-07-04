@@ -194,7 +194,7 @@ export default function Dashboard() {
                   <Link
                     variant="subtleUnderline"
                     onClick={handleCollapseSidebar}
-                    href="/dashboard/admin/submissionsopenCallState=published"
+                    href="/dashboard/admin/submissions?openCallState=published"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
