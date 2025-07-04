@@ -42,7 +42,7 @@ export default async function OrganizerPage({
     !user?.role.includes("admin") &&
     !user?.accountType?.includes("organizer")
   ) {
-    if (!subStatus || subStatus === "cancelled") {
+    if (!subStatus || subStatus === "canceled") {
       redirect("/thelist");
     }
     redirect("/thelist");

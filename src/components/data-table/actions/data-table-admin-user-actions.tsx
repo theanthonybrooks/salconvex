@@ -20,7 +20,7 @@ export const DeleteUser = ({ userId }: UserActionProps) => {
         confirm({
           label: "Delete User",
           description:
-            "Are you sure you want to delete this user? Be sure that you've cancelled any active subscriptions before doing this.",
+            "Are you sure you want to delete this user? Be sure that you've canceled any active subscriptions before doing this.",
           onConfirm: () => {
             deleteUser({
               userId: userId as Id<"users">,

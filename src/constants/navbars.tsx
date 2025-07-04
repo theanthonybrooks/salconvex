@@ -83,7 +83,7 @@ export const landingPageNavbarLinks: {
   //   title: "Billing",
   //   href: "/dashboard/billing",
   //   description: "View your subscription details.",
-  //   sub: ["cancelled"],
+  //   sub: ["canceled"],
   // },
 
   {

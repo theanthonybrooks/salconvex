@@ -34,6 +34,7 @@ const Event = () => {
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
   const artist = artistData?.artist;
+  const isOwner = user?._id === data?.organizer?.ownerId;
 
   // const allEvents = useEventDetailCards();
   // const event = allEvents.find((e) => e.id === id);
@@ -92,6 +93,7 @@ const Event = () => {
         format="mobile"
         user={user}
         activeSub={hasActiveSubscription}
+        isOwner={isOwner}
       />
       {!data ? (
         // <p>Event: {data?.event.name}</p>

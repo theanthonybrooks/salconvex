@@ -1,21 +1,15 @@
 import { useRouter } from "next/navigation";
 
-export function useSalBackNavigation(
-  fallbackPath: string = "/thelist",
-  orgOnly?: boolean,
-) {
+export function useSalBackNavigation(fallbackPath: string = "/thelist") {
   const router = useRouter();
 
   const goBack = () => {
     const previous = sessionStorage.getItem("previousSalPage");
-    if (!orgOnly) {
-      if (previous && previous.includes("/thelist")) {
-        router.push(previous);
-      } else {
-        router.push(fallbackPath);
-      }
+
+    if (previous && previous.includes("/thelist")) {
+      router.push(previous);
     } else {
-      router.push("/dashboard/organizer/events");
+      router.push(fallbackPath);
     }
   };
 

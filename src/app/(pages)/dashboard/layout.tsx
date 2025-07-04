@@ -55,7 +55,7 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/auth/sign-in");
   if (!subStatus) redirect("/pricing#plans");
-  // if (subStatus?.subStatus === "cancelled") {
+  // if (subStatus?.subStatus === "canceled") {
   //   redirect("/pricing#plans")
   // }
 

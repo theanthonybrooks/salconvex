@@ -30,7 +30,7 @@ export default async function DashboardLayout({
   const isAdmin = user?.role.includes("admin");
 
   if (!isAdmin) {
-    if (!subStatus || subStatus === "cancelled") {
+    if (!subStatus || subStatus === "canceled") {
       redirect("/dashboard/account/settings");
     }
 
@@ -57,7 +57,7 @@ export default async function DashboardLayout({
   // const userSub = subStatus?.subStatus;
   // const userType = user?.user?.accountType;
 
-  // if (subStatus?.subStatus === "cancelled") {
+  // if (subStatus?.subStatus === "canceled") {
   //   redirect("/pricing#plans")
   // }
 

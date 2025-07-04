@@ -59,6 +59,8 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
 
   const locationString = getFormattedLocationString(location);
 
+  const isOwner = user?._id === organizer?.ownerId;
+
   const tabList = [
     // { id: "application", label: "My Application" },
     { id: "events", label: "Events/Projects" },
@@ -78,6 +80,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
+        isOwner={isOwner}
       />
 
       <Card

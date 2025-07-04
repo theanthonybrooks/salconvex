@@ -66,6 +66,7 @@ const OpenCallDetail = () => {
   //     document.title = `Open Call | ${document.title}`;
   //   }
   // }, [data?.event?.name]);
+  const isOwner = user?._id === data?.organizer?.ownerId;
 
   return (
     // <OpenCallDetailWrapper>
@@ -73,6 +74,7 @@ const OpenCallDetail = () => {
       <SalBackNavigation
         format="mobile"
         user={user}
+        isOwner={isOwner}
         activeSub={hasActiveSubscription}
       />
 

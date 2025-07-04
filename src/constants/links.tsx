@@ -237,7 +237,7 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "account",
     desc: "Manage your payments",
-    sub: ["active", "trialing", "cancelled"],
+    sub: ["active", "trialing", "canceled"],
     userType: ["artist", "admin"],
   },
   // {

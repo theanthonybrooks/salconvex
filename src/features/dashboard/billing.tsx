@@ -32,7 +32,7 @@ export default function BillingPage() {
   const canceledAt =
     subscription?.canceledAt !== undefined && subscription?.canceledAt;
 
-  const isCancelled = subscription?.status === "cancelled";
+  const isCanceled = subscription?.status === "canceled";
   // const cancelAtTime = new Date(subscription?.cancelAt ?? Date.now());
   const cancelAtTime = subscription?.cancelAt
     ? new Date(subscription.cancelAt)
@@ -93,14 +93,14 @@ export default function BillingPage() {
         toast.error(
           typeof err.data === "string" &&
             err.data.toLowerCase().includes("no such customer")
-            ? "Your account was cancelled. Contact support for assistance."
+            ? "Your account was canceled. Contact support for assistance."
             : err.data || "An unexpected error occurred.",
         );
       } else if (err instanceof Error) {
         toast.error(
           typeof err.message === "string" &&
             err.message.toLowerCase().includes("no such customer")
-            ? "Your account was cancelled. Contact support for assistance."
+            ? "Your account was canceled. Contact support for assistance."
             : err.message || "An unexpected error occurred.",
         );
       } else {
@@ -153,7 +153,7 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex w-max flex-col gap-6 p-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">
           Membership Overview
@@ -172,11 +172,11 @@ export default function BillingPage() {
       )}
 
       {/* Account Information Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6">
         {/* Subscription Details Card */}
         <div className="flex flex-col gap-6">
           <Button
-            className="mt-3 w-full"
+            className="mt-3 w-full max-w-lg"
             onClick={handleManageSubscription}
             variant="salWithShadow"
           >
@@ -214,10 +214,10 @@ export default function BillingPage() {
               </div>
             </form>
           )}
-          <Card>
+          <Card className="w-full max-w-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
+                <CreditCard className="size-5" />
                 Membership Details
               </CardTitle>
             </CardHeader>
@@ -241,6 +241,10 @@ export default function BillingPage() {
                       ) : subscription?.status === "past_due" ? (
                         <span className="rounded bg-red-100 px-3 py-1 font-medium text-red-700">
                           Past Due
+                        </span>
+                      ) : subscription?.status === "canceled" ? (
+                        <span className="rounded bg-red-100 px-3 py-1 font-medium text-red-700">
+                          Canceled
                         </span>
                       ) : subscription?.status === "unpaid" ? (
                         <span className="rounded bg-yellow-100 px-3 py-1 font-medium text-yellow-700">
@@ -316,7 +320,7 @@ export default function BillingPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Auto Renew:</span>
                     <span className="font-medium">
-                      {isCancelled
+                      {isCanceled
                         ? "-"
                         : subscription?.cancelAtPeriodEnd
                           ? "No"
@@ -331,13 +335,13 @@ export default function BillingPage() {
                           Next Due Date:
                         </span>
                         <span className="font-medium">
-                          {isCancelled
-                            ? "Cancelled"
+                          {isCanceled
+                            ? "Canceled"
                             : format(currentPeriodEnd, "MMM do, yyyy")}
                         </span>
                       </>
                     )}
-                    {cancelAtTime && !isCancelled && (
+                    {cancelAtTime && !isCanceled && (
                       <>
                         <span className="text-muted-foreground">
                           Cancels on:
@@ -350,7 +354,7 @@ export default function BillingPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">
-                      {isCancelled ? "Account Created:" : "Member Since:"}
+                      {isCanceled ? "Account Created:" : "Member Since:"}
                     </span>
                     <span className="font-medium">
                       {subscription?.startedAt
@@ -375,7 +379,7 @@ export default function BillingPage() {
                     </div>
                   ) :  */}
                   {canceledAt && (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
                       <span className="text-muted-foreground">
                         Cancellation Date:
                       </span>

@@ -75,6 +75,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const { toggleListAction } = useToggleListAction(event._id);
 
   const locationString = getFormattedLocationString(location);
+  const isOwner = user?._id === organizer?.ownerId;
 
   const onBookmark = () => {
     if (!hasActiveSubscription) {
@@ -103,6 +104,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
+        isOwner={isOwner}
       />
       <Card
         className={cn(

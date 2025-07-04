@@ -62,7 +62,7 @@ NavBarProps) {
       link.sub.includes(statusKey) ||
       link.sub.includes("all") ||
       (link.sub.includes("public") &&
-        (subStatus === "none" || subStatus === "cancelled")),
+        (subStatus === "none" || subStatus === "canceled")),
   );
   const filteredNavbarMenuResources = resources.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all"),

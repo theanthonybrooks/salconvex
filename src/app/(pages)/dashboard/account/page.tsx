@@ -24,7 +24,7 @@ export default function AccountPage() {
     subscription?.canceledAt !== undefined && subscription?.canceledAt;
 
   // console.log("canceledAt: ", canceledAt)
-  const isCancelled = subscription?.status === "cancelled";
+  const isCanceled = subscription?.status === "canceled";
 
   let interval: string | undefined;
   // let nextInterval: string | undefined
@@ -214,7 +214,7 @@ export default function AccountPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Auto Renew:</span>
                   <span className="font-medium">
-                    {isCancelled
+                    {isCanceled
                       ? "-"
                       : subscription?.cancelAtPeriodEnd
                         ? "No"
@@ -225,14 +225,14 @@ export default function AccountPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Next Account:</span>
                   <span className="font-medium">
-                    {isCancelled
-                      ? "Cancelled"
+                    {isCanceled
+                      ? "Canceled"
                       : format(currentPeriodEnd, "eee, MMM do, yyyy")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">
-                    {isCancelled ? "Account Created:" : "Member Since:"}
+                    {isCanceled ? "Account Created:" : "Member Since:"}
                   </span>
                   <span className="font-medium">
                     {subscription?.startedAt

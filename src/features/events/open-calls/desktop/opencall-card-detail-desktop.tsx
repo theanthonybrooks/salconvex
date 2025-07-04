@@ -95,6 +95,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   );
 
   const locationString = getFormattedLocationString(location);
+  const isOwner = user?._id === organizer?.ownerId;
 
   const onBookmark = () => {
     if (!hasActiveSubscription) return;
@@ -124,6 +125,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
+        isOwner={isOwner}
       />
 
       <Card

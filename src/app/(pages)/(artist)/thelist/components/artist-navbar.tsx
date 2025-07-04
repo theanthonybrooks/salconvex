@@ -70,7 +70,6 @@ TheListNavBarProps) {
     (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
   );
 
-  console.log(thelistitems, filteredNavbarMenuTheList);
   const isActiveTheList = filteredNavbarMenuTheList.some(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );

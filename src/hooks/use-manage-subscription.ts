@@ -27,14 +27,14 @@ export function useManageSubscription(subscription: { customerId?: string }) {
         toast.error(
           typeof err.data === "string" &&
             err.data.toLowerCase().includes("no such customer")
-            ? "Your account was cancelled. Contact support for assistance."
+            ? "Your account was canceled. Contact support for assistance."
             : err.data || "An unexpected error occurred.",
         );
       } else if (err instanceof Error) {
         toast.error(
           typeof err.message === "string" &&
             err.message.toLowerCase().includes("no such customer")
-            ? "Your account was cancelled. Contact support for assistance."
+            ? "Your account was canceled. Contact support for assistance."
             : err.message || "An unexpected error occurred.",
         );
       } else {

@@ -115,7 +115,7 @@ export function UserProfile({
             </Link>
           )}
 
-          {subscription !== "none" && subscription !== "cancelled" && (
+          {subscription !== "none" && subscription !== "canceled" && (
             <>
               <Link
                 href="/dashboard/"
@@ -137,7 +137,7 @@ export function UserProfile({
               </Link>
             </>
           )}
-          {subscription === "cancelled" && (
+          {subscription === "canceled" && (
             <Link
               href="/pricing#plans"
               className="underline-offset-2 hover:cursor-pointer hover:underline"

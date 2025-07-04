@@ -44,7 +44,6 @@ export default function Dashboard() {
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subData?.hasActiveSubscription ?? false;
-  const subStatus = subData?.subStatus ?? "none";
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
@@ -474,7 +473,7 @@ export default function Dashboard() {
                 Go to The List
               </Link>
             </Button>
-            {subStatus !== "none" && (
+            {hasActiveSubscription && (
               <Button
                 asChild
                 variant="salWithShadowHiddenYlw"

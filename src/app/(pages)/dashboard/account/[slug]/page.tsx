@@ -25,8 +25,12 @@ export default async function AccountPage({
   if (!user) {
     redirect("/auth/sign-in");
   }
-  if (!subStatus || subStatus === "cancelled") {
-    return <SettingsPage />;
+  if (!subStatus || subStatus === "canceled") {
+    if (slug === "billing" && subStatus === "canceled") {
+      return <BillingPage />;
+    } else {
+      return <SettingsPage />;
+    }
   }
 
   switch (slug) {

@@ -6,8 +6,7 @@ import {
 import { NextResponse } from "next/server";
 
 // const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
-//note-to-self: Moved dashboard logic to the dashboard layout where it checks user and subscription status
-// const isSubOnlyPage = createRouteMatcher(["/dashboard/:path*"])
+
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
 const isOpenCallPage = createRouteMatcher([
   "/thelist/event/:slug/:year/call",

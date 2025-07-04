@@ -31,9 +31,6 @@ const Event = () => {
 
   const {
     data,
-    // status,
-    // isPending,
-    // isSuccess,
     isError,
     // error,
   } = useQueryWithStatus(
@@ -41,30 +38,10 @@ const Event = () => {
     slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
   );
 
-  // const data = useQuery(
-  //   api.events.event.getEventWithDetails,
-  //   slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
-  // );
-
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
-  // console.log(slugValue, year);
-  // console.log(data);
-  // console.log(isSuccess, isError, error);
-  // console.log(artistData);
-  // const data = useQuery(api.events.getEventWithDetails, {
-  //   slug: "mural-fest",
-  //   edition: 2025,
-  // });
+  const isOwner = user?._id === data?.organizer?.ownerId;
 
-  // setTimeout(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, 50); // small delay gives time for back nav
-
-  // try to ensure that the page has a sec to load
-
-  // const allEvents = useEventDetailCards();
-  // const event = allEvents.find((e) => e.id === id);
   useEffect(() => {
     if (isError) {
       router.push("/404");
@@ -77,6 +54,7 @@ const Event = () => {
         format="mobile"
         user={user}
         activeSub={hasActiveSubscription}
+        isOwner={isOwner}
       />
 
       {!data ? (

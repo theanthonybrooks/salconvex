@@ -12,7 +12,6 @@ export async function generateMetadata({
 }) {
   const token = await convexAuthNextjsToken();
   const { slug, year } = await params;
-  console.log(slug, year);
 
   try {
     const event = await fetchQuery(

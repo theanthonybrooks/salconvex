@@ -26,7 +26,7 @@ export default async function ArtistPage({
   }
 
   if (!user?.role.includes("admin") && !user?.accountType?.includes("artist")) {
-    if (!subStatus || subStatus === "cancelled") {
+    if (!subStatus || subStatus === "canceled") {
       redirect("/thelist");
     }
     redirect("/thelist");
