@@ -41,6 +41,7 @@ export interface TheListFilterCommandItem {
   group?: string;
   meta?: string;
   edition?: number;
+  category?: string;
   ocStatus?: number;
 }
 
@@ -300,7 +301,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
           event.ocStatus === 2 || event.ocStatus === 3
             ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
             : `/thelist/event/${event.slug}/${event.dates?.edition}`,
-        meta: `${event.category.toUpperCase()} — ${locationString ?? event.location?.full ?? ""}`,
+        meta: locationString ?? event.location?.full ?? "",
+        category: event.category.toUpperCase(),
         edition: event.dates?.edition,
         ocStatus: event.ocStatus,
         // meta: `${event.category.toUpperCase()}${typeLabel ? ": " + typeLabel : ""} — ${locationString ?? event.location?.full ?? ""}`,
@@ -333,7 +335,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         path: event.ocStatus
           ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
           : `/thelist/event/${event.slug}/${event.dates?.edition}`,
-        meta: `${event.category.toUpperCase()} — ${locationString ?? event.location?.full ?? ""}`,
+        meta: locationString ?? event.location?.full ?? "",
+        category: event.category.toUpperCase(),
         edition: event.dates?.edition,
         ocStatus: event.ocStatus,
       };
@@ -538,7 +541,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                             }}
                           >
                             {groupKey.startsWith("Events") ? (
-                              <div className="grid w-full grid-cols-[1fr_auto_auto_1fr] items-center gap-2">
+                              <div className="grid w-full grid-cols-[1fr_72px_auto_auto_1fr] items-center gap-2">
                                 <span className="flex items-center gap-1 truncate text-wrap">
                                   {item.name}
                                 </span>
@@ -552,6 +555,13 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                 {item.edition ? (
                                   <span className="text-center text-xs text-stone-500">
                                     {item.edition}
+                                  </span>
+                                ) : (
+                                  <span />
+                                )}
+                                {item.category ? (
+                                  <span className="flex items-center gap-2 text-center text-xs text-stone-500">
+                                    |<p>{item.category}</p>
                                   </span>
                                 ) : (
                                   <span />

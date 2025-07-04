@@ -193,8 +193,8 @@ export const FilterBase = ({
                                   className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-base transition-colors active:scale-95 active:underline"
                                 >
                                   {groupKey.startsWith("Events") ? (
-                                    <div className="grid w-full grid-cols-[1.5fr_auto_1fr] items-center gap-2">
-                                      <span className="flex items-center gap-1 truncate text-wrap">
+                                    <div className="flex w-full items-center justify-between gap-2">
+                                      <span className="flex max-w-[40vw] items-center gap-1 truncate text-wrap">
                                         {item.name}
                                       </span>
                                       {item.ocStatus === 2 && (
