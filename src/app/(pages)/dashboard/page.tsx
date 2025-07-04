@@ -84,6 +84,7 @@ export default function Dashboard() {
   const totalUsers = totalUsersData ?? 0;
   const totalNewsletterSubs = totalNewsletterSubsData?.totalSubscribers ?? 0;
   const totalOpenCalls = totalOpenCallsData?.totalOpenCalls ?? 0;
+  const activeOpenCalls = totalOpenCallsData?.activeOpenCalls ?? 0;
   const totalEvents = allEventsData?.totalEvents ?? 0;
   const activeEvents = allEventsData?.activeEvents ?? 0;
   // const archivedEvents = allEventsData?.archivedEvents ?? 0;
@@ -158,6 +159,27 @@ export default function Dashboard() {
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {totalOpenCalls ?? 0}
+                  </div>
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/submissions"
+                  >
+                    <p className="mt-1 text-xs">View all</p>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card className="min-w-50 max-w-80 flex-1">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Active Open Calls
+                    </CardTitle>
+                    <Megaphone className="size-4 text-muted-foreground" />
+                  </span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {activeOpenCalls ?? 0}
                   </div>
                   <Link
                     variant="subtleUnderline"
