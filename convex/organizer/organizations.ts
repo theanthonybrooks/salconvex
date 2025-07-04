@@ -608,14 +608,12 @@ export const checkIfOrgOwner = query({
 
     if (!event) return false;
 
-    const eventMainOrg = event.mainOrgId;
-
     const org = await ctx.db
       .query("organizations")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
       .first();
 
     if (!org) return false;
-    return org._id === eventMainOrg;
+    return org.ownerId === userId;
   },
 });

@@ -706,28 +706,32 @@ export default function SettingsPage() {
                       getItemValue={(currency) => currency.code}
                     />
                   </div>*/}
-                  <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
-                    <div className="space-y-0.5">
-                      <Label>Auto-Apply</Label>
+                  {isArtist && (
+                    <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                      <div className="space-y-0.5">
+                        <Label>Auto-Apply</Label>
 
-                      <p className="text-xs text-muted-foreground">
-                        Automatically mark open calls as &quot;Applied&quot;
-                        after clicking Apply
-                      </p>
+                        <p className="text-xs text-muted-foreground">
+                          Automatically mark open calls as &quot;Applied&quot;
+                          after clicking Apply
+                        </p>
+                      </div>
+                      <Select
+                        value={String(selectedAutoApply)}
+                        onValueChange={(value) =>
+                          setAutoApply(value === "true")
+                        }
+                      >
+                        <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
+                          <SelectValue placeholder="Select One" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true">On (Default)</SelectItem>
+                          <SelectItem value="false">Off</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Select
-                      value={String(selectedAutoApply)}
-                      onValueChange={(value) => setAutoApply(value === "true")}
-                    >
-                      <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
-                        <SelectValue placeholder="Select One" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">On (Default)</SelectItem>
-                        <SelectItem value="false">Off</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

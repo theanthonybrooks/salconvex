@@ -43,6 +43,9 @@ export function UserProfile({
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user;
   const userRole = user?.role;
+  const accountType = user?.accountType;
+  const isArtist = accountType?.includes("artist") ?? false;
+  const isOrganizer = accountType?.includes("organizer") ?? false;
   const isAdmin = userRole?.includes("admin");
   // console.log("User subscription:", subscription)
 
@@ -115,7 +118,10 @@ export function UserProfile({
             </Link>
           )}
 
-          {subscription !== "none" && subscription !== "canceled" && (
+          {((subscription !== "none" &&
+            subscription !== "canceled" &&
+            isArtist) ||
+            isOrganizer) && (
             <>
               <Link
                 href="/dashboard/"

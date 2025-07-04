@@ -750,13 +750,19 @@ export const getEventWithDetails = query({
     edition: v.number(),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
     const events = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .collect();
 
     const event = events.find((e) => e.dates.edition === args.edition);
-    if (!event) throw new ConvexError("No event found");
+    const eventState = event?.state as SubmissionFormState;
+    const eventPublished = eventState === "published";
+
+    if (!event || !userId || eventPublished)
+      throw new ConvexError("No event found");
 
     const [openCalls, organizer] = await Promise.all([
       ctx.db
@@ -765,6 +771,9 @@ export const getEventWithDetails = query({
         .collect(),
       ctx.db.get(event.mainOrgId),
     ]);
+
+    if (organizer?.ownerId !== userId && !eventPublished)
+      throw new ConvexError("You don't have permission to view this event");
 
     const openCall = openCalls.find(
       (e) => e.basicInfo.dates.edition === args.edition,
