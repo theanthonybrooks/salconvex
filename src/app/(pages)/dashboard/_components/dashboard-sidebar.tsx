@@ -16,7 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { RiExpandLeftRightLine } from "react-icons/ri";
 
 import { api } from "~/convex/_generated/api";
@@ -57,9 +57,11 @@ export default function DashboardSideBar({
   const {
     setSidebarCollapsed: setCollapsedSidebar,
     isSidebarCollapsed: collapsedSidebar,
+    openSection,
+    setOpenSection,
+    activeSection,
+    setActiveSection,
   } = useDashboard();
-  const [openSection, setOpenSection] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
@@ -105,11 +107,11 @@ export default function DashboardSideBar({
       setOpenSection(matchingSection);
       setActiveSection(matchingSection);
     }
-  }, [pathname, filteredNavItems]);
+  }, [pathname, filteredNavItems, setOpenSection, setActiveSection]);
 
   const handleSectionToggle = (sectionCat: string | null) => {
     setOpenSection((prev) => {
-      if (collapsedSidebar && prev !== sectionCat) {
+      if (collapsedSidebar) {
         setTimeout(() => setCollapsedSidebar(false), 0);
       }
       return prev === sectionCat ? null : sectionCat;
@@ -201,17 +203,12 @@ export default function DashboardSideBar({
                         activeSection === section.sectionCat
                           ? "cursor-default font-bold"
                           : "cursor-pointer",
+                        collapsedSidebar && "cursor-pointer",
                         activeSection === section.sectionCat &&
                           collapsedSidebar &&
                           "bg-primary/10",
                       )}
-                      onClick={
-                        // openSection === section.sectionCat &&
-                        // pathname.includes("dashboard/" + section.sectionCat)
-                        //   ? () => {}
-                        //   : () => handleSectionToggle(section.sectionCat!)
-                        () => handleSectionToggle(section.sectionCat!)
-                      }
+                      onClick={() => handleSectionToggle(section.sectionCat!)}
                     >
                       <div className="space-between flex justify-between gap-2">
                         <div className="relative flex items-center justify-between gap-2">
