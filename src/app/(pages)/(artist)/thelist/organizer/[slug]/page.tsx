@@ -16,6 +16,7 @@ import { api } from "~/convex/_generated/api";
 
 const Event = () => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
@@ -41,7 +42,6 @@ const Event = () => {
 
   if (isError) {
     if (error instanceof ConvexError) {
-      console.log("Error fetching event:", error.data);
       if (error.data === "No organizer found") {
         return (
           <div className="flex flex-col items-center gap-2">

@@ -1,6 +1,7 @@
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormDatePicker } from "@/components/ui/form-date-pickers";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
@@ -21,7 +22,8 @@ import { EventCategory, eventTypeOptions } from "@/types/event";
 import { User } from "@/types/user";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
-import { useEffect, useRef } from "react";
+import { ConvexError } from "convex/values";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -55,12 +57,19 @@ const SubmissionFormEventStep1 = ({
     formState: { errors, dirtyFields },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
+  const [eventNameErrorValue, setEventNameErrorValue] = useState<string | null>(
+    null,
+  );
+  const currentYear = new Date().getFullYear();
   const currentValues = getValues();
   const eventData = watch("event");
-  const initialName = useRef(eventData?.name ?? "");
+  const initialName = useRef(existingEvent?.name ?? "");
   const eventName = eventData?.name;
   const hasEventName = !!eventName && eventName.trim().length >= 3;
   const eventDates = eventData?.dates?.eventDates;
+  const eventEdition = eventData?.dates?.edition;
+  const eventState = eventData?.state;
+  const archivedEvent = eventState === "archived";
   // console.log(eventData);
   const category = eventData?.category as EventCategory;
   const diffName = !!eventName && eventName !== initialName.current;
@@ -71,17 +80,23 @@ const SubmissionFormEventStep1 = ({
   // #region ------------- Queries, Actions, and Mutations --------------
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
-  const { isSuccess: eventNameValid, isError: eventNameExistsError } =
-    useQueryWithStatus(
-      api.events.event.checkEventNameExists,
-      hasEventName && diffName
-        ? {
-            name: eventName,
-            organizationId: existingOrg?._id,
-            eventId: existingEvent?._id,
-          }
-        : "skip",
-    );
+  const {
+    isSuccess: eventNameValid,
+    isError: eventNameExists,
+    error: eventNameError,
+  } = useQueryWithStatus(
+    api.events.event.checkEventNameExists,
+    hasEventName && diffName
+      ? {
+          name: eventName,
+          organizationId: existingOrg?._id,
+          eventId: existingEvent?._id,
+          edition: eventEdition,
+        }
+      : "skip",
+  );
+
+  console.log(eventNameError);
   // #endregion
 
   // console.log(eventNameValid);
@@ -121,6 +136,14 @@ const SubmissionFormEventStep1 = ({
       // setValue("event.hasOpenCall", "False");
     }
   }, [formType, setValue]);
+
+  useEffect(() => {
+    if (eventNameError) {
+      if (eventNameError instanceof ConvexError) {
+        setEventNameErrorValue(eventNameError.data);
+      }
+    }
+  }, [eventNameError]);
 
   // const timeLineStartingText =
   //   formType > 1
@@ -254,36 +277,60 @@ const SubmissionFormEventStep1 = ({
                 Step {categoryEvent && !eventOnly ? 3 : 2}:{" "}
               </p>
               <p className="lg:text-xs">
-                {getEventCategoryLabelAbbr(category)} Name
+                {getEventCategoryLabelAbbr(category)} Name + Edition
               </p>
             </div>
 
             <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-              <Label htmlFor="event.name" className="sr-only">
-                {getEventCategoryLabelAbbr(category)} Name
-              </Label>
-              <Controller
-                name="event.name"
-                control={control}
-                render={({ field }) => (
-                  <EventNameSearch
-                    value={field.value}
-                    isExisting={eventNameExistsError}
-                    onChange={field.onChange}
-                    className={cn(
-                      "border bg-card !text-base sm:h-[50px]",
-                      errors.event?.name &&
-                        dirtyFields.event?.name &&
-                        "invalid-field",
-                    )}
-                  />
-                )}
-              />
-              {eventNameExistsError && eventNameIsDirty && (
+              <div className="flex w-full gap-2">
+                <Label htmlFor="event.name" className="sr-only">
+                  {getEventCategoryLabelAbbr(category)} Name
+                </Label>
+                <Controller
+                  name="event.name"
+                  control={control}
+                  render={({ field }) => (
+                    <EventNameSearch
+                      value={field.value}
+                      isExisting={eventNameExists}
+                      onChange={field.onChange}
+                      className={cn(
+                        "border bg-card !text-base sm:h-[50px]",
+                        errors.event?.name &&
+                          dirtyFields.event?.name &&
+                          "invalid-field",
+                      )}
+                    />
+                  )}
+                />
+                <Label htmlFor="event.dates.edition" className="sr-only">
+                  {getEventCategoryLabelAbbr(category)} Edition
+                </Label>
+                <Controller
+                  name="event.dates.edition"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      disabled={archivedEvent}
+                      type="number"
+                      min={2000}
+                      max={3000}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      value={field.value ?? currentYear}
+                      className={cn(
+                        "w-25 border bg-card !text-base sm:h-[50px]",
+                        errors.event?.dates?.edition && "invalid-field",
+                      )}
+                    />
+                  )}
+                />
+              </div>
+              {eventNameExists && eventNameIsDirty && (
                 <span className="mt-2 w-full text-center text-sm text-red-600">
-                  {category === "event"
+                  {/* {category === "event"
                     ? "An event with that name already exists."
-                    : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`}
+                    : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`} */}
+                  {eventNameErrorValue}
                 </span>
               )}
             </div>
@@ -311,7 +358,7 @@ const SubmissionFormEventStep1 = ({
                         value={field.value}
                         onChange={field.onChange}
                         onBlur={field.onBlur}
-                        reset={eventNameExistsError}
+                        reset={eventNameExists}
                         tabIndex={2}
                         placeholder="Event Location (if different from organization)..."
                         className="mb-3 w-full lg:mb-0"
@@ -345,8 +392,8 @@ const SubmissionFormEventStep1 = ({
                         onRemove={() =>
                           field.onChange(orgData?.logo ?? "1.jpg")
                         }
-                        reset={eventNameExistsError}
-                        disabled={eventNameExistsError}
+                        reset={eventNameExists}
+                        disabled={eventNameExists}
                         initialImage={
                           typeof field.value === "string"
                             ? field.value

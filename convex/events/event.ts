@@ -628,10 +628,16 @@ export const checkEventNameExists = query({
       if (sameEvent === true || (sameEdition === false && sameOrg === true))
         continue;
 
-      // console.log("throwing error");
-      throw new ConvexError(
-        `An event with the name ${args.name} already exists.`,
-      );
+      if (!sameEvent && sameEdition === true && sameOrg === true) {
+        throw new ConvexError(
+          `An event with that name and edition already exists. Please choose a different name or edition`,
+        );
+      }
+      if (sameOrg === false) {
+        throw new ConvexError(
+          `An event with that name already exists. Please choose a different name`,
+        );
+      }
     }
 
     return true;

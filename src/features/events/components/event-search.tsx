@@ -24,7 +24,7 @@ export function EventNameSearch({
   isExisting,
 }: EventNameSearchProps) {
   const [localValue, setLocalValue] = useState(value);
-  const debouncedValue = useDebounce(localValue, 500);
+  const debouncedValue = useDebounce(localValue, 300);
 
   useEffect(() => {
     onChange(debouncedValue);
