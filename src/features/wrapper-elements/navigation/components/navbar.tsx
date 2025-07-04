@@ -15,7 +15,7 @@ import { UserProfile } from "@/components/ui/user-profile";
 import {
   landingPageNavbarLinks,
   landingPageNavbarMenuLinksResources as resources,
-  landingPageNavbarMenuLinksTheList as thelistitems,
+  theListNavbarMenuLinks as thelistitems,
 } from "@/constants/navbars";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";

@@ -70,6 +70,7 @@ TheListNavBarProps) {
     (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
   );
 
+  console.log(thelistitems, filteredNavbarMenuTheList);
   const isActiveTheList = filteredNavbarMenuTheList.some(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
@@ -282,7 +283,7 @@ TheListNavBarProps) {
                         onPointerLeave={(event) => event.preventDefault()}
                       >
                         {/* TODO: put this back to xl:grid-cols-3 when I add more menu items */}
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-3 xl:max-w-[700px] xl:grid-cols-3">
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:max-w-[700px] lg:grid-cols-3 xl:grid-cols-3">
                           {filteredNavbarMenuTheList.map((component) => (
                             <ListItem
                               key={component.title}

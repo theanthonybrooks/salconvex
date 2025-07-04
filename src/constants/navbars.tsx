@@ -33,53 +33,6 @@ export const landingPageNavbarMenuLinksResources: {
     sub: ["admin"],
   },
 ];
-export const landingPageNavbarMenuLinksTheList: {
-  title: string;
-  href: string;
-  description: string;
-  isIcon?: boolean;
-  sub: string[];
-}[] = [
-  {
-    title: "The List",
-    href: "/thelist",
-    description: "View all current open calls & events.",
-    sub: ["all"],
-  },
-  {
-    title: "This Week",
-    href: "/thisweek",
-    description: "Open calls ending this week.",
-    sub: ["all"],
-  },
-  {
-    title: "Calendar",
-    href: "/calendar",
-    description: "View upcoming events.",
-    sub: ["all"],
-  },
-  {
-    title: "World Map - (Old Site)",
-    // href: "/map",
-    href: "https://thestreetartlist.helioho.st/map",
-    description: "Map of all street art fests, mural projects, etc",
-    sub: ["all"],
-  },
-
-  {
-    title: "The Archive - (Old Site)",
-    // href: "/archive",
-    href: "https://thestreetartlist.helioho.st/archive",
-    description: "Archive of all events - past and current",
-    sub: ["all"],
-  },
-  // {
-  //   title: "Pricing",
-  //   href: "/pricing",
-  //   description: "The price of job security.",
-  //   sub: ["all"],
-  // },
-];
 
 export const landingPageNavbarLinks: {
   title: string;
@@ -153,20 +106,19 @@ export const theListNavbarMenuLinks: {
   {
     title: "The List",
     href: "/thelist",
-    description: "View all current open calls & events",
+    description: "View all current open calls & events.",
     sub: ["all"],
   },
   {
     title: "This Week",
     href: "/thisweek",
-    description: "Open calls ending this week",
+    description: "Open calls ending this week.",
     sub: ["all"],
   },
   {
-    title: "Archive - (Old Site)",
-    // href: "/thelist/archive",
-    href: "https://thestreetartlist.helioho.st/archive",
-    description: "Archive of all events - past and current",
+    title: "Calendar",
+    href: "/calendar",
+    description: "View upcoming events.",
     sub: ["all"],
   },
   {
@@ -176,12 +128,15 @@ export const theListNavbarMenuLinks: {
     description: "Map of all street art fests, mural projects, etc",
     sub: ["all"],
   },
-  // {
-  //   title: "Calendar",
-  //   href: "/calendar",
-  //   description: "View upcoming events",
-  //   sub: ["all"],
-  // },
+
+  {
+    title: "The Archive - (Old Site)",
+    // href: "/archive",
+    href: "https://thestreetartlist.helioho.st/archive",
+    description: "Archive of all events - past and current",
+    sub: ["all"],
+  },
+
   // {
   //   title: "Newsletter Archive",
   //   href: "/newsletter",
