@@ -3,6 +3,7 @@
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
 
+import { DashboardProvider } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { useRouter } from "next/navigation";
 import DashboardSideBar from "./dashboard-sidebar";
 import DashboardTopNav from "./dashbord-top-nav";
@@ -28,7 +29,7 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
     return null;
   }
   return (
-    <>
+    <DashboardProvider>
       <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />
 
       <div className="flex flex-1">
@@ -37,6 +38,6 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
           {children}
         </main>
       </div>
-    </>
+    </DashboardProvider>
   );
 }

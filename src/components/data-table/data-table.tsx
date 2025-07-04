@@ -35,6 +35,7 @@ import {
   statusColorMap,
 } from "@/types/applications";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
@@ -98,16 +99,34 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   isMobile,
 }: DataTableProps<TData, TValue>) {
+  const searchParams = useSearchParams();
   const isSelectable = tableType
     ? selectableTableTypes.includes(tableType)
     : false;
+
+  const defaultFiltersFromUrl: ColumnFiltersState = React.useMemo(() => {
+    const filters: ColumnFiltersState = [];
+
+    searchParams.forEach((value, key) => {
+      if (!value) return;
+      const values = value
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+      if (values.length > 0) {
+        filters.push({ id: key, value: values });
+      }
+    });
+
+    return filters;
+  }, [searchParams]);
 
   const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(defaultVisibility ?? {});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    defaultFiltersFromUrl,
   );
   const initialSort = React.useMemo<SortingState>(() => {
     return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];

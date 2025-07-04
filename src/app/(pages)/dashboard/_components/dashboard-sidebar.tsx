@@ -1,5 +1,6 @@
 "use client";
 
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { Separator } from "@/components/ui/separator";
 import {
   dashboardNavItems,
@@ -19,21 +20,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { RiExpandLeftRightLine } from "react-icons/ri";
 
 import { api } from "~/convex/_generated/api";
-
-// const sectionVariants = {
-//   hidden: { opacity: 0, y: -15 }, // starts slightly to the left
-//   visible: {
-//     opacity: 1,
-//     y: 0,
-//     transition: {
-//       type: "spring",
-//       stiffness: 260,
-//       damping: 20,
-//       // You can tweak these numbers to adjust the 'wind back' and spring effect
-//     },
-//   },
-//   exit: { opacity: 0, y: -15, transition: { type: "linear", duration: 0.1 } },
-// }
 
 const sectionVariants = {
   collapsed: {
@@ -68,9 +54,12 @@ export default function DashboardSideBar({
   user,
 }: DashboardSideBarProps) {
   const pathname = usePathname();
+  const {
+    setSidebarCollapsed: setCollapsedSidebar,
+    isSidebarCollapsed: collapsedSidebar,
+  } = useDashboard();
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [collapsedSidebar, setCollapsedSidebar] = useState(false);
 
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
@@ -108,9 +97,6 @@ export default function DashboardSideBar({
   }, [statusKey, hasAdminRole, userType]);
 
   useEffect(() => {
-    // const matchingSection = filteredNavItems.find(
-    //   (item) => item.href && pathname.includes(item.href),
-    // )?.sectionCat;
     const matchingSection = filteredNavItems.find(
       (item) => item.href === pathname,
     )?.sectionCat;
@@ -123,7 +109,9 @@ export default function DashboardSideBar({
 
   const handleSectionToggle = (sectionCat: string | null) => {
     setOpenSection((prev) => {
-      if (collapsedSidebar && prev !== sectionCat) setCollapsedSidebar(false);
+      if (collapsedSidebar && prev !== sectionCat) {
+        setTimeout(() => setCollapsedSidebar(false), 0);
+      }
       return prev === sectionCat ? null : sectionCat;
     });
   };

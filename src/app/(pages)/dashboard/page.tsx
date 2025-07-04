@@ -1,5 +1,6 @@
 "use client";
 
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,7 +22,6 @@ import {
   EyeOff,
   LucideCalendarPlus2,
   LucideCircleCheck,
-  LucideCircleCheckBig,
   LucideCircleEqual,
   LucideCircleFadingPlus,
   LucideClipboardList,
@@ -38,6 +38,7 @@ import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
 
 export default function Dashboard() {
+  const { isSidebarCollapsed, setSidebarCollapsed } = useDashboard();
   const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -50,8 +51,9 @@ export default function Dashboard() {
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");
-  const isArtist = accountType?.includes("artist") && hasActiveSubscription;
-  const isOrganizer = accountType?.includes("organizer");
+  const isArtist =
+    (accountType?.includes("artist") && hasActiveSubscription) || isAdmin;
+  const isOrganizer = accountType?.includes("organizer") || isAdmin;
 
   const { data: latestFive, isPending: latestPending } = useQueryWithStatus(
     api.events.event.get5latestPublishedEvents,
@@ -100,9 +102,15 @@ export default function Dashboard() {
     applications ?? [],
     "month",
   );
-  const acceptedApps = applications?.filter(
-    (app) => app.applicationStatus === "accepted",
-  );
+  //todo: add this back when application system is in place
+  // const acceptedApps = applications?.filter(
+  //   (app) => app.applicationStatus === "accepted",
+  // );
+
+  const handleCollapseSidebar = () => {
+    if (isSidebarCollapsed) return;
+    setSidebarCollapsed(true);
+  };
   // const rejectedApps = applications?.filter(
   //   (app) => app.applicationStatus === "rejected",
   // );
@@ -125,7 +133,7 @@ export default function Dashboard() {
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
             <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -138,13 +146,14 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{pendingEvents ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/submissions"
+                    onClick={handleCollapseSidebar}
+                    href="/dashboard/admin/submissions?state=submitted"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -162,13 +171,14 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/submissions"
+                    href="/dashboard/admin/submissions?openCallState=published,archived,submitted,draft"
+                    onClick={handleCollapseSidebar}
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -183,13 +193,14 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/submissions"
+                    onClick={handleCollapseSidebar}
+                    href="/dashboard/admin/submissionsopenCallState=published"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -205,13 +216,14 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{totalEvents ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card>
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -224,13 +236,14 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{activeEvents ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
-                    href="/dashboard/admin/submissions"
+                    onClick={handleCollapseSidebar}
+                    href="/dashboard/admin/submissions?state=published"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card>
-              {/* <Card className="min-w-50 max-w-80 flex-1">
+              {/* <Card className="min-w-50 md:max-w-80 flex-1">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">
                     Archived Events
@@ -244,6 +257,7 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
@@ -251,7 +265,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card> */}
 
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -262,7 +276,11 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{totalUsers ?? 0}</div>
-                  <Link variant="subtleUnderline" href="/dashboard/admin/users">
+                  <Link
+                    variant="subtleUnderline"
+                    href="/dashboard/admin/users"
+                    onClick={handleCollapseSidebar}
+                  >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
@@ -272,13 +290,14 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent> */}
               </Card>
-              <Card className="min-w-50 max-w-80 flex-1">
+              <Card className="min-w-50 flex-1 md:max-w-80">
                 <CardHeader className="flex flex-col pb-2">
                   <span className="flex items-center justify-between gap-2 sm:justify-start">
                     <CardTitle className="text-sm font-medium">
@@ -293,6 +312,7 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/admin/newsletter"
                   >
                     <p className="mt-1 text-xs">View all</p>
@@ -304,6 +324,7 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/admin/submissions"
                   >
                     <p className="mt-1 text-xs">View all</p>
@@ -316,13 +337,15 @@ export default function Dashboard() {
         {isArtist && (
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Artist Dashboard:</h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="min-w-50 max-w-80 flex-1">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Applications
-                  </CardTitle>
-                  <LucideClipboardList className="size-4 text-muted-foreground" />
+            <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
+              <Card className="min-w-50 flex-1 md:max-w-80">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Total Applications
+                    </CardTitle>
+                    <LucideClipboardList className="size-4 text-muted-foreground" />
+                  </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -342,8 +365,8 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="min-w-50 max-w-80 flex-1">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+              {/*    <Card className="min-w-50 md:max-w-80 flex-1">
+                <CardHeader className="flex flex-col pb-2">
                   <CardTitle className="text-sm font-medium">
                     Accepted Applications
                   </CardTitle>
@@ -353,17 +376,18 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {acceptedApps?.length ?? 0}
                   </div>
-                  {/* TODO: Add this back */}
-                  {/* <Link
+                  /~ TODO: Add this back ~/
+                  /~ <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/apps/accepted"
                   >
                     <p className="mt-1 text-xs">View all</p>
-                  </Link> */}
+                  </Link> ~/
                 </CardContent>
-              </Card>
-              {/* <Card className="min-w-50 max-w-80 flex-1">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+              </Card>*/}
+              {/* <Card className="min-w-50 md:max-w-80 flex-1">
+                <CardHeader className="flex flex-col pb-2">
                   <CardTitle className="text-sm font-medium">
                     Pending Applications
                   </CardTitle>
@@ -375,18 +399,21 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/apps/pending"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card> */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Bookmarked Events
-                  </CardTitle>
-                  <FaRegBookmark className="size-4 text-muted-foreground" />
+              <Card className="min-w-50 flex-1 md:max-w-80">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Bookmarked Events
+                    </CardTitle>
+                    <FaRegBookmark className="size-4 text-muted-foreground" />
+                  </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -395,18 +422,21 @@ export default function Dashboard() {
 
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/artist/bookmarks"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Hidden Events
-                  </CardTitle>
-                  <EyeOff className="size-4 text-muted-foreground" />
+              <Card className="min-w-50 flex-1 md:max-w-80">
+                <CardHeader className="flex flex-col pb-2">
+                  <span className="flex items-center justify-between gap-2 sm:justify-start">
+                    <CardTitle className="text-sm font-medium">
+                      Hidden Events
+                    </CardTitle>
+                    <EyeOff className="size-4 text-muted-foreground" />
+                  </span>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -414,6 +444,7 @@ export default function Dashboard() {
                   </div>
                   <Link
                     variant="subtleUnderline"
+                    onClick={handleCollapseSidebar}
                     href="/dashboard/artist/hidden"
                   >
                     <p className="mt-1 text-xs">View all</p>

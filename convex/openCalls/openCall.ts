@@ -14,6 +14,9 @@ export const getTotalNumberOfOpenCalls = query({
     for (const openCall of openCalls) {
       switch (openCall.state) {
         case "submitted":
+          pending++;
+          break;
+        case "published":
           active++;
           break;
         case "archived":

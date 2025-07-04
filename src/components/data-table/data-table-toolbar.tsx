@@ -45,8 +45,8 @@ export function DataTableToolbar<TData>({
   const toolbarData = table.options.meta?.toolbarData;
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
-  const viewAll = table.options.meta?.viewAll;
-  const setViewAll = table.options.meta?.setViewAll;
+  // const viewAll = table.options.meta?.viewAll;
+  // const setViewAll = table.options.meta?.setViewAll;
   const tableType = table.options.meta?.tableType;
   const pageType = table.options.meta?.pageType;
   const minimalView = table.options.meta?.minimalView;
@@ -169,7 +169,7 @@ export function DataTableToolbar<TData>({
                   Add New
                 </Button>
 
-                {setViewAll && (
+                {/* {setViewAll && (
                   <Button
                     variant="salWithShadowHidden"
                     onClick={() => setViewAll(!viewAll)}
@@ -177,7 +177,7 @@ export function DataTableToolbar<TData>({
                   >
                     {viewAll ? "View Submissions" : "View  All"}
                   </Button>
-                )}
+                )} */}
               </>
             )}
           </div>
