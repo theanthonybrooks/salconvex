@@ -142,8 +142,9 @@ const EventCardPreview = ({
     locationParts.push(stateAbbr);
   }
 
-  if (countryAbbr === "UK" || countryAbbr === "USA") {
-    locationParts.push(countryAbbr);
+  if (countryAbbr === "US") {
+    locationParts.push("USA");
+    // locationParts.push(countryAbbr);
   } else if (country) {
     locationParts.push(country);
   }

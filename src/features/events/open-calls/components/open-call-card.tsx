@@ -23,6 +23,7 @@ import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/event";
@@ -47,7 +48,6 @@ const OpenCallCard = ({
 }: OpenCallCardProps) => {
   const { category: eventCategory, _id: id, location, dates } = event;
 
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
   const { eventDates } = dates;
   const {
     compensation,
@@ -124,9 +124,7 @@ const OpenCallCard = ({
 
   const eventTimeline = event.timeLine;
 
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
+  const locationString = getFormattedLocationString(location);
 
   const icsLink =
     callType === "Fixed" && isValidIsoDate(ocStart) && isValidIsoDate(ocEnd)

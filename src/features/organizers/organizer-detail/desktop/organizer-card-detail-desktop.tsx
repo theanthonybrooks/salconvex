@@ -15,6 +15,7 @@ import {
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
@@ -47,7 +48,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
     {} as Record<string, typeof events>,
   );
 
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
+  const locationString = getFormattedLocationString(location);
 
   const tabList = [
     // { id: "application", label: "My Application" },
@@ -56,10 +57,6 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   ];
   const [activeTab, setActiveTab] = useState("events");
   // const { toggleListAction } = useToggleListAction(event._id);
-
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
 
   return (
     <div

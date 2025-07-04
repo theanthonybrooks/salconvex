@@ -262,11 +262,7 @@ export function getOrganizerLocationString(
     location?.city && isValidStateAbbr && `${location.stateAbbr}`,
     !location?.city && location?.state && `${location.state}`,
 
-    location?.countryAbbr === "UK" ||
-    location?.countryAbbr === "USA" ||
-    location?.country === "United States"
-      ? location?.countryAbbr
-      : location?.country,
+    location?.countryAbbr === "US" ? "USA" : location?.country,
   ];
 
   return parts.filter(Boolean).join(", ");
@@ -281,7 +277,7 @@ export function getSearchLocationString(
   const parts = [
     city && `${city}`,
     city && isValidStateAbbr && `${stateAbbr}`,
-    countryAbbr,
+    countryAbbr === "US" ? "USA" : countryAbbr,
   ];
 
   return parts.filter(Boolean).join(", ");
@@ -307,9 +303,7 @@ export function getFormattedLocationString(location: {
     city,
     city && isValidStateAbbr ? stateAbbr : null,
     !city && state ? state : null,
-    countryAbbr === "UK" || countryAbbr === "USA" || country === "United States"
-      ? countryAbbr
-      : country,
+    countryAbbr === "US" ? "USA" : country,
   ]
     .filter(Boolean)
     .join(", ");

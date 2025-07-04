@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/components/ui/custom-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
 import { motion } from "framer-motion";
@@ -61,14 +62,11 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
   // const { bookmarked, hidden } = artist?.listActions?.find(
   //   (la) => la.eventId === event._id,
   // ) ?? { bookmarked: false, hidden: false };
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
 
   const [activeTab, setActiveTab] = useState("events");
   const [hasMounted, setHasMounted] = useState(false);
 
-  const locationString = `${locale ? `${locale}, ` : ""}${city}, ${
-    stateAbbr ? stateAbbr + ", " : ""
-  }${countryAbbr === "UK" || countryAbbr === "USA" ? countryAbbr : country}`;
+  const locationString = getFormattedLocationString(location);
 
   useEffect(() => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
