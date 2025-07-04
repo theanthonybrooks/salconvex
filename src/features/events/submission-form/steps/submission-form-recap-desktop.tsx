@@ -501,7 +501,7 @@ export const SubmissionFormRecapDesktop = ({
               <AccordionItem value="OpenCall">
                 <AccordionTrigger title="Open Call Data:" />
                 <AccordionContent>
-                  <pre className="scrollable mini text-sm text-foreground">
+                  <pre className="scrollable mini text-wrap text-sm text-foreground">
                     {JSON.stringify(ocData, null, 2)}
                   </pre>
                 </AccordionContent>
