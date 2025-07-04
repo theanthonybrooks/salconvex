@@ -1179,10 +1179,11 @@ export const reactivateEvent = mutation({
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
 
-    const eventState = event.state === "archived" && isAdmin && "published";
+    const eventState =
+      event.state === "archived" && isAdmin ? "published" : "submitted";
 
     await ctx.db.patch(event._id, {
-      state: eventState || "submitted",
+      state: eventState,
       lastEditedAt: Date.now(),
       approvedBy: undefined,
     });

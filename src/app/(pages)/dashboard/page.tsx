@@ -550,61 +550,63 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 min-[1400px]:col-span-3">
-          <CardHeader>
-            <CardTitle>Latest Updates</CardTitle>
-            <CardDescription>Recently added open calls</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!latestPending && (
-              <div className="space-y-4">
-                {latestFive && latestFive.length > 0 ? (
-                  latestFive.map((event) => (
-                    <div
-                      key={event._id}
-                      className="flex flex-col justify-between gap-1 sm:flex-row sm:gap-4"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">
-                          <Link
-                            href={`/thelist/event/${event.slug}/${event.dates.edition}/call`}
-                            className="hover:underline"
-                          >
-                            {event.name}
-                          </Link>
+        {hasActiveSubscription && (
+          <Card className="lg:col-span-2 min-[1400px]:col-span-3">
+            <CardHeader>
+              <CardTitle>Latest Updates</CardTitle>
+              <CardDescription>Recently added open calls</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!latestPending && (
+                <div className="space-y-4">
+                  {latestFive && latestFive.length > 0 ? (
+                    latestFive.map((event) => (
+                      <div
+                        key={event._id}
+                        className="flex flex-col justify-between gap-1 sm:flex-row sm:gap-4"
+                      >
+                        <div>
+                          <p className="text-sm font-medium">
+                            <Link
+                              href={`/thelist/event/${event.slug}/${event.dates.edition}/call`}
+                              className="hover:underline"
+                            >
+                              {event.name}
+                            </Link>
+                          </p>
+                          <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <p>{event.location.country}</p>-
+                            <p> {getEventCategoryLabel(event.category)}</p>
+                          </span>
+                        </div>
+                        <p className="whitespace-nowrap text-xs text-muted-foreground">
+                          {event.approvedAt
+                            ? formatDistanceToNow(new Date(event.approvedAt), {
+                                addSuffix: true,
+                              })
+                            : "Unknown time"}
                         </p>
-                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <p>{event.location.country}</p>-
-                          <p> {getEventCategoryLabel(event.category)}</p>
-                        </span>
                       </div>
-                      <p className="whitespace-nowrap text-xs text-muted-foreground">
-                        {event.approvedAt
-                          ? formatDistanceToNow(new Date(event.approvedAt), {
-                              addSuffix: true,
-                            })
-                          : "Unknown time"}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm italic text-muted-foreground">
-                    No recent published events found.
-                  </p>
-                )}
-              </div>
-            )}
-          </CardContent>
-          <CardFooter>
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={() => router.push("/thelist")}
-            >
-              View All Updates
-            </Button>
-          </CardFooter>
-        </Card>
+                    ))
+                  ) : (
+                    <p className="text-sm italic text-muted-foreground">
+                      No recent published events found.
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+            <CardFooter>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => router.push("/thelist")}
+              >
+                View All Updates
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </div>
     </div>
   );
