@@ -27,7 +27,7 @@ import type { MergedEventPreviewData } from "@/types/event"; // or define a loca
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 // interface Props {
 
 // }
@@ -40,6 +40,8 @@ const ClientEventList = (
   },
 ) => {
   // inside ClientEventList()
+  const initialTitleRef = useRef(document.title);
+
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const router = useRouter();
@@ -251,7 +253,9 @@ const ClientEventList = (
 
   useEffect(() => {
     if (page && page > 1) {
-      document.title = `${document.title} - Pg.${page}`;
+      document.title = `${initialTitleRef.current} - Pg.${page}`;
+    } else {
+      document.title = initialTitleRef.current;
     }
   }, [page]);
   return (
