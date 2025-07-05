@@ -743,30 +743,7 @@ export const FilterBase = ({
                     showArrow={false}
                   />
                 </section>
-                {/* <section className="flex flex-col gap-2">
-                  <Label
-                    htmlFor="callFormat"
-                    className="flex items-center gap-2"
-                  >
-                    Call Format:
-                  </Label>
-                  <MultiSelect
-                    options={callFormat_option_values}
-                    value={filters.callFormat ?? []}
-                    onValueChange={(value) =>
-                      onChange({ callFormat: value as CallFormat[] })
-                    }
-                    placeholder="--Format--"
-                    variant="basic"
-                    selectAll={false}
-                    hasSearch={false}
-                    textClassName="text-center"
-                    className="w-25 min-w-25 border bg-transparent hover:bg-white/30 sm:h-12"
-                    badgeClassName="h-9"
-                    shortResults
-                    showArrow={false}
-                  />
-                </section> */}
+
                 <section className="flex flex-col gap-2">
                   <Label htmlFor="limit" className="flex items-center gap-2">
                     Call Format:
