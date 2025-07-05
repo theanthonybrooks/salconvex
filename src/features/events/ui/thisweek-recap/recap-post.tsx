@@ -84,7 +84,8 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
             <li>
               <span className="flex items-center gap-1 text-lg">
                 <TiMinus className="size-4" />
-                <b>Where:</b> {getFormattedLocationString(event?.location)}
+                <b>Where:</b>{" "}
+                {getFormattedLocationString(event?.location, true)}
               </span>
             </li>
             <li>

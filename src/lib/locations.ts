@@ -293,18 +293,21 @@ export function getSearchLocationString(
   return parts.filter(Boolean).join(", ");
 }
 
-export function getFormattedLocationString(location: {
-  full?: string;
-  locale?: string;
-  city?: string;
-  state?: string;
-  stateAbbr?: string;
-  region?: string;
-  country: string;
-  countryAbbr?: string;
-  continent?: string;
-  coordinates?: { latitude: number; longitude: number };
-}): string {
+export function getFormattedLocationString(
+  location: {
+    full?: string;
+    locale?: string;
+    city?: string;
+    state?: string;
+    stateAbbr?: string;
+    region?: string;
+    country: string;
+    countryAbbr?: string;
+    continent?: string;
+    coordinates?: { latitude: number; longitude: number };
+  },
+  abbreviated?: boolean,
+): string {
   const { locale, city, stateAbbr, state, country, countryAbbr } = location;
   const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
 
@@ -313,7 +316,11 @@ export function getFormattedLocationString(location: {
     city,
     city && isValidStateAbbr ? stateAbbr : null,
     !city && state ? state : null,
-    countryAbbr === "US" ? "USA" : country,
+    countryAbbr === "US"
+      ? "USA"
+      : countryAbbr === "UK" && abbreviated
+        ? "UK"
+        : country,
   ]
     .filter(Boolean)
     .join(", ");
