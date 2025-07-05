@@ -676,9 +676,9 @@ export const getEventsForCalendar = query({
         }
         return {
           title: event.name,
-          // date: event.dates.eventDates[0].start,
-          start: event.dates.eventDates[0].start,
-          end: event.dates.eventDates[0].end,
+          date: event.dates.eventDates[0].start,
+          // start: event.dates.eventDates[0].start,
+          // end: event.dates.eventDates[0].end,
           extendedProps: {
             logo: event.logo,
             description: event.about,
