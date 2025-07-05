@@ -40,7 +40,11 @@ const ClientEventList = (
   },
 ) => {
   // inside ClientEventList()
-  const initialTitleRef = useRef(document.title);
+  const initialTitleRef = useRef(
+    document.title ?? "The List | The Street Art List",
+  );
+  console.log("initialTitleRef", initialTitleRef);
+  console.log(document.title);
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
