@@ -1,5 +1,18 @@
 import { Link } from "@/components/ui/custom-link";
 import { infoEmail, supportEmail } from "@/constants/siteInfo";
+import { formatDateWithOrdinal } from "@/lib/dateFns";
+
+export const lastUpdatedTermsRaw = "2025-05-23";
+export function LastUpdated() {
+  return (
+    <time
+      dateTime={lastUpdatedTermsRaw}
+      dangerouslySetInnerHTML={{
+        __html: formatDateWithOrdinal(lastUpdatedTermsRaw),
+      }}
+    />
+  );
+}
 
 const TermsPage = () => {
   return (
@@ -9,7 +22,7 @@ const TermsPage = () => {
           Terms of Service
         </h1>
         <p className="text-center text-sm">
-          Last updated: May 23<sup>rd</sup>, 2025
+          Last updated: <LastUpdated />
         </p>
       </span>
 

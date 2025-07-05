@@ -153,7 +153,7 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="flex w-max flex-col gap-6 p-6">
+    <div className="flex w-max max-w-[100dvw] flex-col gap-6 p-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">
           Membership Overview

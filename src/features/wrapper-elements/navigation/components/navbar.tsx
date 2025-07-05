@@ -295,7 +295,7 @@ NavBarProps) {
                         onPointerEnter={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
                       >
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-3 xl:w-[700px]">
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
                           {filteredNavbarMenuTheList.map((component) => (
                             <ListItem
                               key={component.title}

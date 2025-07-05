@@ -518,3 +518,34 @@ export function formatCondensedDateRange(
 
   return `${startMonth} ${startDay} – ${endMonth} ${endDay}`;
 }
+
+export function formatDateWithOrdinal(dateString: string): string {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const month = date.toLocaleString("default", { month: "long" });
+
+  // Ordinal logic
+  const getOrdinal = (n: number) => {
+    if (n > 3 && n < 21) return "th";
+    switch (n % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
+  return `${month} ${day}<sup>${getOrdinal(day)}</sup>, ${year}`;
+}
+export function formatDatePlain(dateString: string): string {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const month = date.toLocaleString("default", { month: "long" });
+  return `${month} ${day}, ${year}`;
+}

@@ -1,5 +1,18 @@
 import { Link } from "@/components/ui/custom-link";
 import { infoEmail, siteUrl } from "@/constants/siteInfo";
+import { formatDateWithOrdinal } from "@/lib/dateFns";
+
+export const lastUpdatedPrivacyRaw = "2025-04-07";
+export function LastUpdated() {
+  return (
+    <time
+      dateTime={lastUpdatedPrivacyRaw}
+      dangerouslySetInnerHTML={{
+        __html: formatDateWithOrdinal(lastUpdatedPrivacyRaw),
+      }}
+    />
+  );
+}
 
 const PrivacyPage = () => {
   return (
@@ -9,7 +22,7 @@ const PrivacyPage = () => {
           Privacy Policy
         </h1>
         <p className="text-center text-sm">
-          Last updated: April 7<sup>th</sup>, 2025
+          Last updated: <LastUpdated />
         </p>
       </span>
       <section className="mb-5 rounded-lg border-2 border-dotted border-foreground/20 p-3">
