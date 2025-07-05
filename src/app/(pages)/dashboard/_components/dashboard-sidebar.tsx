@@ -145,6 +145,7 @@ export default function DashboardSideBar({
           className="mx-4 mb-5"
           placeholder="Find what you're looking for!"
           iconOnly={collapsedSidebar}
+          pageType="dashboard"
         />
         <div
           className={cn(

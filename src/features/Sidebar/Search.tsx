@@ -22,6 +22,7 @@ interface SearchProps<T extends CommandItem> {
   iconOnly?: boolean;
   isMobile?: boolean;
   user?: User | null;
+  pageType?: "page" | "dashboard";
 }
 
 export const Search = <T extends CommandItem>({
@@ -34,6 +35,7 @@ export const Search = <T extends CommandItem>({
   isMobile = false,
   className,
   placeholder,
+  pageType,
 }: SearchProps<T>) => {
   const subscription = useQuery(api.subscriptions.getUserSubscriptionStatus);
   const subStatus = subscription?.subStatus;
@@ -42,6 +44,7 @@ export const Search = <T extends CommandItem>({
   const [value, setValue] = useState("Search");
   const userType = user?.accountType;
   const userRole = user?.role;
+  const dashboardPg = pageType === "dashboard";
 
   return (
     <>
@@ -83,8 +86,12 @@ export const Search = <T extends CommandItem>({
           )}
           onClick={() => setOpen(true)}
         >
-          <TbWorldSearch className="size-8 cursor-pointer md:size-6" />
-          {value && value !== "Search" && (
+          {dashboardPg ? (
+            <FiSearch className="size-8 cursor-pointer md:size-6" />
+          ) : (
+            <TbWorldSearch className="size-8 cursor-pointer md:size-6" />
+          )}
+          {/* {value && value !== "Search" && (
             <span className="flex items-center">
               &quot;
               <p className="max-w-[15ch] overflow-hidden truncate whitespace-nowrap">
@@ -92,7 +99,7 @@ export const Search = <T extends CommandItem>({
               </p>
               &quot;
             </span>
-          )}
+          )} */}
         </div>
       )}
 

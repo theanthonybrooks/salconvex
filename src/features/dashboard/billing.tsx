@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAction, useQuery } from "convex/react";
+import { useAction, usePreloadedQuery } from "convex/react";
 import { format } from "date-fns";
 
 import { Input } from "@/components/ui/input";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
@@ -18,9 +19,12 @@ import { api } from "~/convex/_generated/api";
 export default function BillingPage() {
   // const userData = useQuery(api.users.getCurrentUser, {})
   // const user = userData?.user // This avoids destructuring null or undefined
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { subscription } = subData;
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
-  const subscription = useQuery(api.subscriptions.getUserSubscription);
+
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
   const applyCoupon = useAction(
     api.stripeSubscriptions.applyCouponToSubscription,
@@ -172,7 +176,7 @@ export default function BillingPage() {
       )}
 
       {/* Account Information Grid */}
-      {subscription && (
+      {typeof subStatus === "string" && (
         <div className="grid gap-6">
           {/* Subscription Details Card */}
           <div className="flex flex-col gap-6">
@@ -401,7 +405,7 @@ export default function BillingPage() {
           </div>
         </div>
       )}
-      {!subscription && (
+      {typeof subStatus === undefined && (
         <span className="mt-2 flex items-center gap-4 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
           <FaExclamationTriangle className="color-red-600 size-10 shrink-0" />
           You don&apos;t currently have a membership. Please contact support if

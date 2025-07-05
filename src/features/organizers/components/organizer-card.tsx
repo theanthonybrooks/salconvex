@@ -55,7 +55,6 @@ export const OrganizerCard = ({
               <a
                 className="mt-6 line-clamp-4 text-center text-sm underline-offset-2 hover:underline"
                 href={`/thelist/organizer/${orgSlug}`}
-                target="_blank"
               >
                 Check out other events by this organizer
                 {/* Check out {organizer.name}&apos;s other events */}
@@ -96,7 +95,6 @@ export const OrganizerCard = ({
               <a
                 className="mt-6 line-clamp-4 flex items-center justify-center gap-1 text-sm underline-offset-2 hover:underline"
                 href={`/thelist/organizer/${orgSlug}`}
-                target="_blank"
               >
                 Check out other events by this organizer
                 <TiArrowRight className="inline-block size-6" />

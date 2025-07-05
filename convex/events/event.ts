@@ -676,7 +676,9 @@ export const getEventsForCalendar = query({
         }
         return {
           title: event.name,
-          date: event.dates.eventDates[0].start,
+          // date: event.dates.eventDates[0].start,
+          start: event.dates.eventDates[0].start,
+          end: event.dates.eventDates[0].end,
           extendedProps: {
             logo: event.logo,
             description: event.about,
@@ -767,7 +769,7 @@ export const getEventWithDetails = query({
     const eventState = event?.state as SubmissionFormState;
     const eventPublished = eventState === "published";
 
-    if (!event || !userId || eventPublished)
+    if (!event || !userId || !eventPublished)
       throw new ConvexError("No event found");
 
     const [openCalls, organizer] = await Promise.all([

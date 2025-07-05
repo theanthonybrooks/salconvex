@@ -62,8 +62,7 @@ export const SalBackNavigation = ({
             className,
           )}
         >
-          <IoIosArrowRoundBack className="size-6" />{" "}
-          {isOrganizer ? "Back to my dashboard" : navText}
+          <IoIosArrowRoundBack className="size-6" /> {navText}
         </div>
       )}
     </>
