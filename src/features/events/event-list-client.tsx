@@ -40,11 +40,7 @@ const ClientEventList = (
   },
 ) => {
   // inside ClientEventList()
-  const initialTitleRef = useRef(
-    document.title ?? "The List | The Street Art List",
-  );
-  console.log("initialTitleRef", initialTitleRef);
-  console.log(document.title);
+  const initialTitleRef = useRef<string | null>(null);
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -256,12 +252,31 @@ const ClientEventList = (
   let flatIndex = 0;
 
   useEffect(() => {
+    if (
+      typeof document !== "undefined" &&
+      initialTitleRef.current === null &&
+      !document.title.includes("Pg.")
+    ) {
+      initialTitleRef.current = document.title;
+    }
+  }, []);
+
+  useEffect(() => {
+    const baseTitle =
+      initialTitleRef.current ?? "The List | The Street Art List";
+
     if (page && page > 1) {
-      document.title = `${initialTitleRef.current} - Pg.${page}`;
+      document.title = `${baseTitle} - Pg.${page}`;
     } else {
-      document.title = initialTitleRef.current;
+      document.title = baseTitle;
     }
   }, [page]);
+
+  // useEffect(() => {
+  //   if (page && page > 1) {
+  //     document.title = `${document.title} - Pg.${page}`;
+  //   }
+  // }, [page]);
   return (
     <>
       {!publicView && (
