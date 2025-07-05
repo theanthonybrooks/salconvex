@@ -25,6 +25,7 @@ import {
   getEventCategoryLabelAbbr,
   getEventTypeLabel,
 } from "@/lib/eventFns";
+import { getCallFormatLabel } from "@/lib/openCallFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 
 import { cn } from "@/lib/utils";
@@ -800,11 +801,7 @@ const EventCardPreview = ({
                 {basicInfo.callFormat}:
               </span>
 
-              <p>
-                {basicInfo.callFormat === "RFP"
-                  ? "Request for Proposals"
-                  : "Request for Qualifications"}
-              </p>
+              <p>{getCallFormatLabel(basicInfo.callFormat)}</p>
             </div>
           )}
         </div>
