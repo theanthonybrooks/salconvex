@@ -485,7 +485,7 @@ export const openCallBaseSchema = z.object({
   // mainOrgId: z.string(), //todo: add this later when multiple orgs are supported
   basicInfo: z.object({
     appFee: z.number(),
-    callFormat: z.union([z.literal("RFQ"), z.literal("RFP")]),
+    callFormat: z.union([z.literal("RFQ"), z.literal("RFP"), z.literal("RFA")]),
     // callType: z.union([
     //   z.literal("Fixed"),
     //   z.literal("Rolling"),

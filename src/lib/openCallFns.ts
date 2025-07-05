@@ -4,6 +4,8 @@ export function getCallFormatLabel(callFormat: string): string {
       return "Request for Proposals";
     case "RFQ":
       return "Request for Qualifications";
+    case "RFA":
+      return "Request for Artworks";
     default:
       return "Unknown";
   }

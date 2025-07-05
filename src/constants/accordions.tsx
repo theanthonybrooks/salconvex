@@ -181,8 +181,8 @@ export const openCallFaqs: AccordionSection = {
   items: [
     {
       id: "call-formats",
-      subtitle: "RFQ vs RFP",
-      text: "RFQ is an open call in which you ask for artists to submit their previous work/qualifications — no designs/proposals. RFP is the opposite, in which you require artists to do a design — ideally with a design fee — prior to your selection.",
+      subtitle: "RFQ vs RFP vs RFA",
+      text: "RFQ is an open call in which you ask for artists to submit their previous work/qualifications — no designs/proposals. RFP is the opposite, in which you require artists to do a design — ideally with a design fee — prior to your selection. RFA is for artists to submit their already existing works for events like sticker and pasteup festivals/meetups",
     },
     {
       id: "all-inclusive",

@@ -80,7 +80,7 @@ export const createOrUpdateOpenCall = mutation({
     openCallId: v.optional(v.id("openCalls")),
     basicInfo: v.object({
       appFee: v.number(),
-      callFormat: v.union(v.literal("RFQ"), v.literal("RFP")),
+      callFormat: v.union(v.literal("RFQ"), v.literal("RFP"), v.literal("RFA")),
       callType: v.union(
         v.literal("Fixed"),
         v.literal("Rolling"),

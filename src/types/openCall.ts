@@ -4,7 +4,7 @@ import { Organizer } from "@/types/organizer";
 import { UserPref } from "@/types/user";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
-export const callFormatValues = ["RFP", "RFQ"] as const;
+export const callFormatValues = ["RFP", "RFQ", "RFA"] as const;
 
 export type CallFormat = (typeof callFormatValues)[number];
 
@@ -34,6 +34,7 @@ export type CallType = (typeof callTypeValues)[number];
 export const callFormat_option_values = [
   { label: "RFP", value: "RFP" },
   { label: "RFQ", value: "RFQ" },
+  { label: "RFA", value: "RFA" },
 ];
 
 export const callType_option_values = [

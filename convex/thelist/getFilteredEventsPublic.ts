@@ -228,12 +228,18 @@ export const getFilteredEventsPublic = query({
       }),
     );
 
+    const openCallFilterActive =
+      (filters.eligibility?.length ?? 0) > 0 ||
+      (filters.callType?.length ?? 0) > 0 ||
+      !!filters.callFormat;
+
     const filtered =
       thisWeekPg || nextWeekPg
         ? enriched.filter((e) => e.openCall && e.hasActiveOpenCall)
         : enriched.filter((e) => {
             const oc = e.openCall;
-            if (!oc) return false;
+            // if (!oc) return false;
+            if (!oc) return !openCallFilterActive;
 
             const passesEligibility =
               !filters.eligibility?.length ||

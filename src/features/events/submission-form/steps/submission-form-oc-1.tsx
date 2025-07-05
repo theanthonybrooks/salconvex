@@ -79,8 +79,10 @@ const SubmissionFormOC1 = ({
   const organizer = watch("organization");
   const eventName = watch("event.name");
   const eventId = watch("event._id");
+  const eventType = watch("event.type");
   const callType = watch("event.hasOpenCall");
 
+  const pupstick = eventType?.includes("pup");
   const isDraft = openCall?.state === "draft";
   const orgTimezone = organizer?.location?.timezone;
   const callFormat = openCall?.basicInfo?.callFormat;
@@ -211,6 +213,11 @@ const SubmissionFormOC1 = ({
                     <SelectItem fit value="RFP">
                       RFP (Request for Proposals)
                     </SelectItem>
+                    {pupstick && (
+                      <SelectItem fit value="RFA">
+                        RFA (Request for Artworks)
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               );
