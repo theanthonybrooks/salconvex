@@ -68,6 +68,9 @@ const ClientEventList = (
 
     eventTypes: [],
     eventCategories: [],
+    eligibility: [],
+    callType: [],
+    callFormat: "",
   };
 
   const defaultSort: SortOptions = {

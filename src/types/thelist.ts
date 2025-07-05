@@ -17,6 +17,9 @@ export interface Filters {
   eventTypes?: EventType[];
   eventCategories?: EventCategory[];
   continent?: Continents[];
+  eligibility?: string[];
+  callType?: string[];
+  callFormat?: string;
   limit: number;
 }
 

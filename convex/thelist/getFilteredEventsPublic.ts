@@ -18,6 +18,9 @@ export const getFilteredEventsPublic = query({
       eventCategories: v.optional(v.array(v.string())),
       eventTypes: v.optional(v.array(v.string())),
       continent: v.optional(v.array(v.string())),
+      eligibility: v.optional(v.array(v.string())),
+      callType: v.optional(v.array(v.string())),
+      callFormat: v.optional(v.string()),
       limit: v.optional(v.number()),
       showHidden: v.optional(v.boolean()),
       bookmarkedOnly: v.optional(v.boolean()),
@@ -147,6 +150,7 @@ export const getFilteredEventsPublic = query({
           filters.continent!.includes(e.location.continent),
       );
     }
+
     let totalOpenCalls = 0;
 
     const enriched = await Promise.all(
@@ -223,10 +227,28 @@ export const getFilteredEventsPublic = query({
         };
       }),
     );
+
     const filtered =
       thisWeekPg || nextWeekPg
         ? enriched.filter((e) => e.openCall && e.hasActiveOpenCall)
-        : enriched;
+        : enriched.filter((e) => {
+            const oc = e.openCall;
+            if (!oc) return false;
+
+            const passesEligibility =
+              !filters.eligibility?.length ||
+              filters.eligibility.includes(oc.eligibility?.type ?? "");
+
+            const passesCallType =
+              !filters.callType?.length ||
+              filters.callType.includes(oc.basicInfo?.callType ?? "");
+
+            const passesCallFormat =
+              !filters.callFormat ||
+              filters.callFormat.includes(oc.basicInfo?.callFormat ?? "");
+
+            return passesEligibility && passesCallType && passesCallFormat;
+          });
 
     const sorted = filtered.sort((a, b) =>
       compareEnrichedEvents(

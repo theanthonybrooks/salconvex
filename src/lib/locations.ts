@@ -23,6 +23,16 @@ export interface MapboxSuggestion {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
+export const COUNTRIES_REQUIRING_STATE = [
+  "US", // United States
+  "CA", // Canada
+  "AU", // Australia
+  "MX", // Mexico
+  "BR", // Brazil
+  "IN", // India
+  "NG", // Nigeria
+];
+
 const continentOrder = [
   "North America",
   "Europe",
@@ -308,3 +318,51 @@ export function getFormattedLocationString(location: {
     .filter(Boolean)
     .join(", ");
 }
+
+type Location = {
+  city?: string;
+  stateAbbr?: string;
+  countryAbbr?: string;
+};
+
+export const sortByLocation = <T>(
+  list: T[],
+  countriesRequiringState: string[],
+  getLocation: (item: T) => Location | undefined,
+): T[] => {
+  return [...list].sort((a, b) => {
+    const aLoc = getLocation(a);
+    const bLoc = getLocation(b);
+
+    const isStateRequiredA = countriesRequiringState.includes(
+      aLoc?.countryAbbr ?? "",
+    );
+    const isStateRequiredB = countriesRequiringState.includes(
+      bLoc?.countryAbbr ?? "",
+    );
+
+    let aPrimary = "";
+    let bPrimary = "";
+    let aSecondary = "";
+    let bSecondary = "";
+
+    if (isStateRequiredA) {
+      aPrimary = aLoc?.stateAbbr ?? "";
+      aSecondary = aLoc?.city ?? "";
+    } else {
+      aPrimary = aLoc?.city ?? "";
+    }
+
+    if (isStateRequiredB) {
+      bPrimary = bLoc?.stateAbbr ?? "";
+      bSecondary = bLoc?.city ?? "";
+    } else {
+      bPrimary = bLoc?.city ?? "";
+    }
+
+    const primaryCompare = aPrimary.localeCompare(bPrimary);
+    return primaryCompare !== 0
+      ? primaryCompare
+      : aSecondary.localeCompare(bSecondary);
+  });
+};

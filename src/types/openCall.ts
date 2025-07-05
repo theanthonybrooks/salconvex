@@ -31,12 +31,31 @@ export const callTypeValues = [
 
 export type CallType = (typeof callTypeValues)[number];
 
+export const callFormat_option_values = [
+  { label: "RFP", value: "RFP" },
+  { label: "RFQ", value: "RFQ" },
+];
+
+export const callType_option_values = [
+  { label: "Fixed", value: "Fixed" },
+  { label: "Rolling", value: "Rolling" },
+  { label: "Email", value: "Email" },
+  { label: "Invite", value: "Invite" },
+];
+
 export const eligibilityTypeValues = [
   "International",
   "National",
   "Regional/Local",
   "Other",
 ] as const;
+
+export const eligibility_option_values = [
+  { label: "International", value: "International" },
+  { label: "National", value: "National" },
+  { label: "Regional/Local", value: "Regional/Local" },
+  { label: "Other", value: "Other" },
+];
 
 export type EligibilityType = (typeof eligibilityTypeValues)[number];
 

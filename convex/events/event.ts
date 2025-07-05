@@ -1,3 +1,4 @@
+import { COUNTRIES_REQUIRING_STATE, sortByLocation } from "@/lib/locations";
 import {
   EventCategory,
   EventFormat,
@@ -26,6 +27,7 @@ export const globalSearch = query({
   handler: async (ctx, { searchTerm, searchType }) => {
     const term = searchTerm.trim();
     if (!term) return { results: [], label: null };
+    const searchTerms = term.toLowerCase().split(/\s+/);
 
     const today = new Date().toISOString();
     const now = Date.parse(today);
@@ -87,7 +89,14 @@ export const globalSearch = query({
         )
         .take(20);
 
-      return { results: attachOpenCallStatusFlag(events), label: "Events" };
+      const filteredEvents = events.filter((event) =>
+        searchTerms.every((t) => event.name.toLowerCase().includes(t)),
+      );
+
+      return {
+        results: attachOpenCallStatusFlag(filteredEvents),
+        label: "Events",
+      };
     }
 
     if (searchType === "orgs") {
@@ -96,9 +105,13 @@ export const globalSearch = query({
         .withSearchIndex("search_by_name", (q) =>
           q.search("name", term).eq("isComplete", true),
         )
-
         .take(20);
-      return { results, label: "Organizers" };
+
+      const filteredOrgs = results.filter((org) =>
+        searchTerms.every((t) => org.name.toLowerCase().includes(t)),
+      );
+
+      return { results: filteredOrgs, label: "Organizers" };
     }
 
     if (searchType === "loc") {
@@ -117,10 +130,21 @@ export const globalSearch = query({
           .take(20),
       ]);
 
+      const sortedOrgLocResults = sortByLocation(
+        orgLocResults,
+        COUNTRIES_REQUIRING_STATE,
+        (item) => item.location,
+      );
+      const sortedEventLocResults = sortByLocation(
+        eventLocResults,
+        COUNTRIES_REQUIRING_STATE,
+        (item) => item.location,
+      );
+
       return {
         results: {
-          events: attachOpenCallStatusFlag(eventLocResults),
-          organizers: orgLocResults,
+          events: attachOpenCallStatusFlag(sortedEventLocResults),
+          organizers: sortedOrgLocResults,
         },
         label: "Location",
       };
@@ -154,12 +178,65 @@ export const globalSearch = query({
           .take(20),
       ]);
 
+      const filteredEventName = eventName.filter((event) =>
+        searchTerms.every((t) => event.name.toLowerCase().includes(t)),
+      );
+      const filteredOrgName = orgName.filter((org) =>
+        searchTerms.every((t) => org.name.toLowerCase().includes(t)),
+      );
+
+      // const sortedOrgLoc = orgLoc.sort((a, b) => {
+      //   const isStateRequiredA = COUNTRIES_REQUIRING_STATE.includes(
+      //     a.location?.countryAbbr ?? "",
+      //   );
+      //   const isStateRequiredB = COUNTRIES_REQUIRING_STATE.includes(
+      //     b.location?.countryAbbr ?? "",
+      //   );
+
+      //   let aPrimary = "";
+      //   let bPrimary = "";
+      //   let aSecondary = "";
+      //   let bSecondary = "";
+
+      //   if (isStateRequiredA) {
+      //     aPrimary = a.location?.stateAbbr ?? "";
+      //     aSecondary = a.location?.city ?? "";
+      //   } else {
+      //     aPrimary = a.location?.city ?? "";
+      //     aSecondary = "";
+      //   }
+
+      //   if (isStateRequiredB) {
+      //     bPrimary = b.location?.stateAbbr ?? "";
+      //     bSecondary = b.location?.city ?? "";
+      //   } else {
+      //     bPrimary = b.location?.city ?? "";
+      //     bSecondary = "";
+      //   }
+
+      //   const primaryCompare = aPrimary.localeCompare(bPrimary);
+      //   if (primaryCompare !== 0) return primaryCompare;
+
+      //   return aSecondary.localeCompare(bSecondary);
+      // });
+
+      const sortedOrgLoc = sortByLocation(
+        orgLoc,
+        COUNTRIES_REQUIRING_STATE,
+        (item) => item.location,
+      );
+      const sortedEventLoc = sortByLocation(
+        eventLoc,
+        COUNTRIES_REQUIRING_STATE,
+        (item) => item.location,
+      );
+
       return {
         results: {
-          eventName: attachOpenCallStatusFlag(eventName),
-          orgName,
-          eventLoc: attachOpenCallStatusFlag(eventLoc),
-          orgLoc,
+          eventName: attachOpenCallStatusFlag(filteredEventName),
+          orgName: filteredOrgName,
+          eventLoc: attachOpenCallStatusFlag(sortedEventLoc),
+          orgLoc: sortedOrgLoc,
         },
         label: "All",
       };

@@ -31,7 +31,11 @@ export const EventFilters = ({
     filters.showHidden ||
     (filters.eventTypes && filters.eventTypes.length > 0) ||
     (filters.eventCategories && filters.eventCategories.length > 0) ||
-    (filters.continent && filters.continent.length > 0);
+    (filters.continent && filters.continent.length > 0) ||
+    (filters.eligibility && filters.eligibility.length > 0) ||
+    (filters.callType && filters.callType.length > 0) ||
+    !!(filters.callFormat && filters.callFormat !== "");
+
   //TODO: Add filters for: applied, open calls, budget range?, eligibility, ... ?
   return (
     <div className="mx-auto mb-6 flex w-[min(90vw,1280px)] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12">

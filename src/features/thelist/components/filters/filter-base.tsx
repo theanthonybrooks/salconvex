@@ -24,6 +24,14 @@ import {
   EventType,
   eventTypeOptions,
 } from "@/types/event";
+import {
+  CallFormat,
+  callFormat_option_values,
+  CallType,
+  callType_option_values,
+  eligibility_option_values,
+  EligibilityType,
+} from "@/types/openCall";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
 import {
   ChevronDown,
@@ -689,6 +697,110 @@ export const FilterBase = ({
                     shortResults
                     showArrow={false}
                   />
+                </section>
+                <section className="flex flex-col gap-2">
+                  <Label
+                    htmlFor="eligibility"
+                    className="flex items-center gap-2"
+                  >
+                    Eligibility:
+                  </Label>
+                  <MultiSelect
+                    options={eligibility_option_values}
+                    value={filters.eligibility ?? []}
+                    onValueChange={(value) =>
+                      onChange({ eligibility: value as EligibilityType[] })
+                    }
+                    placeholder="--Eligibility--"
+                    variant="basic"
+                    selectAll={false}
+                    hasSearch={false}
+                    textClassName="text-center"
+                    className="w-30 border bg-transparent hover:bg-white/30 sm:h-12"
+                    badgeClassName="h-9"
+                    shortResults
+                    showArrow={false}
+                  />
+                </section>
+                <section className="flex flex-col gap-2">
+                  <Label htmlFor="callType" className="flex items-center gap-2">
+                    Call Type:
+                  </Label>
+                  <MultiSelect
+                    options={callType_option_values}
+                    value={filters.callType ?? []}
+                    onValueChange={(value) =>
+                      onChange({ callType: value as CallType[] })
+                    }
+                    placeholder="--Call Type--"
+                    variant="basic"
+                    selectAll={false}
+                    hasSearch={false}
+                    textClassName="text-center"
+                    className="w-30 border bg-transparent hover:bg-white/30 sm:h-12"
+                    badgeClassName="h-9"
+                    shortResults
+                    showArrow={false}
+                  />
+                </section>
+                {/* <section className="flex flex-col gap-2">
+                  <Label
+                    htmlFor="callFormat"
+                    className="flex items-center gap-2"
+                  >
+                    Call Format:
+                  </Label>
+                  <MultiSelect
+                    options={callFormat_option_values}
+                    value={filters.callFormat ?? []}
+                    onValueChange={(value) =>
+                      onChange({ callFormat: value as CallFormat[] })
+                    }
+                    placeholder="--Format--"
+                    variant="basic"
+                    selectAll={false}
+                    hasSearch={false}
+                    textClassName="text-center"
+                    className="w-25 min-w-25 border bg-transparent hover:bg-white/30 sm:h-12"
+                    badgeClassName="h-9"
+                    shortResults
+                    showArrow={false}
+                  />
+                </section> */}
+                <section className="flex flex-col gap-2">
+                  <Label htmlFor="limit" className="flex items-center gap-2">
+                    Call Format:
+                  </Label>
+                  <Select
+                    name="limit"
+                    value={filters.callFormat ?? ""}
+                    onValueChange={(value) =>
+                      onChange({
+                        callFormat:
+                          value === "none" ? "" : (value as CallFormat),
+                      })
+                    }
+                  >
+                    <SelectTrigger className="w-full min-w-15 text-center hover:bg-white/30 sm:h-12">
+                      <SelectValue placeholder="Format" />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-auto z-top">
+                      {filters.callFormat !== "" && (
+                        <SelectItem
+                          fit
+                          value="none"
+                          className="italic text-foreground/50"
+                        >
+                          -- All --
+                        </SelectItem>
+                      )}
+                      {callFormat_option_values.map(({ value, label }) => (
+                        <SelectItem fit value={value} key={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </section>
                 <section className="flex flex-col gap-3 self-end">
                   <label className="flex cursor-pointer items-center gap-2">
