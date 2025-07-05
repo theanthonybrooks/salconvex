@@ -18,13 +18,14 @@ interface EventNameSearchProps {
 export function EventNameSearch({
   value,
   onChange,
-  placeholder = "Search or enter event name",
+  placeholder = "Search or enter new",
   className,
   tabIndex,
   isExisting,
 }: EventNameSearchProps) {
   const [localValue, setLocalValue] = useState(value);
   const debouncedValue = useDebounce(localValue, 300);
+  // const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     onChange(debouncedValue);
