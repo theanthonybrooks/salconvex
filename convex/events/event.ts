@@ -601,13 +601,34 @@ export const get5latestPublishedEvents = query({
 
     const publishedEvents = await ctx.db
       .query("events")
-      .withIndex("by_state_hasOpenCall_approvedAt", (q) =>
-        q.eq("state", "published").eq("hasOpenCall", "Fixed"),
+      .withIndex("by_state_approvedAt", (q) => q.eq("state", "published"))
+      // .withIndex("by_state_hasOpenCall_approvedAt", (q) =>
+      //   q.eq("state", "published").eq("hasOpenCall", "Fixed"),
+      // )
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("hasOpenCall"), "Fixed"),
+          q.eq(q.field("hasOpenCall"), "Rolling"),
+          q.eq(q.field("hasOpenCall"), "Email"),
+        ),
       )
       .order("desc")
-      .take(5);
+      .take(10);
 
-    return publishedEvents;
+    const eventsWithActiveOpenCalls = [];
+    for (const event of publishedEvents) {
+      const openCall = await ctx.db
+        .query("openCalls")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .filter((q) => q.eq(q.field("state"), "published"))
+        .first();
+      if (openCall) {
+        eventsWithActiveOpenCalls.push(event);
+        if (eventsWithActiveOpenCalls.length === 5) break;
+      }
+    }
+
+    return eventsWithActiveOpenCalls;
   },
 });
 

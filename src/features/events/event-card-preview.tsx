@@ -591,17 +591,14 @@ const EventCardPreview = ({
               <span className={cn("flex items-center gap-x-1 text-sm")}>
                 <span className={"font-semibold"}>
                   {/* {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}: */}
-                  {basicInfo.callType === "Fixed"
-                    ? "Deadline"
-                    : basicInfo?.callType === "Email"
-                      ? "Email by"
-                      : "Status"}
-                  :
+                  {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
                 </span>
                 {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
                     This Year
                   </span>
+                ) : basicInfo?.callType === "Email" ? (
+                  <p>Submit qualifications via email</p>
                 ) : (
                   <>
                     <span className="hidden 2xl:block">

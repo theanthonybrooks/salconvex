@@ -633,6 +633,7 @@ export default defineSchema({
       "hasOpenCall",
       "approvedAt",
     ])
+
     // .index("by_mainOrgName", ["mainOrgName"])
     .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_mainOrgId_lastEditedAt", ["mainOrgId", "lastEditedAt"])

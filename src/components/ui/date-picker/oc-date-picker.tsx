@@ -51,8 +51,8 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
   ) => {
     const endDate = ocEnd ?? new Date().toISOString();
 
-    const display =
-      pickerType === "start" ? "Select start date" : "Select deadline";
+    // const display =
+    //   pickerType === "start" ? "Select start date" : "Select deadline";
     let formattedValue = "";
     if (rawValue) {
       const date = parseISO(rawValue);
@@ -73,6 +73,8 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     const displayValue =
       formattedValue +
       (showTimeZone ? ` (${getTimezoneFormat(endDate, timeZone)})` : "");
+    const hasValue = !!formattedValue;
+
     return (
       <input
         ref={ref}
@@ -83,7 +85,7 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
         )}
         readOnly
         {...rest}
-        value={displayValue || display}
+        value={hasValue ? displayValue : undefined}
         type="text"
         // {formattedValue || display}
         // {timeZone && showTimeZone && (
