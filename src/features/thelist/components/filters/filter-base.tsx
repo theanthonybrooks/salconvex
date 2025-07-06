@@ -215,7 +215,7 @@ export const FilterBase = ({
                                             <FlairBadge
                                               className={cn(
                                                 "px-2 py-0.5",
-                                                item.ocStatus === 1
+                                                item.ocStatus === 2
                                                   ? "bg-green-500/20"
                                                   : item.ocStatus === 3
                                                     ? "bg-yellow-500/20"
