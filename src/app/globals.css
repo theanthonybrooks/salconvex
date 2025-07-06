@@ -521,6 +521,9 @@ a {
   /* border: 2px solid black ; */
 }
 form {
+  input[readOnly]:focus {
+    caret-color: transparent;
+  }
   input:focus,
   textarea:focus {
     outline: 1px solid black;

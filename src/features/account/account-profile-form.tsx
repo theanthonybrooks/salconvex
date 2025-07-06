@@ -119,7 +119,8 @@ export const AccountSubscribeForm = ({
         className={cn(
           "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
           className,
-          !isArtist && "!h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
+          !isArtist &&
+            "h-[100svh] md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
         )}
       >
         <DialogTitle className={cn(!isArtist && "sr-only")}>
@@ -143,7 +144,8 @@ export const AccountSubscribeForm = ({
               handleClose(true);
             }}
             actionTitle="Exit"
-            className="w-full"
+            className={cn("w-full")}
+            triggerClassName={cn(isArtist && "right-2 top-2")}
           />
         ) : (
           <DialogCloseBtn
@@ -153,7 +155,8 @@ export const AccountSubscribeForm = ({
               handleClose(false);
             }}
             actionTitle="Exit"
-            className="w-full"
+            className={cn("w-full")}
+            triggerClassName={cn(isArtist && "right-2 top-2")}
           />
         )}
 

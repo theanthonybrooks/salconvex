@@ -5,7 +5,6 @@ import { isValid, parseISO, setHours, setMinutes, setSeconds } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
-import { Button } from "../button";
 
 type OcPickerType = "start" | "end";
 
@@ -26,7 +25,7 @@ export interface OcCustomDatePickerProps {
   showTimeZone?: boolean;
 }
 
-interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
+interface DateInputProps extends React.ComponentPropsWithoutRef<"input"> {
   rawValue?: string;
   onClick?: () => void;
   pickerType?: OcPickerType;
@@ -35,7 +34,7 @@ interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
   showTimeZone?: boolean;
 }
 
-const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
+const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
   (
     {
       rawValue,
@@ -71,25 +70,27 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     // console.log("endDate", endDate, ocEnd);
     // console.log("timeZone", timeZone);
     // console.log("formattedValue", formattedValue);
+    const displayValue =
+      formattedValue +
+      (showTimeZone ? ` (${getTimezoneFormat(endDate, timeZone)})` : "");
     return (
-      <Button
+      <input
         ref={ref}
         onClick={onClick}
-        type="button"
         className={cn(
-          "w-full cursor-pointer rounded-lg border bg-card text-base font-normal",
+          "w-full cursor-pointer rounded-lg border bg-card text-center text-base font-normal sm:text-sm",
           className,
         )}
+        readOnly
         {...rest}
-      >
-        <span className="flex items-center gap-2">
-          {formattedValue || display}
-          {timeZone && showTimeZone && (
-            // <p className="text-sm xl:hidden">
-            <p className="text-sm">({getTimezoneFormat(endDate, timeZone)})</p>
-          )}
-        </span>
-      </Button>
+        value={displayValue || display}
+        type="text"
+        // {formattedValue || display}
+        // {timeZone && showTimeZone && (
+        //   // <p className="text-sm xl:hidden">
+        //   <p className="text-sm">({getTimezoneFormat(endDate, timeZone)})</p>
+        // )}
+      />
     );
   },
 );
