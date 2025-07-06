@@ -351,7 +351,7 @@ export default function HorizontalLinearStepper({
                   </Button>
                 )}
 
-              {!lastStep && cancelButton}
+              {lastStep !== activeStep && cancelButton}
               {activeStep !== 0 && (
                 <Button
                   variant="salWithShadowHiddenYlw"

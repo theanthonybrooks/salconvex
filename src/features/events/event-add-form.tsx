@@ -32,6 +32,7 @@ import {
   step1Schema,
 } from "@/features/organizers/schemas/event-add-schema";
 
+import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
 import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
@@ -43,6 +44,7 @@ import { SubmissionFormRecapMobile } from "@/features/events/submission-form/ste
 import { toSeason, toYearMonth } from "@/lib/dateFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
+import { cn } from "@/lib/utils";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
@@ -127,7 +129,7 @@ export const EventOCForm = ({
   shouldClose,
   setOpen,
   setShouldClose,
-  // hasUnsavedChanges,
+  hasUnsavedChanges,
   setHasUnsavedChanges,
   activeStep,
   setActiveStep,
@@ -1941,42 +1943,42 @@ export const EventOCForm = ({
         lastSaved={lastSavedDate}
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
-        // cancelButton={
-        //   <DialogCloseBtn
-        //     className="w-full"
-        //     title={
-        //       hasUnsavedChanges
-        //         ? "Discard unsaved changes?"
-        //         : "Exit submission form?"
-        //     }
-        //     description={
-        //       activeStep > 0
-        //         ? hasUnsavedChanges
-        //           ? "Sure? You can always start the submission process at a later time. Save your event to a draft in your dashboard."
-        //           : "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
-        //         : "Sure? You can always start the submission process at a later time. "
-        //     }
-        //     actionTitle={hasUnsavedChanges ? "Discard" : "Cancel"}
-        //     cancelTitle={hasUnsavedChanges ? "Cancel" : "Back"}
-        //     primaryActionTitle="Save & Exit"
-        //     onAction={() => {
-        //       setOpen(false);
-        //     }}
-        //     onPrimaryAction={
-        //       activeStep > 0 && hasUnsavedChanges
-        //         ? () => {
-        //             handleSave();
-        //             setOpen(false);
-        //           }
-        //         : undefined
-        //     }
-        //     // triggerVariant="salWithShadowHiddenPink"
-        //     triggerTitle="Cancel"
-        //     triggerSize="default"
-        //     triggerClassName={cn(activeStep === 0 && isMobile && "flex-1")}
-        //     type="button"
-        //   />
-        // }
+        cancelButton={
+          <DialogCloseBtn
+            className="w-full"
+            title={
+              hasUnsavedChanges
+                ? "Discard unsaved changes?"
+                : "Exit submission form?"
+            }
+            description={
+              activeStep > 0
+                ? hasUnsavedChanges
+                  ? "Sure? You can always start the submission process at a later time. Save your event to a draft in your dashboard."
+                  : "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
+                : "Sure? You can always start the submission process at a later time. "
+            }
+            actionTitle={hasUnsavedChanges ? "Discard" : "Exit"}
+            cancelTitle={hasUnsavedChanges ? "Cancel" : "Back"}
+            primaryActionTitle="Save & Exit"
+            onAction={() => {
+              setOpen(false);
+            }}
+            onPrimaryAction={
+              activeStep > 0 && hasUnsavedChanges
+                ? () => {
+                    handleSave();
+                    setOpen(false);
+                  }
+                : undefined
+            }
+            // triggerVariant="salWithShadowHiddenPink"
+            triggerTitle="Cancel"
+            triggerSize="default"
+            triggerClassName={cn(activeStep === 0 && isMobile && "flex-1")}
+            type="button"
+          />
+        }
       >
         <div ref={topRef} />
         <FormProvider {...form}>

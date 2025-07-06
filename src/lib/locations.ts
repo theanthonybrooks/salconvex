@@ -318,7 +318,7 @@ export function getFormattedLocationString(
     !city && state ? state : null,
     countryAbbr === "US"
       ? "USA"
-      : countryAbbr === "UK" && abbreviated
+      : countryAbbr === "GB" && abbreviated
         ? "UK"
         : country,
   ]
