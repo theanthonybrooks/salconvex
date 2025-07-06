@@ -39,7 +39,6 @@ import {
   ChevronUp,
   LucideFilter,
   LucideFilterX,
-  Megaphone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -193,6 +192,9 @@ export const FilterBase = ({
                             </h3>
                             <ul className="flex flex-col gap-1">
                               {groupItems.map((item) => {
+                                const hasOpenCall =
+                                  typeof item.ocStatus === "number" &&
+                                  item.ocStatus > 0;
                                 return (
                                   <li
                                     key={item.path}
@@ -206,24 +208,29 @@ export const FilterBase = ({
                                     {groupKey.startsWith("Events") ? (
                                       <div className="flex w-full flex-col gap-2">
                                         <span className="flex max-w-full items-center justify-start gap-1 truncate text-wrap">
-                                          {item.ocStatus === 2 && (
-                                            <FlairBadge className="bg-green-500/20 px-1 py-0.5">
-                                              <Megaphone className="size-4" />
-                                            </FlairBadge>
-                                          )}
-                                          {item.ocStatus === 1 && (
-                                            <FlairBadge className="bg-red-500/20 px-1 py-0.5">
-                                              <Megaphone className="size-4" />
-                                            </FlairBadge>
-                                          )}
                                           {item.name}
                                         </span>
-                                        <span className="flex max-w-[40vw] truncate text-xs text-foreground/50">
+                                        <span className="flex max-w-full gap-2 truncate text-xs text-foreground/50">
+                                          {hasOpenCall && (
+                                            <FlairBadge
+                                              className={cn(
+                                                "px-2 py-0.5",
+                                                item.ocStatus === 1
+                                                  ? "bg-green-500/20"
+                                                  : item.ocStatus === 3
+                                                    ? "bg-yellow-500/20"
+                                                    : "bg-red-500/20",
+                                              )}
+                                            >
+                                              Open Call
+                                            </FlairBadge>
+                                          )}
+
                                           {item.meta}
                                         </span>
                                       </div>
                                     ) : (
-                                      <div className="flex w-full justify-between gap-2">
+                                      <div className="flex w-full flex-col gap-2">
                                         <span className="truncate">
                                           {item.name}
                                         </span>
