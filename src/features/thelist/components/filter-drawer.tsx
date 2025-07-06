@@ -561,7 +561,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                   {item.name}
                                 </span>
                                 {item.ocStatus === 2 ? (
-                                  <FlairBadge className="bg-green-500/20">
+                                  <FlairBadge className="mx-auto bg-green-500/20">
                                     Open Call
                                   </FlairBadge>
                                 ) : (

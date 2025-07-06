@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   SearchType,
   TheListFilterCommandItem,
@@ -203,15 +204,19 @@ export const FilterBase = ({
                                     className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-base transition-colors active:scale-95 active:underline"
                                   >
                                     {groupKey.startsWith("Events") ? (
-                                      <div className="flex w-full items-center justify-between gap-2">
-                                        <span className="flex max-w-[40vw] items-center gap-1 truncate text-wrap">
-                                          {item.name}
+                                      <div className="flex w-full flex-col gap-2">
+                                        <span className="flex max-w-full items-center justify-start gap-1 truncate text-wrap">
                                           {item.ocStatus === 2 && (
                                             <FlairBadge className="bg-green-500/20 px-1 py-0.5">
-                                              {/* Open Call */}
                                               <Megaphone className="size-4" />
                                             </FlairBadge>
                                           )}
+                                          {item.ocStatus === 1 && (
+                                            <FlairBadge className="bg-red-500/20 px-1 py-0.5">
+                                              <Megaphone className="size-4" />
+                                            </FlairBadge>
+                                          )}
+                                          {item.name}
                                         </span>
                                         <span className="flex max-w-[40vw] truncate text-xs text-foreground/50">
                                           {item.meta}
@@ -407,8 +412,12 @@ export const FilterBase = ({
           )}
           <div
             onClick={() => setShowFull((prev) => !prev)}
-            className="flex flex-col items-center justify-center gap-2"
+            className="flex w-full flex-col items-center justify-center gap-2"
           >
+            <Separator
+              orientation="horizontal"
+              className="mx-auto h-2 w-full text-foreground/50"
+            />
             {showFull && <ChevronUp className="size-5 text-foreground/50" />}
 
             {showFull ? "Hide Open Call Filters" : "Show Open Call Filters"}
