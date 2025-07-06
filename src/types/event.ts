@@ -8,12 +8,12 @@ export const freeEvents = ["gjm", "pup"];
 export const paidEvents = ["mur", "saf", "mus", "oth"];
 
 export const eventTypeOptions = [
-  { value: "gjm", label: "Graffiti Jam" },
-  { value: "mur", label: "Mural Project" },
-  { value: "saf", label: "Street Art Festival" },
-  { value: "pup", label: "Paste Up/Sticker" },
-  { value: "mus", label: "At music festival" },
-  { value: "oth", label: "Other" },
+  { value: "gjm", label: "Graffiti Jam", abbr: "Graffiti Jam" },
+  { value: "mur", label: "Mural Project", abbr: "Mural Project" },
+  { value: "saf", label: "Street Art Festival", abbr: "Street Art Fest" },
+  { value: "pup", label: "Paste Up/Sticker", abbr: "Paste Up" },
+  { value: "mus", label: "At music festival", abbr: "Music Fest" },
+  { value: "oth", label: "Other", abbr: "Other" },
 ] as const;
 
 // export const eventTypeValues = [

@@ -38,10 +38,10 @@ export const callFormat_option_values = [
 ];
 
 export const callType_option_values = [
-  { label: "Fixed", value: "Fixed" },
-  { label: "Rolling", value: "Rolling" },
+  { label: "Fixed Dates", value: "Fixed" },
+  { label: "Rolling Call", value: "Rolling" },
   { label: "Email", value: "Email" },
-  { label: "Invite", value: "Invite" },
+  { label: "Invite Only", value: "Invite" },
 ];
 
 export const eligibilityTypeValues = [

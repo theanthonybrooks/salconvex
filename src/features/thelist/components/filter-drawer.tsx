@@ -221,16 +221,30 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     groupedItems["Organizers"] = organizers.map((org) => ({
       name: org.name,
       path: `/thelist/organizer/${org.slug}`,
-      meta: org.location?.full || "",
+      meta:
+        getSearchLocationString(
+          org.location?.city,
+          org.location?.countryAbbr,
+          org.location?.stateAbbr,
+        ) ||
+        org.location?.full ||
+        "",
     }));
 
     groupedItems["Events"] = events.map((event) => ({
       name: event.name,
       path:
-        event.ocStatus === 2 || event.ocStatus === 3
+        typeof event.ocStatus === "number" && event.ocStatus > 0
           ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
           : `/thelist/event/${event.slug}/${event.dates?.edition}`,
-      meta: event.location?.full || "",
+      meta:
+        getSearchLocationString(
+          event.location?.city,
+          event.location?.countryAbbr,
+          event.location?.stateAbbr,
+        ) ||
+        event.location?.full ||
+        "",
       ocStatus: event.ocStatus,
     }));
   }
@@ -244,7 +258,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     groupedItems["Events"] = events.map((event) => ({
       name: event.name,
       path:
-        event.ocStatus === 2 || event.ocStatus === 3
+        typeof event.ocStatus === "number" && event.ocStatus > 0
           ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
           : `/thelist/event/${event.slug}/${event.dates?.edition}`,
       meta:
@@ -298,7 +312,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       return {
         name: event.name,
         path:
-          event.ocStatus === 2 || event.ocStatus === 3
+          typeof event.ocStatus === "number" && event.ocStatus > 0
             ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
             : `/thelist/event/${event.slug}/${event.dates?.edition}`,
         meta: locationString ?? event.location?.full ?? "",
@@ -332,9 +346,10 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path: event.ocStatus
-          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+        path:
+          typeof event.ocStatus === "number" && event.ocStatus > 0
+            ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
+            : `/thelist/event/${event.slug}/${event.dates?.edition}`,
         meta: locationString ?? event.location?.full ?? "",
         category: event.category.toUpperCase(),
         edition: event.dates?.edition,
@@ -591,4 +606,3 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     </Command.Dialog>
   );
 };
-

@@ -38,6 +38,7 @@ import {
   ChevronUp,
   LucideFilter,
   LucideFilterX,
+  Megaphone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -190,36 +191,45 @@ export const FilterBase = ({
                               {groupKey.toUpperCase()}
                             </h3>
                             <ul className="flex flex-col gap-1">
-                              {groupItems.map((item) => (
-                                <li
-                                  key={item.path}
-                                  onClick={() => {
-                                    router.push(item.path || "/thelist");
-                                    setOpen(false);
-                                    setDropdownOpen(false);
-                                  }}
-                                  className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-base transition-colors active:scale-95 active:underline"
-                                >
-                                  {groupKey.startsWith("Events") ? (
-                                    <div className="flex w-full items-center justify-between gap-2">
-                                      <span className="flex max-w-[40vw] items-center gap-1 truncate text-wrap">
-                                        {item.name}
-                                      </span>
-                                      {item.ocStatus === 2 && (
-                                        <FlairBadge className="bg-green-500/20">
-                                          Open Call
-                                        </FlairBadge>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <div className="flex w-full justify-between gap-2">
-                                      <span className="truncate">
-                                        {item.name}
-                                      </span>
-                                    </div>
-                                  )}
-                                </li>
-                              ))}
+                              {groupItems.map((item) => {
+                                return (
+                                  <li
+                                    key={item.path}
+                                    onClick={() => {
+                                      router.push(item.path || "/thelist");
+                                      setOpen(false);
+                                      setDropdownOpen(false);
+                                    }}
+                                    className="group flex cursor-pointer items-center rounded-md px-3 py-2 text-base transition-colors active:scale-95 active:underline"
+                                  >
+                                    {groupKey.startsWith("Events") ? (
+                                      <div className="flex w-full items-center justify-between gap-2">
+                                        <span className="flex max-w-[40vw] items-center gap-1 truncate text-wrap">
+                                          {item.name}
+                                          {item.ocStatus === 2 && (
+                                            <FlairBadge className="bg-green-500/20 px-1 py-0.5">
+                                              {/* Open Call */}
+                                              <Megaphone className="size-4" />
+                                            </FlairBadge>
+                                          )}
+                                        </span>
+                                        <span className="flex max-w-[40vw] truncate text-xs text-foreground/50">
+                                          {item.meta}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex w-full justify-between gap-2">
+                                        <span className="truncate">
+                                          {item.name}
+                                        </span>
+                                        <span className="truncate text-xs text-foreground/50">
+                                          {item.meta}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </div>
                         ))
@@ -348,51 +358,139 @@ export const FilterBase = ({
             </section>
           </div>
 
-          <section className="flex flex-col gap-2">
-            <Label
-              htmlFor="eventCategories"
-              className="flex items-center gap-2"
-            >
-              Category:
-            </Label>
-            <MultiSelect
-              options={[...eventCategoryOptions]}
-              value={filters.eventCategories ?? []}
-              onValueChange={(value) =>
-                onChange({ eventCategories: value as EventCategory[] })
-              }
-              placeholder="Category"
-              variant="basic"
-              selectAll={false}
-              hasSearch={false}
-              className="w-full border bg-card sm:h-9"
-              maxCount={1}
-              showArrow={false}
-            />
-          </section>
-          <section className="flex flex-col gap-2">
-            <Label htmlFor="eventTypes" className="flex items-center gap-2">
-              Event Type:
-            </Label>
-            <MultiSelect
-              options={[...eventTypeOptions]}
-              value={filters.eventTypes ?? []}
-              onValueChange={(value) =>
-                onChange({ eventTypes: value as EventType[] })
-              }
-              placeholder="--Event Type--"
-              disabled={notEvent}
-              variant="basic"
-              selectAll={false}
-              hasSearch={false}
-              textClassName="text-center"
-              className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
-              badgeClassName="h-9"
-              maxCount={1}
-              // shortResults
-              showArrow={false}
-            />
-          </section>
+          <div className="flex w-full max-w-full items-center justify-between gap-3">
+            <section className="flex flex-col gap-2">
+              <Label
+                htmlFor="eventCategories"
+                className="flex items-center gap-2"
+              >
+                Category:
+              </Label>
+              <MultiSelect
+                options={[...eventCategoryOptions]}
+                value={filters.eventCategories ?? []}
+                onValueChange={(value) =>
+                  onChange({ eventCategories: value as EventCategory[] })
+                }
+                placeholder="Category"
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                className="w-full border bg-card sm:h-9"
+                maxCount={1}
+                showArrow={false}
+                shortResults
+                abbreviated
+              />
+            </section>
+            <section className="flex w-full flex-col gap-2">
+              <Label htmlFor="callType" className="flex items-center gap-2">
+                Call Type:
+              </Label>
+              <MultiSelect
+                options={callType_option_values}
+                value={filters.callType ?? []}
+                onValueChange={(value) =>
+                  onChange({ callType: value as CallType[] })
+                }
+                placeholder="--Call Type--"
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                textClassName="text-center"
+                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                badgeClassName="h-9"
+                shortResults
+                showArrow={false}
+              />
+            </section>
+          </div>
+          {(filters.eventCategories?.includes("event") ||
+            filters.eventCategories?.length === 0) && (
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="eventTypes" className="flex items-center gap-2">
+                Event Type:
+              </Label>
+              <MultiSelect
+                options={[...eventTypeOptions]}
+                value={filters.eventTypes ?? []}
+                onValueChange={(value) =>
+                  onChange({ eventTypes: value as EventType[] })
+                }
+                placeholder="--Event Type--"
+                disabled={notEvent}
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                textClassName="text-center"
+                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                badgeClassName="h-9"
+                maxCount={1}
+                shortResults
+                showArrow={false}
+                abbreviated
+              />
+            </section>
+          )}
+
+          <div className="flex w-full max-w-full items-center justify-between gap-3">
+            <section className="flex w-full flex-col gap-2">
+              <Label htmlFor="eligibility" className="flex items-center gap-2">
+                Eligibility:
+              </Label>
+              <MultiSelect
+                options={eligibility_option_values}
+                value={filters.eligibility ?? []}
+                onValueChange={(value) =>
+                  onChange({ eligibility: value as EligibilityType[] })
+                }
+                placeholder="--Eligibility--"
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                textClassName="text-center"
+                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                badgeClassName="h-9"
+                shortResults
+                showArrow={false}
+              />
+            </section>
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="limit" className="flex items-center gap-2">
+                Call Format:
+              </Label>
+              <Select
+                name="limit"
+                value={filters.callFormat ?? ""}
+                onValueChange={(value) =>
+                  onChange({
+                    callFormat: value === "none" ? "" : (value as CallFormat),
+                  })
+                }
+              >
+                <SelectTrigger className="w-full min-w-15 text-center hover:bg-white/30 sm:h-12">
+                  <SelectValue placeholder="Format" />
+                </SelectTrigger>
+                <SelectContent className="min-w-auto z-top">
+                  {filters.callFormat !== "" && (
+                    <SelectItem
+                      fit
+                      value="none"
+                      className="italic text-foreground/50"
+                    >
+                      -- All --
+                    </SelectItem>
+                  )}
+                  {callFormat_option_values.map(({ value, label }) => (
+                    <SelectItem fit value={value} key={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </section>
+          </div>
+
           <section className="flex flex-col gap-2">
             <Label htmlFor="continents" className="flex items-center gap-2">
               Continent:
@@ -582,6 +680,7 @@ export const FilterBase = ({
                 badgeClassName="h-9"
                 shortResults
                 showArrow={false}
+                abbreviated
               />
             </section>
 

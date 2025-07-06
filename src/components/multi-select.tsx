@@ -72,6 +72,7 @@ interface MultiSelectProps
     group?: string;
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>;
+    abbr?: string;
   }[];
 
   /**
@@ -138,6 +139,7 @@ interface MultiSelectProps
   limit?: number;
   shiftOffset?: number;
   tabIndex?: number;
+  abbreviated?: boolean;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -171,6 +173,7 @@ export const MultiSelect = React.forwardRef<
       badgeClassName,
       textClassName,
       disabled,
+      abbreviated = false,
       ...props
     },
     ref,
@@ -316,7 +319,7 @@ export const MultiSelect = React.forwardRef<
                           <p
                             className={cn("text-sm font-normal", textClassName)}
                           >
-                            {option?.label}
+                            {abbreviated ? option?.abbr : option?.label}
                           </p>
                           {!lockedValue.includes(value) && (
                             <X
@@ -518,7 +521,7 @@ export const MultiSelect = React.forwardRef<
                               <option.icon className="mr-2 size-4 text-foreground/50" />
                             )}
                             <span className="text-base sm:text-sm">
-                              {option.label}
+                              {abbreviated ? option?.abbr : option?.label}
                             </span>
                           </CommandItem>
                         );
@@ -557,7 +560,7 @@ export const MultiSelect = React.forwardRef<
                             <option.icon className="mr-2 size-4 text-foreground/50" />
                           )}
                           <span className="text-base sm:text-sm">
-                            {option.label}
+                            {abbreviated ? option?.abbr : option?.label}
                           </span>
                         </CommandItem>
                       );
