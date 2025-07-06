@@ -173,7 +173,7 @@ export const FilterBase = ({
                     ) ? (
                       <>
                         {value.length > 0 && (
-                          <span className="inline-flex items-center gap-2 text-lg">
+                          <span className="flex flex-col items-center gap-2 text-lg">
                             No results found for
                             <span className="inline-flex items-center gap-[1px] italic">
                               <BiSolidQuoteLeft className="size-1 -translate-y-1" />
