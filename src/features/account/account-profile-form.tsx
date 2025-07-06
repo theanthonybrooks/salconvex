@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -97,20 +96,18 @@ export const AccountSubscribeForm = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <DialogHeader
-          className="w-full"
-          onClick={(e) => {
-            if (!user) {
-              e.preventDefault();
-              e.stopPropagation();
-              sessionStorage.setItem("src", "newUser");
-              router.push("/auth/register");
-            }
-          }}
-        >
-          {children}
-        </DialogHeader>
+      <DialogTrigger
+        asChild
+        onClick={(e) => {
+          if (!user) {
+            e.preventDefault();
+            e.stopPropagation();
+            sessionStorage.setItem("src", "newUser");
+            router.push("/auth/register");
+          }
+        }}
+      >
+        {children}
       </DialogTrigger>
 
       <DialogContent
@@ -122,51 +119,18 @@ export const AccountSubscribeForm = ({
         className={cn(
           "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
           className,
-          !isArtist &&
-            "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
+          !isArtist && "!h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
         )}
       >
-        <>
-          <DialogTitle className={cn(!isArtist && "sr-only")}>
-            {isArtist
-              ? activeSub
-                ? "Update Artist Profile"
-                : trialEnded
-                  ? "Update Artist Plan"
-                  : "Create Artist Profile"
-              : "Add New Call"}
-          </DialogTitle>
-          {isArtist && (
-            <DialogDescription>
-              {isArtist
-                ? "Add information needed to apply for open calls"
-                : "Add open call for your project or event"}
-            </DialogDescription>
-          )}
-        </>
-        {isArtist ? (
-          <ArtistProfileForm
-            user={user}
-            subData={subData}
-            onClick={onClick}
-            hasUnsavedChanges={hasUnsavedChanges}
-            setHasUnsavedChanges={setHasUnsavedChanges}
-          />
-        ) : (
-          <EventOCForm
-            user={user}
-            onClick={onClick}
-            hasUnsavedChanges={hasUnsavedChanges}
-            setHasUnsavedChanges={setHasUnsavedChanges}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-            shouldClose={shouldExit}
-            setShouldClose={setShouldExit}
-            setOpen={setOpen}
-            isEligibleForFree={isEligibleForFree}
-            planKey={planKey}
-          />
-        )}
+        <DialogTitle className={cn(!isArtist && "sr-only")}>
+          {isArtist
+            ? activeSub
+              ? "Update Artist Profile"
+              : trialEnded
+                ? "Update Artist Plan"
+                : "Create Artist Profile"
+            : "Add New Call"}
+        </DialogTitle>
         {hasUnsavedChanges ? (
           <DialogCloseBtn
             title={unsavedAlertTitle}
@@ -190,6 +154,39 @@ export const AccountSubscribeForm = ({
             }}
             actionTitle="Exit"
             className="w-full"
+          />
+        )}
+
+        {isArtist && (
+          <DialogDescription>
+            {isArtist
+              ? "Add information needed to apply for open calls"
+              : "Add open call for your project or event"}
+          </DialogDescription>
+        )}
+
+        <></>
+        {isArtist ? (
+          <ArtistProfileForm
+            user={user}
+            subData={subData}
+            onClick={onClick}
+            hasUnsavedChanges={hasUnsavedChanges}
+            setHasUnsavedChanges={setHasUnsavedChanges}
+          />
+        ) : (
+          <EventOCForm
+            user={user}
+            onClick={onClick}
+            hasUnsavedChanges={hasUnsavedChanges}
+            setHasUnsavedChanges={setHasUnsavedChanges}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            shouldClose={shouldExit}
+            setShouldClose={setShouldExit}
+            setOpen={setOpen}
+            isEligibleForFree={isEligibleForFree}
+            planKey={planKey}
           />
         )}
       </DialogContent>

@@ -268,6 +268,11 @@ export const getFilteredEventsPublic = query({
       ),
     );
 
+    const filteredTotalOpenCalls = filtered.reduce(
+      (acc, e) => acc + (e.hasActiveOpenCall ? 1 : 0),
+      0,
+    );
+
     const pg = page ?? 1;
     const limit = filters.limit ?? 10;
     const start = (pg - 1) * limit;
@@ -276,7 +281,7 @@ export const getFilteredEventsPublic = query({
     return {
       results: paginated as PublicEventPreviewData[],
       total: sorted.length,
-      totalOpenCalls,
+      totalOpenCalls: filteredTotalOpenCalls,
       weekStartISO,
       weekEndISO,
     };
