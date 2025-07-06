@@ -399,7 +399,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
           setOpen={setOpen}
           className="fixed z-[100] h-[90vh] max-h-[90%] bg-card"
         >
-          <div className="relative h-full w-full">
+          <div className="scrollable relative h-full w-full">
             <div className="flex h-full w-full flex-col gap-3 overflow-hidden rounded-t-2xl pb-6 pt-4">
               <DrawerHeader>
                 <DrawerTitle className="sr-only">{title}</DrawerTitle>

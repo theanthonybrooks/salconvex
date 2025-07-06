@@ -127,7 +127,7 @@ export const FilterBase = ({
   return (
     <>
       {isMobile ? (
-        <div className="flex flex-col items-center gap-4 px-5 sm:hidden [&>section]:w-full [&>section]:flex-1">
+        <div className="scrollable flex flex-col items-center gap-4 px-5 sm:hidden [&>section]:w-full [&>section]:flex-1">
           <section className="flex flex-col gap-2">
             <div className="flex justify-between gap-3">
               <Label htmlFor="list-search" className="flex items-center gap-2">
@@ -358,53 +358,28 @@ export const FilterBase = ({
             </section>
           </div>
 
-          <div className="flex w-full max-w-full items-center justify-between gap-3">
-            <section className="flex flex-col gap-2">
-              <Label
-                htmlFor="eventCategories"
-                className="flex items-center gap-2"
-              >
-                Category:
-              </Label>
-              <MultiSelect
-                options={[...eventCategoryOptions]}
-                value={filters.eventCategories ?? []}
-                onValueChange={(value) =>
-                  onChange({ eventCategories: value as EventCategory[] })
-                }
-                placeholder="Category"
-                variant="basic"
-                selectAll={false}
-                hasSearch={false}
-                className="w-full border bg-card sm:h-9"
-                maxCount={1}
-                showArrow={false}
-                shortResults
-                abbreviated
-              />
-            </section>
-            <section className="flex w-full flex-col gap-2">
-              <Label htmlFor="callType" className="flex items-center gap-2">
-                Call Type:
-              </Label>
-              <MultiSelect
-                options={callType_option_values}
-                value={filters.callType ?? []}
-                onValueChange={(value) =>
-                  onChange({ callType: value as CallType[] })
-                }
-                placeholder="--Call Type--"
-                variant="basic"
-                selectAll={false}
-                hasSearch={false}
-                textClassName="text-center"
-                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
-                badgeClassName="h-9"
-                shortResults
-                showArrow={false}
-              />
-            </section>
-          </div>
+          <section className="flex flex-col gap-2">
+            <Label
+              htmlFor="eventCategories"
+              className="flex items-center gap-2"
+            >
+              Category:
+            </Label>
+            <MultiSelect
+              options={[...eventCategoryOptions]}
+              value={filters.eventCategories ?? []}
+              onValueChange={(value) =>
+                onChange({ eventCategories: value as EventCategory[] })
+              }
+              placeholder="Category"
+              variant="basic"
+              selectAll={false}
+              hasSearch={false}
+              className="w-full border bg-card sm:h-9"
+              maxCount={1}
+              showArrow={false}
+            />
+          </section>
           {(filters.eventCategories?.includes("event") ||
             filters.eventCategories?.length === 0) && (
             <section className="flex flex-col gap-2">
@@ -426,93 +401,129 @@ export const FilterBase = ({
                 className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
                 badgeClassName="h-9"
                 maxCount={1}
-                shortResults
                 showArrow={false}
-                abbreviated
               />
             </section>
           )}
+          <div
+            onClick={() => setShowFull((prev) => !prev)}
+            className="flex flex-col items-center justify-center gap-2"
+          >
+            {showFull && <ChevronUp className="size-5 text-foreground/50" />}
 
-          <div className="flex w-full max-w-full items-center justify-between gap-3">
-            <section className="flex w-full flex-col gap-2">
-              <Label htmlFor="eligibility" className="flex items-center gap-2">
-                Eligibility:
-              </Label>
-              <MultiSelect
-                options={eligibility_option_values}
-                value={filters.eligibility ?? []}
-                onValueChange={(value) =>
-                  onChange({ eligibility: value as EligibilityType[] })
-                }
-                placeholder="--Eligibility--"
-                variant="basic"
-                selectAll={false}
-                hasSearch={false}
-                textClassName="text-center"
-                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
-                badgeClassName="h-9"
-                shortResults
-                showArrow={false}
-              />
-            </section>
-            <section className="flex flex-col gap-2">
-              <Label htmlFor="limit" className="flex items-center gap-2">
-                Call Format:
-              </Label>
-              <Select
-                name="limit"
-                value={filters.callFormat ?? ""}
-                onValueChange={(value) =>
-                  onChange({
-                    callFormat: value === "none" ? "" : (value as CallFormat),
-                  })
-                }
-              >
-                <SelectTrigger className="w-full min-w-15 text-center hover:bg-white/30 sm:h-12">
-                  <SelectValue placeholder="Format" />
-                </SelectTrigger>
-                <SelectContent className="min-w-auto z-top">
-                  {filters.callFormat !== "" && (
-                    <SelectItem
-                      fit
-                      value="none"
-                      className="italic text-foreground/50"
-                    >
-                      -- All --
-                    </SelectItem>
-                  )}
-                  {callFormat_option_values.map(({ value, label }) => (
-                    <SelectItem fit value={value} key={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </section>
+            {showFull ? "Hide Open Call Filters" : "Show Open Call Filters"}
+            {!showFull && <ChevronDown className="size-5text-foreground/50" />}
           </div>
+          {showFull && (
+            <>
+              <section className="flex w-full flex-col gap-2">
+                <Label htmlFor="callType" className="flex items-center gap-2">
+                  Call Type:
+                </Label>
+                <MultiSelect
+                  options={callType_option_values}
+                  value={filters.callType ?? []}
+                  onValueChange={(value) =>
+                    onChange({ callType: value as CallType[] })
+                  }
+                  placeholder="--Call Type--"
+                  variant="basic"
+                  selectAll={false}
+                  hasSearch={false}
+                  textClassName="text-center"
+                  className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                  badgeClassName="h-9"
+                  shortResults
+                  showArrow={false}
+                />
+              </section>
+              <div className="flex w-full max-w-full items-center justify-between gap-3">
+                <section className="flex w-full flex-col gap-2">
+                  <Label
+                    htmlFor="eligibility"
+                    className="flex items-center gap-2"
+                  >
+                    Eligibility:
+                  </Label>
+                  <MultiSelect
+                    options={eligibility_option_values}
+                    value={filters.eligibility ?? []}
+                    onValueChange={(value) =>
+                      onChange({ eligibility: value as EligibilityType[] })
+                    }
+                    placeholder="--Eligibility--"
+                    variant="basic"
+                    selectAll={false}
+                    hasSearch={false}
+                    textClassName="text-center"
+                    className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                    badgeClassName="h-9"
+                    shortResults
+                    showArrow={false}
+                  />
+                </section>
+                <section className="flex flex-col gap-2">
+                  <Label htmlFor="limit" className="flex items-center gap-2">
+                    Call Format:
+                  </Label>
+                  <Select
+                    name="limit"
+                    value={filters.callFormat ?? ""}
+                    onValueChange={(value) =>
+                      onChange({
+                        callFormat:
+                          value === "none" ? "" : (value as CallFormat),
+                      })
+                    }
+                  >
+                    <SelectTrigger className="w-full min-w-15 text-center hover:bg-white/30 sm:h-12">
+                      <SelectValue placeholder="Format" />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-auto z-top">
+                      {filters.callFormat !== "" && (
+                        <SelectItem
+                          fit
+                          value="none"
+                          className="italic text-foreground/50"
+                        >
+                          -- All --
+                        </SelectItem>
+                      )}
+                      {callFormat_option_values.map(({ value, label }) => (
+                        <SelectItem fit value={value} key={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </section>
+              </div>
 
-          <section className="flex flex-col gap-2">
-            <Label htmlFor="continents" className="flex items-center gap-2">
-              Continent:
-            </Label>
-            <MultiSelect
-              options={select_continents}
-              value={filters.continent ?? []}
-              onValueChange={(value) =>
-                onChange({ continent: value as Continents[] })
-              }
-              placeholder="--Continent--"
-              variant="basic"
-              selectAll={false}
-              hasSearch={false}
-              textClassName="text-center"
-              className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
-              badgeClassName="h-9"
-              maxCount={1}
-              // shortResults
-              showArrow={false}
-            />
-          </section>
+              <section className="flex flex-col gap-2">
+                <Label htmlFor="continents" className="flex items-center gap-2">
+                  Continent:
+                </Label>
+                <MultiSelect
+                  options={select_continents}
+                  value={filters.continent ?? []}
+                  onValueChange={(value) =>
+                    onChange({ continent: value as Continents[] })
+                  }
+                  placeholder="--Continent--"
+                  variant="basic"
+                  selectAll={false}
+                  hasSearch={false}
+                  textClassName="text-center"
+                  className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                  badgeClassName="h-9"
+                  maxCount={1}
+                  // shortResults
+                  showArrow={false}
+                />
+              </section>
+            </>
+          )}
+
           <div className="mt-2 flex w-full justify-between">
             <section className="flex flex-col gap-4">
               <label className="flex cursor-pointer items-center gap-2">
@@ -680,7 +691,6 @@ export const FilterBase = ({
                 badgeClassName="h-9"
                 shortResults
                 showArrow={false}
-                abbreviated
               />
             </section>
 
