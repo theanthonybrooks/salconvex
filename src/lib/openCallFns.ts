@@ -10,3 +10,11 @@ export function getCallFormatLabel(callFormat: string): string {
       return "Unknown";
   }
 }
+
+export const sortByOcStatus = <T extends { ocStatus: number }>(arr: T[]) => {
+  const order: Record<string, number> = { "2": 0, "3": 1, "1": 2, "0": 3 };
+  return arr.sort(
+    (a, b) =>
+      (order[String(a.ocStatus)] ?? 4) - (order[String(b.ocStatus)] ?? 4),
+  );
+};

@@ -1,4 +1,5 @@
 import { COUNTRIES_REQUIRING_STATE, sortByLocation } from "@/lib/locations";
+import { sortByOcStatus } from "@/lib/openCallFns";
 import {
   EventCategory,
   EventFormat,
@@ -94,7 +95,7 @@ export const globalSearch = query({
       );
 
       return {
-        results: attachOpenCallStatusFlag(filteredEvents),
+        results: sortByOcStatus(attachOpenCallStatusFlag(filteredEvents)),
         label: "Events",
       };
     }
@@ -233,7 +234,9 @@ export const globalSearch = query({
 
       return {
         results: {
-          eventName: attachOpenCallStatusFlag(filteredEventName),
+          eventName: sortByOcStatus(
+            attachOpenCallStatusFlag(filteredEventName),
+          ),
           orgName: filteredOrgName,
           eventLoc: attachOpenCallStatusFlag(sortedEventLoc),
           orgLoc: sortedOrgLoc,
