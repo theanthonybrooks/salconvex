@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
 import { CircleCheck, CreditCard, Info, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -22,6 +23,7 @@ import { api } from "~/convex/_generated/api";
 export default function BillingPage() {
   // const userData = useQuery(api.users.getCurrentUser, {})
   // const user = userData?.user // This avoids destructuring null or undefined
+  const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const { preloadedSubStatus } = useConvexPreload();
@@ -97,6 +99,11 @@ export default function BillingPage() {
       toast.error(
         "No membership found. Please contact support if this is incorrect.",
       );
+      return;
+    }
+
+    if (isCanceled) {
+      router.push("/pricing#plans");
       return;
     }
 
@@ -235,7 +242,9 @@ export default function BillingPage() {
             >
               {subStatus === "past_due"
                 ? "Resume Membership"
-                : "Manage Membership"}
+                : isCanceled
+                  ? "Choose Plan"
+                  : "Manage Membership"}
             </Button>
             {!subPromoCode ? (
               <form
@@ -399,7 +408,7 @@ export default function BillingPage() {
                         )}
                       </span>
                     </div>
-                    {oneTime && (
+                    {oneTime && !isCanceled && (
                       <span className="mt-2 w-full items-center gap-3 rounded-lg border border-dashed border-foreground/30 bg-salYellowLt/30 p-2 text-sm font-light italic text-foreground/50 sm:inline-flex">
                         <Info className="size-5 shrink-0 text-sm text-foreground/50 [@media(max-width:768px)]:hidden" />
                         This discount will expire in one{" "}
