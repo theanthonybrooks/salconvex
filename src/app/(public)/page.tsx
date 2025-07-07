@@ -127,7 +127,7 @@ export default function Home() {
             <CarouselItem className="relative w-full">
               <Image
                 src="/artist-highlight/nick_artwork.jpg"
-                alt="The Street Art List - Nick Abstract @NickAbstract"
+                alt="The Street Art List - Nick Abstract @nick.abstract"
                 loading="eager"
                 width={1920}
                 height={1080}
@@ -143,7 +143,7 @@ export default function Home() {
             <CarouselItem className="relative w-full">
               <Image
                 src="/artist-highlight/nick_profile.jpg"
-                alt="The Street Art List - Nick Abstract @NickAbstract"
+                alt="The Street Art List - Nick Abstract @nick.abstract"
                 loading="eager"
                 width={1920}
                 height={1080}
@@ -158,7 +158,7 @@ export default function Home() {
             <CarouselItem className="relative w-full">
               <Image
                 src="/artist-highlight/nick_artwork2.jpg"
-                alt="The Street Art List - Nick Abstract @NickAbstract"
+                alt="The Street Art List - Nick Abstract @nick.abstract"
                 loading="eager"
                 width={1920}
                 height={1080}
@@ -276,7 +276,7 @@ export default function Home() {
                     className="text-base text-muted-foreground"
                     target="_blank"
                   >
-                    @nickabstract
+                    @nick.abstract
                   </Link>
                 </li>
                 <li className="flex items-center gap-x-3">
