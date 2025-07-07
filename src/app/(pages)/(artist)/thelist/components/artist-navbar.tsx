@@ -15,10 +15,11 @@ import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbars";
 import { Search } from "@/features/Sidebar/Search";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-import { Unauthenticated } from "convex/react";
+import { Unauthenticated, usePreloadedQuery } from "convex/react";
 
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
@@ -28,18 +29,25 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 interface TheListNavBarProps {
-  userId: string | undefined;
-  user: User | undefined | null;
+  userId?: string | undefined;
+  user?: User | undefined | null;
   // userPref: UserPref | null
-  subStatus: string | undefined;
+  subStatus?: string | undefined;
 }
 
-export default function TheListNavBar({
-  user,
-  subStatus,
-}: //   subStatus,
-// userPref,
-TheListNavBarProps) {
+export default function TheListNavBar(
+  {
+    // user,
+    // subStatus,
+  }: //   subStatus,
+  // userPref,
+  TheListNavBarProps,
+) {
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const user = userData?.user ?? null;
+  const { subStatus } = subData ?? {};
   const pathname = usePathname();
   const { scrollY, scrollYProgress } = useScroll();
   const [canGoToTop, setCanGoToTop] = useState(false);

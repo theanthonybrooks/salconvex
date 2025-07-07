@@ -321,7 +321,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       </Card>
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex min-h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-[#fef9dd] p-4">
+        <div className="flex min-h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
           <div
             className={cn(
               "flex h-14 w-20 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",

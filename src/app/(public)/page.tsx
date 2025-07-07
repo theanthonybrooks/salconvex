@@ -86,23 +86,39 @@ export default function Home() {
               : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
           )}
         >
-          <h1
+          <div
             className={cn(
-              "text-[3.75rem] leading-[3.5rem] md:text-[6.5rem] md:leading-[7rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
-              currentSlide === 1
-                ? "scale-100"
-                : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+              currentSlide !== 1 && "opacity-0 transition-opacity ease-in-out",
             )}
           >
-            CHUS
-          </h1>
+            <h1
+              className={cn(
+                "text-[4rem] leading-[3.5rem] md:text-[6.9rem] md:leading-[6rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
+                currentSlide === 1
+                  ? "scale-100"
+                  : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+              )}
+            >
+              Nick
+            </h1>
+            <h1
+              className={cn(
+                "text-3xl md:text-[3.25rem] md:leading-[3rem] lg:text-[4.125rem] lg:leading-[4.25rem]",
+                currentSlide === 1
+                  ? "scale-100"
+                  : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+              )}
+            >
+              Abstract
+            </h1>
+          </div>
           <h2
             className={cn(
-              "text-center text-lg md:text-3xl lg:text-4xl",
+              "border-t-4 border-background pt-1 text-center text-lg md:text-3xl lg:text-4xl",
               currentSlide === 1 ? "scale-100" : "hidden",
             )}
           >
-            May / June 2025
+            July / Aug 2025
           </h2>
         </div>
 
@@ -110,12 +126,12 @@ export default function Home() {
           <CarouselContent>
             <CarouselItem className="relative w-full">
               <Image
-                src="/artist-highlight/chus3.jpg"
-                alt="The Street Art List"
+                src="/artist-highlight/nick_artwork.jpg"
+                alt="The Street Art List - Nick Abstract @NickAbstract"
                 loading="eager"
                 width={1920}
                 height={1080}
-                className="h-full w-full object-cover object-[50%_42%]"
+                className="h-full w-full object-cover object-[50%_10%] [@media(max-height:768px)]:object-[50%_38%]"
 
                 // style={{
                 //   borderBottomLeftRadius: borderRadius,
@@ -126,12 +142,12 @@ export default function Home() {
 
             <CarouselItem className="relative w-full">
               <Image
-                src="/artist-highlight/chus2.jpg"
-                alt="The Street Art List"
+                src="/artist-highlight/nick_profile.jpg"
+                alt="The Street Art List - Nick Abstract @NickAbstract"
                 loading="eager"
                 width={1920}
                 height={1080}
-                className="h-full w-full object-cover object-[50%_90%]"
+                className="h-full w-full object-cover object-[50%_63%] [@media(max-height:768px)]:object-[50%_30%]"
 
                 // style={{
                 //   borderBottomLeftRadius: borderRadius,
@@ -141,12 +157,12 @@ export default function Home() {
             </CarouselItem>
             <CarouselItem className="relative w-full">
               <Image
-                src="/artist-highlight/chus.jpg"
-                alt="The Street Art List"
+                src="/artist-highlight/nick_artwork2.jpg"
+                alt="The Street Art List - Nick Abstract @NickAbstract"
                 loading="eager"
                 width={1920}
                 height={1080}
-                className="h-full w-full object-cover object-[50%_13%]"
+                className="h-full w-full object-cover object-[50%_32%]"
 
                 // style={{
                 //   borderBottomLeftRadius: borderRadius,
@@ -173,21 +189,40 @@ export default function Home() {
               // onClick={() => setPopoverOpen((prev) => !prev)}
             >
               <div className="flex flex-col items-center gap-2 sm:flex-row">
-                <span className="flex items-center gap-2">
-                  <i className="text-base">Marching Band Mural </i>
+                <span className={cn("flex items-center gap-2")}>
+                  <i
+                    className={cn("text-base", currentSlide === 2 && "hidden")}
+                  >
+                    6th Street{" "}
+                  </i>
                   {/* <span className="block sm:hidden">-</span>{" "} */}
-                  <span className="block text-xs">by</span>{" "}
-                  <span className="font-bold">CHUS</span>
+                  <span
+                    className={cn(
+                      "block text-xs",
+                      currentSlide === 2 && "hidden",
+                    )}
+                  >
+                    by
+                  </span>{" "}
+                  <span className={cn("font-bold")}>Nick Abstract</span>{" "}
+                  <span
+                    className={cn(
+                      "text-base text-muted-foreground",
+                      currentSlide !== 2 && "hidden",
+                    )}
+                  >
+                    @nick.abstract
+                  </span>{" "}
                 </span>
                 <Separator
                   thickness={2}
                   orientation={isMobile ? "horizontal" : "vertical"}
-                  className={cn("mx-1 h-5", currentSlide !== 1 && "hidden")}
+                  className={cn("mx-1 h-5", "[@media(max-width:768px)]:hidden")}
                 />
                 <span
                   className={cn(
                     "flex items-center gap-1 text-sm hover:cursor-pointer hover:font-semibold",
-                    currentSlide !== 1 && "hidden",
+                    "[@media(max-width:768px)]:hidden",
                   )}
                 >
                   {popoverOpen ? (
@@ -221,7 +256,7 @@ export default function Home() {
           <PopoverContent className="w-80 border-1.5" align="center">
             <div className="grid gap-4">
               {/* <div className="space-y-2">
-                <h3 className="italic">Marching Band Mural</h3>
+                <h3 className="italic">6th Street</h3>
                 <p className="text-base text-muted-foreground">
                   Pieve Santo Stefano, Tuscany (IT)
                 </p>
@@ -229,48 +264,49 @@ export default function Home() {
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">More info:</h4>
                 <p className="text-base text-muted-foreground">
-                  Italian artist located in Copenhagen, Denmark
+                  Colorblind artist/designer based in the Midwestern United
+                  States
                 </p>
               </div>
               <ul className="flex flex-col gap-2 sm:gap-1 [&*svg]:size-4">
                 <li className="flex items-center gap-x-3">
                   <FaInstagram />
                   <Link
-                    href="https://instagram.com/chus.art"
+                    href="https://instagram.com/nick.abstract"
                     className="text-base text-muted-foreground"
                     target="_blank"
                   >
-                    @chus.art
+                    @nickabstract
                   </Link>
                 </li>
                 <li className="flex items-center gap-x-3">
                   <FaFacebook />
                   <Link
-                    href="https://www.facebook.com/mattiachus"
+                    href="https://www.facebook.com/chungwii21/"
                     className="text-base text-muted-foreground"
                     target="_blank"
                   >
-                    @mattiachus
+                    Nick Smith (Nick Abstract)
                   </Link>
                 </li>
                 <li className="flex items-center gap-x-3">
                   <FaGlobe />
                   <Link
-                    href="https://chus.it"
+                    href="https://nickabstract.com"
                     className="text-base text-muted-foreground"
                     target="_blank"
                   >
-                    www.chus.it
+                    www.nickabstract.com
                   </Link>
                 </li>
                 <li className="flex items-center gap-x-3">
                   <FaEnvelope />
                   <Link
-                    href="mailto:mattia.chus@gmail.com"
+                    href="mailto:info@nickabstract.com"
                     className="text-base text-muted-foreground"
                     target="_blank"
                   >
-                    mattia.chus@gmail.com
+                    info@nickabstract.com
                   </Link>
                 </li>
               </ul>

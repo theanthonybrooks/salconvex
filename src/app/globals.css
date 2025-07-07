@@ -56,7 +56,9 @@ body {
     --card: 0 0% 100%;
 
     --card-foreground: 222.2 84% 4.9%;
-    --card-secondary: 51, 94%, 90%;
+    /* --card-secondary: 51, 94%, 93%; */
+    --card-secondary: 0 0% 97%;
+
     --toucan-color: hsl(22, 88%, 54%);
 
     --popover: 0 0% 100%;
@@ -220,6 +222,8 @@ body {
 
     --card-foreground: 222.2 84% 4.9%;
 
+    --card-secondary: 51, 94%, 93%;
+
     --popover: 0 0% 100%;
 
     --popover-foreground: 222.2 84% 4.9%;
@@ -272,6 +276,7 @@ body {
     --foreground: 222.2 84% 4.9%;
     --foreground-hex: #020817;
     --card: 0 0% 100%;
+    --card-secondary: 0 0% 97%;
 
     --card-foreground: 222.2 84% 4.9%;
 

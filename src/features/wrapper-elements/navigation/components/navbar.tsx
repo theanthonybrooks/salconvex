@@ -12,15 +12,18 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { UserProfile } from "@/components/ui/user-profile";
+import { dashboardNavItems } from "@/constants/links";
 import {
   landingPageNavbarLinks,
   landingPageNavbarMenuLinksResources as resources,
   theListNavbarMenuLinks as thelistitems,
 } from "@/constants/navbars";
+import { Search } from "@/features/Sidebar/Search";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-import { Unauthenticated } from "convex/react";
+import { Unauthenticated, usePreloadedQuery } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
@@ -28,17 +31,24 @@ import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
 interface NavBarProps {
-  userId: string | undefined;
-  user: User | undefined | null;
+  userId?: string;
+  user?: User | null;
   // userPref: UserPref | null
-  subStatus: string | undefined;
+  subStatus?: string;
 }
 
-export default function NavBar({
-  user,
-  subStatus,
-}: // userPref,
-NavBarProps) {
+export default function NavBar(
+  {
+    // user,
+    // subStatus,
+  }: // userPref,
+  NavBarProps,
+) {
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const user = userData?.user ?? null;
+  const { subStatus, hasActiveSubscription } = subData ?? {};
   const isAdmin = user?.role?.includes("admin");
   const isOrganizer = user?.accountType?.includes("organizer");
   const pathname = usePathname();
@@ -364,6 +374,16 @@ NavBarProps) {
                   <UserProfile className="size-10" subscription={subStatus} />
 
                   <FullPageNav user={user} subStatus={subStatus} />
+                  {hasActiveSubscription && (
+                    <Search
+                      // invisible
+                      title={"Search"}
+                      source={dashboardNavItems}
+                      className="lg:hidden"
+                      placeholder="Search..."
+                      user={user}
+                    />
+                  )}
                 </div>
               )}
             </>

@@ -21,6 +21,7 @@ interface SearchProps<T extends CommandItem> {
   placeholder?: string;
   iconOnly?: boolean;
   isMobile?: boolean;
+  invisible?: boolean;
   user?: User | null;
   pageType?: "page" | "dashboard";
 }
@@ -33,6 +34,7 @@ export const Search = <T extends CommandItem>({
   // groupName,
   iconOnly = false,
   isMobile = false,
+  invisible = false,
   className,
   placeholder,
   pageType,
@@ -52,6 +54,7 @@ export const Search = <T extends CommandItem>({
         <div
           className={cn(
             "relative flex items-center rounded-lg border-stone-300 bg-primary/10 px-2 py-1.5 text-sm text-foreground hover:bg-primary/20",
+            invisible && "invisible",
             className,
           )}
         >
@@ -82,6 +85,8 @@ export const Search = <T extends CommandItem>({
         <div
           className={cn(
             "flex items-center gap-x-2 hover:scale-110 active:scale-95",
+            invisible && "invisible",
+
             className,
           )}
           onClick={() => setOpen(true)}

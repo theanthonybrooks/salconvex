@@ -45,22 +45,6 @@ export default function NavTabs({
     <div className={cn("folder-container w-full", className)}>
       <div className="folder">
         <div className="tabs">
-          {/*     {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={cn(
-                "tab transition-transform",
-                activeTab === tab.id
-                  ? "active bg-salYellowLtHover px-2 py-2 before:bg-salYellowLtHover after:bg-salYellowLtHover"
-                  : "tab translate-y-2 bg-[#f3de73] px-2 py-2 before:bg-[#f3de73] after:bg-[#f3de73]",
-              )}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <div className="bg-salYellowLtHover">
-                <span className="py-2">{tab.label}</span>
-              </div>
-            </button>
-          ))}*/}
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const tabZIndex = isActive ? 11 : tabs.length - index; // Higher for earlier tabs
@@ -73,12 +57,12 @@ export default function NavTabs({
                 className={cn(
                   "tab text-sm transition-transform",
                   isActive
-                    ? "active bg-[#fef9dd] px-2 py-2 font-bold before:bg-[#fef9dd] after:bg-[#fef9dd]"
+                    ? "active bg-card-secondary px-2 py-2 font-bold before:bg-card-secondary after:bg-card-secondary"
                     : "translate-y-1 bg-background px-2 py-1 leading-[0.5] text-foreground before:bg-background after:bg-background",
                 )}
                 onClick={() => setActiveTab(tab.id)}
               >
-                <div className="bg-[#fef9dd]">
+                <div className="bg-card-secondary">
                   <span className="py-2">{tab.label}</span>
                 </div>
               </button>
@@ -86,7 +70,7 @@ export default function NavTabs({
           })}
         </div>
 
-        <div className="content z-[5] rounded-2xl bg-[#fef9dd] p-4 shadow-sm">
+        <div className="content z-[5] rounded-2xl bg-card-secondary p-4 shadow-sm">
           {tabContent && <>{tabContent}</>}
         </div>
       </div>
