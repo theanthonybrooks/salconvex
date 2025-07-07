@@ -356,7 +356,7 @@ export default function Home() {
                 duration={2}
                 plus
               />
-              + Events & Projects:
+              Events & Projects:
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
               <AnimatedCounter
