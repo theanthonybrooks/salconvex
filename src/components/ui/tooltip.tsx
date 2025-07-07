@@ -63,3 +63,44 @@ const TooltipContent = React.forwardRef<
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
+
+interface TooltipProps {
+  trigger: React.ReactNode;
+  content: React.ReactNode;
+  side?: "top" | "right" | "bottom" | "left";
+  sideOffset?: number;
+  className?: string;
+}
+
+export const TooltipSimple = ({
+  trigger,
+  content,
+  side = "top",
+  sideOffset = 4,
+  className,
+  ...props
+}: TooltipProps) => {
+  return (
+    <TooltipPrimitive.Provider>
+      <TooltipPrimitive.Root>
+        <TooltipPrimitive.Trigger asChild>{trigger}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Portal>
+          <TooltipPrimitive.Content
+            side={side}
+            sideOffset={sideOffset}
+            className={cn(
+              "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
+              "opacity-0 transition-opacity duration-200",
+              "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
+              className,
+            )}
+            {...props}
+          >
+            <CustomArrow />
+            {content}
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Portal>
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
+  );
+};

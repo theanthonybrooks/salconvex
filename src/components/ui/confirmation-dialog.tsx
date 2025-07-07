@@ -14,13 +14,16 @@ export const ConfirmDialog = ({
   description,
   onConfirm,
   onCancel,
+  // children,
 }: {
   label: string;
   description?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  children?: React.ReactNode;
 }) => (
   <AlertDialog open onOpenChange={onCancel}>
+    {/* {children && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>} */}
     <AlertDialogContent overlayClassName="bg-foreground/20">
       <AlertDialogHeader>
         <AlertDialogTitle>{label}</AlertDialogTitle>

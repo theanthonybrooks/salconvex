@@ -5,12 +5,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAction, usePreloadedQuery } from "convex/react";
 import { format } from "date-fns";
 
+import ConfettiBlast from "@/components/ui/confetti";
+import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
-import { CreditCard } from "lucide-react";
+import { CircleCheck, CreditCard, Info, X } from "lucide-react";
 import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -19,6 +22,8 @@ import { api } from "~/convex/_generated/api";
 export default function BillingPage() {
   // const userData = useQuery(api.users.getCurrentUser, {})
   // const user = userData?.user // This avoids destructuring null or undefined
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const { subscription } = subData;
@@ -28,6 +33,9 @@ export default function BillingPage() {
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
   const applyCoupon = useAction(
     api.stripeSubscriptions.applyCouponToSubscription,
+  );
+  const deleteCoupon = useAction(
+    api.stripeSubscriptions.deleteCouponFromSubscription,
   );
   const currentPeriodEnd = new Date(
     subscription?.currentPeriodEnd ?? Date.now(),
@@ -45,8 +53,28 @@ export default function BillingPage() {
   const subStatus = subscription?.status;
 
   let interval: string | undefined;
-  // let nextInterval: string | undefined
+  let nextInterval: string | undefined;
   let nextAmount: string | undefined;
+  const discountDuration = subscription?.discountDuration;
+  const oneTime = discountDuration === "once";
+  const subAmount = subscription?.amount ?? 0;
+  const hasDiscountAmt = typeof subscription?.discountAmount === "number";
+  const hasDiscountPercent = typeof subscription?.discountPercent === "number";
+  const hasDiscount = hasDiscountAmt || hasDiscountPercent;
+  const discountAmt =
+    typeof subscription?.discountAmount === "number"
+      ? subscription.discountAmount
+      : 0;
+  const discountPercent =
+    typeof subscription?.discountPercent === "number"
+      ? subscription.discountPercent
+      : 0;
+
+  console.log("subAmount: ", subAmount);
+  console.log("discountAmt: ", discountAmt);
+  console.log("discountPercent: ", discountPercent);
+
+  console.log("intervals: ", interval, nextInterval);
 
   // if (subscription?.intervalNext !== undefined) {
   //   // intervalNext exists
@@ -56,6 +84,9 @@ export default function BillingPage() {
     // amountNext exists
     nextAmount = (subscription.amountNext! / 100).toFixed(0);
     interval = subscription.interval;
+    nextInterval = subscription.intervalNext;
+  } else {
+    interval = subscription?.interval;
   }
 
   const handleManageSubscription = async () => {
@@ -125,8 +156,10 @@ export default function BillingPage() {
     }
     try {
       await applyCoupon({ couponCode: promoCode });
-      toast.success("Coupon applied successfully");
+      // toast.success("Coupon applied successfully");
+      setShowConfetti(true);
     } catch (err) {
+      setPromoAttempts((prev) => prev + 1);
       if (err instanceof ConvexError) {
         toast.error(
           typeof err.data === "string" &&
@@ -152,19 +185,34 @@ export default function BillingPage() {
       }
     } finally {
       setPromoCode("");
-      setPromoAttempts((prev) => prev + 1);
+      setTimeout(() => setShowConfetti(false), 4000);
+    }
+  };
+
+  const onCancelPromoCode = () => {
+    try {
+      if (!subscription?.stripeId) {
+        toast.error("No active subscription found");
+        return;
+      }
+      deleteCoupon({ subscriptionId: subscription.stripeId });
+    } catch (err) {
+      console.error("Error deleting coupon:", err);
+    } finally {
+      setPromoCode("");
     }
   };
 
   return (
     <div className="flex w-max max-w-[100dvw] flex-col gap-6 p-6">
+      {showConfetti && <ConfettiBlast active={showConfetti} />}
+
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">
           Membership Overview
         </h1>
-        <p className="mt-2 text-foreground">
-          Manage your membership, update your billing information, or cancel
-          your subscription.
+        <p className="mt-2 text-foreground sm:text-sm">
+          Manage/cancel your membership or update your billing information.
         </p>
       </div>
       {subStatus === "past_due" && (
@@ -189,7 +237,7 @@ export default function BillingPage() {
                 ? "Resume Membership"
                 : "Manage Membership"}
             </Button>
-            {!subPromoCode && (
+            {!subPromoCode ? (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -206,6 +254,12 @@ export default function BillingPage() {
                     onChange={(e) => setPromoCode(e.target.value)}
                     className="flex-1 uppercase placeholder:normal-case"
                   />
+                  {promoAttempts > 5 && (
+                    <p className="text-sm italic text-red-600">
+                      You have exceeded the maximum number of coupon attempts.
+                      Try again later.
+                    </p>
+                  )}
                   {promoCode && promoCode.trim().length > 3 && (
                     <Button
                       type="submit"
@@ -218,7 +272,38 @@ export default function BillingPage() {
                   )}
                 </div>
               </form>
+            ) : (
+              <div className="flex items-center justify-center gap-1 rounded-lg border-2 border-dotted border-foreground/70 bg-green-600/10 px-3 py-2 sm:gap-2">
+                <CircleCheck className="size-7 shrink-0 text-emerald-600 sm:size-5" />
+                <p className="text-center text-sm italic">
+                  A <strong>{subPromoCode}</strong> code has been applied to
+                  your subscription.{" "}
+                </p>
+
+                <TooltipSimple
+                  trigger={
+                    <X
+                      className="hidden size-7 shrink-0 cursor-pointer text-red-600 hover:scale-110 active:scale-95 sm:block sm:size-5"
+                      onClick={() => setConfirmDialogOpen(true)}
+                    />
+                  }
+                  content="Delete Promo Code"
+                  side="top"
+                />
+                {confirmDialogOpen && (
+                  <ConfirmDialog
+                    label="Delete Promo Code"
+                    description="Are you sure you want to delete this promo code? You may not be able to apply it again."
+                    onConfirm={() => {
+                      onCancelPromoCode();
+                      setConfirmDialogOpen(false);
+                    }}
+                    onCancel={() => setConfirmDialogOpen(false)}
+                  />
+                )}
+              </div>
             )}
+
             <Card className="w-full max-w-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -274,20 +359,21 @@ export default function BillingPage() {
                       <span className="flex flex-col items-end justify-start font-medium">
                         <span className="flex items-center gap-2">
                           $
-                          {subscription?.amount
+                          {hasDiscountAmt
+                            ? (subAmount - discountAmt) / 100
+                            : hasDiscountPercent
+                              ? subAmount - subAmount * (discountPercent / 100)
+                              : (subAmount / 100).toFixed(0)}
+                          {/* {subscription?.amount
                             ? (subscription.amount / 100).toFixed(0)
-                            : 0}
+                            : 0} */}
                           <p
                             className={
-                              cn(
-                                subscription?.discount &&
-                                  "text-red-600 line-through",
-                              ) || ""
+                              cn(hasDiscount && "text-red-600 line-through") ||
+                              ""
                             }
                           >
-                            {subscription?.discount && (
-                              <>${(subscription.discount / 100).toFixed(0)}</>
-                            )}
+                            {hasDiscount && (subAmount / 100).toFixed(0)}
                           </p>
                         </span>
                         {nextAmount !== undefined && (
@@ -295,7 +381,7 @@ export default function BillingPage() {
                             <span className="text-sm font-light italic text-gray-400">
                               {" "}
                               {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
-                              (${nextAmount}/{interval} starting{" "}
+                              (${nextAmount}/{nextInterval ?? interval} starting{" "}
                               {format(currentPeriodEnd, "MMM do yyyy")})
                             </span>
                             <span className="mt-1 text-balance text-end text-sm font-light italic text-gray-400">
@@ -313,6 +399,14 @@ export default function BillingPage() {
                         )}
                       </span>
                     </div>
+                    {oneTime && (
+                      <span className="mt-2 w-full items-center gap-3 rounded-lg border border-dashed border-foreground/30 bg-salYellowLt/30 p-2 text-sm font-light italic text-foreground/50 sm:inline-flex">
+                        <Info className="size-5 shrink-0 text-sm text-foreground/50 [@media(max-width:768px)]:hidden" />
+                        This discount will expire in one{" "}
+                        {nextInterval ?? interval} and your membership price
+                        will return to the original price.
+                      </span>
+                    )}
 
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">

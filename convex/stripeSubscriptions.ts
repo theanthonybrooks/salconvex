@@ -30,6 +30,29 @@ export const getPlanByKey = internalQuery({
   },
 });
 
+export const getPlanTitleByPriceId = query({
+  args: {
+    priceId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userPlans = await ctx.db.query("userPlans").collect();
+    for (const plan of userPlans) {
+      // Loop through both month and year
+      for (const interval of ["month", "year"] as const) {
+        if (
+          plan.prices &&
+          plan.prices[interval] &&
+          plan.prices[interval].usd &&
+          plan.prices[interval].usd.stripeId === args.priceId
+        ) {
+          return plan.title;
+        }
+      }
+    }
+    return null;
+  },
+});
+
 export const getUserHadTrial = query({
   handler: async (ctx) => {
     const identity = await getAuthUserId(ctx);
@@ -520,6 +543,7 @@ export const subscriptionStoreWebhook = mutation({
 
       case "customer.subscription.updated":
         console.log("customer.subscription.updated:", args.body);
+        console.log("customer id: ", args.body.data.object.customer);
         // Find existing subscription
         const updatedSub = await ctx.db
           .query("userSubscriptions")
@@ -529,15 +553,28 @@ export const subscriptionStoreWebhook = mutation({
           .first();
 
         const base = args.body.data;
-        const discount = base.object?.discount?.coupon?.percent_off;
+
+        const discountPercent = base.object?.discount?.coupon?.percent_off;
+        const discountAmount = base.object?.discount?.coupon?.amount_off;
+        const discountDuration = base.object?.discount?.coupon?.duration;
         // const couponCode = base.object?.discount?.coupon?.name;
         const currentAmount = base.object.plan?.amount;
         const currentInterval = base.object.plan?.interval;
         const prevInterval = updatedSub?.interval;
         const prevAmount = base.previous_attributes?.plan?.amount;
+        const existingMetadata = updatedSub?.metadata || {};
+        const planTitle = await ctx.runQuery(
+          api.stripeSubscriptions.getPlanTitleByPriceId,
+          { priceId: base.object.plan?.id },
+        );
+
+        const updatedMetadata = {
+          ...existingMetadata,
+          interval: currentInterval,
+          plan: planTitle ?? "Unknown",
+        };
 
         let amount: number | undefined;
-        let discountAmount: number | undefined;
         let nextAmount: number | undefined;
         let interval: string | undefined;
         let nextInterval: string | undefined;
@@ -561,12 +598,6 @@ export const subscriptionStoreWebhook = mutation({
           interval = currentInterval;
         }
 
-        if (discount && amount) {
-          discountAmount = amount;
-          amount = amount - amount * (discount / 100);
-          console.log(discountAmount, discount, amount);
-        }
-
         if (updatedSub) {
           const updates: any = {
             status: base.object.status,
@@ -582,13 +613,16 @@ export const subscriptionStoreWebhook = mutation({
             interval: interval,
             intervalNext: nextInterval,
             amount: amount,
-            discount: discountAmount,
+            discountAmount: discountAmount ?? undefined,
+            discountPercent: discountPercent ?? undefined,
+            discountDuration: discountDuration ?? undefined,
             amountNext: nextAmount,
             currentPeriodEnd: base.object.current_period_end
               ? new Date(base.object.current_period_end * 1000).getTime()
               : undefined,
             cancelAtPeriodEnd: base.object.cancel_at_period_end ?? false,
             stripeId: args.body.data.object.id,
+            metadata: updatedMetadata,
             //test if actually needed - the stripeId changes when the subscription is updated, but I don't know if it's able to reference/find the new one in reference to the old one or not. Wait and see.
             lastEditedAt: new Date().getTime(),
           };
@@ -639,6 +673,8 @@ export const subscriptionStoreWebhook = mutation({
           .first();
 
         if (discountedSub) {
+          console.log(discountedSub);
+          console.log(args.body.data.object.coupon);
           await ctx.db.patch(discountedSub._id, {
             discount: discountedSub.amount,
             promoCode: args.body.data.object.coupon.name,
@@ -659,6 +695,10 @@ export const subscriptionStoreWebhook = mutation({
         if (affectedSub) {
           await ctx.db.patch(affectedSub._id, {
             discount: undefined,
+            discountPercent: undefined,
+            discountAmount: undefined,
+            discountDuration: undefined,
+            adminPromoCode: undefined,
             promoCode: undefined,
             promoAppliedAt: undefined,
           });
@@ -766,11 +806,11 @@ export const subscriptionStoreWebhook = mutation({
 });
 
 export const paymentWebhook = httpAction(async (ctx, request) => {
-  console.log("Webhook received!", {
-    method: request.method,
-    url: request.url,
-    headers: request.headers,
-  });
+  // console.log("Webhook received!", {
+  //   method: request.method,
+  //   url: request.url,
+  //   headers: request.headers,
+  // });
 
   try {
     const body = await request.json();
@@ -782,7 +822,7 @@ export const paymentWebhook = httpAction(async (ctx, request) => {
       body,
     });
 
-    console.log("Webhook body:", body);
+    // console.log("Webhook body:", body);
     return new Response(JSON.stringify({ message: "Webhook received!" }), {
       status: 200,
       headers: {
@@ -801,7 +841,6 @@ export const paymentWebhook = httpAction(async (ctx, request) => {
   }
 });
 
-// Add to your stripeSubscriptions.ts file
 export const applyCouponToSubscription = action({
   args: {
     couponCode: v.string(),
@@ -892,19 +931,19 @@ export const applyCouponToSubscription = action({
     });
 
     await ctx.runMutation(api.stripeSubscriptions.markCouponApplied, {
-      promoCode: `${userCode}: (${promoCode.id})`,
+      adminPromoCode: `${userCode}: (${promoCode.id})`,
     });
 
     return { success: true };
   },
 });
 
-// in stripeSubscriptions.ts
 export const markCouponApplied = mutation({
   args: {
-    promoCode: v.string(),
+    adminPromoCode: v.string(),
   },
   handler: async (ctx, args) => {
+    console.log(args);
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
     const user = await ctx.db.get(userId);
@@ -916,7 +955,43 @@ export const markCouponApplied = mutation({
     if (!subscription) throw new Error("Subscription not found");
     await ctx.db.patch(subscription._id, {
       promoAppliedAt: Date.now(),
-      promoCode: args.promoCode,
+      adminPromoCode: args.adminPromoCode,
     });
+  },
+});
+
+export const deleteCouponFromSubscription = action({
+  args: {
+    subscriptionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const subscriptionId = args.subscriptionId;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const result = await ctx.runQuery(
+      api.subscriptions.getUserSubscriptionStatus,
+      {},
+    );
+
+    if (!result) throw new Error("User not found");
+    const { subscription, hasActiveSubscription } = result;
+
+    const subId = subscription?.stripeId;
+    console.log(subId, subscriptionId);
+    if (subId !== subscriptionId) throw new Error("Invalid subscription");
+    const stripeSubscriptionId = subscriptionId;
+
+    if (!subscription || !stripeSubscriptionId || !hasActiveSubscription)
+      throw new Error("Active subscription not found");
+
+    const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    if (!stripeSub.discount) {
+      throw new ConvexError("No active coupon found");
+    }
+
+    await stripe.subscriptions.deleteDiscount(stripeSubscriptionId);
+
+    return { success: true };
   },
 });

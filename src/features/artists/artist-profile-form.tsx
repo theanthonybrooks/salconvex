@@ -62,6 +62,9 @@ export const ArtistProfileForm = ({
   const trialingSub = subStatus === "trialing";
   const trialEndsAt = subData?.trialEndsAt;
   const trialEnded = trialEndsAt && isBefore(new Date(trialEndsAt), new Date());
+  const hasCurrentSub = activeSub || trialingSub;
+
+  console.log(activeSub);
   // const activeTrial = trialingSub && !trialEnded;
   const subAmount = subData?.subAmount
     ? (subData.subAmount / 100).toFixed(0)
@@ -157,7 +160,6 @@ export const ArtistProfileForm = ({
     //   toast.error("Please select at least one nationality");
     //   return;
     // }
-    console.log(artistNationality);
     const artistLocation = data?.artistResidency?.location;
     if (artistLocation?.length === 2) {
       const timezoneData = await getTimezone({
@@ -217,7 +219,7 @@ export const ArtistProfileForm = ({
 
       toast.success("Successfully updated profile! Forwarding to Stripe...");
       setTimeout(() => {
-        if (!activeSub && !hadTrial) {
+        if (!hasCurrentSub) {
           onClick();
         } else {
           handleManageSubscription();

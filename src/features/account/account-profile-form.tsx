@@ -46,6 +46,7 @@ export const AccountSubscribeForm = ({
   planKey,
   isEligibleForFree,
 }: AccountSubscribeFormProps) => {
+  console.log(planKey, onClick )
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const trialEndsAt = subData?.trialEndsAt;
