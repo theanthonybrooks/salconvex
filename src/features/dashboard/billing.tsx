@@ -51,6 +51,9 @@ export default function BillingPage() {
   const cancelAtTime = subscription?.cancelAt
     ? new Date(subscription.cancelAt)
     : undefined;
+  const now = new Date();
+
+  const currentlyCanceled = cancelAtTime && cancelAtTime < now;
 
   const subStatus = subscription?.status;
 
@@ -102,7 +105,7 @@ export default function BillingPage() {
       return;
     }
 
-    if (isCanceled) {
+    if (currentlyCanceled) {
       router.push("/pricing#plans");
       return;
     }
@@ -240,7 +243,7 @@ export default function BillingPage() {
               onClick={handleManageSubscription}
               variant="salWithShadow"
             >
-              {subStatus === "past_due"
+              {subStatus === "past_due" || (isCanceled && !currentlyCanceled)
                 ? "Resume Membership"
                 : isCanceled
                   ? "Choose Plan"
