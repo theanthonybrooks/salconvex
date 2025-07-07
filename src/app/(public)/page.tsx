@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedCounter } from "@/components/ui/animate-counter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -52,12 +53,20 @@ export default function Home() {
   const [expanded, setExpanded] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const toggleReadMore = () => setExpanded((prev) => !prev);
-  // const { scrollY } = useScroll()
+  // const { scrollY, scrollYProgress } = useScroll();
   // const smoothScrollY = useSpring(scrollY, {
   //   stiffness: 100,
   //   damping: 20,
   //   mass: 0.4,
   // })
+
+  // useMotionValueEvent(scrollY, "change", (latest) => {
+  //   console.log("Page scroll: ", latest);
+  // });
+
+  // useMotionValueEvent(scrollYProgress, "change", (latest) => {
+  //   console.log("Page scroll progress: ", latest);
+  // });
   // const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
 
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -334,21 +343,27 @@ export default function Home() {
           </span>
           <div className="flex w-full items-center justify-around gap-3">
             <span className="flex flex-col items-center gap-2 text-nowrap">
-              <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
-                {totalOpenCallsData?.activeOpenCalls ?? 0}
-              </p>
+              <AnimatedCounter
+                to={totalOpenCallsData?.activeOpenCalls ?? 0}
+                className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
+              />
               Open Calls:
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
-              <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
-                1,100+
-              </p>
-              Events & Projects:
+              <AnimatedCounter
+                to={1100}
+                className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
+                duration={2}
+                plus
+              />
+              + Events & Projects:
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
-              <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
-                92
-              </p>
+              <AnimatedCounter
+                to={92}
+                duration={3}
+                className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
+              />
               Countries:
             </span>
           </div>

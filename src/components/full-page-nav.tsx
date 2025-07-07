@@ -554,7 +554,7 @@ const FullPageNav = ({
                         className={cn(
                           "group flex cursor-pointer justify-start px-9 py-4",
                           activeCategory === section.title &&
-                            "bg-foreground text-background unstroked",
+                            "bg-foreground/90 text-background unstroked",
                           // activeCategory === section.title &&
                           //   theme === "default" &&
                           //   "text-white",
