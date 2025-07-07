@@ -30,7 +30,7 @@ export const getPlanByKey = internalQuery({
   },
 });
 
-export const getPlanTitleByPriceId = query({
+export const getPlanKeyByPriceId = query({
   args: {
     priceId: v.string(),
   },
@@ -45,7 +45,7 @@ export const getPlanTitleByPriceId = query({
           plan.prices[interval].usd &&
           plan.prices[interval].usd.stripeId === args.priceId
         ) {
-          return plan.title;
+          return plan.key;
         }
       }
     }
@@ -335,10 +335,10 @@ export const subscriptionStoreWebhook = mutation({
               ? new Date(subscription.current_period_end * 1000).getTime()
               : undefined,
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            cancelAt: undefined,
+            canceledAt: undefined,
             amount: subscription.plan?.amount,
-            startedAt: subscription.start_date
-              ? new Date(subscription.start_date * 1000).getTime()
-              : undefined,
+
             endedAt: subscription.ended_at
               ? new Date(subscription.ended_at * 1000).getTime()
               : undefined,
@@ -563,15 +563,15 @@ export const subscriptionStoreWebhook = mutation({
         const prevInterval = updatedSub?.interval;
         const prevAmount = base.previous_attributes?.plan?.amount;
         const existingMetadata = updatedSub?.metadata || {};
-        const planTitle = await ctx.runQuery(
-          api.stripeSubscriptions.getPlanTitleByPriceId,
+        const PlanKey = await ctx.runQuery(
+          api.stripeSubscriptions.getPlanKeyByPriceId,
           { priceId: base.object.plan?.id },
         );
 
         const updatedMetadata = {
           ...existingMetadata,
           interval: currentInterval,
-          plan: planTitle ?? "Unknown",
+          plan: PlanKey ?? "Unknown",
         };
 
         let amount: number | undefined;
@@ -660,6 +660,13 @@ export const subscriptionStoreWebhook = mutation({
             endedAt: args.body.data.object.ended_at
               ? new Date(args.body.data.object.ended_at * 1000).getTime()
               : undefined,
+            discount: undefined,
+            promoCode: undefined,
+            promoAppliedAt: undefined,
+            discountPercent: undefined,
+            discountAmount: undefined,
+            discountDuration: undefined,
+            adminPromoCode: undefined,
           });
         }
         break;

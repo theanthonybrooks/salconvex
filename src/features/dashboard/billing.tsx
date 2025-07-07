@@ -62,17 +62,18 @@ export default function BillingPage() {
   let nextAmount: string | undefined;
   const discountDuration = subscription?.discountDuration;
   const oneTime = discountDuration === "once";
-  const subAmount = subscription?.amount ?? 0;
+  const subAmount =
+    typeof subscription?.amount === "number" ? subscription.amount / 100 : 0;
   const hasDiscountAmt = typeof subscription?.discountAmount === "number";
   const hasDiscountPercent = typeof subscription?.discountPercent === "number";
   const hasDiscount = hasDiscountAmt || hasDiscountPercent;
   const discountAmt =
     typeof subscription?.discountAmount === "number"
-      ? subscription.discountAmount
+      ? subscription.discountAmount / 100
       : 0;
   const discountPercent =
     typeof subscription?.discountPercent === "number"
-      ? subscription.discountPercent
+      ? subscription.discountPercent / 100
       : 0;
 
   console.log("subAmount: ", subAmount);
@@ -372,10 +373,10 @@ export default function BillingPage() {
                         <span className="flex items-center gap-2">
                           $
                           {hasDiscountAmt
-                            ? (subAmount - discountAmt) / 100
+                            ? subAmount - discountAmt
                             : hasDiscountPercent
-                              ? subAmount - subAmount * (discountPercent / 100)
-                              : (subAmount / 100).toFixed(0)}
+                              ? subAmount - subAmount * discountPercent
+                              : subAmount.toFixed(0)}
                           {/* {subscription?.amount
                             ? (subscription.amount / 100).toFixed(0)
                             : 0} */}
@@ -385,7 +386,7 @@ export default function BillingPage() {
                               ""
                             }
                           >
-                            {hasDiscount && (subAmount / 100).toFixed(0)}
+                            {hasDiscount && subAmount.toFixed(0)}
                           </p>
                         </span>
                         {nextAmount !== undefined && (
