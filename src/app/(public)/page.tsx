@@ -335,7 +335,7 @@ export default function Home() {
           <div className="flex w-full items-center justify-around gap-3">
             <span className="flex flex-col items-center gap-2 text-nowrap">
               <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
-                {totalOpenCallsData?.totalOpenCalls}
+                {totalOpenCallsData?.activeOpenCalls ?? 0}
               </p>
               Open Calls:
             </span>
@@ -422,7 +422,7 @@ export default function Home() {
         </>
       ) : (
         <>
-          <div className="mx-auto mt-10 flex w-full max-w-[min(70vw,1200px)] flex-col items-center justify-center gap-2 p-8">
+          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,70vw,1200px)] flex-col items-center justify-center gap-2 p-8">
             <span className="inline items-center">
               <strong>The Street Art List&nbsp; </strong> is an initiative
               created and run by&nbsp;
