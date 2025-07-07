@@ -20,6 +20,8 @@ import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
@@ -27,14 +29,24 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
+import { api } from "~/convex/_generated/api";
 
 // const font = Poppins({ subsets: ["latin"], weight: "600" })
 
 export default function Home() {
   const searchParams = useSearchParams();
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+
   const { preloadedSubStatus } = useConvexPreload();
+  // const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
+  // const user = userData?.user ?? null;
+  // const isAdmin = user?.role?.includes("admin");
+
+  const { data: totalOpenCallsData } = useQueryWithStatus(
+    api.openCalls.openCall.getTotalNumberOfOpenCalls,
+  );
 
   const [currentSlide, setCurrentSlide] = useState(1);
   const [expanded, setExpanded] = useState(false);
@@ -314,8 +326,35 @@ export default function Home() {
           </PopoverContent>
         </Popover>
       </motion.div>
-
-      {!hasActiveSubscription && (
+      <div className="-mx-4 mt-10 flex w-screen items-center justify-center gap-3 bg-foreground/90 p-6 font-tanker lowercase text-background">
+        <div className="flex w-[clamp(300px,80vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
+          <span className="flex flex-col items-center gap-2">
+            <p className="text-[3.25em] leading-[3rem]">Currently,</p>
+            <p className="text-2xl">on The Street Art List:</p>
+          </span>
+          <div className="flex w-full items-center justify-around gap-3">
+            <span className="flex flex-col items-center gap-2 text-nowrap">
+              <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
+                {totalOpenCallsData?.totalOpenCalls}
+              </p>
+              Open Calls:
+            </span>
+            <span className="flex flex-col items-center gap-2 text-nowrap">
+              <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
+                1,100+
+              </p>
+              Events & Projects:
+            </span>
+            <span className="flex flex-col items-center gap-2 text-nowrap">
+              <p className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]">
+                92
+              </p>
+              Countries:
+            </span>
+          </div>
+        </div>
+      </div>
+      {!hasActiveSubscription ? (
         <>
           <Card className="mx-auto mt-10 max-w-[90dvw] border-1.5 p-6 text-left shadow-md sm:max-w-[70dvw]">
             <CardContent className="space-y-4 !p-0 text-base text-foreground sm:!p-6">
@@ -380,6 +419,37 @@ export default function Home() {
           </Card>
 
           <Pricing />
+        </>
+      ) : (
+        <>
+          <div className="mx-auto mt-10 flex w-full max-w-[min(70vw,1200px)] flex-col items-center justify-center gap-2 p-8">
+            <span className="inline items-center">
+              <strong>The Street Art List&nbsp; </strong> is an initiative
+              created and run by&nbsp;
+              <Link
+                href="https://instagram.com/anthonybrooksart"
+                target="_blank"
+                className="lg:text-base"
+              >
+                Anthony Brooks
+              </Link>
+              , a Serbian-American artist based in Berlin, Germany.
+            </span>
+            <p>
+              {" "}
+              The List is the result (years in the making) of my frustration
+              with the lack of a centralized place to find open calls and to
+              know what&apos;s happening elsewhere in the street art world — a
+              real
+              <i>
+                &quot;If what you want doesn&apos;t exist, create it&quot;&nbsp;
+              </i>
+              sort of situation. It&apos;s been an ongoing project since 2019,
+              and over time, has grown from an extensive spreadsheet to a
+              fully-fledged database of street art-related projects and
+              events.{" "}
+            </p>
+          </div>
         </>
       )}
     </>

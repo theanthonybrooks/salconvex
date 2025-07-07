@@ -157,7 +157,7 @@ const Calendar = () => {
               <p className="text-sm">Event Type</p> <Plus className="size-4" />
             </section>
             <section className="flex items-center justify-between">
-              <p className="text-sm">Category</p> <Plus className="size-4" />
+              <p className="text-sm">Continent</p> <Plus className="size-4" />
             </section>
             <section className="flex items-center justify-between">
               <p className="text-sm">Active</p> <Plus className="size-4" />
