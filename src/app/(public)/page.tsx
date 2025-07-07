@@ -327,7 +327,7 @@ export default function Home() {
         </Popover>
       </motion.div>
       <div className="-mx-4 mt-10 flex w-screen items-center justify-center gap-3 bg-foreground/90 p-6 font-tanker lowercase text-background">
-        <div className="flex w-[clamp(300px,80vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
+        <div className="flex w-[clamp(300px,70vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
           <span className="flex flex-col items-center gap-2">
             <p className="text-[3.25em] leading-[3rem]">Currently,</p>
             <p className="text-2xl">on The Street Art List:</p>
@@ -422,7 +422,7 @@ export default function Home() {
         </>
       ) : (
         <>
-          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,70vw,1200px)] flex-col items-center justify-center gap-2 p-8">
+          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-center justify-center gap-2 py-4">
             <span className="inline items-center">
               <strong>The Street Art List&nbsp; </strong> is an initiative
               created and run by&nbsp;
