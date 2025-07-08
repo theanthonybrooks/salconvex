@@ -45,10 +45,12 @@ const SignInCard: React.FC<SignInCardProps> = ({
   const [isLoading, setIsLoading] = useState("");
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+  const [callBackSrc, setCallBackSrc] = useState<string | null>(null);
+  const [prevSalPage, setPrevSalPage] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
-  const callBackSrc = sessionStorage.getItem("src");
-  const prevSalPage = sessionStorage.getItem("previousSalPage");
+  // const callBackSrc = sessionStorage.getItem("src");
+  // const prevSalPage = sessionStorage.getItem("previousSalPage");
   const isNewUser = callBackSrc === "newUser";
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
@@ -110,6 +112,13 @@ const SignInCard: React.FC<SignInCardProps> = ({
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCallBackSrc(sessionStorage.getItem("src"));
+      setPrevSalPage(sessionStorage.getItem("previousSalPage"));
+    }
+  }, []);
 
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">

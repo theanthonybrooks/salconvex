@@ -1,5 +1,6 @@
 "use client";
 
+import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   CommandItem,
   CommandMenuCustom,
@@ -94,7 +95,9 @@ export const Search = <T extends CommandItem>({
           {dashboardPg ? (
             <FiSearch className="size-8 cursor-pointer md:size-6" />
           ) : (
-            <TbWorldSearch className="size-8 cursor-pointer md:size-6" />
+            <TooltipSimple content="Search Site" align="start" side="bottom">
+              <TbWorldSearch className="size-8 cursor-pointer md:size-6" />
+            </TooltipSimple>
           )}
           {/* {value && value !== "Search" && (
             <span className="flex items-center">

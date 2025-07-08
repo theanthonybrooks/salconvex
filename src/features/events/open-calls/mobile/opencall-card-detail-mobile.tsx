@@ -77,13 +77,13 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     : appUrl;
   //todo: figure out fallback url for something without an application link. Maybe just use the event url? Will obviously need to vary or be missing later when I implement the application system, but for now.
 
-  const { dates: callDates } = basicInfo;
+  const { callType, dates: callDates } = basicInfo;
   const { ocStart, ocEnd } = callDates;
 
   const openCallStatus = getOpenCallStatus(
     ocStart ? new Date(ocStart) : null,
     ocEnd ? new Date(ocEnd) : null,
-    basicInfo.callType,
+    callType,
   );
 
   // const hasOpenCall = openCallStatus === "active";
@@ -291,6 +291,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               edition={event.dates.edition}
               // appStatus={appStatus}
               openCall={openCallStatus}
+              callType={callType}
               manualApplied={appStatus}
               // setManualApplied={setManualApplied}
               isBookmarked={bookmarked}

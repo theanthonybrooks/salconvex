@@ -2,6 +2,7 @@
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { Separator } from "@/components/ui/separator";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   dashboardNavItems,
   dashboardNavItems as navItems,
@@ -130,19 +131,25 @@ export default function DashboardSideBar({
         collapsedSidebar && "w-fit",
       )}
     >
-      <div
-        className="absolute right-0 top-[11%] z-10 translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
-        onClick={handleCollapseSidebar}
+      <TooltipSimple
+        content={collapsedSidebar ? "Expand sidebar" : "Collapse sidebar"}
+        side="top"
+        align="center"
       >
-        <RiExpandLeftRightLine className="size-4" />
-      </div>
+        <div
+          className="absolute right-0 top-[11%] z-10 translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
+          onClick={handleCollapseSidebar}
+        >
+          <RiExpandLeftRightLine className="size-4" />
+        </div>
+      </TooltipSimple>
 
       <nav className="grid h-full max-h-[calc(100vh-55px)] grid-rows-[60px_1fr_65px] space-y-1 overflow-hidden pt-4">
         <Search
           title={"Search"}
           source={dashboardNavItems}
           user={user}
-          className="mx-4 mb-5"
+          className={cn("mb-5", collapsedSidebar ? "mx-auto" : "mx-4")}
           placeholder="Find what you're looking for!"
           iconOnly={collapsedSidebar}
           pageType="dashboard"
@@ -158,25 +165,35 @@ export default function DashboardSideBar({
             .filter((item) => !item.sectionCat)
             .map((item) => (
               <React.Fragment key={item.href}>
-                <Link
-                  prefetch={true}
-                  href={item.href}
-                  className={clsx(
-                    "flex items-center gap-2 px-3 py-5 pl-5 text-sm transition-colors",
-                    pathname === item.href
-                      ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
-                      : "text-primary hover:bg-primary/10 hover:text-foreground",
-                  )}
-                  onClick={() => {
-                    handleSectionToggle(null);
-                    setActiveSection(null);
-                  }}
+                <TooltipSimple
+                  content={item.label}
+                  side="top"
+                  align="start"
+                  alignOffset={3}
+                  disabled={!collapsedSidebar}
                 >
-                  <item.icon
-                    className={cn("size-4", collapsedSidebar && "size-5")}
-                  />
-                  {!collapsedSidebar && <> {item.label}</>}
-                </Link>
+                  <Link
+                    prefetch={true}
+                    href={item.href}
+                    className={clsx(
+                      "flex items-center gap-2 px-3 py-5 text-sm transition-colors",
+                      pathname === item.href
+                        ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
+                        : "text-primary hover:bg-primary/10 hover:text-foreground",
+                      !collapsedSidebar ? "pl-5" : "justify-center",
+                    )}
+                    onClick={() => {
+                      handleSectionToggle(null);
+                      setActiveSection(null);
+                    }}
+                  >
+                    <item.icon
+                      className={cn("size-4", collapsedSidebar && "size-5")}
+                    />
+
+                    {!collapsedSidebar && <> {item.label}</>}
+                  </Link>
+                </TooltipSimple>
                 {pathname !== item.href && (
                   <Separator thickness={2} className="border-foreground/20" />
                 )}
@@ -195,62 +212,76 @@ export default function DashboardSideBar({
                       pathname.includes(section.href) && "hover:bg-primary/10",
                     )}
                   >
-                    <div
-                      className={cn(
-                        "flex flex-col gap-2 py-4 pl-5 pr-3 text-sm transition-colors",
-                        pathname.includes(section.href)
-                          ? "font-bold"
-                          : "text-primary hover:bg-primary/10 hover:text-foreground",
-                        activeSection === section.sectionCat
-                          ? "cursor-default font-bold"
-                          : "cursor-pointer",
-                        collapsedSidebar && "cursor-pointer",
-                        activeSection === section.sectionCat &&
-                          collapsedSidebar &&
-                          "bg-primary/10",
-                      )}
-                      onClick={() => handleSectionToggle(section.sectionCat!)}
+                    <TooltipSimple
+                      content={section.heading}
+                      side="top"
+                      align="start"
+                      alignOffset={3}
+                      disabled={!collapsedSidebar}
                     >
-                      <div className="space-between flex justify-between gap-2">
-                        <div className="relative flex items-center justify-between gap-2">
-                          <span className="flex items-center gap-2">
-                            {section?.sectionIcon && (
-                              <section.sectionIcon
-                                className={cn(
-                                  "size-4",
-                                  collapsedSidebar && "size-5",
-                                )}
-                              />
-                            )}
-
-                            {!collapsedSidebar && <> {section.heading}</>}
-                          </span>
-
-                          {section.heading === "Events" &&
-                            pendingEvents > 0 && (
-                              <span
-                                className={cn(
-                                  "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                                  collapsedSidebar &&
-                                    "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
-                                )}
-                              >
-                                {pendingEvents}
-                              </span>
-                            )}
-                        </div>
-
-                        {!collapsedSidebar && (
-                          <>
-                            {openSection === section.sectionCat ? (
-                              <ChevronDown className="size-4" />
-                            ) : (
-                              <ChevronRight className="size-4" />
-                            )}
-                          </>
+                      <div
+                        className={cn(
+                          "flex flex-col gap-2 py-4 text-sm transition-colors",
+                          pathname.includes(section.href)
+                            ? "font-bold"
+                            : "text-primary hover:bg-primary/10 hover:text-foreground",
+                          activeSection === section.sectionCat
+                            ? "cursor-default font-bold"
+                            : "cursor-pointer",
+                          collapsedSidebar && "cursor-pointer px-3",
+                          activeSection === section.sectionCat &&
+                            collapsedSidebar &&
+                            "bg-primary/10",
+                          !collapsedSidebar && "pl-5 pr-3",
                         )}
+                        onClick={() => handleSectionToggle(section.sectionCat!)}
+                      >
+                        <div
+                          className={cn(
+                            "space-between flex justify-between gap-2",
+                            collapsedSidebar && "px-3",
+                          )}
+                        >
+                          <div className="relative flex items-center justify-between gap-2">
+                            <span className="flex items-center gap-2">
+                              {section?.sectionIcon && (
+                                <section.sectionIcon
+                                  className={cn(
+                                    "size-4",
+                                    collapsedSidebar && "size-5",
+                                  )}
+                                />
+                              )}
+
+                              {!collapsedSidebar && <> {section.heading}</>}
+                            </span>
+
+                            {section.heading === "Events" &&
+                              pendingEvents > 0 && (
+                                <span
+                                  className={cn(
+                                    "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                                    collapsedSidebar &&
+                                      "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
+                                  )}
+                                >
+                                  {pendingEvents}
+                                </span>
+                              )}
+                          </div>
+
+                          {!collapsedSidebar && (
+                            <>
+                              {openSection === section.sectionCat ? (
+                                <ChevronDown className="size-4" />
+                              ) : (
+                                <ChevronRight className="size-4" />
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </TooltipSimple>
                     {index !== arr.length - 1 && (
                       <Separator thickness={2} className="w-full" />
                     )}
@@ -327,22 +358,30 @@ export default function DashboardSideBar({
           {helpNavItems.map((item) => (
             <React.Fragment key={item.href}>
               <Separator thickness={2} className="w-full" />
-              <Link
-                prefetch={true}
-                href={item.href}
-                className={clsx(
-                  "flex items-center justify-center gap-2 py-5 text-center text-sm transition-colors",
-                  pathname === item.href
-                    ? "bg-primary/10 text-primary hover:bg-primary/20"
-                    : "text-primary hover:bg-primary/10 hover:text-foreground",
-                  // collapsedSidebar && "pl-0",
-                )}
+              <TooltipSimple
+                content={item.label}
+                side="top"
+                align="start"
+                alignOffset={3}
+                disabled={!collapsedSidebar}
               >
-                <item.icon
-                  className={cn("size-4", collapsedSidebar && "size-5")}
-                />
-                {!collapsedSidebar && <> {item.label}</>}
-              </Link>
+                <Link
+                  prefetch={true}
+                  href={item.href}
+                  className={clsx(
+                    "flex items-center justify-center gap-2 py-5 text-center text-sm transition-colors",
+                    pathname === item.href
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
+                      : "text-primary hover:bg-primary/10 hover:text-foreground",
+                    // collapsedSidebar && "pl-0",
+                  )}
+                >
+                  <item.icon
+                    className={cn("size-4", collapsedSidebar && "size-5")}
+                  />
+                  {!collapsedSidebar && <> {item.label}</>}
+                </Link>
+              </TooltipSimple>
             </React.Fragment>
           ))}
         </div>

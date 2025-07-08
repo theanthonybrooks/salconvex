@@ -297,6 +297,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               appUrl={outputAppLink}
               edition={event.dates.edition}
               openCall={openCallStatus}
+              callType={callType}
               manualApplied={appStatus}
               isBookmarked={bookmarked}
               isHidden={hidden}
@@ -441,6 +442,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 appUrl={outputAppLink}
                 edition={event.dates.edition}
                 openCall={openCallStatus}
+                callType={callType}
                 manualApplied={appStatus}
                 isBookmarked={bookmarked}
                 isHidden={hidden}

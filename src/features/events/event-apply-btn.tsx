@@ -10,13 +10,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
-import { OpenCallStatus } from "@/types/openCall";
+import { CallType, OpenCallStatus } from "@/types/openCall";
 import { User, UserPref } from "@/types/user";
 import {
   getExternalErrorHtml,
@@ -133,6 +134,7 @@ interface ApplyButtonProps {
   publicPreview?: boolean;
   userPref?: UserPref | null;
   user?: User | null;
+  callType?: CallType;
 }
 
 export const ApplyButton = ({
@@ -160,13 +162,14 @@ export const ApplyButton = ({
   edition,
   finalButton,
   publicPreview,
+  callType,
 }: ApplyButtonProps) => {
   const autoApply = userPref?.autoApply ?? true;
   const subscription = useQuery(
     api.subscriptions.getUserSubscriptionStatus,
     finalButton ? {} : "skip",
   );
-
+  const isEmail = callType === "Email";
   const noSub =
     !subscription?.hasActiveSubscription &&
     (publicPreview || publicView || finalButton);
@@ -239,7 +242,9 @@ export const ApplyButton = ({
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
         : isPreview
           ? "Read More"
-          : "Apply"
+          : isEmail
+            ? "Send Email"
+            : "Apply"
       : openCall === "ended"
         ? appStatus !== null && !publicView
           ? appStatus.slice(0, 1).toUpperCase() +
@@ -388,24 +393,29 @@ export const ApplyButton = ({
       )}
 
       {!hasApplied && (
-        <Button
-          disabled={noSub && !isAdmin}
-          variant="salWithShadowHiddenVert"
-          size="lg"
-          className={cn(
-            "relative z-[2] h-14 w-fit rounded-none border-x px-4 sm:h-11 sm:px-3 [&_svg]:size-6",
-            appStatus !== null &&
-              !publicView &&
-              "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
-          )}
-          onClick={onBookmark}
+        <TooltipSimple
+          content={isBookmarked ? "Remove Bookmark" : "Bookmark"}
+          side="top"
         >
-          {isBookmarked ? (
-            <FaBookmark className="size-7 text-red-500" />
-          ) : (
-            <FaRegBookmark className="size-7" />
-          )}
-        </Button>
+          <Button
+            disabled={noSub && !isAdmin}
+            variant="salWithShadowHiddenVert"
+            size="lg"
+            className={cn(
+              "relative z-[2] h-14 w-fit rounded-none border-x px-4 sm:h-11 sm:px-3 [&_svg]:size-6",
+              appStatus !== null &&
+                !publicView &&
+                "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
+            )}
+            onClick={onBookmark}
+          >
+            {isBookmarked ? (
+              <FaBookmark className="size-7 text-red-500" />
+            ) : (
+              <FaRegBookmark className="size-7" />
+            )}
+          </Button>
+        </TooltipSimple>
       )}
       {hasApplied && (
         <Button

@@ -208,12 +208,20 @@ export const getTimezoneFormat = (dateString: string, timezone: string) => {
   return timeZoneFormat;
 };
 
+export function formatTimeConditionalMinutes(date: DateTime<true>) {
+  if (date.minute === 0) {
+    return date.toFormat("h a");
+  }
+  return date.toFormat("h:mm a");
+}
+
 export const formatOpenCallDeadline = (
   dateString: string,
   timezone: string,
   callType: CallType,
   preview?: boolean,
   weeklyRecap?: boolean,
+  screenSize?: "mobile" | "tablet" | "desktop",
 ) => {
   if (callType === "Invite") return "Invite-only";
   if (callType === "Rolling") return "Rolling Open Call";
@@ -221,6 +229,7 @@ export const formatOpenCallDeadline = (
   if (callType === "False") return "No Open Call";
 
   if (!dateString) return "Unknown Deadline";
+  console.log(screenSize);
 
   const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone);
   if (!dt.isValid) return "Invalid date";
@@ -232,11 +241,17 @@ export const formatOpenCallDeadline = (
   const day = dt.day;
   const year = dt.year;
   const ordinal = getOrdinalSuffix(day);
+  const time = formatTimeConditionalMinutes(dt);
   const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`;
 
-  if (preview) return `${month} ${day}${ordinal}, ${year}`;
+  if (preview) {
+    if (screenSize === "mobile" || screenSize === "tablet") {
+      return `${month} ${day}${ordinal} @ ${time} (${timeZoneFormat})`;
+    } else {
+      return `${month} ${day}${ordinal}, ${year} @ ${time} `;
+    }
+  }
 
-  const time = dt.toFormat("h:mm a");
   if (weeklyRecap)
     return `${month} ${day}${ordinal} @ ${time} (${timeZoneFormat})`;
 

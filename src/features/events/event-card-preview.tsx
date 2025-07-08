@@ -273,6 +273,8 @@ const EventCardPreview = ({
                     userTZ ?? basicInfo.dates?.timezone,
                     basicInfo.callType,
                     true,
+                    false,
+                    "mobile",
                   )
                 )}
               </p>
@@ -614,6 +616,8 @@ const EventCardPreview = ({
                         userTZ ?? basicInfo.dates?.timezone,
                         basicInfo.callType,
                         true,
+                        false,
+                        "tablet",
                       )}
                     </span>
                   </>

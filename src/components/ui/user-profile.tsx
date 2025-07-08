@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { supportEmail } from "@/constants/siteInfo";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -51,30 +52,35 @@ export function UserProfile({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={cn("relative h-[50px] w-[50px] rounded-full", className)}
-        >
-          <Avatar
-            className={cn(
-              "h-[50px] w-[50px] border-1.5 border-border active:scale-95",
-              className,
-            )}
+      <TooltipSimple content="Open Profile Menu" side="bottom">
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className={cn("relative h-[50px] w-[50px] rounded-full", className)}
           >
-            <AvatarImage src={user?.image} alt={user?.name || "User Profile"} />
-
-            <AvatarFallback
+            <Avatar
               className={cn(
-                "border border-border bg-userIcon font-bold text-foreground",
+                "h-[50px] w-[50px] border-1.5 border-border active:scale-95",
+                className,
               )}
             >
-              {user?.firstName?.[0].toUpperCase()}
-              {user?.lastName?.[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
+              <AvatarImage
+                src={user?.image}
+                alt={user?.name || "User Profile"}
+              />
+
+              <AvatarFallback
+                className={cn(
+                  "border border-border bg-userIcon font-bold text-foreground",
+                )}
+              >
+                {user?.firstName?.[0].toUpperCase()}
+                {user?.lastName?.[0].toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+      </TooltipSimple>
       <DropdownMenuContent className="z-[60] w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-row items-center gap-2 overflow-hidden">

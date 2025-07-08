@@ -446,7 +446,7 @@ export default function Home() {
         </>
       ) : (
         <>
-          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-center justify-center gap-2 py-4">
+          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4">
             <span className="inline items-center">
               <strong>The Street Art List&nbsp; </strong> is an initiative
               created and run by&nbsp;

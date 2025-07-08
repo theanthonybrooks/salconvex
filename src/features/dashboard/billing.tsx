@@ -293,16 +293,12 @@ export default function BillingPage() {
                   your subscription.{" "}
                 </p>
 
-                <TooltipSimple
-                  trigger={
-                    <X
-                      className="hidden size-7 shrink-0 cursor-pointer text-red-600 hover:scale-110 active:scale-95 sm:block sm:size-5"
-                      onClick={() => setConfirmDialogOpen(true)}
-                    />
-                  }
-                  content="Delete Promo Code"
-                  side="top"
-                />
+                <TooltipSimple content="Delete Promo Code" side="top">
+                  <X
+                    className="hidden size-7 shrink-0 cursor-pointer text-red-600 hover:scale-110 active:scale-95 sm:block sm:size-5"
+                    onClick={() => setConfirmDialogOpen(true)}
+                  />
+                </TooltipSimple>
                 {confirmDialogOpen && (
                   <ConfirmDialog
                     label="Delete Promo Code"

@@ -14,9 +14,11 @@ const CustomArrow = React.forwardRef<
       className={cn(
         "block",
         "group-data-[side=top]:-translate-y-[2px]",
-        "group-data-[side=bottom]:translate-y-[2px]",
+        "group-data-[side=bottom]:-translate-y-[1.5px]",
         "group-data-[side=left]:translate-x-[2px]",
         "group-data-[side=right]:-translate-x-[2px]",
+        "group-data-[align=start]:-translate-x-[6px]",
+        "group-data-[align=end]:-translate-x-[2px]",
         "opacity-0 transition-opacity duration-200",
         "group-data-[state=closed]:opacity-0 group-data-[state=delayed-open]:opacity-100",
         className,
@@ -65,29 +67,45 @@ TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
 
 interface TooltipProps {
-  trigger: React.ReactNode;
   content: React.ReactNode;
   side?: "top" | "right" | "bottom" | "left";
   sideOffset?: number;
+  align?: "start" | "center" | "end";
+  alignOffset?: number;
   className?: string;
+  disabled?: boolean;
+  delayDuration?: number;
+  children: React.ReactNode;
 }
 
 export const TooltipSimple = ({
-  trigger,
+  children,
   content,
   side = "top",
   sideOffset = 4,
+  align = "center",
+  alignOffset = 0,
+  delayDuration = 300,
   className,
+  disabled,
+
   ...props
 }: TooltipProps) => {
+  if (disabled) return <>{children}</>;
+  const vertSides = ["top", "bottom"];
+  const showArrow = vertSides.includes(side);
+  const sideOffsetValue = showArrow ? sideOffset : 6;
+
   return (
-    <TooltipPrimitive.Provider>
+    <TooltipPrimitive.Provider delayDuration={delayDuration}>
       <TooltipPrimitive.Root>
-        <TooltipPrimitive.Trigger asChild>{trigger}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>
           <TooltipPrimitive.Content
             side={side}
-            sideOffset={sideOffset}
+            sideOffset={sideOffsetValue}
+            align={align}
+            alignOffset={alignOffset}
             className={cn(
               "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
               "opacity-0 transition-opacity duration-200",
@@ -96,7 +114,7 @@ export const TooltipSimple = ({
             )}
             {...props}
           >
-            <CustomArrow />
+            {showArrow && <CustomArrow />}
             {content}
           </TooltipPrimitive.Content>
         </TooltipPrimitive.Portal>

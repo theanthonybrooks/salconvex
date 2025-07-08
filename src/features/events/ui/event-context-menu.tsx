@@ -22,6 +22,7 @@ import { EventCategory } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 
 import { Separator } from "@/components/ui/separator";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { User } from "@/types/user";
@@ -83,25 +84,27 @@ const EventContextMenu = ({
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        {buttonTrigger ? (
-          <Button
-            variant="salWithShadowHidden"
-            size="lg"
-            className={cn(
-              "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 sm:h-11 sm:px-3 [&_svg]:size-6",
+      <TooltipSimple content="More options" side="top">
+        <PopoverTrigger asChild>
+          {buttonTrigger ? (
+            <Button
+              variant="salWithShadowHidden"
+              size="lg"
+              className={cn(
+                "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 sm:h-11 sm:px-3 [&_svg]:size-6",
 
-              appStatus !== null &&
-                !nonAdminPublicView &&
-                "border-foreground/50 bg-background text-foreground/50 hover:shadow-slga",
-            )}
-          >
-            <Ellipsis className="size-6" />
-          </Button>
-        ) : (
-          <Ellipsis className="size-6 cursor-pointer" />
-        )}
-      </PopoverTrigger>
+                appStatus !== null &&
+                  !nonAdminPublicView &&
+                  "border-foreground/50 bg-background text-foreground/50 hover:shadow-slga",
+              )}
+            >
+              <Ellipsis className="size-6" />
+            </Button>
+          ) : (
+            <Ellipsis className="size-6 cursor-pointer" />
+          )}
+        </PopoverTrigger>
+      </TooltipSimple>
       <PopoverContent
         showCloseButton={false}
         className="max-w-max border-1.5 p-0 text-sm"
