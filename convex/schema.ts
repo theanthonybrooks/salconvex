@@ -428,7 +428,7 @@ const openCallSchema = {
     applicationLinkFormat: v.union(v.literal("https://"), v.literal("mailto:")),
 
     applicationLinkSubject: v.optional(v.string()),
-    otherInfo: v.optional(v.array(v.string())), //todo: make not optional later
+    otherInfo: v.optional(v.string()), //todo: make not optional later
   }),
   documents: v.optional(
     v.array(

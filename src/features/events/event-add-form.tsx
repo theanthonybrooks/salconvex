@@ -1122,7 +1122,7 @@ export const EventOCForm = ({
                 openCallData.requirements.applicationLinkFormat,
               applicationLinkSubject:
                 openCallData.requirements.applicationLinkSubject,
-              otherInfo: undefined,
+              otherInfo: openCallData.requirements.otherInfo,
             },
             documents,
             paid: openCallData.paid ?? false,
@@ -1223,7 +1223,7 @@ export const EventOCForm = ({
                 openCallData.requirements.applicationLinkFormat,
               applicationLinkSubject:
                 openCallData.requirements.applicationLinkSubject,
-              otherInfo: undefined,
+              otherInfo: openCallData.requirements.otherInfo,
             },
             documents: openCallData.documents as
               | {
@@ -1436,7 +1436,7 @@ export const EventOCForm = ({
                   openCallData.requirements.applicationLinkFormat,
                 applicationLinkSubject:
                   openCallData.requirements.applicationLinkSubject,
-                otherInfo: undefined,
+                otherInfo: openCallData.requirements.otherInfo,
               },
               documents: openCallData.documents as
                 | {

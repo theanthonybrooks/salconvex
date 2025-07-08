@@ -576,7 +576,9 @@ const SubmissionFormOC1 = ({
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType && !freeCall ? 5 : freeCall ? 3 : 4}:
+                  Step{" "}
+                  {fixedType && !freeCall ? 5 : !fixedType && !freeCall ? 3 : 4}
+                  :
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
@@ -596,7 +598,7 @@ const SubmissionFormOC1 = ({
                         field.onChange(val);
                       }}
                       onBlur={field.onBlur}
-                      placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
+                      placeholder={`Please be as specific as possible${emailType ? " on what you would like for artists to include in their email submissions." : "Please be as specific as possible on what artists will need to submit."}`}
                       charLimit={5000}
                       purpose="openCall"
                       asModal={true}
@@ -611,12 +613,57 @@ const SubmissionFormOC1 = ({
                   )}
                 />
               </div>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">
+                  Step{" "}
+                  {fixedType && !freeCall ? 6 : !fixedType && !freeCall ? 4 : 5}
+                  :
+                </p>
+                <p className="lg:text-xs">Other Info</p>
+              </div>
+              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="event.type" className="sr-only">
+                  Other Info
+                </Label>
+                <Controller
+                  name="openCall.requirements.otherInfo"
+                  control={control}
+                  render={({ field }) => (
+                    <RichTextEditor
+                      readOnly={pastEvent}
+                      value={field.value ?? ""}
+                      // onChange={field.onChange}
+                      onChange={(val) => {
+                        field.onChange(val);
+                      }}
+                      onBlur={field.onBlur}
+                      placeholder="Include any other info pertaining to the open call and production requirements"
+                      charLimit={5000}
+                      purpose="openCall"
+                      asModal={true}
+                      title={eventName}
+                      subtitle="Other Info"
+                      inputPreviewClassName={cn(
+                        errors?.openCall?.requirements?.requirements &&
+                          "invalid-field",
+                      )}
+                      tabIndex={10}
+                    />
+                  )}
+                />
+              </div>
 
               {hasAppRequiredDetails && (
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 6 : freeCall ? 4 : 5}:
+                      Step{" "}
+                      {fixedType && !freeCall
+                        ? 7
+                        : !fixedType && !freeCall
+                          ? 5
+                          : 6}
+                      :
                     </p>
                     <p className="lg:text-xs">
                       Application {emailType ? "Email" : "Link"}
@@ -729,7 +776,13 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 7 : freeCall ? 5 : 6}:
+                      Step{" "}
+                      {fixedType && !freeCall
+                        ? 8
+                        : !fixedType && !freeCall
+                          ? 6
+                          : 7}
+                      :
                     </p>
                     <p className="lg:text-xs">Application Docs</p>
                   </div>
@@ -768,7 +821,13 @@ const SubmissionFormOC1 = ({
                   </div>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 8 : freeCall ? 6 : 7}:
+                      Step{" "}
+                      {fixedType && !freeCall
+                        ? 9
+                        : !fixedType && !freeCall
+                          ? 7
+                          : 8}
+                      :
                     </p>
                     <p className="lg:text-xs">External Links</p>
                   </div>

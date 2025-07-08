@@ -132,7 +132,7 @@ export interface OpenCall {
       title: string;
       href: string;
     }[];
-    otherInfo?: string[];
+    otherInfo?: string;
     applicationLink?: string;
     applicationLinkFormat?: "https://" | "mailto:";
     applicationLinkSubject?: string;

@@ -414,14 +414,11 @@ const OpenCallCard = ({
               <AccordionItem value="AppOther">
                 <AccordionTrigger title="Other info:" />
                 <AccordionContent>
-                  <div className="mb-4 grid grid-cols-[1fr_auto] border-foreground/20 pb-3">
-                    <ol className="list-inside list-decimal px-4">
-                      {openCall?.requirements?.otherInfo?.map((info, index) => (
-                        <li key={index} className="py-1">
-                          {info}
-                        </li>
-                      ))}
-                    </ol>
+                  <div className="flex flex-col space-y-3 p-3">
+                    <RichTextDisplay
+                      html={openCall.requirements.otherInfo}
+                      className="text-sm"
+                    />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -728,14 +725,11 @@ const OpenCallCard = ({
             <AccordionItem value="ApplicationOther">
               <AccordionTrigger title="Other info:" />
               <AccordionContent>
-                <div className="mb-4 grid grid-cols-[1fr_auto] border-foreground/20 pb-3">
-                  <ol className="list-inside list-decimal px-4">
-                    {openCall?.requirements?.otherInfo?.map((info, index) => (
-                      <li key={index} className="py-1">
-                        {info}
-                      </li>
-                    ))}
-                  </ol>
+                <div className="flex flex-col space-y-3 p-3">
+                  <RichTextDisplay
+                    html={openCall.requirements.otherInfo}
+                    className="text-sm"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>

@@ -150,7 +150,7 @@ export const createOrUpdateOpenCall = mutation({
         v.literal("mailto:"),
       ),
       applicationLinkSubject: v.optional(v.string()),
-      otherInfo: v.optional(v.array(v.string())),
+      otherInfo: v.optional(v.string()),
     }),
     documents: v.optional(
       v.array(

@@ -519,7 +519,7 @@ export const openCallBaseSchema = z.object({
     requirements: z.string(),
     //   more: z.string(),
     //   destination: z.string(),
-
+    otherInfo: z.optional(z.string()),
     links: z.array(
       z.object({
         title: z.string().min(1, "Link title is required"), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.

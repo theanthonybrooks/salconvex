@@ -229,7 +229,6 @@ export const formatOpenCallDeadline = (
   if (callType === "False") return "No Open Call";
 
   if (!dateString) return "Unknown Deadline";
-  console.log(screenSize);
 
   const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone);
   if (!dt.isValid) return "Invalid date";
