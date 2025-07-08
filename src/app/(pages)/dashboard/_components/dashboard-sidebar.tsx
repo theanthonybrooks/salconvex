@@ -150,7 +150,7 @@ export default function DashboardSideBar({
           source={dashboardNavItems}
           user={user}
           className={cn("mb-5", collapsedSidebar ? "mx-auto" : "mx-4")}
-          placeholder="Find what you're looking for!"
+          placeholder="Search..."
           iconOnly={collapsedSidebar}
           pageType="dashboard"
         />

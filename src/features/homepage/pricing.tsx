@@ -538,7 +538,7 @@ export default function Pricing() {
 
         {isOrganizer && (
           <PricingHeader
-            title="Select your call type"
+            title="Select your Listing type"
             subtitle="Graffiti jams are always free to list and mural projects are priced on a sliding scale. All event-only listings (without open call) are free."
           />
         )}
