@@ -21,7 +21,7 @@ export function AnimatedCounter({
   const isInView = useInView(ref, { once: true, amount: 0.9 });
 
   useEffect(() => {
-    console.log("isInView value:", isInView, hasAnimated);
+    // console.log("isInView value:", isInView, hasAnimated);
     if (!isInView) return;
 
     setHasAnimated(true);
@@ -29,7 +29,7 @@ export function AnimatedCounter({
       duration,
       ease: "easeInOut",
       onUpdate(value) {
-        console.log("Animating value:", value);
+        // console.log("Animating value:", value);
         setDisplay(Math.floor(value));
       },
     });
