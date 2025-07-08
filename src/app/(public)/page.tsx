@@ -349,7 +349,7 @@ export default function Home() {
               />
               <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
                 {" "}
-                Open Calls:
+                Open Calls
               </p>
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
@@ -361,7 +361,7 @@ export default function Home() {
               />
               <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
                 {" "}
-                Events & Projects:
+                Events & Projects
               </p>
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
@@ -372,7 +372,7 @@ export default function Home() {
               />
               <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
                 {" "}
-                Countries:
+                Countries
               </p>
             </span>
           </div>
