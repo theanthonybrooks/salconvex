@@ -347,7 +347,7 @@ export default function Home() {
                 to={totalOpenCallsData?.activeOpenCalls ?? 0}
                 className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
               />
-              Open Calls:
+              <p className="font-spaceGrotesk font-semibold"> Open Calls:</p>
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
               <AnimatedCounter
@@ -356,7 +356,10 @@ export default function Home() {
                 duration={2}
                 plus
               />
-              Events & Projects:
+              <p className="font-spaceGrotesk font-semibold">
+                {" "}
+                Events & Projects:
+              </p>
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
               <AnimatedCounter
@@ -364,7 +367,7 @@ export default function Home() {
                 duration={3}
                 className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
               />
-              Countries:
+              <p className="font-spaceGrotesk font-semibold"> Countries:</p>
             </span>
           </div>
         </div>
