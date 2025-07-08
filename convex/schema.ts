@@ -38,6 +38,7 @@ export const prodFormatValidator = v.union(
   v.literal("monthRange"),
   v.literal("yearRange"),
   v.literal("seasonRange"),
+  v.literal("noProd"),
 );
 
 export const eventFormatValidator = v.union(
@@ -329,6 +330,7 @@ const eventSchema = {
   // state: v.string(), //draft, submitted, published, archived
   state: v.union(
     v.literal("draft"),
+    v.literal("editing"),
     v.literal("submitted"),
     v.literal("published"),
     v.literal("archived"),
@@ -442,6 +444,7 @@ const openCallSchema = {
   state: v.optional(
     v.union(
       v.literal("draft"),
+      v.literal("editing"),
       v.literal("pending"),
       v.literal("submitted"),
       v.literal("published"),

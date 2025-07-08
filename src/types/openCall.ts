@@ -11,9 +11,13 @@ export type CallFormat = (typeof callFormatValues)[number];
 export const validOCVals = ["Fixed", "Rolling", "Email"];
 export const invalidOCVals = ["Invite", "Unknown", "False"];
 
+export const hasOCDates = ["Fixed"];
+
 export const openCallStates = [
   "draft",
+  "editing",
   "submitted",
+
   "pending",
   "published",
   "archived",

@@ -9,6 +9,7 @@ export const getTotalNumberOfOpenCalls = query({
     let active = 0,
       archived = 0,
       draft = 0,
+      editing = 0,
       pending = 0;
 
     for (const openCall of openCalls) {
@@ -25,6 +26,9 @@ export const getTotalNumberOfOpenCalls = query({
         case "draft":
           draft++;
           break;
+        case "editing":
+          editing++;
+          break;
         case "pending":
           pending++;
           break;
@@ -37,6 +41,7 @@ export const getTotalNumberOfOpenCalls = query({
       archivedOpenCalls: archived,
       draftOpenCalls: draft,
       pendingOpenCalls: pending,
+      editingOpenCalls: editing,
     };
   },
 });
@@ -160,6 +165,7 @@ export const createOrUpdateOpenCall = mutation({
     state: v.optional(
       v.union(
         v.literal("draft"),
+        v.literal("editing"),
         v.literal("pending"),
         v.literal("submitted"),
         v.literal("published"),
@@ -427,6 +433,7 @@ export const changeOCStatus = mutation({
     newStatus: v.union(
       v.literal("published"),
       v.literal("draft"),
+      v.literal("editing"),
       v.literal("submitted"),
       v.literal("archived"),
     ),

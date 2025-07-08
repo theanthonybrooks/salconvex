@@ -114,6 +114,19 @@ const SubmissionFormOC1 = ({
 
   // #region -------------- UseEffect ---------------
 
+  // useEffect(() => {
+  //   if (callType === "Email") {
+  //     setValue("openCall.requirements.applicationLinkFormat", "mailto:");
+  //   }
+  // }, [callType, setValue]);
+
+  useEffect(() => {
+    // You could also check if it's NOT already mailto
+    if (callType === "Email" && appLinkFormat !== "mailto:") {
+      setValue("openCall.requirements.applicationLinkFormat", "mailto:");
+    }
+  }, [callType, setValue, appLinkFormat]);
+
   useEffect(() => {
     if (ocEligibilityWhom !== undefined) return;
     register("openCall.eligibility.whom");
@@ -157,7 +170,6 @@ const SubmissionFormOC1 = ({
   }, [freeCall, setValue]);
 
   // #endregion
-
   // console.log("Open Call", openCall);
 
   return (
@@ -564,7 +576,7 @@ const SubmissionFormOC1 = ({
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">
-                  Step {fixedType && !freeCall ? 5 : 4}:
+                  Step {fixedType && !freeCall ? 5 : freeCall ? 3 : 4}:
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
@@ -604,9 +616,11 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 6 : 5}:
+                      Step {fixedType && !freeCall ? 6 : freeCall ? 4 : 5}:
                     </p>
-                    <p className="lg:text-xs">Application Link</p>
+                    <p className="lg:text-xs">
+                      Application {emailType ? "Email" : "Link"}
+                    </p>
                     {/* TODO: when internal applications are implemented, add this back in */}
                     {/* <p className="lg:text-xs">(If external)</p> */}
                   </div>
@@ -636,6 +650,7 @@ const SubmissionFormOC1 = ({
                                 tabIndex={11}
                                 className={cn(
                                   "w-24 rounded border bg-card text-center text-base sm:h-11",
+                                  emailType && "hidden",
                                 )}
                               >
                                 <SelectValue placeholder="(Type)" />
@@ -714,7 +729,7 @@ const SubmissionFormOC1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 7 : 6}:
+                      Step {fixedType && !freeCall ? 7 : freeCall ? 5 : 6}:
                     </p>
                     <p className="lg:text-xs">Application Docs</p>
                   </div>
@@ -753,7 +768,7 @@ const SubmissionFormOC1 = ({
                   </div>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {fixedType && !freeCall ? 8 : 7}:
+                      Step {fixedType && !freeCall ? 8 : freeCall ? 6 : 7}:
                     </p>
                     <p className="lg:text-xs">External Links</p>
                   </div>

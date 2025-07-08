@@ -78,7 +78,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
   const isEvent = type === "event";
-  const categoryNotEvent = eventData?.category !== "event";
+  // const categoryNotEvent = eventData?.category !== "event";
   const isProduction = type === "production";
   //   const isOpenCall = type === "openCall";
   //   const isOther = type === "other";
@@ -287,11 +287,11 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                 />
               </SelectTrigger>
               <SelectContent className="min-w-auto">
-                {isEvent && categoryNotEvent && (
+                {/* {isEvent && !categoryNotEvent && (
                   <SelectItem fit value="noEvent">
                     No Event
                   </SelectItem>
-                )}
+                )} */}
                 {isProduction && hasEventDates && (
                   <SelectItem fit value="sameAsEvent">
                     Same as{" "}

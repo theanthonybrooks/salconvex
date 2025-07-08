@@ -628,7 +628,7 @@ const SubmissionFormOC2 = ({
         )}
       </div>
 
-      {(hasBudgetMin || hasRate || noBudget) && (
+      {(hasBudgetMin || hasRate || noBudget || unknownBudget) && (
         <>
           {showBudgetInputs && (
             <Separator
@@ -650,7 +650,7 @@ const SubmissionFormOC2 = ({
           >
             {allInclusive === false &&
               activeCategoryFields.length > 0 &&
-              hasBudgetMin && (
+              (hasBudgetMin || unknownBudget) && (
                 <>
                   <div className="input-section">
                     <p className="lg:text-xs">Categories</p>

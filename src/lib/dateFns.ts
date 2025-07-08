@@ -217,6 +217,8 @@ export const formatOpenCallDeadline = (
 ) => {
   if (callType === "Invite") return "Invite-only";
   if (callType === "Rolling") return "Rolling Open Call";
+  if (callType === "Email") return "No Deadline; Email Submissions";
+  if (callType === "False") return "No Open Call";
 
   if (!dateString) return "Unknown Deadline";
 

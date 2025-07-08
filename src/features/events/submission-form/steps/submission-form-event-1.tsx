@@ -18,7 +18,11 @@ import { EventNameSearch } from "@/features/events/components/event-search";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { EventCategory, eventTypeOptions } from "@/types/event";
+import {
+  EventCategory,
+  eventTypeOptions,
+  noEventCategories,
+} from "@/types/event";
 import { User } from "@/types/user";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
@@ -67,11 +71,13 @@ const SubmissionFormEventStep1 = ({
   const eventName = eventData?.name;
   const hasEventName = !!eventName && eventName.trim().length >= 3;
   const eventDates = eventData?.dates?.eventDates;
+
   const eventEdition = eventData?.dates?.edition;
   const eventState = eventData?.state;
   const archivedEvent = eventState === "archived";
   // console.log(eventData);
   const category = eventData?.category as EventCategory;
+  const noEvent = noEventCategories.includes(category);
   const diffName = !!eventName && eventName !== initialName.current;
   // console.log(eventName, initialName.current);
   // console.log(diffName);
@@ -109,6 +115,7 @@ const SubmissionFormEventStep1 = ({
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasEventFormat = !!eventData?.dates?.eventFormat;
+  const prodDatesFormat = eventData?.dates?.prodFormat;
 
   const eventDateFormatRequired = !!(
     hasEventFormat &&
@@ -129,6 +136,13 @@ const SubmissionFormEventStep1 = ({
   const orgData = watch("organization");
   const isAdmin = user?.role?.includes("admin") || false;
   const eventOnly = formType === 1;
+
+  useEffect(() => {
+    if (noEvent && prodDatesFormat !== "noProd") {
+      setValue("event.dates.prodFormat", "noProd");
+      setValue("event.dates.prodDates", [{ start: "", end: "" }]);
+    }
+  }, [noEvent, setValue, prodDatesFormat]);
 
   useEffect(() => {
     if (formType === 1) {
@@ -476,6 +490,7 @@ const SubmissionFormEventStep1 = ({
             />
 
             {!isOngoing &&
+              !noEvent &&
               hasEventFormat &&
               (!blankEventDates || eventDateFormatNotRequired) && (
                 <>
@@ -545,7 +560,12 @@ const SubmissionFormEventStep1 = ({
                   )}
                   <div className="input-section h-full">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent && !eventOnly ? 9 : isOngoing ? 7 : 8}
+                      Step{" "}
+                      {categoryEvent && !eventOnly
+                        ? 9
+                        : isOngoing || noEvent
+                          ? 7
+                          : 8}
                       :{" "}
                     </p>
                     <p className="lg:text-xs">

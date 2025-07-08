@@ -71,6 +71,7 @@ export type Event = {
   lastEditedAt?: number;
   openCallState?: string | null;
   openCallId?: Id<"openCalls"> | null;
+  approvedAt?: number;
 };
 
 export const columns: ColumnDef<Event>[] = [
@@ -333,6 +334,7 @@ export const columns: ColumnDef<Event>[] = [
       const hasOC = !!openCallId;
       const edition = event.dates.edition;
       const slug = event.slug;
+      const eventApproved = typeof event.approvedAt === "number";
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -362,7 +364,7 @@ export const columns: ColumnDef<Event>[] = [
                 <DropdownMenuSeparator />
                 <GoToEvent slug={slug} edition={edition} />
                 <DuplicateEvent eventId={event._id} />
-                {(state === "draft" || isAdmin) && (
+                {((state === "draft" && !eventApproved) || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
                 {state === "submitted" && isAdmin && (

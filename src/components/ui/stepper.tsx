@@ -324,7 +324,7 @@ export default function HorizontalLinearStepper({
 
             <section
               className={cn(
-                "flex w-full min-w-24 items-center justify-end gap-2",
+                "flex w-full min-w-24 items-center justify-end gap-2 sm:w-max",
                 adminFinalStep &&
                   "flex-col justify-center sm:w-auto sm:flex-row sm:justify-end",
                 firstStep && isMobile && "",
