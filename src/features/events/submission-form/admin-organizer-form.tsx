@@ -176,7 +176,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region ------------- Definitions --------------
   // #region ------------- Actions, Mutations, Queries --------------
 
-  // const paidCall = formType === 3 && !isAdmin;
 
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");

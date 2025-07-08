@@ -361,7 +361,7 @@ const PricingCard = ({
           )}
           {!image && (
             <>
-              {!isFree && <CardTitle className="text-xl">{title}</CardTitle>}
+              <CardTitle className="text-xl">{title}</CardTitle>
               <CardDescription className={cn("text-foreground")}>
                 {description}
               </CardDescription>
@@ -380,33 +380,29 @@ const PricingCard = ({
                       ? (prices.year?.usd?.amount?.toFixed(0) ?? "N/A")
                       : (prices.month?.usd?.amount?.toFixed(0) ?? "N/A")
                   }`
-                ) : isEligibleForFree ? (
+                ) : (
                   <div className="flex flex-col gap-1">
                     <p className="text-sm text-muted-foreground">Starting at</p>
                     <span className="flex items-center gap-1">
-                      <span className="mr-1 line-through">$50</span>
-                      {/* <span className="mr-1 line-through">${slidingPrice}</span> */}
-                      <span className="font-semibold text-green-600">$0</span>
-                    </span>
-                  </div>
-                ) : (
-                  // `$${slidingPrice}`
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-muted-foreground">Starting at</p>
+                      <span
+                        className={cn(
+                          "mr-1",
+                          isEligibleForFree && "line-through",
+                        )}
+                      >
+                        $50
+                      </span>
 
-                    <p>$50</p>
+                      {isEligibleForFree && (
+                        <span className="font-semibold text-green-600">$0</span>
+                      )}
+                    </span>
                   </div>
                 )
               ) : (
                 "Free"
               )}
             </span>
-            {/* <span className={cn("text-muted-foreground")}>
-              {isOrganizer &&
-                sliderPrice === 0 &&
-                prices.rate !== 0 &&
-                "Starting at"}
-            </span> */}
 
             <span className={cn("text-muted-foreground")}>
               {isArtist && (isYearly ? "/year" : "/month")}
@@ -417,22 +413,6 @@ const PricingCard = ({
               First Open Call is free
             </p>
           )}
-          {/* {isOrganizer && !isFree && (
-            <div className="mt-3 flex flex-col gap-2">
-              <p>Select your project budget:</p>
-              <DiscreteSlider
-                disabled={isEligibleForFree}
-                value={sliderPrice ?? prices?.rate}
-                onChange={(val) => setSliderPrice(val)}
-                marks={pricingRange}
-                prefix="$"
-                suffix="/mo"
-                labelFormatter={(val) => `$${val}`}
-                labelDisplay="off"
-                className="mx-auto max-w-[80%]"
-              />
-            </div>
-          )} */}
 
           <div className="mt-6 space-y-2">
             {features?.map((feature) => (

@@ -210,7 +210,7 @@ export const getTimezoneFormat = (dateString: string, timezone: string) => {
 
 export function formatTimeConditionalMinutes(date: DateTime<true>) {
   if (date.minute === 0) {
-    return date.toFormat("h a");
+    return date.toFormat("ha");
   }
   return date.toFormat("h:mm a");
 }

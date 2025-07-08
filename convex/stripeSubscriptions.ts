@@ -127,9 +127,6 @@ export const createStripeCheckoutSession = action({
       if (!args.slidingPrice) throw new Error("Sliding price not provided");
     }
 
-    // console.log("Arguments: ", args);
-    // console.log("isEligibleForFree: ", args.isEligibleForFree);
-
     const plan: any = await ctx.runQuery(
       internal.stripeSubscriptions.getPlanByKey,
       {
