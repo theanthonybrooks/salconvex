@@ -684,11 +684,11 @@ export const updateEventName = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
-    const slug = slugify(args.name, { lower: true });
+    const slug = slugify(args.name.trim(), { lower: true });
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
     await ctx.db.patch(event._id, {
-      name: args.name,
+      name: args.name.trim(),
       slug,
       lastEditedAt: Date.now(),
     });
@@ -704,7 +704,7 @@ export const checkEventNameExists = query({
   },
   handler: async (ctx, args) => {
     console.log(args);
-    const eventSlug = slugify(args.name, { lower: true });
+    const eventSlug = slugify(args.name.trim(), { lower: true });
     const existingEvents = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", eventSlug))
@@ -1201,7 +1201,7 @@ export const createOrUpdateEvent = mutation({
 
       await ctx.db.patch(event._id, {
         formType: updatedFormType,
-        name: args.name,
+        name: args.name.trim(),
         slug: args.slug,
         logo: fileUrl || args.logo,
         logoStorageId: args.logoStorageId,
@@ -1239,7 +1239,7 @@ export const createOrUpdateEvent = mutation({
     // console.log("inserting");
     const eventId = await ctx.db.insert("events", {
       formType: args.formType,
-      name: args.name,
+      name: args.name.trim(),
       slug: args.slug,
       logo: fileUrl as string,
       logoStorageId: args.logoStorageId,

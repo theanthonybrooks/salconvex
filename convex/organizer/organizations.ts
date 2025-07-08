@@ -427,7 +427,7 @@ export const updateOrganization = mutation({
     }
 
     await ctx.db.patch(organization._id, {
-      name: args.name,
+      name: args.name.trim(),
       slug: args.slug,
       logo: args.logo,
       location: {

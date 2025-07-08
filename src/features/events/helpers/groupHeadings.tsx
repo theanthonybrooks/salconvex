@@ -126,17 +126,47 @@ export function getGroupKeyFromEvent(
   //   return { raw: `"${event.name.slice(0, 1).toUpperCase()}"` };
   // }
 
+  // if (sortBy === "name") {
+  //   return {
+  //     raw: `${event.name.slice(0, 1).toUpperCase()}`,
+  //     label: (
+  //       <span className="inline-flex items-center gap-1">
+  //         <FaQuoteLeft className="-translate-y-1 text-xs" />
+  //         {event.name.slice(0, 1).toUpperCase()}
+  //         <FaQuoteRight className="-translate-y-1 text-xs" />
+  //       </span>
+  //     ),
+  //   };
+  // }
   if (sortBy === "name") {
-    return {
-      raw: `${event.name.slice(0, 1).toUpperCase()}`,
-      label: (
-        <span className="inline-flex items-center gap-1">
-          <FaQuoteLeft className="-translate-y-1 text-xs" />
-          {event.name.slice(0, 1).toUpperCase()}
-          <FaQuoteRight className="-translate-y-1 text-xs" />
-        </span>
-      ),
-    };
+    const firstChar = event.name.trim().charAt(0);
+    if (firstChar.match(/[0-9]/)) {
+      return {
+        raw: "0-9",
+        label: (
+          <span className="inline-flex items-center gap-1">
+            <FaQuoteLeft className="-translate-y-1 text-xs" />
+            0-9
+            <FaQuoteRight className="-translate-y-1 text-xs" />
+          </span>
+        ),
+      };
+    } else if (firstChar.match(/[A-Za-z]/)) {
+      return {
+        raw: firstChar.toUpperCase(),
+        label: (
+          <span className="inline-flex items-center gap-1">
+            <FaQuoteLeft className="-translate-y-1 text-xs" />
+            {firstChar.toUpperCase()}
+            <FaQuoteRight className="-translate-y-1 text-xs" />
+          </span>
+        ),
+      };
+    } else {
+      return {
+        raw: "",
+      };
+    }
   }
 
   return { raw: "Ungrouped" };
