@@ -75,7 +75,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
               </p>
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 px-10 sm:w-auto sm:px-0">
             <Select
               value={currency}
               onValueChange={(value) => setCurrency(value as "usd" | "eur")}
