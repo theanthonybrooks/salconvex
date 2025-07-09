@@ -25,7 +25,7 @@ import { useScrollToTopOnMount } from "@/hooks/use-scrollToTopOnMount";
 import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
 import { motion } from "framer-motion";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, CircleX } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -50,6 +50,7 @@ type PricingCardProps = {
 
   description: string;
   features?: string[];
+  notIncluded?: string[];
   popular?: boolean;
   image?: string;
 };
@@ -310,6 +311,7 @@ const PricingCard = ({
   prices,
   description,
   features,
+  notIncluded,
   popular,
   accountType,
   image,
@@ -480,6 +482,15 @@ const PricingCard = ({
                 <p className={cn("text-muted-foreground")}>{feature}</p>
               </div>
             ))}
+            {planKey === "1" &&
+              isOrganizer &&
+              notIncluded?.map((feature) => (
+                <div key={feature} className="flex gap-2">
+                  <CircleX className={cn("size-5 shrink-0 text-red-600")} />
+
+                  <p className={cn("text-muted-foreground")}>{feature}</p>
+                </div>
+              ))}
           </div>
         </CardContent>
       </div>

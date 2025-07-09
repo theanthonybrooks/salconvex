@@ -743,6 +743,7 @@ export default defineSchema({
       year: stripeIntervalPricesValidator,
     }),
     features: v.array(v.string()),
+    notIncluded: v.array(v.string()),
     popular: v.boolean(), // added popular column
   })
     .index("key", ["key"])
@@ -759,6 +760,7 @@ export default defineSchema({
       }),
     ),
     features: v.array(v.string()),
+    notIncluded: v.array(v.string()),
     popular: v.optional(v.boolean()),
   })
     .index("key", ["key"])
