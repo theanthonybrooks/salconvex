@@ -4,7 +4,9 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
@@ -123,57 +125,65 @@ const SubmissionFormEventStep2 = ({
         >
           {canNameEvent && (
             <>
-              {!eventOnly && (
-                <>
-                  <div className="input-section">
-                    <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent ? 11 : isOngoing || noEvent ? 9 : 10}:
-                    </p>
-                    <p className="lg:text-xs">Open Call</p>
-                  </div>
-                  <div className="mx-auto mb-2 flex w-full flex-col gap-2 sm:mb-auto lg:min-w-[300px] lg:max-w-md">
-                    <Label htmlFor="event.hasOpenCall" className="sr-only">
-                      Open Call
-                    </Label>
-                    <Controller
-                      name="event.hasOpenCall"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            // setHasOpenCall(value);
-                          }}
-                          value={field.value ?? ""}
-                        >
-                          <SelectTrigger className="h-12 w-full border bg-card text-center text-base sm:h-[50px]">
-                            <SelectValue
-                              placeholder={
-                                !freeCall
-                                  ? `Do you have an open call?`
-                                  : `Select the type of call`
-                              }
-                            />
-                          </SelectTrigger>
-                          <SelectContent className="min-w-auto">
-                            {!freeCall && isAdmin && (
-                              <>
-                                <SelectItem fit value="False">
-                                  No, there&apos;s not an open call
-                                </SelectItem>
-                                <SelectItem fit value="Invite">
-                                  No, it&apos;s an invite only event
-                                </SelectItem>
-                                {/* <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">
+                  Step{" "}
+                  {categoryEvent && !eventOnly
+                    ? 11
+                    : isOngoing || noEvent
+                      ? 9
+                      : 10}
+                  :
+                </p>
+                <p className="lg:text-xs">
+                  {eventOnly ? "Invite Only" : "Open Call"}
+                </p>
+              </div>
+              <div className="mx-auto mb-2 flex w-full flex-col gap-2 sm:mb-auto lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="event.hasOpenCall" className="sr-only">
+                  {eventOnly ? "Invite Only" : "Open Call"}
+                </Label>
+                <Controller
+                  name="event.hasOpenCall"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        // setHasOpenCall(value);
+                      }}
+                      value={field.value ?? ""}
+                    >
+                      <SelectTrigger className="h-12 w-full border bg-card text-center text-base sm:h-[50px]">
+                        <SelectValue
+                          placeholder={
+                            !freeCall
+                              ? `Do you have an open call?`
+                              : `Select the type of call`
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="min-w-auto">
+                        {!freeCall && isAdmin && (
+                          <>
+                            <SelectItem fit value="False">
+                              No, there&apos;s not an open call
+                            </SelectItem>
+                            <SelectItem fit value="Invite">
+                              No, it&apos;s an invite only event
+                            </SelectItem>
+                            {/* <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
                                 Or select the type of call:
                               </p> */}
-                                <SelectSeparator />{" "}
-                                <span className="flex items-center gap-1 px-3 py-1 text-xs italic text-muted-foreground">
-                                  <HiArrowTurnLeftDown className="size-4 shrink-0 translate-y-1.5" />
-                                  Or select the type of call
-                                </span>
-                              </>
-                            )}
+                            <SelectSeparator />{" "}
+                            <span className="flex items-center gap-1 px-3 py-1 text-xs italic text-muted-foreground">
+                              <HiArrowTurnLeftDown className="size-4 shrink-0 translate-y-1.5" />
+                              Or select the type of call
+                            </span>
+                          </>
+                        )}
+                        {!eventOnly && (
+                          <>
                             <SelectItem fit value="Fixed">
                               Fixed Deadline
                             </SelectItem>
@@ -183,22 +193,38 @@ const SubmissionFormEventStep2 = ({
                             <SelectItem fit value="Email">
                               Open email submissions
                             </SelectItem>
-                            {isAdmin && (
-                              <SelectItem
-                                fit
-                                value="Unknown"
-                                className="bg-red-100 italic"
-                              >
-                                Unknown - Admin Only
+                          </>
+                        )}
+                        {eventOnly && (
+                          <>
+                            <SelectGroup>
+                              <SelectLabel className="text-sm text-muted-foreground">
+                                Is it an invite only event?
+                              </SelectLabel>
+                              <SelectItem fit value="Invite">
+                                Yes
                               </SelectItem>
-                            )}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                </>
-              )}
+                              <SelectItem fit value="False">
+                                No
+                              </SelectItem>
+                            </SelectGroup>
+                          </>
+                        )}
+                        {isAdmin && (
+                          <SelectItem
+                            fit
+                            value="Unknown"
+                            className="bg-red-100 italic"
+                          >
+                            Unknown - Admin Only
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
               <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
                   Step{" "}

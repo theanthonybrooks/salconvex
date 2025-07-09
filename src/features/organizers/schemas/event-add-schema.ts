@@ -387,6 +387,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
 
   if (
     data.dates?.eventFormat &&
+    data.category === "event" &&
     // data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&
     !data.dates?.noProdStart &&
@@ -397,7 +398,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "All projects/events must have production dates",
+      message: "All events must have production dates",
       path: ["dates", "prodDates"],
     });
   }

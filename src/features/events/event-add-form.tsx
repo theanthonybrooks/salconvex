@@ -849,9 +849,9 @@ export const EventOCForm = ({
                 edition: new Date().getFullYear(),
                 noProdStart: false,
               },
-              hasOpenCall: !eventOnly
-                ? (eventData.hasOpenCall ?? "Fixed")
-                : "False",
+
+              hasOpenCall:
+                eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             },
           });
         }
@@ -910,9 +910,8 @@ export const EventOCForm = ({
             logo: eventLogo,
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly
-              ? (eventData.hasOpenCall ?? "Fixed")
-              : "False",
+            hasOpenCall:
+              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
@@ -969,9 +968,8 @@ export const EventOCForm = ({
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly
-              ? (eventData.hasOpenCall ?? "Fixed")
-              : "False",
+            hasOpenCall:
+              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             dates: {
               ...eventData.dates,
             },
@@ -1359,9 +1357,8 @@ export const EventOCForm = ({
             logo: eventData.logo as string,
             type: eventData.type || [],
             category: !eventOnly ? eventData.category : "event",
-            hasOpenCall: !eventOnly
-              ? (eventData.hasOpenCall ?? "Fixed")
-              : "False",
+            hasOpenCall:
+              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             dates: {
               ...eventData.dates,
             },
@@ -1715,9 +1712,8 @@ export const EventOCForm = ({
           formType,
           ...existingEvent,
           category: !eventOnly ? existingEvent.category : "event",
-          hasOpenCall: !eventOnly
-            ? (existingEvent.hasOpenCall ?? "Fixed")
-            : "False",
+          hasOpenCall:
+            existingEvent.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
         },
         openCall: {
           ...(ocData ?? {}),

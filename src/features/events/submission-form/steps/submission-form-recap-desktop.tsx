@@ -183,6 +183,12 @@ export const SubmissionFormRecapDesktop = ({
                     </td>
                   </tr>
                 )}
+                {eventOnly && eventData.hasOpenCall === "Invite" && (
+                  <tr>
+                    <th className="pr-4 align-top font-medium">Invite Only</th>
+                    <td>Yes</td>
+                  </tr>
+                )}
 
                 <tr>
                   <th className="pr-4 align-top font-medium">Event Dates</th>
@@ -208,7 +214,8 @@ export const SubmissionFormRecapDesktop = ({
                   </td>
                 </tr>
 
-                {eventData.dates?.prodFormat !== "sameAsEvent" &&
+                {eventData.category === "event" &&
+                  eventData.dates?.prodFormat !== "sameAsEvent" &&
                   eventData.dates?.eventFormat !== "ongoing" && (
                     <tr>
                       <th className="pr-4 align-top font-medium">

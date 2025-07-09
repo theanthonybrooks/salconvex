@@ -716,6 +716,10 @@ export const checkEventNameExists = query({
       const sameOrg =
         args.organizationId && args.organizationId === event.mainOrgId;
       const sameEdition = args.edition && args.edition === event.dates.edition;
+      const now = Date.now();
+      const eventCreatedAt = event._creationTime;
+
+      if (eventCreatedAt && now - eventCreatedAt < 1000) continue;
 
       console.log(
         "sameEvent: ",

@@ -61,13 +61,14 @@ const SubmissionFormEventStep1 = ({
     formState: { errors, dirtyFields },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
+
   const [eventNameErrorValue, setEventNameErrorValue] = useState<string | null>(
     null,
   );
   const currentYear = new Date().getFullYear();
   const currentValues = getValues();
   const eventData = watch("event");
-  const initialName = useRef(existingEvent?.name ?? "");
+  // const initialName = useRef(existingEvent?.name ?? "");
   const eventName = eventData?.name;
   const hasEventName = !!eventName && eventName.trim().length >= 3;
   const eventDates = eventData?.dates?.eventDates;
@@ -78,13 +79,23 @@ const SubmissionFormEventStep1 = ({
   // console.log(eventData);
   const category = eventData?.category as EventCategory;
   const noEvent = noEventCategories.includes(category);
-  const diffName = !!eventName && eventName !== initialName.current;
-  // console.log(eventName, initialName.current);
-  // console.log(diffName);
-  const previousEventNameValid = hasEventName && !diffName;
+
   // console.log(previousEventNameValid);
   // #region ------------- Queries, Actions, and Mutations --------------
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const lastValidated = useRef<{
+    name: string;
+    edition: number | undefined;
+    orgId: string | undefined;
+  } | null>(null);
+
+  const comboChanged =
+    !lastValidated.current ||
+    lastValidated.current.name !== eventName ||
+    lastValidated.current.edition !== eventEdition ||
+    lastValidated.current.orgId !== existingOrg?._id;
+
+  const shouldValidate = hasEventName && comboChanged;
 
   const {
     isSuccess: eventNameValid,
@@ -92,7 +103,7 @@ const SubmissionFormEventStep1 = ({
     error: eventNameError,
   } = useQueryWithStatus(
     api.events.event.checkEventNameExists,
-    hasEventName && diffName
+    shouldValidate
       ? {
           name: eventName,
           organizationId: existingOrg?._id,
@@ -102,11 +113,11 @@ const SubmissionFormEventStep1 = ({
       : "skip",
   );
 
-  console.log(eventNameError);
+  // console.log(eventNameError);
   // #endregion
 
   // console.log(eventNameValid);
-  const nameValidTrigger = eventNameValid || previousEventNameValid;
+  const nameValidTrigger = eventNameValid || (!comboChanged && hasEventName);
 
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
   const hasEventLocation =
@@ -159,10 +170,15 @@ const SubmissionFormEventStep1 = ({
     }
   }, [eventNameError]);
 
-  // const timeLineStartingText =
-  //   formType > 1
-  //     ? "<ol><li><p>Open Call:</p></li><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>"
-  //     : "<ol><li><p>Judging:</p></li><li><p>Selection:</p></li><li><p>Design Due:</p></li> <li><p>Production:</p></li><li><p>Completion Due:</p></li></ol>";
+  useEffect(() => {
+    if (eventNameValid) {
+      lastValidated.current = {
+        name: eventName!,
+        edition: eventEdition,
+        orgId: existingOrg?._id,
+      };
+    }
+  }, [eventNameValid, eventName, eventEdition, existingOrg]);
 
   return (
     <div
