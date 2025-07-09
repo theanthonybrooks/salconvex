@@ -314,7 +314,7 @@ export const pricingFaqs: AccordionSection = {
     {
       id: "organizers",
       subtitle: "What about for organizers?",
-      text: "Accounts for organizers are free. They don't grant access to the open call sections of the list (aside from their own or archived open calls, which are public record for everyone). Organizers only pay a one-time fee when they want to list an open call with a budget of $1,000+ and listing events is always free. For a full pricing breakdown, see the Submission Costs section below.",
+      text: "Accounts for organizers are free. They don't grant access to the open call sections of the list (aside from their own events/projects or archived open calls, which are public record for everyone). Organizers only pay a one-time fee when they want to list an open call with a budget of $1,000+ and listing events is always free. For a full pricing breakdown, see the Submission Costs section below.",
     },
     {
       id: "patreon",
@@ -353,21 +353,32 @@ export const pricingFaqs: AccordionSection = {
       id: "submission-costs",
       subtitle: "Submission Costs",
       text: (
-        <span>
-          <p>
-            Events are always fee to submit. Open calls are free for Graffiti
-            Jams, Pasteup/Sticker Projects, Street Art Festivals, and Mural
-            Projects with a budget less than $1,000.
-          </p>
+        <div className="space-y-2">
+          <span>
+            <p>
+              <b>Events</b> are always fee to submit.
+            </p>
+            <p>
+              {" "}
+              <b>Open calls</b> are free for Graffiti Jams, Pasteup/Sticker
+              Projects, Street Art Festivals, and Mural Projects with a budget
+              less than $1,000.
+            </p>
+          </span>
 
-          <p>
-            Otherwise, the fee is on a sliding scale with breakpoints being $50
-            (up to $5,000 budget), $100 (up to $10,000 budget), $200 (up to
-            $20,000 budget), and $250 (anything above $25,000). Beyond that,
-            there are no additional fees and the first open call listing is
-            always free so you can see how the system works.
-          </p>
-        </span>
+          <span>
+            <p>
+              Otherwise, the fee is on a sliding scale with breakpoints being
+              $50 (up to $5,000 budget), $100 (up to $10,000 budget), $200 (up
+              to $20,000 budget), and $250 (anything up to and above $25,000).
+            </p>
+
+            {/* <p>
+              Beyond that, there are no additional fees and the first open call
+              listing is always free so you can see how the system works.
+            </p> */}
+          </span>
+        </div>
       ),
     },
     {

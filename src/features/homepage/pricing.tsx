@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useAction, usePreloadedQuery } from "convex/react";
 
+import { Link } from "@/components/ui/custom-link";
 import { Separator } from "@/components/ui/separator";
 import {
   AccountSubscribeForm,
@@ -30,7 +31,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
-type PricingSwitchProps = {
+type SwitchProps = {
   onSwitch: (value: string) => void;
 };
 
@@ -93,7 +94,7 @@ const PricingHeader = ({
   subtitle,
 }: {
   title: string;
-  subtitle: string;
+  subtitle: React.ReactNode;
 }) => (
   <div
     id="pricing-header"
@@ -108,7 +109,7 @@ const PricingHeader = ({
 
 //------------------- Pricing Switch -----------------------//
 
-export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
+export const PricingSwitch = ({ onSwitch }: SwitchProps) => {
   const [activeTab, setActiveTab] = useState("0");
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -129,6 +130,62 @@ export const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => {
       >
         <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
           {pricingIntervals.map((opt) => (
+            <TabsTrigger
+              key={opt.val}
+              value={opt.val}
+              className={cn(
+                "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
+                activeTab === opt.val
+                  ? "font-bold text-black"
+                  : "text-foreground/80",
+              )}
+            >
+              {hasMounted && activeTab === opt.val && (
+                <motion.div
+                  exit={{ opacity: 0 }}
+                  layoutId="tab-bg"
+                  className="absolute inset-0 z-0 flex items-center justify-center rounded-md border-2 bg-background shadow-sm"
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                  }}
+                />
+              )}
+
+              <span className="z-10"> {opt.name}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+    </div>
+  );
+};
+export const OpenCallSwitch = ({ onSwitch }: SwitchProps) => {
+  const [activeTab, setActiveTab] = useState("0");
+  const [hasMounted, setHasMounted] = useState(false);
+  const ocOptions = [
+    { name: "Yes", val: "0" },
+    { name: "No", val: "1" },
+  ];
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setHasMounted(true), 50);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center gap-3">
+      <Tabs
+        defaultValue="0"
+        className="relative w-[400px]"
+        onValueChange={(val) => {
+          onSwitch(val);
+          setActiveTab(val);
+        }}
+      >
+        <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
+          {ocOptions.map((opt) => (
             <TabsTrigger
               key={opt.val}
               value={opt.val}
@@ -467,6 +524,7 @@ export default function Pricing() {
   useScrollToTopOnMount();
   const searchParams = useSearchParams();
   const [isYearly, setIsYearly] = useState<boolean>(false);
+  const [hasOpenCall, setHasOpenCall] = useState<boolean>(true);
 
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -513,6 +571,8 @@ export default function Pricing() {
 
   const togglePricingPeriod = (value: string) =>
     setIsYearly(parseInt(value) === 1);
+  const toggleOpenCall = (value: string) =>
+    setHasOpenCall(parseInt(value) === 0);
 
   const plans = useQuery(api.plans.getUserPlans);
   const orgPlans = useQuery(api.plans.getOrgPlans);
@@ -537,10 +597,29 @@ export default function Pricing() {
         )}
 
         {isOrganizer && (
-          <PricingHeader
-            title="Select your Listing type"
-            subtitle="Graffiti jams are always free to list and mural projects are priced on a sliding scale. All event-only listings (without open call) are free."
-          />
+          <>
+            <PricingHeader
+              title="Do you have an open call?"
+              subtitle={
+                hasOpenCall ? (
+                  <p>
+                    Graffiti jams and low-budget calls are always free to list
+                    and mural projects are priced on a sliding scale. See{" "}
+                    <Link
+                      href="/pricing?submit#submission-costs"
+                      className="font-semibold underline underline-offset-2"
+                    >
+                      Pricing FAQ
+                    </Link>{" "}
+                    for more info.
+                  </p>
+                ) : (
+                  "All event-only listings (without open call) are free. You can always add an open call later."
+                )
+              }
+            />
+            <OpenCallSwitch onSwitch={toggleOpenCall} />
+          </>
         )}
 
         {(isArtist && !hasSub) ||
@@ -590,6 +669,9 @@ export default function Pricing() {
           >
             {orgPlans &&
               orgPlans
+                .filter((plan) =>
+                  hasOpenCall ? Number(plan.key) > 1 : Number(plan.key) === 1,
+                )
                 .sort((a, b) => Number(a.key) - Number(b.key))
                 .map((plan) => {
                   const { key, prices, ...rest } = plan;

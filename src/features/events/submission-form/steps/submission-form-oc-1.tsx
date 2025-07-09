@@ -598,7 +598,8 @@ const SubmissionFormOC1 = ({
                         field.onChange(val);
                       }}
                       onBlur={field.onBlur}
-                      placeholder={`Please be as specific as possible${emailType && " on what you would like for artists to include in their email submissions."}`}
+                      placeholder={`Please be as specific as possible
+                        ${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={5000}
                       purpose="openCall"
                       asModal={true}
@@ -632,7 +633,6 @@ const SubmissionFormOC1 = ({
                     <RichTextEditor
                       readOnly={pastEvent}
                       value={field.value ?? ""}
-                      // onChange={field.onChange}
                       onChange={(val) => {
                         field.onChange(val);
                       }}
@@ -644,10 +644,10 @@ const SubmissionFormOC1 = ({
                       title={eventName}
                       subtitle="Other Info"
                       inputPreviewClassName={cn(
-                        errors?.openCall?.requirements?.requirements &&
+                        errors?.openCall?.requirements?.otherInfo &&
                           "invalid-field",
                       )}
-                      tabIndex={10}
+                      tabIndex={11}
                     />
                   )}
                 />
