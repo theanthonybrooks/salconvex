@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 
 import {
+  accountTypeOptions,
   appStatusOptions,
   bookmarkIntents,
   eventCategories,
@@ -203,6 +204,15 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("subStatus")}
                 title="Status"
                 options={subscriptionStatusOptions}
+              />
+            )}
+            {table.getColumn("accountType") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("accountType")}
+                title="Account Type"
+                options={accountTypeOptions}
               />
             )}
 

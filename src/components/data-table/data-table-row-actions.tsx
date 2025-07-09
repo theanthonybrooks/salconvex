@@ -17,9 +17,12 @@ import {
   LucideCircleDashed,
   LucideCircleDollarSign,
   Mail,
+  Paintbrush,
   PaintBucket,
   Pencil,
   Scroll,
+  User2,
+  Users,
   X,
 } from "lucide-react";
 
@@ -242,6 +245,12 @@ export const subscriptionStatusOptions = [
     icon: LucideBadgeX,
   },
   { value: "-", label: "None", icon: LucideBadge },
+];
+
+export const accountTypeOptions = [
+  { value: "artist", label: "Artist", icon: Paintbrush },
+  { value: "organizer", label: "Organizer", icon: User2 },
+  { value: "both", label: "Both", icon: Users },
 ];
 
 // export function DataTableRowActions<TData>({

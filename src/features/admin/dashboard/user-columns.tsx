@@ -30,6 +30,7 @@ export const userColumnLabels: Record<string, string> = {
   createdAt: "Created",
   role: "Role",
   source: "Source",
+  organizationNames: "Organizations",
 };
 
 interface UserColumnsProps {
@@ -43,6 +44,7 @@ interface UserColumnsProps {
   createdAt: number;
   role: string[];
   source?: string;
+  organizationNames: string[];
 }
 
 export const userColumns: ColumnDef<UserColumnsProps>[] = [
@@ -102,14 +104,20 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const subscription = row.getValue("subscription") as string | undefined;
-      // console.log(subscription);
+      const fatcapSubs = ["3a. monthly-fatcap", "3b. yearly-fatcap"];
+      const originalSubs = ["1a. monthly-original", "1b. yearly-original"];
+      const bananaSubs = ["2a. monthly-banana", "2b. yearly-banana"];
       return (
         <div
           className={cn(
             "rounded px-2 py-1 text-xs font-medium",
-            subscription === "pro" && "bg-green-100 text-green-800",
-            subscription === "free" && "bg-gray-100 text-gray-800",
-            subscription === "enterprise" && "bg-indigo-100 text-indigo-800",
+            fatcapSubs.includes(subscription ?? "") &&
+              "border border-green-500 bg-green-100 text-green-800",
+            originalSubs.includes(subscription ?? "") &&
+              "border border-gray-500 bg-gray-100 text-gray-800",
+            bananaSubs.includes(subscription ?? "") &&
+              "border border-orange-500 bg-orange-100 text-orange-800",
+
             !subscription && "italic text-muted-foreground",
           )}
         >
@@ -177,12 +185,46 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Account Type" />
     ),
+    filterFn: (row, columnId, filterValue) => {
+      const types = row.getValue(columnId) as string[];
+      if (!Array.isArray(filterValue)) return true;
+      if (filterValue.includes("both")) {
+        // Only include rows where BOTH "artist" AND "organizer" are present
+        return types.includes("artist") && types.includes("organizer");
+      }
+      // Otherwise, include if any filterValue matches any type
+      return filterValue.some((f) => types.includes(f));
+    },
+    getUniqueValues: (row) => {
+      const value = row.accountType;
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") return [value];
+      return [];
+    },
     cell: ({ row }) => {
       const accountType = row.getValue("accountType") as string[];
       return (
         <div className="capitalize">
           {accountType && accountType.length > 0
             ? accountType.map((type) => type.split("|")[0]).join(", ")
+            : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "organizationNames",
+    minSize: 120,
+    maxSize: 400,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Organization Names" />
+    ),
+    cell: ({ row }) => {
+      const organizationNames = row.getValue("organizationNames") as string[];
+      return (
+        <div className="scrollable mini justy line-clamp-2 capitalize">
+          {organizationNames && organizationNames.length > 0
+            ? organizationNames.join(", ")
             : "-"}
         </div>
       );

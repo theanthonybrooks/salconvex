@@ -32,7 +32,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
 
   const isAdmin = userData?.user?.role?.includes("admin");
   const totalPerMonth = toolbarData?.totalPerMonth ?? 0;
-  const userCount = toolbarData?.userCount;
+  //   const userCount = toolbarData?.userCount;
   const usersMode = mode === "users";
 
   useEffect(() => {
@@ -59,10 +59,10 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
       {usersMode && (
         <>
           <div className="flex flex-col items-center gap-2 sm:flex-row">
-            <span className="flex items-center gap-2">
+            {/* <span className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground">Total Users:</p>
               <p className="text-sm font-bold">{userCount ?? 0}</p>
-            </span>
+            </span> */}
             <span className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground">Total Monthly:</p>
               <p className="text-sm font-bold">
@@ -80,7 +80,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
               value={currency}
               onValueChange={(value) => setCurrency(value as "usd" | "eur")}
             >
-              <SelectTrigger className="h-12 w-fit">
+              <SelectTrigger className="h-12 w-full sm:w-fit">
                 <SelectValue placeholder="Currency" />
               </SelectTrigger>
               <SelectContent className="min-w-auto">

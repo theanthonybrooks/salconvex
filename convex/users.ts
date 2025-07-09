@@ -70,6 +70,19 @@ export const usersWithSubscriptions = query({
           ? formatSubscriptionLabel(planName, interval)
           : null;
 
+        const organizations = await ctx.db
+          .query("organizations")
+          .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
+          .collect();
+
+        const orgIds = organizations.map((org) => org._id);
+        const orgNameMap = new Map(
+          organizations.map((org) => [org._id.toString(), org.name]),
+        );
+        const orgNames = orgIds
+          .map((orgId) => orgNameMap.get(orgId))
+          .filter((name): name is string => typeof name === "string");
+
         return {
           _id: user._id,
           name,
@@ -79,6 +92,7 @@ export const usersWithSubscriptions = query({
           accountType: user.accountType ?? [],
           cancelComment: cancelComment ?? null,
           role: user.role ?? "user",
+          organizationNames: orgNames ?? [],
           createdAt: user.createdAt,
           source: user.source,
         };
