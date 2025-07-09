@@ -20,15 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  eventDetailsSchema,
-  eventOnlySchema,
-  eventWithOCSchema,
-  openCallStep1Schema,
-  openCallStep2Schema,
-  orgDetailsSchema,
-  step1Schema,
-} from "@/features/organizers/schemas/event-add-schema";
+import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schema";
 
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
@@ -55,59 +47,13 @@ import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
+import { steps } from "@/features/events/event-add-form";
 import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
 const formTypeOptions = [
   { value: 1, Icon: LuBadge },
   { value: 2, Icon: LuBadgeCheck },
   { value: 3, Icon: LuBadgeDollarSign },
-];
-
-const steps = [
-  {
-    id: 1,
-    label: "Organization Info",
-    mobileLabel: "Organization Info",
-
-    schema: step1Schema,
-  },
-  {
-    id: 2,
-    label: "Event, Project, Fund, etc",
-    mobileLabel: "Event, Project, Fund, etc",
-    schema: eventOnlySchema,
-  },
-  {
-    id: 3,
-    label: "Event/Project Details Pt.2",
-    mobileLabel: "Event/Project Details",
-    schema: eventDetailsSchema,
-  },
-  {
-    id: 4,
-    label: "Open Call",
-    mobileLabel: "Open Call",
-    schema: openCallStep1Schema,
-  },
-  {
-    id: 5,
-    label: "Budget & Compensation",
-    mobileLabel: "Budget/Compensation",
-    schema: openCallStep2Schema,
-  },
-  {
-    id: 6,
-    label: "Organizer Details",
-    mobileLabel: "Organizer Details",
-    schema: orgDetailsSchema,
-  },
-  {
-    id: 7,
-    label: "Recap",
-    mobileLabel: "Recap",
-    // schema: eventSubmitSchema,
-    schema: eventWithOCSchema,
-  },
 ];
 
 interface AdminEventOCFormProps {
@@ -175,7 +121,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   } = form;
   // #region ------------- Definitions --------------
   // #region ------------- Actions, Mutations, Queries --------------
-
 
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");

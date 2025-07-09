@@ -59,7 +59,7 @@ import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
-const steps = [
+export const steps = [
   {
     id: 1,
     label: "Organization Info",
