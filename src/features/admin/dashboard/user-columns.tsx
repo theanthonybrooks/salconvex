@@ -268,10 +268,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                 align="end"
                 className="scrollable mini darkbar max-h-56"
               >
-                {/* {isAdmin && <DataTableAdminActions eventId={event._id} />} */}
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
-                {/* <DuplicateEvent eventId={event._id} /> */}
                 <DeleteUser userId={user._id} />
                 <DropdownMenuItem>
                   <Link
@@ -281,6 +279,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                   >
                     <FaEnvelope className="size-4" /> Contact
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-x-2"
+                  onClick={() => navigator.clipboard.writeText(user.email)}
+                >
+                  <LucideClipboardCopy className="size-4" /> Copy Email
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(user._id)}

@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { cn } from "@/lib/utils";
 import {
   ApplicationStatus,
@@ -235,6 +236,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className={cn("w-full space-y-4", outerContainerClassName)}>
+      <AdminToolbar toolbarData={toolbarData} mode={tableType} />
       <DataTableToolbar
         table={table}
         setRowSelection={setRowSelection}

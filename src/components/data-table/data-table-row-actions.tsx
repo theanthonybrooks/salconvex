@@ -13,6 +13,9 @@ import {
   LucideBadgeAlert,
   LucideBadgeCheck,
   LucideBadgeX,
+  LucideCircleCheck,
+  LucideCircleDashed,
+  LucideCircleDollarSign,
   Mail,
   PaintBucket,
   Pencil,
@@ -182,12 +185,12 @@ export const subscriptionOptions = [
   {
     value: "1a. monthly-original",
     label: "Monthly-Original",
-    icon: Pencil,
+    icon: LucideCircleCheck,
   },
   {
     value: "1b. yearly-original",
     label: "Yearly-Original",
-    icon: Clock,
+    icon: LucideCircleCheck,
   },
   {
     value: "2a. monthly-banana",
@@ -203,12 +206,17 @@ export const subscriptionOptions = [
   {
     value: "3a. monthly-fatcap",
     label: "Monthly-Fatcap",
-    icon: Pencil,
+    icon: LucideCircleDollarSign,
   },
   {
     value: "3b. yearly-fatcap",
     label: "Yearly-Fatcap",
-    icon: Clock,
+    icon: LucideCircleDollarSign,
+  },
+  {
+    value: "4. none",
+    label: "No Subscription",
+    icon: LucideCircleDashed,
   },
 ];
 
@@ -233,6 +241,7 @@ export const subscriptionStatusOptions = [
     label: "Canceled",
     icon: LucideBadgeX,
   },
+  { value: "-", label: "None", icon: LucideBadge },
 ];
 
 // export function DataTableRowActions<TData>({

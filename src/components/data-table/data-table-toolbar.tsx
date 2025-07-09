@@ -42,7 +42,6 @@ export function DataTableToolbar<TData>({
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,
   );
-  const toolbarData = table.options.meta?.toolbarData;
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
   // const viewAll = table.options.meta?.viewAll;
@@ -221,18 +220,6 @@ export function DataTableToolbar<TData>({
                 )}
               />
             )} */}
-            <span className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">Total Monthly:</p>
-              <p className="text-sm font-bold">
-                {toolbarData?.totalPerMonth?.toFixed(2) ?? 0}
-              </p>
-            </span>
-            <span className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">Total Annual:</p>
-              <p className="text-sm font-bold">
-                {toolbarData?.totalPerYear?.toFixed(2) ?? 0}
-              </p>
-            </span>
           </div>
         )}
         {appsTable && (

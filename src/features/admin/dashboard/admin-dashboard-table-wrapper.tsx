@@ -182,6 +182,7 @@ export function AdminDashboardTableWrapper({
               toolbarData={{
                 totalPerMonth: usersData?.totalPerMonth ?? 0,
                 totalPerYear: usersData?.totalPerYear ?? 0,
+                userCount: usersData?.users?.length ?? 0,
               }}
               onRowSelect={(row) => {
                 console.log(row);
@@ -207,6 +208,7 @@ export function AdminDashboardTableWrapper({
               toolbarData={{
                 totalPerMonth: usersData?.totalPerMonth ?? 0,
                 totalPerYear: usersData?.totalPerYear ?? 0,
+                userCount: usersData?.users?.length ?? 0,
               }}
               defaultSort={{ id: `createdAt`, desc: true }}
               onRowSelect={(row) => {
