@@ -753,14 +753,14 @@ export const RichTextEditor = ({
         >
           <div
             className={cn(
-              "scrollable justy mini max-h-20 min-h-14 text-sm text-muted-foreground",
+              "scrollable justy mini min-h-14 text-sm text-muted-foreground",
               inputPreview && "line-clamp-1 max-h-5 min-h-0",
             )}
           >
             {value ? (
               <div
                 className={cn(
-                  "rich-text__preview-wrapper prose max-w-none text-foreground",
+                  "rich-text__preview-wrapper prose max-w-auto text-foreground",
                   inputPreview && "max-w-10ch truncate",
                 )}
               >

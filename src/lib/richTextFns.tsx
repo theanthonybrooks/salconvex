@@ -25,41 +25,7 @@ export const RichTextDisplay = ({ html, className }: RichTextDisplayProps) => {
 
   return (
     <span className={cn("rich-text", className)}>
-      {parse(normalized, {
-        // replace: (domNode: DOMNode) => {
-        //   if (
-        //     domNode instanceof Element &&
-        //     domNode.name === "li" &&
-        //     domNode.attribs?.["data-type"] === "taskItem"
-        //   ) {
-        //     const checked = domNode.attribs["data-checked"] === "true";
-
-        //     return (
-        //       <li
-        //         data-type="taskItem"
-        //         data-checked={checked}
-        //         className="mb-1 flex gap-1 first:mt-2"
-        //       >
-        //         <Checkbox
-        //           className="rich-check"
-        //           defaultChecked={checked}
-        //           onCheckedChange={(newChecked) => {
-        //             const parent = document.activeElement?.closest("li");
-        //             if (parent) {
-        //               parent.setAttribute(
-        //                 "data-checked",
-        //                 newChecked ? "true" : "false",
-        //               );
-        //             }
-        //           }}
-        //         />
-        //         {domToReact(domNode.children as DOMNode[])}
-        //       </li>
-        //     );
-        //   }
-
-        //   return undefined;
-        // },
+      {parse(normalized, { 
         replace: (domNode: DOMNode) => {
           if (
             domNode instanceof Element &&
