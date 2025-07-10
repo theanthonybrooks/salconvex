@@ -747,6 +747,7 @@ export const TaskDialog = ({
               if (ctrlOrCmd && e.key === "Enter") {
                 e.preventDefault();
                 handleSubmit(e);
+                onClose?.();
               }
             }}
             placeholder="Task title..."
