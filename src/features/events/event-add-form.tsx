@@ -623,10 +623,6 @@ export const EventOCForm = ({
 
             dates: {
               edition: new Date().getFullYear(),
-              // eventFormat: undefined,
-              // prodFormat: undefined,
-              // eventDates: [{ start: "", end: "" }],
-              // prodDates: [{ start: "", end: "" }],
               noProdStart: false,
             },
             links: {
@@ -1029,7 +1025,7 @@ export const EventOCForm = ({
           openCallFiles = result;
 
           saveResults = await saveOrgFile({
-            files: result, // this is your array from handleOrgFileUrl
+            files: result,
             reason: "docs",
             organizationId: orgData._id as Id<"organizations">,
             eventId: eventData._id as Id<"events">,
@@ -1314,7 +1310,7 @@ export const EventOCForm = ({
             },
           });
 
-          console.log("result", result);
+          // console.log("result", result);
 
           setPending(false);
         } catch (error) {
@@ -1324,7 +1320,7 @@ export const EventOCForm = ({
         }
       }
       if (activeStep === steps.length - 1) {
-        console.log("saving final step");
+        // console.log("saving final step");
         let eventResult = null;
         const eventLinks =
           eventData.links && Object.keys(eventData.links).length > 1

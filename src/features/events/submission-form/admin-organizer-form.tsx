@@ -67,6 +67,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [activeStep, setActiveStep] = useState(0);
   const [formType, setFormType] = useState<number>(0);
 
+  const eventOnly = formType === 1;
+
   const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
   // const freeCall = formType === 2;
@@ -83,7 +85,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       event: {
         formType,
         name: "",
-        hasOpenCall: formType === 1 ? "False" : "Fixed",
+        hasOpenCall: eventOnly ? "False" : "Fixed",
       },
       openCall: {
         basicInfo: {
@@ -100,14 +102,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   });
 
   const {
- 
     control,
     watch,
     setValue,
     getValues,
     setError,
     unregister,
-  
+
     handleSubmit,
     formState: {
       // isValid,
@@ -494,7 +495,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               },
               category: eventData.category ?? "event",
 
-              hasOpenCall: eventData.hasOpenCall ?? "Unknown",
+              hasOpenCall: !eventOnly
+                ? (eventData.hasOpenCall ?? "Fixed")
+                : "False",
             },
           }),
         );
@@ -514,16 +517,12 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
             dates: {
               edition: new Date().getFullYear(),
-              // eventFormat: undefined,
-              // prodFormat: undefined,
-              // eventDates: [{ start: "", end: "" }],
-              // prodDates: [{ start: "", end: "" }],
               noProdStart: false,
             },
             links: {
               ...eventLinks,
             },
-            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
+            hasOpenCall: !eventOnly ? "Fixed" : "False",
           },
         });
         // console.log("waffles");
@@ -656,7 +655,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           if (existingOrg) {
             setExistingOrg({
               ...existingOrg,
-              logo: "ballsack.png",
+              logo: orgLogoFullUrl,
               location: {
                 ...existingOrg.location,
                 ...orgData.location,
@@ -672,7 +671,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setPending(false);
         }
 
-        const eventFullUrl = eventData?.logo ?? "ballsack.png";
+        const eventFullUrl = eventData?.logo ?? orgLogoFullUrl;
 
         if (existingEvent) {
           // console.log("existing event");
@@ -727,7 +726,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 edition: new Date().getFullYear(),
                 noProdStart: false,
               },
-              hasOpenCall: eventData.hasOpenCall ?? "Unknown",
+              hasOpenCall:
+                eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             },
           });
         }
@@ -786,7 +786,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             logo: eventLogo,
             type: eventData.type || [],
             category: eventData.category ?? "event",
-            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
+            hasOpenCall:
+              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
+
             dates: {
               edition: eventData.dates.edition,
               eventDates: eventData.dates.eventDates,
@@ -812,8 +814,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           eventResult = event;
 
           setExistingEvent(eventResult);
-          console.log(event);
-          console.log(currentValues.event);
+          // console.log(event);
+          // console.log(currentValues.event);
 
           reset(
             merge({}, currentValues, {
@@ -843,7 +845,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             logo: eventData.logo as string | "1.jpg",
             type: eventData.type || [],
             category: eventData.category ?? "event",
-            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
+            hasOpenCall:
+              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             dates: {
               ...eventData.dates,
             },
@@ -939,7 +942,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             basicInfo: {
               appFee: openCallData.basicInfo?.appFee ?? 0,
               callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
-              callType: eventData.hasOpenCall ?? "Unknown",
+              callType: eventData.hasOpenCall ?? "False",
               dates: {
                 ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
                 ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
@@ -954,14 +957,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             },
             compensation: {
               budget: {
-                hasBudget: false,
-                min: 0,
-                max: undefined,
-                rate: 0,
-                unit: "",
+                hasBudget:
+                  openCallData.compensation?.budget?.hasBudget ?? false,
+                min: openCallData.compensation?.budget?.min ?? 0,
+                max: openCallData.compensation?.budget?.max ?? 0,
+                rate: openCallData.compensation?.budget?.rate ?? 0,
+                unit: openCallData.compensation?.budget?.unit ?? "",
                 currency: orgData.location?.currency?.code ?? "",
-                allInclusive: true,
-                moreInfo: undefined,
+                allInclusive:
+                  openCallData.compensation?.budget?.allInclusive ?? false,
+                moreInfo: openCallData.compensation?.budget?.moreInfo,
               },
               categories: {
                 artistStipend:
@@ -992,7 +997,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 openCallData.requirements.applicationLinkFormat,
               applicationLinkSubject:
                 openCallData.requirements.applicationLinkSubject,
-              otherInfo: undefined,
+              otherInfo: openCallData.requirements.otherInfo,
             },
             documents,
             paid: openCallData.paid ?? false,
@@ -1093,7 +1098,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 openCallData.requirements.applicationLinkFormat,
               applicationLinkSubject:
                 openCallData.requirements.applicationLinkSubject,
-              otherInfo: undefined,
+              otherInfo: openCallData.requirements.otherInfo,
             },
             documents: openCallData.documents as
               | {
@@ -1135,16 +1140,18 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         }
       }
       if (activeStep === steps.length - 2) {
-        console.log("saving org details");
+        // console.log("saving org details");
 
         try {
           setPending(true);
-          console.log("orgData presave", orgData);
+          // console.log("orgData presave", orgData);
 
           const result = await updateOrg({
             orgId: orgData._id as Id<"organizations">,
             name: orgData.name,
-            slug: existingOrg?.slug ?? slugify(orgData.name, { lower: true }),
+            slug:
+              existingOrg?.slug ??
+              slugify(orgData.name?.trim(), { lower: true }),
             logo: orgData.logo as string,
             location: {
               ...orgData.location,
@@ -1155,6 +1162,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             },
             about: orgData.about,
             links: orgData.links,
+            isComplete: true,
           });
 
           if (!result) {
@@ -1186,7 +1194,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             },
           });
 
-          console.log("result", result);
+          // console.log("result", result);
 
           setPending(false);
         } catch (error) {
@@ -1205,13 +1213,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 sameAsOrganizer: true,
               };
 
-        console.log(eventLinks);
+        // console.log(eventLinks);
         try {
           setPending(true);
 
-          if (existingOrg?.isComplete === false) {
+          if (existingOrg?.isComplete !== true) {
             await markOrganizationComplete({
-              orgId: existingOrg._id,
+              orgId: (orgData?._id || existingOrg?._id) as Id<"organizations">,
             });
           }
 
@@ -1224,7 +1232,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             logo: eventData.logo as string,
             type: eventData.type || [],
             category: eventData.category ?? "event",
-            hasOpenCall: eventData.hasOpenCall ?? "Unknown",
+            hasOpenCall:
+              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
             dates: {
               ...eventData.dates,
             },
@@ -1299,7 +1308,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   openCallData.requirements.applicationLinkFormat,
                 applicationLinkSubject:
                   openCallData.requirements.applicationLinkSubject,
-                otherInfo: undefined,
+                otherInfo: openCallData.requirements.otherInfo,
               },
               documents: openCallData.documents as
                 | {
@@ -1332,6 +1341,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       finalStep,
       alreadyPaid,
       formType,
+      eventOnly,
       saveOrgFile,
       hasOpenCall,
       openCallData,
