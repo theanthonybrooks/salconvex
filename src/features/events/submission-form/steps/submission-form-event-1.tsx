@@ -574,41 +574,45 @@ const SubmissionFormEventStep1 = ({
                       </span>
                     </label>
                   )}
-                  <div className="input-section h-full">
-                    <p className="min-w-max font-bold lg:text-xl">
-                      Step{" "}
-                      {categoryEvent && !eventOnly
-                        ? 9
-                        : isOngoing || noEvent
-                          ? 7
-                          : 8}
-                      :{" "}
-                    </p>
-                    <p className="lg:text-xs">
-                      {getEventCategoryLabelAbbr(category)} Timeline
-                    </p>
-                  </div>
-
-                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
-                    <Label htmlFor="event.timeline" className="sr-only">
-                      {getEventCategoryLabelAbbr(category)} Timeline
-                    </Label>
-                    <Controller
-                      name="event.timeLine"
-                      control={control}
-                      render={({ field }) => (
-                        <RichTextEditor
-                          value={field.value ?? ""}
-                          onChange={field.onChange}
-                          placeholder="Important dates: open call, production, judging/selection, etc"
-                          charLimit={1000}
-                          noList={false}
-                        />
-                      )}
-                    />
-                  </div>
                 </>
               )}
+            {hasEventFormat && (
+              <>
+                <div className="input-section h-full">
+                  <p className="min-w-max font-bold lg:text-xl">
+                    Step{" "}
+                    {categoryEvent && !eventOnly
+                      ? 9
+                      : isOngoing || noEvent
+                        ? 7
+                        : 8}
+                    :{" "}
+                  </p>
+                  <p className="lg:text-xs">
+                    {getEventCategoryLabelAbbr(category)} Timeline
+                  </p>
+                </div>
+
+                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+                  <Label htmlFor="event.timeline" className="sr-only">
+                    {getEventCategoryLabelAbbr(category)} Timeline
+                  </Label>
+                  <Controller
+                    name="event.timeLine"
+                    control={control}
+                    render={({ field }) => (
+                      <RichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Important dates: open call, production, judging/selection, etc"
+                        charLimit={1000}
+                        noList={false}
+                      />
+                    )}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </>
       )}

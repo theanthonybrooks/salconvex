@@ -100,16 +100,14 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   });
 
   const {
-    // register,
+ 
     control,
     watch,
     setValue,
     getValues,
     setError,
     unregister,
-    // resetField,
-    // trigger,
-    // setValue,
+  
     handleSubmit,
     formState: {
       // isValid,
@@ -159,7 +157,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     null,
   );
 
-  // const [openCall, setOpenCall] = useState<Doc<"openCalls"> | null>(null);
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const isSelectedRowEmpty =
     selectedRow && Object.keys(selectedRow).length === 0;
