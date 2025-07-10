@@ -244,7 +244,9 @@ export const formatOpenCallDeadline = (
   const timeZoneFormat = dt.offsetNameShort || `GMT${dt.toFormat("ZZ")}`;
 
   if (preview) {
-    if (screenSize === "mobile" || screenSize === "tablet") {
+    if (screenSize === "mobile") {
+      return `${month} ${day} @ ${time} `;
+    } else if (screenSize === "tablet") {
       return `${month} ${day}${ordinal} @ ${time} (${timeZoneFormat})`;
     } else {
       return `${month} ${day}${ordinal}, ${year} @ ${time} `;
