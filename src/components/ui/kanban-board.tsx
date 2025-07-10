@@ -26,8 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
 import { debounce } from "lodash";
-
-type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done";
+import { ColumnType } from "~/convex/kanban/cards";
 
 interface Card {
   title: string;
@@ -108,6 +107,7 @@ const getColumnColor = (column: ColumnType) => {
     todo: "bg-yellow-200",
     doing: "bg-blue-200",
     done: "bg-emerald-200",
+    notPlanned: "bg-red-200",
   };
   return colors[column] || "bg-neutral-500";
 };
@@ -204,6 +204,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
     todo: "To Do",
     doing: "In Progress",
     done: "Complete",
+    notPlanned: "Not Planned",
   };
 
   const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"];
@@ -749,6 +750,7 @@ export const TaskDialog = ({
             <option value="todo">To Do</option>
             <option value="doing">In Progress</option>
             <option value="done">Complete</option>
+            <option value="notPlanned">Not Planned</option>
           </select>
 
           <div className="flex items-center gap-3">

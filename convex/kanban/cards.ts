@@ -1,7 +1,13 @@
 import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 
-type ColumnType = "proposed" | "backlog" | "todo" | "doing" | "done";
+export type ColumnType =
+  | "proposed"
+  | "backlog"
+  | "todo"
+  | "doing"
+  | "done"
+  | "notPlanned";
 
 export const searchCards = query({
   args: {
@@ -43,6 +49,7 @@ export const addCard = mutation({
       v.literal("todo"),
       v.literal("doing"),
       v.literal("done"),
+      v.literal("notPlanned"),
     ),
     order: v.optional(v.string()),
     priority: v.optional(v.string()),
@@ -123,6 +130,7 @@ export const moveCard = mutation({
       v.literal("todo"),
       v.literal("doing"),
       v.literal("done"),
+      v.literal("notPlanned"),
     ),
     beforeId: v.optional(v.id("todoKanban")),
     userId: v.string(),
@@ -206,6 +214,7 @@ export const editCard = mutation({
         v.literal("todo"),
         v.literal("doing"),
         v.literal("done"),
+        v.literal("notPlanned"),
       ),
     ),
     isPublic: v.optional(v.boolean()),

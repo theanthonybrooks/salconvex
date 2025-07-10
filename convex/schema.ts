@@ -714,6 +714,7 @@ export default defineSchema({
       v.literal("todo"),
       v.literal("doing"),
       v.literal("done"),
+      v.literal("notPlanned"),
     ),
     order: v.number(),
     createdAt: v.number(),
