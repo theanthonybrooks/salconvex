@@ -25,6 +25,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { RichTextDisplay } from "@/lib/richTextFns";
 import { debounce } from "lodash";
 import { ColumnType } from "~/convex/kanban/cards";
 
@@ -559,9 +561,13 @@ const Card: React.FC<CardProps> = ({
           )}
         />
 
-        <p className="text-sm text-foreground dark:text-primary-foreground">
+        {/* <p className="text-sm text-foreground dark:text-primary-foreground">
           {title}
-        </p>
+        </p> */}
+        <RichTextDisplay
+          html={title}
+          className="text-sm text-foreground dark:text-primary-foreground"
+        />
       </motion.div>
     </motion.div>
   );
@@ -737,7 +743,15 @@ export const TaskDialog = ({
           <Label htmlFor="title" className="sr-only">
             Task
           </Label>
-          <textarea
+          <RichTextEditor
+            value={title}
+            onChange={(e) => setTitle(e)}
+            placeholder="Task title..."
+            charLimit={5000}
+            asModal={true}
+            inputPreviewClassName="scrollable mini max-h-[60dvh] min-h-72 w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+          />
+          {/* <textarea
             name="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -752,7 +766,7 @@ export const TaskDialog = ({
             }}
             placeholder="Task title..."
             className="scrollable mini max-h-[60dvh] min-h-72 w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
-          />
+          /> */}
 
           <div className="flex items-center gap-3">
             <div className="flex flex-col gap-3">
