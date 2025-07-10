@@ -724,6 +724,8 @@ export default defineSchema({
     lastUpdatedBy: v.string(),
     priority: v.optional(v.string()),
     purpose: v.optional(v.string()),
+    userSuggestion: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
   })
     .searchIndex("search_by_title", {
       searchField: "title",
