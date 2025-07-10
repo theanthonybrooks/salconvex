@@ -127,7 +127,6 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Debounce inside useEffect only
   useEffect(() => {
     const handler = debounce((value: string) => {
       setDebouncedSearch(value);
@@ -136,7 +135,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
     handler(searchTerm.trim());
 
     return () => {
-      handler.cancel(); // prevent memory leaks
+      handler.cancel();
     };
   }, [searchTerm]);
 
@@ -235,12 +234,18 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
           className="w-full max-w-md"
         />
         {debouncedSearch !== "" && (
-          <p
-            className="text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95"
+          // <p
+          //   className="text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95"
+          //   onClick={() => setSearchTerm("")}
+          // >
+          //   Clear Search
+          // </p>
+          <Button
+            variant="salWithShadowHidden"
             onClick={() => setSearchTerm("")}
           >
-            Clear Search
-          </p>
+            Reset
+          </Button>
         )}
       </div>
       <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
