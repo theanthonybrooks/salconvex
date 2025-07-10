@@ -1349,7 +1349,8 @@ div:has(> div.react-datepicker__input-container) {
       padding: 1em 2em 2em;
     }
   }
-  & * a {
+
+  & a {
     font-weight: 600;
     text-decoration: underline;
   }
@@ -1417,11 +1418,20 @@ div:has(> div.react-datepicker__input-container) {
 
 .rich-text__preview-wrapper {
   & p {
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: normal;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 95%;
   }
+  /*  & a {
+    display: inline-block;
+    vertical-align: bottom; /~ Keeps alignment nice with text ~/
+    max-width: 32ch; /~ Or whatever width you prefer ~/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }*/
 }
 
 /* required for @tiptap/extension-placeholder to work */

@@ -242,7 +242,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   <AccordionContent className="text-sm">
                     <RichTextDisplay
                       html={event.about}
-                      className="line-clamp-5"
+                      // className="line-clamp-5"
+                      maxChars={200}
                     />
                     {event.about?.length > 200 && (
                       <button

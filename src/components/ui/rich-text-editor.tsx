@@ -760,7 +760,7 @@ export const RichTextEditor = ({
             {value ? (
               <div
                 className={cn(
-                  "rich-text__preview-wrapper prose max-w-auto text-foreground",
+                  "prose max-w-auto text-foreground",
                   inputPreview && "max-w-10ch truncate",
                 )}
               >

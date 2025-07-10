@@ -750,7 +750,7 @@ export const TaskDialog = ({
             placeholder="Task title..."
             charLimit={5000}
             asModal={true}
-            inputPreviewClassName="scrollable mini max-h-[60dvh] min-h-72 w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+            inputPreviewClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
           {/* <textarea
             name="title"
@@ -770,7 +770,7 @@ export const TaskDialog = ({
           /> */}
 
           <div className="flex items-center gap-3">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-1 flex-col gap-3">
               <Label htmlFor="column">Column</Label>
               <select
                 name="column"
@@ -787,7 +787,7 @@ export const TaskDialog = ({
               </select>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-1 flex-col gap-3">
               <Label htmlFor="priority">Priority</Label>
               <select
                 name="priority"
@@ -804,7 +804,7 @@ export const TaskDialog = ({
             </div>
 
             {!isEdit && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-1 flex-col gap-3">
                 <Label htmlFor="order">Order</Label>
                 <select
                   name="order"
