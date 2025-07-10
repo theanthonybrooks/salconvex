@@ -49,6 +49,10 @@ export default function Home() {
     api.openCalls.openCall.getTotalNumberOfOpenCalls,
   );
 
+  const { data: totalEventsData } = useQueryWithStatus(
+    api.events.event.getTotalNumberOfEvents,
+  );
+
   const [currentSlide, setCurrentSlide] = useState(1);
   const [expanded, setExpanded] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -354,10 +358,14 @@ export default function Home() {
             </span>
             <span className="flex flex-col items-center gap-2 text-nowrap">
               <AnimatedCounter
-                to={1100}
+                to={
+                  1131 +
+                  ((totalEventsData?.activeEvents ?? 0) +
+                    (totalEventsData?.archivedEvents ?? 0))
+                }
                 className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
                 duration={2}
-                plus
+                plus={false}
               />
               <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
                 {" "}
