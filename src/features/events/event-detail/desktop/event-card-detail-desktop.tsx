@@ -141,19 +141,22 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 />
               </span>
             </p>
-            <div className="flex flex-col items-start gap-1 text-sm">
-              <span className="space-x-1 font-semibold">
-                {getEventCategoryLabel(eventCategory)} Dates:
-              </span>
-              <EventDates
-                event={event}
-                format="desktop"
-                limit={0}
-                type="event"
-              />
-            </div>
+            {event.dates.eventFormat !== "noEvent" && (
+              <div className="flex flex-col items-start gap-1 text-sm">
+                <span className="space-x-1 font-semibold">
+                  {getEventCategoryLabel(eventCategory)} Dates:
+                </span>
+                <EventDates
+                  event={event}
+                  format="desktop"
+                  limit={0}
+                  type="event"
+                />
+              </div>
+            )}
             {/*//todo: add this part */}
-            {(eventCategory === "project" ||
+            {((eventCategory === "project" &&
+              event.dates.eventFormat === "noEvent") ||
               (eventCategory === "event" && prodEnd)) && (
               <div className="flex flex-col items-start gap-1 text-sm">
                 <span className="space-x-1 font-semibold">
