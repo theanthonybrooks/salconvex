@@ -210,11 +210,21 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
   const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"];
   const hasProposed =
     cards.some((card) => card.column === "proposed") || purpose === "design";
+  const hasNotPlanned =
+    cards.some((card) => card.column === "notPlanned") || purpose === "design";
 
-  const orderedColumns: ColumnType[] = hasProposed
-    ? ["proposed", ...baseColumns]
-    : baseColumns;
+  // const orderedColumns: ColumnType[] = hasProposed
+  //   ? ["proposed", ...baseColumns]
+  //   : baseColumns;
 
+  let orderedColumns: ColumnType[] = [...baseColumns];
+
+  if (hasProposed) {
+    orderedColumns = ["proposed", ...orderedColumns];
+  }
+  if (hasNotPlanned) {
+    orderedColumns = [...orderedColumns, "notPlanned"];
+  }
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
       <div className="flex items-center gap-3">
