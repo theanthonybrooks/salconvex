@@ -750,41 +750,45 @@ export const TaskDialog = ({
               }
             }}
             placeholder="Task title..."
-            className="scrollable mini w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+            className="scrollable mini max-h-[60dvh] min-h-72 w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
 
-          <Label htmlFor="column">Column</Label>
-          <select
-            name="column"
-            value={column}
-            onChange={(e) => setColumn(e.target.value as ColumnType)}
-            className="rounded border bg-background p-2 text-foreground"
-          >
-            <option value="proposed">Proposed</option>
-            <option value="backlog">Considering</option>
-            <option value="todo">To Do</option>
-            <option value="doing">In Progress</option>
-            <option value="done">Complete</option>
-            <option value="notPlanned">Not Planned</option>
-          </select>
-
           <div className="flex items-center gap-3">
-            <Label htmlFor="priority">Priority</Label>
-            <select
-              name="priority"
-              value={priority}
-              onChange={(e) =>
-                setPriority(e.target.value as "low" | "medium" | "high")
-              }
-              className="rounded border bg-card p-2 text-foreground"
-            >
-              <option value="high">🟢 High</option>
-              <option value="medium">🟡Medium</option>
-              <option value="low">🔴 Low</option>
-            </select>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="column">Column</Label>
+              <select
+                name="column"
+                value={column}
+                onChange={(e) => setColumn(e.target.value as ColumnType)}
+                className="rounded border bg-background p-2 text-foreground"
+              >
+                <option value="proposed">Proposed</option>
+                <option value="backlog">Considering</option>
+                <option value="todo">To Do</option>
+                <option value="doing">In Progress</option>
+                <option value="done">Complete</option>
+                <option value="notPlanned">Not Planned</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="priority">Priority</Label>
+              <select
+                name="priority"
+                value={priority}
+                onChange={(e) =>
+                  setPriority(e.target.value as "low" | "medium" | "high")
+                }
+                className="rounded border bg-card p-2 text-foreground"
+              >
+                <option value="high">🟢 High</option>
+                <option value="medium">🟡Medium</option>
+                <option value="low">🔴 Low</option>
+              </select>
+            </div>
 
             {!isEdit && (
-              <>
+              <div className="flex flex-col gap-3">
                 <Label htmlFor="order">Order</Label>
                 <select
                   name="order"
@@ -795,7 +799,7 @@ export const TaskDialog = ({
                   <option value="start">Start</option>
                   <option value="end">End</option>
                 </select>
-              </>
+              </div>
             )}
           </div>
 
