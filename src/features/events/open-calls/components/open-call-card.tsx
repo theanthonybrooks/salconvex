@@ -635,29 +635,7 @@ const OpenCallCard = ({
               )}
             </AccordionContent>
           </AccordionItem>
-          {/* 
-          {reqsDocs && reqsDocs.length > 0 && (
-            <AccordionItem
-              value="AppDocs"
-              className="rounded-lg border-2 bg-white/30 px-4"
-            >
-              <AccordionTrigger title="Documents:" />
-              <AccordionContent>
-                <ol className="list-outside list-decimal px-4 pl-6">
-                  {reqsDocs?.map((document, index) => (
-                    <li key={index} className="py-2">
-                      <div className="flex items-center gap-x-2">
-                        {document.title}
-                        <a href={document.href} download={document.title}>
-                          <Download className="size-5 hover:scale-110" />
-                        </a>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </AccordionContent>
-            </AccordionItem>
-          )} */}
+
           {reqsDocs && reqsDocs.length > 0 && (
             <>
               {reqsDocs.some((doc) =>
@@ -722,7 +700,10 @@ const OpenCallCard = ({
             </AccordionItem>
           )}
           {openCall?.requirements?.otherInfo && (
-            <AccordionItem value="ApplicationOther">
+            <AccordionItem
+              value="ApplicationOther"
+              className="rounded-lg border-2 bg-white/30 px-4"
+            >
               <AccordionTrigger title="Other info:" />
               <AccordionContent>
                 <div className="flex flex-col space-y-3 p-3">
