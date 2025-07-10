@@ -8,6 +8,7 @@ import { siteUrl } from "@/constants/siteInfo";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata() {
   const headersList = await headers();
@@ -39,6 +40,13 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname");
+
+  if (pathname === "/map") {
+    redirect("https://thestreetartlist.helioho.st/map");
+  }
+
   return (
     // <ClientAuthWrapper>
     <>
