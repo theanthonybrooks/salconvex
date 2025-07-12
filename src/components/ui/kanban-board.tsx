@@ -752,11 +752,7 @@ export const TaskDialog = ({
             asModal={true}
             inputPreviewClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
-          <input
-            autoFocus
-            className="invisible absolute m-0 h-0 w-0 p-0"
-            tabIndex={-1}
-          />
+          <input autoFocus className="sr-only" />
 
           {/* <textarea
             name="title"
