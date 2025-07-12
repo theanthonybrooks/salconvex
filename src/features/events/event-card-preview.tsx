@@ -560,6 +560,7 @@ const EventCardPreview = ({
                 <RichTextDisplay
                   html={event.about}
                   className="line-clamp-3 text-sm"
+                  maxChars={100}
                 />
               </div>
             )}

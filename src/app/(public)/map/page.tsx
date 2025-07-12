@@ -1,3 +1,5 @@
+// TODO: remove the redirect from the layout.tsx file once the map is actually functional
+
 "use client";
 
 import { Separator } from "@/components/ui/separator";
