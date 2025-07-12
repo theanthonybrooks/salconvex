@@ -210,6 +210,8 @@ export function AdminDashboardTableWrapper({
               toolbarData={{
                 totalMonthly: usersData?.totalMonthly ?? 0,
                 totalYearly: usersData?.totalYearly ?? 0,
+                totalThisMonth: usersData?.totalThisMonth ?? 0,
+                totalThisYear: usersData?.totalThisYear ?? 0,
                 userCount: usersData?.users?.length ?? 0,
               }}
               defaultSort={{ id: `createdAt`, desc: true }}

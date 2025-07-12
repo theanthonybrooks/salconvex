@@ -102,7 +102,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
                   maximumFractionDigits: 2,
                 }) ?? 0}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="hidden text-sm text-muted-foreground lg:block">
                 ({currency === "usd" ? "$" : "€"}
                 {convertedTotalPerMonth.toLocaleString("en-US", {
                   minimumFractionDigits: 0,
@@ -120,7 +120,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
                   maximumFractionDigits: 2,
                 }) ?? 0}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="hidden text-sm text-muted-foreground lg:block">
                 ({currency === "usd" ? "$" : "€"}
                 {convertedTotalPerYear.toLocaleString("en-US", {
                   minimumFractionDigits: 0,
