@@ -37,6 +37,7 @@ export const BasicPagination = ({
   const firstPage = page === 1;
   const lastPage = page === totalPages;
   const singlePage = totalPages === 1;
+  const backTrigger = page > 2;
 
   // const [prevTotal, setPrevTotal] = useState(totalPages);
 
@@ -149,7 +150,7 @@ export const BasicPagination = ({
             <p
               className={cn(
                 "col-start-3 hidden opacity-0 sm:block",
-                lastPage && !firstPage && totalPages > 2
+                backTrigger && totalPages > 2
                   ? "cursor-pointer decoration-2 underline-offset-2 opacity-100 hover:underline"
                   : "pointer-events-none",
               )}
