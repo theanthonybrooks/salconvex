@@ -42,8 +42,10 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
 export type ToolbarData = {
-  totalPerMonth?: number;
-  totalPerYear?: number;
+  totalThisMonth?: number;
+  totalThisYear?: number;
+  totalMonthly?: number;
+  totalYearly?: number;
   userCount?: number;
 };
 

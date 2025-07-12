@@ -26,26 +26,56 @@ interface UserAdminToolbarProps {
 export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
   const userData = useQuery(api.users.getCurrentUser, {});
   const [currency, setCurrency] = useState<"usd" | "eur">("usd");
+  const [convertedTotalThisMonth, setConvertedTotalThisMonth] =
+    useState<number>(toolbarData?.totalThisMonth ?? 0);
+  const [convertedTotalThisYear, setConvertedTotalThisYear] = useState<number>(
+    toolbarData?.totalThisYear ?? 0,
+  );
   const [convertedTotalPerMonth, setConvertedTotalPerMonth] = useState<number>(
-    toolbarData?.totalPerMonth ?? 0,
+    toolbarData?.totalMonthly ?? 0,
+  );
+  const [convertedTotalPerYear, setConvertedTotalPerYear] = useState<number>(
+    toolbarData?.totalYearly ?? 0,
   );
 
   const isAdmin = userData?.user?.role?.includes("admin");
-  const totalPerMonth = toolbarData?.totalPerMonth ?? 0;
+  const totalThisMonth = toolbarData?.totalThisMonth ?? 0;
+  const totalThisYear = toolbarData?.totalThisYear ?? 0;
+  const totalMonthly = toolbarData?.totalMonthly ?? 0;
+  const totalYearly = toolbarData?.totalYearly ?? 0;
   //   const userCount = toolbarData?.userCount;
   const usersMode = mode === "users";
 
   useEffect(() => {
     if (currency === "usd") {
-      setConvertedTotalPerMonth(totalPerMonth);
+      setConvertedTotalThisMonth(totalThisMonth);
+      setConvertedTotalThisYear(totalThisYear);
+      setConvertedTotalPerMonth(totalMonthly);
+      setConvertedTotalPerYear(totalYearly);
       return;
     }
+
     convertCurrency({
-      amount: totalPerMonth,
+      amount: totalThisMonth,
+      from: "USD",
+      to: currency.toUpperCase(),
+    }).then(setConvertedTotalThisMonth);
+    convertCurrency({
+      amount: totalThisYear,
+      from: "USD",
+      to: currency.toUpperCase(),
+    }).then(setConvertedTotalThisYear);
+    convertCurrency({
+      amount: totalMonthly,
       from: "USD",
       to: currency.toUpperCase(),
     }).then(setConvertedTotalPerMonth);
-  }, [currency, totalPerMonth]);
+    convertCurrency({
+      amount: totalYearly,
+      from: "USD",
+      to: currency.toUpperCase(),
+    }).then(setConvertedTotalPerYear);
+  }, [currency, totalThisMonth, totalThisYear, totalMonthly, totalYearly]);
 
   if (!isAdmin) return null;
 
@@ -64,14 +94,25 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
               <p className="text-sm font-bold">{userCount ?? 0}</p>
             </span> */}
             <span className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">Total Monthly:</p>
+              <p className="text-sm text-muted-foreground">This Month:</p>
               <p className="text-sm font-bold">
                 {currency === "usd" ? "$" : "€"}
-                {convertedTotalPerMonth.toLocaleString() ?? 0}
+                {convertedTotalThisMonth.toLocaleString() ?? 0}
               </p>
               <p className="text-sm text-muted-foreground">
                 ({currency === "usd" ? "$" : "€"}
-                {(convertedTotalPerMonth * 12).toLocaleString()} per year)
+                {convertedTotalPerMonth.toLocaleString()} per month)
+              </p>
+            </span>
+            <span className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">This Year:</p>
+              <p className="text-sm font-bold">
+                {currency === "usd" ? "$" : "€"}
+                {convertedTotalThisYear.toLocaleString() ?? 0}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                ({currency === "usd" ? "$" : "€"}
+                {convertedTotalPerYear.toLocaleString()} per year)
               </p>
             </span>
           </div>

@@ -29,7 +29,13 @@ export const usersWithSubscriptions = query({
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();
     let totalPerMonth = 0;
-    let totalPerYear = 0;
+    let totalThisYear = 0;
+    let totalMonthly = 0;
+    let totalYearly = 0;
+    let totalThisMonth = 0;
+    const today = new Date();
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+
     const results = await Promise.all(
       users.map(async (user) => {
         const fullName = `${user.firstName} ${user.lastName}`.trim();
@@ -57,13 +63,33 @@ export const usersWithSubscriptions = query({
         const interval = subscription?.interval ?? "unknown";
         const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;
         const amount = subAmount ?? 0;
+        const trialEndsAt = subscription?.trialEndsAt
+          ? new Date(subscription.trialEndsAt)
+          : null;
+        const currentPeriodEndAt = subscription?.currentPeriodEnd
+          ? new Date(subscription.currentPeriodEnd)
+          : null;
+
+        const trialEndsThisMonth =
+          trialEndsAt && trialEndsAt >= today && trialEndsAt < nextMonth;
+        const periodEndsThisMonth =
+          currentPeriodEndAt &&
+          currentPeriodEndAt >= today &&
+          currentPeriodEndAt < nextMonth;
 
         if (interval === "month") {
-          totalPerMonth += amount;
-          totalPerYear += amount * 12;
+          totalThisMonth += amount;
+          totalThisYear += amount * 12;
+          totalMonthly += amount;
         } else if (interval === "year") {
-          totalPerYear += amount;
+          if (trialEndsThisMonth || periodEndsThisMonth) {
+            console.log("trialEndsThisMonth", trialEndsThisMonth, amount);
+            console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
+            totalThisMonth += amount;
+          }
+          totalThisYear += amount;
           totalPerMonth += amount / 12;
+          totalYearly += amount;
         }
 
         const label = subscription
@@ -98,13 +124,15 @@ export const usersWithSubscriptions = query({
         };
       }),
     );
-    totalPerMonth = totalPerMonth / 100;
-    totalPerYear = totalPerYear / 100;
+    totalThisMonth = totalThisMonth / 100;
+    totalThisYear = totalThisYear / 100;
 
     return {
       users: results,
-      totalPerMonth,
-      totalPerYear,
+      totalThisMonth,
+      totalThisYear,
+      totalMonthly,
+      totalYearly,
     };
   },
 });
