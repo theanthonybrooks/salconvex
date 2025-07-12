@@ -126,6 +126,13 @@ export const usersWithSubscriptions = query({
     );
     totalThisMonth = totalThisMonth / 100;
     totalThisYear = totalThisYear / 100;
+    totalMonthly = totalMonthly / 100;
+    totalYearly = totalYearly / 100;
+
+    console.log("totalMonthly", totalMonthly);
+    console.log("totalYearly", totalYearly);
+    console.log("totalThisMonth", totalThisMonth);
+    console.log("totalThisYear", totalThisYear);
 
     return {
       users: results,
