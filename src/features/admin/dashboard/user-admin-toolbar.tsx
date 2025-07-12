@@ -97,22 +97,36 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
               <p className="text-sm text-muted-foreground">This Month:</p>
               <p className="text-sm font-bold">
                 {currency === "usd" ? "$" : "€"}
-                {convertedTotalThisMonth.toLocaleString() ?? 0}
+                {convertedTotalThisMonth.toLocaleString("en-US", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                }) ?? 0}
               </p>
               <p className="text-sm text-muted-foreground">
                 ({currency === "usd" ? "$" : "€"}
-                {convertedTotalPerMonth.toLocaleString()} per month)
+                {convertedTotalPerMonth.toLocaleString("en-US", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                per month)
               </p>
             </span>
             <span className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground">This Year:</p>
               <p className="text-sm font-bold">
                 {currency === "usd" ? "$" : "€"}
-                {convertedTotalThisYear.toLocaleString() ?? 0}
+                {convertedTotalThisYear.toLocaleString("en-US", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                }) ?? 0}
               </p>
               <p className="text-sm text-muted-foreground">
                 ({currency === "usd" ? "$" : "€"}
-                {convertedTotalPerYear.toLocaleString()} per year)
+                {convertedTotalPerYear.toLocaleString("en-US", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                per year)
               </p>
             </span>
           </div>
