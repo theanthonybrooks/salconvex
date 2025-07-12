@@ -94,7 +94,7 @@ export const RichTextEditor = ({
   tabIndex,
 }: Props) => {
   const linkDialogRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   const [hoverPreview, setHoverPreview] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
@@ -242,13 +242,13 @@ export const RichTextEditor = ({
 
     setTimeout(() => {
       setPending(false);
-      setOpen(false);
+      setEditorOpen(false);
     }, 1000);
   }, [tempContent, onChange, onBlur]);
 
   const handleDiscard = () => {
     setTempContent(value);
-    setOpen(false);
+    setEditorOpen(false);
   };
 
   function selectionHasAnyMarks(editor: Editor) {
@@ -267,7 +267,7 @@ export const RichTextEditor = ({
   }
 
   useEffect(() => {
-    if (!open) return;
+    if (!editorOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const isCmdEnter = e.metaKey && e.key === "Enter";
@@ -281,23 +281,23 @@ export const RichTextEditor = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, hasUnsavedChanges, handleAccept]);
+  }, [editorOpen, hasUnsavedChanges, handleAccept]);
 
   useEffect(() => {
-    if (open && editor) {
+    if (editorOpen && editor) {
       setTempContent(value);
       editor.commands.setContent(value);
     }
-  }, [open, editor, value]);
+  }, [editorOpen, editor, value]);
 
   useEffect(() => {
-    if (!open) return;
-    if (tempContent !== value && open) {
+    if (!editorOpen) return;
+    if (tempContent !== value && editorOpen) {
       setHasUnsavedChanges(true);
     } else {
       setHasUnsavedChanges(false);
     }
-  }, [tempContent, value, open]);
+  }, [tempContent, value, editorOpen]);
 
   useEffect(() => {
     if (!editor) return;
@@ -359,7 +359,7 @@ export const RichTextEditor = ({
     if (!next && tempContent !== value) {
       setShowUnsavedDialog(true);
     } else {
-      setOpen(next);
+      setEditorOpen(next);
     }
   };
 
@@ -714,7 +714,7 @@ export const RichTextEditor = ({
               if (hasUnsavedChanges) {
                 handleAccept();
               } else {
-                setOpen(false);
+                setEditorOpen(false);
               }
             }}
           >
@@ -741,13 +741,13 @@ export const RichTextEditor = ({
             inputPreviewClassName,
           )}
           tabIndex={tabIndex}
-          onClick={() => setOpen(true)}
+          onClick={() => setEditorOpen(true)}
           onMouseEnter={() => setHoverPreview(true)}
           onMouseLeave={() => setHoverPreview(false)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              setOpen(true);
+              setEditorOpen(true);
             }
           }}
         >
@@ -786,8 +786,8 @@ export const RichTextEditor = ({
           )}
         </div>
 
-        {/* <Dialog open={open} onOpenChange={setOpen}> */}
-        <Dialog open={open} onOpenChange={handleDialogChange}>
+        {/* <Dialog open={open} onOpenChange={setEditorOpen}> */}
+        <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
             className="h-[90dvh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:w-[95vw]"
             overlayClassName="z-[31]"
