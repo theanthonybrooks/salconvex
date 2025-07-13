@@ -764,7 +764,7 @@ export const RichTextEditor = ({
                   inputPreview && "max-w-10ch truncate",
                 )}
               >
-                <RichTextDisplay html={value} />
+                <RichTextDisplay html={value} maxChars={250} />
               </div>
             ) : (
               <span className="italic text-gray-400">

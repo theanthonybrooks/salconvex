@@ -745,6 +745,7 @@ export default defineSchema({
       searchField: "description",
       filterFields: ["column", "order", "priority", "public", "purpose"],
     })
+    
     .index("by_column_completedAt", ["column", "completedAt"])
     .index("by_purpose", ["purpose"])
     .index("by_column_order", ["column", "order"]),

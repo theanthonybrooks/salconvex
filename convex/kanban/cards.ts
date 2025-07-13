@@ -280,6 +280,8 @@ export const editCard = mutation({
       lastUpdatedBy: args.userId,
       priority: args.priority,
       public: args.isPublic,
+      category: args.category,
+      voters: args.voters,
       ...(args.column !== undefined && { column: args.column }),
     });
   },
