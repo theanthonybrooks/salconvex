@@ -32,10 +32,7 @@ export const OrganizerCard = ({
             {organizer.about && (
               <section>
                 <p className="text-sm font-semibold">About the Organization:</p>
-                <RichTextDisplay
-                  html={organizer.about}
-                  className="line-clamp-4 text-sm"
-                />
+                <RichTextDisplay html={organizer.about} className="text-sm" />
               </section>
             )}
             <section className="flex flex-col gap-y-2 border-b-2 border-dotted border-foreground/20 pb-3">

@@ -73,6 +73,7 @@ interface AddCardArgs {
   column: ColumnType;
   userId: string;
   order?: "start" | "end";
+  voters?: Voter[];
   priority?: string;
   category: string;
   isPublic: boolean;

@@ -72,6 +72,14 @@ export const addCard = mutation({
     userId: v.string(),
     isPublic: v.boolean(),
     purpose: v.string(),
+    voters: v.optional(
+      v.array(
+        v.object({
+          userId: v.id("users"),
+          direction: v.union(v.literal("up"), v.literal("down")),
+        }),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     const {
