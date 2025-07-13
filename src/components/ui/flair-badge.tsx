@@ -4,9 +4,10 @@ import React from "react";
 interface FlairBadgeProps {
   children: React.ReactNode;
   className?: string;
+  icon?: React.ReactNode;
 }
 
-export const FlairBadge = ({ children, className }: FlairBadgeProps) => {
+export const FlairBadge = ({ children, className, icon }: FlairBadgeProps) => {
   return (
     <div
       className={cn(
@@ -14,6 +15,7 @@ export const FlairBadge = ({ children, className }: FlairBadgeProps) => {
         className,
       )}
     >
+      {icon}
       {children}
     </div>
   );

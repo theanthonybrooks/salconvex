@@ -1,4 +1,6 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "../_generated/server";
 
 export type ColumnType =
@@ -9,16 +11,28 @@ export type ColumnType =
   | "done"
   | "notPlanned";
 
+export type VoteType = {
+  upVote: number;
+  downVote: number;
+};
+
+export type Voter = {
+  userId: Id<"users">;
+  direction: "up" | "down";
+};
+
 export const searchCards = query({
   args: {
     purpose: v.optional(v.string()),
     searchTerm: v.optional(v.string()),
+    category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    //todo: add category filter dropdown to search bar
     let q = ctx.db
       .query("todoKanban")
-      .withSearchIndex("search_by_title", (q) => {
-        let filter = q.search("title", args.searchTerm ?? "");
+      .withSearchIndex("search_by_desc", (q) => {
+        let filter = q.search("description", args.searchTerm ?? "");
         if (args.purpose) {
           filter = filter.eq("purpose", args.purpose);
         }
@@ -43,6 +57,7 @@ export const getCards = query({
 export const addCard = mutation({
   args: {
     title: v.string(),
+    description: v.string(),
     column: v.union(
       v.literal("proposed"),
       v.literal("backlog"),
@@ -53,20 +68,34 @@ export const addCard = mutation({
     ),
     order: v.optional(v.string()),
     priority: v.optional(v.string()),
+    category: v.optional(v.string()),
     userId: v.string(),
     isPublic: v.boolean(),
     purpose: v.string(),
   },
   handler: async (ctx, args) => {
-    const { column, order, title, userId, priority, isPublic } = args;
+    const {
+      column,
+      order,
+      title,
+      description,
+
+      category,
+      userId,
+      priority,
+      isPublic,
+    } = args;
 
     if (column === "done") {
       return await ctx.db.insert("todoKanban", {
         title,
+        description,
         column,
         createdAt: Date.now(),
         lastUpdatedBy: userId,
         order: 0,
+        voters: [],
+        category: category ?? "general",
         priority,
         public: isPublic,
         purpose: args.purpose,
@@ -90,10 +119,13 @@ export const addCard = mutation({
       // Insert new card at order = 0
       return await ctx.db.insert("todoKanban", {
         title,
+        description,
         column,
         createdAt: Date.now(),
         lastUpdatedBy: userId,
         order: 0,
+        voters: [],
+        category: category ?? "general",
         priority,
         public: isPublic,
         purpose: args.purpose,
@@ -111,10 +143,14 @@ export const addCard = mutation({
 
     return await ctx.db.insert("todoKanban", {
       title,
+      description,
       column: column as ColumnType,
       createdAt: Date.now(),
       lastUpdatedBy: userId,
       order: newOrder,
+      voters: [],
+
+      category: category ?? "general",
       public: isPublic,
       purpose: args.purpose,
     });
@@ -205,6 +241,7 @@ export const editCard = mutation({
   args: {
     id: v.id("todoKanban"),
     title: v.string(),
+    description: v.optional(v.string()),
     userId: v.string(),
     priority: v.optional(v.string()),
     column: v.optional(
@@ -216,6 +253,13 @@ export const editCard = mutation({
         v.literal("done"),
         v.literal("notPlanned"),
       ),
+    ),
+    category: v.string(),
+    voters: v.array(
+      v.object({
+        userId: v.id("users"),
+        direction: v.union(v.literal("up"), v.literal("down")),
+      }),
     ),
     isPublic: v.optional(v.boolean()),
     purpose: v.string(),
@@ -231,6 +275,7 @@ export const editCard = mutation({
 
     return await ctx.db.patch(args.id, {
       title: args.title,
+      description: args.description,
       updatedAt: Date.now(),
       lastUpdatedBy: args.userId,
       priority: args.priority,
@@ -246,7 +291,47 @@ export const deleteCard = mutation({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    // console.log(`Card ${args.id} deleted by ${args.userId}`)
     return await ctx.db.delete(args.id);
+  },
+});
+
+export const voteCard = mutation({
+  args: {
+    id: v.id("todoKanban"),
+    direction: v.union(v.literal("up"), v.literal("down")),
+  },
+  handler: async (ctx, args) => {
+    const { id, direction } = args;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const card = await ctx.db.get(id);
+    if (!card) throw new Error("Card not found");
+
+    let voters = card.voters ?? [];
+
+    const existing = voters.find((v) => v.userId === userId);
+
+    if (existing) {
+      if (existing.direction === direction) {
+        voters = voters.filter((v) => v.userId !== userId);
+      } else {
+        voters = voters.map((v) =>
+          v.userId === userId ? { ...v, direction } : v,
+        );
+      }
+    } else {
+      voters.push({ userId, direction });
+    }
+
+    await ctx.db.patch(id, { voters });
+
+    const upVote = voters.filter((v) => v.direction === "up").length;
+    const downVote = voters.filter((v) => v.direction === "down").length;
+
+    const votedUsers = voters.map((v) => v.userId);
+    const userVoted = votedUsers.includes(userId);
+
+    return { upVote, downVote, userVoted };
   },
 });

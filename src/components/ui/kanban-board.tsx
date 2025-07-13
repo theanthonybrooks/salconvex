@@ -4,7 +4,14 @@
 import { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import {
+  Construction,
+  Eye,
+  LucideThumbsDown,
+  LucideThumbsUp,
+  Palette,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
@@ -23,19 +30,31 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { FlairBadge } from "@/components/ui/flair-badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { Textarea } from "@/components/ui/textarea";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { User } from "@/types/user";
 import { debounce } from "lodash";
-import { ColumnType } from "~/convex/kanban/cards";
+import {
+  FcHighPriority,
+  FcLowPriority,
+  FcMediumPriority,
+} from "react-icons/fc";
+import { ColumnType, Voter } from "~/convex/kanban/cards";
 
 interface Card {
   title: string;
+  description: string;
   id: string;
   column: ColumnType;
   priority?: string;
+  voters: Voter[];
+  category: string;
   isPublic: boolean;
   purpose: string;
 }
@@ -50,10 +69,12 @@ interface MoveCardArgs {
 
 interface AddCardArgs {
   title: string;
+  description: string;
   column: ColumnType;
   userId: string;
   order?: "start" | "end";
   priority?: string;
+  category: string;
   isPublic: boolean;
   purpose: string;
 }
@@ -79,9 +100,12 @@ interface ColumnProps {
 
 interface CardProps {
   title: string;
+  description: string;
   id: string;
   column: ColumnType;
   priority?: string;
+  voters: Voter[];
+  category: string;
   isPublic: boolean;
   purpose: string;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
@@ -160,8 +184,11 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
     ([] as {
       _id: Id<"todoKanban">;
       title: string;
+      description: string;
       column: ColumnType;
       order: number;
+      voters: Voter[];
+      category: string;
       priority?: string;
       public: boolean;
       purpose: string;
@@ -176,6 +203,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
       id: _id,
       isPublic,
       purpose,
+
       ...rest,
     }))
     .sort((a, b) => {
@@ -445,19 +473,38 @@ const Column: React.FC<
 
 const Card: React.FC<CardProps> = ({
   title,
+  description,
   id,
   column,
   handleDragStart,
   deleteCard,
   priority,
+  voters,
+  category,
   isPublic,
   purpose,
 }) => {
   const [newPriority, setNewPriority] = useState(priority || "medium");
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const userData = useQuery(api.users.getCurrentUser, {});
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin");
 
   const editCard = useMutation(api.kanban.cards.editCard);
+
+  const detailValues = {
+    title,
+    description,
+    category,
+    voters,
+    priority: (["low", "medium", "high"].includes(priority ?? "")
+      ? priority
+      : "medium") as "low" | "medium" | "high",
+    column,
+    isPublic,
+  };
 
   // Delete function
   const handleDelete = async (e: React.MouseEvent) => {
@@ -479,8 +526,11 @@ const Card: React.FC<CardProps> = ({
       editCard({
         id: id as Id<"todoKanban">,
         title,
+        description,
+        category,
+        voters,
         priority: updatedPriority,
-        userId: "admin",
+        userId: user?._id ?? "guest",
         isPublic,
         purpose,
       });
@@ -499,8 +549,11 @@ const Card: React.FC<CardProps> = ({
         onDragStart={(e) =>
           handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
             title,
+            description,
             id,
             column,
+            voters,
+            category,
             priority,
             isPublic,
             purpose,
@@ -510,13 +563,16 @@ const Card: React.FC<CardProps> = ({
           column,
         )}`}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={!isEditing ? () => setIsHovered(false) : () => {}}
+        onMouseLeave={
+          !isEditing && !isPreviewing ? () => setIsHovered(false) : () => {}
+        }
       >
         {isHovered && (
           <div className="absolute right-0 top-0 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
               purpose={purpose}
               mode="edit"
+              isOpen={isEditing}
               onClick={() => setIsEditing(true)}
               onClose={() => {
                 setIsEditing(false);
@@ -527,10 +583,13 @@ const Card: React.FC<CardProps> = ({
               }
               initialValues={{
                 title,
+                description,
                 column,
                 priority: (["low", "medium", "high"].includes(priority ?? "")
                   ? priority
                   : "medium") as "low" | "medium" | "high",
+                voters,
+                category: category ?? "general",
                 isPublic: isPublic ?? true,
               }}
               onSubmit={(data) => {
@@ -542,6 +601,24 @@ const Card: React.FC<CardProps> = ({
                 });
                 setNewPriority(data.priority);
               }}
+            />
+            <DetailsDialog
+              user={user}
+              isAdmin={isAdmin ?? false}
+              onClick={() => setIsPreviewing(true)}
+              onClose={() => {
+                setIsPreviewing(false);
+                setIsHovered(false);
+              }}
+              onEdit={() => {
+                if (!isAdmin) return;
+                setIsEditing(true);
+              }}
+              trigger={
+                <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
+              }
+              initialValues={detailValues}
+              id={id as Id<"todoKanban">}
             />
 
             <X
@@ -611,7 +688,10 @@ const AddCard: React.FC<{
         priority: "medium",
         order: "start",
         title: "",
+        description: "",
         isPublic: true,
+        voters: [],
+        category: "general",
       }}
       onSubmit={(data) => {
         addCard({
@@ -626,8 +706,11 @@ const AddCard: React.FC<{
 
 type BaseTaskValues = {
   title: string;
+  description: string;
   column: ColumnType;
   priority: "low" | "medium" | "high";
+  voters: Voter[];
+  category: string;
   isPublic: boolean;
 };
 
@@ -642,17 +725,29 @@ type AddTaskDialogProps = {
   mode: "add";
   initialValues?: BaseTaskValues & { order: "start" | "end" };
   onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
+  isOpen?: boolean;
 } & BaseTaskDialogSharedProps;
 
 type EditTaskDialogProps = {
   purpose: string;
   mode: "edit";
+  isOpen: boolean;
   initialValues?: BaseTaskValues;
   onSubmit: (values: BaseTaskValues) => void;
 } & BaseTaskDialogSharedProps;
 
 type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
 
+type DetailsDialogProps = {
+  id: Id<"todoKanban">;
+  trigger: React.ReactNode;
+  initialValues: BaseTaskValues;
+  onClick?: () => void;
+  onClose?: () => void;
+  onEdit?: () => void;
+  isAdmin: boolean;
+  user: User | null;
+};
 export const TaskDialog = ({
   mode,
   trigger,
@@ -660,8 +755,13 @@ export const TaskDialog = ({
   onSubmit,
   onClick,
   onClose,
+  isOpen,
 }: TaskDialogProps) => {
+  const voters = initialValues?.voters || [];
   const [title, setTitle] = useState(initialValues?.title || "");
+  const [description, setDescription] = useState(
+    initialValues?.description || "",
+  );
   const [column, setColumn] = useState<ColumnType>(
     initialValues?.column || "todo",
   );
@@ -671,6 +771,9 @@ export const TaskDialog = ({
   const isSubmittingRef = useRef(false);
   const [order, setOrder] = useState<"start" | "end">(
     mode === "add" && initialValues?.order ? initialValues.order : "start",
+  );
+  const [category, setCategory] = useState(
+    initialValues?.category || "general",
   );
 
   const [isPublic, setIsPublic] = useState<boolean>(
@@ -686,24 +789,32 @@ export const TaskDialog = ({
       if (mode === "add") {
         await onSubmit({
           title: title.trim(),
+          description: description.trim(),
           column,
           priority,
           order,
+          voters: [],
           isPublic,
+          category,
         });
       } else {
         await onSubmit({
           title: title.trim(),
+          description: description.trim(),
           column,
           priority,
           isPublic,
+          voters,
+          category,
         });
       }
 
       // Reset form
       setTitle(initialValues?.title || "");
+      setDescription(initialValues?.description || "");
       setColumn(initialValues?.column || "todo");
       setPriority(initialValues?.priority || "high");
+      setCategory(initialValues?.category || "general");
       setOrder(
         mode === "add" && initialValues?.order ? initialValues.order : "end",
       );
@@ -726,7 +837,7 @@ export const TaskDialog = ({
   const isEdit = mode === "edit";
 
   return (
-    <Dialog onOpenChange={(open) => !open && onCloseDialog()}>
+    <Dialog onOpenChange={(open) => !open && onCloseDialog()} open={isOpen}>
       <DialogTrigger asChild onClick={onClick}>
         {trigger}
       </DialogTrigger>
@@ -742,17 +853,26 @@ export const TaskDialog = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Label htmlFor="title" className="sr-only">
-            Task
+            Title
+          </Label>
+          <Textarea
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={60}
+            className="scrollable mini w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+          />
+          <Label htmlFor="description" className="sr-only">
+            Description
           </Label>
           <RichTextEditor
-            value={title}
-            onChange={(e) => setTitle(e)}
-            placeholder="Task title..."
+            value={description}
+            onChange={(e) => setDescription(e)}
+            placeholder="Task description..."
             charLimit={5000}
             asModal={true}
             inputPreviewClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
-          <input autoFocus className="sr-only" />
+          {/* <input autoFocus className="sr-only" /> */}
 
           {/* <textarea
             name="title"
@@ -853,6 +973,170 @@ export const TaskDialog = ({
             </div>
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export const DetailsDialog = ({
+  id,
+  user,
+  isAdmin,
+  trigger,
+  initialValues,
+
+  onClick,
+  onClose,
+  onEdit,
+}: DetailsDialogProps) => {
+  const title = initialValues?.title || "";
+  const description = initialValues?.description || "";
+  const category = initialValues?.category || "";
+  const upVotes = initialValues?.voters?.filter((v) => v.direction === "up");
+  const downVotes = initialValues?.voters?.filter(
+    (v) => v.direction === "down",
+  );
+  const upVoteCount = upVotes?.length ?? 0;
+  const downVoteCount = downVotes?.length ?? 0;
+
+  const guestUser = user === null;
+
+  const [priority] = useState<"low" | "medium" | "high">(
+    initialValues?.priority || "medium",
+  );
+
+  const voteCard = useMutation(api.kanban.cards.voteCard);
+
+  const onCloseDialog = () => {
+    setTimeout(() => {
+      onClose?.();
+      return;
+    }, 500);
+  };
+
+  const handleVote = async (direction: "up" | "down") => {
+    await voteCard({
+      id,
+      direction,
+    });
+
+    // setVote({ upVote, downVote });
+
+    // console.log("userVoted", userVoted, userVotedFlag);
+  };
+
+  const userVotedUp = !!initialValues.voters.find(
+    (v) => v.userId === user?.userId && v.direction === "up",
+  );
+  const userVotedDown = !!initialValues.voters.find(
+    (v) => v.userId === user?.userId && v.direction === "down",
+  );
+
+  return (
+    <Dialog onOpenChange={(open) => !open && onCloseDialog()}>
+      <DialogTrigger asChild onClick={onClick}>
+        {trigger}
+      </DialogTrigger>
+      <DialogContent className="bg-card">
+        <DialogHeader>
+          <div className="flex flex-col gap-4">
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {"View task/suggestion details"}
+            </DialogDescription>
+            <div className="flex items-center gap-2">
+              {priority === "high" ? (
+                <FlairBadge
+                  icon={<FcHighPriority className="size-5" />}
+                  className={cn("bg-red-100")}
+                >
+                  {priority}
+                </FlairBadge>
+              ) : priority === "medium" ? (
+                <FlairBadge
+                  icon={<FcMediumPriority className="size-5" />}
+                  className={cn("bg-yellow-100")}
+                >
+                  {priority}
+                </FlairBadge>
+              ) : (
+                <FlairBadge
+                  icon={<FcLowPriority className="size-5" />}
+                  className={cn("bg-green-100")}
+                >
+                  {priority}
+                </FlairBadge>
+              )}
+              {category === "general" ? (
+                <FlairBadge
+                  icon={<Construction className="size-5" />}
+                  className={cn("bg-stone-100")}
+                >
+                  {category}
+                </FlairBadge>
+              ) : category === "ui/ux" ? (
+                <FlairBadge
+                  icon={<Palette className="size-5" />}
+                  className={cn("bg-purple-100")}
+                >
+                  {category}
+                </FlairBadge>
+              ) : (
+                <FlairBadge
+                  icon={<FcLowPriority className="size-5" />}
+                  className={cn("bg-green-100")}
+                >
+                  {category}
+                </FlairBadge>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-2">
+                  {" "}
+                  <LucideThumbsUp
+                    className={cn(
+                      "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",
+                      guestUser && "pointer-events-none",
+                      userVotedUp && "text-green-600",
+                    )}
+                    onClick={() => handleVote("up")}
+                  />{" "}
+                  {upVoteCount}
+                </span>
+                {/* {" | "} */}
+                <span className="flex items-center gap-2">
+                  {" "}
+                  <LucideThumbsDown
+                    className={cn(
+                      "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",
+                      userVotedDown && "text-red-600",
+
+                      guestUser && "pointer-events-none",
+                    )}
+                    onClick={() => handleVote("down")}
+                  />{" "}
+                  {downVoteCount}
+                </span>
+              </div>
+              {isAdmin && (
+                <div className="relative min-w-50 rounded-lg border-1.5 border-dashed border-foreground/30 p-2">
+                  <TooltipSimple content="Edit task">
+                    <Pencil
+                      className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4"
+                      onClick={onEdit}
+                    />
+                  </TooltipSimple>
+                  <p className="absolute -top-3 left-0.5 bg-card text-xs text-foreground/50">
+                    Admin only
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-4">
+          <RichTextDisplay html={description} className="scrollable mini" />
+        </div>
       </DialogContent>
     </Dialog>
   );

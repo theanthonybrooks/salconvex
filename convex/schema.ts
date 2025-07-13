@@ -708,6 +708,7 @@ export default defineSchema({
 
   todoKanban: defineTable({
     title: v.string(),
+    description: v.string(),
     column: v.union(
       v.literal("proposed"),
       v.literal("backlog"),
@@ -716,6 +717,15 @@ export default defineSchema({
       v.literal("done"),
       v.literal("notPlanned"),
     ),
+
+    voters: v.array(
+      v.object({
+        userId: v.id("users"),
+        direction: v.union(v.literal("up"), v.literal("down")),
+      }),
+    ),
+
+    category: v.string(),
     order: v.number(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
@@ -729,6 +739,10 @@ export default defineSchema({
   })
     .searchIndex("search_by_title", {
       searchField: "title",
+      filterFields: ["column", "order", "priority", "public", "purpose"],
+    })
+    .searchIndex("search_by_desc", {
+      searchField: "description",
       filterFields: ["column", "order", "priority", "public", "purpose"],
     })
     .index("by_column_completedAt", ["column", "completedAt"])
