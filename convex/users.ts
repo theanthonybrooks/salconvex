@@ -83,8 +83,8 @@ export const usersWithSubscriptions = query({
           totalMonthly += amount;
         } else if (interval === "year") {
           if (trialEndsThisMonth || periodEndsThisMonth) {
-            console.log("trialEndsThisMonth", trialEndsThisMonth, amount);
-            console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
+            // console.log("trialEndsThisMonth", trialEndsThisMonth, amount);
+            // console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
             totalThisMonth += amount;
           }
           totalThisYear += amount;
@@ -197,7 +197,7 @@ export const getCurrentUser = query({
       .unique();
 
     if (!userPref) {
-      console.log("userPref not found");
+      // console.log("userPref not found");
       return null;
     }
 
@@ -527,7 +527,7 @@ export const deleteAccount = mutation({
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    console.log("args", args);
+    // console.log("args", args);
     let userId: Id<"users"> | undefined = undefined;
     if (args.userId) {
       userId = args.userId as Id<"users">;

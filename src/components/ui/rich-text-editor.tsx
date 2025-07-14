@@ -75,6 +75,7 @@ export const ALLOWED_TAGS = [
   "ol",
   "li",
   "br",
+  "strike",
 ];
 export const ALLOWED_ATTR = ["href", "target", "rel"];
 
