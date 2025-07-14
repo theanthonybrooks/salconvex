@@ -10,6 +10,7 @@ import { useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { waitForImagesToLoad } from "@/lib/thisWeekFns";
 import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
@@ -72,7 +73,10 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     if (!folder) return;
 
-    const nodes = refs.current.filter(Boolean); // clean nulls
+    // const nodes = refs.current.filter(Boolean); // clean nulls
+    const nodes = refs.current.filter(Boolean) as HTMLElement[];
+
+    await waitForImagesToLoad(nodes);
     for (let i = 0; i < nodes.length; i++) {
       try {
         const dataUrl = await toJpeg(nodes[i]!, { quality: 0.95 });
@@ -90,6 +94,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const handleDownloadSingle = async (index: number) => {
     const node = refs.current[index];
     if (!node) return;
+    await waitForImagesToLoad([node]);
     try {
       const dataUrl = await toJpeg(node, { quality: 0.95 });
       saveAs(dataUrl, `${displayRange}-recap-${index + 1}.jpg`);
