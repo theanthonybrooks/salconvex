@@ -87,6 +87,17 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     saveAs(content, `${displayRange}-recap.zip`);
   };
 
+  const handleDownloadSingle = async (index: number) => {
+    const node = refs.current[index];
+    if (!node) return;
+    try {
+      const dataUrl = await toJpeg(node, { quality: 0.95 });
+      saveAs(dataUrl, `${displayRange}-recap-${index + 1}.jpg`);
+    } catch (err) {
+      console.error(`Error rendering node ${index}`, err);
+    }
+  };
+
   const handleCopyText = () => {
     navigator.clipboard.writeText(captionText).then(() => {
       setCopiedText(true);
@@ -187,12 +198,22 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
       <div className="scrollable mini flex w-full max-w-[90vw] flex-col-reverse gap-6 py-6 sm:grid sm:grid-cols-2">
         <div className="mx-auto flex w-fit flex-col gap-y-6">
-          <RecapCover
-            dateRange={displayRange}
-            ref={(el) => {
-              refs.current[0] = el;
-            }}
-          />
+          <div className="group relative">
+            <RecapCover
+              dateRange={displayRange}
+              ref={(el) => {
+                refs.current[0] = el;
+              }}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+              onClick={() => handleDownloadSingle(0)}
+              title="Download image"
+            >
+              <ImageIcon className="size-5" />
+            </button>
+          </div>
 
           {queryResult?.results
             ?.slice()
@@ -206,21 +227,42 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
               return aDate - bDate;
             })
             .map((event, index) => (
-              <RecapPost
-                ref={(el) => {
-                  refs.current[index + 1] = el;
-                }}
-                key={event._id}
-                event={event}
-                index={index}
-              />
+              <div className="group relative" key={event._id}>
+                <RecapPost
+                  ref={(el) => {
+                    refs.current[index + 1] = el;
+                  }}
+                  event={event}
+                  index={index}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                  onClick={() => handleDownloadSingle(index + 1)}
+                  title="Download image"
+                >
+                  <ImageIcon className="size-5" />
+                </button>
+              </div>
             ))}
           {queryResult?.results && (
-            <RecapEndCover
-              ref={(el) => {
-                refs.current[queryResult.results.length + 1] = el;
-              }}
-            />
+            <div className="group relative">
+              <RecapEndCover
+                ref={(el) => {
+                  refs.current[queryResult.results.length + 1] = el;
+                }}
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                onClick={() =>
+                  handleDownloadSingle(queryResult.results.length + 1)
+                }
+                title="Download image"
+              >
+                <ImageIcon className="size-5" />
+              </button>
+            </div>
           )}
         </div>
         <div className="flex flex-col gap-y-6 sm:px-4 xl:px-0">
