@@ -67,6 +67,13 @@ interface MoveCardArgs {
   purpose: string;
 }
 
+interface AddCardProps {
+  column: ColumnType;
+  userRole: string;
+  purpose: string;
+  addCard: (args: AddCardArgs) => void;
+}
+
 interface AddCardArgs {
   title: string;
   description: string;
@@ -94,6 +101,8 @@ interface ColumnProps {
   cards: Card[];
   userRole: string;
   purpose: string;
+  activeColumn: string | null;
+  setActiveColumn: (col: string | null) => void;
   moveCard: (args: MoveCardArgs) => void;
   addCard: (args: AddCardArgs) => void;
   deleteCard: (args: DeleteCardArgs) => void;
@@ -124,8 +133,8 @@ interface DropIndicatorProps {
 // }
 
 interface KanbanBoardProps {
-  userRole?: string;
-  purpose?: string;
+  userRole: string;
+  purpose: string;
 }
 
 const getColumnColor = (column: ColumnType) => {
@@ -140,17 +149,14 @@ const getColumnColor = (column: ColumnType) => {
   return colors[column] || "bg-neutral-500";
 };
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({
+export const KanbanBoard = ({
   userRole = "user",
   purpose = "todo",
-}) => {
+}: KanbanBoardProps) => {
   return <Board userRole={userRole} purpose={purpose} />;
 };
 
-const Board: React.FC<{ userRole: string; purpose: string }> = ({
-  userRole,
-  purpose,
-}) => {
+const Board = ({ userRole, purpose }: KanbanBoardProps) => {
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -302,15 +308,7 @@ const Board: React.FC<{ userRole: string; purpose: string }> = ({
   );
 };
 
-const Column: React.FC<
-  ColumnProps & {
-    moveCard: (args: MoveCardArgs) => void;
-    addCard: (args: AddCardArgs) => void;
-    deleteCard: (args: DeleteCardArgs) => void;
-    activeColumn: string | null;
-    setActiveColumn: (col: string | null) => void;
-  }
-> = ({
+const Column = ({
   purpose,
   title,
   headingColor,
@@ -320,9 +318,7 @@ const Column: React.FC<
   deleteCard,
   moveCard,
   addCard,
-
-  setActiveColumn,
-}) => {
+}: ColumnProps) => {
   const [active, setActive] = useState(false);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
@@ -433,7 +429,6 @@ const Column: React.FC<
               column={column}
               addCard={addCard}
               userRole={userRole}
-              setActiveColumn={setActiveColumn}
             />
           )}
           <span className="rounded pr-4 text-sm text-foreground dark:text-primary-foreground">
@@ -472,7 +467,7 @@ const Column: React.FC<
   );
 };
 
-const Card: React.FC<CardProps> = ({
+const Card = ({
   title,
   description,
   id,
@@ -484,7 +479,7 @@ const Card: React.FC<CardProps> = ({
   category,
   isPublic,
   purpose,
-}) => {
+}: CardProps) => {
   const [newPriority, setNewPriority] = useState(priority || "medium");
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -652,7 +647,7 @@ const Card: React.FC<CardProps> = ({
   );
 };
 
-const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
+const DropIndicator = ({ beforeId, column }: DropIndicatorProps) => {
   return (
     <div
       data-before={beforeId || "-1"}
@@ -662,14 +657,7 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
   );
 };
 
-const AddCard: React.FC<{
-  column: ColumnType;
-  addCard: (args: AddCardArgs) => void;
-
-  setActiveColumn: (col: string | null) => void;
-  userRole: string;
-  purpose: string;
-}> = ({ column, addCard, userRole, purpose }) => {
+const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
   if (userRole !== "admin") return null;
 
   return (

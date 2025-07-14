@@ -238,10 +238,10 @@ export const moveCard = mutation({
       cardsInColumn.map((c, index) => ctx.db.patch(c._id, { order: index })),
     );
 
-    console.log(
-      "Final column order after renumbering:",
-      cardsInColumn.map((c, index) => ({ id: c._id, order: index })),
-    );
+    // console.log(
+    //   "Final column order after renumbering:",
+    //   cardsInColumn.map((c, index) => ({ id: c._id, order: index })),
+    // );
   },
 });
 
