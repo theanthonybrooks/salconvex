@@ -1,4 +1,5 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
+
 import { forwardRef } from "react";
 
 interface RecapCoverProps {
@@ -13,12 +14,13 @@ export const RecapCover = forwardRef<HTMLDivElement, RecapCoverProps>(
         className="relative w-[500px] bg-[#feee1f] bg-cover bg-center"
       >
         <section className="post-header">
-          <Image
+          <img
             className="-z-1 h-full w-full p-10 pl-12"
             src="/branding/weeklybgsalupdate.png"
             alt="Open Calls Ending this Week Background"
             height={400}
             width={400}
+            crossOrigin="anonymous"
           />
         </section>
         <section className="absolute bottom-1/2 flex w-full translate-y-[12.3em] flex-col">
@@ -44,12 +46,13 @@ export const RecapEndCover = forwardRef<HTMLDivElement>((_, ref) => {
       className="relative w-[500px] bg-[#feee1f] bg-cover bg-center"
     >
       <section className="post-header">
-        <Image
+        <img
           className="-z-1 h-full w-full -translate-y-6 p-10 pl-12"
           src="/branding/weekly-back-cover2.png"
           alt="Open Calls Ending this Week Background"
           height={400}
           width={400}
+          crossOrigin="anonymous"
         />
       </section>
       <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
