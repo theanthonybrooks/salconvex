@@ -1,6 +1,6 @@
 import { Migrations } from "@convex-dev/migrations";
 import { components, internal } from "./_generated/api.js";
-import { DataModel } from "./_generated/dataModel.js";
+import { DataModel, Id } from "./_generated/dataModel.js";
 
 //NOTE: (TO RUN THIS MIGRATION)
 // FOR PRODUCTION:
@@ -19,8 +19,16 @@ export const addVotersArrayToKanban = migrations.define({
   },
 });
 
-export const runAATK = migrations.runner(
-  internal.migrations.addVotersArrayToKanban,
+export const addUserIdToKanban = migrations.define({
+  table: "todoKanban",
+  migrateOne: async (ctx, todo) => {
+    await ctx.db.patch(todo._id, {
+      lastUpdatedBy: "mh74phva5yrxhg9ga6x1g1csk97cp2vc" as Id<"users">,
+    });
+  },
+});
+export const runAUIDTK = migrations.runner(
+  internal.migrations.addUserIdToKanban,
 );
 
 // export const copyUpdatedAtToCompletedAt = migrations.define({

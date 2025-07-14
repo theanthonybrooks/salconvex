@@ -69,7 +69,6 @@ export const addCard = mutation({
     order: v.optional(v.string()),
     priority: v.optional(v.string()),
     category: v.optional(v.string()),
-    userId: v.string(),
     isPublic: v.boolean(),
     purpose: v.string(),
     voters: v.optional(
@@ -89,11 +88,12 @@ export const addCard = mutation({
       description,
 
       category,
-      userId,
       priority,
       isPublic,
     } = args;
 
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("User not authenticated");
     if (column === "done") {
       return await ctx.db.insert("todoKanban", {
         title,
@@ -137,6 +137,7 @@ export const addCard = mutation({
         priority,
         public: isPublic,
         purpose: args.purpose,
+        userId,
       });
     }
 
@@ -177,11 +178,13 @@ export const moveCard = mutation({
       v.literal("notPlanned"),
     ),
     beforeId: v.optional(v.id("todoKanban")),
-    userId: v.string(),
+
     purpose: v.string(),
   },
   handler: async (ctx, args) => {
-    const { id, column, beforeId, userId } = args;
+    const { id, column, beforeId } = args;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("User not authenticated");
     const card = await ctx.db.get(id);
     if (!card) throw new Error("Card not found");
 
@@ -250,7 +253,6 @@ export const editCard = mutation({
     id: v.id("todoKanban"),
     title: v.string(),
     description: v.optional(v.string()),
-    userId: v.string(),
     priority: v.optional(v.string()),
     column: v.optional(
       v.union(
@@ -273,6 +275,8 @@ export const editCard = mutation({
     purpose: v.string(),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
     if (args.column === "done") {
       const card = await ctx.db.get(args.id);
       if (!card) throw new Error("Card not found");
@@ -285,7 +289,7 @@ export const editCard = mutation({
       title: args.title,
       description: args.description,
       updatedAt: Date.now(),
-      lastUpdatedBy: args.userId,
+      lastUpdatedBy: userId,
       priority: args.priority,
       public: args.isPublic,
       category: args.category,
@@ -298,10 +302,18 @@ export const editCard = mutation({
 export const deleteCard = mutation({
   args: {
     id: v.id("todoKanban"),
-    userId: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.delete(args.id);
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("User not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new Error("User not found");
+    if (user.role.includes("admin")) {
+      return await ctx.db.delete(args.id);
+    }
   },
 });
 

@@ -60,6 +60,7 @@ interface Props {
   inputPreview?: boolean;
   inputPreviewClassName?: string;
   tabIndex?: number;
+  withTaskList?: boolean;
 }
 
 export const ALLOWED_TAGS = [
@@ -92,6 +93,7 @@ export const RichTextEditor = ({
   inputPreview,
   inputPreviewClassName,
   tabIndex,
+  withTaskList,
 }: Props) => {
   const linkDialogRef = useRef<HTMLDivElement>(null);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -473,23 +475,24 @@ export const RichTextEditor = ({
           >
             <FaListOl className="size-4 shrink-0" />
           </Button>
-          {forOpenCall && (
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleTaskList().run()}
-              className={cn(
-                buttonClass,
-                editor.isActive("taskList")
-                  ? activeButtonClass
-                  : "text-gray-500",
-                noListButtonClass,
-              )}
-            >
-              <FaListCheck className="size-4 shrink-0" />
-            </Button>
-          )}
+          {forOpenCall ||
+            (withTaskList && (
+              <Button
+                variant="richTextButton"
+                size="richText"
+                type="button"
+                onClick={() => editor.chain().focus().toggleTaskList().run()}
+                className={cn(
+                  buttonClass,
+                  editor.isActive("taskList")
+                    ? activeButtonClass
+                    : "text-gray-500",
+                  noListButtonClass,
+                )}
+              >
+                <FaListCheck className="size-4 shrink-0" />
+              </Button>
+            ))}
           <Separator
             orientation="vertical"
             className={cn("mx-2 hidden sm:block", noListButtonClass)}

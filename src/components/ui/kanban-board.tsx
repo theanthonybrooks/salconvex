@@ -63,7 +63,6 @@ interface MoveCardArgs {
   id: Id<"todoKanban">;
   column: ColumnType;
   beforeId?: Id<"todoKanban"> | undefined;
-  userId: string;
   purpose: string;
 }
 
@@ -78,7 +77,6 @@ interface AddCardArgs {
   title: string;
   description: string;
   column: ColumnType;
-  userId: string;
   order?: "start" | "end";
   voters?: Voter[];
   priority?: string;
@@ -89,7 +87,6 @@ interface AddCardArgs {
 
 interface DeleteCardArgs {
   id: Id<"todoKanban">;
-  userId: string;
 }
 
 // type ConvexCard = Omit<Card, "id"> & { _id: string }
@@ -324,7 +321,7 @@ const Column = ({
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
     if (userRole !== "admin") return;
     e.dataTransfer.setData("cardId", card.id);
-    setActive(true);
+    // setActive(true);
   };
 
   const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
@@ -351,7 +348,6 @@ const Column = ({
       id: cardId as Id<"todoKanban">,
       column,
       beforeId,
-      userId: "admin",
       purpose,
     });
   };
@@ -446,7 +442,7 @@ const Column = ({
           "scrollable mini flex flex-1 flex-col gap-[2px] overflow-y-auto px-2 transition-colors",
           "h-[calc(100vh-160px)]",
           active
-            ? "bg-[hsl(295,100%,71%)]/30"
+            ? "bg-[hsl(295,100%,71%)]/20"
             : "bg-[hsl(60, 100%, 99.6078431372549%)]/0",
           "mask-fade-top-bottom",
         )}
@@ -505,7 +501,7 @@ const Card = ({
   // Delete function
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await deleteCard({ id: id as Id<"todoKanban">, userId: "admin" });
+    await deleteCard({ id: id as Id<"todoKanban"> });
   };
 
   const handleTogglePriority = async () => {
@@ -526,7 +522,6 @@ const Card = ({
         category,
         voters,
         priority: updatedPriority,
-        userId: user?._id ?? "guest",
         isPublic,
         purpose,
       });
@@ -592,7 +587,6 @@ const Card = ({
                 editCard({
                   id: id as Id<"todoKanban">,
                   ...data,
-                  userId: "admin",
                   purpose,
                 });
                 setNewPriority(data.priority);
@@ -685,7 +679,6 @@ const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
       onSubmit={(data) => {
         addCard({
           ...data,
-          userId: "admin",
           purpose,
         });
       }}
@@ -859,6 +852,7 @@ export const TaskDialog = ({
             placeholder="Task description..."
             charLimit={5000}
             asModal={true}
+            withTaskList={true}
             inputPreviewClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
           {/* <input autoFocus className="sr-only" /> */}
