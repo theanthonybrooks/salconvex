@@ -110,6 +110,7 @@ export const TooltipSimple = ({
               "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
               "opacity-0 transition-opacity duration-200",
               "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
+              "pointer-events-none",
               className,
             )}
             {...props}

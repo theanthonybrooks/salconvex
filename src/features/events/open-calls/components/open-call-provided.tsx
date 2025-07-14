@@ -1,3 +1,4 @@
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { siteUrl } from "@/constants/siteInfo";
 import { formatCompCurrency } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
@@ -151,7 +152,14 @@ export const OpenCallProvidedPreview = ({
                 : "border-foreground/20 text-foreground/20",
             )}
           >
-            <Icon size={18} />
+            <TooltipSimple
+              content={
+                openCallCategoryFields.find((field) => field.value === key)
+                  ?.label ?? key
+              }
+            >
+              <Icon size={18} />
+            </TooltipSimple>
           </span>
         );
       })}

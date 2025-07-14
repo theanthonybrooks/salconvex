@@ -318,6 +318,11 @@ export const subscriptionStoreWebhook = mutation({
             existingSubscription._id,
           );
 
+          const startDate =
+            existingSubscription?.startedAt ||
+            new Date(subscription.start_date * 1000).getTime() ||
+            undefined;
+
           // Update the existing subscription
           await ctx.db.patch(existingSubscription._id, {
             stripeId: subscription.id,
@@ -325,6 +330,7 @@ export const subscriptionStoreWebhook = mutation({
             currency: subscription.currency,
             interval: subscription.plan?.interval,
             status: subscription.status,
+            startedAt: startDate,
             currentPeriodStart: subscription.current_period_start
               ? new Date(subscription.current_period_start * 1000).getTime()
               : undefined,
