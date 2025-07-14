@@ -46,6 +46,9 @@ export default async function HomeLayout({
   if (pathname === "/map") {
     redirect("https://thestreetartlist.helioho.st/map");
   }
+  if (pathname === "/archive") {
+    redirect("https://thestreetartlist.helioho.st/archive");
+  }
 
   return (
     // <ClientAuthWrapper>
