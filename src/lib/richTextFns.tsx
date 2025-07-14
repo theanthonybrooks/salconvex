@@ -143,3 +143,7 @@ export const RichTextDisplay = ({
     </span>
   );
 };
+
+export function trimTrailingEmptyParagraphs(html: string): string {
+  return html.replace(/(?:<p>\s*<\/p>)+$/g, "");
+}

@@ -18,7 +18,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { RichTextDisplay } from "@/lib/richTextFns";
+import {
+  RichTextDisplay,
+  trimTrailingEmptyParagraphs,
+} from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import CharacterCount from "@tiptap/extension-character-count";
 import Link from "@tiptap/extension-link";
@@ -236,10 +239,11 @@ export const RichTextEditor = ({
 
   const handleAccept = useCallback(() => {
     setPending(true);
-    const clean = DOMPurify.sanitize(tempContent, {
+    let clean = DOMPurify.sanitize(tempContent, {
       ALLOWED_TAGS,
       ALLOWED_ATTR,
     }).trim();
+    clean = trimTrailingEmptyParagraphs(clean);
     onChange(clean === "<p></p>" ? "" : clean);
     onBlur?.();
 
