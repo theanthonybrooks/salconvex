@@ -763,6 +763,7 @@ export const RichTextEditor = ({
             className={cn(
               "scrollable justy mini min-h-14 text-sm text-muted-foreground",
               inputPreview && "line-clamp-1 max-h-5 min-h-0",
+              
             )}
           >
             {value ? (

@@ -84,8 +84,8 @@ export const usersWithSubscriptions = query({
         } else if (interval === "year") {
           if (trialEndsThisMonth || periodEndsThisMonth) {
             // console.log("trialEndsThisMonth", trialEndsThisMonth, amount);
-            // console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
             totalThisMonth += amount;
+            // console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
           }
           totalThisYear += amount;
           totalPerMonth += amount / 12;
@@ -529,6 +529,7 @@ export const deleteAccount = mutation({
   handler: async (ctx, args) => {
     // console.log("args", args);
     let userId: Id<"users"> | undefined = undefined;
+    let agent: string = "user-self";
     if (args.userId) {
       userId = args.userId as Id<"users">;
     } else if (args.email) {
@@ -538,9 +539,12 @@ export const deleteAccount = mutation({
         .unique();
       if (user) {
         userId = user._id;
+        if (user.role.includes("admin")) {
+          agent = "admin";
+        }
       }
     }
-    await performDeleteAccount(ctx, args);
+    await performDeleteAccount(ctx, { ...args, agent });
     if (userId) {
       await updateOrgOwnerBeforeDelete(ctx, userId as Id<"users">);
     }
@@ -549,7 +553,7 @@ export const deleteAccount = mutation({
 
 async function performDeleteAccount(
   ctx: MutationCtx,
-  args: { method: string; email?: string; userId?: string },
+  args: { method: string; email?: string; userId?: string; agent?: string },
 ): Promise<void> {
   // Define the allowed methods and their configuration.
   type MethodType =
@@ -571,6 +575,7 @@ async function performDeleteAccount(
     throw new ConvexError("Invalid method");
   }
   const method = args.method as MethodType;
+  const agent = args.agent;
 
   const methodConfigs: Record<
     MethodType,
@@ -578,7 +583,7 @@ async function performDeleteAccount(
   > = {
     deleteAccount: {
       deleteType: "deleteAccount",
-      userAgent: "user-self",
+      userAgent: agent ?? "user-self",
       requiresEmail: false,
     },
     ban: { deleteType: "ban", userAgent: "admin", requiresEmail: false },
@@ -787,6 +792,14 @@ async function deleteRelatedDocuments(
   if (userPW) {
     await ctx.db.delete(userPW._id);
   }
+
+  // const userPWEmail  = await ctx.db
+  //   .query("userPW")
+  //   .withIndex("by_email", (q: any) => q.eq("email", email))
+  //   .unique();
+  // if (userPW) {
+  //   await ctx.db.delete(userPWEmail._id);
+  // }
 
   // 4. Delete authSessions and then their refresh tokens.
   const sessions = await ctx.db

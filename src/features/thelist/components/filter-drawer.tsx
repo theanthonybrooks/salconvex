@@ -132,7 +132,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
   const { data: searchResults } = useQueryWithStatus(
     api.events.event.globalSearch,
-    value.trim().length >= 3
+    value.trim().length >= 2
       ? {
           searchTerm: debouncedValue,
           searchType,
