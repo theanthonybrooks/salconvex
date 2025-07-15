@@ -221,7 +221,7 @@ export const formatOpenCallDeadline = (
   callType: CallType,
   preview?: boolean,
   weeklyRecap?: boolean,
-  screenSize?: "mobile" | "tablet" | "desktop",
+  screenSize?: "mobile" | "tablet" | "desktop" | "xlDesktop",
 ) => {
   if (callType === "Invite") return "Invite-only";
   if (callType === "Rolling") return "Rolling Open Call";
@@ -245,11 +245,11 @@ export const formatOpenCallDeadline = (
 
   if (preview) {
     if (screenSize === "mobile") {
-      return `${month} ${day} @ ${time} `;
+      return `${month} ${day} @ ${time}`;
     } else if (screenSize === "tablet") {
-      return `${month} ${day}${ordinal} @ ${time} (${timeZoneFormat})`;
+      return `${month} ${day}${ordinal} @ ${time}`;
     } else {
-      return `${month} ${day}${ordinal}, ${year} @ ${time} `;
+      return `${month} ${day}${ordinal}, ${year} @ ${time}`;
     }
   }
 

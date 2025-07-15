@@ -604,14 +604,14 @@ const EventCardPreview = ({
                   <p>Submit qualifications via email</p>
                 ) : (
                   <>
-                    <span className="hidden 2xl:block">
+                    <span className="hidden xl:block">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
                         userTZ ?? basicInfo.dates?.timezone,
                         basicInfo.callType,
                       )}
                     </span>
-                    <span className="block 2xl:hidden">
+                    <span className="block xl:hidden">
                       {formatOpenCallDeadline(
                         basicInfo.dates?.ocEnd || "",
                         userTZ ?? basicInfo.dates?.timezone,
