@@ -42,8 +42,6 @@ interface DataTableProps<TData, TValue> {
   selectedRow?: Record<string, boolean>;
   adminActions?: {
     isAdmin: boolean;
-    viewAll: boolean;
-    setViewAll: React.Dispatch<React.SetStateAction<boolean>>;
   };
   tableType?: TableTypes;
   pageType?: PageTypes;
@@ -63,7 +61,7 @@ export function DataTable<TData, TValue>({
   tableType,
   pageType,
 }: DataTableProps<TData, TValue>) {
-  const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
+  const { isAdmin } = adminActions ?? {};
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(defaultVisibility ?? {});
@@ -78,8 +76,7 @@ export function DataTable<TData, TValue>({
 
     meta: {
       isAdmin,
-      viewAll,
-      setViewAll,
+
       tableType,
       pageType,
     },
@@ -132,7 +129,7 @@ export function DataTable<TData, TValue>({
     if (isAdmin) {
       setRowSelection({});
     }
-  }, [viewAll, isAdmin]);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (defaultVisibility) {

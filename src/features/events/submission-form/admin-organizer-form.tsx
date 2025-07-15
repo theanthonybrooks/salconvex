@@ -122,7 +122,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region ------------- Actions, Mutations, Queries --------------
 
   const searchParams = useSearchParams();
-  const eventId = searchParams.get("eventId");
+  const eventId = searchParams.get("_id");
   const currentValues = getValues();
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
 

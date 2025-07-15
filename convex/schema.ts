@@ -673,6 +673,7 @@ export default defineSchema({
     })
 
     .index("by_eventId", ["eventId"])
+    .index("by_eventId_and_state", ["eventId", "state"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_budget", ["compensation.budget.min"])

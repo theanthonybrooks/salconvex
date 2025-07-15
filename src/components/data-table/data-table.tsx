@@ -70,8 +70,6 @@ interface DataTableProps<TData, TValue> {
   selectedRow?: Record<string, boolean>;
   adminActions?: {
     isAdmin: boolean;
-    viewAll: boolean;
-    setViewAll: React.Dispatch<React.SetStateAction<boolean>>;
   };
   tableType?: TableTypes;
   pageType?: PageTypes;
@@ -124,7 +122,8 @@ export function DataTable<TData, TValue>({
     return filters;
   }, [searchParams]);
 
-  const { isAdmin, viewAll, setViewAll } = adminActions ?? {};
+  const { isAdmin } = adminActions ?? {};
+
   const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(defaultVisibility ?? {});
@@ -145,8 +144,7 @@ export function DataTable<TData, TValue>({
     meta: {
       isAdmin,
       isMobile,
-      viewAll,
-      setViewAll,
+
       tableType,
       pageType,
       minimalView,
@@ -191,10 +189,11 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-  const tableRows = table.getRowModel().rows;
-  const preloadedEvent = initialSearchTerm ? tableRows[0]?.index : null;
+  const tableRows = table.getRowModel?.().rows ?? [];
+  const preloadedEvent =
+    initialSearchTerm && tableRows.length > 0 ? tableRows[0]?.index : null;
   const hasPreloadedEvent =
-    typeof preloadedEvent === "number" && preloadedEvent > 0;
+    typeof preloadedEvent === "number" && preloadedEvent >= 0;
   const hasRows = table.getRowModel().rows?.length > 0;
 
   useEffect(() => {
@@ -215,7 +214,7 @@ export function DataTable<TData, TValue>({
     if (isAdmin) {
       setRowSelection({});
     }
-  }, [viewAll, isAdmin]);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (defaultVisibility) {

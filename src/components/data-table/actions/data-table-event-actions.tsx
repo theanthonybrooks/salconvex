@@ -12,10 +12,15 @@ import {
   LucideFolderClock,
   LucideFolderInput,
 } from "lucide-react";
+import { useState } from "react";
 import { FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
 
 export interface EventActionProps {
   eventId: string;
+}
+
+export interface CopyActionProps extends EventActionProps {
+  displayText?: string;
 }
 interface DeleteEventActionProps extends EventActionProps {
   isAdmin: boolean | undefined;
@@ -125,5 +130,24 @@ export const ApproveEvent = ({ eventId }: EventActionProps) => {
       <LucideFolderCheck className="size-4" />
       Approve
     </DropdownMenuItem>
+  );
+};
+
+export const CopyEventId = ({ eventId, displayText }: CopyActionProps) => {
+  const [copied, setCopied] = useState(false);
+  const displayVal = displayText ?? eventId;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(eventId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <span
+      className="max-w-[20ch] truncate font-medium capitalize"
+      onClick={handleCopy}
+    >
+      {copied ? "Copied!" : displayVal}
+    </span>
   );
 };

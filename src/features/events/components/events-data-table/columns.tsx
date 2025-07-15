@@ -6,6 +6,7 @@ import { DataTableAdminActions } from "@/components/data-table/actions/data-tabl
 import {
   ApproveEvent,
   ArchiveEvent,
+  CopyEventId,
   DeleteEvent,
   DuplicateEvent,
   GoToEvent,
@@ -55,6 +56,7 @@ export const columnLabels: Record<string, string> = {
   lastEditedAt: "Last Edited",
   category: "Category",
   type: "Event Type",
+  _id: "Event ID",
 };
 
 export type Event = {
@@ -315,6 +317,22 @@ export const columns: ColumnDef<Event>[] = [
               ? types.map((type) => getEventTypeLabel(type)).join(", ")
               : "-"}
           </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "_id",
+    minSize: 120,
+    maxSize: 400,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Event ID" />
+    ),
+    cell: ({ row }) => {
+      const value = row.original as Event;
+      return (
+        <div className="flex justify-center">
+          <CopyEventId eventId={value._id} />
         </div>
       );
     },

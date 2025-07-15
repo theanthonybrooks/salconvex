@@ -45,8 +45,6 @@ export function DataTableToolbar<TData>({
   );
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
-  // const viewAll = table.options.meta?.viewAll;
-  // const setViewAll = table.options.meta?.setViewAll;
   const tableType = table.options.meta?.tableType;
   const pageType = table.options.meta?.pageType;
   const minimalView = table.options.meta?.minimalView;
@@ -106,16 +104,6 @@ export function DataTableToolbar<TData>({
       )}
     >
       <div className="mx-auto flex w-full flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
-        {/* {isAdmin && setViewAll && (
-          <Button
-            variant="ghost"
-            onClick={() => setViewAll(!viewAll)}
-            className="hover:scale-105 sm:hidden"
-          >
-            {viewAll ? "View Submissions" : "View  All"}
-          </Button>
-        )} */}
-
         <Input
           placeholder="Search..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -172,16 +160,6 @@ export function DataTableToolbar<TData>({
                   <LucideDiamondPlus className="size-4" />
                   Add New
                 </Button>
-
-                {/* {setViewAll && (
-                  <Button
-                    variant="salWithShadowHidden"
-                    onClick={() => setViewAll(!viewAll)}
-                    className="h-10 sm:h-10"
-                  >
-                    {viewAll ? "View Submissions" : "View  All"}
-                  </Button>
-                )} */}
               </>
             )}
           </div>

@@ -158,7 +158,13 @@ export const getFilteredEventsPublic = query({
         const openCall = await ctx.db
           .query("openCalls")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .unique();
+          .filter((q) =>
+            q.or(
+              q.eq(q.field("state"), "published"),
+              q.eq(q.field("state"), "archived"),
+            ),
+          )
+          .first();
 
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;

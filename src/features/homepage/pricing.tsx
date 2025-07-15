@@ -104,7 +104,7 @@ const PricingHeader = ({
     <h2 className="cursor-pointer text-pretty font-tanker text-4h lowercase tracking-wide text-foreground md:text-wrap md:text-[4em]">
       {title}
     </h2>
-    <p className="max-w-2xl text-balance text-foreground">{subtitle}</p>
+    <span className="max-w-2xl text-balance text-foreground">{subtitle}</span>
   </div>
 );
 

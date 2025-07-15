@@ -1391,7 +1391,6 @@ export const duplicateEvent = mutation({
     eventName = name;
     eventSlug = slug;
 
-    const eventState = "draft";
     const newEvent = await ctx.db.insert("events", {
       formType: event.formType,
       name: eventName,
@@ -1417,7 +1416,7 @@ export const duplicateEvent = mutation({
       organizerId: event.organizerId,
       // mainOrgName: "",
 
-      state: eventState,
+      state: "draft",
       lastEditedAt: Date.now(),
     });
 

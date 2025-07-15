@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
+import { generateUniqueNameAndSlug } from "~/convex/events/event";
 
 export const getTotalNumberOfOpenCalls = query({
   handler: async (ctx) => {
@@ -366,24 +367,70 @@ export const duplicateOC = mutation({
     if (!userId) throw new Error("Not authenticated");
     const openCall = await ctx.db.get(args.openCallId);
     if (!openCall) return null;
+    const eventId = openCall.eventId;
+    const event = await ctx.db.get(eventId);
+    if (!event) return null;
+    const existingOcEdition = openCall.basicInfo.dates.edition;
+    let eventName = event.name;
+    let eventSlug = event.slug;
+    let edition = existingOcEdition;
+
+    if (existingOcEdition !== new Date().getFullYear()) {
+      edition = new Date().getFullYear();
+    }
+    //  else {
+    //   edition = existingOcEdition + 1;
+    // }
+
+    const { name, slug } = await generateUniqueNameAndSlug(
+      ctx,
+      event.name,
+      edition,
+    );
+    eventName = name;
+    eventSlug = slug;
 
     //TODO: Is this the best way to handle this? Should there be only one open call per edition/event? Or should there be multiple open calls per edition/event?
-    const edition = openCall.basicInfo.dates.edition;
-    if (edition === new Date().getFullYear())
-      throw new ConvexError(
-        "You can't duplicate an open call for the current year",
-      );
+
+    const newEvent = await ctx.db.insert("events", {
+      formType: event.formType,
+      name: eventName,
+      slug: eventSlug,
+      logo: event.logo,
+      logoStorageId: event.logoStorageId,
+      type: event.type,
+      category: event.category,
+      hasOpenCall: event.hasOpenCall,
+      dates: {
+        ...event.dates,
+        edition,
+      },
+      location: {
+        ...event.location,
+      },
+      about: event.about,
+      links: event.links,
+      otherInfo: event.otherInfo,
+      timeLine: event.timeLine,
+      active: event.active,
+      mainOrgId: event.mainOrgId,
+      organizerId: event.organizerId,
+      // mainOrgName: "",
+
+      state: "draft",
+      lastEditedAt: Date.now(),
+    });
 
     const newOpenCall = await ctx.db.insert("openCalls", {
       adminNoteOC: openCall.adminNoteOC,
-      eventId: openCall.eventId,
+      eventId: newEvent,
       organizerId: openCall.organizerId,
       mainOrgId: openCall.mainOrgId,
       basicInfo: {
         ...openCall.basicInfo,
         dates: {
           ...openCall.basicInfo.dates,
-          edition: new Date().getFullYear(),
+          edition,
         },
       },
       eligibility: {
@@ -402,7 +449,7 @@ export const duplicateOC = mutation({
       lastUpdatedBy: userId,
     });
 
-    return { openCall: newOpenCall };
+    return { openCall: newOpenCall, event: newEvent };
   },
 });
 

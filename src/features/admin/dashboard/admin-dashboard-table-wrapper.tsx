@@ -12,7 +12,6 @@ import { columns } from "@/features/events/components/events-data-table/columns"
 import { cn } from "@/lib/utils";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
-import { useState } from "react";
 import { api } from "~/convex/_generated/api";
 interface AdminDashboardTableWrapperProps {
   page: TableTypes;
@@ -26,22 +25,18 @@ export function AdminDashboardTableWrapper({
   // );
   // const [existingOpenCall, setExistingOpenCall] =
   //   useState<Doc<"openCalls"> | null>(null);
-  const { preloadedEventData, preloadedSubmissionData } = useAdminPreload();
+  const { preloadedEventData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const userRole = userData?.user?.role;
   const isAdmin = userRole?.includes("admin") ?? false;
 
   const allEventsData = usePreloadedQuery(preloadedEventData);
-  const subEventsData = usePreloadedQuery(preloadedSubmissionData);
+  // const subEventsData = usePreloadedQuery(preloadedSubmissionData);
 
-  const [viewAll, setViewAll] = useState(true);
-
-  const eventsData = (viewAll ? allEventsData : subEventsData) ?? [];
+  const eventsData = allEventsData ?? [];
   const adminActions = {
     isAdmin,
-    viewAll,
-    setViewAll,
   };
 
   const usersData = useQuery(api.users.usersWithSubscriptions);
@@ -65,8 +60,8 @@ export function AdminDashboardTableWrapper({
               columns={columns}
               data={eventsData}
               defaultVisibility={{
-                category: viewAll ? true : false,
-                dates_edition: viewAll ? true : false,
+                category: true,
+                dates_edition: true,
                 type: false,
               }}
               onRowSelect={(row) => {
@@ -174,8 +169,8 @@ export function AdminDashboardTableWrapper({
               columns={userColumns}
               data={usersData?.users ?? []}
               defaultVisibility={{
-                category: viewAll ? true : false,
-                dates_edition: viewAll ? true : false,
+                category: true,
+                dates_edition: true,
                 type: false,
                 role: false,
               }}

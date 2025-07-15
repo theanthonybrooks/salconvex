@@ -32,8 +32,6 @@ export function DataTableToolbar<TData>({
   );
   const isFiltered = table.getState().columnFilters.length > 0;
   const isAdmin = table.options.meta?.isAdmin;
-  const viewAll = table.options.meta?.viewAll;
-  const setViewAll = table.options.meta?.setViewAll;
   const tableType = table.options.meta?.tableType;
   const pageType = table.options.meta?.pageType;
   const forDashboard = pageType === "dashboard";
@@ -74,16 +72,6 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex max-w-[90vw] items-center justify-between">
       <div className="mx-auto flex w-full flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
-        {isAdmin && setViewAll && (
-          <Button
-            variant="ghost"
-            onClick={() => setViewAll(!viewAll)}
-            className="hover:scale-105 sm:hidden"
-          >
-            {viewAll ? "View Submissions" : "View  All"}
-          </Button>
-        )}
-
         <Input
           placeholder="Search..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -119,16 +107,6 @@ export function DataTableToolbar<TData>({
                 title="Category"
                 options={eventCategories}
               />
-            )}
-
-            {isAdmin && setViewAll && (
-              <Button
-                variant="ghost"
-                onClick={() => setViewAll(!viewAll)}
-                className="hidden hover:scale-105 sm:inline-flex"
-              >
-                {viewAll ? "View Submissions" : "View  All"}
-              </Button>
             )}
           </div>
         )}

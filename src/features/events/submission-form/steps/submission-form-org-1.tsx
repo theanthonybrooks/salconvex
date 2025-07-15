@@ -73,6 +73,7 @@ const SubmissionFormOrgStep = ({
     watch,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+  console.log(isAdmin);
   // const currentValues = getValues();
   const [firstColVisible, setFirstColVisible] = useState(true);
   const orgData = watch("organization");
@@ -338,6 +339,7 @@ const SubmissionFormOrgStep = ({
               columns={columns}
               data={eventsData}
               defaultVisibility={{
+                _id: false,
                 type: false,
                 category: false,
                 lastEditedAt: false,
@@ -370,6 +372,7 @@ const SubmissionFormOrgStep = ({
               tableType="events"
               defaultSort={{ id: "lastEditedAt", desc: true }}
               pageSize={5}
+              adminActions={{ isAdmin }}
             />
             <DataTable
               columns={columns}
@@ -398,6 +401,10 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
               defaultSort={{ id: "lastEditedAt", desc: true }}
+              adminActions={{ isAdmin }}
+              defaultVisibility={{
+                _id: false,
+              }}
             />
             <DataTable
               columns={columns}
@@ -419,6 +426,8 @@ const SubmissionFormOrgStep = ({
               }}
               selectedRow={selectedRow}
               defaultVisibility={{
+                _id: false,
+
                 category: false,
                 type: false,
                 // lastEditedAt: false,
@@ -434,6 +443,7 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
               defaultSort={{ id: "lastEditedAt", desc: true }}
+              adminActions={{ isAdmin }}
             />
 
             <p
