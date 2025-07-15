@@ -21,4 +21,10 @@ crons.hourly(
   internal.openCalls.openCall.archiveExpiredOpenCalls,
 );
 
+crons.hourly(
+  "delete orphaned user passwords",
+  { minuteUTC: 0 },
+  internal.users.deleteOrphanedUserPw,
+);
+
 export default crons;

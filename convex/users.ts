@@ -785,23 +785,15 @@ async function deleteRelatedDocuments(
     );
   }
   // 4.1 Delete User Password
-  const userPW = await ctx.db
+  const userPWs = await ctx.db
     .query("userPW")
     .withIndex("by_userId", (q: any) => q.eq("userId", userId))
-    .unique();
-  if (userPW) {
-    await ctx.db.delete(userPW._id);
+    .collect();
+  for (const pw of userPWs) {
+    await ctx.db.delete(pw._id);
   }
 
-  // const userPWEmail  = await ctx.db
-  //   .query("userPW")
-  //   .withIndex("by_email", (q: any) => q.eq("email", email))
-  //   .unique();
-  // if (userPW) {
-  //   await ctx.db.delete(userPWEmail._id);
-  // }
-
-  // 4. Delete authSessions and then their refresh tokens.
+  // 4.2 Delete authSessions and then their refresh tokens.
   const sessions = await ctx.db
     .query("authSessions")
     .withIndex("userId", (q: any) => q.eq("userId", userId))
@@ -873,5 +865,18 @@ export const currentSession = query({
       return null;
     }
     return await ctx.db.get(sessionId);
+  },
+});
+
+export const deleteOrphanedUserPw = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const userPWs = await ctx.db.query("userPW").collect();
+    for (const pw of userPWs) {
+      const user = await ctx.db.get(pw.userId);
+      if (!user) {
+        await ctx.db.delete(pw._id);
+      }
+    }
   },
 });

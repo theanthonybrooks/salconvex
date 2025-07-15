@@ -127,122 +127,130 @@ export function OpenCallFilesTable({
         <tbody>
           {visibleFiles
             .sort((a, b) => a.title.localeCompare(b.title))
-            .map((doc, i) => (
-              <tr
-                key={doc.id}
-                className="group border-b border-muted transition-all hover:bg-accent/20"
-              >
-                <td className="px-2 py-2">{i + 1}</td>
-                <td
-                  className={cn(
-                    "max-w-30 px-2 py-2 sm:max-w-none",
-                    editingId === doc.id && "max-w-auto",
-                  )}
+            .map((doc, i) => {
+              const maxLength = 25;
+              const formattedTitle =
+                doc.title.slice(0, 25) + "..." + doc.title.slice(-5);
+              const displayTitle =
+                doc.title.length > maxLength ? formattedTitle : doc.title;
+
+              return (
+                <tr
+                  key={doc.id}
+                  className="group border-b border-muted transition-all hover:bg-accent/20"
                 >
-                  {isPublic ? (
-                    <FilePreviewer
-                      title={doc.title}
-                      href={doc.href}
-                      type={getMimeTypeFromHref(doc.title)}
-                      isPublic={isPublic}
-                      icon={false}
-                    >
-                      {doc.title}
-                    </FilePreviewer>
-                  ) : editingId === doc.id ? (
-                    <Input
-                      value={tempTitle}
-                      onChange={(e) => setTempTitle(e.target.value)}
-                      onBlur={() => submitTitle(doc.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") submitTitle(doc.id);
-                        if (e.key === "Escape") setEditingId(null);
-                      }}
-                      autoFocus
-                      className="text-base sm:text-sm"
-                    />
-                  ) : (
-                    <button
-                      className={cn(
-                        "w-full truncate text-left hover:underline",
-                        doc.archived && "line-through",
-                      )}
-                      onClick={() => {
-                        if (isPublic) return;
-                        startEditing(doc.id, doc.title);
-                      }}
-                    >
-                      {doc.title}
-                    </button>
-                  )}
-                </td>
-                {!mobileEditing && (
-                  <td className={cn("px-2 py-2 text-center")}>
-                    <FilePreviewer
-                      title={doc.title}
-                      href={doc.href}
-                      type={getMimeTypeFromHref(doc.title)}
-                      isPublic={isPublic}
-                    />
-                  </td>
-                )}
-                {!isDraft && !isMobile && !isPublic && (
+                  <td className="px-2 py-2">{i + 1}</td>
                   <td
-                    className="px-2 py-2 text-center"
-                    onClick={() => {
-                      deleteFile({
-                        fileId: doc.id as Id<"openCallFiles">,
-                        eventId: eventId as Id<"events">,
-                        archive: doc?.archived ?? false,
-                      });
-                    }}
+                    className={cn(
+                      "max-w-30 px-2 py-2 sm:max-w-none",
+                      editingId === doc.id && "max-w-auto",
+                    )}
                   >
-                    <div className="cursor-pointer text-amber-800 opacity-70 transition hover:scale-110">
-                      {!doc?.archived && !isDraft && (
-                        <Book className={cn("mx-auto size-4")} />
-                      )}
-                      {doc?.archived && (
-                        <BookDashed className="mx-auto size-4" />
-                      )}
-                    </div>
-                  </td>
-                )}
-                {!mobileEditing &&
-                  !isPublic &&
-                  !disabled &&
-                  (isDraft || isAdmin) && (
-                    <td className="px-2 py-2 text-center">
-                      <X
+                    {isPublic ? (
+                      <FilePreviewer
+                        title={doc.title}
+                        href={doc.href}
+                        type={getMimeTypeFromHref(doc.title)}
+                        isPublic={isPublic}
+                        icon={false}
+                      >
+                        {doc.title}
+                      </FilePreviewer>
+                    ) : editingId === doc.id ? (
+                      <Input
+                        value={tempTitle}
+                        onChange={(e) => setTempTitle(e.target.value)}
+                        onBlur={() => submitTitle(doc.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") submitTitle(doc.id);
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                        autoFocus
+                        className="text-base sm:text-sm"
+                      />
+                    ) : (
+                      <button
                         className={cn(
-                          "mx-auto size-4 cursor-pointer text-red-600 opacity-70 transition hover:scale-110 hover:opacity-100",
+                          "w-full truncate text-left hover:underline",
+                          doc.archived && "line-through",
                         )}
-                        onClick={() =>
-                          deleteFile({
-                            fileId: doc.id as Id<"openCallFiles">,
-                            eventId: eventId as Id<"events">,
-                          })
-                        }
+                        onClick={() => {
+                          if (isPublic) return;
+                          startEditing(doc.id, doc.title);
+                        }}
+                      >
+                        {displayTitle}
+                      </button>
+                    )}
+                  </td>
+                  {!mobileEditing && (
+                    <td className={cn("px-2 py-2 text-center")}>
+                      <FilePreviewer
+                        title={doc.title}
+                        href={doc.href}
+                        type={getMimeTypeFromHref(doc.title)}
+                        isPublic={isPublic}
                       />
                     </td>
                   )}
-                {isPublic && (
-                  <td className="px-2 py-2 text-center">
-                    <a
-                      href={doc.href}
-                      download={doc.title}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  {!isDraft && !isMobile && !isPublic && (
+                    <td
+                      className="px-2 py-2 text-center"
+                      onClick={() => {
+                        deleteFile({
+                          fileId: doc.id as Id<"openCallFiles">,
+                          eventId: eventId as Id<"events">,
+                          archive: doc?.archived ?? false,
+                        });
+                      }}
                     >
-                      <Download
-                        className={cn(
-                          "mx-auto size-4 cursor-pointer hover:scale-110 active:scale-95",
+                      <div className="cursor-pointer text-amber-800 opacity-70 transition hover:scale-110">
+                        {!doc?.archived && !isDraft && (
+                          <Book className={cn("mx-auto size-4")} />
                         )}
-                      />
-                    </a>
-                  </td>
-                )}
-              </tr>
-            ))}
+                        {doc?.archived && (
+                          <BookDashed className="mx-auto size-4" />
+                        )}
+                      </div>
+                    </td>
+                  )}
+                  {!mobileEditing &&
+                    !isPublic &&
+                    !disabled &&
+                    (isDraft || isAdmin) && (
+                      <td className="px-2 py-2 text-center">
+                        <X
+                          className={cn(
+                            "mx-auto size-4 cursor-pointer text-red-600 opacity-70 transition hover:scale-110 hover:opacity-100",
+                          )}
+                          onClick={() =>
+                            deleteFile({
+                              fileId: doc.id as Id<"openCallFiles">,
+                              eventId: eventId as Id<"events">,
+                            })
+                          }
+                        />
+                      </td>
+                    )}
+                  {isPublic && (
+                    <td className="px-2 py-2 text-center">
+                      <a
+                        href={doc.href}
+                        download={doc.title}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Download
+                          className={cn(
+                            "mx-auto size-4 cursor-pointer hover:scale-110 active:scale-95",
+                          )}
+                        />
+                      </a>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     </div>
