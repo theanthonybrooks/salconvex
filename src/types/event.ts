@@ -7,7 +7,9 @@ import { Doc, Id } from "~/convex/_generated/dataModel";
 export const freeEvents = ["gjm", "pup"];
 export const paidEvents = ["mur", "saf", "mus", "oth"];
 
-export const noEventCategories = ["project", "residency", "gfund", "roster"];
+export const noEventCategories = ["residency", "gfund", "roster"];
+
+export const prodOnlyCategories = ["project"];
 
 export const eventTypeOptions = [
   { value: "gjm", label: "Graffiti Jam", abbr: "Graffiti Jam" },

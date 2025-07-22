@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { noEventCategories } from "@/types/event";
+import { noEventCategories, prodOnlyCategories } from "@/types/event";
 import { User } from "@/types/user";
 import { Controller, useFormContext } from "react-hook-form";
 import { HiArrowTurnLeftDown } from "react-icons/hi2";
@@ -61,6 +61,7 @@ const SubmissionFormEventStep2 = ({
   const isOngoing = watch("event.dates.eventFormat") === "ongoing";
 
   const noEvent = noEventCategories.includes(category);
+  const prodOnly = prodOnlyCategories.includes(category);
   // #region ------------- Queries, Actions, and Mutations --------------
 
   // #endregion
@@ -86,7 +87,11 @@ const SubmissionFormEventStep2 = ({
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">
             Step{" "}
-            {categoryEvent && !eventOnly ? 10 : isOngoing || noEvent ? 8 : 9}
+            {categoryEvent && !eventOnly
+              ? 10
+              : isOngoing || noEvent || prodOnly
+                ? 8
+                : 9}
             :{" "}
           </p>
           <p className="lg:text-xs">
@@ -130,7 +135,7 @@ const SubmissionFormEventStep2 = ({
                   Step{" "}
                   {categoryEvent && !eventOnly
                     ? 11
-                    : isOngoing || noEvent
+                    : isOngoing || noEvent || prodOnly
                       ? 9
                       : 10}
                   :
@@ -230,7 +235,7 @@ const SubmissionFormEventStep2 = ({
                   Step{" "}
                   {categoryEvent && !eventOnly
                     ? 12
-                    : isOngoing || noEvent
+                    : isOngoing || noEvent || prodOnly
                       ? 10
                       : 11}
                   :{" "}

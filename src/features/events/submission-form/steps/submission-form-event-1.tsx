@@ -22,6 +22,7 @@ import {
   EventCategory,
   eventTypeOptions,
   noEventCategories,
+  prodOnlyCategories,
 } from "@/types/event";
 import { User } from "@/types/user";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -79,6 +80,7 @@ const SubmissionFormEventStep1 = ({
   // console.log(eventData);
   const category = eventData?.category as EventCategory;
   const noEvent = noEventCategories.includes(category);
+  const prodOnly = prodOnlyCategories.includes(category);
 
   // console.log(previousEventNameValid);
   // #region ------------- Queries, Actions, and Mutations --------------
@@ -156,9 +158,15 @@ const SubmissionFormEventStep1 = ({
   }, [noEvent, setValue, prodDatesFormat]);
 
   useEffect(() => {
+    if (prodOnly) {
+      setValue("event.dates.eventFormat", "noEvent");
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+    }
+  }, [prodOnly, setValue]);
+
+  useEffect(() => {
     if (formType === 1) {
       setValue("event.category", "event");
-      // setValue("event.hasOpenCall", "False");
     }
   }, [formType, setValue]);
 
@@ -488,22 +496,26 @@ const SubmissionFormEventStep1 = ({
               // "xl:self-center",
             )}
           >
-            <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">
-                Step {categoryEvent && !eventOnly ? 7 : 6}:{" "}
-              </p>
-              <p className="lg:text-xs">
-                {getEventCategoryLabelAbbr(category)} Dates
-              </p>
-            </div>
+            {!prodOnly && (
+              <>
+                <div className="input-section">
+                  <p className="min-w-max font-bold lg:text-xl">
+                    Step {categoryEvent && !eventOnly ? 7 : 6}:{" "}
+                  </p>
+                  <p className="lg:text-xs">
+                    {getEventCategoryLabelAbbr(category)} Dates
+                  </p>
+                </div>
 
-            <FormDatePicker
-              isAdmin={isAdmin}
-              title="Event Dates Format"
-              nameBase="event.dates"
-              type="event"
-              watchPath="event"
-            />
+                <FormDatePicker
+                  isAdmin={isAdmin}
+                  title="Event Dates Format"
+                  nameBase="event.dates"
+                  type="event"
+                  watchPath="event"
+                />
+              </>
+            )}
 
             {!isOngoing &&
               !noEvent &&
@@ -512,7 +524,8 @@ const SubmissionFormEventStep1 = ({
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent && !eventOnly ? 8 : 7}:{" "}
+                      Step {categoryEvent && !eventOnly ? 8 : prodOnly ? 6 : 7}
+                      :{" "}
                     </p>
                     <p className="lg:text-xs">Production Dates</p>
                   </div>
@@ -583,7 +596,7 @@ const SubmissionFormEventStep1 = ({
                     Step{" "}
                     {categoryEvent && !eventOnly
                       ? 9
-                      : isOngoing || noEvent
+                      : isOngoing || noEvent || prodOnly
                         ? 7
                         : 8}
                     :{" "}

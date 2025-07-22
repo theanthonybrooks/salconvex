@@ -30,6 +30,7 @@ import { Country } from "world-countries";
 
 registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
+import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { ExternalLinksInput } from "@/features/events/open-calls/components/external-links-input";
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
@@ -467,23 +468,24 @@ const SubmissionFormOC1 = ({
                   name="openCall.basicInfo.appFee"
                   control={control}
                   render={({ field }) => (
-                    <DebouncedControllerInput
+                    <DebouncedControllerNumInput
+                      disabled={!showAppFeeInput || pastEvent}
+                      field={{
+                        ...field,
+                        onChange: (val: string) => {
+                          const num = parseFloat(val);
+                          field.onChange(isNaN(num) ? true : num);
+                        },
+                      }}
+                      min={0}
+                      formatNumber={true}
                       tabIndex={
                         ocEligiblityType === "National" && showAppFeeInput
                           ? 7
                           : -1
                       }
-                      type="number"
-                      disabled={!showAppFeeInput || pastEvent}
                       // field={field}
-                      field={{
-                        ...field,
-                        onChange: (val: string) => {
-                          const num = parseFloat(val);
-                          field.onChange(isNaN(num) ? 0 : num);
-                        },
-                      }}
-                      placeholder={hasAppFee ? "Enter Amount" : ""}
+                      placeholder={hasAppFee ? "Amount" : ""}
                       className="h-fit border-none bg-card py-2 text-center focus:border-none focus:outline-none sm:text-base"
                     />
                   )}
