@@ -7,7 +7,7 @@ import {
   stateToRegionMap,
 } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 //NOTE: This is the full version of the mapbox input that passes the full location object rather than just the full string/value.
 export interface FullLocation {
@@ -44,7 +44,7 @@ interface MapboxInputFullProps {
 
 export const MapboxInputFull = ({
   id,
-  // reset,
+  reset,
   value,
   onChange,
   // onSelect,
@@ -104,6 +104,12 @@ export const MapboxInputFull = ({
       setIsFocused(true);
     }
   };
+
+  const handleReset = useCallback(() => {
+    setInputValue("");
+    setSuggestions([]);
+    setHighlightedIndex(0);
+  }, []);
 
   const handleSelect = (s: MapboxSuggestion) => {
     console.log(s);
@@ -351,6 +357,12 @@ export const MapboxInputFull = ({
     }
   }, [fullLocation, value, newLocation]);
 
+  useEffect(() => {
+    if (reset && inputValue.trim() !== "") {
+      handleReset();
+    }
+  }, [reset, handleReset, inputValue]);
+
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>
       <input
@@ -394,191 +406,3 @@ export const MapboxInputFull = ({
     </div>
   );
 };
-
-{
-  /*
-interface MapboxInputProps {
-  id: string;
-  value: string;
-  onChange: (value: string) => void;
-  onSelect: (location: {
-    city: string;
-    state: string;
-    stateAbbr: string;
-    country: string;
-    countryAbbr: string;
-    coordinates: number[];
-    full: string;
-  }) => void;
-  placeholder?: string;
-  className?: string;
-  inputClassName?: string;
-  tabIndex?: number;
-  reset?: boolean;
-  disabled?: boolean;
-}
-
-export const MapboxInput = ({
-  id,
-  // reset,
-  value,
-  // onChange,
-  onSelect,
-  placeholder = "Enter a location",
-  className,
-  inputClassName,
-  tabIndex,
-  disabled,
-}: MapboxInputProps) => {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
-  const [suggestions, setSuggestions] = useState<MapboxSuggestion[]>([]);
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [inputValue, setInputValue] = useState(value || "");
-
-  const newValue = value && value !== inputValue && !isFocused;
-
-  const listRef = useRef<HTMLUListElement>(null);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (suggestions.length === 0) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex((prev) =>
-        prev === 0 ? suggestions.length - 1 : prev - 1,
-      );
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      handleSelect(suggestions[highlightedIndex]);
-    }
-  };
-
-  const handleSelect = (s: MapboxSuggestion) => {
-    const context = s.context || [];
-    const findContext = (type: string) =>
-      context.find((c) => c.id.startsWith(type));
-
-    const stateContext = findContext("region");
-    const countryContext = findContext("country");
-
-    const locationData = {
-      city: s.text,
-      state: stateContext?.text || "",
-      stateAbbr: stateContext?.short_code?.split("-")[1] || "",
-      country: countryContext?.text || "",
-      countryAbbr: countryContext?.short_code?.toUpperCase() || "",
-      coordinates: s.center,
-      full: s.place_name,
-    };
-
-    onSelect(locationData);
-
-    setInputValue(locationData.full);
-    setSuggestions([]);
-  };
-
-  // useEffect(() => {
-  //   if (reset) {
-  //     setSuggestions([]);
-  //     setInputValue("");
-  //     setHighlightedIndex(0);
-  //     onChange("");
-  //   }
-  // }, [reset, onChange]);
-
-  useEffect(() => {
-    if (suggestions.length > 0 && listRef.current) {
-      setTimeout(() => {
-        listRef?.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-        });
-      }, 100);
-    }
-  }, [suggestions]);
-
-  useEffect(() => {
-    if (!isFocused) return;
-    const timeout = setTimeout(async () => {
-      if (!inputValue.trim()) {
-        setSuggestions([]);
-        return;
-      }
-
-      const results = await fetchMapboxSuggestions(inputValue);
-      setSuggestions(results);
-      setHighlightedIndex(0);
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [inputValue, isFocused]);
-
-  useEffect(() => {
-    if (newValue) {
-      setInputValue(value);
-    }
-  }, [newValue, value]);
-
-  // useEffect(() => {
-  //   onChange(inputValue);
-  // }, [inputValue, onChange]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
-        setSuggestions([]);
-        setIsFocused(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div ref={wrapperRef} className={cn("relative", className)}>
-      <input
-        id={id}
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setTimeout(() => setIsFocused(false), 150)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        tabIndex={tabIndex}
-        disabled={disabled}
-        className={cn(
-          "w-full rounded border border-foreground/30 p-3 text-base placeholder-foreground/50 placeholder-shown:bg-card focus:outline-none focus:ring-1 focus:ring-foreground",
-          inputClassName,
-        )}
-      />
-      {isFocused && suggestions.length > 0 && (
-        <ul
-          ref={listRef}
-          className="scrollable mini absolute z-50 mt-1 w-full rounded-md border-1.5 bg-white shadow"
-        >
-          {suggestions.map((s, i) => (
-            <li
-              key={s.id}
-              className={`cursor-pointer p-2 text-sm ${
-                i === highlightedIndex
-                  ? "bg-salPinkLt"
-                  : "hover:bg-salYellow/70"
-              }`}
-              onMouseDown={() => handleSelect(s)}
-            >
-              {s.place_name}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};*/
-}

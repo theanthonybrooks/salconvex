@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { Check, CircleCheck, CircleX, Search } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 
@@ -62,11 +62,11 @@ export const OrgSearch = ({
     hasUserInteracted ? { query: debouncedQuery || "" } : "skip",
   );
 
-  // useEffect(() => {
-  //   console.log("debouncedQuery", debouncedQuery);
-  //   console.log("results", results);
-  //   console.log(focused);
-  // }, [debouncedQuery, results, focused]);
+  const sortedResults = useMemo(
+    () =>
+      results ? [...results].sort((a, b) => a.name.localeCompare(b.name)) : [],
+    [results],
+  );
 
   const showSuggestions = focused && results && results.length > 0;
 
@@ -120,15 +120,15 @@ export const OrgSearch = ({
       }
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       e.preventDefault();
-      handleSelect(results[selectedIndex]);
+      handleSelect(sortedResults[selectedIndex]);
       setSelectedIndex(-1);
-      // setSelectedVal(results[selectedIndex].organizationName)
+      // setSelectedVal(sortedResults[selectedIndex].organizationName)
     } else if (e.key === "Escape") {
       setFocused(false);
       setSelectedIndex(-1);
     } else if (e.key === "Tab") {
       if (selectedIndex >= 0) {
-        handleSelect(results[selectedIndex]);
+        handleSelect(sortedResults[selectedIndex]);
         setFocused(false);
         setSelectedIndex(-1);
       }
@@ -148,13 +148,18 @@ export const OrgSearch = ({
 
   const handleBlur = () => {
     // console.log("handleBlur");
-    if (inputValue.trim() !== "" && inputValue.trim() !== selectedVal) {
+
+    if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
       if (results && results?.length > 0) {
-        handleSelect(results[selectedIndex]);
+        handleSelect(sortedResults[selectedIndex]);
       }
       setFocused(false);
       setSelectedIndex(-1);
       // console.log("if");
+    } else if (inputValue.trim() === "" && selectedVal.trim() !== "") {
+      handleSelect(sortedResults[selectedIndex]);
+      setFocused(false);
+      setSelectedIndex(-1);
     } else {
       setTimeout(() => {
         setFocused(false);
@@ -163,14 +168,6 @@ export const OrgSearch = ({
       // console.log("else");
     }
   };
-
-  // useEffect(() => {
-  //   if (!inputValRef.current && inputValue === "") return;
-  //   console.log(inputValue, inputValRef.current, value);
-  //   if (inputValue === inputValRef.current) return;
-  //   inputValRef.current = value;
-  //   setInputValue(value || "");
-  // }, [value, inputValue]);
 
   useEffect(() => {
     if (
@@ -190,13 +187,13 @@ export const OrgSearch = ({
     }
   }, [selectedIndex]);
 
-  useEffect(() => {
-    if (showSuggestions) {
-      setSelectedIndex(0);
-    } else {
-      setSelectedIndex(-1);
-    }
-  }, [showSuggestions]);
+  // useEffect(() => {
+  //   if (showSuggestions) {
+  //     setSelectedIndex(0);
+  //   } else {
+  //     setSelectedIndex(-1);
+  //   }
+  // }, [showSuggestions]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -210,7 +207,7 @@ export const OrgSearch = ({
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [rawQuery, hasUserInteracted, onChange, onLoadClick]);
+  }, [rawQuery, hasUserInteracted, onChange]);
 
   useEffect(() => {
     if (!showSuggestions || !listRef.current) return;
@@ -220,9 +217,20 @@ export const OrgSearch = ({
     }, 100);
   }, [showSuggestions]);
 
-  const sortedResults = results
-    ? [...results].sort((a, b) => a.name.localeCompare(b.name))
-    : [];
+  useEffect(() => {
+    if (!showSuggestions) return;
+    const selected = sortedResults[selectedIndex];
+    if (selectedIndex >= 0) {
+      setSelectedVal(selected.name);
+    } else {
+      if (
+        sortedResults.length > 0 &&
+        sortedResults[0].name.trim() === inputValue.trim()
+      ) {
+        setSelectedIndex(0);
+      }
+    }
+  }, [showSuggestions, selectedIndex, sortedResults, inputValue]);
 
   return (
     <div className="relative mx-auto w-full lg:max-w-md" ref={containerRef}>

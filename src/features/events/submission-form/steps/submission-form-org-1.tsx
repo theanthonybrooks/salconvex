@@ -71,9 +71,10 @@ const SubmissionFormOrgStep = ({
   const {
     control,
     watch,
+
+    unregister,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  console.log(isAdmin);
   // const currentValues = getValues();
   const [firstColVisible, setFirstColVisible] = useState(true);
   const orgData = watch("organization");
@@ -90,6 +91,13 @@ const SubmissionFormOrgStep = ({
     }
   }, [scrollTrigger]);
 
+  useEffect(() => {
+    if (orgName === "") {
+      unregister("organization.location");
+    }
+  }, [unregister, orgName]);
+
+  console.log(orgData.location);
   return (
     <div
       id="step-1-container"
@@ -219,7 +227,7 @@ const SubmissionFormOrgStep = ({
                       value={field.value}
                       onChange={field.onChange}
                       onBlur={field.onBlur}
-                      reset={!validOrgWZod}
+                      reset={!validOrgWZod || orgName === ""}
                       tabIndex={2}
                       disabled={!orgNameValid}
                       placeholder="Organization Location (city, state, country, etc)..."
@@ -259,7 +267,7 @@ const SubmissionFormOrgStep = ({
                       id="organization.logo"
                       onChange={(file) => field.onChange(file)}
                       onRemove={() => field.onChange(undefined)}
-                      reset={!validOrgWZod}
+                      reset={orgName === ""}
                       disabled={!orgNameValid}
                       initialImage={existingOrg?.logo}
                       size={72}

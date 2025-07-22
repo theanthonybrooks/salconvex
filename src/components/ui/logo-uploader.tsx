@@ -26,7 +26,7 @@ type AvatarUploaderProps = {
 
 export default function AvatarUploader({
   id,
-  // reset,
+  reset,
   onChange,
   onRemove,
   initialImage,
@@ -37,6 +37,7 @@ export default function AvatarUploader({
   imageOnly = false,
   loading = false,
 }: AvatarUploaderProps) {
+  console.log(initialImage);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageForCropping, setImageForCropping] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(
@@ -106,11 +107,11 @@ export default function AvatarUploader({
     }
   }, [initialImage]);
 
-  // useEffect(() => {
-  //   if (reset) {
-  //     handleReset();
-  //   }
-  // }, [reset]);
+  useEffect(() => {
+    if (reset && !!croppedPreviewUrl) {
+      handleReset();
+    }
+  }, [reset, croppedPreviewUrl]);
 
   return (
     <>
