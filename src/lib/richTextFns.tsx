@@ -78,7 +78,7 @@ export const RichTextDisplay = ({
       domNode instanceof Element &&
       ["p", "li", "ul", "ol", "a", "div", "span"].includes(domNode.name)
     ) {
-      const commonClasses = "break-words max-w-full whitespace-normal mb-2";
+      const commonClasses = "break-words max-w-full whitespace-normal";
       const children = domToReact(domNode.children as DOMNode[], { replace });
 
       if (domNode.name === "a") {
@@ -138,7 +138,12 @@ export const RichTextDisplay = ({
   }
 
   return (
-    <span className={cn("rich-text rich-text__preview-wrapper", className)}>
+    <span
+      className={cn(
+        "rich-text rich-text__preview-wrapper space-y-2",
+        className,
+      )}
+    >
       {parse(truncated, { replace })}
     </span>
   );
