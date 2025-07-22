@@ -56,6 +56,7 @@ export const usersWithSubscriptions = query({
         const planName =
           subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
         const cancelAt = subscription?.cancelAt;
+        const canceledAt = subscription?.canceledAt;
         const currentStatus = cancelAt ? "canceled" : subscription?.status;
         const cancelComment = cancelAt
           ? subscription?.customerCancellationComment
@@ -117,6 +118,7 @@ export const usersWithSubscriptions = query({
           subStatus: currentStatus ?? "-",
           accountType: user.accountType ?? [],
           cancelComment: cancelComment ?? null,
+          canceledAt: canceledAt ?? null,
           role: user.role ?? "user",
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,

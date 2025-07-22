@@ -27,6 +27,7 @@ export const userColumnLabels: Record<string, string> = {
   subscription: "Subscription",
   subStatus: "Sub Status",
   cancelComment: "Cancel Comment",
+  canceledAt: "Canceled At",
   accountType: "Account Type",
   createdAt: "Created",
   role: "Role",
@@ -41,6 +42,7 @@ interface UserColumnsProps {
   subscription: string;
   subStatus: string;
   cancelComment: string | null;
+  canceledAt: number | null;
   accountType: string[];
   createdAt: number;
   role: string[];
@@ -177,6 +179,22 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             {cancelComment || "-"}
           </div>
         </TooltipSimple>
+      );
+    },
+  },
+  {
+    accessorKey: "canceledAt",
+    minSize: 120,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Canceled At" />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue("canceledAt") as number | undefined;
+      return (
+        <div className="truncate text-sm text-muted-foreground">
+          {value ? new Date(value).toLocaleString() : "-"}
+        </div>
       );
     },
   },
