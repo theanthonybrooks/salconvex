@@ -23,7 +23,7 @@ export function AccordionComponent({
 }: AccordionComponentProps) {
   const sectionSlug = slugify(
     src?.title ?? src?.sectionTitle ?? `section ${+1}`,
-    { lower: true },
+    { lower: true, strict: true },
   );
   // console.log(sectionSlug);
   const [openItem, setOpenItem] = useState<string | undefined>(

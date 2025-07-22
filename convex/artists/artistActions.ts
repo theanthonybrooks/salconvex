@@ -71,7 +71,7 @@ export const updateOrCreateArtist = mutation({
       });
     }
     const artistSlug = args.artistName
-      ? slugify(args.artistName, { lower: true })
+      ? slugify(args.artistName, { lower: true, strict: true })
       : null;
 
     if (!artist) {

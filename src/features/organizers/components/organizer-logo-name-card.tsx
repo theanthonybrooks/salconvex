@@ -63,7 +63,7 @@ export const OrganizerCardLogoName = ({
 }: OrganizerCardLogoNameProps) => {
   const orgLocationString = getOrganizerLocationString(organizer, true);
   const isMobile = format === "mobile";
-  const slug = slugify(organizer.name, { lower: true });
+  const slug = slugify(organizer.name, { lower: true, strict: true });
 
   return (
     <Link href={`/thelist/organizer/${slug}`}>

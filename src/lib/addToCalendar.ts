@@ -52,7 +52,7 @@ export const generateICSFile = (
       }
     }
   };
-  const slug = slugify(title, { lower: true });
+  const slug = slugify(title, { lower: true, strict: true });
   const thisYear = new Date().getFullYear();
   let formattedStart: string | null = null;
   let formattedEnd: string | null = null;

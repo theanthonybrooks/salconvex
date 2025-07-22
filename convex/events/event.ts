@@ -273,7 +273,10 @@ export async function generateUniqueNameAndSlug(
     .unique();
 
   if (!existingExact) {
-    return { name: baseName, slug: slugify(baseName, { lower: true }) };
+    return {
+      name: baseName,
+      slug: slugify(baseName, { lower: true, strict: true }),
+    };
   }
 
   while (true) {
@@ -286,7 +289,10 @@ export async function generateUniqueNameAndSlug(
       .unique();
 
     if (!exists) {
-      return { name: tryName, slug: slugify(tryName, { lower: true }) };
+      return {
+        name: tryName,
+        slug: slugify(tryName, { lower: true, strict: true }),
+      };
     }
 
     suffix++;
@@ -684,7 +690,7 @@ export const updateEventName = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
-    const slug = slugify(args.name.trim(), { lower: true });
+    const slug = slugify(args.name.trim(), { lower: true, strict: true });
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
     await ctx.db.patch(event._id, {
@@ -704,7 +710,7 @@ export const checkEventNameExists = query({
   },
   handler: async (ctx, args) => {
     console.log(args);
-    const eventSlug = slugify(args.name.trim(), { lower: true });
+    const eventSlug = slugify(args.name.trim(), { lower: true, strict: true });
     const existingEvents = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", eventSlug))

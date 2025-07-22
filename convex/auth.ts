@@ -135,7 +135,10 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           await ctx.db.insert("organizations", {
             ownerId: newUserId,
             name: profile.organizationName,
-            slug: slugify(profile.organizationName as string, { lower: true }),
+            slug: slugify(profile.organizationName as string, {
+              lower: true,
+              strict: true,
+            }),
             logo: "/1.jpg",
             hadFreeCall: false,
             isComplete: false,

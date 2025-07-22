@@ -17,7 +17,10 @@ export const OrgEventActions = ({ event, field }: OrgEventActionsProps) => {
     event.openCallState === "published";
   const orgName = field === "orgName";
   const eventName = field === "eventName";
-  const orgSlug = slugify(event.organizationName, { lower: true });
+  const orgSlug = slugify(event.organizationName, {
+    lower: true,
+    strict: true,
+  });
   return (
     <p
       onClick={() => {
