@@ -19,7 +19,8 @@ export const OrganizerCard = ({
   srcPage,
 }: OrganizerCardProps) => {
   const orgHasOtherEvents = organizer?.events?.length > 1;
-  const orgSlug = slugify(organizer.name, { lower: true, strict: true });
+  const orgSlug =
+    organizer?.slug ?? slugify(organizer.name, { lower: true, strict: true });
   const isMobile = format === "mobile";
   const orgPage = srcPage === "organizer";
 

@@ -1,4 +1,5 @@
 "use client";
+import { Link } from "@/components/ui/custom-link";
 import { DialogTitle } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -519,7 +520,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 ) ? (
                   <>
                     {value.length !== 0 ? (
-                      <Command.Empty>
+                      <Command.Empty className="flex flex-col items-center gap-5">
                         <span className="inline-flex items-center gap-2">
                           No results found for
                           <span className="inline-flex items-center gap-[1px] italic">
@@ -528,6 +529,18 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                             <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
                           </span>
                         </span>
+
+                        <p className="text-sm italic text-foreground/60">
+                          If you&apos;re an organizer, you can submit your
+                          event, project, or open call{" "}
+                          <Link
+                            href="/pricing?submit"
+                            className="font-bold uppercase"
+                          >
+                            here
+                          </Link>
+                          .
+                        </p>
                       </Command.Empty>
                     ) : (
                       <Command.Empty>
