@@ -1506,13 +1506,13 @@ export const EventOCForm = ({
       organization: {
         name: "",
         logo: "",
-        location: undefined,
+        location: { ...orgData.location, full: "" },
       },
       event: {
         formType,
         name: "",
         logo: "/1.jpg",
-        location: undefined,
+        location: { ...orgData.location, full: "" },
         hasOpenCall: "False",
       },
       openCall: {
@@ -1661,7 +1661,6 @@ export const EventOCForm = ({
       existingOrg &&
       typeof existingOrg._id === "string" &&
       existingOrg._id.length > 0;
-    // console.log("existingOrg", existingOrg);
 
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
@@ -1681,7 +1680,7 @@ export const EventOCForm = ({
     } else {
       setLastSaved(null);
     }
-  }, [existingOrg, reset, getValues, formType]);
+  }, [existingOrg, reset, getValues, formType, orgData]);
 
   useEffect(() => {
     const eventReady =
@@ -1789,7 +1788,7 @@ export const EventOCForm = ({
         event: {
           formType,
           name: "",
-          logo: currentValues?.organization?.logo || "/1.jpg",
+          logo: currentValues?.organization?.logo || "",
           location: {
             ...(currentValues?.organization?.location ?? {}),
             sameAsOrganizer: true,

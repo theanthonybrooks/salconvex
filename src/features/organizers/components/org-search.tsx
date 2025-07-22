@@ -150,7 +150,7 @@ export const OrgSearch = ({
     // console.log("handleBlur");
 
     if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
-      if (results && results?.length > 0) {
+      if (results && results?.length > 0 && selectedIndex >= 0) {
         handleSelect(sortedResults[selectedIndex]);
       }
       setFocused(false);

@@ -358,10 +358,12 @@ export const MapboxInputFull = ({
   }, [fullLocation, value, newLocation]);
 
   useEffect(() => {
-    if (reset && inputValue.trim() !== "") {
+    if (reset) {
       handleReset();
+      console.log("resetting", reset);
     }
-  }, [reset, handleReset, inputValue]);
+  }, [reset, handleReset]);
+  console.log(inputValue, value?.full);
 
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>

@@ -72,11 +72,12 @@ const SubmissionFormOrgStep = ({
     control,
     watch,
 
-    unregister,
+    // unregister,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
   const [firstColVisible, setFirstColVisible] = useState(true);
+  const [reset, setReset] = useState(false);
   const orgData = watch("organization");
   const eventName = watch("event.name");
 
@@ -91,13 +92,12 @@ const SubmissionFormOrgStep = ({
     }
   }, [scrollTrigger]);
 
-  useEffect(() => {
-    if (orgName === "") {
-      unregister("organization.location");
-    }
-  }, [unregister, orgName]);
+  // useEffect(() => {
+  //   if (orgName === "") {
+  //     unregister("organization.location");
+  //   }
+  // }, [unregister, orgName]);
 
-  console.log(orgData.location);
   return (
     <div
       id="step-1-container"
@@ -176,7 +176,14 @@ const SubmissionFormOrgStep = ({
                   isValid={validOrgWZod}
                   validationError={invalidOrgWZod}
                   onLoadClick={setExistingOrg}
-                  onReset={handleReset}
+                  onReset={() => {
+                    handleReset();
+
+                    setReset(true);
+                    setTimeout(() => {
+                      setReset(false);
+                    }, 0);
+                  }}
                   placeholder={
                     isMobile
                       ? "Search or enter new"
@@ -227,7 +234,7 @@ const SubmissionFormOrgStep = ({
                       value={field.value}
                       onChange={field.onChange}
                       onBlur={field.onBlur}
-                      reset={!validOrgWZod || orgName === ""}
+                      reset={reset}
                       tabIndex={2}
                       disabled={!orgNameValid}
                       placeholder="Organization Location (city, state, country, etc)..."
@@ -267,7 +274,7 @@ const SubmissionFormOrgStep = ({
                       id="organization.logo"
                       onChange={(file) => field.onChange(file)}
                       onRemove={() => field.onChange(undefined)}
-                      reset={orgName === ""}
+                      reset={reset}
                       disabled={!orgNameValid}
                       initialImage={existingOrg?.logo}
                       size={72}

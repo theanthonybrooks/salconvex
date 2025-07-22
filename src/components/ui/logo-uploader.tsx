@@ -37,7 +37,6 @@ export default function AvatarUploader({
   imageOnly = false,
   loading = false,
 }: AvatarUploaderProps) {
-  console.log(initialImage);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageForCropping, setImageForCropping] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(
