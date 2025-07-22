@@ -78,7 +78,7 @@ export const RichTextDisplay = ({
       domNode instanceof Element &&
       ["p", "li", "ul", "ol", "a", "div", "span"].includes(domNode.name)
     ) {
-      const commonClasses = "break-words max-w-full whitespace-normal";
+      const commonClasses = "break-words max-w-full whitespace-normal mb-2";
       const children = domToReact(domNode.children as DOMNode[], { replace });
 
       if (domNode.name === "a") {

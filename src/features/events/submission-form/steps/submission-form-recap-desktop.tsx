@@ -190,31 +190,34 @@ export const SubmissionFormRecapDesktop = ({
                   </tr>
                 )}
 
-                <tr>
-                  <th className="pr-4 align-top font-medium">Event Dates</th>
-                  <td>
-                    <EventDates
-                      event={{
-                        dates: {
-                          ...eventData.dates,
-                          eventFormat:
-                            eventData.dates?.eventFormat === ""
-                              ? undefined
-                              : eventData.dates?.eventFormat,
-                          prodFormat:
-                            eventData.dates?.prodFormat === ""
-                              ? undefined
-                              : eventData.dates?.prodFormat,
-                        },
-                      }}
-                      format="desktop"
-                      limit={0}
-                      type="event"
-                    />
-                  </td>
-                </tr>
+                {eventData.category !== "project" && (
+                  <tr>
+                    <th className="pr-4 align-top font-medium">Event Dates</th>
+                    <td>
+                      <EventDates
+                        event={{
+                          dates: {
+                            ...eventData.dates,
+                            eventFormat:
+                              eventData.dates?.eventFormat === ""
+                                ? undefined
+                                : eventData.dates?.eventFormat,
+                            prodFormat:
+                              eventData.dates?.prodFormat === ""
+                                ? undefined
+                                : eventData.dates?.prodFormat,
+                          },
+                        }}
+                        format="desktop"
+                        limit={0}
+                        type="event"
+                      />
+                    </td>
+                  </tr>
+                )}
 
-                {eventData.category === "event" &&
+                {(eventData.category === "event" ||
+                  eventData.category === "project") &&
                   eventData.dates?.prodFormat !== "sameAsEvent" &&
                   eventData.dates?.eventFormat !== "ongoing" && (
                     <tr>
