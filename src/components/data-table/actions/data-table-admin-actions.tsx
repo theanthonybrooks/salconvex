@@ -15,7 +15,7 @@ export const DataTableAdminActions = ({ eventId }: DataTableAdminProps) => {
       <DropdownMenuItem
         onClick={(e) => {
           e.stopPropagation();
-          router.push(`/dashboard/admin/event?eventId=${eventId}`);
+          router.push(`/dashboard/admin/event?_id=${eventId}`);
         }}
         className="flex items-center gap-x-2"
       >

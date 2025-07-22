@@ -203,7 +203,7 @@ const EventContextMenu = ({
           {isAdmin && (
             <>
               <Link
-                href={`/dashboard/admin/event?eventId=${eventId}`}
+                href={`/dashboard/admin/event?_id=${eventId}`}
                 target="_blank"
                 className={cn(
                   "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
