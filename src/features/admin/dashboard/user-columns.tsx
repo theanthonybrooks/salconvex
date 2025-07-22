@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
@@ -171,9 +172,11 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const cancelComment = row.getValue("cancelComment") as string | null;
       return (
-        <div className="truncate text-sm text-muted-foreground">
-          {cancelComment || "-"}
-        </div>
+        <TooltipSimple content={cancelComment}>
+          <div className="truncate text-sm text-muted-foreground">
+            {cancelComment || "-"}
+          </div>
+        </TooltipSimple>
       );
     },
   },

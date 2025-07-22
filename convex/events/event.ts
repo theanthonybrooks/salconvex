@@ -774,7 +774,8 @@ export const getEventsForCalendar = query({
         const openCallStatus = await ctx.db
           .query("openCalls")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .unique();
+          .first();
+        //todo: update this later to accommodate multiple open calls per event
 
         if (openCallStatus?.state === "published") {
           hasOpenCall = true;
