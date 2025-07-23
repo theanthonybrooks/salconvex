@@ -24,6 +24,7 @@ import {
   getExternalRedirectHtml,
 } from "@/utils/loading-page-html";
 import { useQuery } from "convex-helpers/react/cache";
+import { useMutation } from "convex/react";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -169,6 +170,7 @@ export const ApplyButton = ({
     api.subscriptions.getUserSubscriptionStatus,
     finalButton ? {} : "skip",
   );
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const isEmail = callType === "Email";
   const noSub =
     !subscription?.hasActiveSubscription &&
@@ -183,6 +185,7 @@ export const ApplyButton = ({
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
+
     const newTab = window.open("about:blank");
 
     if (!newTab) {
@@ -205,6 +208,7 @@ export const ApplyButton = ({
           manualApplied: true,
         });
       }
+      await updateUserLastActive({ email: user?.email ?? "" });
 
       newTab.location.href = finalAppUrl;
     } catch (error) {
@@ -218,9 +222,14 @@ export const ApplyButton = ({
     }
   };
 
-  const onBookmark = () => {
+  const onBookmark = async () => {
     // setIsBookmarked(!isBookmarked);
     toggleListAction({ bookmarked: !isBookmarked });
+    try {
+      await updateUserLastActive({ email: user?.email ?? "" });
+    } catch (error) {
+      console.error("Error updating last active:", error);
+    }
   };
   const router = useRouter();
 

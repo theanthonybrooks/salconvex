@@ -28,6 +28,7 @@ export const userColumnLabels: Record<string, string> = {
   subStatus: "Sub Status",
   cancelComment: "Cancel Comment",
   canceledAt: "Canceled At",
+  lastActive: "Last Active",
   accountType: "Account Type",
   createdAt: "Created",
   role: "Role",
@@ -43,6 +44,7 @@ interface UserColumnsProps {
   subStatus: string;
   cancelComment: string | null;
   canceledAt: number | null;
+  lastActive: number | null;
   accountType: string[];
   createdAt: number;
   role: string[];
@@ -191,6 +193,22 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const value = row.getValue("canceledAt") as number | undefined;
+      return (
+        <div className="truncate text-sm text-muted-foreground">
+          {value ? new Date(value).toLocaleString() : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "lastActive",
+    minSize: 120,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Active" />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue("lastActive") as number | undefined;
       return (
         <div className="truncate text-sm text-muted-foreground">
           {value ? new Date(value).toLocaleString() : "-"}

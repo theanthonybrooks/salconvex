@@ -15,7 +15,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { CheckCircleIcon, EyeOff, Info, MapPin } from "lucide-react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
@@ -34,6 +34,7 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
+import { api } from "~/convex/_generated/api";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -80,7 +81,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     : appUrl;
 
   const [activeTab, setActiveTab] = useState("openCall");
-
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const { toggleListAction } = useToggleListAction(event._id);
   const { callType, dates: callDates } = basicInfo;
   const { ocStart, ocEnd, timezone } = callDates;
@@ -97,14 +98,17 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const locationString = getFormattedLocationString(location);
   const isOwner = user?._id === organizer?.ownerId;
 
-  const onBookmark = () => {
+  const onBookmark = async () => {
     if (!hasActiveSubscription) return;
     toggleListAction({ bookmarked: !bookmarked });
+
+    await updateUserLastActive({ email: user?.email ?? "" });
   };
 
-  const onHide = () => {
+  const onHide = async () => {
     if (!hasActiveSubscription) return;
     toggleListAction({ hidden: !hidden });
+    await updateUserLastActive({ email: user?.email ?? "" });
   };
 
   const tabList = [

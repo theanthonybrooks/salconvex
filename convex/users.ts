@@ -16,16 +16,25 @@ import {
 
 export const updateUserLastActive = mutation({
   args: {
-    email: v.optional(v.string()),
+    email: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    let userId = null;
+    const identity = await getAuthUserId(ctx);
+    const userByEmail = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email))
+      .first();
+    if (identity) {
+      userId = identity;
+    } else {
+      userId = userByEmail?._id;
+    }
     if (!userId) {
       console.log("User not found");
       // throw new Error("User not found");
       return null;
     }
-    console.log("userId", userId);
 
     await ctx.db.patch(userId, {
       lastActive: Date.now(),
@@ -138,6 +147,7 @@ export const usersWithSubscriptions = query({
           accountType: user.accountType ?? [],
           cancelComment: cancelComment ?? null,
           canceledAt: canceledAt ?? null,
+          lastActive: user.lastActive ?? null,
           role: user.role ?? "user",
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,

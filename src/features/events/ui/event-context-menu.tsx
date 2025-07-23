@@ -26,7 +26,9 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { User } from "@/types/user";
+import { useMutation } from "convex/react";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
+import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface EventContextMenuProps {
@@ -63,21 +65,25 @@ const EventContextMenu = ({
   isBookmarked,
 }: EventContextMenuProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const hasApplied = appStatus !== null;
-  const onHide = () => {
+  const onHide = async () => {
     toggleListAction({ hidden: !isHidden });
+    await updateUserLastActive({ email: user?.email ?? "" });
   };
-  const onBookmark = () => {
+  const onBookmark = async () => {
     toggleListAction({ bookmarked: !isBookmarked || false });
+    await updateUserLastActive({ email: user?.email ?? "" });
   };
-  const onApply = () => {
+  const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
     toggleAppActions({
       openCallId: openCallId as Id<"openCalls">,
       manualApplied: appStatus === "applied" ? false : true,
     });
+    await updateUserLastActive({ email: user?.email ?? "" });
   };
 
   const nonAdminPublicView = publicView && !isAdmin;

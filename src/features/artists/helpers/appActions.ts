@@ -15,6 +15,7 @@ export function useArtistApplicationActions() {
       await appActions(options);
     } catch (error) {
       console.error("Error toggling application action:", error);
+    } finally {
     }
   };
 

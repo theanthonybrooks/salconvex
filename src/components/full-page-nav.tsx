@@ -645,7 +645,7 @@ const FullPageNav = ({
                 )}
               </Unauthenticated>
               <Authenticated>
-                <SignOutBtn>
+                <SignOutBtn email={user?.email}>
                   <div
                     onClick={() => {
                       setTimeout(() => setIsOpen("closed"), 1000);

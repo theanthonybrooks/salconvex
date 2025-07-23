@@ -18,11 +18,12 @@ import { isValidIsoDate } from "@/lib/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { EventCardProps } from "@/types/event";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
   const router = useRouter();
@@ -30,6 +31,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const isAdmin = userData?.user?.role?.includes("admin") || false;
+  const user = userData?.user;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
   const {
@@ -59,6 +61,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   //   bookmarked: false,
   //   hidden: false,
   // };
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const { toggleListAction } = useToggleListAction(event._id);
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
@@ -98,19 +101,21 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     return () => clearTimeout(timeout);
   }, []);
 
-  const onBookmark = () => {
+  const onBookmark = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
+      await updateUserLastActive({ email: user?.email ?? "" });
     }
   };
 
-  const onHide = () => {
+  const onHide = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
+      await updateUserLastActive({ email: user?.email ?? "" });
     }
   };
 

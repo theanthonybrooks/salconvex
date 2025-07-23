@@ -31,10 +31,11 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const router = useRouter();
@@ -76,20 +77,23 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
   const locationString = getFormattedLocationString(location);
   const isOwner = user?._id === organizer?.ownerId;
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
 
-  const onBookmark = () => {
+  const onBookmark = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
+      await updateUserLastActive({ email: user?.email ?? "" });
     }
   };
 
-  const onHide = () => {
+  const onHide = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
+      await updateUserLastActive({ email: user?.email ?? "" });
     }
   };
 

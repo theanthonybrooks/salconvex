@@ -20,11 +20,12 @@ import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const router = useRouter();
@@ -90,6 +91,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   // console.log("has open call", hasOpenCall)
 
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const [activeTab, setActiveTab] = useState("opencall");
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -97,19 +99,21 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   const { toggleListAction } = useToggleListAction(event._id);
 
-  const onBookmark = () => {
+  const onBookmark = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
+      await updateUserLastActive({ email: user?.email ?? "" });
     }
   };
 
-  const onHide = () => {
+  const onHide = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
+      await updateUserLastActive({ email: user?.email ?? "" });
     }
   };
 

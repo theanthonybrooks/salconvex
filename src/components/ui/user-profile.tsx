@@ -43,6 +43,7 @@ export function UserProfile({
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user;
+
   const userRole = user?.role;
   const accountType = user?.accountType;
   const isArtist = accountType?.includes("artist") ?? false;
@@ -181,7 +182,7 @@ export function UserProfile({
           </DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <SignOutBtn>
+        <SignOutBtn email={user?.email}>
           <DropdownMenuItem className="focus:bg-salPink/50">
             <LogOut className="mr-2 size-4" />
             <span>Log out</span>

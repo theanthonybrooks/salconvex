@@ -31,6 +31,7 @@ import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import { CombinedEventPreviewCardData } from "@/types/event";
 import { User, UserPref } from "@/types/user";
+import { useMutation } from "convex/react";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -40,6 +41,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaBookmark, FaMapLocationDot, FaRegBookmark } from "react-icons/fa6";
+import { api } from "~/convex/_generated/api";
 
 export interface EventCardPreviewProps {
   event: CombinedEventPreviewCardData;
@@ -168,20 +170,31 @@ const EventCardPreview = ({
   // const userCurrency = userPref?.currency ?? ""
 
   const { toggleListAction } = useToggleListAction(event._id);
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
 
-  const onBookmark = () => {
+  const onBookmark = async () => {
     if (publicView) {
       router.push("/pricing");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
+      try {
+        await updateUserLastActive({ email: user?.email ?? "" });
+      } catch (error) {
+        console.error("Error updating last active:", error);
+      }
     }
   };
 
-  const onHide = () => {
+  const onHide = async () => {
     if (publicView) {
       router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
+      try {
+        await updateUserLastActive({ email: user?.email ?? "" });
+      } catch (error) {
+        console.error("Error updating last active:", error);
+      }
     }
   };
 
