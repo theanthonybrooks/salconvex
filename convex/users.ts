@@ -21,9 +21,11 @@ export const updateUserLastActive = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
+      console.log("User not found");
       // throw new Error("User not found");
       return null;
     }
+    console.log("userId", userId);
 
     await ctx.db.patch(userId, {
       lastActive: Date.now(),
