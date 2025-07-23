@@ -69,7 +69,7 @@ const ClientThisWeekList = (
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
     {
-      showHidden: false,
+      showHidden: true,
       bookmarkedOnly: false,
       limit: 20,
       eventTypes: [],
@@ -86,7 +86,6 @@ const ClientThisWeekList = (
       ? formatCondensedDateRange(
           queryResult.weekStartISO,
           queryResult.weekEndISO,
-         
         )
       : "";
 

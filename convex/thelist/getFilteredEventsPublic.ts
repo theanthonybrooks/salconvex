@@ -3,13 +3,7 @@ import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import {
-  addHours,
-  addMinutes,
-  addWeeks,
-  endOfWeek,
-  startOfWeek,
-} from "date-fns";
+import { addDays, addWeeks, endOfWeek, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 export const getFilteredEventsPublic = query({
@@ -46,19 +40,34 @@ export const getFilteredEventsPublic = query({
     const nextWeekPg = source === "nextweek";
     const theListPg = source === "thelist";
 
+    let refDate = new Date();
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isAdmin = user?.role?.includes("admin");
+    const subscription = user
+      ? await ctx.db
+          .query("userSubscriptions")
+          .withIndex("userId", (q) => q.eq("userId", user._id))
+          .first()
+      : null;
+    const hasActiveSubscription =
+      subscription?.status === "active" ||
+      subscription?.status === "trialing" ||
+      isAdmin;
+
+    if (thisWeekPg && refDate.getDay() === 0 && hasActiveSubscription) {
+      refDate = addDays(refDate, 1);
+    }
     // const now = new Date();
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
     // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
     // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 0);
-    const startDay = addMinutes(
-      startOfWeek(new Date(), { weekStartsOn: 1 }),
-      0,
-    );
-    // const startDay = addHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 4);
+    const startDay = startOfWeek(refDate, { weekStartsOn: 1 });
+    // const startDay = addHours(startOfWeek(refDate, { weekStartsOn: 1 }), 4);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 
-    const endDay = addHours(endOfWeek(new Date(), { weekStartsOn: 1 }), 0);
+    const endDay = endOfWeek(refDate, { weekStartsOn: 1 });
 
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
     // console.log(
@@ -73,19 +82,6 @@ export const getFilteredEventsPublic = query({
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
 
-    const userId = await getAuthUserId(ctx);
-    const user = userId ? await ctx.db.get(userId) : null;
-    const isAdmin = user?.role?.includes("admin");
-    const subscription = user
-      ? await ctx.db
-          .query("userSubscriptions")
-          .withIndex("userId", (q) => q.eq("userId", user._id))
-          .first()
-      : null;
-    const hasActiveSubscription =
-      subscription?.status === "active" ||
-      subscription?.status === "trialing" ||
-      isAdmin;
     const listActions =
       user?._id && hasActiveSubscription
         ? await ctx.db
