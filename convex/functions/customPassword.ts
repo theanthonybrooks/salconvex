@@ -23,7 +23,6 @@ export const CustomPassword = () =>
       }
     },
     profile(params) {
-      // console.log("params", params)
       return {
         name: params.name as string,
         email: (params.email as string)?.toLowerCase(),
@@ -41,6 +40,7 @@ export const CustomPassword = () =>
         subscription: params.subscription as string,
         tokenIdentifier: params.userId as string,
         updatedAt: Date.now(),
+        lastActive: Date.now(),
       };
     },
   });

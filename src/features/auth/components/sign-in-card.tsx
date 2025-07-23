@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
   Eye,
@@ -25,6 +26,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
+import { api } from "~/convex/_generated/api";
 
 interface SignInCardProps {
   // setState: (state: SignInFlow) => void
@@ -38,6 +40,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
 }: SignInCardProps) => {
   const router = useRouter();
   const { signIn } = useAuthActions();
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -83,7 +86,10 @@ const SignInCard: React.FC<SignInCardProps> = ({
             : "Check your email/password and try again.";
         setError(errorMessage);
       })
-      .finally(() => {
+      .finally(async () => {
+        if (!isNewUser) {
+          await updateUserLastActive({ email: email });
+        }
         setPending(false);
       });
   };

@@ -37,15 +37,19 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   ],
   callbacks: {
     async createOrUpdateUser(ctx, { existingUserId, profile, type, provider }) {
-      // console.log("profile data:", profile);
-      // console.log("provider:", provider);
-      // console.log("type:", type);
-      // console.log("existingUserId:", existingUserId);
+      console.log("profile data:", profile);
+      console.log("provider:", provider);
+      console.log("type:", type);
+      console.log("existingUserId:", existingUserId);
+
       if (existingUserId) {
         const user = await ctx.db.get(existingUserId);
         if (type === "oauth" && profile.image !== undefined && !user.image) {
           await ctx.db.patch(existingUserId, { image: profile.image });
         }
+        await ctx.db.patch(existingUserId, {
+          lastActive: Date.now(),
+        });
 
         return existingUserId;
       }

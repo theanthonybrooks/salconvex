@@ -85,6 +85,7 @@ const customUserSchema = {
   imageStorageId: v.optional(v.id("_storage")),
 
   emailVerified: v.optional(v.boolean()),
+  lastActive: v.optional(v.number()),
 };
 
 const userPWSchema = v.object({

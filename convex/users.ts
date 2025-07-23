@@ -14,6 +14,23 @@ import {
   query,
 } from "./_generated/server";
 
+export const updateUserLastActive = mutation({
+  args: {
+    email: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      // throw new Error("User not found");
+      return null;
+    }
+
+    await ctx.db.patch(userId, {
+      lastActive: Date.now(),
+    });
+  },
+});
+
 export const getTotalUsers = query({
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();
