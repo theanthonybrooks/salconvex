@@ -172,7 +172,7 @@ const ClientThisWeekList = (
           ))}
         </div>
       ) : (
-        <div className="mb-16">
+        <div className={cn(!publicView && "mb-16")}>
           <div className="mb-12 flex flex-col gap-8">
             <section>
               <h1 className="mx-auto text-center font-tanker text-3xl lowercase tracking-wide">
@@ -228,6 +228,11 @@ const ClientThisWeekList = (
               </p>
               {/* <SocialsRow className="size-8 md:size-6" contClassName="gap-8" /> */}
             </section>
+            {/* {publicView && (
+              <p className="mx-auto">
+                Members view this week&apos;s open calls 
+              </p>
+            )} */}
           </div>
 
           {hasResults ? (
@@ -316,8 +321,8 @@ const ClientThisWeekList = (
 
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
-        <div className="mx-auto mb-20 mt-10 max-w-[90vw]">
-          <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:pb-4">
+        <div className="mx-auto -mt-10 mb-20 max-w-[90vw]">
+          <div className="mx-auto max-w-[90dvw] pb-8 sm:max-w-[1200px] sm:pb-4">
             <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:justify-center sm:gap-2 lg:text-xl">
               <Button
                 variant="salWithShadowHiddenBg"

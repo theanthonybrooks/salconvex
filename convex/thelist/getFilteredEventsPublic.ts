@@ -55,7 +55,7 @@ export const getFilteredEventsPublic = query({
       subscription?.status === "trialing" ||
       isAdmin;
 
-    if (thisWeekPg && refDate.getDay() === 0 && hasActiveSubscription) {
+    if (thisWeekPg && refDate.getDay() === 0) {
       refDate = addDays(refDate, 1);
     }
     // const now = new Date();
