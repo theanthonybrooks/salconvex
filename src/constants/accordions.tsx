@@ -314,7 +314,22 @@ export const pricingFaqs: AccordionSection = {
     {
       id: "organizers",
       subtitle: "What about for organizers?",
-      text: "Accounts for organizers are free. They don't grant access to the open call sections of the list (aside from their own events/projects or archived open calls, which are public record for everyone). Organizers only pay a one-time fee when they want to list an open call with a budget of $1,000+ and listing events is always free. For a full pricing breakdown, see the Submission Costs section below.",
+      text: (
+        <>
+          <p>
+            Accounts for organizers are free. They don&apos;t grant access to
+            the open call sections of the list (aside from their own
+            events/projects or archived open calls, which are public record for
+            everyone).
+          </p>
+
+          <p>
+            Organizers only pay a one-time fee when they want to list an open
+            call with a budget of $1,000+ and listing events is always free. For
+            a full pricing breakdown, see the Submission Costs section below.
+          </p>
+        </>
+      ),
     },
     {
       id: "patreon",
