@@ -3,9 +3,9 @@ import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-crons.daily(
+crons.hourly(
   "Delete unconfirmed users",
-  { hourUTC: 0, minuteUTC: 0 }, // Run daily at midnight UTC (-1 from Berlin)
+  { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)
   internal.users.deleteUnconfirmedUsers,
 );
 

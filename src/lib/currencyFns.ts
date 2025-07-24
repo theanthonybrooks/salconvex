@@ -1,5 +1,17 @@
 import { currencies } from "@/app/data/currencies";
 
+export function formatAmount(amount: number): string {
+  return amount % 1 === 0
+    ? amount.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })
+    : amount.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+}
+
 export async function convertCurrency({
   amount,
   from,

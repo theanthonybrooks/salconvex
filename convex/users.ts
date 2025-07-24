@@ -62,7 +62,13 @@ export const usersWithSubscriptions = query({
     let totalYearly = 0;
     let totalThisMonth = 0;
     const today = new Date();
-    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const nextMonthStart = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      1,
+    );
 
     const results = await Promise.all(
       users.map(async (user) => {
@@ -86,12 +92,19 @@ export const usersWithSubscriptions = query({
         const cancelAt = subscription?.cancelAt;
         const canceledAt = subscription?.canceledAt;
         const currentStatus = cancelAt ? "canceled" : subscription?.status;
+        const inactiveStatus =
+          currentStatus === "canceled" || currentStatus === "past_due";
         const cancelComment = cancelAt
           ? subscription?.customerCancellationComment
           : null;
         const interval = subscription?.interval ?? "unknown";
         const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;
-        const amount = subAmount ?? 0;
+        let amount = subAmount ?? 0;
+        if (subscription?.discountPercent) {
+          amount = amount * (1 - subscription.discountPercent / 100);
+        } else if (subscription?.discountAmount) {
+          amount = amount - subscription.discountAmount;
+        }
         const trialEndsAt = subscription?.trialEndsAt
           ? new Date(subscription.trialEndsAt)
           : null;
@@ -99,26 +112,31 @@ export const usersWithSubscriptions = query({
           ? new Date(subscription.currentPeriodEnd)
           : null;
 
+        console.log("inactiveStatus", inactiveStatus);
+
         const trialEndsThisMonth =
-          trialEndsAt && trialEndsAt >= today && trialEndsAt < nextMonth;
+          trialEndsAt &&
+          trialEndsAt >= monthStart &&
+          trialEndsAt < nextMonthStart;
         const periodEndsThisMonth =
           currentPeriodEndAt &&
-          currentPeriodEndAt >= today &&
-          currentPeriodEndAt < nextMonth;
-
-        if (interval === "month") {
-          totalThisMonth += amount;
-          totalThisYear += amount * 12;
-          totalMonthly += amount;
-        } else if (interval === "year") {
-          if (trialEndsThisMonth || periodEndsThisMonth) {
-            // console.log("trialEndsThisMonth", trialEndsThisMonth, amount);
+          currentPeriodEndAt >= monthStart &&
+          currentPeriodEndAt < nextMonthStart;
+        if (!inactiveStatus) {
+          if (interval === "month") {
             totalThisMonth += amount;
-            // console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
+            totalThisYear += amount * 12;
+            totalMonthly += amount;
+          } else if (interval === "year") {
+            if (trialEndsThisMonth || periodEndsThisMonth) {
+              // console.log("trialEndsThisMonth", trialEndsThisMonth, amount);
+              totalThisMonth += amount;
+              // console.log("periodEndsThisMonth", periodEndsThisMonth, amount);
+            }
+            totalThisYear += amount;
+            totalPerMonth += amount / 12;
+            totalYearly += amount;
           }
-          totalThisYear += amount;
-          totalPerMonth += amount / 12;
-          totalYearly += amount;
         }
 
         const label = subscription

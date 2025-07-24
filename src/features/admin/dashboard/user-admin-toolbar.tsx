@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { convertCurrency } from "@/lib/currencyFns";
+import { convertCurrency, formatAmount } from "@/lib/currencyFns";
 import { cn } from "@/lib/utils";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
@@ -97,36 +97,22 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
               <p className="text-sm text-muted-foreground">This Month:</p>
               <p className="text-sm font-bold">
                 {currency === "usd" ? "$" : "€"}
-                {convertedTotalThisMonth.toLocaleString("en-US", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2,
-                }) ?? 0}
+                {formatAmount(convertedTotalThisMonth) ?? 0}
               </p>
               <p className="text-sm text-muted-foreground">
                 ({currency === "usd" ? "$" : "€"}
-                {convertedTotalPerMonth.toLocaleString("en-US", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2,
-                })}{" "}
-                per month)
+                {formatAmount(convertedTotalPerMonth) ?? 0} per month)
               </p>
             </span>
             <span className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground">This Year:</p>
               <p className="text-sm font-bold">
                 {currency === "usd" ? "$" : "€"}
-                {convertedTotalThisYear.toLocaleString("en-US", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2,
-                }) ?? 0}
+                {formatAmount(convertedTotalThisYear) ?? 0}
               </p>
               <p className="text-sm text-muted-foreground">
                 ({currency === "usd" ? "$" : "€"}
-                {convertedTotalPerYear.toLocaleString("en-US", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2,
-                })}{" "}
-                per year)
+                {formatAmount(convertedTotalPerYear) ?? 0} per year)
               </p>
             </span>
           </div>
