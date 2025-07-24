@@ -115,7 +115,7 @@ export function UserProfile({
         <DropdownMenuGroup>
           {isAdmin && (
             <Link
-              href="/dashboard/admin/submissions"
+              href="/dashboard/admin/users"
               className="underline-offset-2 hover:cursor-pointer hover:underline"
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">
