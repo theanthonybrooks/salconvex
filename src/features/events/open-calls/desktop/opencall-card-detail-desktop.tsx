@@ -348,10 +348,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               <Image
                 src={eventLogo}
                 alt="Event Logo"
-                width={60}
-                height={60}
+                width={80}
+                height={80}
                 className={cn(
-                  "size-[60px] rounded-full border-2 xl:hidden",
+                  "size-[80px] rounded-full border-2 xl:hidden",
 
                   appStatus === "accepted"
                     ? "ring-4 ring-emerald-500 ring-offset-1"
@@ -373,6 +373,18 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     onClick={() => setActiveTab("event")}
                     className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
                   />
+                </span>
+                <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">
+                  {getEventCategoryLabel(eventCategory)}
+
+                  {eventType && eventCategory === "event" && (
+                    <p className="flex items-center gap-1 text-sm">
+                      {" - "}
+                      {eventType
+                        .map((type) => getEventTypeLabel(type))
+                        .join(" | ")}
+                    </p>
+                  )}
                 </span>
               </div>
             </div>

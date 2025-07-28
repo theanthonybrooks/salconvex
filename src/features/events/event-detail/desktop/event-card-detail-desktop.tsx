@@ -224,9 +224,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
               <Image
                 src={eventLogo}
                 alt="Event Logo"
-                width={60}
-                height={60}
-                className={cn("size-[60px] rounded-full border-2 xl:hidden")}
+                width={80}
+                height={80}
+                className={cn("size-[80px] rounded-full border-2 xl:hidden")}
               />
               <div className="flex flex-col">
                 <span className="text-xl font-bold capitalize">
@@ -239,6 +239,18 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     onClick={() => setActiveTab("event")}
                     className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
                   />
+                </span>
+                <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">
+                  {getEventCategoryLabel(eventCategory)}
+
+                  {eventType && eventCategory === "event" && (
+                    <p className="flex items-center gap-1 text-sm">
+                      {" - "}
+                      {eventType
+                        .map((type) => getEventTypeLabel(type))
+                        .join(" | ")}
+                    </p>
+                  )}
                 </span>
               </div>
             </div>

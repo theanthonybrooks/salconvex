@@ -10,7 +10,7 @@ import { EventData } from "@/types/event";
 import { Card } from "@/components/ui/card";
 import { LinkList } from "@/components/ui/link-list";
 import EventDates from "@/features/events/components/event-dates";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
+import { getEventCategoryLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { FaMapLocationDot } from "react-icons/fa6";
 
@@ -101,7 +101,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
       ) : (
         <Accordion
           type="multiple"
-          defaultValue={["map", "evemt", "about", "links"]}
+          defaultValue={["map", "dates", "about", "links"]}
         >
           {location.coordinates && (
             <AccordionItem value="map">
@@ -126,11 +126,11 @@ export const EventCard = ({ event, format }: EventCardProps) => {
             </AccordionItem>
           )}
           {event && (
-            <AccordionItem value="event">
-              <AccordionTrigger title={getEventCategoryLabel(eventCategory)} />
+            <AccordionItem value="dates">
+              <AccordionTrigger title="Dates:" />
               <AccordionContent>
                 <span className="flex flex-col gap-1">
-                  <p className="flex flex-col items-start gap-1 text-sm">
+                  {/* <p className="flex flex-col items-start gap-1 text-sm">
                     <span className="font-semibold">Category:</span>
                     {getEventCategoryLabel(eventCategory)}
                   </p>
@@ -142,37 +142,37 @@ export const EventCard = ({ event, format }: EventCardProps) => {
                         .join(" | ")}
                     </p>
                   )}
-                  <div className="mt-3 flex flex-col gap-1">
-                    {event.dates.eventFormat !== "noEvent" && (
-                      <div className="flex flex-col items-start gap-1 text-sm">
-                        <span className="space-x-1 font-semibold">
-                          {getEventCategoryLabel(eventCategory)} Dates:
-                        </span>
-                        <EventDates
-                          event={event}
-                          format="desktop"
-                          limit={0}
-                          type="event"
-                        />
-                      </div>
-                    )}
+                  <div className="mt-3 flex flex-col gap-1"> */}
+                  {event.dates.eventFormat !== "noEvent" && (
+                    <div className="flex flex-col items-start gap-1 text-sm">
+                      <span className="space-x-1 font-semibold">
+                        {getEventCategoryLabel(eventCategory)} Dates:
+                      </span>
+                      <EventDates
+                        event={event}
+                        format="desktop"
+                        limit={0}
+                        type="event"
+                      />
+                    </div>
+                  )}
 
-                    {((eventCategory === "project" &&
-                      dates.eventFormat === "noEvent") ||
-                      (eventCategory === "event" && prodEnd)) && (
-                      <div className="flex flex-col items-start gap-1 text-sm">
-                        <span className="space-x-1 font-semibold">
-                          Painting/Production Dates:
-                        </span>
-                        <EventDates
-                          event={event}
-                          format="desktop"
-                          limit={0}
-                          type="production"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {((eventCategory === "project" &&
+                    dates.eventFormat === "noEvent") ||
+                    (eventCategory === "event" && prodEnd)) && (
+                    <div className="flex flex-col items-start gap-1 text-sm">
+                      <span className="space-x-1 font-semibold">
+                        Painting/Production Dates:
+                      </span>
+                      <EventDates
+                        event={event}
+                        format="desktop"
+                        limit={0}
+                        type="production"
+                      />
+                    </div>
+                  )}
+                  {/* </div> */}
                 </span>
               </AccordionContent>
             </AccordionItem>
