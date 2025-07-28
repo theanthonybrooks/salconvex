@@ -218,13 +218,13 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
         </CardDescription>
       </CardHeader>
       {!!error && (
-        <div className="mx-auto mb-6 flex max-w-[90%] items-center gap-x-2 text-balance rounded-md bg-destructive/15 p-3 text-center text-sm text-destructive">
+        <div className="mx-auto mb-6 flex max-w-[90%] items-center justify-center gap-x-2 text-balance rounded-md bg-destructive/15 p-3 text-center text-sm text-destructive">
           <TriangleAlert className="size-6" />
           <p>{error}</p>
         </div>
       )}
       {!!success && (
-        <div className="mx-auto mb-6 flex max-w-[90%] items-center gap-x-2 rounded-md bg-emerald-500/15 p-3 text-center text-sm">
+        <div className="mx-auto mb-6 flex max-w-[90%] items-center justify-center gap-x-2 rounded-md bg-emerald-500/15 p-3 text-center text-sm">
           <Heart className="size-4" />
           <p>{success}</p>
         </div>

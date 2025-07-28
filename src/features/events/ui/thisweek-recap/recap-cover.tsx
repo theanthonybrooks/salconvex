@@ -1,13 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 
+import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
 
 interface RecapCoverProps {
   dateRange: string;
+  fontSize: number | null;
+}
+
+interface RecapLastPageProps {
+  openCallCount: number;
 }
 
 export const RecapCover = forwardRef<HTMLDivElement, RecapCoverProps>(
-  ({ dateRange }, ref) => {
+  ({ dateRange, fontSize }, ref) => {
+    const rangeLength = dateRange.trim().length;
     return (
       <div
         ref={ref}
@@ -25,7 +32,19 @@ export const RecapCover = forwardRef<HTMLDivElement, RecapCoverProps>(
         </section>
         <section className="absolute bottom-1/2 flex w-full translate-y-[12.3em] flex-col">
           <section className="filler">
-            <h2 className="text-center font-tanker text-[2.8em] lowercase">
+            <h2
+              className={cn(
+                "text-center font-tanker lowercase",
+                rangeLength > 12
+                  ? "text-[2.3em] leading-[1.75em]"
+                  : "text-[2.8em]",
+              )}
+              style={
+                fontSize !== null
+                  ? { fontSize: `${fontSize}em`, lineHeight: "1.75em" }
+                  : undefined
+              }
+            >
               {dateRange}
             </h2>
             <div className="translate-y-6 text-center text-lg">
@@ -61,6 +80,27 @@ export const RecapEndCover = forwardRef<HTMLDivElement>((_, ref) => {
     </div>
   );
 });
+export const RecapLastPage = forwardRef<HTMLDivElement, RecapLastPageProps>(
+  ({ openCallCount }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className="relative flex aspect-square w-[500px] flex-col items-center justify-center bg-[#feee1f] bg-cover bg-center"
+      >
+        <section className="flex w-full flex-col px-8">
+          <span className={cn("text-center font-tanker lowercase", "text-4xl")}>
+            <p className="text-[4em] leading-[1em]">+{openCallCount} </p>
+            <p>more open calls</p>{" "}
+          </span>
+        </section>
+        <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
+          TheStreetArtList.com
+        </section>
+      </div>
+    );
+  },
+);
 
 RecapEndCover.displayName = "RecapEndCover";
 RecapCover.displayName = "RecapCover";
+RecapLastPage.displayName = "RecapLastPage";

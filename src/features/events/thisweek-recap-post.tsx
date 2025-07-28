@@ -1,6 +1,7 @@
 import {
   RecapCover,
   RecapEndCover,
+  RecapLastPage,
 } from "@/features/events/ui/thisweek-recap/recap-cover";
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
@@ -11,6 +12,8 @@ import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { waitForImagesToLoad } from "@/lib/thisWeekFns";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
@@ -20,9 +23,11 @@ import {
   ArrowRight,
   Clipboard,
   Image as ImageIcon,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 interface ThisweekRecapPostProps {
   source: "thisweek" | "nextweek";
@@ -30,6 +35,7 @@ interface ThisweekRecapPostProps {
 
 const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const router = useRouter();
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
   const [copiedText, setCopiedText] = useState(false);
   const [copiedAlt, setCopiedAlt] = useState(false);
@@ -38,6 +44,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const [altText, setAltText] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [altCharCount, setAltCharCount] = useState(0);
+  const [dateFontSize, setDateFontSize] = useState<number | null>(null);
 
   const sortOptions = useMemo<SortOptions>(
     () => ({
@@ -60,6 +67,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     source,
   );
 
+  const { data: totalOpenCallsData } = useQueryWithStatus(
+    api.openCalls.openCall.getTotalNumberOfOpenCalls,
+  );
+
+  const openCallsThisWeek = queryResult?.results.length ?? 0;
+  const activeOpenCalls = totalOpenCallsData?.activeOpenCalls ?? 0;
+
+  const otherOpenCallCount = activeOpenCalls - openCallsThisWeek;
   const displayRange =
     queryResult?.weekStartISO && queryResult?.weekEndISO
       ? formatCondensedDateRange(
@@ -206,6 +221,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           <div className="group relative">
             <RecapCover
               dateRange={displayRange}
+              fontSize={dateFontSize}
               ref={(el) => {
                 refs.current[0] = el;
               }}
@@ -218,6 +234,33 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             >
               <ImageIcon className="size-5" />
             </button>
+            <div className="absolute left-2 top-2 z-10 hidden w-fit items-center gap-2 rounded bg-card/80 p-1 group-hover:flex">
+              <input
+                type="number"
+                min={1}
+                step={0.1}
+                value={dateFontSize ?? 2.5}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (isNaN(value)) {
+                    setDateFontSize(null);
+                  } else {
+                    setDateFontSize(value);
+                  }
+                }}
+                className="w-14 text-center"
+              />
+              {dateFontSize !== null && (
+                <button
+                  type="button"
+                  className="p-1"
+                  onClick={() => setDateFontSize(null)}
+                  title="Reset font size"
+                >
+                  <X className="size-5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {queryResult?.results
@@ -252,7 +295,8 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             ))}
           {queryResult?.results && (
             <div className="group relative">
-              <RecapEndCover
+              <RecapLastPage
+                openCallCount={otherOpenCallCount}
                 ref={(el) => {
                   refs.current[queryResult.results.length + 1] = el;
                 }}
@@ -262,6 +306,25 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                 className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
                 onClick={() =>
                   handleDownloadSingle(queryResult.results.length + 1)
+                }
+                title="Download image"
+              >
+                <ImageIcon className="size-5" />
+              </button>
+            </div>
+          )}
+          {queryResult?.results && (
+            <div className="group relative">
+              <RecapEndCover
+                ref={(el) => {
+                  refs.current[queryResult.results.length + 2] = el;
+                }}
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                onClick={() =>
+                  handleDownloadSingle(queryResult.results.length + 2)
                 }
                 title="Download image"
               >
