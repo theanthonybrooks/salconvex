@@ -1,3 +1,4 @@
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { Organizer } from "@/types/organizer";
 import { Globe, Phone } from "lucide-react";
 import React from "react";
@@ -72,13 +73,18 @@ export const OrganizerLinks = ({ organizer }: OrganizerLinksProps) => {
           if (!value || !icon) return null;
 
           return (
-            <a
+            <TooltipSimple
               key={key}
-              href={getLinkHref(key, value, orgName)}
-              className="size-6 hover:scale-110"
+              content={key.slice(0, 1).toUpperCase() + key.slice(1)}
             >
-              {icon}
-            </a>
+              <a
+                key={key}
+                href={getLinkHref(key, value, orgName)}
+                className="size-6 hover:scale-110"
+              >
+                {icon}
+              </a>
+            </TooltipSimple>
           );
         })}
       </div>
