@@ -618,7 +618,7 @@ const SubmissionFormEventStep1 = ({
                         value={field.value ?? ""}
                         onChange={field.onChange}
                         placeholder="Important dates: open call, production, judging/selection, etc"
-                        charLimit={1000}
+                        charLimit={2500}
                         noList={false}
                       />
                     )}
