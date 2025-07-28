@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useMutation } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
   Eye,
@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
 interface SignInCardProps {
@@ -34,19 +35,19 @@ interface SignInCardProps {
   forgotPasswordHandler: () => void;
 }
 
-const SignInCard: React.FC<SignInCardProps> = ({
-  switchFlow,
-  forgotPasswordHandler,
-}: SignInCardProps) => {
+const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
   const router = useRouter();
+  const convex = useConvex();
   const { signIn } = useAuthActions();
+  const DeleteAccount = useMutation(api.users.deleteAccount);
+
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [isLoading, setIsLoading] = useState("");
-  const [error, setError] = useState<string | undefined>("");
+  const [error, setError] = useState<React.ReactNode | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [callBackSrc, setCallBackSrc] = useState<string | null>(null);
   const [prevSalPage, setPrevSalPage] = useState<string | null>(null);
@@ -58,12 +59,59 @@ const SignInCard: React.FC<SignInCardProps> = ({
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
-  const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
+  const onPasswordSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPending(true);
     setError("");
     setSuccess("");
     const formData = new FormData(e.currentTarget);
+    try {
+      const hasVerifiedEmail = await convex.query(api.users.hasVerifiedEmail, {
+        email,
+      });
+      if (!hasVerifiedEmail) {
+        await DeleteAccount({ method: "cancelSignup", email });
+        setError("No account found. Sign up with email and password first.");
+        return;
+      } else {
+        console.log("hasVerifiedEmail", hasVerifiedEmail);
+      }
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        const data = error.data as { message: string; contactUrl: string };
+        if (error.data === "User not found") {
+          console.log("User not found - continuing");
+        } else {
+          setError(
+            data.contactUrl ? (
+              <>
+                {data.message.split("contact us")[0]}
+                <Link
+                  href={data.contactUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  contact us
+                </Link>
+                {data.message.split("contact us")[1]}
+              </>
+            ) : (
+              "An error occurred while checking for user."
+            ),
+          );
+          // setError(error.data ?? "An error occurred while checking for user.");
+          return;
+        }
+      } else {
+        toast.error("An error occurred while checking for user.");
+        console.error("Unexpected error:", error);
+        return;
+      }
+    } finally {
+      setPending(false);
+    }
+
     formData.append("redirectTo", "/dashboard");
     formData.append("flow", "signIn");
     signIn("password", formData)

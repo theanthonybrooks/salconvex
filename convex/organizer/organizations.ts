@@ -1,6 +1,7 @@
 import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 
+import { supportEmail } from "@/constants/siteInfo";
 import { EventCategory, EventData, SubmissionFormState } from "@/types/event";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -54,9 +55,11 @@ export async function checkOrgStatus(
 ): Promise<{
   isNew: boolean;
   orgId: Id<"organizations"> | undefined;
+  orgOwnerId: Id<"users"> | undefined;
   orgOwnerIsAdmin: boolean | undefined;
   orgDomain: string | undefined;
   emailDomain: string | undefined;
+  domainsMatch: boolean | undefined;
 }> {
   let orgDomain: string | undefined;
   const emailDomain = email?.split("@")[1]?.toLowerCase();
@@ -79,12 +82,19 @@ export async function checkOrgStatus(
     orgOwnerIsAdmin = orgOwner?.role?.includes("admin");
   }
 
+  const domainsMatch =
+    typeof orgDomain === "string" &&
+    orgDomain !== "gmail.com" &&
+    orgDomain === emailDomain;
+
   return {
     isNew: existingOrg === null,
+    orgOwnerId: existingOrg?.ownerId,
     orgId: existingOrg?._id,
     orgOwnerIsAdmin,
     orgDomain,
     emailDomain,
+    domainsMatch,
   };
 }
 
@@ -95,28 +105,73 @@ export const isNewOrg = query({
   },
 
   handler: async (ctx, args) => {
-    console.log("args", args);
+    // console.log("args", args);
     const results = await checkOrgStatus(
       ctx,
       args.organizationName,
       args.email,
     );
-    const { isNew, orgOwnerIsAdmin, orgDomain, emailDomain } = results;
+    const {
+      isNew,
+      orgOwnerId,
+      orgOwnerIsAdmin,
+      orgDomain,
+      emailDomain,
+      domainsMatch,
+    } = results;
 
-    console.log("isNew", isNew);
-    console.log("orgOwnerIsAdmin", orgOwnerIsAdmin);
-    console.log("orgDomain", orgDomain);
-    console.log("emailDomain", emailDomain);
+    // console.log("isNew", isNew);
+    // console.log("orgOwnerIsAdmin", orgOwnerIsAdmin);
+    // console.log("orgDomain", orgDomain);
+    // console.log("emailDomain", emailDomain);
+    // console.log("domainsMatch", domainsMatch);
 
-    if (orgDomain === emailDomain) {
+    if (domainsMatch) {
       if (orgOwnerIsAdmin) {
         return true;
       } else {
-        throw new ConvexError(
-          // "Contact your org admin to add your email to the organization.",
-          "An admin already exists for this organization. Please contact us for additional admins.",
-        );
+        let orgOwnerEmail: string | undefined = undefined;
+        // console.log("orgOwnerId", orgOwnerId);
+        if (orgOwnerId) {
+          const orgOwner = await ctx.db
+            .query("users")
+            .withIndex("by_id", (q) => q.eq("_id", orgOwnerId))
+            .unique();
+          console.log("orgOwner", orgOwner);
+          if (orgOwner) {
+            // console.log("orgOwner", orgOwner);
+            // console.log("orgOwner.email", orgOwner.email);
+            // console.log("args.email", args.email);
+            orgOwnerEmail = orgOwner.email;
+            return orgOwnerEmail === args.email;
+          }
+        }
+        console.log("orgOwnerEmail", orgOwnerEmail);
+
+        throw new ConvexError({
+          message:
+            "An admin already exists for this organization. Please contact us for additional admins.",
+          contactUrl: supportEmail,
+        });
       }
+    } else if (orgDomain === "gmail.com" && emailDomain === "gmail.com") {
+      // throw new ConvexError(
+      //   "Please contact us to add you to this organization. We're unable to automatically verify you using a Gmail account.",
+      // );
+      throw new ConvexError({
+        message:
+          "Please contact us to add you to this organization. We're unable to automatically verify you using a Gmail account.",
+        contactUrl: supportEmail,
+      });
+    } else if (orgDomain === "gmail.com" && emailDomain !== "gmail.com") {
+      // throw new ConvexError(
+      //   "Please contact us to add you to this organization. We need to verify your email address before you can be added.",
+      // );
+      throw new ConvexError({
+        message:
+          "Please contact us to add you to this organization. We need to verify your email address before you can be added.",
+        contactUrl: supportEmail,
+      });
     } else {
       return isNew;
     }

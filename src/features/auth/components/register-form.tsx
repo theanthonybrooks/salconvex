@@ -58,9 +58,7 @@ interface RegisterFormProps {
 
 type StepType = "signUp" | "verifyOtp";
 
-const RegisterForm: React.FC<RegisterFormProps> = ({
-  switchFlow,
-}: RegisterFormProps) => {
+const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const router = useRouter();
   const userId = uuidv4();
   const convex = useConvex();
@@ -70,7 +68,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const { signIn } = useAuthActions();
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>("");
+  const [error, setError] = useState<React.ReactNode | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string[]>(["artist"]);
@@ -98,16 +96,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     mode: "onBlur",
   });
 
-  // const onEmailChange = (inputEmail: string) => {
-  //   if (inputEmail.includes("@")) {
-  //     const [username, domain] = inputEmail.split("@")
-  //     if (!username || username.length < 2) {
-  //       setObsEmail(inputEmail)
-  //       return
-  //     }
-  //     setObsEmail(`${username.slice(0, 2)}****@${domain}`)
-  //   }
-  // }
+  useEffect(() => {
+    const accountType = form.getValues("accountType");
+    const organizationName = form.getValues("organizationName");
+
+    if (
+      Array.isArray(accountType) &&
+      accountType.length === 1 &&
+      accountType[0] === "artist" &&
+      organizationName !== ""
+    ) {
+      form.setValue("organizationName", "");
+    }
+  }, [selectedOption, form]);
 
   const handleStep1Submit = async (values: z.infer<typeof RegisterSchema>) => {
     setError("");
@@ -140,7 +141,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     } catch (error) {
       if (error instanceof ConvexError) {
         // toast.error(error.data ?? "Organization Exists");
-        setError(error.data ?? "Organization Exists");
+        // setError(error.data ?? "Organization Exists");
+        const data = error.data as { message: string; contactUrl: string };
+        setError(
+          data.contactUrl ? (
+            <>
+              {data.message.split("contact us")[0]}
+              <Link
+                href={`mailto:${data.contactUrl}?subject=${values.organizationName?.trim() + " -" || ""} Organization Signup`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:cursor-pointer hover:underline"
+              >
+                contact us
+              </Link>
+              {data.message.split("contact us")[1]}
+            </>
+          ) : (
+            "Organization Exists"
+          ),
+        );
       } else {
         toast.error("An error occurred while checking for organization.");
       }

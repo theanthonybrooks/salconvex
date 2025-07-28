@@ -148,7 +148,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
             isComplete: false,
             events: [],
           });
-        } else if (existingOrgResult?.orgId) {
+        } else if (
+          existingOrgResult?.domainsMatch &&
+          existingOrgResult?.orgOwnerIsAdmin &&
+          existingOrgResult?.orgId
+        ) {
           await updateOrgOwner(ctx, existingOrgResult.orgId, newUserId);
         }
       }

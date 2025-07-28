@@ -10,6 +10,8 @@ export default function ClientAuthWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+
   // const { theme } = useTheme()
   // const { isLoading } = useConvexAuth()
   const targetRef = useRef(null);

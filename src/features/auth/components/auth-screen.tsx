@@ -3,6 +3,7 @@
 import ForgotPassword from "@/features/auth/components/forgot-password";
 import RegisterForm from "@/features/auth/components/register-form";
 import SignInCard from "@/features/auth/components/sign-in-card";
+
 import { cn } from "@/lib/utils";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 export default function AuthScreen() {
   const router = useRouter();
   const pathname = usePathname();
+
   // const callbackUrl = useSearchParams().get("src")
 
   // Create booleans based on the URL.

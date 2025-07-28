@@ -1,5 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { action } from "./_generated/server";
+import { action, QueryCtx } from "./_generated/server";
 
 import { formatSubscriptionLabel } from "@/lib/subscriptionFns";
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
@@ -262,11 +262,18 @@ export const isNewUser = query({
       .query("users")
       .withIndex("email", (q) => q.eq("email", emailFormatted))
       .unique();
+
+    if (user && user?.emailVerified === false) {
+      return true;
+    }
     return user === null;
   },
 });
 
-export async function findUserByEmail(ctx: MutationCtx, email: string) {
+export async function findUserByEmail(
+  ctx: MutationCtx | QueryCtx,
+  email: string,
+) {
   const emailFormatted = email.toLowerCase().trim();
   return await ctx.db
     .query("users")
@@ -274,7 +281,10 @@ export async function findUserByEmail(ctx: MutationCtx, email: string) {
     .unique();
 }
 
-export async function findUserByEmailPW(ctx: MutationCtx, email: string) {
+export async function findUserByEmailPW(
+  ctx: MutationCtx | QueryCtx,
+  email: string,
+) {
   const emailFormatted = email.toLowerCase().trim();
   const userPW = await ctx.db
     .query("userPW")
@@ -411,6 +421,21 @@ export const updateUserPrefs = mutation({
 //       })
 //   },
 // })
+
+export const hasVerifiedEmail = query({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    console.log("args", args);
+    const user = await findUserByEmail(ctx, args.email);
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+    console.log("verified", user?.emailVerified);
+    return user?.emailVerified;
+  },
+});
 
 export const updateUserEmailVerification = mutation({
   args: {
@@ -748,7 +773,9 @@ async function performDeleteAccount(
 }
 
 async function deleteRelatedDocuments(
-  ctx: { db: { query: Function; delete: Function; get: Function } },
+  ctx: {
+    db: { query: Function; delete: Function; get: Function; patch: Function };
+  },
   userId: string,
 ) {
   const pageSize = 50;
@@ -811,6 +838,33 @@ async function deleteRelatedDocuments(
       }
     } catch (error) {
       console.error("Error deleting organization:", error);
+    }
+  }
+
+  // 3.1 Change completed orgs to admin ownership
+  const completedOrgs = await ctx.db
+    .query("organizations")
+    .withIndex("by_complete_with_ownerId", (q: any) =>
+      q.eq("isComplete", true).eq("ownerId", userId),
+    )
+    .collect();
+  const adminUser = await ctx.db
+    .query("users")
+    .withIndex("by_role", (q: any) => q.eq("role", ["admin"]))
+    .first();
+  const adminUserId = adminUser?._id as Id<"users">;
+  for (const org of completedOrgs) {
+    try {
+      const orgDoc = await ctx.db.get(org._id);
+      if (orgDoc) {
+        await ctx.db.patch(org._id, {
+          ownerId: adminUserId,
+          updatedAt: Date.now(),
+          lastUpdatedBy: userId,
+        });
+      }
+    } catch (error) {
+      console.error("Error changing organization ownership:", error);
     }
   }
 
