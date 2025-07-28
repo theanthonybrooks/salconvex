@@ -27,7 +27,7 @@ interface EventCardProps extends LinkProps {
 export const EventCard = ({ event, format }: EventCardProps) => {
   const {
     category: eventCategory,
-    type: eventType,
+    // type: eventType,
     location,
     dates,
     // slug,
