@@ -9,6 +9,8 @@ import { EventData } from "@/types/event";
 
 import { Card } from "@/components/ui/card";
 import { LinkList } from "@/components/ui/link-list";
+import EventDates from "@/features/events/components/event-dates";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { FaMapLocationDot } from "react-icons/fa6";
 
@@ -24,16 +26,19 @@ interface EventCardProps extends LinkProps {
 
 export const EventCard = ({ event, format }: EventCardProps) => {
   const {
-    // eventCategory,
-    // eventType,
+    category: eventCategory,
+    type: eventType,
     location,
-    // dates,
+    dates,
     // slug,
   } = event;
 
   const latitude = location.coordinates?.latitude ?? 0;
   const longitude = location.coordinates?.longitude ?? 0;
   const isMobile = format === "mobile";
+  const { prodDates } = dates;
+  // const prodStart = prodDates?.[0]?.start;
+  const prodEnd = prodDates?.[0]?.end;
 
   return (
     <>
@@ -96,10 +101,10 @@ export const EventCard = ({ event, format }: EventCardProps) => {
       ) : (
         <Accordion
           type="multiple"
-          defaultValue={["item-1", "item-2", "item-3"]}
+          defaultValue={["map", "evemt", "about", "links"]}
         >
           {location.coordinates && (
-            <AccordionItem value="item-1">
+            <AccordionItem value="map">
               <AccordionTrigger title="Location:" />
 
               <AccordionContent>
@@ -120,9 +125,61 @@ export const EventCard = ({ event, format }: EventCardProps) => {
               </AccordionContent>
             </AccordionItem>
           )}
+          {event && (
+            <AccordionItem value="event">
+              <AccordionTrigger title={getEventCategoryLabel(eventCategory)} />
+              <AccordionContent>
+                <span className="flex flex-col gap-1">
+                  <p className="flex flex-col items-start gap-1 text-sm">
+                    <span className="font-semibold">Category:</span>
+                    {getEventCategoryLabel(eventCategory)}
+                  </p>
+                  {eventType && eventCategory === "event" && (
+                    <p className="flex flex-col items-start gap-1 text-sm">
+                      <span className="font-semibold">Type:</span>{" "}
+                      {eventType
+                        .map((type) => getEventTypeLabel(type))
+                        .join(" | ")}
+                    </p>
+                  )}
+                  <div className="mt-3 flex flex-col gap-1">
+                    {event.dates.eventFormat !== "noEvent" && (
+                      <div className="flex flex-col items-start gap-1 text-sm">
+                        <span className="space-x-1 font-semibold">
+                          {getEventCategoryLabel(eventCategory)} Dates:
+                        </span>
+                        <EventDates
+                          event={event}
+                          format="desktop"
+                          limit={0}
+                          type="event"
+                        />
+                      </div>
+                    )}
+
+                    {((eventCategory === "project" &&
+                      dates.eventFormat === "noEvent") ||
+                      (eventCategory === "event" && prodEnd)) && (
+                      <div className="flex flex-col items-start gap-1 text-sm">
+                        <span className="space-x-1 font-semibold">
+                          Painting/Production Dates:
+                        </span>
+                        <EventDates
+                          event={event}
+                          format="desktop"
+                          limit={0}
+                          type="production"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </span>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
           {event.about && (
-            <AccordionItem value="item-2">
+            <AccordionItem value="about">
               <AccordionTrigger title="About:" />
 
               <AccordionContent>
@@ -134,7 +191,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
           )}
 
           {event.links && (
-            <AccordionItem value="item-3">
+            <AccordionItem value="links">
               <AccordionTrigger title="Links:" />
 
               <AccordionContent>
@@ -144,7 +201,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
           )}
 
           {event.otherInfo && (
-            <AccordionItem value="item-4">
+            <AccordionItem value="other">
               <AccordionTrigger title="Other info:" />
               <AccordionContent>
                 <RichTextDisplay html={event.otherInfo} />

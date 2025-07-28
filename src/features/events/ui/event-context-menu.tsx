@@ -7,6 +7,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import {
+  Check,
   CheckCircle,
   CircleX,
   Ellipsis,
@@ -27,6 +28,7 @@ import { useArtistApplicationActions } from "@/features/artists/helpers/appActio
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { User } from "@/types/user";
 import { useMutation } from "convex/react";
+import { useState } from "react";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -65,6 +67,7 @@ const EventContextMenu = ({
   isBookmarked,
 }: EventContextMenuProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
+  const [eventIdCopied, setEventIdCopied] = useState(false);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -224,6 +227,8 @@ const EventContextMenu = ({
               <div
                 onClick={() => {
                   navigator.clipboard.writeText(eventId);
+                  setEventIdCopied(true);
+                  setTimeout(() => setEventIdCopied(false), 2000);
                 }}
                 className={cn(
                   "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
@@ -231,8 +236,12 @@ const EventContextMenu = ({
                 )}
               >
                 <span className="flex items-center gap-x-1 text-sm">
-                  <FaRegCopy className="size-4" />
-                  Copy Event ID
+                  {eventIdCopied ? (
+                    <Check className="size-4" />
+                  ) : (
+                    <FaRegCopy className="size-4" />
+                  )}
+                  {eventIdCopied ? "ID Copied" : "Copy Event ID"}
                 </span>
               </div>
             </>

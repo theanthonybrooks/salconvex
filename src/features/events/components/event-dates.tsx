@@ -35,6 +35,7 @@ const EventDates = ({
     })) ?? [];
 
   const eventSliceLimit = limit === 0 ? mappedEventDates?.length : (limit ?? 3);
+  const prodSliceLimit = limit === 0 ? mappedProdDates?.length : (limit ?? 3);
   const showProdInstead =
     (preview || isMobile) &&
     type === "event" &&
@@ -99,7 +100,7 @@ const EventDates = ({
       {forProd && mappedProdDates && (
         <div className={cn("flex flex-col gap-y-1", className)}>
           {mappedProdDates
-            ?.slice(0, eventSliceLimit)
+            ?.slice(0, prodSliceLimit)
             .map(({ start, end }, index) => {
               return (
                 <span key={index} className="flex flex-col gap-1">
