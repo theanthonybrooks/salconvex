@@ -91,7 +91,7 @@ export const TooltipSimple = ({
 
   ...props
 }: TooltipProps) => {
-  if (disabled) return <>{children}</>;
+  if (disabled || !content) return <>{children}</>;
   const vertSides = ["top", "bottom"];
   const showArrow = vertSides.includes(side);
   const sideOffsetValue = showArrow ? sideOffset : 6;

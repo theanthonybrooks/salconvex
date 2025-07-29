@@ -49,7 +49,7 @@ export default async function OrganizerPage({
   }
 
   switch (slug) {
-    case "add-edit":
+    case "update-event":
       return <AdminEventForm user={user} />; // case "bookmarks":
     //   return <OrganizerDashboardTableWrapper page="bookmarks" />;
     // case "hidden":

@@ -4,6 +4,10 @@ import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import Image from "next/image";
 
+export async function generateMetadata() {
+  return { title: "Page Not Found" };
+}
+
 export default async function NotFound() {
   return (
     <ClientAuthWrapper>

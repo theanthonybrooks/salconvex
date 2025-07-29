@@ -14,7 +14,7 @@ export async function generateMetadata({
   const { slug, year } = await params;
 
   try {
-    const event = await fetchQuery(
+    const data = await fetchQuery(
       api.events.event.getEventWithOCDetails,
       {
         slug,
@@ -24,12 +24,12 @@ export async function generateMetadata({
       { token },
     );
 
-    if (!event?.event?.name) {
+    if (!data?.event?.name) {
       return { title: "Open Call - Event Not Found" };
     }
 
     return {
-      title: `${capitalize(event.event.name)} (${year}) - Open Call`,
+      title: `${capitalize(data.event.name)} (${year}) - Open Call`,
     };
   } catch {
     return { title: "Open Call - Error" };

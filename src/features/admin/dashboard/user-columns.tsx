@@ -5,6 +5,7 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
+import { CopyableItem } from "@/components/ui/copyable-item";
 import { Link } from "@/components/ui/custom-link";
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
@@ -83,9 +85,18 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => (
-      <div className="truncate font-medium">{row.getValue("name")}</div>
-    ),
+    cell: ({ row }) => {
+      const user = row.original;
+      return (
+        <ConvexDashboardLink
+          className="truncate font-medium"
+          table="userSubscriptions"
+          id={user._id}
+        >
+          {row.getValue("name")}
+        </ConvexDashboardLink>
+      );
+    },
   },
   {
     accessorKey: "email",
@@ -95,9 +106,9 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Email" />
     ),
     cell: ({ row }) => (
-      <div className="truncate text-sm text-muted-foreground">
+      <CopyableItem className="text-sm text-muted-foreground" truncate>
         {row.getValue("email")}
-      </div>
+      </CopyableItem>
     ),
   },
   {
@@ -315,7 +326,11 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const value = row.getValue("source") as string | undefined;
-      return <span className="text-sm">{value ? value : "-"}</span>;
+      return (
+        <TooltipSimple content={value}>
+          <p className={cn("truncate text-sm")}>{value ? value : "-"}</p>
+        </TooltipSimple>
+      );
     },
   },
   {
@@ -361,17 +376,23 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                     <FaEnvelope className="size-4" /> Contact
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center gap-x-2"
-                  onClick={() => navigator.clipboard.writeText(user.email)}
-                >
-                  <LucideClipboardCopy className="size-4" /> Copy Email
+                <DropdownMenuItem>
+                  <CopyableItem
+                    defaultIcon={<LucideClipboardCopy className="size-4" />}
+                    copyContent={user.email}
+                    className="gap-x-2"
+                  >
+                    Copy Email
+                  </CopyableItem>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(user._id)}
-                  className="flex items-center gap-x-2"
-                >
-                  <LucideClipboardCopy className="size-4" /> User ID
+                <DropdownMenuItem>
+                  <CopyableItem
+                    defaultIcon={<LucideClipboardCopy className="size-4" />}
+                    copyContent={user._id}
+                    className="gap-x-2"
+                  >
+                    User ID
+                  </CopyableItem>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

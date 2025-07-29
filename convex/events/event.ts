@@ -998,7 +998,9 @@ export const getEventWithOCDetails = query({
       user?.accountType?.includes("organizer") && userId === organizer?.ownerId;
 
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
-    if (source === "ocpage" && !openCall && !userIsOrganizer)
+    if (!userIsOrganizer && !hasActiveSubscription)
+      throw new ConvexError("You don't have permission to view this event");
+    if (source === "ocpage" && !openCall)
       throw new ConvexError("Open Call not found");
     if (!openCall) return null;
 
