@@ -117,6 +117,7 @@ export interface EventData {
   };
 
   location: {
+    full?: string;
     sameAsOrganizer?: boolean;
     locale?: string;
     city?: string;

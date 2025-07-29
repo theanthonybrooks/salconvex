@@ -24,7 +24,7 @@ import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
@@ -215,9 +215,20 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               {getEventCategoryLabel(eventCategory)}
             </p>
             {eventType && eventCategory === "event" && (
-              <p className="flex items-center gap-x-1 text-sm">
+              <p className="flex items-start gap-x-1 text-sm">
                 <span className="font-semibold">Type:</span>{" "}
-                {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
+                {/* {eventType.map((type) => getEventTypeLabel(type)).join(" | ")} */}
+                {eventType.map((type, index) => {
+                  return (
+                    <React.Fragment key={type}>
+                      {eventType.length > 1 && index > 0 && <br />}
+                      {getEventTypeLabel(type)}
+                      {eventType.length > 1 &&
+                        index < eventType.length - 1 &&
+                        " |"}
+                    </React.Fragment>
+                  );
+                })}
               </p>
             )}
             {basicInfo?.appFee !== 0 && (

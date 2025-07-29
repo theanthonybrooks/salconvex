@@ -56,13 +56,18 @@ export const EventCard = ({ event, format }: EventCardProps) => {
                     label={event.name}
                     className="z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl"
                   />
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
-                    className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
-                  >
-                    Get directions
-                    <FaMapLocationDot className="size-5 md:size-4" />
-                  </a>
+                  <span className="flex items-center gap-2">
+                    <p>
+                      <strong>Full Location:</strong> {event.location.full}
+                    </p>
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+                      className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
+                    >
+                      {/* Get directions */}
+                      <FaMapLocationDot className="size-5 md:size-4" />
+                    </a>
+                  </span>
                 </AccordionContent>
               </AccordionItem>
             )}
@@ -112,9 +117,22 @@ export const EventCard = ({ event, format }: EventCardProps) => {
                   latitude={latitude}
                   longitude={longitude}
                   label={event.name}
-                  hasDirections={true}
+                  // hasDirections={true}
                   className="z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"
                 />
+                <span className="flex items-center gap-2">
+                  <p>
+                    <strong>Full Location:</strong> {event.location.full}
+                  </p>
+                  {"-"}
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+                    className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
+                  >
+                    Get directions
+                    <FaMapLocationDot className="size-5 md:size-4" />
+                  </a>
+                </span>
                 {/* <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
                   className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"

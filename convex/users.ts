@@ -111,8 +111,7 @@ export const usersWithSubscriptions = query({
         const currentPeriodEndAt = subscription?.currentPeriodEnd
           ? new Date(subscription.currentPeriodEnd)
           : null;
-
-        console.log("inactiveStatus", inactiveStatus);
+        const trialEnded = trialEndsAt && today > trialEndsAt;
 
         const trialEndsThisMonth =
           trialEndsAt &&
@@ -124,7 +123,9 @@ export const usersWithSubscriptions = query({
           currentPeriodEndAt < nextMonthStart;
         if (!inactiveStatus) {
           if (interval === "month") {
-            totalThisMonth += amount;
+            if (trialEndsThisMonth || trialEnded) {
+              totalThisMonth += amount;
+            }
             totalThisYear += amount * 12;
             totalMonthly += amount;
           } else if (interval === "year") {
