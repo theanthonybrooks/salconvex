@@ -2,10 +2,11 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { MapPin } from "lucide-react";
+import { ExternalLink, MapPin } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
+import { Separator } from "@/components/ui/separator";
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
+import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventDates } from "@/lib/dateFns";
@@ -140,6 +142,22 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
             )}
           </div>
         </div>
+        {isAdmin && (
+          <>
+            <Separator
+              orientation="horizontal"
+              thickness={2}
+              className="col-span-full mx-auto mb-2 mt-3"
+            />
+            <ConvexDashboardLink
+              table="organizations"
+              className="col-span-full flex items-center justify-center gap-x-2 underline-offset-1 hover:underline"
+              id={organizer._id}
+            >
+              View Org in Convex <ExternalLink className="size-5" />
+            </ConvexDashboardLink>
+          </>
+        )}
       </Card>
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
