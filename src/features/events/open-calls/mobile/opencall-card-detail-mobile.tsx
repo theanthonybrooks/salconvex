@@ -217,7 +217,6 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
             {eventType && eventCategory === "event" && (
               <p className="flex items-start gap-x-1 text-sm">
                 <span className="font-semibold">Type:</span>{" "}
-                {/* {eventType.map((type) => getEventTypeLabel(type)).join(" | ")} */}
                 {eventType.map((type, index) => {
                   return (
                     <React.Fragment key={type}>

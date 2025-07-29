@@ -22,7 +22,7 @@ import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
@@ -192,11 +192,21 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
             {eventType && eventCategory === "event" && (
               <p className="flex items-center gap-x-1 text-sm">
                 <span className="font-semibold">Type:</span>{" "}
-                {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
+                {eventType.map((type, index) => {
+                  return (
+                    <React.Fragment key={type}>
+                      {eventType.length > 1 && index > 0 && <br />}
+                      {getEventTypeLabel(type)}
+                      {eventType.length > 1 &&
+                        index < eventType.length - 1 &&
+                        " |"}
+                    </React.Fragment>
+                  );
+                })}
               </p>
             )}
           </div>
-          {/* NOTE: Make these dynamic and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
+          {/* NOTE: Make these dynamic links and perhaps make a dropdown menu or popover or something for them. Not sure if they're really necessary right here.  */}
           {/* <div className='flex gap-x-4 mt-3 items-center justify-start'>
                 <MailIcon size={24} />
                 <Globe size={24} />
