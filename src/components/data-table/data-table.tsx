@@ -62,6 +62,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   toolbarData?: ToolbarData;
+
   defaultVisibility?: VisibilityState;
   onRowSelect?: (row: TData | null, selection: Record<string, boolean>) => void;
   className?: string;

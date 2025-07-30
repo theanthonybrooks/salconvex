@@ -470,6 +470,27 @@ export const getSubmittedEvents = query({
   },
 });
 
+export const getSubmittedEventCount = query({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+    const isAdmin = user?.role?.includes("admin");
+    if (!isAdmin)
+      throw new ConvexError("You don't have permission to view this");
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_state", (q) => q.eq("state", "submitted"))
+      .collect();
+
+    return events.length;
+  },
+});
+
 export const getAllEvents = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);

@@ -358,6 +358,7 @@ const SubmissionFormOrgStep = ({
                 type: false,
                 category: false,
                 lastEditedAt: false,
+                submissionState: false,
                 // dates_edition: false,
                 state: false,
                 openCallState: false,
@@ -419,6 +420,7 @@ const SubmissionFormOrgStep = ({
               adminActions={{ isAdmin }}
               defaultVisibility={{
                 _id: false,
+                submissionState: false,
               }}
             />
             <DataTable
@@ -442,7 +444,7 @@ const SubmissionFormOrgStep = ({
               selectedRow={selectedRow}
               defaultVisibility={{
                 _id: false,
-
+                submissionState: false,
                 category: false,
                 type: false,
                 // lastEditedAt: false,

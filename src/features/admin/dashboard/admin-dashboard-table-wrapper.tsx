@@ -59,9 +59,13 @@ export function AdminDashboardTableWrapper({
             <DataTable
               columns={columns}
               data={eventsData}
+              // columnVisibility={{
+              //   category: true,
+              // }}
               defaultVisibility={{
                 category: true,
                 dates_edition: true,
+                submissionState: false,
                 type: false,
               }}
               onRowSelect={(row) => {
@@ -83,6 +87,7 @@ export function AdminDashboardTableWrapper({
                 category: false,
                 lastEditedAt: false,
                 dates_edition: false,
+                submissionState: false,
               }}
               onRowSelect={(row) => {
                 //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.

@@ -18,6 +18,8 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { cn } from "@/lib/utils";
 import { usePreloadedQuery } from "convex/react";
 // import { SignOutButton, useUser } from "@clerk/nextjs";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 import {
   HelpCircle,
   LogOut,
@@ -28,6 +30,7 @@ import {
 import Link from "next/link";
 import { FaUserNinja } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
+import { api } from "~/convex/_generated/api";
 
 interface UserProfileProps {
   // user: UserType;
@@ -50,7 +53,18 @@ export function UserProfile({
   const isOrganizer = accountType?.includes("organizer") ?? false;
   const isAdmin = userRole?.includes("admin");
   // console.log("User subscription:", subscription)
-
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const { data: submittedEventsData } = useQueryWithStatus(
+    api.events.event.getSubmittedEventCount,
+    isAdmin ? {} : "skip",
+  );
+  const { data: submittedOpenCallsData } = useQueryWithStatus(
+    api.openCalls.openCall.getSubmittedOpenCallCount,
+    isAdmin ? {} : "skip",
+  );
+  const pendingEvents = submittedEventsData ?? 0;
+  const pendingOpenCalls = submittedOpenCallsData ?? 0;
+  const totalPending = pendingOpenCalls + pendingEvents;
   return (
     <DropdownMenu>
       <TooltipSimple content="Open Profile Menu" side="bottom">
@@ -79,6 +93,11 @@ export function UserProfile({
                 {user?.lastName?.[0].toUpperCase()}
               </AvatarFallback>
             </Avatar>
+            {isAdmin && totalPending > 0 && (
+              <div className="absolute -bottom-1 -left-2 z-10 flex size-5 items-center justify-center rounded-full border border-foreground bg-salYellow text-xs font-bold hover:scale-105 hover:cursor-pointer">
+                {totalPending}
+              </div>
+            )}
           </Button>
         </DropdownMenuTrigger>
       </TooltipSimple>
@@ -115,11 +134,17 @@ export function UserProfile({
         <DropdownMenuGroup>
           {isAdmin && (
             <Link
-              href="/dashboard/admin/users"
+              href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?state=submitted" : "users"}`}
               className="underline-offset-2 hover:cursor-pointer hover:underline"
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">
-                <Users className="mr-2 size-4" />
+                {totalPending > 0 ? (
+                  <div className="flex size-5 items-center justify-center rounded-full border border-foreground bg-salYellow text-xs font-bold">
+                    {totalPending}
+                  </div>
+                ) : (
+                  <Users className="mr-2 size-4" />
+                )}
                 <span>Admin Dashboard</span>
               </DropdownMenuItem>
             </Link>

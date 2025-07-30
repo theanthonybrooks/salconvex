@@ -69,10 +69,16 @@ export default function DashboardSideBar({
   const userType = user?.accountType;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
-    api.events.event.getSubmittedEvents,
+    api.events.event.getSubmittedEventCount,
     hasAdminRole ? {} : "skip",
   );
-  const pendingEvents = submittedEventsData?.length ?? 0;
+  const { data: submittedOpenCallsData } = useQueryWithStatus(
+    api.openCalls.openCall.getSubmittedOpenCallCount,
+    hasAdminRole ? {} : "skip",
+  );
+  const pendingOpenCalls = submittedOpenCallsData ?? 0;
+  const pendingEvents = submittedEventsData ?? 0;
+  const totalPending = pendingOpenCalls + pendingEvents;
   // console.log(pendingEvents);
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"));
   const filteredNavItems = useMemo(() => {
@@ -256,18 +262,41 @@ export default function DashboardSideBar({
                               {!collapsedSidebar && <> {section.heading}</>}
                             </span>
 
-                            {section.heading === "Events" &&
-                              pendingEvents > 0 && (
-                                <span
-                                  className={cn(
-                                    "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                                    collapsedSidebar &&
-                                      "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
-                                  )}
-                                >
-                                  {pendingEvents}
-                                </span>
-                              )}
+                            {section.heading === "Events" && (
+                              <>
+                                {pendingEvents > 0 && !collapsedSidebar && (
+                                  <span
+                                    className={cn(
+                                      "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                                      collapsedSidebar &&
+                                        "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
+                                    )}
+                                  >
+                                    {pendingEvents}
+                                  </span>
+                                )}
+                                {pendingOpenCalls > 0 && !collapsedSidebar && (
+                                  <span
+                                    className={cn(
+                                      "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                                      collapsedSidebar &&
+                                        "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
+                                    )}
+                                  >
+                                    {pendingOpenCalls}
+                                  </span>
+                                )}
+                                {totalPending > 0 && collapsedSidebar && (
+                                  <span
+                                    className={cn(
+                                      "absolute -right-[10px] -top-2 inline-flex items-center justify-center rounded-full border-1.5 border-foreground bg-background px-[7px] py-0.5 text-2xs text-xs font-semibold",
+                                    )}
+                                  >
+                                    {totalPending}
+                                  </span>
+                                )}
+                              </>
+                            )}
                           </div>
 
                           {!collapsedSidebar && (
@@ -328,9 +357,9 @@ export default function DashboardSideBar({
                                     )}
                                   </span>
                                   {sectionItem.label === "Submissions" &&
-                                    pendingEvents > 0 && (
+                                    totalPending > 0 && (
                                       <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
-                                        {pendingEvents}
+                                        {totalPending}
                                       </span>
                                     )}
                                 </Link>

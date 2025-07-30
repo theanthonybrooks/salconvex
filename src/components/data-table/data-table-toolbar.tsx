@@ -137,6 +137,20 @@ export function DataTableToolbar<TData>({
                 )}
               />
             )}
+            {/* {table.getColumn("submissionState") && !minimalView && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("submissionState")}
+                title="State/OC"
+                options={eventStates}
+                className={cn(
+                  "2xl:flex",
+                  forDashboard && "flex",
+                  !forDashboard && "not-ipad md:hidden",
+                )}
+              />
+            )} */}
             {table.getColumn("category") && !minimalView && (
               <DataTableFacetedFilter
                 isMobile={isMobile}

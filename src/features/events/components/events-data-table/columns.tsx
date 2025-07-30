@@ -256,6 +256,20 @@ export const columns: ColumnDef<Event>[] = [
       return filterValue.includes(row.getValue(columnId));
     },
   },
+  {
+    id: "submissionState",
+    accessorKey: "submissionState",
+    header: () => null, // no header cell
+    cell: () => null, // no table cell
+    filterFn: (row, _columnId, filterValue: string[]) => {
+      const state = row.original.state;
+      const ocState = row.original.openCallState;
+      return filterValue.includes(state) || filterValue.includes(ocState ?? "");
+    },
+
+    enableHiding: false,
+    enableSorting: false,
+  },
 
   {
     accessorKey: "lastEditedAt",

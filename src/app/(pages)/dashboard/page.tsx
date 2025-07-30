@@ -72,8 +72,8 @@ export default function Dashboard() {
     isAdmin ? {} : "skip",
   );
 
-  const { data: submittedEventsData } = useQueryWithStatus(
-    api.events.event.getSubmittedEvents,
+  const { data: totalSubmittedEventCount } = useQueryWithStatus(
+    api.events.event.getSubmittedEventCount,
     isAdmin ? {} : "skip",
   );
 
@@ -94,7 +94,9 @@ export default function Dashboard() {
   const activeEvents = allEventsData?.activeEvents ?? 0;
   // const archivedEvents = allEventsData?.archivedEvents ?? 0;
   // const draftEvents = allEventsData?.draftEvents ?? 0;
-  const pendingEvents = submittedEventsData?.length ?? 0;
+  const pendingEvents = totalSubmittedEventCount ?? 0;
+  const pendingOpenCalls = totalOpenCallsData?.pendingOpenCalls ?? 0;
+  const totalPending = pendingOpenCalls + pendingEvents;
 
   const artistData = useQuery(api.artists.applications.getArtistApplications);
   const { applications, listActions } = artistData ?? {};
@@ -185,11 +187,11 @@ export default function Dashboard() {
                   </span>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{pendingEvents ?? 0}</div>
+                  <div className="text-2xl font-bold">{totalPending ?? 0}</div>
                   <Link
                     variant="subtleUnderline"
                     onClick={handleCollapseSidebar}
-                    href="/dashboard/admin/submissions?state=submitted"
+                    href="/dashboard/admin/submissions?submissionState=submitted"
                   >
                     <p className="mt-1 text-xs">View all</p>
                   </Link>
