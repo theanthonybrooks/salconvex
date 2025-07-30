@@ -41,6 +41,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const {
     logo: orgLogo,
     location,
+    ownerId,
     //  links
   } = organizer;
 
@@ -63,7 +64,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
 
   const locationString = getFormattedLocationString(location);
 
-  const isOwner = user?._id === organizer?.ownerId;
+  const isOwner = user?._id === ownerId;
 
   const tabList = [
     // { id: "application", label: "My Application" },
@@ -226,7 +227,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                             <li key={event._id} className="text-sm">
                               <div className="flex items-center gap-x-2">
                                 <Link
-                                  href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) ? "/call" : ""}`}
+                                  href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) && (hasActiveSubscription || isOwner) ? "/call" : ""}`}
                                 >
                                   <p className="text-sm">
                                     <span className="font-bold capitalize">
