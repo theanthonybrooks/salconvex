@@ -1,6 +1,6 @@
 "use client";
 
-import { OpenCallCardProps } from "@/types/openCall";
+import { OpenCallCardProps, publicStateValues } from "@/types/openCall";
 
 import { Card } from "@/components/ui/card";
 import NavTabs from "@/components/ui/nav-tabs";
@@ -36,6 +36,8 @@ import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import { api } from "~/convex/_generated/api";
 
+import { ApproveBtn } from "@/components/ui/approve-btn";
+
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -56,7 +58,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     dates,
     slug,
     mainOrgId,
+    state: eventState,
   } = event;
+
   const manualApplied = application?.manualApplied ?? false;
   const appStatus = application?.applicationStatus ?? null;
   const hasApplied = appStatus !== null;
@@ -72,7 +76,17 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { prodDates } = dates;
   // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
-  const { basicInfo, requirements, _id: openCallId } = openCall;
+  const {
+    basicInfo,
+    requirements,
+    _id: openCallId,
+    state: openCallState,
+  } = openCall;
+
+  const validEventState = publicStateValues.includes(eventState ?? "");
+  const validOpenCallState = publicStateValues.includes(openCallState ?? "");
+  const bothValid = validEventState && validOpenCallState;
+
 
   const appUrl = requirements?.applicationLink;
   const appLinkFormat = requirements?.applicationLinkFormat;
@@ -314,36 +328,46 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 {`$${basicInfo?.appFee}`}
               </p>
             )}
-            <ApplyButton
-              user={user}
-              userPref={userPref}
-              id={event._id}
+            {bothValid && (
+              <>
+                <ApplyButton
+                  user={user}
+                  userPref={userPref}
+                  id={event._id}
+                  openCallId={openCallId}
+                  mainOrgId={mainOrgId}
+                  slug={slug}
+                  appUrl={outputAppLink}
+                  edition={event.dates.edition}
+                  openCall={openCallStatus}
+                  callType={callType}
+                  manualApplied={appStatus}
+                  isBookmarked={bookmarked}
+                  isHidden={hidden}
+                  eventCategory={eventCategory}
+                  appFee={basicInfo?.appFee ?? 0}
+                  className="w-full"
+                  detailCard
+                  finalButton
+                />
+                <p
+                  className={cn(
+                    "mt-2 flex w-full items-center justify-center gap-x-1 text-center text-sm italic text-muted-foreground hover:cursor-pointer",
+                    hidden && "text-red-600 underline underline-offset-2",
+                  )}
+                  onClick={onHide}
+                >
+                  {hidden ? "Marked" : "Mark"} as not interested
+                  {!hidden ? "?" : "."}
+                </p>
+              </>
+            )}
+            <ApproveBtn
+              eventState={eventState}
+              openCallState={openCallState}
+              eventId={event._id}
               openCallId={openCallId}
-              mainOrgId={mainOrgId}
-              slug={slug}
-              appUrl={outputAppLink}
-              edition={event.dates.edition}
-              openCall={openCallStatus}
-              callType={callType}
-              manualApplied={appStatus}
-              isBookmarked={bookmarked}
-              isHidden={hidden}
-              eventCategory={eventCategory}
-              appFee={basicInfo?.appFee ?? 0}
-              className="w-full"
-              detailCard
-              finalButton
             />
-            <p
-              className={cn(
-                "mt-2 flex w-full items-center justify-center gap-x-1 text-center text-sm italic text-muted-foreground hover:cursor-pointer",
-                hidden && "text-red-600 underline underline-offset-2",
-              )}
-              onClick={onHide}
-            >
-              {hidden ? "Marked" : "Mark"} as not interested
-              {!hidden ? "?" : "."}
-            </p>
           </Card>
         </div>
       </Card>

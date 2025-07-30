@@ -24,6 +24,8 @@ export const openCallStates = [
 ] as const;
 export type SubmissionFormState = (typeof openCallStates)[number];
 
+export const publicStateValues = ["published", "archived"];
+
 export const callTypeValues = [
   "Fixed",
   "Rolling",

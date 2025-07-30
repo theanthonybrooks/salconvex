@@ -13,7 +13,9 @@ import {
 
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
+import { ApproveBtn } from "@/components/ui/approve-btn";
 import NavTabs from "@/components/ui/nav-tabs";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -31,6 +33,7 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
+import { publicStateValues } from "@/types/openCall";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -57,7 +60,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     type: eventType,
     location,
     dates,
+    state: eventState,
   } = event;
+  const validEventState = publicStateValues.includes(eventState ?? "");
 
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
@@ -231,6 +236,16 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 organizer={organizer}
                 abbr={true}
               />
+              {isAdmin && !validEventState && (
+                <>
+                  <Separator
+                    orientation="horizontal"
+                    thickness={2}
+                    className="col-span-full mx-auto mb-2 mt-3"
+                  />
+                  <ApproveBtn eventState={eventState} eventId={event._id} />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -259,6 +274,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
                   />
                 </span>
+
                 <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">
                   {getEventCategoryLabel(eventCategory)}
 
@@ -272,6 +288,30 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   )}
                 </span>
               </div>
+              {eventState === "draft" && (
+                <>
+                  <Separator
+                    orientation="vertical"
+                    className="mr-2 h-10 bg-foreground"
+                    thickness={2}
+                  />
+                  <p className="rounded-lg border-2 bg-stone-100 p-4 text-2xl font-bold uppercase text-foreground/60">
+                    Draft
+                  </p>
+                </>
+              )}
+              {eventState === "submitted" && (
+                <>
+                  <Separator
+                    orientation="vertical"
+                    className="mr-2 h-10 bg-foreground"
+                    thickness={2}
+                  />
+                  <p className="rounded-lg border-2 bg-salYellow/70 p-4 text-2xl font-bold uppercase text-foreground/60">
+                    Pending
+                  </p>
+                </>
+              )}
             </div>
             <div className="flex items-center gap-x-4">
               {hidden && hasActiveSubscription ? (

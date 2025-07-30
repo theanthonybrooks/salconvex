@@ -892,6 +892,8 @@ export const getEventWithDetails = query({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isAdmin = user?.role?.includes("admin");
 
     const events = await ctx.db
       .query("events")
@@ -900,7 +902,7 @@ export const getEventWithDetails = query({
 
     const event = events.find((e) => e.dates.edition === args.edition);
     const eventState = event?.state as SubmissionFormState;
-    const eventPublished = eventState === "published";
+    const eventPublished = eventState === "published" || isAdmin;
 
     if (!event || !userId || !eventPublished)
       throw new ConvexError("No event found");
@@ -989,7 +991,8 @@ export const getEventWithOCDetails = query({
       .filter((q) => q.eq(q.field("dates.edition"), args.edition))
       .first();
 
-    if (!event) return null;
+    console.log(event);
+    if (!event) throw new ConvexError("Event not found");
 
     const openCall = await ctx.db
       .query("openCalls")
@@ -997,13 +1000,20 @@ export const getEventWithOCDetails = query({
       .filter((q) => q.eq(q.field("basicInfo.dates.edition"), args.edition))
       // .filter((q) => q.eq(q.field("state"), "published"))
       .filter((q) =>
-        q.or(
-          q.eq(q.field("state"), "published"),
-          q.eq(q.field("state"), "archived"),
-        ),
+        isAdmin
+          ? q.or(
+              q.eq(q.field("state"), "published"),
+              q.eq(q.field("state"), "archived"),
+              q.eq(q.field("state"), "submitted"),
+            )
+          : q.or(
+              q.eq(q.field("state"), "published"),
+              q.eq(q.field("state"), "archived"),
+            ),
       )
 
       .first();
+    console.log(openCall);
 
     const organizer = await ctx.db.get(event.mainOrgId);
 

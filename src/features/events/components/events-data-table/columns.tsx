@@ -26,6 +26,7 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
+import { CopyableItem } from "@/components/ui/copyable-item";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -369,8 +370,6 @@ export const columns: ColumnDef<Event>[] = [
       const eventApproved = typeof event.approvedAt === "number";
 
       // const openCallState = event.openCallState;
-      // const openCallId = event.openCallId;
-      // console.log(table.options)
 
       return (
         <div className={cn("flex justify-center", isAdmin && "flex")}>
@@ -433,6 +432,22 @@ export const columns: ColumnDef<Event>[] = [
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <CopyableItem
+                        defaultIcon={<LucideClipboardCopy className="size-4" />}
+                        copyContent={event._id}
+                      >
+                        Event ID
+                      </CopyableItem>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <CopyableItem
+                        defaultIcon={<LucideClipboardCopy className="size-4" />}
+                        copyContent={openCallId as string}
+                      >
+                        Open Call ID
+                      </CopyableItem>
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => navigator.clipboard.writeText(event._id)}
                       className="flex items-center gap-x-2"
