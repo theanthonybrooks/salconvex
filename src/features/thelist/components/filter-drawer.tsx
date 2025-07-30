@@ -506,8 +506,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                   <SelectValue placeholder="Search Type" />
                 </SelectTrigger>
                 <SelectContent align="end" className="z-top">
-                  <SelectItem value="events">Events</SelectItem>
-                  <SelectItem value="orgs">Organizers</SelectItem>
+                  <SelectItem value="events">Event Name</SelectItem>
+                  <SelectItem value="orgs">Organizer Name</SelectItem>
                   <SelectItem value="loc">Location</SelectItem>
                   <SelectItem value="all">All</SelectItem>
                 </SelectContent>
