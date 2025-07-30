@@ -15,7 +15,6 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
 
 const OrganizerDetail = () => {
@@ -40,12 +39,6 @@ const OrganizerDetail = () => {
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
   const artist = artistData?.artist;
   const isOwner = user?._id === data?.organizer?.ownerId;
-
-  useEffect(() => {
-    if (isError) {
-      router.push("/404");
-    }
-  }, [isError, router]);
 
   if (isError) {
     if (error instanceof ConvexError) {
@@ -90,7 +83,7 @@ const OrganizerDetail = () => {
         );
       }
     } else {
-      router.push("/thelist");
+      router.push("/404");
     }
   }
 
