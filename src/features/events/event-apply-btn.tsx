@@ -118,6 +118,7 @@ interface ApplyButtonProps {
   mainOrgId?: Id<"organizations">;
   slug: string;
   appUrl?: string;
+  appLinkformat?: string;
   edition: number;
   finalButton?: boolean;
   manualApplied: ApplicationStatus;
@@ -145,6 +146,7 @@ export const ApplyButton = ({
   mainOrgId,
   slug,
   appUrl,
+  appLinkformat,
   user,
   userPref,
   //isExternalApply, //todo: think about this. Could just use appUrl if it exists to gather the same assumption and user outcome.
@@ -173,7 +175,7 @@ export const ApplyButton = ({
     finalButton ? {} : "skip",
   );
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
-  const isEmail = callType === "Email";
+  const isEmail = callType === "Email" || appLinkformat === "mailto:";
   const noSub =
     !subscription?.hasActiveSubscription &&
     (publicPreview || publicView || finalButton);

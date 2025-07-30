@@ -168,7 +168,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
                     ? submitRecap
                       ? event.links.facebook.split("@").slice(-1)[0]
                       : event.links.facebook
-                    : event.name}
+                    : "Facebook"}
                 </span>
               </div>
             </a>

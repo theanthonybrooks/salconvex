@@ -87,7 +87,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const validOpenCallState = publicStateValues.includes(openCallState ?? "");
   const bothValid = validEventState && validOpenCallState;
 
-
   const appUrl = requirements?.applicationLink;
   const appLinkFormat = requirements?.applicationLinkFormat;
   const mailLink = appLinkFormat === "mailto:";
@@ -338,6 +337,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   mainOrgId={mainOrgId}
                   slug={slug}
                   appUrl={outputAppLink}
+                  appLinkformat={appLinkFormat}
                   edition={event.dates.edition}
                   openCall={openCallStatus}
                   callType={callType}
