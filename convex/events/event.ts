@@ -991,7 +991,6 @@ export const getEventWithOCDetails = query({
       .filter((q) => q.eq(q.field("dates.edition"), args.edition))
       .first();
 
-    console.log(event);
     if (!event) throw new ConvexError("Event not found");
 
     const openCall = await ctx.db
@@ -1013,7 +1012,6 @@ export const getEventWithOCDetails = query({
       )
 
       .first();
-    console.log(openCall);
 
     const organizer = await ctx.db.get(event.mainOrgId);
 
