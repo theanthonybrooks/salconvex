@@ -302,6 +302,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               openCallId={openCallId}
               slug={slug}
               appUrl={outputAppLink}
+              appLinkformat={appLinkFormat}
               edition={event.dates.edition}
               // appStatus={appStatus}
               openCall={openCallStatus}
