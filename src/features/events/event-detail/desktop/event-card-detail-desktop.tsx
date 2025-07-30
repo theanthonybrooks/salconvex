@@ -34,7 +34,7 @@ import { EventCardProps } from "@/types/event";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
@@ -49,6 +49,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     (subData?.hasActiveSubscription || isAdmin) ?? false;
   const { data, artist, className } = props;
   //note: removed artist from props. Add back when needed
+  const aboutRef = useRef<HTMLDivElement | null>(null);
   const { event, organizer } = data;
   const {
     logo: eventLogo,
@@ -95,6 +96,24 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
       toggleListAction({ hidden: !hidden });
       await updateUserLastActive({ email: user?.email ?? "" });
     }
+  };
+
+  const scrollToAbout = () => {
+    setActiveTab("event");
+    setTimeout(() => {
+      const element = aboutRef.current;
+      console.log(element);
+      if (element) {
+        const offset = element.getBoundingClientRect().top + window.scrollY;
+
+        const scrollOffset = offset - 160;
+
+        window.scrollTo({
+          top: scrollOffset,
+          behavior: "smooth",
+        });
+      }
+    }, 50);
   };
 
   return (
@@ -195,7 +214,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     {event.about?.length > 200 && (
                       <button
                         className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={() => setActiveTab("event")}
+                        onClick={scrollToAbout}
                       >
                         Read more
                       </button>
@@ -319,7 +338,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           setActiveTab={setActiveTab}
         >
           <div id="event">
-            <EventCard event={event} format="desktop" />
+            <EventCard event={event} format="desktop" aboutRef={aboutRef} />
           </div>
           <div id="organizer">
             <OrganizerCard organizer={organizer} format="desktop" />

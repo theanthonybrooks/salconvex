@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/state-accordion-test";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useMutation, usePreloadedQuery } from "convex/react";
@@ -44,6 +44,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
+  const aboutRef = useRef<HTMLDivElement | null>(null);
 
   const { data, artist, userPref, className } = props;
   const { event, organizer, openCall, application } = data;
@@ -54,6 +55,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     location,
     dates,
     slug,
+    mainOrgId,
   } = event;
   const manualApplied = application?.manualApplied ?? false;
   const appStatus = application?.applicationStatus ?? null;
@@ -117,6 +119,24 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     { id: "event", label: getEventCategoryLabel(eventCategory) },
     { id: "organizer", label: "Organizer" },
   ];
+
+  const scrollToAbout = () => {
+    setActiveTab("event");
+    setTimeout(() => {
+      const element = aboutRef.current;
+      console.log(element);
+      if (element) {
+        const offset = element.getBoundingClientRect().top + window.scrollY;
+
+        const scrollOffset = offset - 160;
+
+        window.scrollTo({
+          top: scrollOffset,
+          behavior: "smooth",
+        });
+      }
+    }, 50);
+  };
 
   return (
     <div
@@ -252,7 +272,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     {event.about?.length > 200 && (
                       <button
                         className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={() => setActiveTab("event")}
+                        onClick={scrollToAbout}
                       >
                         Read more
                       </button>
@@ -299,6 +319,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               userPref={userPref}
               id={event._id}
               openCallId={openCallId}
+              mainOrgId={mainOrgId}
               slug={slug}
               appUrl={outputAppLink}
               edition={event.dates.edition}
@@ -473,7 +494,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </div>
           </div>
           <div id="event">
-            <EventCard event={event} format="desktop" />
+            <EventCard event={event} format="desktop" aboutRef={aboutRef} />
           </div>
           <div id="organizer">
             <OrganizerCard organizer={organizer} format="desktop" />

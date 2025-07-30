@@ -4,6 +4,7 @@ import { OrganizerCardLogoName } from "@/features/organizers/components/organize
 import { OrganizerMainContact } from "@/features/organizers/components/organizer-main-contact";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { Organizer } from "@/types/organizer";
+import { RefObject } from "react";
 import { TiArrowRight } from "react-icons/ti";
 import slugify from "slugify";
 
@@ -11,12 +12,14 @@ interface OrganizerCardProps {
   organizer: Organizer;
   format?: string;
   srcPage?: string;
+  aboutRef?: RefObject<HTMLDivElement | null>;
 }
 
 export const OrganizerCard = ({
   organizer,
   format,
   srcPage,
+  aboutRef,
 }: OrganizerCardProps) => {
   const orgHasOtherEvents = organizer?.events?.length > 1;
   const orgSlug =
@@ -61,7 +64,10 @@ export const OrganizerCard = ({
           </div>
         </Card>
       ) : (
-        <Card className="grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-xl border-2 border-dotted border-foreground/20 bg-white/30 p-5">
+        <Card
+          className="grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-xl border-2 border-dotted border-foreground/20 bg-white/30 p-5"
+          ref={aboutRef}
+        >
           <div className="w-full space-y-5 divide-y-2 divide-dotted divide-foreground/20">
             <OrganizerCardLogoName organizer={organizer} format="desktop" />
 

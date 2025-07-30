@@ -86,6 +86,7 @@ const EventCardPreview = ({
 
     // manualApplied,
     // organizerId,
+    mainOrgId,
     // hasActiveOpenCall,
     hidden,
     openCallStatus,
@@ -496,6 +497,7 @@ const EventCardPreview = ({
           </div>
           <EventContextMenu
             eventId={event._id}
+            mainOrgId={mainOrgId}
             openCallId={opencall ? opencall._id : ""}
             isHidden={hidden}
             publicView={publicView}

@@ -50,7 +50,6 @@ const ClientEventList = (
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
-  console.log(subStatus);
   const artistData = usePreloadedQuery(preloadedArtistData);
   // console.log(artistData);
   const user = userData?.user || null;

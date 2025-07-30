@@ -115,6 +115,7 @@ export const ApplyButtonShort = ({
 interface ApplyButtonProps {
   id: string;
   openCallId: string;
+  mainOrgId?: Id<"organizations">;
   slug: string;
   appUrl?: string;
   edition: number;
@@ -141,6 +142,7 @@ interface ApplyButtonProps {
 export const ApplyButton = ({
   id,
   openCallId,
+  mainOrgId,
   slug,
   appUrl,
   user,
@@ -441,6 +443,7 @@ export const ApplyButton = ({
       <EventContextMenu
         user={user}
         eventId={id}
+        mainOrgId={mainOrgId}
         openCallId={openCallId}
         // onHide={onHide}
         isHidden={isHidden}

@@ -24,12 +24,14 @@ import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
+  const aboutRef = useRef<HTMLDivElement | null>(null);
   const user = userData?.user ?? null;
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
@@ -71,6 +73,22 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const [activeTab, setActiveTab] = useState("events");
   // const { toggleListAction } = useToggleListAction(event._id);
 
+  const scrollToAbout = () => {
+    setActiveTab("organizer");
+
+    setTimeout(() => {
+      const element = aboutRef.current;
+      if (element) {
+        const offset = element.getBoundingClientRect().top + window.scrollY;
+        const scrollOffset = offset - 160;
+
+        window.scrollTo({
+          top: scrollOffset,
+          behavior: "smooth",
+        });
+      }
+    }, 50);
+  };
   return (
     <div
       className={cn(
@@ -131,7 +149,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                     {organizer.about?.length > 200 && (
                       <button
                         className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={() => setActiveTab("organizer")}
+                        onClick={scrollToAbout}
                       >
                         Read more
                       </button>
@@ -192,32 +210,10 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         >
-          {/* <div id="events">
-            <ol className="list-outside list-decimal px-2">
-              {events?.map((event) => (
-                <li key={event._id} className="text-sm">
-                  <div className="flex items-center gap-x-2">
-                    <Link
-                      href={`/thelist/event/${event.slug}/${event.dates.edition}`}
-                      target="_blank"
-                    >
-                      <p className="text-sm">
-                        <span className="font-bold">{event.name}</span>
-                        {" - "}
-                        <span className="font-light italic">
-                          {event.dates.edition}
-                        </span>
-                      </p>
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div> */}
           <div id="events" className="px-4">
             {groupedEvents &&
               Object.entries(groupedEvents)
-                .sort((a, b) => b[0].localeCompare(a[0])) // Optional: sort editions descending
+                .sort((a, b) => b[0].localeCompare(a[0])) // For now, I'm sorting editions descending
                 .map(([edition, editionEvents]) => {
                   return (
                     <div key={edition} className="mb-4">
@@ -276,6 +272,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
               organizer={organizer}
               format="desktop"
               srcPage="organizer"
+              aboutRef={aboutRef}
             />
           </div>
           <div id="application">

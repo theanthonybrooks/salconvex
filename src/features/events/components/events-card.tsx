@@ -12,6 +12,7 @@ import { LinkList } from "@/components/ui/link-list";
 import EventDates from "@/features/events/components/event-dates";
 import { getEventCategoryLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { RefObject } from "react";
 import { FaMapLocationDot } from "react-icons/fa6";
 
 interface LinkProps {
@@ -20,11 +21,12 @@ interface LinkProps {
 
 interface EventCardProps extends LinkProps {
   format: "mobile" | "desktop";
+  aboutRef?: RefObject<HTMLDivElement | null>;
 }
 
 //TODO: Add in logic for the event dates, a structured (formatted) about section that will utilize something like Quill on the submission form. Perhaps have a specific "Dates" accordion section that just gives the event dates/times and/or artist/production dates/times.
 
-export const EventCard = ({ event, format }: EventCardProps) => {
+export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
   const {
     category: eventCategory,
     // type: eventType,
@@ -201,7 +203,7 @@ export const EventCard = ({ event, format }: EventCardProps) => {
             <AccordionItem value="about">
               <AccordionTrigger title="About:" />
 
-              <AccordionContent>
+              <AccordionContent ref={aboutRef}>
                 <div className="mb-4 flex flex-col space-y-3 pb-3">
                   <RichTextDisplay html={event.about} />
                 </div>

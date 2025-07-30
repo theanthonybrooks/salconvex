@@ -11,6 +11,7 @@ interface CopyableItemProps {
   defaultIcon?: ReactNode | LucideIcon;
   className?: string;
   copyContent?: string;
+  center?: boolean;
 }
 
 export const CopyableItem = ({
@@ -20,6 +21,7 @@ export const CopyableItem = ({
   defaultIcon,
   className,
   copyContent,
+  center,
 }: CopyableItemProps) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
@@ -34,7 +36,7 @@ export const CopyableItem = ({
         className={cn(
           className,
           "flex cursor-pointer items-center gap-x-1",
-          copied && "justify-center",
+          center && "justify-center",
         )}
       >
         {(iconBefore || defaultIcon) && copied && <Check className="size-5" />}

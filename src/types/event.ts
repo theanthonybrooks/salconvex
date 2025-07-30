@@ -89,7 +89,7 @@ export interface EventData {
   _id: Id<"events">;
   adminNote?: string;
   organizerId: string[];
-  mainOrgId: string;
+  mainOrgId: Id<"organizations">;
 
   name: string;
   slug: string;
