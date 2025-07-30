@@ -89,11 +89,11 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const user = row.original;
       return (
         <ConvexDashboardLink
-          className="truncate font-medium"
+          className="font-medium"
           table="userSubscriptions"
           id={user._id}
         >
-          {row.getValue("name")}
+          <p className="truncate">{row.getValue("name")}</p>
         </ConvexDashboardLink>
       );
     },
