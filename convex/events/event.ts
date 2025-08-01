@@ -970,7 +970,10 @@ export const getEventWithOCDetails = query({
   handler: async (ctx, args) => {
     const source = args.source ?? "eventpage";
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
+    // if (!userId) {
+    //   console.log("user not authenticated");
+    // }
+    // if (!userId) throw new ConvexError("Not authenticated");
     const user = userId ? await ctx.db.get(userId) : null;
     const isAdmin = user?.role?.includes("admin");
     const subscription = user
@@ -1027,8 +1030,9 @@ export const getEventWithOCDetails = query({
       user?.accountType?.includes("organizer") && userId === organizer?.ownerId;
 
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
-    if (!userIsOrganizer && !hasActiveSubscription)
-      throw new ConvexError("You don't have permission to view this event");
+    // if (!userIsOrganizer && !hasActiveSubscription)
+    // throw new ConvexError("You don't have permission to view this event");
+    // console.log("user doesn't have permission to view this event");
     if (source === "ocpage" && !openCall)
       throw new ConvexError("Open Call not found");
     if (!openCall) return null;

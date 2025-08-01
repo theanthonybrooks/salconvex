@@ -8,10 +8,10 @@ import { NextResponse } from "next/server";
 // const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
 
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
-const isOpenCallPage = createRouteMatcher([
-  "/thelist/event/:slug/:year/call",
-  "/thelist/event/:slug/:year/call/:path*",
-]);
+// const isOpenCallPage = createRouteMatcher([
+//   "/thelist/event/:slug/:year/call",
+//   "/thelist/event/:slug/:year/call/:path*",
+// ]);
 
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
@@ -24,9 +24,9 @@ export default convexAuthNextjsMiddleware(
       return nextjsMiddlewareRedirect(request, "/");
     }
 
-    if (isOpenCallPage(request) && !isAuthenticated) {
-      return nextjsMiddlewareRedirect(request, "/auth/sign-in");
-    }
+    // if (isOpenCallPage(request) && !isAuthenticated) {
+    //   return nextjsMiddlewareRedirect(request, "/auth/sign-in");
+    // }
 
     // if (isAuthPage(request) && isAuthenticated) {
     //   return nextjsMiddlewareRedirect(request, "/")

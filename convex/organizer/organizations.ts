@@ -71,9 +71,11 @@ export async function checkOrgStatus(
     .unique();
 
   let orgOwnerIsAdmin: boolean | undefined = undefined;
+  let emailMatches = false;
   if (existingOrg) {
     const orgOwnerId = existingOrg.ownerId;
     const orgEmail = existingOrg.links?.email?.toLowerCase();
+    emailMatches = typeof orgEmail === "string" && orgEmail === email;
     orgDomain = orgEmail?.split("@")[1].toLowerCase();
     const orgOwner = await ctx.db
       .query("users")
@@ -84,7 +86,7 @@ export async function checkOrgStatus(
 
   const domainsMatch =
     typeof orgDomain === "string" &&
-    orgDomain !== "gmail.com" &&
+    (orgDomain !== "gmail.com" || emailMatches) &&
     orgDomain === emailDomain;
 
   return {

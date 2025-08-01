@@ -39,6 +39,7 @@ const OpenCallDetail = () => {
       : "skip",
   );
 
+
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
 
   useEffect(() => {

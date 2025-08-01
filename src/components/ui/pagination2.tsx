@@ -55,7 +55,7 @@ export const BasicPagination = ({
           animate={totalPages >= 1 && { opacity: 1 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
           className={cn(
-            "my-6 flex w-full max-w-[min(70vw,1200px)] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0",
+            "my-6 flex w-full grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:max-w-[min(70vw,1200px)] sm:gap-0",
             className,
             totalPages === 0 && "justify-center sm:flex",
           )}
