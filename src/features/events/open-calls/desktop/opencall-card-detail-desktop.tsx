@@ -474,7 +474,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 />
               ) : (
                 <FaRegBookmark
-                  className="size-7 cursor-pointer"
+                  className={cn(
+                    "size-7 cursor-pointer",
+                    !hasActiveSubscription && "text-foreground/50",
+                  )}
                   onClick={onBookmark}
                 />
               )}

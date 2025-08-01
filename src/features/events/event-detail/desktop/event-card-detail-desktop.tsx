@@ -332,7 +332,13 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Eye className="size-7 cursor-pointer" onClick={onHide} />
+                      <Eye
+                        className={cn(
+                          "size-7 cursor-pointer",
+                          !hasActiveSubscription && "text-foreground/50",
+                        )}
+                        onClick={onHide}
+                      />
                     </TooltipTrigger>
                     <TooltipContent align="end">
                       <p>Hide {getEventCategoryLabel(eventCategory)}</p>
@@ -359,7 +365,10 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   <Tooltip>
                     <TooltipTrigger>
                       <FaRegBookmark
-                        className="size-7 cursor-pointer"
+                        className={cn(
+                          "size-7 cursor-pointer",
+                          !hasActiveSubscription && "text-foreground/50",
+                        )}
                         onClick={onBookmark}
                       />{" "}
                     </TooltipTrigger>

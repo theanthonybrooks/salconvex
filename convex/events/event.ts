@@ -904,8 +904,7 @@ export const getEventWithDetails = query({
     const eventState = event?.state as SubmissionFormState;
     const eventPublished = eventState === "published" || isAdmin;
 
-    if (!event || !userId || !eventPublished)
-      throw new ConvexError("No event found");
+    if (!event || !eventPublished) throw new ConvexError("No event found");
 
     const [openCalls, organizer] = await Promise.all([
       ctx.db
@@ -969,6 +968,7 @@ export const getEventWithOCDetails = query({
   },
   handler: async (ctx, args) => {
     const source = args.source ?? "eventpage";
+    console.log("source", source, args.source);
     const userId = await getAuthUserId(ctx);
     // if (!userId) {
     //   console.log("user not authenticated");
