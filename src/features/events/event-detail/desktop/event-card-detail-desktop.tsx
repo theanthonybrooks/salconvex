@@ -335,7 +335,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       <Eye
                         className={cn(
                           "size-7 cursor-pointer",
-                          !hasActiveSubscription && "text-foreground/50",
+                          !hasActiveSubscription &&
+                            "cursor-default text-foreground/50",
                         )}
                         onClick={onHide}
                       />
@@ -367,7 +368,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       <FaRegBookmark
                         className={cn(
                           "size-7 cursor-pointer",
-                          !hasActiveSubscription && "text-foreground/50",
+                          !hasActiveSubscription &&
+                            "cursor-default text-foreground/50",
                         )}
                         onClick={onBookmark}
                       />{" "}

@@ -968,7 +968,6 @@ export const getEventWithOCDetails = query({
   },
   handler: async (ctx, args) => {
     const source = args.source ?? "eventpage";
-    console.log("source", source, args.source);
     const userId = await getAuthUserId(ctx);
     // if (!userId) {
     //   console.log("user not authenticated");
@@ -982,10 +981,10 @@ export const getEventWithOCDetails = query({
           .withIndex("userId", (q) => q.eq("userId", user._id))
           .first()
       : null;
-    const hasActiveSubscription =
-      subscription?.status === "active" ||
-      subscription?.status === "trialing" ||
-      isAdmin;
+    // const hasActiveSubscription =
+    //   subscription?.status === "active" ||
+    //   subscription?.status === "trialing" ||
+    //   isAdmin;
     let application = null;
 
     const event = await ctx.db
@@ -1026,8 +1025,8 @@ export const getEventWithOCDetails = query({
         .first();
     }
 
-    const userIsOrganizer =
-      user?.accountType?.includes("organizer") && userId === organizer?.ownerId;
+    // const userIsOrganizer =
+    //   user?.accountType?.includes("organizer") && userId === organizer?.ownerId;
 
     //todo: may need to add safety in case there are multiple open calls for the same event and edition. How to handle this going forward?
     // if (!userIsOrganizer && !hasActiveSubscription)
