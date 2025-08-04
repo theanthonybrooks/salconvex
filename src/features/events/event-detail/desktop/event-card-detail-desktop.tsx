@@ -14,6 +14,7 @@ import {
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import NavTabs from "@/components/ui/nav-tabs";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -35,7 +36,6 @@ import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
 import { publicStateValues } from "@/types/openCall";
 import { useMutation, usePreloadedQuery } from "convex/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { api } from "~/convex/_generated/api";
@@ -141,15 +141,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
       >
         <div className="col-span-full mb-4 grid w-full max-w-[calc(100%-12px)] grid-cols-[75px_auto] gap-x-3 pt-2">
           <div className="col-span-1 flex items-start justify-center">
-            <Image
-              src={eventLogo}
-              alt="Event Logo"
-              width={60}
-              height={60}
-              className={cn(
-                "size-[60px] rounded-full border-2 border-foreground",
-              )}
-            />
+            <EventOrgLogo imgSrc={eventLogo} type="event" />
           </div>
 
           <div className="col-start-2 row-start-1 flex items-center">
@@ -255,12 +247,11 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         <div className="flex min-h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
           <div className="flex w-full items-center justify-between pr-2">
             <div className="flex items-center gap-x-4 px-4">
-              <Image
-                src={eventLogo}
-                alt="Event Logo"
-                width={80}
-                height={80}
-                className={cn("size-[80px] rounded-full border-2 xl:hidden")}
+              <EventOrgLogo
+                imgSrc={eventLogo}
+                type="event"
+                size="large"
+                className="xl:hidden"
               />
               <div className="flex flex-col">
                 <span className="text-xl font-bold capitalize">

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { LinkList } from "@/components/ui/link-list";
 import {
   Tooltip,
@@ -38,7 +39,6 @@ import {
   EyeOff,
   Info,
 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaBookmark, FaMapLocationDot, FaRegBookmark } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
@@ -214,11 +214,11 @@ const EventCardPreview = ({
             }}
             className="active:scale-95"
           >
-            <Image
-              src={logo}
-              alt="Event Logo"
+            <EventOrgLogo
+              imgSrc={logo}
+              type="event"
               className={cn(
-                "size-12 rounded-full border border-black",
+                "size-12 rounded-full border",
                 !publicView &&
                   hasOpenCall &&
                   (event.status === "accepted"
@@ -229,8 +229,6 @@ const EventCardPreview = ({
                         ? "ring-4 ring-foreground/30 ring-offset-1"
                         : ""),
               )}
-              height={48}
-              width={48}
             />
           </div>
           <div
@@ -522,11 +520,11 @@ const EventCardPreview = ({
               className="group hover:cursor-pointer"
             >
               <div className="mb-2 flex items-center gap-x-3">
-                <Image
-                  src={logo}
-                  alt="Event Logo"
+                <EventOrgLogo
+                  imgSrc={logo}
+                  type="event"
                   className={cn(
-                    "size-12 rounded-full border border-black",
+                    "size-12 rounded-full border",
                     !publicView &&
                       hasOpenCall &&
                       (event.status === "accepted"
@@ -537,8 +535,6 @@ const EventCardPreview = ({
                             ? "ring-4 ring-foreground/30 ring-offset-1"
                             : ""),
                   )}
-                  height={48}
-                  width={48}
                 />
                 <p className="line-clamp-2 break-words text-base font-semibold group-hover:underline group-hover:underline-offset-2">
                   {name}

@@ -11,7 +11,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 
-import Image from "next/image";
 import { useRef, useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -37,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { api } from "~/convex/_generated/api";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -195,14 +195,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         )}
         <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
           <div className="col-span-1 flex items-start justify-center">
-            <Image
-              src={eventLogo}
-              alt="Event Logo"
-              width={60}
-              height={60}
+            <EventOrgLogo
+              imgSrc={eventLogo}
+              type="event"
               className={cn(
-                "size-[60px] rounded-full border-2 border-foreground",
-
                 appStatus === "accepted"
                   ? "ring-4 ring-emerald-500 ring-offset-1"
                   : appStatus === "rejected"
@@ -390,14 +386,11 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           </div>
           <div className="flex w-full items-center justify-between pr-2">
             <div className="flex items-center gap-x-4 px-4">
-              <Image
-                src={eventLogo}
-                alt="Event Logo"
-                width={80}
-                height={80}
+              <EventOrgLogo
+                imgSrc={eventLogo}
+                type="event"
+                size="large"
                 className={cn(
-                  "size-[80px] rounded-full border-2 xl:hidden",
-
                   appStatus === "accepted"
                     ? "ring-4 ring-emerald-500 ring-offset-1"
                     : appStatus === "rejected"

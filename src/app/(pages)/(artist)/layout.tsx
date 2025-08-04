@@ -1,3 +1,5 @@
+//TODO: Add a provider for cookies popup, for other site notification popups
+
 import { ArtistPreloadContextProvider } from "@/features/wrapper-elements/artist-preload-context";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";

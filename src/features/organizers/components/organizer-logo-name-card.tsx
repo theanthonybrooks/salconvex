@@ -1,9 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { getOrganizerLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { Organizer } from "@/types/organizer";
-import Image from "next/image";
 import React from "react";
 import slugify from "slugify";
 
@@ -40,13 +40,7 @@ export const OrganizerLogoNameCard = ({
         setActiveTab("organizer");
       }}
     >
-      <Image
-        src={organizer.logo}
-        alt="Event Logo"
-        width={50}
-        height={50}
-        className={cn("size-[40px] rounded-full border-1.5 border-foreground")}
-      />
+      <EventOrgLogo imgSrc={organizer.logo} type="organizer" size="small" />
       <div className="col-span-1">
         <p className="max-w-[18ch] truncate text-sm font-bold">
           {organizer.name}
@@ -73,16 +67,14 @@ export const OrganizerCardLogoName = ({
           isMobile && "grid-cols-[75px_minmax(0,1fr)]",
         )}
       >
-        <Image
-          src={organizer?.logo || "/1.jpg"}
-          alt="Event Logo"
-          width={60}
-          height={60}
+        <EventOrgLogo
+          imgSrc={organizer?.logo || "/1.jpg"}
           className={cn(
             "size-[50px] rounded-full border-1.5 border-foreground",
             isMobile && "size-15 border-2",
           )}
         />
+
         <div className="col-span-1">
           <p className="line-clamp-2 text-sm font-bold">{organizer.name}</p>
           <p className={cn("text-sm", isMobile && "font-medium")}>

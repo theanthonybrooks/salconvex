@@ -8,6 +8,7 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
@@ -20,7 +21,6 @@ import { getFormattedLocationString } from "@/lib/locations";
 import { EventCardProps } from "@/types/event";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
@@ -128,15 +128,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     >
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
         <div className="col-span-1 flex flex-col items-center justify-between space-y-6 pb-3 pt-3">
-          <Image
-            src={eventLogo}
-            alt="Event Logo"
-            width={60}
-            height={60}
-            className={cn(
-              "size-[60px] rounded-full border-2 border-foreground",
-            )}
-          />
+          <EventOrgLogo imgSrc={eventLogo} type="event" />
 
           <div className="flex flex-col items-center space-y-4">
             {bookmarked && hasActiveSubscription ? (

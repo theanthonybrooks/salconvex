@@ -3,6 +3,7 @@
 "use client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { LinkList } from "@/components/ui/link-list";
 import NavTabs from "@/components/ui/nav-tabs";
 import {
@@ -29,7 +30,6 @@ import { getCallFormatLabel } from "@/lib/openCallFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import { EligibilityType } from "@/types/openCall";
-import Image from "next/image";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Id } from "~/convex/_generated/dataModel";
@@ -148,12 +148,10 @@ export const SubmissionFormRecapDesktop = ({
                   </th>
                   <td className="first-child">
                     {typeof eventData.logo === "string" && (
-                      <Image
-                        src={eventData.logo}
-                        alt="Event Logo"
-                        width={80}
-                        height={80}
-                        className={cn("size-20 rounded-full border-2")}
+                      <EventOrgLogo
+                        imgSrc={eventData.logo}
+                        type="event"
+                        size="large"
                       />
                     )}
                   </td>

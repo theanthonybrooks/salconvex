@@ -7,13 +7,13 @@ import { MapPin } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Link } from "@/components/ui/custom-link";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { formatEventDates } from "@/lib/dateFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
@@ -98,15 +98,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
     >
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
         <div className="col-span-1 flex flex-col items-center justify-between space-y-6 pb-3 pt-3">
-          <Image
-            src={orgLogo}
-            alt="Organizer Logo"
-            width={60}
-            height={60}
-            className={cn(
-              "size-[60px] rounded-full border-2 border-foreground",
-            )}
-          />
+          <EventOrgLogo imgSrc={orgLogo} type="organizer" />
 
           <div className="flex flex-col items-center space-y-4">
             {/* {bookmarked ? (

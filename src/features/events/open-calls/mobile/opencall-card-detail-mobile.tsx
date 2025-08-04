@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplyButton } from "@/features/events/event-apply-btn";
 import { OpenCallCardProps } from "@/types/openCall";
 
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
@@ -22,7 +23,6 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
@@ -153,14 +153,10 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
       )}
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
         <div className="col-span-1 flex flex-col items-center justify-around space-y-6 pb-3 pt-3">
-          <Image
-            src={eventLogo}
-            alt="Event Logo"
-            width={60}
-            height={60}
+          <EventOrgLogo
+            imgSrc={eventLogo}
+            type="event"
             className={cn(
-              "size-[60px] rounded-full border-2 border-foreground",
-
               appStatus === "accepted"
                 ? "ring-4 ring-emerald-500 ring-offset-1"
                 : appStatus === "rejected"
