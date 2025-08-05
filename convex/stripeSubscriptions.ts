@@ -72,11 +72,13 @@ export const getOrgHadFreeCall = query({
   handler: async (ctx) => {
     const identity = await getAuthUserId(ctx);
     if (!identity) return false;
-    const org = await ctx.db
+    const orgs = await ctx.db
       .query("organizations")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", identity))
-      .first();
-    return org?.hadFreeCall === true;
+      .collect();
+    return orgs.some((org) => org.hadFreeCall === true);
+
+    // return org?.hadFreeCall === true;
   },
 });
 
@@ -210,12 +212,8 @@ export const createStripeCheckoutSession = action({
         metadata: metadata,
         client_reference_id: metadata.userId,
         discounts: args.isEligibleForFree
-          ? [{ coupon: "Qd1pEJ7t" }]
+          ? [{ coupon: process.env.STRIPE_FREE_COUPON }]
           : undefined,
-        // discounts: args.isEligibleForFree
-        //   ? [{ coupon: "KT7bnfqn" }]
-        //   : undefined,
-        //TODO: Add coupon and products to production version of Stripe
       });
 
     // console.log("checkout session created: ", session);
@@ -424,7 +422,8 @@ export const subscriptionStoreWebhook = mutation({
         const metaInterval = metadata?.interval;
         const oneTime = metaInterval === "One-time";
         const freeCall =
-          args.body.data.object.discounts[0]?.coupon === "Qd1pEJ7t";
+          args.body.data.object.discounts[0]?.coupon ===
+          process.env.STRIPE_FREE_COUPON;
         // args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
         const createdAt = new Date(
           args.body.data.object.created * 1000,
@@ -522,9 +521,10 @@ export const subscriptionStoreWebhook = mutation({
           //TODO: Add logic for organizations. Currently, it's adding the metadata in the style of artists plans, which isn't useful or accurate.
 
           if (metadata?.accountType === "organizer") {
-            await ctx.db.patch(existingUser._id, {
-              subscription: `${metadata.interval}-${metadata.plan}`,
-            });
+            console.log("patching user subscription as organizer");
+            // await ctx.db.patch(existingUser._id, {
+            //   subscription: `Organizer-${metadata.interval}`,
+            // });
             await ctx.db.patch(metadata.openCallId, {
               paid: paymentStatus === "paid" ? true : false,
               paidAt: createdAt,

@@ -904,7 +904,7 @@ export const getEventWithDetails = query({
     const eventState = event?.state as SubmissionFormState;
     const eventPublished = eventState === "published" || isAdmin;
 
-    if (!event || !eventPublished) throw new ConvexError("No event found");
+    if (!event) throw new ConvexError("No event found");
 
     const [openCalls, organizer] = await Promise.all([
       ctx.db

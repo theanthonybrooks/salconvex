@@ -85,7 +85,7 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
         )}
         readOnly
         {...rest}
-        value={hasValue ? displayValue : undefined}
+        value={hasValue ? displayValue : ""}
         type="text"
         // {formattedValue || display}
         // {timeZone && showTimeZone && (

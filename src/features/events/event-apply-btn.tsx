@@ -135,6 +135,7 @@ interface ApplyButtonProps {
   className?: string;
   detailCard?: boolean;
   publicPreview?: boolean;
+  orgPreview?: boolean;
   userPref?: UserPref | null;
   user?: User | null;
   callType?: CallType;
@@ -161,6 +162,7 @@ export const ApplyButton = ({
   appFee,
   openCall,
   publicView,
+  orgPreview,
   isPreview = false,
   className,
   detailCard,
@@ -206,7 +208,7 @@ export const ApplyButton = ({
     try {
       setPending(true);
 
-      if (!appStatus && openCall === "active" && autoApply) {
+      if (!appStatus && openCall === "active" && autoApply && !orgPreview) {
         await toggleAppActions({
           openCallId: openCallId as Id<"openCalls">,
           manualApplied: true,
@@ -227,6 +229,7 @@ export const ApplyButton = ({
   };
 
   const onBookmark = async () => {
+    if (orgPreview) return;
     // setIsBookmarked(!isBookmarked);
     toggleListAction({ bookmarked: !isBookmarked });
     try {
@@ -255,9 +258,11 @@ export const ApplyButton = ({
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
         : isPreview
           ? "Read More"
-          : isEmail
-            ? "Send Email"
-            : "Apply"
+          : orgPreview
+            ? "Test Apply"
+            : isEmail
+              ? "Send Email"
+              : "Apply"
       : openCall === "ended"
         ? appStatus !== null && !publicView
           ? appStatus.slice(0, 1).toUpperCase() +
@@ -345,7 +350,7 @@ export const ApplyButton = ({
               </AlertDialogTitle>
               <AlertDialogDescription className="text-foreground">
                 <span className="flex flex-col gap-y-2">
-                  {!appStatus && openCall === "active" && (
+                  {!orgPreview && !appStatus && openCall === "active" && (
                     <>
                       {autoApply && (
                         <>
@@ -370,7 +375,7 @@ export const ApplyButton = ({
                       )}
                     </>
                   )}
-                  {appStatus && (
+                  {!orgPreview && appStatus && (
                     <>
                       <span>
                         You&apos;ve already applied for this open call. Do you
@@ -378,13 +383,19 @@ export const ApplyButton = ({
                       </span>
                     </>
                   )}
-                  {!appStatus && openCall === "ended" && (
+                  {!orgPreview && !appStatus && openCall === "ended" && (
                     <>
                       <span>
                         This application is closed. You can&apos;t apply for
                         this open call, though you can still view it.
                       </span>
                     </>
+                  )}
+                  {orgPreview && (
+                    <span>
+                      This is a preview of your application link. You will be
+                      redirected.
+                    </span>
                   )}
                 </span>
               </AlertDialogDescription>
@@ -397,7 +408,9 @@ export const ApplyButton = ({
                 onClick={onApply}
                 className="flex items-center gap-x-1 sm:w-40"
               >
-                {!appStatus && openCall === "active" ? "Apply" : "Continue"}{" "}
+                {!orgPreview && !appStatus && openCall === "active"
+                  ? "Apply"
+                  : "Continue"}{" "}
                 {pending && <LoaderCircle className="size-4 animate-spin" />}
               </AlertDialogPrimaryAction>
             </AlertDialogFooter>
@@ -405,7 +418,7 @@ export const ApplyButton = ({
         </AlertDialog>
       )}
 
-      {!hasApplied && (
+      {!orgPreview && !hasApplied && (
         <TooltipSimple
           content={isBookmarked ? "Remove Bookmark" : "Bookmark"}
           side="top"
@@ -430,7 +443,7 @@ export const ApplyButton = ({
           </Button>
         </TooltipSimple>
       )}
-      {hasApplied && (
+      {!orgPreview && hasApplied && (
         <Button
           variant="salWithoutShadow"
           size="lg"
@@ -450,7 +463,7 @@ export const ApplyButton = ({
         // onHide={onHide}
         isHidden={isHidden}
         // setIsHidden={setIsHidden}
-        publicView={publicView || noSub}
+        publicView={publicView || noSub || orgPreview}
         appStatus={appStatus}
         eventCategory={eventCategory}
         openCallStatus={openCall}

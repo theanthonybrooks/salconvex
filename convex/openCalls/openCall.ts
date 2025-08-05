@@ -234,9 +234,10 @@ export const createOrUpdateOpenCall = mutation({
           ? "draft"
           : "submitted"
       : args.finalStep && !args.paid
-        ? //todo: figure out if I actually need to use the pending state at all vs submitted. Pending should only be when there are changes to be made to an already approved event/oc, I think
-          "submitted"
+        ? "pending"
         : args.state;
+
+    //todo: utilize the patch in stripe subscriptions to update the state from pending to submitted when it's paid
 
     const openCallData = {
       adminNoteOC: "",

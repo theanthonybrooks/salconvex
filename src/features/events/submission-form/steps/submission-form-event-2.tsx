@@ -87,9 +87,9 @@ const SubmissionFormEventStep2 = ({
         <div className="input-section">
           <p className="min-w-max font-bold lg:text-xl">
             Step{" "}
-            {categoryEvent && !eventOnly
+            {categoryEvent && !eventOnly && !isOngoing
               ? 10
-              : isOngoing || noEvent || prodOnly
+              : (!categoryEvent && isOngoing) || noEvent || prodOnly
                 ? 8
                 : 9}
             :{" "}
@@ -133,9 +133,9 @@ const SubmissionFormEventStep2 = ({
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">
                   Step{" "}
-                  {categoryEvent && !eventOnly
+                  {categoryEvent && !eventOnly && !isOngoing
                     ? 11
-                    : isOngoing || noEvent || prodOnly
+                    : (!categoryEvent && isOngoing) || noEvent || prodOnly
                       ? 9
                       : 10}
                   :
@@ -233,9 +233,9 @@ const SubmissionFormEventStep2 = ({
               <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
                   Step{" "}
-                  {categoryEvent && !eventOnly
+                  {categoryEvent && !eventOnly && !isOngoing
                     ? 12
-                    : isOngoing || noEvent || prodOnly
+                    : (!categoryEvent && isOngoing) || noEvent || prodOnly
                       ? 10
                       : 11}
                   :{" "}

@@ -76,6 +76,8 @@ const SubmissionFormOC2 = ({
 
   const orgCurrency = organizer?.location?.currency;
   const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
+  console.log("existingHasBudget: ", existingHasBudget);
+  console.log("paid call: ", paidCall);
   // const eventName = watch("event.name");
   // const eventId = watch("event._id");
   const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
@@ -85,6 +87,7 @@ const SubmissionFormOC2 = ({
         ? "true"
         : "",
   );
+  console.log("hasBudget: ", hasBudget);
 
   const showBudgetInputs = hasBudget?.trim() === "true";
 
@@ -109,6 +112,7 @@ const SubmissionFormOC2 = ({
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
+  console.log("min budget", budgetMin, "max budget", budgetMax);
 
   useEffect(() => {
     if (!paidCall) return;
@@ -119,8 +123,9 @@ const SubmissionFormOC2 = ({
 
   useEffect(() => {
     const formValue = hasBudget?.trim();
+    console.log("hasBudget", hasBudget);
     const shouldBe = validBudgetMin ? "true" : "";
-
+    console.log("shouldBe", shouldBe);
     if (!formValue && validBudgetMin) {
       setHasBudget(shouldBe);
       setValue("openCall.compensation.budget.max", budgetMin);

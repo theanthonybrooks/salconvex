@@ -52,6 +52,7 @@ interface EventContextMenuProps {
   user?: User | null;
   isBookmarked?: boolean;
   reviewMode?: boolean;
+  orgPreview?: boolean;
 }
 
 const EventContextMenu = ({

@@ -594,9 +594,9 @@ const SubmissionFormEventStep1 = ({
                 <div className="input-section h-full">
                   <p className="min-w-max font-bold lg:text-xl">
                     Step{" "}
-                    {categoryEvent && !eventOnly
+                    {categoryEvent && !eventOnly && !isOngoing
                       ? 9
-                      : isOngoing || noEvent || prodOnly
+                      : (!categoryEvent && isOngoing) || noEvent || prodOnly
                         ? 7
                         : 8}
                     :{" "}

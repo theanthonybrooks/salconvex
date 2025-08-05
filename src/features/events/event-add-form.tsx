@@ -301,6 +301,7 @@ export const EventOCForm = ({
   const hasOpenCall = validOCVals.includes(eventOpenCall) && formType !== 1;
 
   const eventName = eventData?.name;
+  const eventSlug = eventData?.slug;
   // const eventLogo = eventData?.logo;
 
   const clearEventDataTrigger =
@@ -396,7 +397,7 @@ export const EventOCForm = ({
   const prevEventRef = useRef(existingEvent);
   const validStep1 =
     activeStep > 0
-      ? !!(eventName && eventName.trim().length > 3 && !!eventDatesFormat)
+      ? !!(eventName && eventName.trim().length >= 3 && !!eventDatesFormat)
       : true;
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
@@ -405,10 +406,11 @@ export const EventOCForm = ({
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
 
-  const projectMaxBudget = ocData?.compensation?.budget?.max;
-  const projectMinBudget = ocData?.compensation?.budget?.min;
-  const projectBudget = (projectMaxBudget || projectMinBudget) ?? 0;
-  const submissionCost = getOcPricing(projectBudget);
+  const projectBudget = ocData?.compensation?.budget;
+  const projectMaxBudget = projectBudget?.max;
+  const projectMinBudget = projectBudget?.min;
+  const projectBudgetAmt = (projectMaxBudget || projectMinBudget) ?? 0;
+  const submissionCost = getOcPricing(projectBudgetAmt);
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
@@ -444,6 +446,10 @@ export const EventOCForm = ({
   //   setActiveStep(0);
   // };
 
+  const submissionUrl = `${
+    eventSlug || existingEvent?.slug
+  }/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
+
   const onSubmit = async () => {
     let url: string | undefined;
     let newTab: Window | null = null;
@@ -459,6 +465,7 @@ export const EventOCForm = ({
       console.log(existingOrg?.isComplete);
 
       await handleSave(true);
+
       if (paidCall && !alreadyPaid) {
         const result = await getCheckoutUrl({
           planKey,
@@ -469,7 +476,7 @@ export const EventOCForm = ({
               : 50,
           accountType: "organizer",
           isEligibleForFree,
-          openCallId: openCallData?._id as Id<"openCalls">,
+          openCallId: ocData?._id as Id<"openCalls">,
         });
         url = result.url;
       }
@@ -504,6 +511,9 @@ export const EventOCForm = ({
         // handleReset();
         setOpen(false);
       }
+      setTimeout(() => {
+        window.location.href = `/thelist/event/${submissionUrl}`;
+      }, 1000);
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
@@ -512,8 +522,6 @@ export const EventOCForm = ({
       }
     }
   };
-  // TODO: Convert timezone on deadline to user timezone on submit to ensure that displayed time is correct.
-  // use convertOpenCallDatesToUserTimezone()
   const handleNextStep = async () => {
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
@@ -1074,15 +1082,33 @@ export const EventOCForm = ({
             compensation: {
               budget: {
                 hasBudget:
-                  openCallData.compensation?.budget?.hasBudget ?? false,
-                min: openCallData.compensation?.budget?.min ?? 0,
-                max: openCallData.compensation?.budget?.max ?? 0,
-                rate: openCallData.compensation?.budget?.rate ?? 0,
-                unit: openCallData.compensation?.budget?.unit ?? "",
+                  projectBudget?.hasBudget ??
+                  openCallData.compensation?.budget?.hasBudget ??
+                  (formType === 3 ? true : false),
+                min:
+                  projectBudget?.min ??
+                  openCallData.compensation?.budget?.min ??
+                  0,
+                max:
+                  projectBudget?.max ??
+                  openCallData.compensation?.budget?.max ??
+                  0,
+                rate:
+                  projectBudget?.rate ??
+                  openCallData.compensation?.budget?.rate ??
+                  0,
+                unit:
+                  projectBudget?.unit ??
+                  openCallData.compensation?.budget?.unit ??
+                  "",
                 currency: orgData.location?.currency?.code ?? "",
                 allInclusive:
-                  openCallData.compensation?.budget?.allInclusive ?? false,
-                moreInfo: openCallData.compensation?.budget?.moreInfo,
+                  projectBudget?.allInclusive ??
+                  openCallData.compensation?.budget?.allInclusive ??
+                  false,
+                moreInfo:
+                  projectBudget?.moreInfo ??
+                  openCallData.compensation?.budget?.moreInfo,
               },
               categories: {
                 artistStipend:
@@ -1183,14 +1209,17 @@ export const EventOCForm = ({
             },
             compensation: {
               budget: {
-                hasBudget: openCallData.compensation.budget.hasBudget ?? false,
-                min: openCallData.compensation.budget.min,
-                max: openCallData.compensation.budget.max,
-                rate: openCallData.compensation.budget.rate,
-                unit: openCallData.compensation.budget.unit,
-                currency: openCallData.compensation.budget.currency,
-                allInclusive: openCallData.compensation.budget.allInclusive,
-                moreInfo: openCallData.compensation.budget.moreInfo,
+                hasBudget:
+                  openCallData.compensation?.budget?.hasBudget ??
+                  (formType === 3 ? true : false),
+                min: openCallData.compensation?.budget?.min ?? 0,
+                max: openCallData.compensation?.budget?.max ?? 0,
+                rate: openCallData.compensation?.budget?.rate ?? 0,
+                unit: openCallData.compensation?.budget?.unit ?? "",
+                currency: orgData.location?.currency?.code ?? "",
+                allInclusive:
+                  openCallData.compensation?.budget?.allInclusive ?? false,
+                moreInfo: openCallData.compensation?.budget?.moreInfo,
               },
               categories: {
                 artistStipend:
@@ -1395,14 +1424,16 @@ export const EventOCForm = ({
               compensation: {
                 budget: {
                   hasBudget:
-                    openCallData.compensation.budget.hasBudget ?? false,
-                  min: openCallData.compensation.budget.min,
-                  max: openCallData.compensation.budget.max,
-                  rate: openCallData.compensation.budget.rate,
-                  unit: openCallData.compensation.budget.unit,
-                  currency: openCallData.compensation.budget.currency,
-                  allInclusive: openCallData.compensation.budget.allInclusive,
-                  moreInfo: openCallData.compensation.budget.moreInfo,
+                    openCallData.compensation?.budget?.hasBudget ??
+                    (formType === 3 ? true : false),
+                  min: openCallData.compensation?.budget?.min ?? 0,
+                  max: openCallData.compensation?.budget?.max ?? 0,
+                  rate: openCallData.compensation?.budget?.rate ?? 0,
+                  unit: openCallData.compensation?.budget?.unit ?? "",
+                  currency: orgData.location?.currency?.code ?? "",
+                  allInclusive:
+                    openCallData.compensation?.budget?.allInclusive ?? false,
+                  moreInfo: openCallData.compensation?.budget?.moreInfo,
                 },
                 categories: {
                   artistStipend:
@@ -1455,6 +1486,7 @@ export const EventOCForm = ({
       }
     },
     [
+      projectBudget,
       paidCall,
       finalStep,
       alreadyPaid,

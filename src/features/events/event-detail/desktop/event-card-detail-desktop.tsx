@@ -301,7 +301,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   </p>
                 </>
               )}
-              {eventState === "submitted" && (
+              {eventState === "submitted"  && (
                 <>
                   <Separator
                     orientation="vertical"

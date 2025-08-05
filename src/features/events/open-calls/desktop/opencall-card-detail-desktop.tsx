@@ -37,6 +37,7 @@ import { api } from "~/convex/_generated/api";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
+import { Separator } from "@/components/ui/separator";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -358,6 +359,31 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 </p>
               </>
             )}
+            {!bothValid && !isAdmin && (
+              <ApplyButton
+                user={user}
+                userPref={userPref}
+                id={event._id}
+                openCallId={openCallId}
+                mainOrgId={mainOrgId}
+                slug={slug}
+                appUrl={outputAppLink}
+                appLinkformat={appLinkFormat}
+                edition={event.dates.edition}
+                openCall={openCallStatus}
+                callType={callType}
+                manualApplied={appStatus}
+                isBookmarked={bookmarked}
+                isHidden={hidden}
+                orgPreview
+                eventCategory={eventCategory}
+                appFee={basicInfo?.appFee ?? 0}
+                className="w-full"
+                detailCard
+                finalButton
+              />
+            )}
+
             {isAdmin && (
               <>
                 <ApproveBtn
@@ -401,7 +427,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 type="event"
                 size="large"
                 className={cn(
-              "xl:hidden",
+                  "xl:hidden",
                   appStatus === "accepted"
                     ? "ring-4 ring-emerald-500 ring-offset-1"
                     : appStatus === "rejected"
@@ -436,6 +462,32 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   )}
                 </span>
               </div>
+              {eventState === "draft" && (
+                <>
+                  <Separator
+                    orientation="vertical"
+                    className="mr-2 h-10 bg-foreground"
+                    thickness={2}
+                  />
+                  <p className="rounded-lg border-2 bg-stone-100 p-4 text-2xl font-bold uppercase text-foreground/60">
+                    Draft
+                  </p>
+                </>
+              )}
+              {(eventState === "submitted" ||
+                openCallState === "pending" ||
+                openCallState === "submitted") && (
+                <>
+                  <Separator
+                    orientation="vertical"
+                    className="mr-2 h-10 bg-foreground"
+                    thickness={2}
+                  />
+                  <p className="rounded-lg border-2 bg-salYellow/70 p-4 text-2xl font-bold uppercase text-foreground/60">
+                    Pending
+                  </p>
+                </>
+              )}
             </div>
             <div className="flex items-center gap-x-4 text-nowrap">
               <div className="flex flex-col items-end gap-1">
