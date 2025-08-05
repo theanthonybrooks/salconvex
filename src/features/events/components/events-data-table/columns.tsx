@@ -43,6 +43,7 @@ import {
   CheckCircle2,
   Circle,
   CircleFadingPlus,
+  DollarSign,
   LucideClipboardCopy,
   MoreHorizontal,
 } from "lucide-react";
@@ -236,9 +237,9 @@ export const columns: ColumnDef<Event>[] = [
               ocState === "draft" ? (
                 <FaRegFloppyDisk className="size-4 shrink-0" />
               ) : ocState === "submitted" ? (
-                <Circle className="size-4 shrink-0" />
-              ) : ocState === "pending" ? (
                 <CircleFadingPlus className="size-4 shrink-0" />
+              ) : ocState === "pending" ? (
+                <DollarSign className="size-4 shrink-0" />
               ) : ocState === "published" ? (
                 <CheckCircle2 className="size-4 shrink-0" />
               ) : (

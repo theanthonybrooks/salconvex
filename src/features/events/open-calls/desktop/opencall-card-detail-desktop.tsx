@@ -384,7 +384,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               />
             )}
 
-            {isAdmin && (
+            {isAdmin && !bothValid && (
               <>
                 <ApproveBtn
                   user={user}
