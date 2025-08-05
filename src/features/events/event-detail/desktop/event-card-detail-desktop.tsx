@@ -263,7 +263,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 size="large"
                 className="xl:hidden"
               />
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-2">
                 <span className="text-xl font-bold capitalize">
                   {event?.name}
                 </span>
