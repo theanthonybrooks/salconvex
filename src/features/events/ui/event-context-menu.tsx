@@ -5,13 +5,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { cn } from "@/lib/utils";
+import { capitalize, cn } from "@/lib/utils";
 import {
   CheckCircle,
   CircleX,
   Ellipsis,
   Eye,
   EyeOff,
+  Mail,
   Pencil,
 } from "lucide-react";
 import Link from "next/link";
@@ -27,6 +28,8 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { User } from "@/types/user";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation } from "convex/react";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
@@ -48,6 +51,7 @@ interface EventContextMenuProps {
   align?: "center" | "start" | "end" | undefined;
   user?: User | null;
   isBookmarked?: boolean;
+  reviewMode?: boolean;
 }
 
 const EventContextMenu = ({
@@ -66,9 +70,10 @@ const EventContextMenu = ({
   align,
   user,
   isBookmarked,
+  reviewMode = false,
 }: EventContextMenuProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
-
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -89,6 +94,14 @@ const EventContextMenu = ({
     });
     await updateUserLastActive({ email: user?.email ?? "" });
   };
+  const {
+    data: orgOwnerEmailData,
+    // isError: isOrgOwnerError,
+    // error,
+  } = useQueryWithStatus(
+    api.organizer.organizations.getOrgContactInfo,
+    mainOrgId ? { orgId: mainOrgId, eventId: eventId as Id<"events"> } : "skip",
+  );
 
   const nonAdminPublicView = publicView && !isAdmin;
 
@@ -242,6 +255,15 @@ const EventContextMenu = ({
                 >
                   Copy Org ID
                 </CopyableItem>
+              )}
+              {reviewMode && mainOrgId && (
+                <Link
+                  href={`mailto:${orgOwnerEmailData?.orgOwnerEmail ?? ""}?subject=${capitalize(orgOwnerEmailData?.eventName ?? "")} submission`}
+                  className="flex items-center gap-x-1 px-4 py-2 text-sm"
+                >
+                  <Mail className="size-4" />
+                  Contact Org
+                </Link>
               )}
             </>
           )}

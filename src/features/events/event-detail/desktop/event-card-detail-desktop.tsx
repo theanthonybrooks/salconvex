@@ -235,7 +235,17 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     thickness={2}
                     className="col-span-full mx-auto mb-2 mt-3"
                   />
-                  <ApproveBtn eventState={eventState} eventId={event._id} />
+                  <ApproveBtn
+                    user={user}
+                    eventState={eventState}
+                    eventCategory={eventCategory}
+                    eventId={event._id}
+                    openCallId={""}
+                    orgId={event.mainOrgId}
+                    openCallStatus={null}
+                    appStatus={null}
+                    isHidden={hidden}
+                  />
                 </>
               )}
             </div>

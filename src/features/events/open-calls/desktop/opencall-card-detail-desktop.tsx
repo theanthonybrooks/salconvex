@@ -358,12 +358,22 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 </p>
               </>
             )}
-            <ApproveBtn
-              eventState={eventState}
-              openCallState={openCallState}
-              eventId={event._id}
-              openCallId={openCallId}
-            />
+            {isAdmin && (
+              <>
+                <ApproveBtn
+                  user={user}
+                  eventState={eventState}
+                  eventCategory={eventCategory}
+                  openCallState={openCallState}
+                  eventId={event._id}
+                  openCallId={openCallId}
+                  orgId={event.mainOrgId}
+                  openCallStatus={openCallStatus}
+                  appStatus={appStatus}
+                  isHidden={hidden}
+                />
+              </>
+            )}
           </Card>
         </div>
       </Card>

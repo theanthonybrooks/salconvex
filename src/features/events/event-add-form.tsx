@@ -456,7 +456,6 @@ export const EventOCForm = ({
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
-      console.log("hi mom");
       console.log(existingOrg?.isComplete);
 
       await handleSave(true);

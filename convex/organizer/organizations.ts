@@ -100,6 +100,30 @@ export async function checkOrgStatus(
   };
 }
 
+export const getOrgContactInfo = query({
+  args: {
+    orgId: v.id("organizations"),
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    const org = await ctx.db.get(args.orgId);
+    if (!org) return null;
+    const orgOwner = org?.ownerId;
+    if (!orgOwner) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", orgOwner))
+      .unique();
+    if (!user) return null;
+    return {
+      orgOwnerEmail: user.email,
+      eventName: event.name,
+    };
+  },
+});
+
 export const isNewOrg = query({
   args: {
     organizationName: v.string(),

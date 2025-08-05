@@ -36,8 +36,6 @@ export const EventOrgLogo = ({
         className,
       )}
       onError={() => setImgError(true)}
-      // The above line will throw a TS error, but it works in the browser.
-      // You can add @ts-ignore if needed.
     />
   );
 };

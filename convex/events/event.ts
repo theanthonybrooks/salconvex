@@ -995,17 +995,22 @@ export const getEventWithOCDetails = query({
 
     if (!event) throw new ConvexError("Event not found");
 
+    const organizer = await ctx.db.get(event.mainOrgId);
+
+    const userIsOrganizer = user?._id === organizer?.ownerId;
+
     const openCall = await ctx.db
       .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
       .filter((q) => q.eq(q.field("basicInfo.dates.edition"), args.edition))
       // .filter((q) => q.eq(q.field("state"), "published"))
       .filter((q) =>
-        isAdmin
+        isAdmin || userIsOrganizer
           ? q.or(
               q.eq(q.field("state"), "published"),
               q.eq(q.field("state"), "archived"),
               q.eq(q.field("state"), "submitted"),
+              q.eq(q.field("state"), "pending"),
             )
           : q.or(
               q.eq(q.field("state"), "published"),
@@ -1014,8 +1019,6 @@ export const getEventWithOCDetails = query({
       )
 
       .first();
-
-    const organizer = await ctx.db.get(event.mainOrgId);
 
     if (userId && openCall) {
       application = await ctx.db

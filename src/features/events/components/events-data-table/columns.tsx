@@ -42,7 +42,7 @@ import { SubmissionFormState as OpenCallState } from "@/types/openCall";
 import {
   CheckCircle2,
   Circle,
-  DollarSign,
+  CircleFadingPlus,
   LucideClipboardCopy,
   MoreHorizontal,
 } from "lucide-react";
@@ -238,7 +238,7 @@ export const columns: ColumnDef<Event>[] = [
               ) : ocState === "submitted" ? (
                 <Circle className="size-4 shrink-0" />
               ) : ocState === "pending" ? (
-                <DollarSign className="size-4 shrink-0" />
+                <CircleFadingPlus className="size-4 shrink-0" />
               ) : ocState === "published" ? (
                 <CheckCircle2 className="size-4 shrink-0" />
               ) : (

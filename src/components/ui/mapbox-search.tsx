@@ -363,7 +363,7 @@ export const MapboxInputFull = ({
       console.log("resetting", reset);
     }
   }, [reset, handleReset]);
-  console.log(inputValue, value?.full);
+  // console.log(inputValue, "mapbox", value?.full);
 
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>

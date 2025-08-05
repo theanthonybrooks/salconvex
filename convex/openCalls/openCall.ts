@@ -234,7 +234,8 @@ export const createOrUpdateOpenCall = mutation({
           ? "draft"
           : "submitted"
       : args.finalStep && !args.paid
-        ? "pending"
+        ? //todo: figure out if I actually need to use the pending state at all vs submitted. Pending should only be when there are changes to be made to an already approved event/oc, I think
+          "submitted"
         : args.state;
 
     const openCallData = {
