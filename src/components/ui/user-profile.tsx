@@ -94,7 +94,7 @@ export function UserProfile({
               </AvatarFallback>
             </Avatar>
             {isAdmin && totalPending > 0 && (
-              <div className="absolute -bottom-1 -left-2 z-10 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-salYellow text-xs font-bold hover:scale-105 hover:cursor-pointer">
+              <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:scale-105 hover:cursor-pointer">
                 {totalPending}
               </div>
             )}
@@ -139,7 +139,7 @@ export function UserProfile({
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">
                 {totalPending > 0 ? (
-                  <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-salYellow text-xs font-bold hover:no-underline">
+                  <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
                     {totalPending}
                   </div>
                 ) : (

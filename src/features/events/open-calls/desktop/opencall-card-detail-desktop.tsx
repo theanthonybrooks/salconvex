@@ -401,7 +401,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 type="event"
                 size="large"
                 className={cn(
-                  "xl:hidden",
+              "xl:hidden",
                   appStatus === "accepted"
                     ? "ring-4 ring-emerald-500 ring-offset-1"
                     : appStatus === "rejected"
