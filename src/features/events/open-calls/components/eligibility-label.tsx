@@ -1,3 +1,8 @@
+import {
+  EuropeanCountries,
+  EuropeanEUCountries,
+  EuropeanNonEUCountries,
+} from "@/lib/locations";
 import { CheckIcon, XIcon } from "lucide-react";
 
 interface EligibilityLabelProps {
@@ -7,6 +12,22 @@ interface EligibilityLabelProps {
   preview?: boolean;
   eligible?: boolean;
   publicView?: boolean;
+}
+
+function getGroupEligibilityLabel(whom: string[]): string | null {
+  if (arraysEqualSet(whom, EuropeanEUCountries)) return "EU Artists";
+  if (arraysEqualSet(whom, EuropeanNonEUCountries))
+    return "European artists in non-EU countries";
+  if (arraysEqualSet(whom, EuropeanCountries)) return "European Artists";
+  return null;
+}
+
+function arraysEqualSet(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const setA = new Set(a);
+  const setB = new Set(b);
+  for (const val of setA) if (!setB.has(val)) return false;
+  return true;
 }
 
 export const EligibilityLabel = ({
@@ -60,9 +81,15 @@ export const EligibilityLabel = ({
     // }
     parts.push(whom[0]);
   } else if (multipleWhom) {
+    const groupLabel = getGroupEligibilityLabel(whom);
+
     if (preview) {
       if (whom.length > 2) {
-        parts.push("See app details");
+        if (groupLabel) {
+          parts.push(groupLabel);
+        } else {
+          parts.push("See app details");
+        }
       } else if (isDesktop && whom.length <= 2) {
         // parts.push("Artists from/residing in ");
         const whomString = whom.join(" or ");
@@ -84,17 +111,26 @@ export const EligibilityLabel = ({
           const whomString =
             whom.length === 2
               ? whom.join(" or ")
-              : `${whom.slice(0, -1).join(", ")}, or ${whom[whom.length - 1]}`;
+              : groupLabel
+                ? groupLabel
+                : `${whom.slice(0, -1).join(", ")}, or ${whom[whom.length - 1]}`;
           parts.push(whomString);
         } else {
+          if (groupLabel) {
+            parts.push(groupLabel);
+          }
           return (
             <div className="flex gap-1">
               <span>{type}:</span>
-              <ul>
-                {whom.map((w) => (
-                  <li key={w}>{w}</li>
-                ))}
-              </ul>
+              {groupLabel && <span className="font-medium">{groupLabel}</span>}
+
+              {!groupLabel && (
+                <ul>
+                  {whom.map((w) => (
+                    <li key={w}>{w}</li>
+                  ))}
+                </ul>
+              )}
 
               {(international || eligible) && !publicView && (
                 <CheckIcon className="size-4 shrink-0 translate-y-0.5 text-emerald-800" />
