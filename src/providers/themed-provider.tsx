@@ -25,7 +25,11 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
   return (
     <ThemeProvider
       // themes={["light", "dark", "default", "white", "system"]} //TODO: Re-enable dark and system modes once it's actually set up
-      themes={["light", "default", "white"]}
+      themes={
+        isAdmin
+          ? ["light", "dark", "default", "white", "system"]
+          : ["light", "default", "white"]
+      }
       attribute="class"
       defaultTheme={userTheme ? userTheme : "default"}
       enableSystem

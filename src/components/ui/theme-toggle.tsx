@@ -1,15 +1,21 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
+import { useMutation } from "convex/react";
 import { motion as m } from "framer-motion";
 import { useTheme } from "next-themes";
+import { api } from "~/convex/_generated/api";
 
 interface ThemeToggleProps {
   className?: string;
+  user: User | null;
 }
 
-export default function ThemeToggle({ className }: ThemeToggleProps) {
+export default function ThemeToggle({ className, user }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme();
+  const updateUserPref = useMutation(api.users.updateUserPrefs);
+  const isAdmin = user?.role?.includes("admin");
 
   const raysVariants = {
     hidden: {
@@ -75,15 +81,28 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
     <div className="flex items-center justify-center">
       <div
         className={cn(className, "cursor-pointer active:scale-90")}
-        onClick={() =>
-          theme === "default"
-            ? setTheme("light")
-            : theme === "light"
-              ? // ? setTheme("dark")
-                // : theme === "dark"
-                setTheme("white")
-              : setTheme("default")
-        }
+        onClick={async () => {
+          if (theme === "default") {
+            await updateUserPref({ theme: "light" });
+            setTheme("light");
+          } else if (theme === "light") {
+            await updateUserPref({ theme: "white" });
+            setTheme("white");
+          } else if (theme === "white" && isAdmin) {
+            await updateUserPref({ theme: "dark" });
+            setTheme("dark");
+          } else {
+            await updateUserPref({ theme: "default" });
+            setTheme("default");
+          }
+          // theme === "default"
+          // ? setTheme("light")
+          // : theme === "light"
+          // ? // ? setTheme("dark")
+          // // : theme === "dark"
+          // setTheme("white")
+          // : setTheme("default")
+        }}
       >
         <m.svg
           strokeWidth="4"

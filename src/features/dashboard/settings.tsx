@@ -88,6 +88,7 @@ export default function SettingsPage() {
 
   const user = userData?.user;
   const userType = user?.accountType;
+  const isAdmin = user?.role?.includes("admin");
   const isArtist = userType?.includes("artist");
 
   const userPrefs = userData?.userPref;
@@ -839,9 +840,13 @@ export default function SettingsPage() {
                         Default (SAL Yellow)
                       </SelectItem>
                       <SelectItem value="light">Light</SelectItem>
-                      {/* <SelectItem value="dark">Dark</SelectItem> */}
+                      {isAdmin && (
+                        <SelectItem value="dark">Dark</SelectItem>
+                      )}{" "}
                       <SelectItem value="white">White</SelectItem>
-                      {/* <SelectItem value='orange'>Orange</SelectItem> */}
+                      {isAdmin && (
+                        <SelectItem value="orange">Orange</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
