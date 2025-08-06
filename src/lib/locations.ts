@@ -33,6 +33,36 @@ export const COUNTRIES_REQUIRING_STATE = [
   "NG", // Nigeria
 ];
 
+export const EU_COUNTRIES = [
+  "AT",
+  "BE",
+  "BG",
+  "HR",
+  "CY",
+  "CZ",
+  "DK",
+  "EE",
+  "FI",
+  "FR",
+  "DE",
+  "GR",
+  "HU",
+  "IE",
+  "IT",
+  "LV",
+  "LT",
+  "LU",
+  "MT",
+  "NL",
+  "PL",
+  "PT",
+  "RO",
+  "SK",
+  "SI",
+  "ES",
+  "SE",
+];
+
 const continentOrder = [
   "North America",
   "Europe",
@@ -91,6 +121,44 @@ export const sortedGroupedCountries: Record<string, Country[]> = {};
 for (const region of continentOrder) {
   if (groupedCountries[region]) {
     sortedGroupedCountries[region] = groupedCountries[region];
+  }
+}
+
+export const enhancedGroupedCountries: Record<string, Country[]> = {};
+
+for (const region of continentOrder) {
+  if (region === "Europe" && sortedGroupedCountries["Europe"]) {
+    enhancedGroupedCountries["Europe: EU Countries"] = sortedGroupedCountries[
+      "Europe"
+    ].filter((country) => EU_COUNTRIES.includes(country.cca2));
+    enhancedGroupedCountries["Europe: Non-EU Countries"] =
+      sortedGroupedCountries["Europe"].filter(
+        (country) => !EU_COUNTRIES.includes(country.cca2),
+      );
+  } else if (sortedGroupedCountries[region]) {
+    enhancedGroupedCountries[region] = sortedGroupedCountries[region];
+  }
+}
+
+export const nestedGroupedCountries: Record<
+  string,
+  Record<string, Country[]>
+> = {};
+
+for (const region of continentOrder) {
+  if (region === "Europe" && sortedGroupedCountries["Europe"]) {
+    nestedGroupedCountries["Europe"] = {
+      "EU Countries": sortedGroupedCountries["Europe"].filter((country) =>
+        EU_COUNTRIES.includes(country.cca2),
+      ),
+      "Non-EU Countries": sortedGroupedCountries["Europe"].filter(
+        (country) => !EU_COUNTRIES.includes(country.cca2),
+      ),
+    };
+  } else if (sortedGroupedCountries[region]) {
+    nestedGroupedCountries[region] = {
+      All: sortedGroupedCountries[region],
+    };
   }
 }
 

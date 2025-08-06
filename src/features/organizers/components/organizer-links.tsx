@@ -26,6 +26,20 @@ const linkDisplayOrder: (keyof Organizer["links"])[] = [
   "youTube",
 ];
 
+const displayNames: Record<keyof Organizer["links"], string> = {
+  website: "Website",
+  email: "Email",
+  phone: "Phone",
+  linkAggregate: "Link Aggregate",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  threads: "Threads",
+  vk: "VK",
+  youTube: "YouTube",
+  address: "Address",
+  other: "Other",
+};
+
 const organizerLinkIcons: Record<keyof Organizer["links"], React.ReactNode> = {
   website: <Globe className={iconSize} />,
   email: <FaRegEnvelope className={iconSize} />,
@@ -73,10 +87,7 @@ export const OrganizerLinks = ({ organizer }: OrganizerLinksProps) => {
           if (!value || !icon) return null;
 
           return (
-            <TooltipSimple
-              key={key}
-              content={key.slice(0, 1).toUpperCase() + key.slice(1)}
-            >
+            <TooltipSimple key={key} content={displayNames[key]}>
               <a
                 key={key}
                 href={getLinkHref(key, value, orgName)}

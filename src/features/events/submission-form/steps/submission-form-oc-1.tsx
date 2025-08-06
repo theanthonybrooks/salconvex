@@ -16,7 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { sortedGroupedCountries } from "@/lib/locations";
+import { enhancedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { CallFormat, EligibilityType } from "@/types/openCall";
 import { User } from "@/types/user";
@@ -324,11 +324,12 @@ const SubmissionFormOC1 = ({
                     disabled={pastEvent}
                     values={field.value ?? []}
                     onChange={field.onChange}
-                    data={sortedGroupedCountries}
+                    data={enhancedGroupedCountries}
                     placeholder="Select eligible nationalities"
                     getItemLabel={(country) => country.name.common}
                     getItemValue={(country) => country.name.common}
                     displayLimit={isMobile ? 1 : 2}
+                    enableGroupSelect
                     // getItemValue={(country) => country.name.common}
                     searchFields={[
                       "name.common",

@@ -31,6 +31,7 @@ interface SearchMappedMultiSelectProps<T> {
   placeholder?: string;
   className?: string;
   hideGroupLabels?: boolean;
+  enableGroupSelect?: boolean;
   selectLimit?: number;
   displayLimit?: number;
   tabIndex?: number;
@@ -49,6 +50,7 @@ export function SearchMappedMultiSelect<T>({
   disabled = false,
   placeholder = "Select options",
   hideGroupLabels = false,
+  enableGroupSelect = false,
   selectLimit,
   displayLimit = 1,
   tabIndex,
@@ -106,6 +108,20 @@ export function SearchMappedMultiSelect<T>({
     },
     {},
   );
+
+  function getGroupState(
+    groupItems: T[],
+    selectedValues: string[],
+  ): "checked" | "indeterminate" | "unchecked" {
+    const itemValues = groupItems.map(getItemValue);
+    const selectedInGroup = itemValues.filter((val) =>
+      selectedValues.includes(val),
+    ).length;
+
+    if (selectedInGroup === 0) return "unchecked";
+    if (selectedInGroup === itemValues.length) return "checked";
+    return "indeterminate";
+  }
 
   const onClear = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
@@ -210,9 +226,77 @@ export function SearchMappedMultiSelect<T>({
               translate="no"
             >
               {Object.entries(filteredData).map(([group, items]) => (
+                // <CommandGroup
+                //   key={group}
+                //   {...(!hideGroupLabels && { heading: group })}
+                // >
                 <CommandGroup
                   key={group}
-                  {...(!hideGroupLabels && { heading: group })}
+                  {...(!hideGroupLabels && {
+                    heading: enableGroupSelect ? (
+                      <div
+                        className="flex cursor-pointer items-center gap-2 border-b-1.5 border-foreground/50 pb-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (
+                            isLimit &&
+                            getGroupState(items, values) === "unchecked"
+                          )
+                            return; // prevent adding over limit
+
+                          const groupItems = items;
+                          const groupItemValues = groupItems.map(getItemValue);
+                          const groupState = getGroupState(groupItems, values);
+
+                          if (
+                            groupState === "checked" ||
+                            groupState === "indeterminate"
+                          ) {
+                            // Deselect all group items
+                            onChange(
+                              values.filter(
+                                (val) => !groupItemValues.includes(val),
+                              ),
+                            );
+                          } else {
+                            const remaining = selectLimit
+                              ? selectLimit - values.length
+                              : groupItemValues.length;
+                            if (remaining < 1) return;
+                            const toAdd = groupItemValues
+                              .filter((val) => !values.includes(val))
+                              .slice(0, remaining);
+                            onChange([...values, ...toAdd]);
+                          }
+                        }}
+                      >
+                        <span
+                          className={cn(
+                            "flex cursor-pointer items-center",
+                            isLimit &&
+                              getGroupState(items, values) === "unchecked" &&
+                              "cursor-not-allowed text-foreground/50",
+                          )}
+                        >
+                          {(() => {
+                            const groupState = getGroupState(items, values);
+                            if (groupState === "checked")
+                              return <MdOutlineCheckBox className="h-4 w-4" />;
+                            if (groupState === "indeterminate")
+                              return (
+                                <MdOutlineCheckBox className="h-4 w-4 opacity-60" />
+                              );
+                            return (
+                              <MdOutlineCheckBoxOutlineBlank className="h-4 w-4" />
+                            );
+                          })()}
+                        </span>
+                        <span>{group}</span>
+                      </div>
+                    ) : (
+                      <span>{group}</span>
+                    ),
+                  })}
                 >
                   {items.map((item) => {
                     const itemValue = getItemValue(item);
