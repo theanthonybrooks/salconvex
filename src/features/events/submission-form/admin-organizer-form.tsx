@@ -346,10 +346,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const isValid =
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep1;
 
-  const projectMaxBudget = ocData?.compensation?.budget?.max;
-  const projectMinBudget = ocData?.compensation?.budget?.min;
-  const projectBudget = (projectMaxBudget || projectMinBudget) ?? 0;
-  const submissionCost = getOcPricing(projectBudget);
+  const projectBudget = ocData?.compensation?.budget;
+  const projectMaxBudget = projectBudget?.max;
+  const projectMinBudget = projectBudget?.min;
+  const projectBudgetAmt = (projectMaxBudget || projectMinBudget) ?? 0;
+  const submissionCost = getOcPricing(projectBudgetAmt);
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
@@ -960,15 +961,33 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             compensation: {
               budget: {
                 hasBudget:
-                  openCallData.compensation?.budget?.hasBudget ?? false,
-                min: openCallData.compensation?.budget?.min ?? 0,
-                max: openCallData.compensation?.budget?.max ?? 0,
-                rate: openCallData.compensation?.budget?.rate ?? 0,
-                unit: openCallData.compensation?.budget?.unit ?? "",
+                  projectBudget?.hasBudget ??
+                  openCallData.compensation?.budget?.hasBudget ??
+                  (formType === 3 ? true : false),
+                min:
+                  projectBudget?.min ??
+                  openCallData.compensation?.budget?.min ??
+                  0,
+                max:
+                  projectBudget?.max ??
+                  openCallData.compensation?.budget?.max ??
+                  0,
+                rate:
+                  projectBudget?.rate ??
+                  openCallData.compensation?.budget?.rate ??
+                  0,
+                unit:
+                  projectBudget?.unit ??
+                  openCallData.compensation?.budget?.unit ??
+                  "",
                 currency: orgData.location?.currency?.code ?? "",
                 allInclusive:
-                  openCallData.compensation?.budget?.allInclusive ?? false,
-                moreInfo: openCallData.compensation?.budget?.moreInfo,
+                  projectBudget?.allInclusive ??
+                  openCallData.compensation?.budget?.allInclusive ??
+                  false,
+                moreInfo:
+                  projectBudget?.moreInfo ??
+                  openCallData.compensation?.budget?.moreInfo,
               },
               categories: {
                 artistStipend:
@@ -1069,12 +1088,14 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             },
             compensation: {
               budget: {
-                hasBudget: openCallData.compensation.budget.hasBudget ?? false,
-                min: openCallData.compensation.budget.min,
-                max: openCallData.compensation.budget.max,
-                rate: openCallData.compensation.budget.rate,
-                unit: openCallData.compensation.budget.unit,
-                currency: openCallData.compensation.budget.currency,
+                hasBudget:
+                  openCallData.compensation?.budget?.hasBudget ??
+                  (formType === 3 ? true : false),
+                min: openCallData.compensation?.budget?.min ?? 0,
+                max: openCallData.compensation?.budget?.max ?? 0,
+                rate: openCallData.compensation?.budget?.rate ?? 0,
+                unit: openCallData.compensation?.budget?.unit ?? "",
+                currency: orgData.location?.currency?.code ?? "",
                 allInclusive: openCallData.compensation.budget.allInclusive,
                 moreInfo: openCallData.compensation.budget.moreInfo,
               },
@@ -1279,12 +1300,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               compensation: {
                 budget: {
                   hasBudget:
-                    openCallData.compensation.budget.hasBudget ?? false,
-                  min: openCallData.compensation.budget.min,
-                  max: openCallData.compensation.budget.max,
-                  rate: openCallData.compensation.budget.rate,
-                  unit: openCallData.compensation.budget.unit,
-                  currency: openCallData.compensation.budget.currency,
+                    openCallData.compensation?.budget?.hasBudget ??
+                    (formType === 3 ? true : false),
+                  min: openCallData.compensation?.budget?.min ?? 0,
+                  max: openCallData.compensation?.budget?.max ?? 0,
+                  rate: openCallData.compensation?.budget?.rate ?? 0,
+                  unit: openCallData.compensation?.budget?.unit ?? "",
+                  currency: orgData.location?.currency?.code ?? "",
                   allInclusive: openCallData.compensation.budget.allInclusive,
                   moreInfo: openCallData.compensation.budget.moreInfo,
                 },
@@ -1340,6 +1362,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       }
     },
     [
+      projectBudget,
       isAdmin,
       finalStep,
       alreadyPaid,
