@@ -95,13 +95,6 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
             await updateUserPref({ theme: "default" });
             setTheme("default");
           }
-          // theme === "default"
-          // ? setTheme("light")
-          // : theme === "light"
-          // ? // ? setTheme("dark")
-          // // : theme === "dark"
-          // setTheme("white")
-          // : setTheme("default")
         }}
       >
         <m.svg

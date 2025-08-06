@@ -817,8 +817,6 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <Palette className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      {/* 
-                      TODO: Add theme (just use useTheme() hook and set the theme to whatever they choose + add it to their preferences to load on startup on any new devices) */}
                       <Label>Theme Color</Label>
                       <p className="text-sm text-muted-foreground">
                         Choose your theme color
@@ -826,7 +824,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Select
-                    defaultValue={userPrefs?.theme ?? theme}
+                    value={selectedTheme ?? theme}
                     onValueChange={(value) => {
                       setThemePref(value);
                       setTheme(value);

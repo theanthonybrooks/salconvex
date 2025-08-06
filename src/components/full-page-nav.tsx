@@ -552,7 +552,7 @@ const FullPageNav = ({
                           );
                         }}
                         className={cn(
-                          "group flex cursor-pointer justify-start px-9 py-4",
+                          "group flex cursor-pointer justify-center px-9 py-4",
                           activeCategory === section.title &&
                             "bg-foreground/90 text-background unstroked",
                           // activeCategory === section.title &&
@@ -619,7 +619,7 @@ const FullPageNav = ({
 
               <div
                 className={cn(
-                  "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
+                  "font-foreground m-x-auto w-full border-b-2 border-foreground px-9 py-5 text-center font-tanker text-[4rem] lowercase",
                 )}
               >
                 <Link onClick={onHandleLinkClick} href={"/pricing?submit"}>
@@ -632,7 +632,7 @@ const FullPageNav = ({
                 {!isPricingPage && (
                   <div
                     className={cn(
-                      "font-foreground m-x-auto w-full border-b-2 border-foreground py-5 pl-8 font-tanker text-[4rem] lowercase",
+                      "font-foreground m-x-auto w-full border-b-2 border-foreground px-9 py-5 text-center font-tanker text-[4rem] lowercase",
                     )}
                   >
                     <Link onClick={onHandleLinkClick} href={"/pricing"}>
@@ -651,7 +651,7 @@ const FullPageNav = ({
                       setTimeout(() => setIsOpen("closed"), 1000);
                     }}
                     className={cn(
-                      "font-foreground m-x-auto w-full py-6 pl-8 font-tanker text-[3rem] lowercase active:scale-95",
+                      "font-foreground m-x-auto w-full py-6 pl-8 text-center font-tanker text-[3rem] lowercase active:scale-95",
                     )}
                   >
                     log out
