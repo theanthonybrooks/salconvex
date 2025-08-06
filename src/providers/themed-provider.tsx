@@ -21,16 +21,6 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
   // const userTheme = userPref?.theme
   const pathname = usePathname();
   const forcedTheme = pathname.startsWith("/auth") ? "default" : undefined;
-  const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    if (!isAdmin) return;
-    console.log("userTheme", userTheme);
-    console.log("theme", theme);
-    if (userTheme && theme !== userTheme) {
-      setTheme(userTheme);
-    }
-  }, [theme, userTheme, setTheme, isAdmin]);
 
   return (
     <ThemeProvider
@@ -43,7 +33,33 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
       storageKey="theme"
       forcedTheme={forcedTheme}
     >
-      {children}
+      <ThemeSync userTheme={userTheme} isAdmin={isAdmin}>
+        {children}
+      </ThemeSync>
     </ThemeProvider>
   );
+}
+
+function ThemeSync({
+  userTheme,
+  isAdmin,
+  children,
+}: {
+  userTheme?: string;
+  isAdmin: boolean | undefined;
+  children: React.ReactNode;
+}) {
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    console.log("userTheme", userTheme);
+    console.log("theme", theme);
+    if (userTheme && theme !== userTheme) {
+      console.log("setting theme");
+      setTheme(userTheme);
+    }
+  }, [theme, userTheme, setTheme, isAdmin]);
+
+  return <>{children}</>;
 }
