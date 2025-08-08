@@ -1,9 +1,18 @@
+import { PopoverSimple } from "@/components/ui/popover";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/state-accordion-test";
 import {
   EuropeanCountries,
   EuropeanEUCountries,
   EuropeanNonEUCountries,
 } from "@/lib/locations";
+import { cn } from "@/lib/utils";
 import { CheckIcon, XIcon } from "lucide-react";
+import { useState } from "react";
 
 interface EligibilityLabelProps {
   type: string | null;
@@ -11,6 +20,7 @@ interface EligibilityLabelProps {
   format?: "desktop" | "mobile";
   preview?: boolean;
   eligible?: boolean;
+  hasDetails?: boolean;
   publicView?: boolean;
 }
 
@@ -36,20 +46,23 @@ export const EligibilityLabel = ({
   format,
   preview = false,
   eligible,
+  hasDetails,
   publicView,
 }: EligibilityLabelProps) => {
-  const international = type === "International";
-  const national = type === "National";
+  const internationalType = type === "International";
+  const nationalType = type === "National";
   const multipleWhom = whom.length > 1;
   const mobilePreview = format === "mobile" && preview;
   const isMobile = format === "mobile";
   const isDesktop = format === "desktop";
+  const [fullListIsOpen, setFullListIsOpen] = useState(false);
 
   if (!type || !whom) return null;
   const parts: string[] = [];
+  const groupLabel = getGroupEligibilityLabel(whom);
 
-  if (type !== "International" && type !== "Other") {
-    if (national) {
+  if (type !== "International" && type !== "Other" && !groupLabel) {
+    if (nationalType) {
       if (!mobilePreview) {
         parts.push(`${type}:`);
       }
@@ -57,13 +70,13 @@ export const EligibilityLabel = ({
       parts.push(type);
     }
   }
-  if (whom.length === 0 || type === "International" || type === "Other") {
-    if (type === "International") {
+  if (internationalType || type === "Other") {
+    if (internationalType) {
       // return "International (all)";
       if (mobilePreview) {
-        parts.push("International");
+        parts.push(`International${hasDetails ? "*" : ""}`);
       } else {
-        parts.push("International (all)");
+        parts.push(`International (all)${hasDetails ? "*" : ""}`);
       }
     }
     if (type === "Other") {
@@ -81,8 +94,6 @@ export const EligibilityLabel = ({
     // }
     parts.push(whom[0]);
   } else if (multipleWhom) {
-    const groupLabel = getGroupEligibilityLabel(whom);
-
     if (preview) {
       if (whom.length > 2) {
         if (groupLabel) {
@@ -120,24 +131,51 @@ export const EligibilityLabel = ({
             parts.push(groupLabel);
           }
           return (
-            <div className="flex gap-1">
-              <span>{type}:</span>
-              {groupLabel && <span className="font-medium">{groupLabel}</span>}
+            <div className="w-full">
+              <section className={cn("flex gap-1")}>
+                <span>{type}:</span>
+                {groupLabel && (
+                  <span className="font-medium">{groupLabel}</span>
+                )}
 
-              {!groupLabel && (
-                <ul>
-                  {whom.map((w) => (
-                    <li key={w}>{w}</li>
-                  ))}
-                </ul>
+                {!groupLabel && (
+                  <ul>
+                    {whom.map((w) => (
+                      <li key={w}>{w}</li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+              {groupLabel && (
+                <Accordion type="multiple">
+                  <AccordionItem value="eligibility-list">
+                    <AccordionTrigger
+                      title={`
+                        ${fullListIsOpen ? "Hide" : "View"} Full List
+                      `}
+                      onClick={() => setFullListIsOpen(!fullListIsOpen)}
+                    />
+                    <AccordionContent>
+                      <ul>
+                        {whom.map((w) => (
+                          <li key={w}>{w}</li>
+                        ))}
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               )}
 
-              {(international || eligible) && !publicView && (
-                <CheckIcon className="size-4 shrink-0 translate-y-0.5 text-emerald-800" />
-              )}
-              {national && eligible === false && !publicView && (
-                <XIcon className="size-4 shrink-0 translate-y-1 text-red-600" />
-              )}
+              {/* {preview && (
+                <>
+                  {(internationalType || eligible) && !publicView && (
+                    <CheckIcon className="size-4 shrink-0 translate-y-0.5 text-emerald-800" />
+                  )}
+                  {nationalType && eligible === false && !publicView && (
+                    <XIcon className="size-4 shrink-0 translate-y-1 text-red-600" />
+                  )}
+                </>
+              )} */}
             </div>
           );
         }
@@ -146,14 +184,43 @@ export const EligibilityLabel = ({
   }
 
   return (
-    <span className="flex items-center gap-1">
-      {parts.join(" ")}
-      {(international || eligible) && !publicView && (
-        <CheckIcon className="size-4 shrink-0 text-emerald-800" />
+    <div className={cn("flex items-start gap-0.5", preview && "items-center")}>
+      <section className={cn("flex items-start gap-1")}>
+        {groupLabel && (
+          <>
+            {!mobilePreview && <span>{type}:</span>}
+            <span className="font-medium">
+              <PopoverSimple
+                content={parts.join(" ")}
+                className="w-full max-w-xl border"
+                disabled={preview}
+              >
+                <span className="flex items-center gap-1">
+                  <p>{groupLabel}</p>
+                  {!preview && (
+                    <p className="text-xs italic text-foreground/50">
+                      - Hover to view full list
+                    </p>
+                  )}
+                </span>
+              </PopoverSimple>
+            </span>
+          </>
+        )}
+
+        {!groupLabel && parts.join(" ")}
+      </section>
+
+      {preview && (
+        <>
+          {(internationalType || eligible) && !publicView && (
+            <CheckIcon className="size-4 shrink-0 text-emerald-800" />
+          )}
+          {nationalType && eligible === false && !publicView && (
+            <XIcon className="size-4 shrink-0 text-red-600" />
+          )}
+        </>
       )}
-      {national && eligible === false && !publicView && (
-        <XIcon className="size-4 shrink-0 text-red-600" />
-      )}
-    </span>
+    </div>
   );
 };

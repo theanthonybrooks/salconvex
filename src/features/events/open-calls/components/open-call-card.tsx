@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CalendarClockIcon } from "lucide-react";
+import { CalendarClockIcon, CheckIcon, X } from "lucide-react";
 
 import {
   Accordion,
@@ -100,6 +100,7 @@ const OpenCallCard = ({
       ? [artist.artistResidency.country]
       : []),
   ];
+
   // console.log(artistCountries);
   //compare this to the eligibility whom array
   const artistEligible = artistCountries.some((artistCountry) =>
@@ -107,6 +108,18 @@ const OpenCallCard = ({
       (whom) =>
         artistCountry.trim().toLowerCase() === whom.trim().toLowerCase(),
     ),
+  );
+
+  const noEligibilityParams =
+    eligibilityType === "Regional/Local" || eligibilityType === "Other";
+
+  const artistIsEligible =
+    (artistEligible || eligibilityType === "International") &&
+    !noEligibilityParams;
+  const artistNotEligible = !artistEligible && eligibilityType === "National";
+  const hasEligibilityDetails = !!(
+    typeof eligibilityDetails === "string" &&
+    eligibilityDetails?.trim().length > 0
   );
 
   const hasBudgetRange = budgetMax && budgetMax > 0 && budgetMax !== budgetMin;
@@ -181,24 +194,30 @@ const OpenCallCard = ({
                     </span>
                   </span>
                   <span>
-                    <span className="font-semibold underline underline-offset-2">
+                    <span className="flex items-center gap-1 font-semibold underline underline-offset-2">
                       Eligible:
+                      {artistIsEligible && (
+                        <CheckIcon className="size-4 shrink-0 text-emerald-800" />
+                      )}
+                      {artistNotEligible && (
+                        <X className="size-4 shrink-0 text-red-600" />
+                      )}
                     </span>
-                    <br />
+
                     <span
                       className={cn(
                         "flex items-center gap-2",
-                        !artistEligible &&
-                          eligibilityType !== "International" &&
+                        (artistNotEligible || noEligibilityParams) &&
                           "text-red-600",
-                        artistEligible && "text-emerald-800",
+                        artistIsEligible && "text-emerald-800",
                       )}
                     >
                       <EligibilityLabel
                         type={eligibilityType}
                         whom={eligibilityWhom}
                         format="mobile"
-                        eligible={artistEligible}
+                        eligible={artistIsEligible}
+                        hasDetails={hasEligibilityDetails}
                         publicView={publicPreview}
                       />
                     </span>
@@ -206,7 +225,7 @@ const OpenCallCard = ({
                   {eligibilityDetails && (
                     <div>
                       <span className="font-semibold underline underline-offset-2">
-                        More Info:
+                        More Details:
                       </span>
                       <br />
                       <RichTextDisplay
@@ -470,24 +489,37 @@ const OpenCallCard = ({
                   </span>
                 </span>
                 <span>
-                  <span className="font-semibold underline underline-offset-2">
-                    Eligible:
+                  <span className="mb-1.5 flex items-center gap-1">
+                    <p className="font-semibold underline underline-offset-2">
+                      Eligible:
+                    </p>
+                    {artistIsEligible && (
+                      <span className="flex items-center gap-1 text-xs text-emerald-800">
+                        (Eligible <CheckIcon className="size-4 shrink-0" />)
+                      </span>
+                    )}
+                    {artistNotEligible && (
+                      <span className="flex items-center text-xs text-red-600">
+                        (Not Eligible
+                        <X className="size-4 shrink-0" />)
+                      </span>
+                    )}
                   </span>
-                  <br />
+
                   <span
                     className={cn(
                       "flex items-center gap-2",
-                      !artistEligible &&
-                        eligibilityType !== "International" &&
+                      (artistNotEligible || noEligibilityParams) &&
                         "text-red-600",
-                      artistEligible && "text-emerald-800",
+                      artistIsEligible && "text-emerald-800",
                     )}
                   >
                     <EligibilityLabel
                       type={eligibilityType}
                       whom={eligibilityWhom}
                       format="desktop"
-                      eligible={artistEligible}
+                      eligible={artistIsEligible}
+                      hasDetails={hasEligibilityDetails}
                       publicView={publicPreview}
                     />
                   </span>
@@ -495,7 +527,7 @@ const OpenCallCard = ({
                 {eligibilityDetails && (
                   <div>
                     <span className="font-semibold underline underline-offset-2">
-                      More Info:
+                      More Details:
                     </span>
                     <br />
                     <RichTextDisplay

@@ -112,6 +112,17 @@ const EventCardPreview = ({
       (whom) => artistNat.trim().toLowerCase() === whom.trim().toLowerCase(),
     ),
   );
+  const noEligibilityParams =
+    eligibilityType === "Regional/Local" || eligibilityType === "Other";
+
+  const artistIsEligible =
+    (artistEligible || eligibilityType === "International") &&
+    !noEligibilityParams;
+  const artistNotEligible = !artistEligible && eligibilityType === "National";
+  const hasEligibilityDetails = !!(
+    typeof eligibility?.details === "string" &&
+    eligibility.details.trim().length > 0
+  );
   const budget = compensation?.budget;
   const {
     min: budgetMin,
@@ -335,21 +346,21 @@ const EventCardPreview = ({
                 ) : (
                   <span
                     className={cn(
-                      !artistEligible &&
+                      (artistNotEligible || noEligibilityParams) &&
                         !publicView &&
                         !publicPreview &&
-                        eligibilityType !== "International" &&
                         "text-red-600",
-                      artistEligible && "text-emerald-800",
+                      artistIsEligible && "text-emerald-800",
                     )}
                   >
                     <EligibilityLabel
                       type={eligibility.type}
                       whom={eligibility.whom}
+                      hasDetails={hasEligibilityDetails}
                       format="mobile"
                       preview={true}
                       publicView={publicView}
-                      eligible={artistEligible}
+                      eligible={artistIsEligible}
                     />
                   </span>
                 )}
@@ -646,12 +657,12 @@ const EventCardPreview = ({
                     <span
                       className={cn(
                         "hidden xl:block",
-                        !artistEligible &&
+
+                        (artistNotEligible || noEligibilityParams) &&
                           !publicView &&
                           !publicPreview &&
-                          eligibilityType !== "International" &&
                           "text-red-600",
-                        artistEligible && "text-emerald-800",
+                        artistIsEligible && "text-emerald-800",
                       )}
                     >
                       <EligibilityLabel
@@ -660,7 +671,8 @@ const EventCardPreview = ({
                         format="desktop"
                         preview={true}
                         publicView={publicView}
-                        eligible={artistEligible}
+                        eligible={artistIsEligible}
+                        hasDetails={hasEligibilityDetails}
                       />
                     </span>
                     <span

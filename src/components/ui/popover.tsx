@@ -5,6 +5,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { useState } from "react";
 
 const Popover = PopoverPrimitive.Root;
 
@@ -173,4 +174,54 @@ export {
   PopoverGroup,
   PopoverItem,
   PopoverTrigger,
+};
+
+export const PopoverSimple = ({
+  children,
+  content,
+  align = "center",
+  sideOffset = 4,
+  showCloseButton = false,
+  showArrow = true,
+  className,
+  triggerClassName,
+  disabled,
+}: {
+  children: React.ReactNode;
+  content: React.ReactNode;
+  align?: "start" | "center" | "end";
+  sideOffset?: number;
+  showCloseButton?: boolean;
+  showArrow?: boolean;
+  className?: string;
+  triggerClassName?: string;
+  disabled?: boolean;
+}) => {
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  if (disabled) return <>{children}</>;
+  return (
+    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <PopoverTrigger
+        asChild
+        onMouseOver={() => setPopoverOpen(true)}
+        onMouseLeave={() => setPopoverOpen(false)}
+        className={cn(triggerClassName, "hover:cursor-pointer")}
+      >
+        {children}
+      </PopoverTrigger>
+
+      <PopoverContent
+        align={align}
+        sideOffset={sideOffset}
+        showCloseButton={showCloseButton}
+        showArrow={showArrow}
+        className={cn(
+          "outline-hidden relative z-40 w-72 rounded-md bg-popover p-5 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          className,
+        )}
+      >
+        {content}
+      </PopoverContent>
+    </Popover>
+  );
 };
