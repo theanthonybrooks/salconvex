@@ -5,6 +5,7 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DashboardProvider } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import DashboardSideBar from "./dashboard-sidebar";
 import DashboardTopNav from "./dashbord-top-nav";
 
@@ -24,10 +25,12 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
 
   const subData = usePreloadedQuery(preloadedSubStatus);
   const subStatus = subData?.subStatus ?? "none";
-  if (!userData) {
-    router.replace("/auth/sign-in");
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      router.replace("/auth/sign-in");
+    }
+  }, [user, router]);
+
   return (
     <DashboardProvider>
       <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />

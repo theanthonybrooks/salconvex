@@ -14,23 +14,13 @@ export default async function OrganizerPage({
   const { slug } = await params;
 
   const token = await convexAuthNextjsToken();
+  if (!token) redirect("/auth/sign-in");
   const subscription = await fetchQuery(
     api.subscriptions.getUserSubscription,
     {},
     { token },
   );
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
-
-  const orgEventsData = await fetchQuery(
-    api.events.event.getUserEvents,
-    {},
-    {
-      token,
-    },
-  );
-
-  // console.log(orgEventsData);
-
   const user = userData?.user;
   const subStatus = subscription?.status;
 
@@ -43,10 +33,19 @@ export default async function OrganizerPage({
     !user?.accountType?.includes("organizer")
   ) {
     if (!subStatus || subStatus === "canceled") {
-      redirect("/thelist");
+      redirect("/pricing");
     }
     redirect("/thelist");
   }
+  const orgEventsData = await fetchQuery(
+    api.events.event.getUserEvents,
+    {},
+    {
+      token,
+    },
+  );
+
+  // console.log(orgEventsData);
 
   switch (slug) {
     case "update-event":

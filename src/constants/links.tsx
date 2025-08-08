@@ -461,7 +461,7 @@ export const dashboardNavItems: DashNavItem[] = [
   // },
   {
     label: "My Events/Projects",
-    href: "/dashboard/organizer",
+    href: "/dashboard/organizer/events",
     icon: LucideCalendar,
     section: true,
     sectionIcon: BsPersonVcard,

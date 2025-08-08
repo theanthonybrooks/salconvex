@@ -48,7 +48,7 @@ export const getUserSubscriptionStatus = query({
     const hasActiveSubscription =
       subscription?.status === "active" || subscription?.status === "trialing";
 
-    const subStatus = subscription?.status;
+    const subStatus = subscription?.status || "none";
     const hadTrial = subscription?.hadTrial || false;
     const subAmount = subscription?.amount;
     const subInterval = subscription?.interval || "none";

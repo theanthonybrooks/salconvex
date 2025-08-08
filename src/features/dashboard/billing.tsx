@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAction, usePreloadedQuery } from "convex/react";
 import { format } from "date-fns";
 
+import { CanceledBanner } from "@/components/ui/canceled-banner";
 import ConfettiBlast from "@/components/ui/confetti";
 import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
@@ -28,7 +29,7 @@ export default function BillingPage() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
-  const { subscription } = subData;
+  const { subscription, hasActiveSubscription } = subData;
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
 
@@ -55,7 +56,7 @@ export default function BillingPage() {
 
   const currentlyCanceled = cancelAtTime && cancelAtTime < now;
 
-  const subStatus = subscription?.status;
+  const subStatus = subscription?.status ?? "none";
 
   let interval: string | undefined;
   let nextInterval: string | undefined;
@@ -76,11 +77,11 @@ export default function BillingPage() {
       ? subscription.discountPercent / 100
       : 0;
 
-  console.log("subAmount: ", subAmount);
-  console.log("discountAmt: ", discountAmt);
-  console.log("discountPercent: ", discountPercent);
+  // console.log("subAmount: ", subAmount);
+  // console.log("discountAmt: ", discountAmt);
+  // console.log("discountPercent: ", discountPercent);
 
-  console.log("intervals: ", interval, nextInterval);
+  // console.log("intervals: ", interval, nextInterval);
 
   // if (subscription?.intervalNext !== undefined) {
   //   // intervalNext exists
@@ -217,6 +218,7 @@ export default function BillingPage() {
   return (
     <div className="flex w-max max-w-[100dvw] flex-col gap-6 p-6">
       {showConfetti && <ConfettiBlast active={showConfetti} />}
+      <CanceledBanner activeSub={hasActiveSubscription} subStatus={subStatus} />
 
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">
@@ -250,67 +252,71 @@ export default function BillingPage() {
                   ? "Choose Plan"
                   : "Manage Membership"}
             </Button>
-            {!subPromoCode ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleApplyCoupon();
-                }}
-                className="space-y-2"
-              >
-                <p>Have a promo code? Enter it below:</p>
-                <div className="flex items-center gap-3">
-                  <Input
-                    placeholder="Enter Promo Code"
-                    value={promoCode}
-                    disabled={promoAttempts >= 5}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                    className="flex-1 uppercase placeholder:normal-case"
-                  />
-                  {promoAttempts > 5 && (
-                    <p className="text-sm italic text-red-600">
-                      You have exceeded the maximum number of coupon attempts.
-                      Try again later.
-                    </p>
-                  )}
-                  {promoCode && promoCode.trim().length > 3 && (
-                    <Button
-                      type="submit"
-                      variant="salWithShadowHidden"
-                      className="w-fit"
-                      disabled={promoAttempts >= 5}
-                    >
-                      Apply Promo Code
-                    </Button>
-                  )}
-                </div>
-              </form>
-            ) : (
-              <div className="flex items-center justify-center gap-1 rounded-lg border-2 border-dotted border-foreground/70 bg-green-600/10 px-3 py-2 sm:gap-2">
-                <CircleCheck className="size-7 shrink-0 text-emerald-600 sm:size-5" />
-                <p className="text-center text-sm italic">
-                  A <strong>{subPromoCode}</strong> code has been applied to
-                  your subscription.{" "}
-                </p>
-
-                <TooltipSimple content="Delete Promo Code" side="top">
-                  <X
-                    className="hidden size-7 shrink-0 cursor-pointer text-red-600 hover:scale-110 active:scale-95 sm:block sm:size-5"
-                    onClick={() => setConfirmDialogOpen(true)}
-                  />
-                </TooltipSimple>
-                {confirmDialogOpen && (
-                  <ConfirmDialog
-                    label="Delete Promo Code"
-                    description="Are you sure you want to delete this promo code? You may not be able to apply it again."
-                    onConfirm={() => {
-                      onCancelPromoCode();
-                      setConfirmDialogOpen(false);
+            {hasActiveSubscription && (
+              <>
+                {!subPromoCode ? (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleApplyCoupon();
                     }}
-                    onCancel={() => setConfirmDialogOpen(false)}
-                  />
+                    className="space-y-2"
+                  >
+                    <p>Have a promo code? Enter it below:</p>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        placeholder="Enter Promo Code"
+                        value={promoCode}
+                        disabled={promoAttempts >= 5}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        className="flex-1 uppercase placeholder:normal-case"
+                      />
+                      {promoAttempts > 5 && (
+                        <p className="text-sm italic text-red-600">
+                          You have exceeded the maximum number of coupon
+                          attempts. Try again later.
+                        </p>
+                      )}
+                      {promoCode && promoCode.trim().length > 3 && (
+                        <Button
+                          type="submit"
+                          variant="salWithShadowHidden"
+                          className="w-fit"
+                          disabled={promoAttempts >= 5}
+                        >
+                          Apply Promo Code
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex items-center justify-center gap-1 rounded-lg border-2 border-dotted border-foreground/70 bg-green-600/10 px-3 py-2 sm:gap-2">
+                    <CircleCheck className="size-7 shrink-0 text-emerald-600 sm:size-5" />
+                    <p className="text-center text-sm italic">
+                      A <strong>{subPromoCode}</strong> code has been applied to
+                      your subscription.{" "}
+                    </p>
+
+                    <TooltipSimple content="Delete Promo Code" side="top">
+                      <X
+                        className="hidden size-7 shrink-0 cursor-pointer text-red-600 hover:scale-110 active:scale-95 sm:block sm:size-5"
+                        onClick={() => setConfirmDialogOpen(true)}
+                      />
+                    </TooltipSimple>
+                    {confirmDialogOpen && (
+                      <ConfirmDialog
+                        label="Delete Promo Code"
+                        description="Are you sure you want to delete this promo code? You may not be able to apply it again."
+                        onConfirm={() => {
+                          onCancelPromoCode();
+                          setConfirmDialogOpen(false);
+                        }}
+                        onCancel={() => setConfirmDialogOpen(false)}
+                      />
+                    )}
+                  </div>
                 )}
-              </div>
+              </>
             )}
 
             <Card className="w-full max-w-lg">

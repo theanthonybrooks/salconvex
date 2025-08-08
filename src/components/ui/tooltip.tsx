@@ -29,7 +29,7 @@ const CustomArrow = React.forwardRef<
       preserveAspectRatio="none"
     >
       <polygon points="0,0 30,0 15,10" fill="black" />
-      <polygon points="2,0 28,0 15,8" fill="white" />
+      <polygon points="2,0 28,0 15,8" style={{ fill: "white" }} />
     </svg>
   </TooltipPrimitive.Arrow>
 ));
@@ -107,7 +107,7 @@ export const TooltipSimple = ({
             align={align}
             alignOffset={alignOffset}
             className={cn(
-              "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
+              "group z-50 overflow-hidden rounded-md border-1.5 bg-white px-3 py-1.5 text-xs text-black",
               "opacity-0 transition-opacity duration-200",
               "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
               "pointer-events-none",

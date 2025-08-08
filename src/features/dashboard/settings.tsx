@@ -66,6 +66,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Timezone, timezones } from "@/app/data/timezones";
+import { CanceledBanner } from "@/components/ui/canceled-banner";
 import { Link } from "@/components/ui/custom-link";
 import AvatarUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
@@ -94,6 +95,7 @@ export default function SettingsPage() {
   const userPrefs = userData?.userPref;
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
+  const subStatus = subData?.subStatus ?? "none";
 
   const sessionCount = useQuery(
     api.users.countSessions,
@@ -453,6 +455,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
+      <CanceledBanner activeSub={activeSub} subStatus={subStatus} />
       {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>

@@ -2,6 +2,7 @@
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { Button } from "@/components/ui/button";
+import { CanceledBanner } from "@/components/ui/canceled-banner";
 import {
   Card,
   CardContent,
@@ -11,13 +12,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
-import { supportEmail } from "@/constants/siteInfo";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/lib/applicationFns";
 import { getEventCategoryLabel } from "@/lib/eventFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
-import { usePreloadedQuery, useQuery } from "convex/react";
+import { usePreloadedQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import {
   EyeOff,
@@ -35,7 +35,6 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FaExclamationTriangle } from "react-icons/fa";
 import { FaGear, FaRegBookmark } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
@@ -86,6 +85,11 @@ export default function Dashboard() {
     api.newsletter.subscriber.getNewsletterSubscribers,
     isAdmin ? {} : "skip",
   );
+  const { data: artistData } = useQueryWithStatus(
+    api.artists.applications.getArtistApplications,
+    isArtist || isAdmin ? {} : "skip",
+  );
+  //  const artistData = useQuery(api.artists.applications.getArtistApplications);
   const totalUsers = totalUsersData ?? 0;
   const totalNewsletterSubs = totalNewsletterSubsData?.totalSubscribers ?? 0;
   const totalOpenCalls = totalOpenCallsData?.totalOpenCalls ?? 0;
@@ -98,7 +102,6 @@ export default function Dashboard() {
   const pendingOpenCalls = totalOpenCallsData?.pendingOpenCalls ?? 0;
   const totalPending = pendingOpenCalls + pendingEvents;
 
-  const artistData = useQuery(api.artists.applications.getArtistApplications);
   const { applications, listActions } = artistData ?? {};
   const bookmarkedEvents = listActions?.filter((la) => la.bookmarked === true);
   const hiddenEvents = listActions?.filter((la) => la.hidden === true);
@@ -124,46 +127,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      {!hasActiveSubscription && (
-        <>
-          {subStatus === "past_due" && (
-            <div className="mt-2 inline-flex items-center gap-1 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
-              <FaExclamationTriangle className="color-red-600 mr-2 size-10 shrink-0" />
-
-              <p>
-                Your membership is past due. Please{" "}
-                <Link
-                  className="underline underline-offset-2"
-                  href="/dashboard/account/billing"
-                >
-                  check your payment method
-                </Link>{" "}
-                and try again or{" "}
-                <Link
-                  className="underline underline-offset-2"
-                  href={`mailto:${supportEmail}?Subject=Past Due Subscription`}
-                >
-                  contact support
-                </Link>{" "}
-                if you think this is an error.
-              </p>
-            </div>
-          )}
-          {subStatus === "canceled" && (
-            <span className="mt-2 inline-flex items-center gap-1 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
-              <FaExclamationTriangle className="color-red-600 mr-2 size-10 shrink-0" />
-              Your membership has been canceled. Please
-              <Link
-                className="underline underline-offset-2"
-                href={`mailto:${supportEmail}?Subject=Canceled Subscription`}
-              >
-                contact support
-              </Link>
-              if this is incorrect.
-            </span>
-          )}
-        </>
-      )}
+      <CanceledBanner activeSub={hasActiveSubscription} subStatus={subStatus} />
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-2 text-foreground">

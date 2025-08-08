@@ -6,10 +6,10 @@ import { UserPref } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
 import { ThemeProvider, useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
-import React, { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 
 interface ThemedProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   userPref?: UserPref;
 }
 
@@ -21,6 +21,7 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
   // const userTheme = userPref?.theme
   const pathname = usePathname();
   const forcedTheme = pathname.startsWith("/auth") ? "default" : undefined;
+  const user = userData?.user;
 
   return (
     <ThemeProvider
@@ -37,7 +38,7 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
       storageKey="theme"
       forcedTheme={forcedTheme}
     >
-      <ThemeSync userTheme={userTheme} isAdmin={isAdmin}>
+      <ThemeSync userTheme={userTheme} hasUser={!!user}>
         {children}
       </ThemeSync>
     </ThemeProvider>
@@ -45,25 +46,24 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
 }
 
 function ThemeSync({
+  hasUser,
   userTheme,
-  isAdmin,
   children,
 }: {
+  hasUser?: boolean;
   userTheme?: string;
-  isAdmin: boolean | undefined;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    if (!isAdmin) return;
-    console.log("userTheme", userTheme);
-    console.log("theme", theme);
-    if (userTheme && theme !== userTheme) {
-      console.log("setting theme");
+    if (!hasUser) {
+      setTheme("default");
+      return;
+    } else if (userTheme && theme !== userTheme) {
       setTheme(userTheme);
     }
-  }, [theme, userTheme, setTheme, isAdmin]);
+  }, [theme, userTheme, setTheme, hasUser]);
 
   return <>{children}</>;
 }
