@@ -1,10 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { PendingThemeContext } from "@/providers/themed-provider";
 import { User } from "@/types/user";
 import { useMutation } from "convex/react";
 import { motion as m } from "framer-motion";
+import { debounce } from "lodash";
 import { useTheme } from "next-themes";
+import { useContext, useRef } from "react";
 import { api } from "~/convex/_generated/api";
 
 interface ThemeToggleProps {
@@ -14,8 +17,25 @@ interface ThemeToggleProps {
 
 export default function ThemeToggle({ className, user }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme();
+  const { setPendingTheme } = useContext(PendingThemeContext);
+
   const updateUserPref = useMutation(api.users.updateUserPrefs);
   const isAdmin = user?.role?.includes("admin");
+
+  const debouncedUpdate = useRef(
+    debounce((themeValue: string) => {
+      updateUserPref({ theme: themeValue }).catch(console.error);
+    }, 400),
+  ).current;
+
+  const handleClick = async (nextTheme: string) => {
+    setPendingTheme(nextTheme);
+    setTheme(nextTheme);
+    // await updateUserPref({ theme: nextTheme }).catch((e) => {
+    //   console.error(e);
+    // });
+    debouncedUpdate(nextTheme);
+  };
 
   const raysVariants = {
     hidden: {
@@ -103,14 +123,11 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
           else if (theme === "white" && isAdmin) nextTheme = "dark";
           else nextTheme = "default";
 
-          setTheme(nextTheme); // update UI immediately (localStorage, class, etc.)
-          // fire and forget
-          updateUserPref({ theme: nextTheme }).catch((e) => {
-            console.error(e);
-            // Optionally: handle errors (notification/snackbar)
-            // Optionally: revert to previous theme if you want strict sync, but most apps just ignore
-            // setTheme(theme);
-          });
+          // setTheme(nextTheme);
+          handleClick(nextTheme);
+          // updateUserPref({ theme: nextTheme }).catch((e) => {
+          //   console.error(e);
+          // });
         }}
       >
         <m.svg
