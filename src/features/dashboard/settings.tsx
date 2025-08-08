@@ -829,8 +829,8 @@ export default function SettingsPage() {
                   <Select
                     value={selectedTheme ?? theme}
                     onValueChange={(value) => {
-                      setThemePref(value);
                       setTheme(value);
+                      setThemePref(value);
                     }}
                   >
                     <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">

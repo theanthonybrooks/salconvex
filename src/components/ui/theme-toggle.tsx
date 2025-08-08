@@ -81,20 +81,36 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
     <div className="flex items-center justify-center">
       <div
         className={cn(className, "cursor-pointer active:scale-90")}
-        onClick={async () => {
-          if (theme === "default") {
-            await updateUserPref({ theme: "light" });
-            setTheme("light");
-          } else if (theme === "light") {
-            await updateUserPref({ theme: "white" });
-            setTheme("white");
-          } else if (theme === "white" && isAdmin) {
-            await updateUserPref({ theme: "dark" });
-            setTheme("dark");
-          } else {
-            await updateUserPref({ theme: "default" });
-            setTheme("default");
-          }
+        // onClick={async () => {
+        //   if (theme === "default") {
+        //     await updateUserPref({ theme: "light" });
+        //     setTheme("light");
+        //   } else if (theme === "light") {
+        //     await updateUserPref({ theme: "white" });
+        //     setTheme("white");
+        //   } else if (theme === "white" && isAdmin) {
+        //     await updateUserPref({ theme: "dark" });
+        //     setTheme("dark");
+        //   } else {
+        //     await updateUserPref({ theme: "default" });
+        //     setTheme("default");
+        //   }
+        // }}
+        onClick={() => {
+          let nextTheme: string;
+          if (theme === "default") nextTheme = "light";
+          else if (theme === "light") nextTheme = "white";
+          else if (theme === "white" && isAdmin) nextTheme = "dark";
+          else nextTheme = "default";
+
+          setTheme(nextTheme); // update UI immediately (localStorage, class, etc.)
+          // fire and forget
+          updateUserPref({ theme: nextTheme }).catch((e) => {
+            console.error(e);
+            // Optionally: handle errors (notification/snackbar)
+            // Optionally: revert to previous theme if you want strict sync, but most apps just ignore
+            // setTheme(theme);
+          });
         }}
       >
         <m.svg
