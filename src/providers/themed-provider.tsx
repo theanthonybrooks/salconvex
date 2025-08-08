@@ -30,7 +30,6 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
   const userData = usePreloadedQuery(preloadedUserData);
   const userTheme = userData?.userPref?.theme;
   const isAdmin = userData?.user?.role?.includes("admin");
-  // const userTheme = userPref?.theme
   const pathname = usePathname();
   const forcedTheme = pathname.startsWith("/auth") ? "default" : undefined;
   const user = userData?.user;
@@ -80,15 +79,6 @@ function ThemeSync({
     if (!hasUser) setTheme("default");
     else if (userTheme && theme !== userTheme) setTheme(userTheme);
   }, [theme, userTheme, setTheme, hasUser, pendingTheme]);
-  //   useEffect(() => {
-  //   if (pendingTheme) return;
-  //   if (!hasUser) {
-  //     setTheme("default");
-  //     return;
-  //   } else if (userTheme && theme !== userTheme) {
-  //     setTheme(userTheme);
-  //   }
-  // }, [theme, userTheme, setTheme, hasUser, pendingTheme]);
 
   return <>{children}</>;
 }

@@ -31,9 +31,6 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
   const handleClick = async (nextTheme: string) => {
     setPendingTheme(nextTheme);
     setTheme(nextTheme);
-    // await updateUserPref({ theme: nextTheme }).catch((e) => {
-    //   console.error(e);
-    // });
     debouncedUpdate(nextTheme);
   };
 

@@ -483,7 +483,7 @@ const FullPageNav = ({
               <Unauthenticated>
                 <div
                   className={cn(
-                    "font-foreground m-x-auto flex w-full gap-3 border-b-2 border-foreground px-9 py-6 font-tanker text-[3rem] lowercase",
+                    "font-foreground m-x-auto flex w-full justify-center gap-3 border-b-2 border-foreground px-9 py-6 font-tanker text-[3rem] lowercase",
                   )}
                 >
                   <Link onClick={onHandleLinkClick} href={"/auth/sign-in"}>
@@ -579,7 +579,7 @@ const FullPageNav = ({
                               duration: 0.4,
                               ease: "easeInOut",
                             }}
-                            className="overflow-hidden pl-6 text-[2.5rem]"
+                            className="overflow-hidden text-[2.5rem]"
                           >
                             <ul className="select-none">
                               {filteredItems
@@ -591,7 +591,7 @@ const FullPageNav = ({
                                 .map((item) => (
                                   <li
                                     key={`${item.title}-${item.category}-mobileItem`}
-                                    className="pl-4"
+                                    className="text-center"
                                   >
                                     <Link
                                       href={item.path}
@@ -645,16 +645,16 @@ const FullPageNav = ({
                 )}
               </Unauthenticated>
               <Authenticated>
-                <SignOutBtn email={user?.email}>
+                <SignOutBtn email={user?.email} className="underline-offset-4">
                   <div
                     onClick={() => {
                       setTimeout(() => setIsOpen("closed"), 1000);
                     }}
                     className={cn(
-                      "font-foreground m-x-auto w-full py-6 pl-8 text-center font-tanker text-[3rem] lowercase active:scale-95",
+                      "font-foreground m-x-auto w-full px-9 py-6 text-center font-tanker text-[3rem] lowercase active:scale-95",
                     )}
                   >
-                    log out
+                    Log out
                   </div>
                 </SignOutBtn>
               </Authenticated>
