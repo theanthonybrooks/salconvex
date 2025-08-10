@@ -21,6 +21,7 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
 
   const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
+  const userPref = userData?.userPref ?? null;
   const role = user?.role;
 
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -36,7 +37,12 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
       <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />
 
       <div className="flex flex-1">
-        <DashboardSideBar user={user} subStatus={subStatus} role={role} />
+        <DashboardSideBar
+          user={user}
+          subStatus={subStatus}
+          role={role}
+          userPref={userPref}
+        />
         <main className="scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-200">
           {children}
         </main>

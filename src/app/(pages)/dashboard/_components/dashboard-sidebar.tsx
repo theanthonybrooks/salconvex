@@ -9,7 +9,7 @@ import {
 } from "@/constants/links";
 import { Search } from "@/features/Sidebar/Search";
 import { cn } from "@/lib/utils";
-import { User } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 import clsx from "clsx";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
@@ -47,12 +47,14 @@ interface DashboardSideBarProps {
   subStatus: string | undefined;
   role: string[] | undefined;
   user: User | null;
+  userPref: UserPref | null;
 }
 
 export default function DashboardSideBar({
   subStatus,
   role,
   user,
+  userPref,
 }: DashboardSideBarProps) {
   const pathname = usePathname();
   const {
@@ -67,6 +69,7 @@ export default function DashboardSideBar({
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
   const userType = user?.accountType;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,
@@ -182,11 +185,12 @@ export default function DashboardSideBar({
                     prefetch={true}
                     href={item.href}
                     className={clsx(
-                      "flex items-center gap-2 px-3 py-5 text-sm transition-colors",
+                      "flex items-center gap-2 px-3 py-5 transition-colors",
                       pathname === item.href
                         ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
                         : "text-primary hover:bg-primary/10 hover:text-foreground",
                       !collapsedSidebar ? "pl-5" : "justify-center",
+                      fontSize === "text-base" ? "sm:text-base" : "text-sm",
                     )}
                     onClick={() => {
                       handleSectionToggle(null);
@@ -227,7 +231,8 @@ export default function DashboardSideBar({
                     >
                       <div
                         className={cn(
-                          "flex flex-col gap-2 py-4 text-sm transition-colors",
+                          "flex flex-col gap-2 py-4 transition-colors",
+                          fontSize,
                           pathname.includes(section.href)
                             ? "font-bold"
                             : "text-primary hover:bg-primary/10 hover:text-foreground",
@@ -338,7 +343,10 @@ export default function DashboardSideBar({
                                   prefetch={true}
                                   href={sectionItem.href}
                                   className={clsx(
-                                    "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                                    "flex items-center justify-between gap-2 rounded-lg px-3 py-2 transition-colors",
+                                    fontSize === "text-base"
+                                      ? "sm:text-base"
+                                      : "text-sm",
                                     pathname === sectionItem.href
                                       ? "bg-primary/10 pl-3 text-primary hover:bg-primary/20"
                                       : "pl-3 text-primary hover:bg-primary/10 hover:text-foreground",
@@ -398,7 +406,8 @@ export default function DashboardSideBar({
                   prefetch={true}
                   href={item.href}
                   className={clsx(
-                    "flex items-center justify-center gap-2 py-5 text-center text-sm transition-colors",
+                    "flex items-center justify-center gap-2 py-5 text-center transition-colors",
+                    fontSize === "text-base" ? "sm:text-base" : "text-sm",
                     pathname === item.href
                       ? "bg-primary/10 text-primary hover:bg-primary/20"
                       : "text-primary hover:bg-primary/10 hover:text-foreground",

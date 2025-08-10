@@ -94,6 +94,7 @@ export default function SettingsPage() {
   const isArtist = userType?.includes("artist");
 
   const userPrefs = userData?.userPref;
+  const fontSize = userPrefs?.fontSize === "large" ? "text-base" : "text-sm";
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
   const subStatus = subData?.subStatus ?? "none";
@@ -518,7 +519,9 @@ export default function SettingsPage() {
                 <form onSubmit={updateHandleSubmit(handleUpdateUserSubmit)}>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName" className={fontSize}>
+                        First Name
+                      </Label>
                       <Input
                         {...updateRegister("firstName")}
                         disabled={pending}
@@ -528,7 +531,9 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName" className={fontSize}>
+                        Last Name
+                      </Label>
                       <Input
                         disabled={pending}
                         {...updateRegister("lastName")}
@@ -538,7 +543,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">
+                      <Label htmlFor="email" className={fontSize}>
                         Email{" "}
                         <i className="text-xs font-light">
                           (Updating will require re-verifying*)
@@ -558,7 +563,9 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-start gap-x-2">
-                        <Label htmlFor="name">Artist Name/Preferred Name</Label>
+                        <Label htmlFor="name" className={fontSize}>
+                          Artist Name/Preferred Name
+                        </Label>
                         <p className="text-sm font-light italic">(Optional)</p>
                       </div>
                       <Input
@@ -616,7 +623,7 @@ export default function SettingsPage() {
                   {/* <div className='flex items-center justify-between'>
                    //TODO: Add language selection in the future 
                      <div className='space-y-0.5'>
-                      <Label>Language</Label>
+                      <Label className={fontSize}>Language</Label>
                       <p className='text-sm text-muted-foreground'>
                         Select your preferred language
                       </p>
@@ -636,7 +643,7 @@ export default function SettingsPage() {
                   <Separator />*/}
                   <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="space-y-0.5">
-                      <Label>Timezone</Label>
+                      <Label className={fontSize}>Timezone</Label>
                       <span
                         className={cn(
                           "flex items-center gap-x-1",
@@ -663,7 +670,7 @@ export default function SettingsPage() {
                       ]}
                       value={selectedTimezone ?? "Europe/Berlin"}
                       onChange={setTimezone}
-                      // className='w-full sm:w-[280px]'
+                      className={fontSize === "text-base" ? "sm:text-base" : ""}
                       data={timezones[0]}
                       getItemLabel={(timezone) =>
                         `${timezone.gmtAbbreviation}  - ${timezone.name} (${
@@ -688,7 +695,7 @@ export default function SettingsPage() {
                   {/* //TODO: Add this back in when I implement the currency conversion logic */}
                   {/*     <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="space-y-0.5">
-                      <Label>Currency</Label>
+                      <Label className={fontSize}>Currency</Label>
                       <p className="text-sm text-muted-foreground">
                         Set your preferred currency
                       </p>
@@ -724,7 +731,7 @@ export default function SettingsPage() {
                   {isArtist && (
                     <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                       <div className="space-y-0.5">
-                        <Label>Auto-Apply</Label>
+                        <Label className={fontSize}>Auto-Apply</Label>
 
                         <p className="text-xs text-muted-foreground">
                           Automatically mark open calls as &quot;Applied&quot;
@@ -737,7 +744,14 @@ export default function SettingsPage() {
                           setAutoApply(value === "true")
                         }
                       >
-                        <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
+                        <SelectTrigger
+                          className={cn(
+                            "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                            fontSize === "text-base"
+                              ? "sm:text-base"
+                              : fontSize,
+                          )}
+                        >
                           <SelectValue placeholder="Select One" />
                         </SelectTrigger>
                         <SelectContent>
@@ -767,7 +781,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <Bell className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <Label>Push Notifications</Label>
+                      <Label className={fontSize}>Push Notifications</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive push notifications
                       </p>
@@ -780,7 +794,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <Mail className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <Label>Email Notifications</Label>
+                      <Label className={fontSize}>Email Notifications</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive email updates
                       </p>
@@ -793,7 +807,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <Globe className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <Label>Marketing Emails</Label>
+                      <Label className={fontSize}>Marketing Emails</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive marketing emails
                       </p>
@@ -818,7 +832,7 @@ export default function SettingsPage() {
                   <div className='flex items-center gap-4'>
                     <Moon className='h-5 w-5 text-muted-foreground' />
                     <div>
-                      <Label>Dark Mode</Label>
+                      <Label className={fontSize}>Dark Mode</Label>
                       <p className='text-sm text-muted-foreground'>
                         Toggle dark mode <i>(coming soon)</i>
                       </p>
@@ -831,7 +845,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <Palette className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <Label>Theme Color</Label>
+                      <Label className={fontSize}>Theme Color</Label>
                       <p className="text-sm text-muted-foreground">
                         Choose your theme color
                       </p>
@@ -845,7 +859,12 @@ export default function SettingsPage() {
                       setThemePref(value);
                     }}
                   >
-                    <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
+                    <SelectTrigger
+                      className={cn(
+                        "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                        fontSize === "text-base" ? "sm:text-base" : fontSize,
+                      )}
+                    >
                       <SelectValue placeholder="Select color" />
                     </SelectTrigger>
                     <SelectContent>
@@ -867,7 +886,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <FontSizeIcon className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <Label>Text Size</Label>
+                      <Label className={fontSize}>Text Size</Label>
                       <p className="text-sm text-muted-foreground">
                         Choose your display text size
                       </p>
@@ -880,7 +899,12 @@ export default function SettingsPage() {
                       setFontSize(value);
                     }}
                   >
-                    <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
+                    <SelectTrigger
+                      className={cn(
+                        "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                        fontSize === "text-base" ? "sm:text-base" : fontSize,
+                      )}
+                    >
                       <SelectValue placeholder="Select text size" />
                     </SelectTrigger>
                     <SelectContent>
@@ -907,7 +931,7 @@ export default function SettingsPage() {
                     <div className='flex items-center gap-4'>
                       <Lock className='h-5 w-5 text-muted-foreground' />
                       <div>
-                        <Label>Two-Factor Authentication</Label>
+                        <Label className={fontSize}>Two-Factor Authentication</Label>
                         <p className='text-sm text-muted-foreground'>
                           Add an extra layer of security
                         </p>
@@ -923,7 +947,7 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-4">
                       <Shield className="h-5 w-5 text-muted-foreground" />
                       <div>
-                        <Label>Password</Label>
+                        <Label className={fontSize}>Password</Label>
                         <p className="text-sm text-muted-foreground">
                           Change your password
                         </p>
@@ -955,7 +979,10 @@ export default function SettingsPage() {
                           className="space-y-2"
                         >
                           <div className="space-y-1">
-                            <Label htmlFor="current" className="text-right">
+                            <Label
+                              htmlFor="current"
+                              className={cn("text-right", fontSize)}
+                            >
                               Current password
                             </Label>
                             <div className="relative">
@@ -1053,7 +1080,7 @@ export default function SettingsPage() {
                 <CardDescription>Manage your active sessions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className={cn("space-y-4", fontSize)}>
                   <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <p className="font-medium">Current Session</p>
                     <div>
