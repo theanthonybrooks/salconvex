@@ -8,6 +8,7 @@ import {
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { siteUrl } from "@/constants/siteInfo";
 import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
+import { isAppleUA } from "@/lib/appleFns";
 import { cn } from "@/lib/utils";
 import { PostHogProvider } from "@/providers/posthog-provider";
 import { ThemedProvider } from "@/providers/themed-provider";
@@ -20,6 +21,7 @@ import { preloadQuery } from "convex/nextjs";
 import { GeistSans } from "geist/font/sans";
 import "leaflet/dist/leaflet.css";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer } from "react-toastify";
 import { api } from "~/convex/_generated/api";
@@ -62,6 +64,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const ua = (await headers()).get("user-agent") ?? "";
+  const appleClass = isAppleUA(ua) ? "apple-webkit-fix" : "";
   const token = await convexAuthNextjsToken();
   const preloadedUserData = await preloadQuery(
     api.users.getCurrentUser,
@@ -76,7 +80,7 @@ export default async function RootLayout({
 
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning className={appleClass}>
         <head>
           {/* <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' /> */}
         </head>
@@ -89,6 +93,7 @@ export default async function RootLayout({
             // "default:font-spaceGrotesk",
 
             // " scrollable invis darkbar antialiased",
+
             tankerReg.variable,
             spaceMono.variable,
             libreFranklin.variable,

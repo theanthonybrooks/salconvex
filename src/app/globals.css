@@ -375,6 +375,13 @@ a {
   scroll-margin-top: 6rem;
 }
 
+.apple-webkit-fix {
+  & ul,
+  ol {
+    list-style-position: inside;
+  }
+}
+
 /* ----------- Components ------------ */
 
 .search {
@@ -1360,15 +1367,8 @@ div:has(> div.react-datepicker__input-container) {
       /* margin-left: 1.25em; */
       padding-left: 1.25em;
     }
-    /* // reverts to pre-tailwind preflight */
     list-style: revert;
-    /* margin-left: 1.25em;
-    padding-left: 1.25em; */
     list-style-position: outside;
-    @supports (-webkit-touch-callout: none) {
-      list-style-position: inside;
-      padding-left: 1rem; /* match other browsers’ alignment */
-    }
   }
   & > ul:not([data-type="taskList"]) {
     list-style-type: disc;
