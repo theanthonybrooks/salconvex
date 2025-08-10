@@ -44,8 +44,8 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
             : ["light", "default", "white"]
         }
         attribute="class"
-        defaultTheme={userTheme ? userTheme : "default"}
-        enableSystem
+        defaultTheme="default"
+        enableSystem={false} //TODO: Re-enable dark and system modes once it's actually set up
         disableTransitionOnChange
         storageKey="theme"
         forcedTheme={forcedTheme}
@@ -68,14 +68,15 @@ function ThemeSync({
   children: ReactNode;
 }) {
   const { theme, setTheme } = useTheme();
-  const { pendingTheme, setPendingTheme } = useContext(PendingThemeContext);
+  const { pendingTheme } = useContext(PendingThemeContext);
 
-  useEffect(() => {
-    if (pendingTheme && userTheme === pendingTheme) setPendingTheme(null);
-  }, [pendingTheme, userTheme, setPendingTheme]);
+  // useEffect(() => {
+  //   if (pendingTheme && userTheme === pendingTheme) setPendingTheme(null);
+  // }, [pendingTheme, userTheme, setPendingTheme]);
 
   useEffect(() => {
     if (pendingTheme) return;
+
     if (!hasUser) setTheme("default");
     else if (userTheme && theme !== userTheme) setTheme(userTheme);
   }, [theme, userTheme, setTheme, hasUser, pendingTheme]);

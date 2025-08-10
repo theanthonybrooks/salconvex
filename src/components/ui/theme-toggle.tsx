@@ -24,7 +24,7 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
 
   const debouncedUpdate = useRef(
     debounce((themeValue: string) => {
-      updateUserPref({ theme: themeValue }).catch(console.error);
+      return updateUserPref({ theme: themeValue });
     }, 400),
   ).current;
 
@@ -32,6 +32,8 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
     setPendingTheme(nextTheme);
     setTheme(nextTheme);
     debouncedUpdate(nextTheme);
+    await debouncedUpdate.flush();
+    setPendingTheme(null);
   };
 
   const raysVariants = {
@@ -70,25 +72,6 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
     },
   };
 
-  // const shineVariant = {
-  //   hidden: {
-  //     opacity: 0,
-  //     scale: 3,
-  //     strokeDasharray: "20, 1000",
-  //     strokeDashoffset: 0,
-  //     filter: "blur(0px)",
-  //   },
-  //   visible: {
-  //     opacity: [0, 1, 0],
-  //     strokeDashoffset: [0, -50, -100],
-  //     filter: ["blur(2px)", "blur(2px)", "blur(0px)"],
-  //     transition: {
-  //       duration: 0.75,
-  //       ease: "linear",
-  //     },
-  //   },
-  // }
-
   const sunPath =
     "M70 49.5C70 60.8218 60.8218 70 49.5 70C38.1782 70 29 60.8218 29 49.5C29 38.1782 38.1782 29 49.5 29C60 29 69.5 38 70 49.5Z";
   const moonPath =
@@ -98,33 +81,13 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
     <div className="flex items-center justify-center">
       <div
         className={cn(className, "cursor-pointer active:scale-90")}
-        // onClick={async () => {
-        //   if (theme === "default") {
-        //     await updateUserPref({ theme: "light" });
-        //     setTheme("light");
-        //   } else if (theme === "light") {
-        //     await updateUserPref({ theme: "white" });
-        //     setTheme("white");
-        //   } else if (theme === "white" && isAdmin) {
-        //     await updateUserPref({ theme: "dark" });
-        //     setTheme("dark");
-        //   } else {
-        //     await updateUserPref({ theme: "default" });
-        //     setTheme("default");
-        //   }
-        // }}
         onClick={() => {
           let nextTheme: string;
           if (theme === "default") nextTheme = "light";
           else if (theme === "light") nextTheme = "white";
           else if (theme === "white" && isAdmin) nextTheme = "dark";
           else nextTheme = "default";
-
-          // setTheme(nextTheme);
           handleClick(nextTheme);
-          // updateUserPref({ theme: nextTheme }).catch((e) => {
-          //   console.error(e);
-          // });
         }}
       >
         <m.svg
