@@ -66,6 +66,8 @@ export default async function RootLayout({
 }>) {
   const ua = (await headers()).get("user-agent") ?? "";
   const appleClass = isAppleUA(ua) ? "apple-webkit-fix" : "";
+  console.log(appleClass, ua);
+
   const token = await convexAuthNextjsToken();
   const preloadedUserData = await preloadQuery(
     api.users.getCurrentUser,
@@ -80,7 +82,7 @@ export default async function RootLayout({
 
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang="en" suppressHydrationWarning className={appleClass}>
+      <html lang="en" suppressHydrationWarning>
         <head>
           {/* <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' /> */}
         </head>
@@ -93,7 +95,7 @@ export default async function RootLayout({
             // "default:font-spaceGrotesk",
 
             // " scrollable invis darkbar antialiased",
-
+            appleClass,
             tankerReg.variable,
             spaceMono.variable,
             libreFranklin.variable,

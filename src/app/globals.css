@@ -375,13 +375,6 @@ a {
   scroll-margin-top: 6rem;
 }
 
-.apple-webkit-fix {
-  & ul,
-  ol {
-    list-style-position: inside;
-  }
-}
-
 /* ----------- Components ------------ */
 
 .search {
@@ -1417,6 +1410,17 @@ div:has(> div.react-datepicker__input-container) {
 
   & ol ol ol {
     list-style-type: lower-roman;
+  }
+}
+
+.apple-webkit-fix {
+  .rich-text {
+    & ol,
+    ul {
+      &:not([data-type="taskList"]) {
+        list-style-position: inside;
+      }
+    }
   }
 }
 
