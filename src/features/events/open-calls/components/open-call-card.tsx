@@ -611,7 +611,7 @@ const OpenCallCard = ({
                     noBudgetInfo={noBudgetInfo}
                     currency={currency}
                   />
-                  {!allInclusive && (
+                  {!allInclusiveBudget && (
                     <p className="mt-2 text-center text-xs italic text-muted-foreground">
                       (Items listed above are in addition to the main budget)
                     </p>

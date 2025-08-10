@@ -66,7 +66,6 @@ export default async function RootLayout({
 }>) {
   const ua = (await headers()).get("user-agent") ?? "";
   const appleClass = isAppleUA(ua) ? "apple-webkit-fix" : "";
-  console.log(appleClass, ua);
 
   const token = await convexAuthNextjsToken();
   const preloadedUserData = await preloadQuery(
