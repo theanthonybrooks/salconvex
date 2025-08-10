@@ -111,4 +111,5 @@ export const UpdateUserPrefsSchema = z.object({
   timezone: z.string().optional(),
   language: z.string().optional(),
   theme: z.string().optional(),
+  fontSize: z.string().optional(),
 });

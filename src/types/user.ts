@@ -24,6 +24,7 @@ export interface UserPref {
   currency?: string;
   autoApply?: boolean;
   theme?: string;
+  fontSize?: string;
 }
 
 export type UserData = {

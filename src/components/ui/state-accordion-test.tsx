@@ -55,6 +55,7 @@ interface AccordionTriggerProps
   title: string;
   hasPreview?: boolean;
   hidePreview?: boolean;
+  fontSize?: string;
 }
 
 const AccordionTrigger = React.forwardRef<
@@ -68,6 +69,7 @@ const AccordionTrigger = React.forwardRef<
       children,
       title,
       hasPreview = false,
+      fontSize = "text-sm",
       ...props
     },
     ref,
@@ -93,7 +95,7 @@ const AccordionTrigger = React.forwardRef<
           {...props}
         >
           <div className="flex w-full items-center justify-between">
-            <span className="hover:underline">{title}</span>
+            <span className={cn("hover:underline", fontSize)}>{title}</span>
             <span className="absolute right-2">
               <Minus className="ralph size-4 shrink-0 origin-center text-muted-foreground transition-transform ease-in hover:scale-125 group-data-[state=closed]:hidden" />
               <Plus className="mert size-4 shrink-0 origin-center text-muted-foreground transition-transform ease-in hover:scale-125 group-data-[state=open]:hidden" />
@@ -103,6 +105,7 @@ const AccordionTrigger = React.forwardRef<
           <span
             className={cn(
               className,
+
               hasPreview && "group-data-[state=closed]:block",
               hidePreview && "group-data-[state=open]:hidden",
               !hidePreview && "group-data-[state=open]:block",

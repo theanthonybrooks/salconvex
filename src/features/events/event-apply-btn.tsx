@@ -139,6 +139,7 @@ interface ApplyButtonProps {
   userPref?: UserPref | null;
   user?: User | null;
   callType?: CallType;
+  fontSize?: "text-sm" | "text-base";
 }
 
 export const ApplyButton = ({
@@ -170,6 +171,7 @@ export const ApplyButton = ({
   finalButton,
   publicPreview,
   callType,
+  fontSize = "text-sm",
 }: ApplyButtonProps) => {
   const autoApply = userPref?.autoApply ?? true;
   const subscription = useQuery(
@@ -295,7 +297,7 @@ export const ApplyButton = ({
               "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
           )}
         >
-          <span className="flex items-center gap-x-1">
+          <span className={cn("flex items-center gap-x-1", fontSize)}>
             {buttonText}
             {appFee > 0 && !publicView && (
               <CircleDollarSignIcon

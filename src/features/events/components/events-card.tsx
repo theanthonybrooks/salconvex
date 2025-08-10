@@ -12,6 +12,7 @@ import { LinkList } from "@/components/ui/link-list";
 import EventDates from "@/features/events/components/event-dates";
 import { getEventCategoryLabel } from "@/lib/eventFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { cn } from "@/lib/utils";
 import { RefObject } from "react";
 import { FaMapLocationDot } from "react-icons/fa6";
 
@@ -22,11 +23,17 @@ interface LinkProps {
 interface EventCardProps extends LinkProps {
   format: "mobile" | "desktop";
   aboutRef?: RefObject<HTMLDivElement | null>;
+  fontSize?: "text-base" | "text-sm";
 }
 
 //TODO: Add in logic for the event dates, a structured (formatted) about section that will utilize something like Quill on the submission form. Perhaps have a specific "Dates" accordion section that just gives the event dates/times and/or artist/production dates/times.
 
-export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
+export const EventCard = ({
+  event,
+  format,
+  fontSize,
+  aboutRef,
+}: EventCardProps) => {
   const {
     category: eventCategory,
     // type: eventType,
@@ -49,7 +56,7 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
           <Accordion type="multiple" defaultValue={["item-1"]}>
             {location.coordinates && (
               <AccordionItem value="item-1">
-                <AccordionTrigger title="Location:" />
+                <AccordionTrigger title="Location:" fontSize={fontSize} />
 
                 <AccordionContent>
                   <LazyMap
@@ -58,8 +65,8 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
                     label={event.name}
                     className="z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl"
                   />
-                  <p className="font-medium">Full Location:</p>
-                  <span className="flex items-center gap-2">
+                  <p className={cn("font-medium", fontSize)}>Full Location:</p>
+                  <span className={cn("flex items-center gap-2", fontSize)}>
                     {event.location.full}
                     <a
                       href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
@@ -75,28 +82,32 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
 
             {event.about && (
               <AccordionItem value="item-2">
-                <AccordionTrigger title="About:" />
+                <AccordionTrigger title="About:" fontSize={fontSize} />
 
                 <AccordionContent>
                   <div className="mb-4 flex flex-col space-y-3 pb-3">
-                    <RichTextDisplay html={event.about} />
+                    <RichTextDisplay html={event.about} fontSize={fontSize} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
             )}
             {event.links && (
               <AccordionItem value="item-3">
-                <AccordionTrigger title="Links:" />
+                <AccordionTrigger title="Links:" fontSize={fontSize} />
 
                 <AccordionContent>
-                  <LinkList event={event} purpose="detail" />
+                  <LinkList
+                    event={event}
+                    purpose="detail"
+                    fontSize={fontSize}
+                  />
                 </AccordionContent>
               </AccordionItem>
             )}
 
             {event.otherInfo && (
               <AccordionItem value="item-4">
-                <AccordionTrigger title="Other info:" />
+                <AccordionTrigger title="Other info:" fontSize={fontSize} />
                 <AccordionContent>
                   <RichTextDisplay html={event.otherInfo} />
                 </AccordionContent>
@@ -111,15 +122,17 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
         >
           {location.coordinates && (
             <AccordionItem value="map">
-              <AccordionTrigger title="Location:" />
+              <AccordionTrigger title="Location:" fontSize={fontSize} />
 
-              <AccordionContent>
+              <AccordionContent className={cn(fontSize)}>
                 <LazyMap
                   latitude={latitude}
                   longitude={longitude}
                   label={event.name}
                   // hasDirections={true}
-                  className="z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"
+                  className={
+                    "z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"
+                  }
                 />
                 <section className="flex flex-col gap-2">
                   <p className="font-medium">Full Location:</p>
@@ -148,8 +161,8 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
           )}
           {event && (
             <AccordionItem value="dates">
-              <AccordionTrigger title="Dates:" />
-              <AccordionContent>
+              <AccordionTrigger title="Dates:" fontSize={fontSize} />
+              <AccordionContent className={cn(fontSize)}>
                 <span className="flex flex-col gap-1">
                   {/* <p className="flex flex-col items-start gap-1 text-sm">
                     <span className="font-semibold">Category:</span>
@@ -165,7 +178,7 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
                   )}
                   <div className="mt-3 flex flex-col gap-1"> */}
                   {event.dates.eventFormat !== "noEvent" && (
-                    <div className="flex flex-col items-start gap-1 text-sm">
+                    <div className="flex flex-col items-start gap-1">
                       <span className="space-x-1 font-semibold">
                         {getEventCategoryLabel(eventCategory)} Dates:
                       </span>
@@ -181,7 +194,7 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
                   {((eventCategory === "project" &&
                     dates.eventFormat === "noEvent") ||
                     (eventCategory === "event" && prodEnd)) && (
-                    <div className="flex flex-col items-start gap-1 text-sm">
+                    <div className="flex flex-col items-start gap-1">
                       <span className="space-x-1 font-semibold">
                         Painting/Production Dates:
                       </span>
@@ -201,11 +214,11 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
 
           {event.about && (
             <AccordionItem value="about">
-              <AccordionTrigger title="About:" />
+              <AccordionTrigger title="About:" fontSize={fontSize} />
 
               <AccordionContent ref={aboutRef}>
                 <div className="mb-4 flex flex-col space-y-3 pb-3">
-                  <RichTextDisplay html={event.about} />
+                  <RichTextDisplay html={event.about} fontSize={fontSize} />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -213,19 +226,19 @@ export const EventCard = ({ event, format, aboutRef }: EventCardProps) => {
 
           {event.links && (
             <AccordionItem value="links">
-              <AccordionTrigger title="Links:" />
+              <AccordionTrigger title="Links:" fontSize={fontSize} />
 
               <AccordionContent>
-                <LinkList event={event} purpose="detail" />
+                <LinkList event={event} purpose="detail" fontSize={fontSize} />
               </AccordionContent>
             </AccordionItem>
           )}
 
           {event.otherInfo && (
             <AccordionItem value="other">
-              <AccordionTrigger title="Other info:" />
+              <AccordionTrigger title="Other info:" fontSize={fontSize} />
               <AccordionContent>
-                <RichTextDisplay html={event.otherInfo} />
+                <RichTextDisplay html={event.otherInfo} fontSize={fontSize} />
               </AccordionContent>
             </AccordionItem>
           )}

@@ -15,7 +15,7 @@ import { useRef, useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useMutation, usePreloadedQuery } from "convex/react";
-import { CheckCircleIcon, EyeOff, Info, MapPin } from "lucide-react";
+import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
@@ -44,12 +44,14 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
   const aboutRef = useRef<HTMLDivElement | null>(null);
 
-  const { data, artist, userPref, className } = props;
+  const { data, artist, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
     logo: eventLogo,
@@ -157,6 +159,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       className={cn(
         "flex w-full max-w-[min(90vw,1400px)] flex-col gap-x-6 pb-10 xl:grid xl:grid-cols-[300px_auto]",
         className,
+        fontSize,
       )}
     >
       <SalBackNavigation
@@ -217,9 +220,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
-            <p className="flex flex-col items-start gap-1 text-sm">
+            <p className="flex flex-col items-start gap-1">
               <span className="space-x-1 font-semibold">Location:</span>
-              <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
+              <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
                 {locationString}
 
                 <MapPin
@@ -229,7 +232,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               </span>
             </p>
             {event.dates.eventFormat !== "noEvent" && (
-              <div className="flex flex-col items-start gap-1 text-sm">
+              <div className="flex flex-col items-start gap-1">
                 <span className="space-x-1 font-semibold">
                   {getEventCategoryLabel(eventCategory)} Dates:
                 </span>
@@ -245,7 +248,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             {((eventCategory === "project" &&
               event.dates.eventFormat === "noEvent") ||
               (eventCategory === "event" && prodEnd)) && (
-              <div className="flex flex-col items-start gap-1 text-sm">
+              <div className="flex flex-col items-start gap-1">
                 <span className="space-x-1 font-semibold">
                   Painting/Production Dates:
                 </span>
@@ -257,12 +260,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 />
               </div>
             )}
-            <p className="flex flex-col items-start gap-1 text-sm">
+            <p className="flex flex-col items-start gap-1">
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}
             </p>
             {eventType && eventCategory === "event" && (
-              <p className="flex flex-col items-start gap-1 text-sm">
+              <p className="flex flex-col items-start gap-1">
                 <span className="font-semibold">Type:</span>{" "}
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </p>
@@ -272,11 +275,16 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             {event.about && (
               <Accordion type="multiple" defaultValue={["about"]}>
                 <AccordionItem value="about">
-                  <AccordionTrigger title="About:" className="pb-2" />
-                  <AccordionContent className="text-sm">
+                  <AccordionTrigger
+                    title="About:"
+                    className="pb-2"
+                    fontSize={fontSize}
+                  />
+                  <AccordionContent>
                     <RichTextDisplay
                       html={event.about}
                       // className="line-clamp-5"
+                      fontSize={fontSize}
                       maxChars={200}
                     />
                     {event.about?.length > 200 && (
@@ -291,12 +299,13 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 </AccordionItem>
               </Accordion>
             )}
-            <div className="flex flex-col items-start gap-1 text-sm">
+            <div className="flex flex-col items-start gap-1">
               <span className="font-semibold">Organized by:</span>
               <OrganizerLogoNameCard
                 setActiveTab={setActiveTab}
                 organizer={organizer}
                 abbr={true}
+                fontSize={fontSize}
               />
             </div>
             <p className="flex items-center gap-1 text-xs">
@@ -307,7 +316,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
         <div className="col-span-full flex w-full flex-col items-start justify-start gap-y-3 overflow-hidden">
           <Card className="flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">
-            {!appUrl && (
+            {/* TODO: add this back once application system is made to signify when something is external */}
+            {/* {!appUrl && (
               <p
                 className={cn(
                   "flex items-center justify-center gap-x-2 text-center text-sm text-muted-foreground",
@@ -317,7 +327,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               >
                 <Info className="size-4" /> External Application
               </p>
-            )}
+            )} */}
             {basicInfo?.appFee !== 0 && (
               <p className="flex w-full items-center justify-center gap-x-1 text-center text-sm text-red-600">
                 <span className="font-semibold">Application Fee:</span>
@@ -545,6 +555,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           tabs={tabList}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          fontSize={fontSize}
         >
           <div id="openCall">
             <OpenCallCard
@@ -554,6 +565,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               format="desktop"
               userPref={userPref}
               publicPreview={!hasActiveSubscription}
+              fontSize={fontSize}
             />
             <div className="mt-6 flex w-full justify-end xl:hidden">
               <ApplyButton
@@ -578,10 +590,19 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </div>
           </div>
           <div id="event">
-            <EventCard event={event} format="desktop" aboutRef={aboutRef} />
+            <EventCard
+              event={event}
+              format="desktop"
+              aboutRef={aboutRef}
+              fontSize={fontSize}
+            />
           </div>
           <div id="organizer">
-            <OrganizerCard organizer={organizer} format="desktop" />
+            <OrganizerCard
+              organizer={organizer}
+              format="desktop"
+              fontSize={fontSize}
+            />
           </div>
           <div id="application">
             <p>Application content</p>

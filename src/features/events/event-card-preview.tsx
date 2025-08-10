@@ -96,7 +96,7 @@ const EventCardPreview = ({
     slug,
     artistNationality,
   } = event;
-
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { opencall } = tabs;
   const compensation = event.hasActiveOpenCall
     ? opencall?.compensation
@@ -213,171 +213,41 @@ const EventCardPreview = ({
   return (
     <>
       {/* //---------------------- (Mobile) Layout ---------------------- */}
-      <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
-        <div className="col-span-1 row-span-2 flex flex-col items-center justify-between pb-3 pl-2 pt-3">
-          <div
-            onClick={() => {
-              router.push(
-                !publicView || publicPreview
-                  ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
-                  : "/pricing#plans",
-              );
-            }}
-            className="active:scale-95"
-          >
-            <EventOrgLogo
-              imgSrc={logo}
-              type="event"
-              className={cn(
-                "size-12 rounded-full border",
-                !publicView &&
-                  hasOpenCall &&
-                  (event.status === "accepted"
-                    ? "ring-4 ring-emerald-500 ring-offset-1"
-                    : event.status === "rejected"
-                      ? "ring-4 ring-red-500 ring-offset-1"
-                      : event.status === "pending"
-                        ? "ring-4 ring-foreground/30 ring-offset-1"
-                        : ""),
-              )}
-            />
-          </div>
-          <div
+      <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] grid-rows-[repeat(3_auto)] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
+        <div
+          onClick={() => {
+            router.push(
+              !publicView || publicPreview
+                ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
+                : "/pricing#plans",
+            );
+          }}
+          className="col-span-1 row-start-1 mx-auto pl-2 pt-3 active:scale-95"
+        >
+          <EventOrgLogo
+            imgSrc={logo}
+            type="event"
             className={cn(
-              "flex h-11 w-14 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",
-              !isCurrentlyOpen && "opacity-0",
+              "size-12 rounded-full border",
+              !publicView &&
+                hasOpenCall &&
+                (event.status === "accepted"
+                  ? "ring-4 ring-emerald-500 ring-offset-1"
+                  : event.status === "rejected"
+                    ? "ring-4 ring-red-500 ring-offset-1"
+                    : event.status === "pending"
+                      ? "ring-4 ring-foreground/30 ring-offset-1"
+                      : ""),
             )}
-          >
-            <span className="text-2xs leading-[0.85rem]">Call Type</span>
-            <span className="text-md font-foreground font-bold leading-[0.85rem]">
-              {basicInfo && basicInfo.callFormat}
-            </span>
-            {/* // todo: make this dynamic to show project, event, etc for the type */}
-            <span className="text-2xs leading-[0.85rem]">
-              {getEventCategoryLabelAbbr(eventCategory)}
-            </span>
-          </div>
-        </div>
-
-        {/* <CardHeader>
-            <CardTitle>The List</CardTitle>
-          </CardHeader>*/}
-        <div className="flex flex-col gap-y-3 pb-3 pt-3">
-          <div className="mb-2 flex flex-col gap-y-1">
-            <div className="mb-2 flex flex-col gap-y-1">
-              <p className="line-clamp-2 break-words text-base font-semibold">
-                {event?.name}
-              </p>
-              <p className="text-sm">{locationString}</p>
-            </div>
-            <div className="flex items-start gap-x-1 text-sm">
-              {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
-              <span className="font-semibold">Dates:</span>
-              <EventDates
-                event={event}
-                format="mobile"
-                limit={1}
-                preview={true}
-                type="event"
-              />
-            </div>
-            {isCurrentlyOpen && (
-              <p className={cn("flex items-center gap-x-1 text-sm")}>
-                <span className={"font-semibold"}>
-                  {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
-                </span>
-                {publicView && !publicPreview ? (
-                  <span className="pointer-events-none blur-[5px]">
-                    This Year
-                  </span>
-                ) : (
-                  formatOpenCallDeadline(
-                    basicInfo.dates?.ocEnd || "",
-                    userTZ ?? basicInfo.dates?.timezone,
-                    basicInfo.callType,
-                    true,
-                    false,
-                    "mobile",
-                  )
-                )}
-              </p>
-            )}
-            {isCurrentlyOpen && (
-              <p className={cn("flex items-center gap-x-1 text-sm")}>
-                <span className="font-semibold">Budget:</span>
-                {publicView && !publicPreview ? (
-                  <span className="pointer-events-none blur-[5px]">
-                    Sign in to view
-                  </span>
-                ) : budget.min > 0 || (budget.max && budget.max > 0) ? (
-                  formatCurrency(
-                    budget.min,
-                    budget.max,
-                    budget.currency,
-                    true,
-                    budget.allInclusive,
-                    // userCurrency !== currency ? userCurrency : undefined
-                  )
-                ) : budget.rate && budget.rate > 0 ? (
-                  formatRate(
-                    budget.rate,
-                    budget.unit,
-                    budget.currency,
-                    budget.allInclusive,
-                    // userCurrency !== currency ? userCurrency : undefined
-                  )
-                ) : (
-                  "No Info"
-                )}
-              </p>
-            )}
-            {isCurrentlyOpen && (
-              <span
-                className={cn(
-                  "flex items-center gap-x-1 text-sm",
-                  !event.hasActiveOpenCall && "hidden",
-                )}
-              >
-                <span className="font-semibold">Eligible:</span>
-                {publicView && !publicPreview ? (
-                  <span className="pointer-events-none blur-[5px]">
-                    $3 per month
-                  </span>
-                ) : (
-                  <span
-                    className={cn(
-                      (artistNotEligible || noEligibilityParams) &&
-                        !publicView &&
-                        !publicPreview &&
-                        "text-red-600",
-                      artistIsEligible && "text-emerald-800",
-                    )}
-                  >
-                    <EligibilityLabel
-                      type={eligibility.type}
-                      whom={eligibility.whom}
-                      hasDetails={hasEligibilityDetails}
-                      format="mobile"
-                      preview={true}
-                      publicView={publicView}
-                      eligible={artistIsEligible}
-                    />
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
-
-          <ApplyButtonShort
-            slug={slug}
-            edition={event.dates.edition}
-            appStatus={event.status}
-            openCall={event.openCallStatus}
-            publicView={publicPreview ? false : publicView}
-            appFee={basicInfo ? basicInfo.appFee : 0}
           />
         </div>
-        <div className="flex flex-col items-center justify-between pb-5 pr-2 pt-5">
+        <div className="col-span-1 row-start-1 flex flex-col gap-y-1 pt-3">
+          <p className="line-clamp-2 break-words text-base font-semibold">
+            {event?.name}
+          </p>
+          <p className={fontSize}>{locationString}</p>
+        </div>
+        <div className="col-span-1 row-start-1 mx-auto pt-3">
           {event.status === null && !appStatus ? (
             <CircleDollarSignIcon
               className={cn(
@@ -393,6 +263,132 @@ const EventCardPreview = ({
               )}
             />
           )}
+        </div>
+
+        <div className="col-span-2 col-start-2 mb-5 mt-4 flex flex-col gap-y-1">
+          <div className={cn("flex items-start gap-x-1", fontSize)}>
+            {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
+            <span className="font-semibold">Dates:</span>
+            <EventDates
+              event={event}
+              format="mobile"
+              limit={1}
+              preview={true}
+              type="event"
+            />
+          </div>
+          {isCurrentlyOpen && (
+            <span className={cn("flex items-center gap-x-1", fontSize)}>
+              <p className={"font-semibold"}>
+                {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
+              </p>
+              {publicView && !publicPreview ? (
+                <span className="pointer-events-none blur-[5px]">
+                  This Year
+                </span>
+              ) : (
+                formatOpenCallDeadline(
+                  basicInfo.dates?.ocEnd || "",
+                  userTZ ?? basicInfo.dates?.timezone,
+                  basicInfo.callType,
+                  true,
+                  false,
+                  "mobile",
+                )
+              )}
+            </span>
+          )}
+          {isCurrentlyOpen && (
+            <p className={cn("flex items-center gap-x-1", fontSize)}>
+              <span className="font-semibold">Budget:</span>
+              {publicView && !publicPreview ? (
+                <span className="pointer-events-none blur-[5px]">
+                  Sign in to view
+                </span>
+              ) : budget.min > 0 || (budget.max && budget.max > 0) ? (
+                formatCurrency(
+                  budget.min,
+                  budget.max,
+                  budget.currency,
+                  true,
+                  budget.allInclusive,
+                  // userCurrency !== currency ? userCurrency : undefined
+                )
+              ) : budget.rate && budget.rate > 0 ? (
+                formatRate(
+                  budget.rate,
+                  budget.unit,
+                  budget.currency,
+                  budget.allInclusive,
+                  // userCurrency !== currency ? userCurrency : undefined
+                )
+              ) : (
+                "No Info"
+              )}
+            </p>
+          )}
+          {isCurrentlyOpen && (
+            <span
+              className={cn(
+                "flex items-center gap-x-1",
+                !event.hasActiveOpenCall && "hidden",
+                fontSize,
+              )}
+            >
+              <span className="font-semibold">Eligible:</span>
+              {publicView && !publicPreview ? (
+                <span className="pointer-events-none blur-[5px]">
+                  $3 per month
+                </span>
+              ) : (
+                <span
+                  className={cn(
+                    (artistNotEligible || noEligibilityParams) &&
+                      !publicView &&
+                      !publicPreview &&
+                      "text-red-600",
+                    artistIsEligible && "text-emerald-800",
+                  )}
+                >
+                  <EligibilityLabel
+                    type={eligibility.type}
+                    whom={eligibility.whom}
+                    hasDetails={hasEligibilityDetails}
+                    format="mobile"
+                    preview={true}
+                    publicView={publicView}
+                    eligible={artistIsEligible}
+                  />
+                </span>
+              )}
+            </span>
+          )}
+        </div>
+
+        <div className="col-span-full row-start-3 flex items-center justify-around gap-x-4 px-3 pb-2">
+          <div
+            className={cn(
+              "flex h-11 w-28 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",
+              !isCurrentlyOpen && "opacity-0",
+            )}
+          >
+            <span className="text-2xs leading-[0.85rem]">Call Type</span>
+            <span className="text-md font-foreground font-bold leading-[0.85rem]">
+              {basicInfo && basicInfo.callFormat}
+            </span>
+            {/* // todo: make this dynamic to show project, event, etc for the type */}
+            <span className="text-2xs leading-[0.85rem]">
+              {getEventCategoryLabelAbbr(eventCategory)}
+            </span>
+          </div>
+          <ApplyButtonShort
+            slug={slug}
+            edition={event.dates.edition}
+            appStatus={event.status}
+            openCall={event.openCallStatus}
+            publicView={publicPreview ? false : publicView}
+            appFee={basicInfo ? basicInfo.appFee : 0}
+          />
           <div className="flex items-center justify-center gap-x-2">
             {bookmarked ? (
               <FaBookmark
@@ -550,10 +546,9 @@ const EventCardPreview = ({
                 <p className="line-clamp-2 break-words text-base font-semibold group-hover:underline group-hover:underline-offset-2">
                   {name}
                 </p>
-                {/* <p className='text-sm'>{locationString}</p> */}
               </div>
             </div>
-            <div className="flex items-start gap-x-1 text-sm">
+            <div className={cn("flex items-start gap-x-1", fontSize)}>
               {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
               <span className="font-semibold">Dates:</span>
               <EventDates
@@ -564,31 +559,34 @@ const EventCardPreview = ({
                 type="event"
               />
             </div>
-            <p className="flex items-center gap-x-1 text-sm">
-              <span className="font-semibold">Category:</span>
+            <span className={cn("flex items-center gap-x-1", fontSize)}>
+              <p className="font-semibold">Category:</p>
 
               {getEventCategoryLabel(eventCategory)}
-            </p>
+            </span>
             {eventCategory === "event" && eventType && (
-              <p className="flex items-start gap-x-1 text-sm">
-                <span className="font-semibold">Type:</span>
+              <span
+                className={cn("flex items-start gap-x-1 text-sm", fontSize)}
+              >
+                <p className="font-semibold">Type:</p>
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
-              </p>
+              </span>
             )}
             {event.about && (
-              <div className="flex flex-col gap-y-1 text-sm">
+              <div className={cn("flex flex-col gap-y-1 text-sm", fontSize)}>
                 <span className="font-semibold">About:</span>
 
                 <RichTextDisplay
                   html={event.about}
                   className="line-clamp-3 text-sm"
                   maxChars={100}
+                  fontSize={fontSize}
                 />
               </div>
             )}
           </div>
         </div>
-        <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
+        <div className={cn("flex flex-col gap-y-6 pb-3 pt-8", fontSize)}>
           {/* // todo: make this dynamic to show whether event, project, or... else. This won't necessarily be an event timeline, and I think it should default to painting dates rather than event dates */}
           <span className="font-semibold">Location:</span>
           <div className="flex flex-col gap-y-4">
@@ -610,18 +608,15 @@ const EventCardPreview = ({
           </div>
         </div>
         {isCurrentlyOpen ? (
-          <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
+          <div className={cn("flex flex-col gap-y-6 pb-3 pt-8", fontSize)}>
             <span className="font-semibold">Open Call:</span>
             <div className="flex flex-col gap-y-2">
-              <span className={cn("flex items-center gap-x-1 text-sm")}>
-                <span className={"font-semibold"}>
-                  {/* {basicInfo?.callType === "Fixed" ? "Deadline" : "Status"}: */}
+              <span className={cn("flex items-center gap-x-1")}>
+                <p className={"font-semibold"}>
                   {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
-                </span>
+                </p>
                 {publicView && !publicPreview ? (
-                  <span className="pointer-events-none blur-[5px]">
-                    This Year
-                  </span>
+                  <p className="pointer-events-none blur-[5px]">This Year</p>
                 ) : basicInfo?.callType === "Email" ? (
                   <p>Submit qualifications via email</p>
                 ) : (
@@ -646,7 +641,7 @@ const EventCardPreview = ({
                   </>
                 )}
               </span>
-              <span className={cn("flex items-center gap-x-1 text-sm")}>
+              <span className={cn("flex items-center gap-x-1")}>
                 <span className="font-semibold">Eligible:</span>
                 {publicView && !publicPreview ? (
                   <span className="pointer-events-none blur-[5px]">
@@ -717,9 +712,7 @@ const EventCardPreview = ({
                               false,
                               budget.allInclusive,
                             )}
-                          {hasBudget && hasRate && (
-                            <span className="text-sm"> | </span>
-                          )}
+                          {hasBudget && hasRate && <p> | </p>}
 
                           {hasRate &&
                             formatRate(
@@ -741,12 +734,8 @@ const EventCardPreview = ({
                         </span>
                       </>
                     )}
-                    {!hasRate && !hasBudget && (
-                      <p className="text-sm">No Info</p>
-                    )}
-                    {!budget.allInclusive && !noCategories && (
-                      <span className="text-sm">*</span>
-                    )}
+                    {!hasRate && !hasBudget && <p>No Info</p>}
+                    {!budget.allInclusive && !noCategories && <span>*</span>}
                   </>
                 )}
               </div>
@@ -819,6 +808,7 @@ const EventCardPreview = ({
             isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}
             className="hidden xl:flex"
+            fontSize={fontSize}
           />
           {isCurrentlyOpen && basicInfo.callFormat && (
             <div className="flex max-w-40 items-center justify-center gap-x-1 text-center text-sm xl:max-w-none">

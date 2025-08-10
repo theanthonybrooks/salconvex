@@ -13,6 +13,7 @@ import { OpenCall } from "@/types/openCall";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { LightboxGallery } from "@/components/ui/lightbox-gallery";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
 import {
   OpenCallProvided,
@@ -36,6 +37,7 @@ interface OpenCallCardProps {
   userPref: UserPref | null;
   format: "mobile" | "desktop";
   publicPreview?: boolean;
+  fontSize: "text-sm" | "text-base";
 }
 
 const OpenCallCard = ({
@@ -45,6 +47,7 @@ const OpenCallCard = ({
   format,
   userPref,
   publicPreview,
+  fontSize,
 }: OpenCallCardProps) => {
   const { category: eventCategory, _id: id, location, dates } = event;
 
@@ -169,27 +172,35 @@ const OpenCallCard = ({
         <Card className="w-full rounded-xl border-foreground/20 bg-white/60 p-5">
           <Accordion type="multiple" defaultValue={["Deadline"]}>
             <AccordionItem value="Deadline">
-              <AccordionTrigger title="Deadline & Eligibility:" />
+              <AccordionTrigger
+                title="Deadline & Eligibility:"
+                fontSize={fontSize}
+              />
               <AccordionContent>
-                <div className="flex flex-col gap-y-2">
+                <div className={cn("flex flex-col gap-y-2", fontSize)}>
                   <span>
                     <span className="font-semibold underline underline-offset-2">
                       {openCallStatus === "ended" ? "Ended" : "Deadline"}:
                     </span>
                     <br />{" "}
-                    <span className="flex items-center gap-x-2">
+                    <span className="flex flex-col gap-x-2">
                       {formatOpenCallDeadline(
                         ocEnd || "",
                         deadlineTimezone,
                         callType,
                       )}
                       {icsLink && callType === "Fixed" && (
-                        <a
+                        <Link
                           href={icsLink}
                           download={`${event.name.replace(/\s+/g, "_")}.ics`}
+                          className={cn(
+                            fontSize === "text-sm" ? "text-xs" : "text-sm",
+                            "mt-2 flex items-center justify-center gap-x-2 italic text-foreground/70",
+                          )}
                         >
-                          <CalendarClockIcon className="size-5 md:size-4" />
-                        </a>
+                          Add to Calendar
+                          <CalendarClockIcon className="size-5 text-foreground/70 md:size-4" />
+                        </Link>
                       )}
                     </span>
                   </span>
@@ -230,7 +241,7 @@ const OpenCallCard = ({
                       <br />
                       <RichTextDisplay
                         html={eligibilityDetails}
-                        className="text-sm"
+                        fontSize={fontSize}
                       />
                     </div>
                   )}
@@ -240,12 +251,17 @@ const OpenCallCard = ({
 
             <AccordionItem value="BudgetComp">
               <AccordionTrigger
-                title=" Budget & Compensation:"
+                title=" Budget & Compensationsss:"
                 hasPreview
                 hidePreview
-                className="w-full"
+                fontSize={fontSize}
               >
-                <section className="flex w-full flex-col items-center justify-center gap-y-3 pt-2">
+                <section
+                  className={cn(
+                    "flex w-full flex-col items-center justify-center gap-y-3 pt-2",
+                    fontSize,
+                  )}
+                >
                   <div className="flex justify-start gap-2">
                     {hasBudget &&
                       formatCurrency(
@@ -256,9 +272,7 @@ const OpenCallCard = ({
                         allInclusive,
                       )}
 
-                    {hasBudget && hasRate && (
-                      <span className="text-sm"> | </span>
-                    )}
+                    {hasBudget && hasRate && <span> | </span>}
 
                     {hasRate &&
                       formatRate(
@@ -268,7 +282,7 @@ const OpenCallCard = ({
                         true,
                       )}
 
-                    {noBudgetInfo && <p className="text-sm">No Budget Info</p>}
+                    {noBudgetInfo && <p>No Budget Info</p>}
                   </div>
 
                   <OpenCallProvidedPreview
@@ -280,7 +294,9 @@ const OpenCallCard = ({
                 </section>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="mb-4 flex flex-col space-y-3 pb-3">
+                <div
+                  className={cn("mb-4 flex flex-col space-y-3 pb-3", fontSize)}
+                >
                   <div>
                     <span className="font-semibold underline underline-offset-2">
                       Budget:
@@ -295,9 +311,7 @@ const OpenCallCard = ({
                         allInclusive,
                       )}
 
-                    {hasBudget && hasRate && (
-                      <span className="text-sm"> | </span>
-                    )}
+                    {hasBudget && hasRate && <span> | </span>}
 
                     {hasRate &&
                       formatRate(
@@ -307,7 +321,7 @@ const OpenCallCard = ({
                         true,
                       )}
 
-                    {noBudgetInfo && <p className="text-sm">No Info</p>}
+                    {noBudgetInfo && <p>No Info</p>}
                   </div>
                   <p className="mx-auto font-semibold underline underline-offset-2">
                     Compensation Includes:
@@ -330,21 +344,28 @@ const OpenCallCard = ({
             </AccordionItem>
 
             <AccordionItem value="AppReqs">
-              <AccordionTrigger title="Application Requirements" />
+              <AccordionTrigger
+                title="Application Requirements"
+                fontSize={fontSize}
+              />
               <AccordionContent>
                 <div className="flex flex-col space-y-3 p-3">
-                  <RichTextDisplay html={reqs} className="text-sm" />
+                  <RichTextDisplay html={reqs} fontSize={fontSize} />
                 </div>
                 {reqsMore && (
                   <div className="col-span-full">
                     <Accordion type="multiple">
                       <AccordionItem value="reqsMoreInfo">
-                        <AccordionTrigger title="More Info:" className="pb-2" />
+                        <AccordionTrigger
+                          title="More Info:"
+                          className={cn("pb-2")}
+                          fontSize={fontSize}
+                        />
                         <AccordionContent>
                           <div className="mb-4 flex flex-col space-y-3 pb-3">
                             <RichTextDisplay
                               html={reqsMore}
-                              className="text-sm"
+                              fontSize={fontSize}
                             />
                           </div>
                         </AccordionContent>
@@ -380,7 +401,7 @@ const OpenCallCard = ({
                   /\.(pdf|docx?|pptx?)$/i.test(doc.title),
                 ) && (
                   <AccordionItem value="Docs">
-                    <AccordionTrigger title="Documents:" />
+                    <AccordionTrigger title="Documents:" fontSize={fontSize} />
                     <AccordionContent>
                       <OpenCallFilesTable
                         files={(reqsDocs ?? []).filter(hasId)}
@@ -397,7 +418,7 @@ const OpenCallCard = ({
 
                 {reqsDocs.some((doc) => /\.(jpe?g|png)$/i.test(doc.title)) && (
                   <AccordionItem value="Images">
-                    <AccordionTrigger title="Images:" />
+                    <AccordionTrigger title="Images:" fontSize={fontSize} />
                     <AccordionContent>
                       <div className="flex items-center gap-3">
                         <LightboxGallery
@@ -414,12 +435,16 @@ const OpenCallCard = ({
 
             {reqsLinks && reqsLinks.length > 0 && (
               <AccordionItem value="AppLinks">
-                <AccordionTrigger title="Links:" />
+                <AccordionTrigger title="Links:" fontSize={fontSize} />
                 <AccordionContent>
                   <ol className="list-outside list-decimal px-4 pl-6">
                     {reqsLinks?.map((link, index) => (
-                      <li key={index} className="py-2">
-                        <Link href={link.href} target="_blank">
+                      <li key={index} className={cn("py-2", fontSize)}>
+                        <Link
+                          href={link.href}
+                          target="_blank"
+                          className={cn(fontSize)}
+                        >
                           {link.title ?? link.href.split("https://").pop()}
                         </Link>
                       </li>
@@ -431,12 +456,12 @@ const OpenCallCard = ({
 
             {openCall?.requirements?.otherInfo && (
               <AccordionItem value="AppOther">
-                <AccordionTrigger title="Other info:" />
+                <AccordionTrigger title="Other info:" fontSize={fontSize} />
                 <AccordionContent>
                   <div className="flex flex-col space-y-3 p-3">
                     <RichTextDisplay
                       html={openCall.requirements.otherInfo}
-                      className="text-sm"
+                      fontSize={fontSize}
                     />
                   </div>
                 </AccordionContent>
@@ -444,10 +469,10 @@ const OpenCallCard = ({
             )}
             {eventTimeline && (
               <AccordionItem value="timeline">
-                <AccordionTrigger title="Timeline:" />
+                <AccordionTrigger title="Timeline:" fontSize={fontSize} />
                 <AccordionContent>
                   <div className="flex flex-col space-y-3 p-3">
-                    <RichTextDisplay html={eventTimeline} className="text-sm" />
+                    <RichTextDisplay html={eventTimeline} fontSize={fontSize} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -464,9 +489,12 @@ const OpenCallCard = ({
             value="deadElig"
             className="rounded-lg border-2 bg-white/30 px-4"
           >
-            <AccordionTrigger title="Deadline & Eligibility:" />
+            <AccordionTrigger
+              title="Deadline & Eligibility:"
+              fontSize={fontSize}
+            />
             <AccordionContent>
-              <div className="flex flex-col gap-y-3 p-3">
+              <div className={cn("flex flex-col gap-y-3 p-3", fontSize)}>
                 <span>
                   <span className="font-semibold underline underline-offset-2">
                     {openCallStatus === "ended" ? "Ended" : "Deadline"}:
@@ -479,12 +507,14 @@ const OpenCallCard = ({
                       callType,
                     )}
                     {icsLink && callType === "Fixed" && (
-                      <a
-                        href={icsLink}
-                        download={`${event.name.replace(/\s+/g, "_")}.ics`}
-                      >
-                        <CalendarClockIcon className="size-7 md:size-4" />
-                      </a>
+                      <TooltipSimple content="Add to Calendar" side="top">
+                        <a
+                          href={icsLink}
+                          download={`${event.name.replace(/\s+/g, "_")}.ics`}
+                        >
+                          <CalendarClockIcon className="size-7 md:size-4" />
+                        </a>
+                      </TooltipSimple>
                     )}
                   </span>
                 </span>
@@ -532,7 +562,7 @@ const OpenCallCard = ({
                     <br />
                     <RichTextDisplay
                       html={eligibilityDetails}
-                      className="text-sm"
+                      fontSize={fontSize}
                     />
                   </div>
                 )}
@@ -548,13 +578,16 @@ const OpenCallCard = ({
               title=" Budget & Compensation:"
               // hasPreview
               // hidePreview
-              className="w-full"
+
+              fontSize={fontSize}
             >
               {/* ----------------- Preview Section ------------------/ */}
               {/*todo: add functionality for cases where no budget/no info is present*/}
             </AccordionTrigger>
             <AccordionContent>
-              <div className="mb-4 grid grid-cols-2 gap-y-4 p-3">
+              <div
+                className={cn("mb-4 grid grid-cols-2 gap-y-4 p-3", fontSize)}
+              >
                 <div className="flex flex-col gap-2">
                   {!noBudgetInfo && (
                     <>
@@ -588,7 +621,7 @@ const OpenCallCard = ({
                     </>
                   )}
 
-                  {noBudgetInfo && <p className="text-sm">No Info</p>}
+                  {noBudgetInfo && <p>No Info</p>}
                   {budget.allInclusive && hasBudget && !allInclusive && (
                     <span className="text-sm font-bold italic text-red-600">
                       All-inclusive budget (no additional compensation)
@@ -622,12 +655,16 @@ const OpenCallCard = ({
                   <div className="col-span-full">
                     <Accordion type="multiple">
                       <AccordionItem value="budgetMoreInfo">
-                        <AccordionTrigger title="More Info:" className="pb-2" />
+                        <AccordionTrigger
+                          title="More Info:"
+                          className="pb-2"
+                          fontSize={fontSize}
+                        />
                         <AccordionContent>
                           <div className="mb-4 flex flex-col space-y-3 pb-3">
                             <RichTextDisplay
                               html={budgetMoreInfo}
-                              className="text-sm"
+                              fontSize={fontSize}
                             />
                           </div>
                         </AccordionContent>
@@ -643,21 +680,28 @@ const OpenCallCard = ({
             value="appRequirements"
             className="rounded-lg border-2 bg-white/30 px-4"
           >
-            <AccordionTrigger title="Application Requirements" />
+            <AccordionTrigger
+              title="Application Requirements"
+              fontSize={fontSize}
+            />
             <AccordionContent>
               <div className="flex flex-col space-y-3 p-3">
-                <RichTextDisplay html={reqs} className="text-sm" />
+                <RichTextDisplay html={reqs} fontSize={fontSize} />
               </div>
               {reqsMore && (
                 <div className="col-span-full">
                   <Accordion type="multiple">
                     <AccordionItem value="reqsMoreInfo">
-                      <AccordionTrigger title="More Info:" className="pb-2" />
+                      <AccordionTrigger
+                        title="More Info:"
+                        className="pb-2"
+                        fontSize={fontSize}
+                      />
                       <AccordionContent>
                         <div className="mb-4 flex flex-col space-y-3 pb-3">
                           <RichTextDisplay
                             html={reqsMore}
-                            className="text-sm"
+                            fontSize={fontSize}
                           />
                         </div>
                       </AccordionContent>
@@ -677,7 +721,7 @@ const OpenCallCard = ({
                   value="AppDocs"
                   className="rounded-lg border-2 bg-white/30 px-4"
                 >
-                  <AccordionTrigger title="Documents:" />
+                  <AccordionTrigger title="Documents:" fontSize={fontSize} />
                   <AccordionContent>
                     <OpenCallFilesTable
                       files={(reqsDocs ?? []).filter(hasId)}
@@ -698,7 +742,7 @@ const OpenCallCard = ({
                   value="AppImgs"
                   className="rounded-lg border-2 bg-white/30 px-4"
                 >
-                  <AccordionTrigger title="Images:" />
+                  <AccordionTrigger title="Images:" fontSize={fontSize} />
                   <AccordionContent>
                     <div className="flex items-center gap-3">
                       <LightboxGallery
@@ -717,12 +761,18 @@ const OpenCallCard = ({
               value="ApplicationLinks"
               className="rounded-lg border-2 bg-white/30 px-4"
             >
-              <AccordionTrigger title="Links:" />
+              <AccordionTrigger title="Links:" fontSize={fontSize} />
               <AccordionContent>
                 <ol className="list-outside list-decimal px-4 pl-6">
                   {reqsLinks?.map((link, index) => (
                     <li key={index} className="py-2">
-                      <Link href={link.href} target="_blank">
+                      <Link
+                        href={link.href}
+                        target="_blank"
+                        className={cn(
+                          fontSize === "text-base" && "lg:text-base",
+                        )}
+                      >
                         {link.title ?? link.href.split("https://").pop()}
                       </Link>
                     </li>
@@ -736,12 +786,12 @@ const OpenCallCard = ({
               value="ApplicationOther"
               className="rounded-lg border-2 bg-white/30 px-4"
             >
-              <AccordionTrigger title="Other info:" />
+              <AccordionTrigger title="Other info:" fontSize={fontSize} />
               <AccordionContent>
                 <div className="flex flex-col space-y-3 p-3">
                   <RichTextDisplay
                     html={openCall.requirements.otherInfo}
-                    className="text-sm"
+                    fontSize={fontSize}
                   />
                 </div>
               </AccordionContent>
@@ -752,10 +802,10 @@ const OpenCallCard = ({
               value="eventTimeline"
               className="rounded-lg border-2 bg-white/30 px-4"
             >
-              <AccordionTrigger title="Timeline:" />
+              <AccordionTrigger title="Timeline:" fontSize={fontSize} />
               <AccordionContent>
                 <div className="flex flex-col space-y-3 p-3">
-                  <RichTextDisplay html={eventTimeline} className="text-sm" />
+                  <RichTextDisplay html={eventTimeline} fontSize={fontSize} />
                 </div>
               </AccordionContent>
             </AccordionItem>

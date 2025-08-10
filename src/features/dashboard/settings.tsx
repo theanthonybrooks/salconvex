@@ -74,6 +74,7 @@ import { ArtistProfileForm } from "@/features/artists/components/artist-profile-
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
+import { FontSizeIcon } from "@radix-ui/react-icons";
 import { usePreloadedQuery } from "convex/react";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
@@ -119,6 +120,9 @@ export default function SettingsPage() {
   const [pwOpen, setPwOpen] = useState(false);
   const { setTheme, theme } = useTheme();
   const [selectedTheme, setThemePref] = useState<string | undefined>(undefined);
+  const [selectedFontSize, setFontSize] = useState<string | undefined>(
+    undefined,
+  );
   // const [selectedLanguage, setLanguage] = useState("en")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -135,6 +139,7 @@ export default function SettingsPage() {
     timezone: selectedTimezone,
     currency: selectedCurrency,
     theme: selectedTheme,
+    fontSize: selectedFontSize,
   });
 
   const DeleteAccount = useMutation(api.users.deleteAccount);
@@ -322,6 +327,7 @@ export default function SettingsPage() {
           timezone: data.timezone ?? "",
           language: data.language ?? "",
           theme: data.theme ?? "",
+          fontSize: data.fontSize ?? "",
         });
 
         setPending(false);
@@ -414,6 +420,7 @@ export default function SettingsPage() {
       setTimezone(userPrefs.timezone ?? "GMT");
       setCurrency(userPrefs.currency ?? "USD");
       setThemePref(userPrefs.theme ?? "light");
+      setFontSize(userPrefs.fontSize ?? "normal");
       setAutoApply(userPrefs.autoApply ?? true);
       // setTheme(userPrefs.theme ?? "light")
     }
@@ -425,6 +432,7 @@ export default function SettingsPage() {
         prevPrefs.current.timezone !== selectedTimezone ||
         prevPrefs.current.currency !== selectedCurrency ||
         prevPrefs.current.theme !== selectedTheme ||
+        prevPrefs.current.fontSize !== selectedFontSize ||
         prevPrefs.current.autoApply !== selectedAutoApply;
 
       if (hasChanged) {
@@ -432,6 +440,7 @@ export default function SettingsPage() {
           currency: selectedCurrency,
           timezone: selectedTimezone,
           theme: selectedTheme,
+          fontSize: selectedFontSize,
           autoApply: selectedAutoApply,
         });
 
@@ -439,6 +448,7 @@ export default function SettingsPage() {
           timezone: selectedTimezone,
           currency: selectedCurrency,
           theme: selectedTheme,
+          fontSize: selectedFontSize,
           autoApply: selectedAutoApply,
         };
       }
@@ -447,6 +457,7 @@ export default function SettingsPage() {
     return () => clearTimeout(handler);
   }, [
     selectedTheme,
+    selectedFontSize,
     selectedTimezone,
     selectedCurrency,
     selectedAutoApply,
@@ -826,6 +837,7 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
+
                   <Select
                     value={selectedTheme ?? theme}
                     onValueChange={(value) => {
@@ -838,7 +850,7 @@ export default function SettingsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="default">
-                        Default (SAL Yellow)
+                        SAL Yellow (Default)
                       </SelectItem>
                       <SelectItem value="light">Light</SelectItem>
                       {isAdmin && (
@@ -848,6 +860,32 @@ export default function SettingsPage() {
                       {isAdmin && (
                         <SelectItem value="orange">Orange</SelectItem>
                       )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                  <div className="flex items-center gap-4">
+                    <FontSizeIcon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <Label>Text Size</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Choose your display text size
+                      </p>
+                    </div>
+                  </div>
+
+                  <Select
+                    value={selectedFontSize ?? "normal"}
+                    onValueChange={(value) => {
+                      setFontSize(value);
+                    }}
+                  >
+                    <SelectTrigger className="w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[180px]">
+                      <SelectValue placeholder="Select text size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">Normal (Default)</SelectItem>
+                      <SelectItem value="large">Large</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

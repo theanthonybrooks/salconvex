@@ -9,14 +9,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/components/ui/custom-link";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventDates } from "@/lib/dateFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { validOCVals } from "@/types/openCall";
 import { OrganizerCardProps } from "@/types/organizer";
+import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+
   const {
     data,
     // artist,
@@ -122,7 +129,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
           <div className="flex flex-col gap-y-1">
             <p className="mb-1 text-base font-semibold">{organizer?.name}</p>
 
-            <p className="inline-flex items-end gap-x-1 text-sm">
+            <p className={cn("inline-flex items-end gap-x-1", fontSize)}>
               {locationString}
               <MapPin
                 onClick={() => setActiveTab("event")}
@@ -172,7 +179,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
           </TabsList>
 
           <TabsContent value="events">
-            <div id="events" className="px-4">
+            <div id="events" className={cn("px-4", fontSize)}>
               {groupedEvents &&
                 Object.entries(groupedEvents)
                   .sort((a, b) => b[0].localeCompare(a[0])) // Optional: sort editions descending
@@ -183,18 +190,18 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                       </h3>
                       <ul className="list-outside list-none px-2">
                         {editionEvents.map((event) => (
-                          <li key={event._id} className="text-sm">
+                          <li key={event._id} className={cn(fontSize, "mb-2")}>
                             <div className="flex items-center gap-x-2">
                               <Link
                                 href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) ? "/call" : ""}`}
+                                className={cn(fontSize)}
                               >
-                                <p className="text-sm">
-                                  <span className="font-bold capitalize">
+                                <span>
+                                  <p className="font-bold capitalize">
                                     {event.name}
-                                  </span>
+                                  </p>
 
-                                  {" - "}
-                                  <span className="font-light italic">
+                                  <span className="text-sm font-light italic">
                                     {event.dates.eventFormat !== "noEvent"
                                       ? formatEventDates(
                                           event.dates.eventDates[0].start,
@@ -215,7 +222,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                                           )
                                         : event.dates.edition}
                                   </span>
-                                </p>
+                                </span>
                               </Link>
                             </div>
                           </li>
@@ -224,33 +231,13 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                     </div>
                   ))}
             </div>
-            {/* <ol className="list-outside list-decimal px-2 pl-6">
-              {events?.map((event) => (
-                <li key={event._id} className="text-sm">
-                  <div className="flex items-center gap-x-2">
-                    <Link
-                      href={`/thelist/event/${event.slug}/${event.dates.edition}`}
-                      target="_blank"
-                    >
-                      <p className="text-sm">
-                        <span className="font-bold">{event.name}</span>
-                        {" - "}
-                        <span className="font-light italic">
-                          {event.dates.edition}
-                        </span>
-                      </p>
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ol> */}
-            {/* <EventCard event={event} organizer={organizer} format="mobile" /> */}
           </TabsContent>
           <TabsContent value="organizer">
             <OrganizerCard
               organizer={organizer}
               format="mobile"
               srcPage="organizer"
+              fontSize={fontSize}
             />
           </TabsContent>
         </Tabs>

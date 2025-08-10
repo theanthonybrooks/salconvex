@@ -1,4 +1,5 @@
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { Organizer } from "@/types/organizer";
 import { Globe, Phone } from "lucide-react";
 import React from "react";
@@ -72,12 +73,16 @@ const getLinkHref = (
 
 interface OrganizerLinksProps {
   organizer: Organizer;
+  fontSize?: "text-sm" | "text-base";
 }
 
-export const OrganizerLinks = ({ organizer }: OrganizerLinksProps) => {
+export const OrganizerLinks = ({
+  organizer,
+  fontSize,
+}: OrganizerLinksProps) => {
   return (
     <section>
-      <p className="text-sm font-semibold">Links:</p>
+      <p className={cn("font-semibold", fontSize)}>Links:</p>
       <div className="flex items-center justify-start gap-x-6 pt-2">
         {linkDisplayOrder.map((key) => {
           const value = organizer.links[key];

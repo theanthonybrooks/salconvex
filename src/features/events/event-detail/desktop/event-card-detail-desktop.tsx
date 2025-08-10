@@ -46,6 +46,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  console.log(fontSize);
   const isAdmin = user?.role?.includes("admin") || false;
 
   const hasActiveSubscription =
@@ -301,7 +304,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   </p>
                 </>
               )}
-              {eventState === "submitted"  && (
+              {eventState === "submitted" && (
                 <>
                   <Separator
                     orientation="vertical"
@@ -388,6 +391,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           tabs={tabList}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          fontSize={fontSize}
         >
           <div id="event">
             <EventCard event={event} format="desktop" aboutRef={aboutRef} />

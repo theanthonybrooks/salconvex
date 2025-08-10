@@ -32,8 +32,11 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const userData = usePreloadedQuery(preloadedUserData);
   const isAdmin = userData?.user?.role?.includes("admin") || false;
   const user = userData?.user;
+  const userPref = userData?.userPref;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+
   const {
     data,
     artist,
@@ -154,7 +157,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
               {event?.name}
             </p>
 
-            <p className="inline-flex items-end gap-x-1 text-sm">
+            <p className={cn("inline-flex items-end gap-x-1", fontSize)}>
               {locationString}
               <MapPin
                 onClick={() => setActiveTab("event")}
@@ -163,9 +166,14 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
             </p>
           </div>
           <div className="flex flex-col justify-between gap-y-1">
-            <div className="flex items-start gap-x-1 text-sm">
+            <div className={cn("flex items-start gap-x-1", fontSize)}>
               <span className="font-semibold">Dates:</span>
-              <span className="inline-grid auto-cols-max grid-flow-col gap-x-2 align-top text-sm">
+              <span
+                className={cn(
+                  "inline-grid auto-cols-max grid-flow-col gap-x-2 align-top",
+                  fontSize,
+                )}
+              >
                 <EventDates event={event} format="mobile" type="event" />
                 {icsLink && (
                   <a
@@ -177,12 +185,12 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
                 )}
               </span>
             </div>
-            <p className="flex items-center gap-x-1 text-sm">
+            <p className={cn("flex items-center gap-x-1", fontSize)}>
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}
             </p>
             {eventType && eventCategory === "event" && (
-              <p className="flex items-center gap-x-1 text-sm">
+              <p className={cn("flex items-center gap-x-1", fontSize)}>
                 <span className="font-semibold">Type:</span>{" "}
                 {eventType.map((type, index) => {
                   return (
@@ -248,10 +256,14 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
           </TabsList>
 
           <TabsContent value="event">
-            <EventCard event={event} format="mobile" />
+            <EventCard event={event} format="mobile" fontSize={fontSize} />
           </TabsContent>
           <TabsContent value="organizer">
-            <OrganizerCard organizer={organizer} format="mobile" />
+            <OrganizerCard
+              organizer={organizer}
+              format="mobile"
+              fontSize={fontSize}
+            />
           </TabsContent>
         </Tabs>
       </div>

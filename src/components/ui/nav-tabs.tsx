@@ -21,6 +21,7 @@ export interface NavTabsProps {
   defaultTab?: string;
   activeTab?: string;
   setActiveTab?: (tabId: string) => void;
+  fontSize?: "text-sm" | "text-base";
 }
 
 export default function NavTabs({
@@ -30,6 +31,7 @@ export default function NavTabs({
   defaultTab,
   activeTab: controlledTab,
   setActiveTab: setControlledTab,
+  fontSize = "text-sm",
 }: NavTabsProps) {
   const internalTab = useState(defaultTab ?? tabs[0]?.id);
   const activeTab = controlledTab ?? internalTab[0];
@@ -55,7 +57,8 @@ export default function NavTabs({
                 key={tab.id}
                 style={{ zIndex: tabZIndex, position: "relative" }}
                 className={cn(
-                  "tab text-sm transition-transform",
+                  "tab transition-transform",
+                  fontSize,
                   isActive
                     ? "active bg-card-secondary px-2 py-2 font-bold before:bg-card-secondary after:bg-card-secondary"
                     : "translate-y-1 bg-background px-2 py-1 leading-[0.5] text-foreground before:bg-background after:bg-background",

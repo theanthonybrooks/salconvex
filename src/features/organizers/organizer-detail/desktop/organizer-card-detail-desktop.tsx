@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
@@ -33,6 +34,8 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const userData = usePreloadedQuery(preloadedUserData);
   const aboutRef = useRef<HTMLDivElement | null>(null);
   const user = userData?.user ?? null;
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
@@ -127,10 +130,15 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
               {organizer?.name}
             </p>
           </div>
-          <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
-            <p className="flex flex-col items-start gap-1 text-sm">
+          <div
+            className={cn(
+              "col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4",
+              fontSize,
+            )}
+          >
+            <p className="flex flex-col items-start gap-1">
               <span className="space-x-1 font-semibold">Location:</span>
-              <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
+              <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
                 {locationString}
 
                 <MapPin
@@ -144,9 +152,17 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
             {organizer.about && (
               <Accordion type="multiple" defaultValue={["about"]}>
                 <AccordionItem value="about">
-                  <AccordionTrigger title="About:" className="pb-2" />
+                  <AccordionTrigger
+                    title="About:"
+                    className="pb-2"
+                    fontSize={fontSize}
+                  />
                   <AccordionContent className="text-sm">
-                    <RichTextDisplay html={organizer.about} maxChars={200} />
+                    <RichTextDisplay
+                      html={organizer.about}
+                      maxChars={200}
+                      fontSize={fontSize}
+                    />
                     {organizer.about?.length > 200 && (
                       <button
                         className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
@@ -197,10 +213,12 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 
-                  <MapPin
-                    onClick={() => setActiveTab("event")}
-                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
-                  />
+                  <TooltipSimple content="View on Map" side="top">
+                    <MapPin
+                      onClick={() => setActiveTab("event")}
+                      className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                    />
+                  </TooltipSimple>
                 </span>
               </div>
             </div>
@@ -210,6 +228,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
           tabs={tabList}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          fontSize={fontSize}
         >
           <div id="events" className="px-4">
             {groupedEvents &&
@@ -228,36 +247,38 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                               <div className="flex items-center gap-x-2">
                                 <Link
                                   href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) && (hasActiveSubscription || isOwner) ? "/call" : ""}`}
+                                  className={cn(
+                                    fontSize === "text-base"
+                                      ? "lg:text-base"
+                                      : fontSize,
+                                  )}
                                 >
-                                  <p className="text-sm">
-                                    <span className="font-bold capitalize">
-                                      {event.name}
-                                    </span>
+                                  <span className="font-bold capitalize">
+                                    {event.name}
+                                  </span>
 
-                                    {" - "}
-                                    <span className="font-light italic">
-                                      {event.dates.eventFormat !== "noEvent"
+                                  {" - "}
+                                  <span className="text-sm font-light italic">
+                                    {event.dates.eventFormat !== "noEvent"
+                                      ? formatEventDates(
+                                          event.dates.eventDates[0].start,
+                                          event.dates.eventDates[
+                                            event.dates.eventDates.length - 1
+                                          ].end,
+                                          event.dates.eventFormat === "ongoing",
+                                          "desktop",
+                                        )
+                                      : event.dates.prodDates
                                         ? formatEventDates(
-                                            event.dates.eventDates[0].start,
-                                            event.dates.eventDates[
-                                              event.dates.eventDates.length - 1
+                                            event.dates.prodDates[0].start,
+                                            event.dates.prodDates[
+                                              event.dates.prodDates.length - 1
                                             ].end,
-                                            event.dates.eventFormat ===
-                                              "ongoing",
+                                            false,
                                             "desktop",
                                           )
-                                        : event.dates.prodDates
-                                          ? formatEventDates(
-                                              event.dates.prodDates[0].start,
-                                              event.dates.prodDates[
-                                                event.dates.prodDates.length - 1
-                                              ].end,
-                                              false,
-                                              "desktop",
-                                            )
-                                          : event.dates.edition}
-                                    </span>
-                                  </p>
+                                        : event.dates.edition}
+                                  </span>
                                 </Link>
                               </div>
                             </li>
@@ -274,6 +295,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
               format="desktop"
               srcPage="organizer"
               aboutRef={aboutRef}
+              fontSize={fontSize}
             />
           </div>
           <div id="application">

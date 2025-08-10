@@ -33,13 +33,15 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
   const {
     data,
     artist,
-    userPref,
+    // userPref,
     className,
     // organizer,
   } = props;
@@ -193,7 +195,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               {event?.name}
             </p>
 
-            <p className="inline-flex items-end gap-x-1 text-sm">
+            <p className={cn("inline-flex items-end gap-x-1", fontSize)}>
               {locationString}
               <MapPin
                 onClick={() => setActiveTab("event")}
@@ -201,17 +203,19 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               />
             </p>
           </div>
-          <div className="flex flex-col justify-between gap-y-1">
-            <div className="flex items-start gap-x-1 text-sm">
+          <div
+            className={cn("flex flex-col justify-between gap-y-1", fontSize)}
+          >
+            <div className="flex items-start gap-x-1">
               <span className="font-semibold">Dates:</span>
               <EventDates event={event} format="mobile" type="event" />
             </div>
-            <p className="flex items-center gap-x-1 text-sm">
+            <p className="flex items-center gap-x-1">
               <span className="font-semibold">Category:</span>
               {getEventCategoryLabel(eventCategory)}
             </p>
             {eventType && eventCategory === "event" && (
-              <p className="flex items-start gap-x-1 text-sm">
+              <p className="flex items-start gap-x-1">
                 <span className="font-semibold">Type:</span>{" "}
                 {eventType.map((type, index) => {
                   return (
@@ -227,7 +231,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               </p>
             )}
             {basicInfo?.appFee !== 0 && (
-              <p className="flex items-center gap-x-1 text-sm text-red-600">
+              <p className="flex items-center gap-x-1 text-red-600">
                 <span className="font-semibold">Application Fee:</span>
                 {`$${basicInfo?.appFee}`}
               </p>
@@ -290,6 +294,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               format="mobile"
               userPref={userPref}
               publicPreview={!hasActiveSubscription}
+              fontSize={fontSize}
             />
             <ApplyButton
               user={user}
@@ -317,10 +322,14 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
             />
           </TabsContent>
           <TabsContent value="event">
-            <EventCard event={event} format="mobile" />
+            <EventCard event={event} format="mobile" fontSize={fontSize} />
           </TabsContent>
           <TabsContent value="organizer">
-            <OrganizerCard organizer={organizer} format="mobile" />
+            <OrganizerCard
+              organizer={organizer}
+              format="mobile"
+              fontSize={fontSize}
+            />
           </TabsContent>
         </Tabs>
       </div>

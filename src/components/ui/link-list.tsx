@@ -29,9 +29,15 @@ interface LinkListProps {
   event?: MinimalEventLinks;
   organizer?: MinimalOrgLinks;
   purpose?: string;
+  fontSize?: "text-base" | "text-sm";
 }
 
-export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
+export const LinkList = ({
+  event,
+  organizer,
+  purpose,
+  fontSize,
+}: LinkListProps) => {
   const listPreview = purpose === "preview";
   const submitRecap = purpose === "recap";
 
@@ -67,6 +73,7 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
             "flex flex-col gap-y-2",
             !listPreview && "p-3",
             submitRecap && "p-0",
+            fontSize,
           )}
         >
           {event.links?.email && !listPreview && (
@@ -252,7 +259,11 @@ export const LinkList = ({ event, organizer, purpose }: LinkListProps) => {
             (!event || event?.links?.sameAsOrganizer === true))) &&
         Object.keys(organizer.links || {}).length > 0 && (
           <div
-            className={cn("flex flex-col gap-y-2 p-3", submitRecap && "p-0")}
+            className={cn(
+              "flex flex-col gap-y-2 p-3",
+              submitRecap && "p-0",
+              fontSize,
+            )}
           >
             {organizer.links?.email && (
               <a

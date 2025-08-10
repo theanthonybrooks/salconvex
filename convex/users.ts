@@ -355,6 +355,7 @@ export const updateUserPrefs = mutation({
     currency: v.optional(v.string()),
     timezone: v.optional(v.string()),
     theme: v.optional(v.string()),
+    fontSize: v.optional(v.string()),
     language: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -384,6 +385,7 @@ export const updateUserPrefs = mutation({
       timezone: args.timezone,
       theme: args.theme,
       language: args.language,
+      fontSize: args.fontSize,
     });
 
     const user = await ctx.db

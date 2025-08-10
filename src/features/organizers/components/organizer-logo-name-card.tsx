@@ -15,17 +15,20 @@ interface OrganizerCardProps {
 
 interface OrganizerCardLogoNameProps extends OrganizerCardProps {
   format?: "desktop" | "mobile";
+  fontSize?: "text-sm" | "text-base";
 }
 
 interface OrganizerLogoNameCardProps extends OrganizerCardProps {
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   abbr?: boolean;
+  fontSize?: "text-sm" | "text-base";
 }
 
 export const OrganizerLogoNameCard = ({
   setActiveTab,
   organizer,
   abbr = false,
+  fontSize = "text-sm",
 }: OrganizerLogoNameCardProps) => {
   const orgLocationString = getOrganizerLocationString(organizer, abbr);
 
@@ -42,10 +45,17 @@ export const OrganizerLogoNameCard = ({
     >
       <EventOrgLogo imgSrc={organizer.logo} type="organizer" size="small" />
       <div className="col-span-1">
-        <p className="max-w-[18ch] truncate text-sm font-bold">
+        <p className={cn("max-w-[18ch] truncate font-bold", fontSize)}>
           {organizer.name}
         </p>
-        <p className="max-w-[18ch] truncate text-xs">{orgLocationString}</p>
+        <p
+          className={cn(
+            "max-w-[18ch] truncate",
+            fontSize === "text-sm" ? "text-xs" : "text-sm",
+          )}
+        >
+          {orgLocationString}
+        </p>
       </div>
     </Card>
   );
@@ -54,6 +64,7 @@ export const OrganizerLogoNameCard = ({
 export const OrganizerCardLogoName = ({
   organizer,
   format,
+  fontSize = "text-sm",
 }: OrganizerCardLogoNameProps) => {
   const orgLocationString = getOrganizerLocationString(organizer, true);
   const isMobile = format === "mobile";
@@ -76,8 +87,15 @@ export const OrganizerCardLogoName = ({
         />
 
         <div className="col-span-1">
-          <p className="line-clamp-2 text-sm font-bold">{organizer.name}</p>
-          <p className={cn("text-sm", isMobile && "font-medium")}>
+          <p className={cn("line-clamp-2 font-bold", fontSize)}>
+            {organizer.name}
+          </p>
+          <p
+            className={cn(
+              isMobile && "font-medium",
+              fontSize === "text-sm" ? "text-xs" : "text-sm",
+            )}
+          >
             {orgLocationString}
           </p>
         </div>

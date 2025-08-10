@@ -57,24 +57,26 @@ export type OrgContactProps = Pick<Organizer, "contact" | "links">;
 interface OrganizerMainContactProps {
   organizer: OrgContactProps;
   linkOnly?: boolean;
+  fontSize?: "text-sm" | "text-base";
 }
 
 export const OrganizerMainContact = ({
   organizer,
   linkOnly = false,
+  fontSize = "text-sm",
 }: OrganizerMainContactProps) => {
   const primaryContact = organizer.contact?.primaryContact;
   const value = primaryContact && organizer.links[primaryContact];
 
   if (!primaryContact || !value) return null;
   return (
-    <span>
-      {!linkOnly && <p className="text-sm font-semibold">Main Contact:</p>}{" "}
+    <span className={cn(fontSize)}>
+      {!linkOnly && <p className={cn("font-semibold")}>Main Contact:</p>}{" "}
       <div className={cn("flex items-center gap-x-2 pt-2", linkOnly && "pt-0")}>
         {contactIcons[primaryContact] ?? <Globe />}
         <a
           href={contactHref(primaryContact, value)}
-          className="line-clamp-4 text-sm underline-offset-2 hover:underline"
+          className="line-clamp-4 underline-offset-2 hover:underline"
         >
           {contactLabel(primaryContact, value)}
         </a>
