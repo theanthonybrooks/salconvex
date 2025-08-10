@@ -742,13 +742,14 @@ export const getOrganizerBySlug = query({
 
     // console.log(organizer);
 
-    if (!organizer) throw new ConvexError("No organizer found");
+    if (!organizer)
+      throw new ConvexError(`No organizer found for ${args.slug}`);
 
     if (organizer.isComplete === false) {
       if (userIsOrganizer) {
-        throw new ConvexError("Organizer is not complete");
+        throw new ConvexError(`Organizer is not complete for ${args.slug}`);
       }
-      throw new ConvexError("No organizer found");
+      throw new ConvexError(`No organizer found for ${args.slug}`);
     }
     const rawEvents = await ctx.db
       .query("events")

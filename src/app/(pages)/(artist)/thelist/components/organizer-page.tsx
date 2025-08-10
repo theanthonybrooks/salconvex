@@ -42,7 +42,7 @@ const OrganizerDetail = () => {
 
   if (isError) {
     if (error instanceof ConvexError) {
-      if (error.data === "No organizer found") {
+      if (error.data.includes("No organizer found")) {
         return (
           <div className="flex flex-col items-center gap-2">
             <p className="text-lg font-bold">Organizer not found</p>
@@ -57,7 +57,7 @@ const OrganizerDetail = () => {
             </p>
           </div>
         );
-      } else if (error.data === "Organizer is not complete") {
+      } else if (error.data.includes("Organizer is not complete")) {
         return (
           <div className="flex flex-col items-center gap-2">
             <p className="text-lg font-bold">
