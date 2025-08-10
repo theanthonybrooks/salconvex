@@ -554,13 +554,8 @@ const FullPageNav = ({
                         className={cn(
                           "group flex cursor-pointer justify-center px-9 py-4",
                           activeCategory === section.title &&
+                            isExpanded &&
                             "bg-foreground/90 text-background unstroked",
-                          // activeCategory === section.title &&
-                          //   theme === "default" &&
-                          //   "text-white",
-                          // activeCategory === section.title &&
-                          //   theme === "light" &&
-                          //   "text-salYellow"
                         )}
                       >
                         <p className="transition-all group-active:scale-95">
