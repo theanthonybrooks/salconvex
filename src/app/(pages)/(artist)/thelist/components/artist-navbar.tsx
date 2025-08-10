@@ -228,7 +228,7 @@ export default function TheListNavBar(
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >
-                <Button className="h-9 border-2 border-transparent bg-background font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95">
+                <Button className="h-9 border-2 border-transparent bg-background text-base font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95">
                   View Pricing
                 </Button>
               </Link>
@@ -262,7 +262,7 @@ export default function TheListNavBar(
           {!isMobile && (
             <div className="flex items-center gap-2">
               <Link href="/pricing?submit">
-                <Button className="hidden h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background active:scale-95 lg:inline-flex">
+                <Button className="hidden h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground hover:bg-background active:scale-95 sm:text-base lg:inline-flex">
                   Submit
                 </Button>
               </Link>
@@ -272,7 +272,7 @@ export default function TheListNavBar(
                   className="z-0"
                   align="right"
                 >
-                  <NavigationMenuList className="christoph gap-2">
+                  <NavigationMenuList className="gap-2">
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}

@@ -330,7 +330,7 @@ export default function NavBar(
                 {filteredNavbarLinks.map((link) => (
                   <Link key={link.title} href={link.href} prefetch={true}>
                     {!link.isIcon ? (
-                      <Button className="h-9 border-2 border-transparent bg-background text-foreground hover:border-foreground hover:bg-background">
+                      <Button className="h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground hover:bg-background sm:text-base">
                         {link.title}
                       </Button>
                     ) : (
@@ -438,7 +438,7 @@ export const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none">{title}</div>
+          <div className="text-base font-medium leading-none">{title}</div>
           <p className="line-clamp-2 text-sm leading-snug text-foreground">
             {children}
           </p>
