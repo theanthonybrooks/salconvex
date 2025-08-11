@@ -233,11 +233,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               </span>
               <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
                 {locationString}
-
-                <MapPin
-                  onClick={() => setActiveTab("event")}
-                  className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
-                />
               </span>
             </div>
             {event.dates.eventFormat !== "noEvent" && (
@@ -463,10 +458,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 
-                  <MapPin
-                    onClick={() => setActiveTab("event")}
-                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
-                  />
+                  <TooltipSimple content="View on Map" side="top">
+                    <MapPin
+                      onClick={() => setActiveTab("event")}
+                      className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                    />
+                  </TooltipSimple>
                 </span>
                 <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">
                   {getEventCategoryLabel(eventCategory)}

@@ -833,7 +833,7 @@ export const getEventBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    console.log(args.slug);
+    // console.log(args.slug);
     const event = await ctx.db
       .query("events")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
