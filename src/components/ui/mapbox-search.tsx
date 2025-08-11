@@ -5,6 +5,7 @@ import {
   fetchMapboxSuggestionsFull,
   MapboxSuggestion,
   stateToRegionMap,
+  USAddressFormatCountries,
 } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -80,6 +81,10 @@ export const MapboxInputFull = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isFocused && inputValue.trim().length > 0) {
+      setIsFocused(true);
+      return;
+    }
     if (suggestions.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -112,7 +117,7 @@ export const MapboxInputFull = ({
   }, []);
 
   const handleSelect = (s: MapboxSuggestion) => {
-    console.log(s);
+    // console.log(s);
     const context = s.context || [];
     const findContext = (type: string) =>
       context.find((c) => c.id.startsWith(type));
@@ -121,19 +126,6 @@ export const MapboxInputFull = ({
     const localityContext = findContext("locality");
     const stateContext = findContext("region");
     const countryContext = findContext("country");
-    const USAddressFormatCountries = [
-      "United States",
-      "Canada",
-      "Mexico",
-      "United Kingdom",
-      "Australia",
-      "Ireland",
-      "New Zealand",
-      "South Africa",
-      "Philippines",
-      "India",
-      "Israel",
-    ];
 
     //TODO: Add postal code context for the places that require it in order to know where to go.
     // const postalContext = findContext("postcode");
@@ -326,15 +318,17 @@ export const MapboxInputFull = ({
       setTimeout(() => {
         listRef?.current?.scrollIntoView({
           behavior: "smooth",
-          block: "end", // or "nearest", depending on how it’s being cut off
+          block: "end",
         });
       }, 100);
     }
   }, [suggestions]);
 
   useEffect(() => {
+    // console.log("is focused: ", isFocused);
     if (!isFocused) return;
     const timeout = setTimeout(async () => {
+      // console.log("input value: ", inputValue);
       if (!inputValue.trim()) {
         setSuggestions([]);
         return;

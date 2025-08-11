@@ -41,7 +41,7 @@ import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submi
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
-import { toSeason, toYearMonth } from "@/lib/dateFns";
+import { toSeason, toYear, toYearMonth } from "@/lib/dateFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
 import { cn } from "@/lib/utils";
@@ -277,6 +277,7 @@ export const EventOCForm = ({
   const hasClosed = useRef(false);
   const isFirstRun = useRef(true);
   const savedState = useRef(false);
+  const latestSaveId = useRef<symbol | null>(null);
   // #endregion
   // #region ------------- Watch --------------
   const orgData = watch("organization");
@@ -697,717 +698,524 @@ export const EventOCForm = ({
   const handleSave = useCallback(
     async (direct = false, publish = false) => {
       if (pending) return;
-      if (direct) {
-        const isStepValid = handleCheckSchema();
-        if (!isStepValid) {
-          toast.error("Please fix errors before continuing.", {
-            toastId: "form-validation-error",
-          });
-          return;
-        }
-      }
-      let orgResult = null;
-      let orgLogoFullUrl = "/1.jpg";
-      // console.log(hasUserEditedStep0);
-      if (hasUserEditedStep0) {
-        // console.log("user edited step 0");
-        const result = await handleFileUrl({
-          data: orgData,
-          generateUploadUrl,
-          getTimezone,
-        });
-
-        if (!result) {
-          toast.error("Failed to upload logo", {
-            autoClose: 2000,
-            pauseOnHover: false,
-            hideProgressBar: true,
-          });
-          return;
-        }
-        const { logoStorageId, timezone, timezoneOffset } = result;
-        const logo = typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
-        // console.log(result);
-        try {
-          setPending(true);
-          const { org } = await createNewOrg({
-            organizationName: orgData.name?.trim(),
-            logoStorageId,
-            logo,
-            location: {
-              full: orgData.location.full,
-              locale: orgData.location.locale,
-              city: orgData.location.city,
-              state: orgData.location.state,
-              stateAbbr: orgData.location.stateAbbr,
-              region: orgData.location.region,
-              country: orgData.location.country,
-              countryAbbr: orgData.location.countryAbbr,
-              continent: orgData.location?.continent || "",
-              coordinates: {
-                latitude: orgData.location.coordinates?.latitude || 0,
-                longitude: orgData.location.coordinates?.longitude || 0,
-              },
-              currency: {
-                code: orgData.location?.currency?.code || "",
-                name: orgData.location?.currency?.name || "",
-                symbol: orgData.location?.currency?.symbol || "",
-              },
-              demonym: orgData.location.demonym,
-              timezone: timezone,
-              timezoneOffset: timezoneOffset,
-            },
-          });
-          orgResult = org;
-          // orgLogoFullUrl = fileUrl ?? orgResult?.logo ?? "/1.jpg";
-          orgLogoFullUrl =
-            orgResult?.logo ??
-            (orgData.logo === "string" ? orgData.logo : "/1.jpg");
-
-          setPending(false);
-          // toast.success(
-          //   existingOrg
-          //     ? "Organization updated!"
-          //     : "Organization created! Going to step 2...",
-          //   {},
-          // );
-
-          // Updating existingOrg state with new values
-          //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
-          if (existingOrg) {
-            setExistingOrg({
-              ...existingOrg,
-              logo: orgLogoFullUrl,
-              location: {
-                ...existingOrg.location,
-                ...orgData.location,
-                continent: orgData.location?.continent ?? "",
-                timezone,
-                timezoneOffset,
-              },
+      setPending(true);
+      const saveId = Symbol("save");
+      latestSaveId.current = saveId;
+      try {
+        if (direct) {
+          const isStepValid = handleCheckSchema();
+          if (!isStepValid) {
+            toast.error("Please fix errors before continuing.", {
+              toastId: "form-validation-error",
             });
+            throw new Error("validation_failed");
+            // return;
           }
-        } catch (error) {
-          console.error("Failed to create new organization:", error);
-          toast.error("Failed to create new organization");
-          setPending(false);
         }
-
-        const eventFullUrl = eventData?.logo ?? orgLogoFullUrl;
-
-        if (existingEvent) {
-          // console.log("existing event");
-          const locationFromEvent = existingEvent.location?.full
-            ? existingEvent.location?.sameAsOrganizer
-              ? {
-                  ...currentValues.organization?.location,
-                  sameAsOrganizer: true,
-                }
-              : {
-                  ...existingEvent.location,
-                }
-            : {
-                ...currentValues.organization?.location,
-                sameAsOrganizer: true,
-              };
-          reset({
-            organization: {
-              ...orgResult,
-            },
-            event: {
-              formType,
-              ...existingEvent,
-              logo: eventFullUrl,
-              logoStorageId: existingEvent?.logoStorageId ?? logoStorageId,
-              links: eventLinks,
-              // category: existingEvent.category,
-              // type: existingEvent.type ?? [],
-              location: locationFromEvent,
-              dates: {
-                ...existingEvent.dates,
-              },
-            },
-          });
-        } else {
-          reset({
-            organization: {
-              ...orgResult,
-            },
-            event: {
-              formType,
-              name: "",
-              logo: orgLogoFullUrl || eventFullUrl,
-              logoStorageId,
-              links: eventLinks,
-              location: {
-                ...(orgResult?.location ||
-                  currentValues.organization?.location),
-                sameAsOrganizer: true,
-              },
-              dates: {
-                edition: new Date().getFullYear(),
-                noProdStart: false,
-              },
-
-              hasOpenCall:
-                eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
-            },
-          });
-        }
-      }
-      // await handleFormValues();
-      if (activeStep === 1 && hasUserEditedEventSteps) {
-        let result = {
-          logoStorageId: eventData?.logoStorageId as Id<"_storage"> | undefined,
-          timezone: existingEvent?.location?.timezone,
-          timezoneOffset: existingEvent?.location?.timezoneOffset,
-        };
-
-        const needsUpload =
-          (eventData?.logo && typeof eventData.logo !== "string") ||
-          !eventData?.logoStorageId;
-
-        if (needsUpload) {
-          const uploadResult = await handleFileUrl({
-            data: eventData,
+        let orgResult;
+        let orgLogoFullUrl = "/1.jpg";
+        let orgLogoStorageId: Id<"_storage"> | undefined;
+        let timezone: string | undefined;
+        let timezoneOffset: number | undefined; // console.log(hasUserEditedStep0);
+        if (hasUserEditedStep0) {
+          // console.log("user edited step 0");
+          const result = await handleFileUrl({
+            data: orgData,
             generateUploadUrl,
             getTimezone,
           });
 
-          if (!uploadResult) {
+          if (!result) {
             toast.error("Failed to upload logo", {
               autoClose: 2000,
               pauseOnHover: false,
               hideProgressBar: true,
             });
-            return;
+            // return;
+            throw new Error("org_logo_upload_failed");
           }
-          result = uploadResult;
+          orgLogoStorageId = result.logoStorageId;
+          timezone = result.timezone;
+          timezoneOffset = result.timezoneOffset;
+          const logo =
+            typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
           // console.log(result);
-        }
-        // console.log("doesnt need upload");
-        const { logoStorageId, timezone, timezoneOffset } = result;
-        // console.log(logoStorageId, timezone, timezoneOffset);
-        let eventResult = null;
-        const eventLogo =
-          typeof eventData.logo === "string" ? eventData.logo : "1.jpg";
+          try {
+            // setPending(true);
+            const { org } = await createNewOrg({
+              organizationName: orgData.name?.trim(),
+              logoStorageId: orgLogoStorageId,
+              logo,
+              location: {
+                full: orgData.location.full,
+                locale: orgData.location.locale,
+                city: orgData.location.city,
+                state: orgData.location.state,
+                stateAbbr: orgData.location.stateAbbr,
+                region: orgData.location.region,
+                country: orgData.location.country,
+                countryAbbr: orgData.location.countryAbbr,
+                continent: orgData.location?.continent || "",
+                coordinates: {
+                  latitude: orgData.location.coordinates?.latitude || 0,
+                  longitude: orgData.location.coordinates?.longitude || 0,
+                },
+                currency: {
+                  code: orgData.location?.currency?.code || "",
+                  name: orgData.location?.currency?.name || "",
+                  symbol: orgData.location?.currency?.symbol || "",
+                },
+                demonym: orgData.location.demonym,
+                timezone: timezone,
+                timezoneOffset: timezoneOffset,
+              },
+            });
+            orgResult = org;
+            // orgLogoFullUrl = fileUrl ?? orgResult?.logo ?? "/1.jpg";
+            orgLogoFullUrl =
+              orgResult?.logo ??
+              (orgData.logo === "string" ? orgData.logo : "/1.jpg");
 
-        try {
-          setPending(true);
-          const prodDates =
-            eventData.dates.prodFormat === "sameAsEvent"
-              ? eventData.dates.eventDates
-              : eventData.dates.prodDates;
+            // setPending(false);
+            // toast.success(
+            //   existingOrg
+            //     ? "Organization updated!"
+            //     : "Organization created! Going to step 2...",
+            //   {},
+            // );
 
-          const { event } = await createOrUpdateEvent({
-            formType,
-            _id: eventData._id || "",
-            name: eventData.name,
-            slug:
-              existingEvent?.slug ??
-              slugify(eventData.name, { lower: true, strict: true }),
-            logoStorageId,
-            logo: eventLogo,
-            type: eventData.type || [],
-            category: !eventOnly ? eventData.category : "event",
-            hasOpenCall:
-              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
-            dates: {
-              edition: eventData.dates.edition,
-              eventDates: eventData.dates.eventDates,
-              eventFormat: eventData.dates.eventFormat,
-              prodDates,
-              prodFormat: eventData.dates.prodFormat,
-              noProdStart: eventData.dates.noProdStart,
-            },
-            location: {
-              ...eventData.location,
-              timezone: timezone,
-              timezoneOffset: timezoneOffset,
-            },
-            about: eventData.about,
-            timeLine: eventData.timeLine,
-            links: eventData.links,
-            otherInfo: eventData.otherInfo || undefined,
-            adminNote: eventData.adminNote || undefined,
-            active: eventData.active,
-            orgId: orgData._id as Id<"organizations">,
-          });
+            // Updating existingOrg state with new values
+            //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
+            if (existingOrg) {
+              setExistingOrg({
+                ...existingOrg,
+                logo: orgLogoFullUrl,
+                location: {
+                  ...existingOrg.location,
+                  ...orgData.location,
+                  continent: orgData.location?.continent ?? "",
+                  timezone,
+                  timezoneOffset,
+                },
+              });
+            }
+          } catch (error) {
+            console.error("Failed to create new organization:", error);
+            toast.error("Failed to create new organization");
+            throw new Error("org_creation_failed");
+            // setPending(false);
+          }
 
-          eventResult = event;
+          const eventFullUrl = eventData?.logo ?? orgLogoFullUrl;
 
-          setExistingEvent(eventResult);
-          // console.log(event);
-          // console.log(currentValues.event);
-
-          reset(
-            merge({}, currentValues, {
-              event,
-            }),
-          );
-
-          setPending(false);
-        } catch (error) {
-          console.error("Failed to create new event:", error);
-          toast.error("Failed to create new event");
-          setPending(false);
-        }
-      }
-      if (activeStep === 2 && hasUserEditedEventSteps) {
-        let eventResult = null;
-
-        try {
-          setPending(true);
-
-          const { event } = await createOrUpdateEvent({
-            _id: eventData._id || "",
-            name: eventData.name,
-            slug:
-              existingEvent?.slug ??
-              slugify(eventData.name, { lower: true, strict: true }),
-
-            logo: eventData.logo as string | "1.jpg",
-            type: eventData.type || [],
-            category: !eventOnly ? eventData.category : "event",
-            hasOpenCall:
-              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
-            dates: {
-              ...eventData.dates,
-            },
-            location: {
-              ...eventData.location,
-            },
-            about: eventData.about,
-            links: eventData.links,
-            otherInfo: eventData.otherInfo || undefined,
-            timeLine: eventData.timeLine,
-            adminNote: eventData.adminNote || undefined,
-            active: eventData.active,
-            orgId: orgData._id as Id<"organizations">,
-          });
-
-          eventResult = event;
-
-          setExistingEvent(eventResult);
-
-          reset(
-            merge({}, currentValues, {
+          if (existingEvent) {
+            // console.log("existing event");
+            const locationFromEvent = existingEvent.location?.full
+              ? existingEvent.location?.sameAsOrganizer
+                ? {
+                    ...currentValues.organization?.location,
+                    sameAsOrganizer: true,
+                  }
+                : {
+                    ...existingEvent.location,
+                  }
+              : {
+                  ...currentValues.organization?.location,
+                  sameAsOrganizer: true,
+                };
+            reset({
+              organization: {
+                ...orgResult,
+              },
               event: {
                 formType,
-                ...eventData,
-              },
-            }),
-          );
-
-          setPending(false);
-        } catch (error) {
-          console.error("Failed to create new event:", error);
-          toast.error("Failed to create new event");
-          setPending(false);
-        }
-      }
-      if (activeStep === 3 && hasUserEditedStep3) {
-        let openCallFiles = null;
-        let saveResults: {
-          id: Id<"openCallFiles">;
-          url: string;
-          fileName?: string;
-          storageId: Id<"_storage">;
-        }[] = [];
-
-        if (!openCallData) return;
-
-        if (openCallData.tempFiles && openCallData.tempFiles?.length > 0) {
-          const result = await handleOrgFileUrl({
-            data: { files: openCallData.tempFiles },
-            generateUploadUrl,
-          });
-
-          if (!result) {
-            toast.error("Failed to upload files", {
-              autoClose: 2000,
-              pauseOnHover: false,
-              hideProgressBar: true,
-            });
-            return;
-          }
-          openCallFiles = result;
-
-          saveResults = await saveOrgFile({
-            files: result,
-            reason: "docs",
-            organizationId: orgData._id as Id<"organizations">,
-            eventId: eventData._id as Id<"events">,
-            openCallId: openCallData._id
-              ? (openCallData._id as Id<"openCalls">)
-              : undefined,
-          });
-        }
-        const documents = saveResults.map((saved, i) => {
-          const matched = openCallFiles?.find(
-            (original) => original.storageId === saved.storageId,
-          );
-
-          return {
-            id: saved.id,
-            title:
-              matched?.fileName ??
-              `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
-            href: saved.url,
-          };
-        });
-
-        try {
-          setPending(true);
-          const ocResult = await createOrUpdateOpenCall({
-            orgId: orgData._id as Id<"organizations">,
-            eventId: eventData._id as Id<"events">,
-            openCallId: openCallData?._id as Id<"openCalls">,
-            basicInfo: {
-              appFee: paidCall ? openCallData.basicInfo.appFee : 0,
-              callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
-              callType: eventData.hasOpenCall ?? "False",
-              dates: {
-                ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
-                ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
-                timezone: orgData.location?.timezone ?? "",
-                edition: eventData.dates.edition,
-              },
-            },
-            eligibility: {
-              type: openCallData.eligibility.type,
-              whom: openCallData.eligibility?.whom ?? [],
-              details: openCallData.eligibility.details,
-            },
-            compensation: {
-              budget: {
-                hasBudget:
-                  projectBudget?.hasBudget ??
-                  openCallData.compensation?.budget?.hasBudget ??
-                  (formType === 3 ? true : false),
-                min:
-                  projectBudget?.min ??
-                  openCallData.compensation?.budget?.min ??
-                  0,
-                max:
-                  projectBudget?.max ??
-                  openCallData.compensation?.budget?.max ??
-                  0,
-                rate:
-                  projectBudget?.rate ??
-                  openCallData.compensation?.budget?.rate ??
-                  0,
-                unit:
-                  projectBudget?.unit ??
-                  openCallData.compensation?.budget?.unit ??
-                  "",
-                currency: orgData.location?.currency?.code ?? "",
-                allInclusive:
-                  projectBudget?.allInclusive ??
-                  openCallData.compensation?.budget?.allInclusive ??
-                  false,
-                moreInfo:
-                  projectBudget?.moreInfo ??
-                  openCallData.compensation?.budget?.moreInfo,
-              },
-              categories: {
-                artistStipend:
-                  openCallData.compensation?.categories?.artistStipend ??
-                  undefined,
-                designFee:
-                  openCallData.compensation?.categories?.designFee ?? undefined,
-                accommodation:
-                  openCallData.compensation?.categories?.accommodation ??
-                  undefined,
-                food: openCallData.compensation?.categories?.food ?? undefined,
-                travelCosts:
-                  openCallData.compensation?.categories?.travelCosts ??
-                  undefined,
-                materials:
-                  openCallData.compensation?.categories?.materials ?? undefined,
-                equipment:
-                  openCallData.compensation?.categories?.equipment ?? undefined,
-              },
-            },
-            requirements: {
-              requirements: openCallData.requirements.requirements,
-              more: "reqsMore",
-              destination: "reqsDestination",
-              links: openCallData.requirements.links,
-              applicationLink: openCallData.requirements.applicationLink,
-              applicationLinkFormat:
-                openCallData.requirements.applicationLinkFormat,
-              applicationLinkSubject:
-                openCallData.requirements.applicationLinkSubject,
-              otherInfo: openCallData.requirements.otherInfo,
-            },
-            documents,
-            paid: openCallData.paid ?? false,
-          });
-
-          let lastEditedResult = null;
-          if (existingEvent?._id) {
-            lastEditedResult = await updateEventLastEditedAt({
-              eventId: existingEvent._id,
-            });
-          }
-          if (lastEditedResult) {
-            const lastEditedAt = lastEditedResult.lastEditedAt;
-            setLastSaved(lastEditedAt);
-            if (existingEvent) {
-              setExistingEvent({
                 ...existingEvent,
-                lastEditedAt,
-              });
-            }
+                logo: eventFullUrl,
+                logoStorageId: existingEvent?.logoStorageId ?? orgLogoStorageId,
+                links: eventLinks,
+                // category: existingEvent.category,
+                // type: existingEvent.type ?? [],
+                location: locationFromEvent,
+                dates: {
+                  ...existingEvent.dates,
+                },
+              },
+            });
+          } else {
+            reset({
+              organization: {
+                ...orgResult,
+              },
+              event: {
+                formType,
+                name: "",
+                logo: orgLogoFullUrl || eventFullUrl,
+                logoStorageId: orgLogoStorageId,
+                links: eventLinks,
+                location: {
+                  ...(orgResult?.location ||
+                    currentValues.organization?.location),
+                  sameAsOrganizer: true,
+                },
+                dates: {
+                  edition: new Date().getFullYear(),
+                  noProdStart: false,
+                },
+
+                hasOpenCall:
+                  eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
+              },
+            });
           }
-
-          // reset({
-          //   ...currentValues,
-          //   openCall: {
-          //     ...(ocResult || currentValues.openCall),
-          //   },
-          // });
-          reset(
-            merge({}, currentValues, {
-              openCall: {
-                ...(ocResult || currentValues.openCall),
-              },
-            }),
-          );
-        } catch (error) {
-          console.error("Failed to create or update open call:", error);
-          toast.error("Failed to create or update open call");
-        } finally {
-          setPending(false);
         }
-      }
-      if (activeStep === 4 && hasUserEditedStep4) {
-        if (!openCallData) return;
-
-        try {
-          setPending(true);
-          await createOrUpdateOpenCall({
-            orgId: orgData._id as Id<"organizations">,
-            eventId: eventData._id as Id<"events">,
-            openCallId: openCallData?._id as Id<"openCalls">,
-            basicInfo: {
-              appFee: paidCall ? openCallData.basicInfo.appFee : 0,
-              callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
-              callType: eventData.hasOpenCall ?? "False",
-              dates: {
-                ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
-                ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
-                timezone: orgData.location?.timezone ?? "",
-                edition: eventData.dates.edition,
-              },
-            },
-            eligibility: {
-              type: openCallData.eligibility.type,
-              whom: openCallData.eligibility?.whom ?? [],
-              details: openCallData.eligibility.details,
-            },
-            compensation: {
-              budget: {
-                hasBudget:
-                  openCallData.compensation?.budget?.hasBudget ??
-                  (formType === 3 ? true : false),
-                min: openCallData.compensation?.budget?.min ?? 0,
-                max: openCallData.compensation?.budget?.max ?? 0,
-                rate: openCallData.compensation?.budget?.rate ?? 0,
-                unit: openCallData.compensation?.budget?.unit ?? "",
-                currency: orgData.location?.currency?.code ?? "",
-                allInclusive:
-                  openCallData.compensation?.budget?.allInclusive ?? false,
-                moreInfo: openCallData.compensation?.budget?.moreInfo,
-              },
-              categories: {
-                artistStipend:
-                  openCallData.compensation.categories.artistStipend,
-                designFee: openCallData.compensation.categories.designFee,
-                accommodation:
-                  openCallData.compensation.categories.accommodation,
-                food: openCallData.compensation.categories.food,
-                travelCosts: openCallData.compensation.categories.travelCosts,
-                materials: openCallData.compensation.categories.materials,
-                equipment: openCallData.compensation.categories.equipment,
-              },
-            },
-            requirements: {
-              requirements: openCallData.requirements.requirements,
-              more: undefined,
-              destination: undefined,
-              links: openCallData.requirements.links,
-              applicationLink: openCallData.requirements.applicationLink,
-              applicationLinkFormat:
-                openCallData.requirements.applicationLinkFormat,
-              applicationLinkSubject:
-                openCallData.requirements.applicationLinkSubject,
-              otherInfo: openCallData.requirements.otherInfo,
-            },
-            documents: openCallData.documents as
-              | {
-                  id: Id<"openCallFiles">;
-                  title: string;
-                  href: string;
-                }[]
+        // await handleFormValues();
+        if (activeStep === 1 && hasUserEditedEventSteps) {
+          let result = {
+            logoStorageId: eventData?.logoStorageId as
+              | Id<"_storage">
               | undefined,
+            timezone: existingEvent?.location?.timezone,
+            timezoneOffset: existingEvent?.location?.timezoneOffset,
+          };
 
-            paid: openCallData.paid ?? false,
-          });
-          let lastEditedResult = null;
-          if (existingEvent?._id) {
-            lastEditedResult = await updateEventLastEditedAt({
-              eventId: existingEvent._id,
+          const needsUpload =
+            (eventData?.logo && typeof eventData.logo !== "string") ||
+            !eventData?.logoStorageId;
+
+          if (needsUpload) {
+            const uploadResult = await handleFileUrl({
+              data: eventData,
+              generateUploadUrl,
+              getTimezone,
+            });
+
+            if (!uploadResult) {
+              toast.error("Failed to upload logo", {
+                autoClose: 2000,
+                pauseOnHover: false,
+                hideProgressBar: true,
+              });
+              // return;
+              throw new Error("event_logo_upload_failed");
+            }
+            result = uploadResult;
+            // console.log(result);
+          }
+          // console.log("doesnt need upload");
+          const { logoStorageId, timezone, timezoneOffset } = result;
+          // console.log(logoStorageId, timezone, timezoneOffset);
+          let eventResult = null;
+          const eventLogo =
+            typeof eventData.logo === "string" ? eventData.logo : "1.jpg";
+
+          try {
+            // setPending(true);
+            const prodDates =
+              eventData.dates.prodFormat === "sameAsEvent"
+                ? eventData.dates.eventDates
+                : eventData.dates.prodDates;
+
+            const { event } = await createOrUpdateEvent({
+              formType,
+              _id: eventData._id || "",
+              name: eventData.name,
+              slug:
+                existingEvent?.slug ??
+                slugify(eventData.name, { lower: true, strict: true }),
+              logoStorageId,
+              logo: eventLogo,
+              type: eventData.type || [],
+              category: !eventOnly ? eventData.category : "event",
+              hasOpenCall:
+                eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
+              dates: {
+                edition: eventData.dates.edition,
+                eventDates: eventData.dates.eventDates,
+                eventFormat: eventData.dates.eventFormat,
+                prodDates,
+                prodFormat: eventData.dates.prodFormat,
+                noProdStart: eventData.dates.noProdStart,
+              },
+              location: {
+                ...eventData.location,
+                timezone: timezone,
+                timezoneOffset: timezoneOffset,
+              },
+              about: eventData.about,
+              timeLine: eventData.timeLine,
+              links: eventData.links,
+              otherInfo: eventData.otherInfo || undefined,
+              adminNote: eventData.adminNote || undefined,
+              active: eventData.active,
+              orgId: orgData._id as Id<"organizations">,
+            });
+
+            eventResult = event;
+
+            setExistingEvent(eventResult);
+            // console.log(event);
+            // console.log(currentValues.event);
+
+            reset(
+              merge({}, currentValues, {
+                event,
+              }),
+            );
+
+            // setPending(false);
+          } catch (error) {
+            console.error("Failed to create new event:", error);
+            toast.error("Failed to create new event");
+            throw new Error("event_creation_failed");
+            // setPending(false);
+          }
+        }
+        if (activeStep === 2 && hasUserEditedEventSteps) {
+          let eventResult = null;
+
+          try {
+            // setPending(true);
+
+            const { event } = await createOrUpdateEvent({
+              _id: eventData._id || "",
+              name: eventData.name,
+              slug:
+                existingEvent?.slug ??
+                slugify(eventData.name, { lower: true, strict: true }),
+
+              logo: eventData.logo as string | "1.jpg",
+              type: eventData.type || [],
+              category: !eventOnly ? eventData.category : "event",
+              hasOpenCall:
+                eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
+              dates: {
+                ...eventData.dates,
+              },
+              location: {
+                ...eventData.location,
+              },
+              about: eventData.about,
+              links: eventData.links,
+              otherInfo: eventData.otherInfo || undefined,
+              timeLine: eventData.timeLine,
+              adminNote: eventData.adminNote || undefined,
+              active: eventData.active,
+              orgId: orgData._id as Id<"organizations">,
+            });
+
+            eventResult = event;
+
+            setExistingEvent(eventResult);
+
+            reset(
+              merge({}, currentValues, {
+                event: {
+                  formType,
+                  ...eventData,
+                },
+              }),
+            );
+
+            // setPending(false);
+          } catch (error) {
+            console.error("Failed to update event:", error);
+            toast.error("Failed to update event");
+            throw new Error("event_update_failed");
+            // setPending(false);
+          }
+        }
+        if (activeStep === 3 && hasUserEditedStep3) {
+          let openCallFiles = null;
+          let saveResults: {
+            id: Id<"openCallFiles">;
+            url: string;
+            fileName?: string;
+            storageId: Id<"_storage">;
+          }[] = [];
+
+          if (!openCallData) return;
+
+          if (openCallData.tempFiles && openCallData.tempFiles?.length > 0) {
+            const result = await handleOrgFileUrl({
+              data: { files: openCallData.tempFiles },
+              generateUploadUrl,
+            });
+
+            if (!result) {
+              toast.error("Failed to upload files", {
+                autoClose: 2000,
+                pauseOnHover: false,
+                hideProgressBar: true,
+              });
+              throw new Error("open_call_file_upload_failed");
+              // return;
+            }
+            openCallFiles = result;
+
+            saveResults = await saveOrgFile({
+              files: result,
+              reason: "docs",
+              organizationId: orgData._id as Id<"organizations">,
+              eventId: eventData._id as Id<"events">,
+              openCallId: openCallData._id
+                ? (openCallData._id as Id<"openCalls">)
+                : undefined,
             });
           }
-          if (lastEditedResult) {
-            const lastEditedAt = lastEditedResult.lastEditedAt;
-            setLastSaved(lastEditedAt);
-            if (existingEvent) {
-              setExistingEvent({
-                ...existingEvent,
-                lastEditedAt,
+          const documents = saveResults.map((saved, i) => {
+            const matched = openCallFiles?.find(
+              (original) => original.storageId === saved.storageId,
+            );
+
+            return {
+              id: saved.id,
+              title:
+                matched?.fileName ??
+                `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
+              href: saved.url,
+            };
+          });
+
+          try {
+            // setPending(true);
+            const ocResult = await createOrUpdateOpenCall({
+              orgId: orgData._id as Id<"organizations">,
+              eventId: eventData._id as Id<"events">,
+              openCallId: openCallData?._id as Id<"openCalls">,
+              basicInfo: {
+                appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+                callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
+                callType: eventData.hasOpenCall ?? "False",
+                dates: {
+                  ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
+                  ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
+                  timezone: orgData.location?.timezone ?? "",
+                  edition: eventData.dates.edition,
+                },
+              },
+              eligibility: {
+                type: openCallData.eligibility.type,
+                whom: openCallData.eligibility?.whom ?? [],
+                details: openCallData.eligibility.details,
+              },
+              compensation: {
+                budget: {
+                  hasBudget:
+                    projectBudget?.hasBudget ??
+                    openCallData.compensation?.budget?.hasBudget ??
+                    (formType === 3 ? true : false),
+                  min:
+                    projectBudget?.min ??
+                    openCallData.compensation?.budget?.min ??
+                    0,
+                  max:
+                    projectBudget?.max ??
+                    openCallData.compensation?.budget?.max ??
+                    0,
+                  rate:
+                    projectBudget?.rate ??
+                    openCallData.compensation?.budget?.rate ??
+                    0,
+                  unit:
+                    projectBudget?.unit ??
+                    openCallData.compensation?.budget?.unit ??
+                    "",
+                  currency: orgData.location?.currency?.code ?? "",
+                  allInclusive:
+                    projectBudget?.allInclusive ??
+                    openCallData.compensation?.budget?.allInclusive ??
+                    false,
+                  moreInfo:
+                    projectBudget?.moreInfo ??
+                    openCallData.compensation?.budget?.moreInfo,
+                },
+                categories: {
+                  artistStipend:
+                    openCallData.compensation?.categories?.artistStipend ??
+                    undefined,
+                  designFee:
+                    openCallData.compensation?.categories?.designFee ??
+                    undefined,
+                  accommodation:
+                    openCallData.compensation?.categories?.accommodation ??
+                    undefined,
+                  food:
+                    openCallData.compensation?.categories?.food ?? undefined,
+                  travelCosts:
+                    openCallData.compensation?.categories?.travelCosts ??
+                    undefined,
+                  materials:
+                    openCallData.compensation?.categories?.materials ??
+                    undefined,
+                  equipment:
+                    openCallData.compensation?.categories?.equipment ??
+                    undefined,
+                },
+              },
+              requirements: {
+                requirements: openCallData.requirements.requirements,
+                more: "reqsMore",
+                destination: "reqsDestination",
+                links: openCallData.requirements.links,
+                applicationLink: openCallData.requirements.applicationLink,
+                applicationLinkFormat:
+                  openCallData.requirements.applicationLinkFormat,
+                applicationLinkSubject:
+                  openCallData.requirements.applicationLinkSubject,
+                otherInfo: openCallData.requirements.otherInfo,
+              },
+              documents,
+              paid: openCallData.paid ?? false,
+            });
+
+            let lastEditedResult = null;
+            if (existingEvent?._id) {
+              lastEditedResult = await updateEventLastEditedAt({
+                eventId: existingEvent._id,
               });
             }
-          }
-
-          reset({
-            ...currentValues,
-            openCall: {
-              ...currentValues.openCall,
-            },
-          });
-        } catch (error) {
-          console.error("Failed to create or update open call:", error);
-          toast.error("Failed to create or update open call");
-        } finally {
-          setPending(false);
-        }
-      }
-      if (activeStep === steps.length - 2) {
-        // console.log("saving org details");
-
-        try {
-          setPending(true);
-          // console.log("orgData presave", orgData);
-
-          const result = await updateOrg({
-            orgId: orgData._id as Id<"organizations">,
-            name: orgData.name?.trim(),
-            slug:
-              existingOrg?.slug ??
-              slugify(orgData.name?.trim(), { lower: true, strict: true }),
-            logo: orgData.logo as string,
-            location: {
-              ...orgData.location,
-            },
-            contact: {
-              organizer: orgData.contact?.organizer,
-              primaryContact: orgData.contact?.primaryContact || "",
-            },
-            about: orgData.about,
-            links: orgData.links,
-            isComplete: true,
-          });
-
-          if (!result) {
-            toast.error("Failed to update organization");
-            setPending(false);
-            return;
-          }
-          let lastEditedResult = null;
-          if (existingEvent?._id) {
-            lastEditedResult = await updateEventLastEditedAt({
-              eventId: existingEvent._id,
-            });
-          }
-          if (lastEditedResult) {
-            const lastEditedAt = lastEditedResult.lastEditedAt;
-            setLastSaved(lastEditedAt);
-            if (existingEvent) {
-              setExistingEvent({
-                ...existingEvent,
-                lastEditedAt,
-              });
+            if (lastEditedResult) {
+              const lastEditedAt = lastEditedResult.lastEditedAt;
+              setLastSaved(lastEditedAt);
+              if (existingEvent) {
+                setExistingEvent({
+                  ...existingEvent,
+                  lastEditedAt,
+                });
+              }
             }
+
+            // reset({
+            //   ...currentValues,
+            //   openCall: {
+            //     ...(ocResult || currentValues.openCall),
+            //   },
+            // });
+            reset(
+              merge({}, currentValues, {
+                openCall: {
+                  ...(ocResult || currentValues.openCall),
+                },
+              }),
+            );
+          } catch (error) {
+            console.error("Failed to create or update open call:", error);
+            toast.error("Failed to create or update open call");
+            throw new Error("open_call_create_update_failed");
           }
-
-          reset({
-            ...currentValues,
-            organization: {
-              ...result.org,
-            },
-          });
-
-          // console.log("result", result);
-
-          setPending(false);
-        } catch (error) {
-          console.error("Failed to submit event:", error);
-          toast.error("Failed to submit event");
-          setPending(false);
         }
-      }
-      if (activeStep === steps.length - 1) {
-        // console.log("saving final step");
-        let eventResult = null;
-        const eventLinks =
-          eventData.links && Object.keys(eventData.links).length > 1
-            ? eventData.links
-            : orgData.links && {
-                ...orgData.links,
-                sameAsOrganizer: true,
-              };
+        if (activeStep === 4 && hasUserEditedStep4) {
+          if (!openCallData) return;
 
-        // console.log(eventLinks);
-        try {
-          setPending(true);
-
-          if (existingOrg?.isComplete !== true) {
-            await markOrganizationComplete({
-              orgId: (orgData?._id || existingOrg?._id) as Id<"organizations">,
-            });
-          }
-
-          const { event } = await createOrUpdateEvent({
-            formType,
-            _id: eventData._id || "",
-            name: eventData.name,
-            slug:
-              existingEvent?.slug ??
-              slugify(eventData.name, { lower: true, strict: true }),
-            logo: eventData.logo as string,
-            type: eventData.type || [],
-            category: !eventOnly ? eventData.category : "event",
-            hasOpenCall:
-              eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
-            dates: {
-              ...eventData.dates,
-            },
-            location: {
-              ...eventData.location,
-            },
-            about: eventData.about,
-            links: eventLinks,
-            otherInfo: eventData.otherInfo || undefined,
-            timeLine: eventData.timeLine,
-            adminNote: eventData.adminNote || undefined,
-
-            active: eventData.active,
-
-            finalStep,
-            publish,
-            orgId: orgData._id as Id<"organizations">,
-          });
-          if (hasOpenCall && openCallData) {
+          try {
+            // setPending(true);
             await createOrUpdateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
               openCallId: openCallData?._id as Id<"openCalls">,
               basicInfo: {
                 appFee: paidCall ? openCallData.basicInfo.appFee : 0,
-                callFormat: openCallData.basicInfo.callFormat,
+                callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
                 callType: eventData.hasOpenCall ?? "False",
                 dates: {
                   ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
@@ -1451,7 +1259,6 @@ export const EventOCForm = ({
                 requirements: openCallData.requirements.requirements,
                 more: undefined,
                 destination: undefined,
-
                 links: openCallData.requirements.links,
                 applicationLink: openCallData.requirements.applicationLink,
                 applicationLinkFormat:
@@ -1468,19 +1275,246 @@ export const EventOCForm = ({
                   }[]
                 | undefined,
 
-              state: publish ? "published" : "submitted",
-              finalStep,
-              approved: publish,
-              paid: formType === 3 && !alreadyPaid ? false : true,
+              paid: openCallData.paid ?? false,
             });
+            let lastEditedResult = null;
+            if (existingEvent?._id) {
+              lastEditedResult = await updateEventLastEditedAt({
+                eventId: existingEvent._id,
+              });
+            }
+            if (lastEditedResult) {
+              const lastEditedAt = lastEditedResult.lastEditedAt;
+              setLastSaved(lastEditedAt);
+              if (existingEvent) {
+                setExistingEvent({
+                  ...existingEvent,
+                  lastEditedAt,
+                });
+              }
+            }
+
+            reset({
+              ...currentValues,
+              openCall: {
+                ...currentValues.openCall,
+              },
+            });
+          } catch (error) {
+            console.error("Failed to update open call:", error);
+            toast.error("Failed to update open call");
           }
-          eventResult = event;
-          setExistingEvent(eventResult);
-        } catch (error) {
-          console.error("Failed to submit:", error);
-          toast.error("Failed to submit");
-        } finally {
+        }
+        if (activeStep === steps.length - 2) {
+          // console.log("saving org details");
+
+          try {
+            // setPending(true);
+            // console.log("orgData presave", orgData);
+
+            const result = await updateOrg({
+              orgId: orgData._id as Id<"organizations">,
+              name: orgData.name?.trim(),
+              slug:
+                existingOrg?.slug ??
+                slugify(orgData.name?.trim(), { lower: true, strict: true }),
+              logo: orgData.logo as string,
+              location: {
+                ...orgData.location,
+              },
+              contact: {
+                organizer: orgData.contact?.organizer,
+                primaryContact: orgData.contact?.primaryContact || "",
+              },
+              about: orgData.about,
+              links: orgData.links,
+              isComplete: true,
+            });
+
+            if (!result) {
+              toast.error("Failed to update organization");
+              // setPending(false);
+              return;
+            }
+            let lastEditedResult = null;
+            if (existingEvent?._id) {
+              lastEditedResult = await updateEventLastEditedAt({
+                eventId: existingEvent._id,
+              });
+            }
+            if (lastEditedResult) {
+              const lastEditedAt = lastEditedResult.lastEditedAt;
+              setLastSaved(lastEditedAt);
+              if (existingEvent) {
+                setExistingEvent({
+                  ...existingEvent,
+                  lastEditedAt,
+                });
+              }
+            }
+
+            reset({
+              ...currentValues,
+              organization: {
+                ...result.org,
+              },
+            });
+
+            // console.log("result", result);
+
+            // setPending(false);
+          } catch (error) {
+            console.error("Failed to update organization final step:", error);
+            toast.error("Failed to update organization");
+            throw new Error("org_final_step_failed");
+            // setPending(false);
+          }
+        }
+        if (activeStep === steps.length - 1) {
+          // console.log("saving final step");
+          let eventResult = null;
+          const eventLinks =
+            eventData.links && Object.keys(eventData.links).length > 1
+              ? eventData.links
+              : orgData.links && {
+                  ...orgData.links,
+                  sameAsOrganizer: true,
+                };
+
+          // console.log(eventLinks);
+          try {
+            // setPending(true);
+
+            if (existingOrg?.isComplete !== true) {
+              await markOrganizationComplete({
+                orgId: (orgData?._id ||
+                  existingOrg?._id) as Id<"organizations">,
+              });
+            }
+
+            const { event } = await createOrUpdateEvent({
+              formType,
+              _id: eventData._id || "",
+              name: eventData.name,
+              slug:
+                existingEvent?.slug ??
+                slugify(eventData.name, { lower: true, strict: true }),
+              logo: eventData.logo as string,
+              type: eventData.type || [],
+              category: !eventOnly ? eventData.category : "event",
+              hasOpenCall:
+                eventData.hasOpenCall ?? (eventOnly ? "False" : "Fixed"),
+              dates: {
+                ...eventData.dates,
+              },
+              location: {
+                ...eventData.location,
+              },
+              about: eventData.about,
+              links: eventLinks,
+              otherInfo: eventData.otherInfo || undefined,
+              timeLine: eventData.timeLine,
+              adminNote: eventData.adminNote || undefined,
+
+              active: eventData.active,
+
+              finalStep,
+              publish,
+              orgId: orgData._id as Id<"organizations">,
+            });
+            if (hasOpenCall && openCallData) {
+              await createOrUpdateOpenCall({
+                orgId: orgData._id as Id<"organizations">,
+                eventId: eventData._id as Id<"events">,
+                openCallId: openCallData?._id as Id<"openCalls">,
+                basicInfo: {
+                  appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+                  callFormat: openCallData.basicInfo.callFormat,
+                  callType: eventData.hasOpenCall ?? "False",
+                  dates: {
+                    ocStart: openCallData.basicInfo?.dates?.ocStart ?? "",
+                    ocEnd: openCallData.basicInfo?.dates?.ocEnd ?? "",
+                    timezone: orgData.location?.timezone ?? "",
+                    edition: eventData.dates.edition,
+                  },
+                },
+                eligibility: {
+                  type: openCallData.eligibility.type,
+                  whom: openCallData.eligibility?.whom ?? [],
+                  details: openCallData.eligibility.details,
+                },
+                compensation: {
+                  budget: {
+                    hasBudget:
+                      openCallData.compensation?.budget?.hasBudget ??
+                      (formType === 3 ? true : false),
+                    min: openCallData.compensation?.budget?.min ?? 0,
+                    max: openCallData.compensation?.budget?.max ?? 0,
+                    rate: openCallData.compensation?.budget?.rate ?? 0,
+                    unit: openCallData.compensation?.budget?.unit ?? "",
+                    currency: orgData.location?.currency?.code ?? "",
+                    allInclusive:
+                      openCallData.compensation?.budget?.allInclusive ?? false,
+                    moreInfo: openCallData.compensation?.budget?.moreInfo,
+                  },
+                  categories: {
+                    artistStipend:
+                      openCallData.compensation.categories.artistStipend,
+                    designFee: openCallData.compensation.categories.designFee,
+                    accommodation:
+                      openCallData.compensation.categories.accommodation,
+                    food: openCallData.compensation.categories.food,
+                    travelCosts:
+                      openCallData.compensation.categories.travelCosts,
+                    materials: openCallData.compensation.categories.materials,
+                    equipment: openCallData.compensation.categories.equipment,
+                  },
+                },
+                requirements: {
+                  requirements: openCallData.requirements.requirements,
+                  more: undefined,
+                  destination: undefined,
+
+                  links: openCallData.requirements.links,
+                  applicationLink: openCallData.requirements.applicationLink,
+                  applicationLinkFormat:
+                    openCallData.requirements.applicationLinkFormat,
+                  applicationLinkSubject:
+                    openCallData.requirements.applicationLinkSubject,
+                  otherInfo: openCallData.requirements.otherInfo,
+                },
+                documents: openCallData.documents as
+                  | {
+                      id: Id<"openCallFiles">;
+                      title: string;
+                      href: string;
+                    }[]
+                  | undefined,
+
+                state: publish ? "published" : "submitted",
+                finalStep,
+                approved: publish,
+                paid: formType === 3 && !alreadyPaid ? false : true,
+              });
+            }
+            eventResult = event;
+            setExistingEvent(eventResult);
+          } catch (error) {
+            console.error("Failed to submit:", error);
+            toast.error("Failed to submit");
+          }
+        }
+      } catch (err) {
+        // console.error("Failed to submit:", error);
+        if ((err as Error)?.message !== "validation_failed") {
+          toast.error("Save failed");
+          console.error(err);
+        }
+      } finally {
+        if (latestSaveId.current === saveId) {
           setPending(false);
+        }
+        if (activeStep === steps.length - 1) {
           setOpen(false);
         }
       }
@@ -1675,10 +1709,11 @@ export const EventOCForm = ({
       // console.log(now, last);
 
       if (shouldSave) {
-        handleSave().then(() => {
-          // console.log("Autosaved at", new Date().toLocaleTimeString());
-          setPending(false);
-        });
+        // handleSave().then(() => {
+        //   // console.log("Autosaved at", new Date().toLocaleTimeString());
+        //   setPending(false);
+        // });
+        handleSave();
       }
     }, 5000); // check every 5 seconds (adjustable)
 
@@ -1857,10 +1892,11 @@ export const EventOCForm = ({
     }
 
     if (eventDatesFormat === "yearRange") {
+      const y = toYear(new Date());
       setValue("event.dates.eventDates", [
         {
-          start: new Date().getFullYear().toString(),
-          end: "",
+          start: y,
+          end: y,
         },
       ]);
     }

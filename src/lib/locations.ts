@@ -23,6 +23,20 @@ export interface MapboxSuggestion {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
+export const USAddressFormatCountries = [
+  "United States",
+  "Canada",
+  "Mexico",
+  "United Kingdom",
+  "Australia",
+  "Ireland",
+  "New Zealand",
+  "South Africa",
+  "Philippines",
+  "India",
+  "Israel",
+];
+
 export const COUNTRIES_REQUIRING_STATE = [
   "US", // United States
   "CA", // Canada

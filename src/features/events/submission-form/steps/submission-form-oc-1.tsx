@@ -74,7 +74,9 @@ const SubmissionFormOC1 = ({
 
   const pastEvent = pastEventCheck && !isAdmin;
   const freeCall = formType === 2;
-  const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">("");
+  const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">(
+    isAdmin ? "false" : "",
+  );
 
   const openCall = watch("openCall");
   const organizer = watch("organization");

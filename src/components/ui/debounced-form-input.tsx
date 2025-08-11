@@ -84,6 +84,9 @@ export function DebouncedControllerInput<
           shouldValidate: true,
           shouldDirty: true,
         });
+        requestAnimationFrame(() => {
+          field.onBlur();
+        });
       }}
       onBlur={(e) => {
         field.onBlur();

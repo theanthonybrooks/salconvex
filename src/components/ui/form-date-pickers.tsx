@@ -184,14 +184,11 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         );
       } else if (formatValue === "yearRange") {
         // console.log("year range");
-        setValue(
-          "event.dates.prodDates",
-          [{ start: toYear(new Date()), end: "" }],
-          {
-            shouldValidate: true,
-            shouldDirty: true,
-          },
-        );
+        const y = toYear(new Date());
+        setValue("event.dates.prodDates", [{ start: y, end: y }], {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
       } else if (formatValue === "seasonRange") {
         setValue(
           "event.dates.prodDates",
@@ -522,15 +519,35 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                   name={`${nameBase}.${formatKey}.0.start` as Path<T>}
                   control={control}
                   render={({ field }) => {
+                    const endPath =
+                      `${nameBase}.${formatKey}.0.end` as Path<EventOCFormValues>;
+
                     return (
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="year"
                         value={watchedStart as CustomDatePickerProps["value"]}
-                        onChange={(date) => field.onChange(toYear(date))}
+                        // onChange={(date) => field.onChange(toYear(date))}
+                        onChange={(date) => {
+                          const y = toYear(date);
+                          field.onChange(y);
+
+                          const currentEnd = watch(endPath) as
+                            | string
+                            | undefined;
+                          if (
+                            !currentEnd ||
+                            parseInt(currentEnd, 10) < parseInt(y, 10)
+                          ) {
+                            setValue(endPath, y, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                          }
+                        }}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"
-                        maxDate={formatDatesArray?.[0]?.end}
+                        // maxDate={formatDatesArray?.[0]?.end}
                       />
                     );
                   }}
