@@ -97,7 +97,7 @@ export const TooltipSimple = ({
   const sideOffsetValue = showArrow ? sideOffset : 6;
 
   return (
-    <TooltipPrimitive.Provider delayDuration={delayDuration}>
+    <TooltipPrimitive.Provider delayDuration={delayDuration} >
       <TooltipPrimitive.Root>
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>

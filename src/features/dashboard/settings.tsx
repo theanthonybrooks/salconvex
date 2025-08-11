@@ -952,7 +952,7 @@ export default function SettingsPage() {
                       <SelectItem value="normal" center>
                         Normal (Default)
                       </SelectItem>
-                      <SelectItem value="large" center>
+                      <SelectItem value="large" center className="sm:text-base">
                         Large
                       </SelectItem>
                     </SelectContent>
