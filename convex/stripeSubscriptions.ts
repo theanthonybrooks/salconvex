@@ -660,6 +660,8 @@ export const subscriptionStoreWebhook = mutation({
             canceledAt: args.body.data.object.canceled_at
               ? new Date(args.body.data.object.canceled_at * 1000).getTime()
               : undefined,
+            customerCancellationReason:
+              args.body.data.object.cancellation_details.reason ?? undefined,
             endedAt: args.body.data.object.ended_at
               ? new Date(args.body.data.object.ended_at * 1000).getTime()
               : undefined,

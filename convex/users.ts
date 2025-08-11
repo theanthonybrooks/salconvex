@@ -95,9 +95,12 @@ export const usersWithSubscriptions = query({
         const currentStatus = cancelAt ? "canceled" : subscription?.status;
         const inactiveStatus =
           currentStatus === "canceled" || currentStatus === "past_due";
+        const cancelReason = cancelAt
+          ? subscription?.customerCancellationReason
+          : undefined;
         const cancelComment = cancelAt
           ? subscription?.customerCancellationComment
-          : null;
+          : undefined;
         const interval = subscription?.interval ?? "unknown";
         const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;
         let amount = subAmount ?? 0;
@@ -166,9 +169,10 @@ export const usersWithSubscriptions = query({
           subscription: label ?? "4. none",
           subStatus: currentStatus ?? "-",
           accountType: user.accountType ?? [],
-          cancelComment: cancelComment ?? null,
-          canceledAt: canceledAt ?? null,
-          lastActive: user.lastActive ?? null,
+          cancelComment,
+          cancelReason,
+          canceledAt,
+          lastActive: user.lastActive,
           role: user.role ?? "user",
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,

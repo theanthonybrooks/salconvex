@@ -29,6 +29,7 @@ export const userColumnLabels: Record<string, string> = {
   subscription: "Subscription",
   subStatus: "Sub Status",
   cancelComment: "Cancel Comment",
+  cancelReason: "Cancel Reason",
   canceledAt: "Canceled At",
   lastActive: "Last Active",
   accountType: "Account Type",
@@ -45,9 +46,10 @@ interface UserColumnsProps {
   email: string;
   subscription: string;
   subStatus: string;
-  cancelComment: string | null;
-  canceledAt: number | null;
-  lastActive: number | null;
+  cancelComment?: string;
+  cancelReason?: string;
+  canceledAt?: number;
+  lastActive?: number;
   accountType: string[];
   createdAt: number;
   role: string[];
@@ -178,6 +180,30 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       return filterValue.includes(row.getValue(columnId));
     },
   },
+
+  {
+    accessorKey: "cancelReason",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Cancel Reason" />
+    ),
+    cell: ({ row }) => {
+      const cancelReason = row.getValue("cancelReason") as string | undefined;
+      return (
+        <TooltipSimple content={cancelReason}>
+          <div
+            className={cn(
+              "truncate text-sm text-muted-foreground",
+              !cancelReason && "text-center",
+            )}
+          >
+            {cancelReason || "-"}
+          </div>
+        </TooltipSimple>
+      );
+    },
+  },
   {
     accessorKey: "cancelComment",
     minSize: 120,
@@ -186,10 +212,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Cancel Comment" />
     ),
     cell: ({ row }) => {
-      const cancelComment = row.getValue("cancelComment") as string | null;
+      const cancelComment = row.getValue("cancelComment") as string | undefined;
       return (
         <TooltipSimple content={cancelComment}>
-          <div className="truncate text-sm text-muted-foreground">
+          <div
+            className={cn(
+              "truncate text-sm text-muted-foreground",
+              !cancelComment && "text-center",
+            )}
+          >
             {cancelComment || "-"}
           </div>
         </TooltipSimple>
@@ -206,7 +237,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const value = row.getValue("canceledAt") as number | undefined;
       return (
-        <div className="truncate text-sm text-muted-foreground">
+        <div
+          className={cn(
+            "truncate text-sm text-muted-foreground",
+            !value && "text-center",
+          )}
+        >
           {value ? new Date(value).toLocaleString() : "-"}
         </div>
       );
@@ -222,7 +258,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const value = row.getValue("lastActive") as number | undefined;
       return (
-        <div className="truncate text-sm text-muted-foreground">
+        <div
+          className={cn(
+            "truncate text-sm text-muted-foreground",
+            !value && "text-center",
+          )}
+        >
           {value ? new Date(value).toLocaleString() : "-"}
         </div>
       );
@@ -273,7 +314,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const organizationNames = row.getValue("organizationNames") as string[];
       return (
-        <div className="scrollable mini justy line-clamp-2 capitalize">
+        <div
+          className={cn(
+            "scrollable mini justy line-clamp-2 capitalize",
+            !organizationNames?.length && "text-center",
+          )}
+        >
           {organizationNames && organizationNames.length > 0
             ? organizationNames.join(", ")
             : "-"}
@@ -329,7 +375,9 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const value = row.getValue("source") as string | undefined;
       return (
         <TooltipSimple content={value}>
-          <p className={cn("truncate text-sm")}>{value ? value : "-"}</p>
+          <p className={cn("truncate text-sm", !value && "text-center")}>
+            {value ? value : "-"}
+          </p>
         </TooltipSimple>
       );
     },
