@@ -21,6 +21,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
+  TooltipSimple,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
@@ -153,17 +154,20 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
-            <p className="flex flex-col items-start gap-1 text-sm">
-              <span className="space-x-1 font-semibold">Location:</span>
+            <div className="flex flex-col items-start gap-1 text-sm">
+              <span className="flex items-baseline gap-1 font-semibold">
+                Location:
+                <TooltipSimple content="View on Map" side="top">
+                  <MapPin
+                    onClick={() => setActiveTab("event")}
+                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                  />
+                </TooltipSimple>
+              </span>
               <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                 {locationString}
-
-                <MapPin
-                  onClick={() => setActiveTab("event")}
-                  className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
-                />
               </span>
-            </p>
+            </div>
             {event.dates.eventFormat !== "noEvent" && (
               <div className="flex flex-col items-start gap-1 text-sm">
                 <span className="space-x-1 font-semibold">
@@ -273,10 +277,12 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 
-                  <MapPin
-                    onClick={() => setActiveTab("event")}
-                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
-                  />
+                  <TooltipSimple content="View on Map" side="top">
+                    <MapPin
+                      onClick={() => setActiveTab("event")}
+                      className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                    />
+                  </TooltipSimple>
                 </span>
 
                 <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">

@@ -38,6 +38,7 @@ import { api } from "~/convex/_generated/api";
 import { ApproveBtn } from "@/components/ui/approve-btn";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { Separator } from "@/components/ui/separator";
+import { TooltipSimple } from "@/components/ui/tooltip";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -220,8 +221,16 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </p>
           </div>
           <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
-            <p className="flex flex-col items-start gap-1">
-              <span className="space-x-1 font-semibold">Location:</span>
+            <div className="flex flex-col items-start gap-1">
+              <span className="flex items-baseline gap-1 font-semibold">
+                Location:
+                <TooltipSimple content="View on Map" side="top">
+                  <MapPin
+                    onClick={() => setActiveTab("event")}
+                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                  />
+                </TooltipSimple>
+              </span>
               <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
                 {locationString}
 
@@ -230,7 +239,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
                 />
               </span>
-            </p>
+            </div>
             {event.dates.eventFormat !== "noEvent" && (
               <div className="flex flex-col items-start gap-1">
                 <span className="space-x-1 font-semibold">

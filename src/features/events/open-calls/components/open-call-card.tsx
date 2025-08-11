@@ -251,7 +251,7 @@ const OpenCallCard = ({
 
             <AccordionItem value="BudgetComp">
               <AccordionTrigger
-                title=" Budget & Compensationsss:"
+                title=" Budget & Compensation:"
                 hasPreview
                 hidePreview
                 fontSize={fontSize}

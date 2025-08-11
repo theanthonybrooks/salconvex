@@ -1,8 +1,9 @@
 "use client";
+//TODO: once map page is built, connect the mapPin icons to that. Should have an organizer view on the map page.
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
@@ -13,7 +14,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
-import { TooltipSimple } from "@/components/ui/tooltip";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
@@ -137,12 +137,14 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
             )}
           >
             <p className="flex flex-col items-start gap-1">
-              <span className="space-x-1 font-semibold">
+              <span className="flex items-baseline gap-1 font-semibold">
                 Location:
-                <MapPin
-                  onClick={() => setActiveTab("event")}
-                  className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
-                />
+                {/* <TooltipSimple content="View on Map" side="top">
+                  <MapPin
+                    onClick={() => setActiveTab("event")}
+                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                  />
+                </TooltipSimple> */}
               </span>
               <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
                 {locationString}
@@ -219,12 +221,12 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                 <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
                   {locationString}
 
-                  <TooltipSimple content="View on Map" side="top">
+                  {/* <TooltipSimple content="View on Map" side="top">
                     <MapPin
                       onClick={() => setActiveTab("event")}
                       className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
                     />
-                  </TooltipSimple>
+                  </TooltipSimple> */}
                 </span>
               </div>
             </div>

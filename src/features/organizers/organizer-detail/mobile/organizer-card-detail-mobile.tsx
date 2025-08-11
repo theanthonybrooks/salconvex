@@ -2,7 +2,6 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { MapPin } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -131,10 +130,10 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
 
             <p className={cn("inline-flex items-end gap-x-1", fontSize)}>
               {locationString}
-              <MapPin
+              {/* <MapPin
                 onClick={() => setActiveTab("event")}
                 className="cursor-pointer transition-transform duration-150 hover:scale-105"
-              />
+              /> */}
             </p>
           </div>
         </div>
