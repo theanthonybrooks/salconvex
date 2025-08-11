@@ -471,7 +471,11 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <CanceledBanner activeSub={activeSub} subStatus={subStatus} />
+      <CanceledBanner
+        activeSub={activeSub}
+        subStatus={subStatus}
+        fontSize={fontSize}
+      />
       {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>

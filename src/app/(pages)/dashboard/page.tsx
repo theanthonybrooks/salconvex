@@ -50,6 +50,8 @@ export default function Dashboard() {
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");
@@ -127,7 +129,11 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <CanceledBanner activeSub={hasActiveSubscription} subStatus={subStatus} />
+      <CanceledBanner
+        activeSub={hasActiveSubscription}
+        subStatus={subStatus}
+        fontSize={fontSize}
+      />
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-2 text-foreground">

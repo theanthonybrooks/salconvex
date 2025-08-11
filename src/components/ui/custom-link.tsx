@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import Link from "next/link";
@@ -24,16 +26,29 @@ const linkVariants = cva(
 type CustomLinkProps = ComponentPropsWithRef<typeof Link> &
   VariantProps<typeof linkVariants> & {
     className?: string;
+    fontSize?: "text-sm" | "text-base";
   };
 
 const CustomLink = ({
   className,
   variant,
+  fontSize,
 
   ...props
 }: CustomLinkProps) => {
   return (
-    <Link className={cn(linkVariants({ variant }), className)} {...props} />
+    <Link
+      className={cn(
+        linkVariants({ variant }),
+        className,
+        fontSize === "text-base"
+          ? "lg:text-base"
+          : fontSize === "text-sm"
+            ? fontSize
+            : "",
+      )}
+      {...props}
+    />
   );
 };
 

@@ -228,7 +228,7 @@ export default function TheListNavBar(
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >
-                <Button className="h-9 border-2 border-transparent bg-background text-base font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95">
+                <Button className="h-9 border-2 border-transparent bg-background text-base font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95 sm:text-base">
                   View Pricing
                 </Button>
               </Link>
@@ -317,7 +317,7 @@ export default function TheListNavBar(
                       <Link
                         href="/auth/sign-in"
                         prefetch={true}
-                        className="font-bold"
+                        className="font-bold lg:text-base"
                       >
                         Sign in
                       </Link>
@@ -328,7 +328,7 @@ export default function TheListNavBar(
                       >
                         <Button
                           variant="salWithShadowHiddenBg"
-                          className="hidden rounded-full font-bold lg:block"
+                          className="hidden rounded-full font-bold sm:text-base lg:block"
                         >
                           Sign up
                         </Button>

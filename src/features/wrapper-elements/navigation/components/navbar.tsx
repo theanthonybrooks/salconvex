@@ -33,7 +33,7 @@ import React, { useState } from "react";
 interface NavBarProps {
   userId?: string;
   user?: User | null;
-  // userPref: UserPref | null
+
   subStatus?: string;
 }
 
@@ -41,13 +41,14 @@ export default function NavBar(
   {
     // user,
     // subStatus,
-  }: // userPref,
-  NavBarProps,
+  }: NavBarProps,
 ) {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const user = userData?.user ?? null;
+  // const userPref = userData?.userPref ?? null;
+  // const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { subStatus, hasActiveSubscription } = subData ?? {};
   const isAdmin = user?.role?.includes("admin");
   const isOrganizer = user?.accountType?.includes("organizer");
@@ -353,7 +354,7 @@ export default function NavBar(
                     <Link href="/auth/sign-in" prefetch={true}>
                       <Button
                         variant="link"
-                        className="hidden rounded-full font-bold lg:block"
+                        className="hidden rounded-full font-bold sm:text-base lg:block"
                       >
                         Sign in
                       </Button>
@@ -361,7 +362,7 @@ export default function NavBar(
                     <Link href="/auth/register" prefetch={true}>
                       <Button
                         variant="salWithShadowHiddenBg"
-                        className="hidden rounded-full font-bold lg:block"
+                        className="hidden rounded-full font-bold sm:text-base lg:block"
                       >
                         Sign up
                       </Button>

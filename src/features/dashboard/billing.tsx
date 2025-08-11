@@ -27,8 +27,11 @@ export default function BillingPage() {
   const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const { preloadedSubStatus } = useConvexPreload();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const userPref = userData?.userPref ?? null;
+  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { subscription, hasActiveSubscription } = subData;
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
@@ -218,7 +221,11 @@ export default function BillingPage() {
   return (
     <div className="flex w-max max-w-[100dvw] flex-col gap-6 p-6">
       {showConfetti && <ConfettiBlast active={showConfetti} />}
-      <CanceledBanner activeSub={hasActiveSubscription} subStatus={subStatus} />
+      <CanceledBanner
+        activeSub={hasActiveSubscription}
+        subStatus={subStatus}
+        fontSize={fontSize}
+      />
 
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">

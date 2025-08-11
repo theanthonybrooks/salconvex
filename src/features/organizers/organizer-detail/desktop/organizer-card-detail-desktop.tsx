@@ -137,14 +137,20 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
             )}
           >
             <p className="flex flex-col items-start gap-1">
-              <span className="space-x-1 font-semibold">Location:</span>
-              <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
-                {locationString}
-
+              <span className="space-x-1 font-semibold">
+                Location:
                 <MapPin
                   onClick={() => setActiveTab("event")}
                   className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
                 />
+              </span>
+              <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
+                {locationString}
+
+                {/* <MapPin
+                  onClick={() => setActiveTab("event")}
+                  className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
+                /> */}
               </span>
             </p>
 
