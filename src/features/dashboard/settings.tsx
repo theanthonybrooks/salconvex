@@ -674,7 +674,10 @@ export default function SettingsPage() {
                       ]}
                       value={selectedTimezone ?? "Europe/Berlin"}
                       onChange={setTimezone}
-                      className={fontSize === "text-base" ? "sm:text-base" : ""}
+                      className={cn(
+                        fontSize === "text-base" ? "sm:text-base" : "",
+                        "sm:w-[350px]",
+                      )}
                       data={timezones[0]}
                       getItemLabel={(timezone) =>
                         `${formatGmtOffsetSimple(
@@ -777,8 +780,12 @@ export default function SettingsPage() {
                           <SelectValue placeholder="Select One" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="true">On (Default)</SelectItem>
-                          <SelectItem value="false">Off</SelectItem>
+                          <SelectItem value="true" center>
+                            On (Default)
+                          </SelectItem>
+                          <SelectItem value="false" center>
+                            Off
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -890,16 +897,24 @@ export default function SettingsPage() {
                       <SelectValue placeholder="Select color" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="default">
+                      <SelectItem value="default" center>
                         SAL Yellow (Default)
                       </SelectItem>
-                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="light" center>
+                        Light
+                      </SelectItem>
                       {isAdmin && (
-                        <SelectItem value="dark">Dark</SelectItem>
+                        <SelectItem value="dark" center>
+                          Dark
+                        </SelectItem>
                       )}{" "}
-                      <SelectItem value="white">White</SelectItem>
+                      <SelectItem value="white" center>
+                        White
+                      </SelectItem>
                       {isAdmin && (
-                        <SelectItem value="orange">Orange</SelectItem>
+                        <SelectItem value="orange" center>
+                          Orange
+                        </SelectItem>
                       )}
                     </SelectContent>
                   </Select>
@@ -930,8 +945,12 @@ export default function SettingsPage() {
                       <SelectValue placeholder="Select text size" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="normal">Normal (Default)</SelectItem>
-                      <SelectItem value="large">Large</SelectItem>
+                      <SelectItem value="normal" center>
+                        Normal (Default)
+                      </SelectItem>
+                      <SelectItem value="large" center>
+                        Large
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

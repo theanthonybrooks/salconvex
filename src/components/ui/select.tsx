@@ -1,4 +1,5 @@
 "use client";
+//TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
 
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
@@ -80,6 +81,7 @@ const SelectContent = React.forwardRef<
         "relative z-50 max-h-96 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+
         className,
       )}
       position={position}
@@ -119,14 +121,15 @@ const SelectItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
     indicator?: boolean;
     fit?: boolean;
+    center?: boolean;
   }
->(({ className, children, indicator = true, fit, ...props }, ref) => (
+>(({ className, children, indicator = true, center, fit, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
       "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 text-base focus:bg-salPinkLt focus:text-accent-foreground data-[state=checked]:bg-salPinkLt/50 data-[state=checked]:font-bold sm:text-sm",
       indicator && !fit ? "pr-8" : fit ? "pr-2" : "justify-center pr-2",
-
+      center && "justify-center",
       className,
     )}
     {...props}
