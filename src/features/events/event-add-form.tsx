@@ -425,9 +425,9 @@ export const EventOCForm = ({
   //
   // #region ------------- Console Logs --------------
   // console.log(errors);
-  if (errors && Object.keys(errors).length > 0) {
-    console.log("errors", errors);
-  }
+  // if (errors && Object.keys(errors).length > 0) {
+  //   console.log("errors", errors);
+  // }
 
   // console.log(
   //   isValid,
@@ -463,7 +463,7 @@ export const EventOCForm = ({
     try {
       // console.log("organizer mode)");
       setValue("event.state", "submitted");
-      console.log(existingOrg?.isComplete);
+      // console.log(existingOrg?.isComplete);
 
       await handleSave(true);
 

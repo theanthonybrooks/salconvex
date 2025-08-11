@@ -185,7 +185,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const isStepValidZod = useMemo(() => {
     if (!currentSchema) return true;
     const result = currentSchema.safeParse(watchedValues);
-    console.log(result);
+    // console.log(result);
     return result.success;
   }, [watchedValues, currentSchema]);
   // #endregion
@@ -365,9 +365,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   //
   // #region ------------- Console Logs --------------
-  if (errors && Object.keys(errors).length > 0) {
-    console.log("errors", errors);
-  }
+  // if (errors && Object.keys(errors).length > 0) {
+  //   console.log("errors", errors);
+  // }
   // console.log(
   //   isValid,
   //   validOrgWZod,
@@ -1448,7 +1448,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   useEffect(() => {
     if (scrollTrigger) {
-      console.log("scrolling");
+      // console.log("scrolling");
       if (bottomRef.current) {
         bottomRef.current.scrollIntoView({ behavior: "smooth" });
         setScrollTrigger(false);
@@ -1552,8 +1552,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
     if (orgChanged && !preloadOrgRef.current) {
-      console.log("meow meow mcPoundTown");
-
       // console.log("resetting");
       setFurthestStep(0);
       reset({
@@ -1604,7 +1602,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     if (!eventReady && !existingEvent && prevEventRef.current !== null) {
       prevEventRef.current = null;
     }
-    console.log(existingEvent?._id, prevEventRef.current?._id);
+    // console.log(existingEvent?._id, prevEventRef.current?._id);
     const eventChanged =
       eventReady && existingEvent._id !== prevEventRef.current?._id;
     if (eventChanged && !preloadEventRef.current) {
