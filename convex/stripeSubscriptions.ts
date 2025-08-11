@@ -657,6 +657,10 @@ export const subscriptionStoreWebhook = mutation({
         if (deletedSub) {
           await ctx.db.patch(deletedSub._id, {
             status: args.body.data.object.status,
+            cancelAt:
+              (deletedSub.cancelAt ?? args.body.data.object.canceled_at)
+                ? new Date(args.body.data.object.canceled_at * 1000).getTime()
+                : undefined,
             canceledAt: args.body.data.object.canceled_at
               ? new Date(args.body.data.object.canceled_at * 1000).getTime()
               : undefined,

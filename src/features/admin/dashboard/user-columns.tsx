@@ -19,7 +19,8 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
+import { BsRobot } from "react-icons/bs";
 import { FaEnvelope } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -158,6 +159,9 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const subStatus = row.getValue("subStatus") as string | undefined;
+      const cancelType = row.getValue("cancelReason") as string | undefined;
+      const systemCancel = cancelType === "payment_failed";
+
       return (
         <div
           className={cn(
@@ -171,7 +175,16 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             !subStatus && "italic text-muted-foreground",
           )}
         >
-          <p className="text-center capitalize">{subStatus || "none"}</p>
+          <p className="flex items-center justify-center gap-1 text-center capitalize">
+            {subStatus || "none"}
+            {cancelType ? (
+              systemCancel ? (
+                <BsRobot className="size-3" />
+              ) : (
+                <User className="size-3" />
+              )
+            ) : null}
+          </p>
         </div>
       );
     },
