@@ -65,7 +65,11 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Timezone, timezones } from "@/app/data/timezones";
+import {
+  formatGmtOffsetSimple,
+  Timezone,
+  timezones,
+} from "@/app/data/timezones";
 import { CanceledBanner } from "@/components/ui/canceled-banner";
 import { Link } from "@/components/ui/custom-link";
 import AvatarUploader from "@/components/ui/logo-uploader";
@@ -673,21 +677,39 @@ export default function SettingsPage() {
                       className={fontSize === "text-base" ? "sm:text-base" : ""}
                       data={timezones[0]}
                       getItemLabel={(timezone) =>
-                        `${timezone.gmtAbbreviation}  - ${timezone.name} (${
-                          timezone.abbreviation
-                        }${
+                        `${formatGmtOffsetSimple(
+                          timezone.utcOffsets,
+                        )}  - ${timezone.name} (${timezone.abbreviation}${
                           timezone.dstAbbreviation
                             ? `/${timezone.dstAbbreviation}`
                             : ""
                         })`
                       }
-                      getItemDisplay={(timezone) =>
-                        `(${
+                      // getItemDisplay={(timezone) =>
+                      //   `(${
+                      //     timezone.region !== "North America"
+                      //       ? timezone.gmtAbbreviation
+                      //       : timezone.abbreviation
+                      //   })  - ${timezone.name}`
+                      // }
+                      getItemDisplay={(timezone) => {
+                        // Build GMT offsets string from utcOffsets
+                        const gmtOffsetsDisplay = formatGmtOffsetSimple(
+                          timezone.utcOffsets,
+                        );
+
+                        const abbrevDisplay = timezone.dstAbbreviation
+                          ? `${timezone.abbreviation}/${timezone.dstAbbreviation}`
+                          : timezone.abbreviation;
+
+                        // Use GMT offsets for non–North America, abbreviations otherwise
+                        const regionLabel =
                           timezone.region !== "North America"
-                            ? timezone.gmtAbbreviation
-                            : timezone.abbreviation
-                        })  - ${timezone.name}`
-                      }
+                            ? gmtOffsetsDisplay
+                            : abbrevDisplay;
+
+                        return `(${regionLabel}) - ${timezone.name}`;
+                      }}
                       getItemValue={(timezone) => timezone.iana[0]}
                     />
                   </div>

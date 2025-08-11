@@ -13,6 +13,42 @@ interface TimezoneData {
   [region: string]: Timezone[];
 }
 
+export function formatGmtOffset(offset: number) {
+  const sign = offset >= 0 ? "+" : "";
+  return `GMT${sign}${offset}`;
+}
+
+export function formatGmtOffsetSimple(offsets: number[]) {
+  if (!offsets?.length) return "";
+
+  const sign = (n: number) => (n >= 0 ? "+" : "-");
+  const hm = (n: number) => {
+    const abs = Math.abs(n);
+    const h = Math.trunc(abs);
+    const m = Math.round((abs - h) * 60);
+    return m ? `${h}:${String(m).padStart(2, "0")}` : String(h);
+  };
+
+  if (offsets.length === 1) {
+    const n = offsets[0];
+    return n === 0 ? "GMT" : `GMT${sign(n)}${hm(n)}`;
+  }
+
+  const [a, b] = offsets;
+  const sameSign = (a >= 0 && b >= 0) || (a < 0 && b < 0);
+
+  if (a === 0) {
+    const second = b === 0 ? "GMT" : `GMT${sign(b)}${hm(b)}`;
+    return `GMT/${second}`;
+  }
+
+  if (sameSign) {
+    return `GMT${sign(a)}${hm(a)}/${hm(b)}`;
+  }
+
+  return `GMT${sign(a)}${hm(a)}/${sign(b)}${hm(b)}`;
+}
+
 export const timezones: TimezoneData[] = [
   {
     "North America": [
