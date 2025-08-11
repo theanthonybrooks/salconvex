@@ -28,6 +28,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { FaUserNinja } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
 import { api } from "~/convex/_generated/api";
@@ -43,7 +44,9 @@ export function UserProfile({
   className,
   subscription,
 }: UserProfileProps) {
-  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [tooltipDisabled, setTooltipDisabled] = useState(false);
+
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user;
@@ -67,8 +70,20 @@ export function UserProfile({
   const pendingOpenCalls = submittedOpenCallsData ?? 0;
   const totalPending = pendingOpenCalls + pendingEvents;
   return (
-    <DropdownMenu>
-      <TooltipSimple content="Open Profile Menu" side="bottom">
+    <DropdownMenu
+      onOpenChange={(val) => {
+        setOpen(val);
+        if (!val) {
+          setTooltipDisabled(true);
+          setTimeout(() => setTooltipDisabled(false), 250);
+        }
+      }}
+    >
+      <TooltipSimple
+        content="Open Profile Menu"
+        side="bottom"
+        disabled={open || tooltipDisabled}
+      >
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"

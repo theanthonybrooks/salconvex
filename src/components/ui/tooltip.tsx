@@ -91,17 +91,18 @@ export const TooltipSimple = ({
 
   ...props
 }: TooltipProps) => {
-  if (disabled || !content) return <>{children}</>;
+  // if (disabled || !content) return <>{children}</>;
   const vertSides = ["top", "bottom"];
   const showArrow = vertSides.includes(side);
   const sideOffsetValue = showArrow ? sideOffset : 6;
 
   return (
-    <TooltipPrimitive.Provider delayDuration={delayDuration} >
-      <TooltipPrimitive.Root>
-        <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
-        <TooltipPrimitive.Portal>
-          <TooltipPrimitive.Content
+    <TooltipProvider delayDuration={disabled ? 0 : delayDuration}>
+      <Tooltip open={disabled ? false : undefined}>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+
+        {!disabled && content ? (
+          <TooltipContent
             side={side}
             sideOffset={sideOffsetValue}
             align={align}
@@ -117,9 +118,9 @@ export const TooltipSimple = ({
           >
             {showArrow && <CustomArrow />}
             {content}
-          </TooltipPrimitive.Content>
-        </TooltipPrimitive.Portal>
-      </TooltipPrimitive.Root>
-    </TooltipPrimitive.Provider>
+          </TooltipContent>
+        ) : null}
+      </Tooltip>
+    </TooltipProvider>
   );
 };
