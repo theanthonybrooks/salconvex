@@ -91,6 +91,7 @@ export const usersWithSubscriptions = query({
           subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
         const cancelAt = subscription?.cancelAt;
         const canceledAt = subscription?.canceledAt;
+        const customerId = subscription?.customerId;
         const currentStatus = cancelAt ? "canceled" : subscription?.status;
         const inactiveStatus =
           currentStatus === "canceled" || currentStatus === "past_due";
@@ -159,6 +160,7 @@ export const usersWithSubscriptions = query({
 
         return {
           _id: user._id,
+          customerId,
           name,
           email: user.email,
           subscription: label ?? "4. none",

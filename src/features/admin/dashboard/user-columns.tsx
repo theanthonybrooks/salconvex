@@ -40,6 +40,7 @@ export const userColumnLabels: Record<string, string> = {
 
 interface UserColumnsProps {
   _id: Id<"users">;
+  customerId?: string;
   name: string;
   email: string;
   subscription: string;
@@ -394,6 +395,17 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                     User ID
                   </CopyableItem>
                 </DropdownMenuItem>
+                {user.customerId && (
+                  <DropdownMenuItem>
+                    <CopyableItem
+                      defaultIcon={<LucideClipboardCopy className="size-4" />}
+                      copyContent={user.customerId}
+                      className="gap-x-2"
+                    >
+                      Stripe ID
+                    </CopyableItem>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </ConfirmingDropdown>
