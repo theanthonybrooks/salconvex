@@ -373,6 +373,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     });
   }
   if (
+    data.name?.trim().length > 3 &&
     data.dates?.eventFormat &&
     // data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&

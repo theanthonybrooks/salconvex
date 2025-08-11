@@ -716,7 +716,7 @@ export const EventOCForm = ({
         let orgLogoFullUrl = "/1.jpg";
         let orgLogoStorageId: Id<"_storage"> | undefined;
         let timezone: string | undefined;
-        let timezoneOffset: number | undefined; // console.log(hasUserEditedStep0);
+        let timezoneOffset: number | undefined;
         if (hasUserEditedStep0) {
           // console.log("user edited step 0");
           const result = await handleFileUrl({
@@ -741,7 +741,6 @@ export const EventOCForm = ({
             typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
           // console.log(result);
           try {
-            // setPending(true);
             const { org } = await createNewOrg({
               organizationName: orgData.name?.trim(),
               logoStorageId: orgLogoStorageId,
@@ -803,7 +802,6 @@ export const EventOCForm = ({
             console.error("Failed to create new organization:", error);
             toast.error("Failed to create new organization");
             throw new Error("org_creation_failed");
-            // setPending(false);
           }
 
           const eventFullUrl = eventData?.logo ?? orgLogoFullUrl;
@@ -909,7 +907,6 @@ export const EventOCForm = ({
             typeof eventData.logo === "string" ? eventData.logo : "1.jpg";
 
           try {
-            // setPending(true);
             const prodDates =
               eventData.dates.prodFormat === "sameAsEvent"
                 ? eventData.dates.eventDates
@@ -961,21 +958,16 @@ export const EventOCForm = ({
                 event,
               }),
             );
-
-            // setPending(false);
           } catch (error) {
             console.error("Failed to create new event:", error);
             toast.error("Failed to create new event");
             throw new Error("event_creation_failed");
-            // setPending(false);
           }
         }
         if (activeStep === 2 && hasUserEditedEventSteps) {
           let eventResult = null;
 
           try {
-            // setPending(true);
-
             const { event } = await createOrUpdateEvent({
               _id: eventData._id || "",
               name: eventData.name,
@@ -1015,13 +1007,10 @@ export const EventOCForm = ({
                 },
               }),
             );
-
-            // setPending(false);
           } catch (error) {
             console.error("Failed to update event:", error);
             toast.error("Failed to update event");
             throw new Error("event_update_failed");
-            // setPending(false);
           }
         }
         if (activeStep === 3 && hasUserEditedStep3) {
@@ -1077,7 +1066,6 @@ export const EventOCForm = ({
           });
 
           try {
-            // setPending(true);
             const ocResult = await createOrUpdateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
@@ -1185,12 +1173,6 @@ export const EventOCForm = ({
               }
             }
 
-            // reset({
-            //   ...currentValues,
-            //   openCall: {
-            //     ...(ocResult || currentValues.openCall),
-            //   },
-            // });
             reset(
               merge({}, currentValues, {
                 openCall: {
@@ -1208,7 +1190,6 @@ export const EventOCForm = ({
           if (!openCallData) return;
 
           try {
-            // setPending(true);
             await createOrUpdateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
@@ -1303,13 +1284,13 @@ export const EventOCForm = ({
           } catch (error) {
             console.error("Failed to update open call:", error);
             toast.error("Failed to update open call");
+            throw new Error("open_call_update_failed");
           }
         }
         if (activeStep === steps.length - 2) {
           // console.log("saving org details");
 
           try {
-            // setPending(true);
             // console.log("orgData presave", orgData);
 
             const result = await updateOrg({
@@ -1333,8 +1314,7 @@ export const EventOCForm = ({
 
             if (!result) {
               toast.error("Failed to update organization");
-              // setPending(false);
-              return;
+              throw new Error("org_update_failed");
             }
             let lastEditedResult = null;
             if (existingEvent?._id) {
@@ -1361,13 +1341,10 @@ export const EventOCForm = ({
             });
 
             // console.log("result", result);
-
-            // setPending(false);
           } catch (error) {
             console.error("Failed to update organization final step:", error);
             toast.error("Failed to update organization");
             throw new Error("org_final_step_failed");
-            // setPending(false);
           }
         }
         if (activeStep === steps.length - 1) {
@@ -1381,10 +1358,7 @@ export const EventOCForm = ({
                   sameAsOrganizer: true,
                 };
 
-          // console.log(eventLinks);
           try {
-            // setPending(true);
-
             if (existingOrg?.isComplete !== true) {
               await markOrganizationComplete({
                 orgId: (orgData?._id ||
@@ -1502,6 +1476,7 @@ export const EventOCForm = ({
           } catch (error) {
             console.error("Failed to submit:", error);
             toast.error("Failed to submit");
+            throw new Error("final_submit_failed");
           }
         }
       } catch (err) {
