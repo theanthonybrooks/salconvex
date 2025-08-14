@@ -212,7 +212,7 @@ const organizationSchema = z.object({
     .string()
     .min(3, "Name must be at least 3 characters")
     .max(50, "Max 50 characters")
-    .regex(/^[^"';]*$/, "No quotes or semicolons allowed"),
+    .regex(/^[^";]*$/, "No quotes or semicolons allowed"),
   slug: z.optional(z.string()),
   logo: z.union([
     z

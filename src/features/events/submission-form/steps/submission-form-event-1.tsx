@@ -583,7 +583,7 @@ const SubmissionFormEventStep1 = ({
                       />
 
                       <span className={cn("text-sm")}>
-                        The beginning production date is flexible/open
+                        The production start date is flexible/open
                       </span>
                     </label>
                   )}

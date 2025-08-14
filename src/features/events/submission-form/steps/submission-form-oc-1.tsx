@@ -100,7 +100,7 @@ const SubmissionFormOC1 = ({
   const showAppFeeInput = hasAppFee?.trim() === "true";
   const hasRequiredDetails =
     eligDetails.trim().length > 10 || isInternational || isNational;
-  const hasAppRequiredDetails = appDetails?.trim().length > 10 || isAdmin;
+  const hasAppRequiredDetails = appDetails?.trim().length > 100 || isAdmin;
   const appLink = openCall?.requirements?.applicationLink ?? "";
 
   const hasAppLink = appLink?.trim().length > 10;
@@ -604,7 +604,7 @@ const SubmissionFormOC1 = ({
                       }}
                       onBlur={field.onBlur}
                       placeholder={`Please be as specific as possible
-                        ${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
+                        ${emailType ? " on what you would like for artists to include in their email submissions." : ""} Minimum 100 characters.`}
                       charLimit={5000}
                       purpose="openCall"
                       asModal={true}

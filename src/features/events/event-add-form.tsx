@@ -734,17 +734,20 @@ export const EventOCForm = ({
             // return;
             throw new Error("org_logo_upload_failed");
           }
+
           orgLogoStorageId = result.logoStorageId;
           timezone = result.timezone;
           timezoneOffset = result.timezoneOffset;
-          const logo =
-            typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
-          // console.log(result);
+          console.log(orgLogoStorageId);
+          // const logo =
+          //   typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
+          // // console.log(result);
+          // console.log(logo);
           try {
             const { org } = await createNewOrg({
               organizationName: orgData.name?.trim(),
               logoStorageId: orgLogoStorageId,
-              logo,
+              // logo,
               location: {
                 full: orgData.location.full,
                 locale: orgData.location.locale,

@@ -37,6 +37,8 @@ export default function AvatarUploader({
   imageOnly = false,
   loading = false,
 }: AvatarUploaderProps) {
+  const shownErrorUrls = useRef<Set<string>>(new Set());
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageForCropping, setImageForCropping] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(
@@ -67,9 +69,15 @@ export default function AvatarUploader({
       setEditMode(true);
     } catch (error) {
       console.error("Failed to fetch image:", error);
-      toast.error(
-        "Could not load image from URL. Make sure it's a valid, public image",
-      );
+      // toast.error(
+      //   "Could not load image from URL. Make sure it's a valid, public image",
+      // );
+      if (!shownErrorUrls.current.has(url)) {
+        shownErrorUrls.current.add(url);
+        toast.error(
+          "Could not load image from URL. Make sure it's a valid, public image",
+        );
+      }
     }
   };
 
