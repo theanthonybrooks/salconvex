@@ -32,7 +32,7 @@ import Underline from "@tiptap/extension-underline";
 import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import DOMPurify from "dompurify";
-import { CheckIcon, LoaderCircle, Pencil } from "lucide-react";
+import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
 
@@ -113,6 +113,7 @@ export const RichTextEditor = ({
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pending, setPending] = useState(false);
+  const [reqCharsMet, setReqCharsMet] = useState(requiredChars ? false : true);
   const forOpenCall = purpose === "openCall";
   const plainText = (tempContent || "")
     .replace(/<[^>]*>/g, "")
@@ -140,7 +141,9 @@ export const RichTextEditor = ({
       }),
       Underline,
       Placeholder.configure({
-        placeholder,
+        placeholder: requiredChars
+          ? `${placeholder} (Minimum ${requiredChars} characters*)`
+          : placeholder,
         showOnlyWhenEditable: true,
         showOnlyCurrent: true,
       }),
@@ -364,6 +367,19 @@ export const RichTextEditor = ({
       dialogNode?.removeEventListener("keydown", handleKeyDown);
     };
   }, [showLinkInput, linkUrl, displayText, editor, handleLink]);
+
+  useEffect(() => {
+    if (!requiredChars) {
+      setReqCharsMet(true);
+      return;
+    }
+
+    if (count >= requiredChars) {
+      setReqCharsMet(true);
+    } else {
+      setReqCharsMet(false);
+    }
+  }, [requiredChars, count]);
 
   const handleDialogChange = (next: boolean) => {
     if (!next && tempContent !== value) {
@@ -708,35 +724,53 @@ export const RichTextEditor = ({
         )}
       />
 
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2 rounded bg-card">
-        <p className="mr-1 text-right text-sm text-gray-500">
+      <div className="absolute bottom-4 right-4 flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-1 sm:w-auto">
+        <p
+          className={cn(
+            "mr-1 flex items-center justify-end gap-1 text-right text-sm text-gray-500",
+            requiredChars && !reqCharsMet && "text-red-500",
+            requiredChars && reqCharsMet && "text-emerald-500",
+          )}
+        >
           {editor.storage.characterCount.characters()}/{charLimit}
+          {requiredChars && reqCharsMet && (
+            <Check className="size-3 text-emerald-500" />
+          )}
         </p>
 
-        <div className="flex items-center gap-1">
-          {hasUnsavedChanges && (
-            <Button variant="salWithShadowHidden" onClick={handleDiscard}>
-              Discard
-            </Button>
+        <div className="flex flex-col items-center justify-end gap-3 sm:flex-row">
+          {!reqCharsMet && (
+            <p className="text-nowrap text-xs text-red-500 sm:text-sm">
+              Content is too short. Must be at least {requiredChars} characters.
+            </p>
           )}
-          <Button
-            variant="salWithShadowHiddenYlw"
-            onClick={() => {
-              if (hasUnsavedChanges) {
-                handleAccept();
-              } else {
-                setEditorOpen(false);
-              }
-            }}
-          >
-            {hasUnsavedChanges ? "Save" : readOnly ? "Close" : "Cancel"}
-            {hasUnsavedChanges && !pending && (
-              <CheckIcon className="ml-1 size-4 shrink-0" />
+          <div className="flex w-full items-center gap-2">
+            {hasUnsavedChanges && (
+              <Button variant="salWithShadowHidden" onClick={handleDiscard}>
+                Discard
+              </Button>
             )}
-            {pending && (
-              <LoaderCircle className="ml-1 size-4 shrink-0 animate-spin" />
-            )}
-          </Button>
+            <Button
+              disabled={!reqCharsMet}
+              variant="salWithShadowHiddenYlw"
+              onClick={() => {
+                if (hasUnsavedChanges) {
+                  handleAccept();
+                } else {
+                  setEditorOpen(false);
+                }
+              }}
+              className="flex-1 sm:flex-none"
+            >
+              {hasUnsavedChanges ? "Save" : readOnly ? "Close" : "Cancel"}
+              {hasUnsavedChanges && !pending && (
+                <CheckIcon className="ml-1 size-4 shrink-0" />
+              )}
+              {pending && (
+                <LoaderCircle className="ml-1 size-4 shrink-0 animate-spin" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -765,7 +799,7 @@ export const RichTextEditor = ({
           <div
             className={cn(
               "scrollable justy mini min-h-14 text-sm text-muted-foreground",
-              inputPreview && "line-clamp-1 max-h-5 min-h-0",
+              (inputPreview || !editorOpen) && "line-clamp-3 max-h-25 min-h-10",
             )}
           >
             {value ? (
@@ -794,13 +828,21 @@ export const RichTextEditor = ({
             </div>
           )}
           {!inputPreview && (
-            <div className="absolute bottom-1 right-1 rounded bg-card p-1 text-right text-xs text-foreground/60">
+            <div
+              className={cn(
+                "absolute bottom-1 right-1 flex items-center gap-1 rounded bg-card p-1 text-right text-xs text-foreground/60",
+                requiredChars && !reqCharsMet && "text-red-500",
+                requiredChars && reqCharsMet && "text-emerald-500",
+              )}
+            >
               {editor.storage.characterCount.characters()}/{charLimit}
+              {requiredChars && reqCharsMet && (
+                <Check className="size-3 text-emerald-500" />
+              )}
             </div>
           )}
         </div>
 
-        {/* <Dialog open={open} onOpenChange={setEditorOpen}> */}
         <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
             className="h-[90dvh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:w-[95vw]"
@@ -831,7 +873,11 @@ export const RichTextEditor = ({
               >
                 Discard
               </AlertDialogAction>
-              <AlertDialogPrimaryAction onClick={handleAccept} className="w-30">
+              <AlertDialogPrimaryAction
+                onClick={handleAccept}
+                className="md:w-30"
+                disabled={!reqCharsMet}
+              >
                 Save
               </AlertDialogPrimaryAction>
             </AlertDialogFooter>

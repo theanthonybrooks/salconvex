@@ -8,6 +8,7 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
@@ -55,6 +56,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
 
     // hasActiveOpenCall: hasOpenCall,
     // adminNote,
+    state: eventState,
     dates,
   } = event;
 
@@ -129,6 +131,11 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
         className,
       )}
     >
+      <DraftPendingBanner
+        format="mobile"
+        eventState={eventState}
+        eventId={event._id}
+      />
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
         <div className="col-span-1 flex flex-col items-center justify-between space-y-6 pb-3 pt-3">
           <EventOrgLogo imgSrc={eventLogo} type="event" />

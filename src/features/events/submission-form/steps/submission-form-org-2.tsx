@@ -9,10 +9,12 @@ import { Controller, useFormContext } from "react-hook-form";
 
 interface SubmissionFormOrgStep2Props {
   handleCheckSchema?: () => void;
+  dashBoardView?: boolean;
 }
 
 const SubmissionFormOrgStep2 = ({
   handleCheckSchema,
+  dashBoardView,
 }: SubmissionFormOrgStep2Props) => {
   const {
     control,
@@ -53,6 +55,7 @@ const SubmissionFormOrgStep2 = ({
             <FormLinksInput
               type="organization"
               handleCheckSchema={handleCheckSchema}
+              dashBoardView={dashBoardView}
             />
           </div>
         </div>
@@ -118,7 +121,7 @@ const SubmissionFormOrgStep2 = ({
               <p className="lg:text-xs">Organizer - About</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="organization.about" className="sr-only">
                 Organizer - About
               </Label>

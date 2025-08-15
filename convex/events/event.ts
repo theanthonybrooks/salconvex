@@ -1035,6 +1035,7 @@ export const getEventWithOCDetails = query({
     // if (!userIsOrganizer && !hasActiveSubscription)
     // throw new ConvexError("You don't have permission to view this event");
     // console.log("user doesn't have permission to view this event");
+    console.log(source, openCall);
     if (source === "ocpage" && !openCall)
       throw new ConvexError("Open Call not found");
     if (!openCall) return null;
@@ -1136,6 +1137,7 @@ export const createOrUpdateEvent = mutation({
         vk: v.optional(v.string()),
         youTube: v.optional(v.string()),
         phone: v.optional(v.string()),
+        phoneExt: v.optional(v.string()),
         linkAggregate: v.optional(v.string()),
         other: v.optional(v.string()),
       }),

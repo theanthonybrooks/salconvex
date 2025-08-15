@@ -13,6 +13,7 @@ import { HiArrowTurnRightDown } from "react-icons/hi2";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { ValidLinkPath } from "@/features/organizers/schemas/event-add-schema";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Control, Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   FaEnvelope,
@@ -33,6 +34,7 @@ type FormLinksInputProps = {
   existingOrgHasLinks?: boolean;
   type: "event" | "organization";
   handleCheckSchema?: () => void;
+  dashBoardView?: boolean;
 };
 
 const handleFields: {
@@ -40,36 +42,42 @@ const handleFields: {
   icon: React.ReactNode;
   platform: PlatformType;
   placeholder: string;
+  primaryOption: boolean;
 }[] = [
   {
     key: "instagram",
     icon: <FaInstagram className={cn("size-5 shrink-0")} />,
     platform: "instagram",
     placeholder: "@eventname",
+    primaryOption: true,
   },
   {
     key: "facebook",
     icon: <FaFacebook className={cn("size-5 shrink-0")} />,
     platform: "facebook",
     placeholder: "@eventname",
+    primaryOption: true,
   },
   {
     key: "threads",
     icon: <FaThreads className={cn("size-5 shrink-0")} />,
     platform: "threads",
     placeholder: "@eventname",
+    primaryOption: true,
   },
   {
     key: "vk",
     icon: <FaVk className={cn("size-5 shrink-0")} />,
     platform: "vk",
     placeholder: "@eventname",
+    primaryOption: true,
   },
   {
     key: "youTube",
     icon: <FaYoutube className={cn("size-5 shrink-0")} />,
     platform: "youTube",
     placeholder: "youtube.com/...",
+    primaryOption: false,
   },
 ];
 
@@ -77,6 +85,7 @@ export const FormLinksInput = ({
   existingOrgHasLinks,
   type,
   handleCheckSchema,
+  dashBoardView,
 }: FormLinksInputProps) => {
   const {
     control,
@@ -84,6 +93,7 @@ export const FormLinksInput = ({
     setValue,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+  const isMobile = useIsMobile();
   const isEvent = type === "event";
   const isOrg = type === "organization";
   const eventData = watch("event");
@@ -95,7 +105,12 @@ export const FormLinksInput = ({
 
   return (
     <>
-      <div className={cn("flex max-w-[80dvw] flex-col gap-y-2")}>
+      <div
+        className={cn(
+          "flex max-w-[80dvw] flex-col gap-y-2",
+          dashBoardView && "max-w-full",
+        )}
+      >
         {existingOrgHasLinks && isEvent && (
           <Controller
             name="event.links.sameAsOrganizer"
@@ -283,36 +298,67 @@ export const FormLinksInput = ({
                 name="organization.contact.primaryContact"
                 control={control}
                 render={({ field: primaryFieldControl }) => (
-                  <div className="flex items-center gap-x-4">
+                  <div
+                    className={cn(
+                      "flex items-center gap-x-4",
+                      isMobile && "items-start gap-x-3",
+                    )}
+                  >
                     <FaPhone
                       className={cn(
                         "size-5 shrink-0",
                         primaryField === "phone" && "text-emerald-600",
+                        isMobile && "mt-2.5",
                       )}
                     />
-                    <Controller
-                      name={`${type}.links.phone`}
-                      control={control}
-                      render={({ field }) => (
-                        <PhoneInput
-                          {...field}
-                          international
-                          defaultCountry={(eventCountry as Country) || "US"}
-                          value={field.value ?? ""}
-                          placeholder="+1 (555) 555-5555"
-                          className={cn(
-                            "flex h-10 flex-1 rounded-md border border-gray-300 bg-card px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
-                            errors?.[type]?.links?.phone && "invalid-field",
+                    <div className={cn("flex gap-3", isMobile && "flex-col")}>
+                      <Controller
+                        name={`${type}.links.phone`}
+                        control={control}
+                        render={({ field }) => (
+                          <PhoneInput
+                            {...field}
+                            international
+                            defaultCountry={(eventCountry as Country) || "US"}
+                            value={field.value ?? ""}
+                            placeholder="+1 (555) 555-5555"
+                            className={cn(
+                              "flex h-10 min-w-[10.5rem] flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                              errors?.[type]?.links?.phone && "invalid-field",
+                            )}
+                            onChange={field.onChange}
+                            onBlur={() => {
+                              field.onBlur?.();
+                              handleCheckSchema?.();
+                              // console.log("Blur me", field + type)
+                            }}
+                          />
+                        )}
+                      />
+                      <div className="flex items-center gap-x-2">
+                        <p className="text-sm">Ext:</p>
+                        <Controller
+                          name={`${type}.links.phoneExt`}
+                          control={control}
+                          render={({ field }) => (
+                            <DebouncedControllerInput
+                              disabled={eventSameAsOrg && isEvent}
+                              field={field}
+                              placeholder="ex. 1234 (optional)"
+                              className={cn(
+                                "sm:max-w-20",
+                                errors?.[type]?.links?.phoneExt &&
+                                  "invalid-field",
+                              )}
+                              onBlur={() => {
+                                field.onBlur?.();
+                                handleCheckSchema?.();
+                              }}
+                            />
                           )}
-                          onChange={field.onChange}
-                          onBlur={() => {
-                            field.onBlur?.();
-                            handleCheckSchema?.();
-                            // console.log("Blur me", field + type)
-                          }}
                         />
-                      )}
-                    />
+                      </div>
+                    </div>
 
                     <Input
                       type="radio"
@@ -321,12 +367,18 @@ export const FormLinksInput = ({
                       value="phone"
                       checked={primaryField === "phone"}
                       onChange={() => primaryFieldControl.onChange("phone")}
+                      className={cn(isMobile && "mt-2.5")}
                     />
                   </div>
                 )}
               />
             ) : (
-              <div className="flex items-center gap-x-4">
+              <div
+                className={cn(
+                  "flex items-center gap-x-4",
+                  isMobile && "gap-x-3",
+                )}
+              >
                 <FaPhone className={cn("size-5 shrink-0")} />
                 <Controller
                   name={`${type}.links.phone`}
@@ -340,10 +392,31 @@ export const FormLinksInput = ({
                       value={field.value ?? ""}
                       placeholder="+1 (555) 555-5555"
                       className={cn(
-                        "flex h-10 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-[16px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                        "flex h-10 min-w-[10.5rem] flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
                         errors?.[type]?.links?.phone && "invalid-field",
                       )}
                       onChange={field.onChange}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
+                    />
+                  )}
+                />
+
+                <p className="text-sm">Ext:</p>
+                <Controller
+                  name={`${type}.links.phoneExt`}
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerInput
+                      disabled={eventSameAsOrg && isEvent}
+                      field={field}
+                      placeholder={isMobile ? "123" : "ex. 1234 (optional)"}
+                      className={cn(
+                        "max-w-15 sm:max-w-20",
+                        errors?.[type]?.links?.phoneExt && "invalid-field",
+                      )}
                       onBlur={() => {
                         field.onBlur?.();
                         handleCheckSchema?.();
@@ -387,7 +460,7 @@ export const FormLinksInput = ({
                   <>
                     {/* Debounced handle fields */}
                     {handleFields.map(
-                      ({ key, icon, platform, placeholder }) => {
+                      ({ key, icon, platform, placeholder, primaryOption }) => {
                         const name =
                           `organization.links.${key}` as ValidLinkPath;
 
@@ -399,6 +472,7 @@ export const FormLinksInput = ({
                             platform={platform}
                             icon={icon}
                             placeholder={placeholder}
+                            primaryOption={primaryOption}
                             isOrg={true}
                             primaryField={primaryField}
                             onPrimaryChange={primaryFieldControl.onChange}
@@ -490,6 +564,7 @@ type HandleInputProps = {
   platform: PlatformType;
   icon: React.ReactNode;
   placeholder: string;
+  primaryOption?: boolean;
   disabled?: boolean;
   isOrg?: boolean;
   primaryField?: string;
@@ -503,6 +578,7 @@ function HandleInput({
   platform,
   icon,
   placeholder,
+  primaryOption,
   disabled,
   isOrg,
   primaryField,
@@ -522,24 +598,6 @@ function HandleInput({
         control={control}
         render={({ field }) => {
           return (
-            // <Input
-            //   disabled={disabled}
-            //   value={inputVal}
-            //   placeholder={placeholder}
-            //   className="flex-1"
-            //   onChange={(e) => {
-            //     const raw = e.target.value;
-            //     setInputVal(raw);
-            //     debounced(raw, field.onChange);
-            //   }}
-            //   onPaste={(e) => {
-            //     e.preventDefault();
-            //     const pasted = e.clipboardData.getData("text");
-            //     const formatted = formatHandleInput(pasted, platform);
-            //     setInputVal(formatted);
-            //     field.onChange(formatted);
-            //   }}
-            // />
             <DebouncedControllerInput
               field={field}
               disabled={disabled}
@@ -562,7 +620,7 @@ function HandleInput({
           );
         }}
       />
-      {isOrg && fieldKey && (
+      {isOrg && fieldKey && primaryOption && (
         <Input
           type="radio"
           disabled={typeof watched !== "string" || !watched.trim()}

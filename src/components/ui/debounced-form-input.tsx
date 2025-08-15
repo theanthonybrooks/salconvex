@@ -62,6 +62,7 @@ export function DebouncedControllerInput<
   return (
     <Input
       {...inputProps}
+      name={field.name}
       className={cn(
         "bg-card text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
         typeof inputProps.className === "string"

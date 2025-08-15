@@ -59,6 +59,7 @@ export type Organizer = {
     email?: string;
     vk?: string;
     phone?: string;
+    phoneExt?: string;
     address?: string;
     linkAggregate?: string;
     youTube?: string;

@@ -111,7 +111,8 @@ export const LinkList = ({
                     submitRecap && "truncate",
                   )}
                 >
-                  {formatPhoneNumberIntl(event.links.phone)}
+                  {formatPhoneNumberIntl(event.links.phone)}{" "}
+                  {event.links.phoneExt ? `Ext: ${event.links.phoneExt}` : ""}
                 </span>
               </div>
             </a>
@@ -319,7 +320,10 @@ export const LinkList = ({
                       submitRecap && "truncate",
                     )}
                   >
-                    {organizer.links.phone}
+                    {organizer.links.phone}{" "}
+                    {organizer.links.phoneExt
+                      ? `Ext: ${organizer.links.phoneExt}`
+                      : ""}
                   </span>
                 </div>
               </a>

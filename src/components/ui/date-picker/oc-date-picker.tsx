@@ -142,7 +142,7 @@ export const OcCustomDatePicker = ({
     ? DateTime.fromISO("2010-01-01", { zone: tz }).toJSDate()
     : pickerType === "start"
       ? DateTime.local().startOf("year").toJSDate()
-      : UTCTodayStart.toJSDate();
+      : (minToDate ?? UTCTodayStart.toJSDate());
 
   let minTimeForEnd: Date | undefined;
   let maxTimeForEnd: Date | undefined;

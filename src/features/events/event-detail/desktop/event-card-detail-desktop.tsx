@@ -14,6 +14,7 @@ import {
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
+import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import NavTabs from "@/components/ui/nav-tabs";
 import { Separator } from "@/components/ui/separator";
@@ -298,30 +299,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   )}
                 </span>
               </div>
-              {eventState === "draft" && (
-                <>
-                  <Separator
-                    orientation="vertical"
-                    className="mr-2 h-10 bg-foreground"
-                    thickness={2}
-                  />
-                  <p className="rounded-lg border-2 bg-stone-100 p-4 text-2xl font-bold uppercase text-foreground/60">
-                    Draft
-                  </p>
-                </>
-              )}
-              {eventState === "submitted" && (
-                <>
-                  <Separator
-                    orientation="vertical"
-                    className="mr-2 h-10 bg-foreground"
-                    thickness={2}
-                  />
-                  <p className="rounded-lg border-2 bg-salYellow/70 p-4 text-2xl font-bold uppercase text-foreground/60">
-                    Pending
-                  </p>
-                </>
-              )}
+              <DraftPendingBanner format="desktop" eventState={eventState} eventId={event._id}/>
             </div>
             <div className="flex items-center gap-x-4">
               {hidden && hasActiveSubscription ? (

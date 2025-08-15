@@ -31,6 +31,7 @@ const displayNames: Record<keyof Organizer["links"], string> = {
   website: "Website",
   email: "Email",
   phone: "Phone",
+  phoneExt: "Phone Ext",
   linkAggregate: "Link Aggregate",
   instagram: "Instagram",
   facebook: "Facebook",
@@ -45,6 +46,7 @@ const organizerLinkIcons: Record<keyof Organizer["links"], React.ReactNode> = {
   website: <Globe className={iconSize} />,
   email: <FaRegEnvelope className={iconSize} />,
   phone: <Phone className={iconSize} />,
+  phoneExt: <Phone className={iconSize} />,
   linkAggregate: <FaLink className={iconSize} />,
   instagram: <FaInstagram className={iconSize} />,
   facebook: <FaFacebookF className={iconSize} />,
@@ -85,7 +87,7 @@ export const OrganizerLinks = ({
       <p className={cn("font-semibold", fontSize)}>Links:</p>
       <div className="flex items-center justify-start gap-x-6 pt-2">
         {linkDisplayOrder.map((key) => {
-          const value = organizer.links[key];
+          const value = organizer.links?.[key];
           const icon = organizerLinkIcons[key];
           const orgName = organizer.name;
 

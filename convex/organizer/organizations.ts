@@ -100,6 +100,21 @@ export async function checkOrgStatus(
   };
 }
 
+// export const getIsOrgOwner = query({
+//   args: {
+//     orgId: v.id("organizations"),
+//     userId: v.id("users"),
+//   },
+//   handler: async (ctx, args) => {
+//     const org = await ctx.db.get(args.orgId);
+//     if (!org) return false;
+//     const ownerId = org.ownerId;
+//     const user = await ctx.db.get(args.userId);
+//     if (!user) return false;
+//     return ownerId === user._id;
+//   },
+// });
+
 export const getOrgContactInfo = query({
   args: {
     orgId: v.id("organizations"),
@@ -465,6 +480,7 @@ export const updateOrganization = mutation({
         vk: v.optional(v.string()),
         youTube: v.optional(v.string()),
         phone: v.optional(v.string()),
+        phoneExt: v.optional(v.string()),
         linkAggregate: v.optional(v.string()),
         other: v.optional(v.string()),
       }),

@@ -102,9 +102,9 @@ const SubmissionFormOC1 = ({
   const eligDetails = openCall?.eligibility?.details ?? "";
   const appDetails = openCall?.requirements?.requirements ?? "";
   const showAppFeeInput = hasAppFee?.trim() === "true";
-  const hasRequiredDetails =
-    eligDetails.trim().length > 10 || isInternational || isNational;
-  const hasAppRequiredDetails = appDetails?.trim().length > 100 || isAdmin;
+  const hasRequiredEligDetails =
+    eligDetails.trim().length > 25 || isInternational || isNational;
+  const hasAppRequiredDetails = appDetails?.trim().length > 50 || isAdmin;
   const appLink = openCall?.requirements?.applicationLink ?? "";
 
   const hasAppLink = appLink?.trim().length > 10;
@@ -371,7 +371,7 @@ const SubmissionFormOC1 = ({
               <p className="lg:text-xs">More Info</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Eligibility Continued... (if not &quot;International&quot;)
               </Label>
@@ -388,11 +388,15 @@ const SubmissionFormOC1 = ({
                     //   field.onChange(val);
                     //   // handleCheckSchema();
                     // }}
+                    requiredChars={
+                      !isNational && !isInternational ? 25 : undefined
+                    }
                     onBlur={field.onBlur}
                     placeholder="Please be as specific as possible"
                     charLimit={1200}
                     inputPreviewClassName={cn(
-                      errors?.openCall?.eligibility?.details && "invalid-field",
+                      errors?.openCall?.eligibility?.details ||
+                        (!hasRequiredEligDetails && "invalid-field"),
                     )}
                   />
                 )}
@@ -401,7 +405,7 @@ const SubmissionFormOC1 = ({
           </>
         )}
 
-        {hasRequiredDetails && !freeCall && (
+        {hasRequiredEligDetails && !freeCall && (
           <>
             <div className="input-section">
               <p className="min-w-max font-bold lg:text-xl">Step 3:</p>
@@ -533,7 +537,7 @@ const SubmissionFormOC1 = ({
           {" "}
           {fixedType &&
             ocEligiblityType &&
-            hasRequiredDetails &&
+            hasRequiredEligDetails &&
             typeof appFee === "number" && (
               <>
                 <div className="input-section">
@@ -594,7 +598,7 @@ const SubmissionFormOC1 = ({
                 </div>
               </>
             )}
-          {(ocEnd || noEndRequired) && hasRequiredDetails && (
+          {(ocEnd || noEndRequired) && hasRequiredEligDetails && (
             <>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">
@@ -604,7 +608,7 @@ const SubmissionFormOC1 = ({
                 </p>
                 <p className="lg:text-xs">Application Requirements</p>
               </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.type" className="sr-only">
                   Application Requirements
                 </Label>
@@ -623,7 +627,7 @@ const SubmissionFormOC1 = ({
                       placeholder={`Please be as specific as possible ${!emailType ? " on what artists will need to submit in order to apply." : null}
                         ${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={5000}
-                      requiredChars={100}
+                      requiredChars={50}
                       purpose="openCall"
                       asModal={true}
                       title={eventName}
@@ -645,7 +649,7 @@ const SubmissionFormOC1 = ({
                 </p>
                 <p className="lg:text-xs">Other Info</p>
               </div>
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.type" className="sr-only">
                   Other Info
                 </Label>

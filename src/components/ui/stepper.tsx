@@ -43,6 +43,7 @@ interface StepperProps {
   isAdmin?: boolean;
   isMobile?: boolean;
   adminMode?: boolean;
+  dashboardView?: boolean;
   formType?: number;
   setFormType?: React.Dispatch<React.SetStateAction<number>>;
   formTypeOptions?: { value: number; Icon: React.ElementType }[];
@@ -71,6 +72,7 @@ export default function HorizontalLinearStepper({
   onCheckSchema,
   isAdmin,
   isMobile,
+  dashboardView,
   adminMode,
   formType,
   setFormType,
@@ -116,7 +118,8 @@ export default function HorizontalLinearStepper({
   return (
     <div
       className={cn(
-        "flex h-full max-h-[90dvh] w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[85dvh]",
+        "flex h-full w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[85dvh]",
+        dashboardView ? "max-h-[87dvh] xl:max-h-[87dvh]" : "max-h-[90dvh]",
         className,
       )}
     >
@@ -254,7 +257,11 @@ export default function HorizontalLinearStepper({
                 {errorMsg}
               </p>
             )}
-          <div className={cn("flex items-center justify-between gap-x-4")}>
+          <div
+            className={cn(
+              "flex items-center justify-end gap-x-4 lg:justify-between",
+            )}
+          >
             <section className="hidden items-center gap-x-2 lg:flex">
               <div>
                 {activeStep >= 1 && activeStep !== stepArray.length - 1 && (

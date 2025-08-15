@@ -2,7 +2,10 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import { DataTableAdminActions } from "@/components/data-table/actions/data-table-admin-actions";
+import {
+  DataTableAdminOrgActions,
+  DataTableAdminOrgStateActions,
+} from "@/components/data-table/actions/data-table-admin-org-actions";
 import {
   ApproveEvent,
   ArchiveEvent,
@@ -39,15 +42,7 @@ import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import { EventType, SubmissionFormState } from "@/types/event";
 import { SubmissionFormState as OpenCallState } from "@/types/openCall";
-import {
-  CheckCircle2,
-  Circle,
-  CircleFadingPlus,
-  DollarSign,
-  LucideClipboardCopy,
-  MoreHorizontal,
-} from "lucide-react";
-import { FaRegFloppyDisk } from "react-icons/fa6";
+import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const columnLabels: Record<string, string> = {
@@ -179,29 +174,17 @@ export const columns: ColumnDef<Event>[] = [
       <DataTableColumnHeader column={column} title="State" />
     ),
 
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      const event = row.original as Event;
       const state = row.getValue("state") as SubmissionFormState;
+      const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex justify-center">
-          <div
-            className={cn(
-              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
-              state === "draft" && "bg-orange-200",
-              state === "submitted" && "bg-blue-200",
-              state === "published" && "bg-green-200",
-            )}
-          >
-            {state === "draft" ? (
-              <FaRegFloppyDisk className="size-4 shrink-0" />
-            ) : state === "submitted" ? (
-              <Circle className="size-4 shrink-0" />
-            ) : state === "published" ? (
-              <CheckCircle2 className="size-4 shrink-0" />
-            ) : (
-              <CheckCircle2 className="size-4 shrink-0" />
-            )}
-            <span className="capitalize">{state}</span>
-          </div>
+          <DataTableAdminOrgStateActions
+            eventId={event._id}
+            state={state}
+            userRole={isAdmin ? "admin" : "user"}
+          />
         </div>
       );
     },
@@ -219,11 +202,13 @@ export const columns: ColumnDef<Event>[] = [
       <DataTableColumnHeader column={column} title="Open Call" />
     ),
 
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      const event = row.original as Event;
       const ocState = (row.getValue("openCallState") as OpenCallState) || null;
+      const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex justify-center">
-          <div
+          {/* <div
             className={cn(
               "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
               !ocState && "border-transparent",
@@ -249,7 +234,12 @@ export const columns: ColumnDef<Event>[] = [
               ""
             )}
             <span className="capitalize">{ocState || "-"}</span>
-          </div>
+          </div> */}
+          <DataTableAdminOrgStateActions
+            eventId={event._id}
+            state={ocState}
+            userRole={isAdmin ? "admin" : "user"}
+          />
         </div>
       );
     },
@@ -389,7 +379,12 @@ export const columns: ColumnDef<Event>[] = [
                 align="end"
                 className="scrollable mini darkbar max-h-56"
               >
-                {isAdmin && <DataTableAdminActions eventId={event._id} />}
+                {isAdmin && (
+                  <DataTableAdminOrgActions
+                    eventId={event._id}
+                    userRole="admin"
+                  />
+                )}
                 <DropdownMenuLabel>
                   {isAdmin ? "Event" : "Actions"}
                 </DropdownMenuLabel>{" "}

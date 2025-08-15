@@ -31,6 +31,7 @@ interface SubmissionFormEventStep2Props {
   canNameEvent: boolean;
   handleCheckSchema?: () => void;
   formType: number;
+  dashBoardView?: boolean;
 }
 
 const SubmissionFormEventStep2 = ({
@@ -43,6 +44,7 @@ const SubmissionFormEventStep2 = ({
   canNameEvent,
   handleCheckSchema,
   formType,
+  dashBoardView,
 }: SubmissionFormEventStep2Props) => {
   const {
     control,
@@ -108,6 +110,7 @@ const SubmissionFormEventStep2 = ({
             existingOrgHasLinks={!!existingOrg?.links}
             type="event"
             handleCheckSchema={handleCheckSchema}
+            dashBoardView={dashBoardView}
           />
         </div>
       </div>
@@ -145,7 +148,7 @@ const SubmissionFormEventStep2 = ({
                 </p>
               </div>
 
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.name" className="sr-only">
                   {getEventCategoryLabelAbbr(category)} Other Info
                 </Label>
@@ -286,7 +289,7 @@ const SubmissionFormEventStep2 = ({
                     <p className="lg:text-xs">Admin Notes</p>
                   </div>
 
-                  <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+                  <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                     <Label htmlFor="event.name" className="sr-only">
                       Admin Notes
                     </Label>

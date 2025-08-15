@@ -383,7 +383,7 @@ const SubmissionFormOrgStep = ({
               outerContainerClassName={cn(
                 "lg:hidden",
                 newOrgEvent && "opacity-80",
-                dashboardView ? "max-w-full" : "max-w-[74dvw]",
+                dashboardView ? "max-w-full" : "max-w-[74dvw] sm:max-w-full",
               )}
               tableType="events"
               defaultSort={{ id: "lastEditedAt", desc: true }}

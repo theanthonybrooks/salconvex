@@ -20,17 +20,25 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
-import { OpenCallStatus } from "@/types/openCall";
+import {
+  SubmissionFormState as OpenCallState,
+  OpenCallStatus,
+} from "@/types/openCall";
 
 import { CopyableItem } from "@/components/ui/copyable-item";
 import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
+import {
+  getEventCategoryLabel,
+  getEventCategoryLabelAbbr,
+} from "@/lib/eventFns";
 import { User } from "@/types/user";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation } from "convex/react";
+import { useRouter } from "next/navigation";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -39,6 +47,7 @@ interface EventContextMenuProps {
   // onHide: () => void;
   eventId: string;
   openCallId: string;
+  openCallState?: OpenCallState;
   isHidden: boolean;
   // setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
   appStatus: ApplicationStatus | null;
@@ -59,6 +68,7 @@ const EventContextMenu = ({
   eventId,
   mainOrgId,
   openCallId,
+  openCallState,
   // onHide,
   isHidden,
   // setIsHidden,
@@ -72,7 +82,9 @@ const EventContextMenu = ({
   user,
   isBookmarked,
   reviewMode = false,
+  orgPreview,
 }: EventContextMenuProps) => {
+  const router = useRouter();
   const isAdmin = user?.role?.includes("admin") || false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
@@ -104,7 +116,7 @@ const EventContextMenu = ({
     mainOrgId ? { orgId: mainOrgId, eventId: eventId as Id<"events"> } : "skip",
   );
 
-  const nonAdminPublicView = publicView && !isAdmin;
+  const nonAdminPublicView = publicView && !isAdmin && !orgPreview;
 
   return (
     <Popover>
@@ -137,56 +149,57 @@ const EventContextMenu = ({
         <p className="py-2 pl-4 font-bold">More options</p>
         <Separator />
         <div className="flex flex-col gap-y-1 pb-2">
-          <div
-            onClick={onHide}
-            className={cn(
-              "cursor-pointer rounded px-4 py-2 text-black/80 hover:bg-salPinkLtHover hover:text-red-700",
-              nonAdminPublicView && "hidden",
-            )}
-          >
-            {isHidden ? (
-              <span className="flex items-center gap-x-1 capitalize">
-                <EyeOff className="size-4" />
-                Unhide{" "}
-                {openCallId !== ""
-                  ? "Open Call"
-                  : eventCategory.slice(0, 1).toUpperCase() +
-                    eventCategory.slice(1)}
-              </span>
-            ) : (
-              <span className="flex items-center gap-x-1 capitalize">
-                <Eye className="size-4" />
-                Hide{" "}
-                {openCallId !== ""
-                  ? "Open Call"
-                  : eventCategory.slice(0, 1).toUpperCase() +
-                    eventCategory.slice(1)}
-              </span>
-            )}
-          </div>
           {(openCallStatus === "active" || isAdmin) && (
-            <div
-              onClick={onApply}
-              className={cn(
-                "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                nonAdminPublicView && "hidden",
-                appStatus
-                  ? "text-black/80 hover:text-emerald-700"
-                  : "text-emerald-700 hover:text-black/80",
-              )}
-            >
-              {appStatus ? (
-                <span className="flex items-center gap-x-1 text-sm">
-                  <CircleX className="size-4" />
-                  Mark as Not Applied
-                </span>
-              ) : (
-                <span className="flex items-center gap-x-1 text-sm">
-                  <CheckCircle className="size-4" />
-                  Mark as Applied
-                </span>
-              )}
-            </div>
+            <>
+              <div
+                onClick={onHide}
+                className={cn(
+                  "cursor-pointer rounded px-4 py-2 text-black/80 hover:bg-salPinkLtHover hover:text-red-700",
+                  nonAdminPublicView && "hidden",
+                )}
+              >
+                {isHidden ? (
+                  <span className="flex items-center gap-x-1 capitalize">
+                    <EyeOff className="size-4" />
+                    Unhide{" "}
+                    {openCallId !== ""
+                      ? "Open Call"
+                      : getEventCategoryLabel(eventCategory)}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-x-1 capitalize">
+                    <Eye className="size-4" />
+                    Hide{" "}
+                    {openCallId !== ""
+                      ? "Open Call"
+                      : getEventCategoryLabel(eventCategory)}
+                  </span>
+                )}
+              </div>
+
+              <div
+                onClick={onApply}
+                className={cn(
+                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                  nonAdminPublicView && "hidden",
+                  appStatus
+                    ? "text-black/80 hover:text-emerald-700"
+                    : "text-emerald-700 hover:text-black/80",
+                )}
+              >
+                {appStatus ? (
+                  <span className="flex items-center gap-x-1 text-sm">
+                    <CircleX className="size-4" />
+                    Mark as Not Applied
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-x-1 text-sm">
+                    <CheckCircle className="size-4" />
+                    Mark as Applied
+                  </span>
+                )}
+              </div>
+            </>
           )}
           {hasApplied && isBookmarked !== undefined && (
             <div
@@ -207,6 +220,19 @@ const EventContextMenu = ({
                   Bookmark Event
                 </span>
               )}
+            </div>
+          )}
+          {orgPreview && (
+            <div
+              className="flex cursor-pointer items-center gap-x-2 rounded px-4 py-2 text-sm hover:bg-salPinkLtHover"
+              onClick={() =>
+                router.push(`/dashboard/organizer/update-event?_id=${eventId}`)
+              }
+            >
+              <Pencil className="size-4" />{" "}
+              {openCallState === "pending"
+                ? "Finish Submission"
+                : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
             </div>
           )}
           {nonAdminPublicView && (

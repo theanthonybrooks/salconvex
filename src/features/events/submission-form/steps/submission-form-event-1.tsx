@@ -455,7 +455,7 @@ const SubmissionFormEventStep1 = ({
                       </p>
                     </div>
 
-                    <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+                    <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
                         {getEventCategoryLabelAbbr(category)} About
                       </Label>
@@ -606,7 +606,7 @@ const SubmissionFormEventStep1 = ({
                   </p>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+                <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.timeline" className="sr-only">
                     {getEventCategoryLabelAbbr(category)} Timeline
                   </Label>

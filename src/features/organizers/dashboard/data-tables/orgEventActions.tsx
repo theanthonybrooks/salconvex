@@ -12,9 +12,7 @@ interface OrgEventActionsProps {
 
 export const OrgEventActions = ({ event, field }: OrgEventActionsProps) => {
   const router = useRouter();
-  const hasOpenCall =
-    validOCVals.includes(event.hasOpenCall ?? "") &&
-    event.openCallState === "published";
+  const hasOpenCall = validOCVals.includes(event.hasOpenCall ?? "");
   const orgName = field === "orgName";
   const eventName = field === "eventName";
   const orgSlug = slugify(event.organizationName, {

@@ -117,6 +117,7 @@ export const createStripeCheckoutSession = action({
       openCallId?: Id<"openCalls"> | undefined;
     },
   ): Promise<{ url: string }> => {
+    console.log(args);
     const isOrganizer = args.accountType === "organizer";
     const identity = await getAuthUserId(ctx);
     if (!identity) throw new Error("Not authenticated");

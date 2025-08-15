@@ -134,6 +134,7 @@ const linksSchemaLoose = z.object({
   threads: z.string().optional(),
   vk: z.string().optional(),
   phone: z.string().optional(),
+  phoneExt: z.string().optional(),
   linkAggregate: z.string().optional(),
   other: z.string().optional(),
 });
@@ -185,6 +186,8 @@ const linksSchemaStrict = z.object({
     .refine((val) => !val || isValidPhone(val), {
       message: "Must be a valid phone number",
     }),
+
+  phoneExt: z.string().optional(),
 
   linkAggregate: z
     .string()
@@ -626,7 +629,7 @@ export const openCallStep1Schema = z
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "More eligibility info is required (min 15 characters)",
+          message: "More eligibility info is required (min 25 characters)",
           path: ["openCall", "eligibility", "details"],
         });
       }

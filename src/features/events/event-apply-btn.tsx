@@ -17,7 +17,11 @@ import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
-import { CallType, OpenCallStatus } from "@/types/openCall";
+import {
+  CallType,
+  SubmissionFormState as OpenCallState,
+  OpenCallStatus,
+} from "@/types/openCall";
 import { User, UserPref } from "@/types/user";
 import {
   getExternalErrorHtml,
@@ -115,7 +119,9 @@ export const ApplyButtonShort = ({
 interface ApplyButtonProps {
   id: string;
   openCallId: string;
+  openCallState?: OpenCallState;
   mainOrgId?: Id<"organizations">;
+
   slug: string;
   appUrl?: string;
   appLinkformat?: string;
@@ -145,7 +151,9 @@ interface ApplyButtonProps {
 export const ApplyButton = ({
   id,
   openCallId,
+  openCallState,
   mainOrgId,
+
   slug,
   appUrl,
   appLinkformat,
@@ -270,9 +278,10 @@ export const ApplyButton = ({
           ? appStatus.slice(0, 1).toUpperCase() +
             appStatus.slice(1).toLowerCase()
           : "Read More"
-        : "Read More";
+        : orgPreview
+          ? "Test Apply"
+          : "Read More";
   const hasApplied = appStatus !== null;
-
   return (
     <div
       className={cn(
@@ -315,7 +324,8 @@ export const ApplyButton = ({
           <AlertDialogTrigger asChild>
             <Button
               disabled={
-                (openCall !== "active" && !isAdmin) || (noSub && !isAdmin)
+                (openCall !== "active" && !isAdmin && !orgPreview) ||
+                (noSub && !isAdmin && !orgPreview)
               }
               variant="salWithShadowHiddenLeft"
               size="lg"
@@ -462,10 +472,11 @@ export const ApplyButton = ({
         eventId={id}
         mainOrgId={mainOrgId}
         openCallId={openCallId}
+        openCallState={openCallState}
         // onHide={onHide}
         isHidden={isHidden}
         // setIsHidden={setIsHidden}
-        publicView={publicView || noSub || orgPreview}
+        publicView={publicView || noSub}
         appStatus={appStatus}
         eventCategory={eventCategory}
         openCallStatus={openCall}
@@ -473,6 +484,7 @@ export const ApplyButton = ({
         buttonTrigger={true}
         align="end"
         isBookmarked={isBookmarked}
+        orgPreview={orgPreview}
       />
     </div>
   );

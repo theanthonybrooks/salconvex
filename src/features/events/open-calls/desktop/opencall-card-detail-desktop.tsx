@@ -36,8 +36,8 @@ import { cn } from "@/lib/utils";
 import { api } from "~/convex/_generated/api";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
+import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
-import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
@@ -478,43 +478,25 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   )}
                 </span>
               </div>
-              {eventState === "draft" && (
-                <>
-                  <Separator
-                    orientation="vertical"
-                    className="mr-2 h-10 bg-foreground"
-                    thickness={2}
-                  />
-                  <p className="rounded-lg border-2 bg-stone-100 p-4 text-2xl font-bold uppercase text-foreground/60">
-                    Draft
-                  </p>
-                </>
-              )}
-              {(eventState === "submitted" ||
-                openCallState === "pending" ||
-                openCallState === "submitted") && (
-                <>
-                  <Separator
-                    orientation="vertical"
-                    className="mr-2 h-10 bg-foreground"
-                    thickness={2}
-                  />
-                  <p className="rounded-lg border-2 bg-salYellow/70 p-4 text-2xl font-bold uppercase text-foreground/60">
-                    Pending
-                  </p>
-                </>
-              )}
+              <DraftPendingBanner
+                format="desktop"
+                openCallState={openCallState}
+                eventState={eventState}
+                eventId={event._id}
+              />
             </div>
             <div className="flex items-center gap-x-4 text-nowrap">
               <div className="flex flex-col items-end gap-1">
-                <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
-                  {openCallStatus === "ended" ? "Ended" : "Deadline"}: &nbsp;
-                  {formatOpenCallDeadline(
-                    ocEnd || "",
-                    deadlineTimezone,
-                    callType,
-                  )}
-                </span>
+                {openCallState === "published" && (
+                  <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
+                    {openCallStatus === "ended" ? "Ended" : "Deadline"}: &nbsp;
+                    {formatOpenCallDeadline(
+                      ocEnd || "",
+                      deadlineTimezone,
+                      callType,
+                    )}
+                  </span>
+                )}
                 {application?.applicationTime && hasApplied && (
                   <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
                     Applied: {formatSingleDate(application.applicationTime)}
@@ -577,8 +559,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               <ApplyButton
                 user={user}
                 userPref={userPref}
+                orgPreview={isOwner}
                 id={event._id}
                 openCallId={openCallId}
+                openCallState={openCallState}
                 slug={slug}
                 appUrl={outputAppLink}
                 edition={event.dates.edition}

@@ -37,7 +37,7 @@ import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { debounce, merge } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,6 +48,7 @@ import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
 import { steps } from "@/features/events/event-add-form";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
 const formTypeOptions = [
@@ -68,9 +69,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [formType, setFormType] = useState<number>(0);
 
   const eventOnly = formType === 1;
-
   const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
+  const paidCall = formType === 3 && !isAdmin;
   // const freeCall = formType === 2;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
@@ -124,6 +125,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const searchParams = useSearchParams();
   const eventId = searchParams.get("_id");
   const currentValues = getValues();
+  const getCheckoutUrl = useAction(
+    api.stripeSubscriptions.createStripeCheckoutSession,
+  );
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
 
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
@@ -141,6 +145,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const orgHadFreeCall = useQuery(api.stripeSubscriptions.getOrgHadFreeCall);
+
   // #endregion
   // #region ------------- State --------------
   const [acceptedTerms, setAcceptedTerms] = useState(isAdmin);
@@ -168,6 +174,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   );
   const [pending, setPending] = useState(false);
   const [scrollTrigger, setScrollTrigger] = useState(false);
+  const isEligibleForFree = orgHadFreeCall === false;
 
   const hasExistingOrg =
     typeof existingOrg === "object" && existingOrg !== null;
@@ -232,6 +239,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     (validOCVals.includes(eventOpenCall) && formType > 1) || formType >= 2;
 
   const eventName = eventData?.name;
+  const eventSlug = eventData?.slug;
   // const eventLogo = eventData?.logo;
 
   const clearEventDataTrigger =
@@ -249,9 +257,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
   const { data: preloadData } = useQueryWithStatus(
     api.events.event.preloadEventAndOrgById,
-    typeof eventId === "string" && isAdmin
-      ? { eventId: eventId as Id<"events"> }
-      : "skip",
+    typeof eventId === "string" ? { eventId: eventId as Id<"events"> } : "skip",
   );
 
   const {
@@ -358,6 +364,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const alreadyApprovedEvent = !!eventData?.approvedBy;
   const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
 
+  console.log(submissionCost);
   // console.log(finalStep, acceptedTerms, isAdmin);
   // #endregion
   // #endregion
@@ -386,29 +393,108 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     setActiveStep(0);
   };
 
+  const submissionUrl = `${
+    eventSlug || existingEvent?.slug
+  }/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
+
+  // const onSubmit = async () => {
+  //   try {
+  //     // console.log("organizer mode)");
+  //     setValue("event.state", "submitted");
+
+  //     await handleSave(true);
+
+  //     toast.success(
+  //       "Successfully updated project!",
+
+  //       {
+  //         onClick: () => toast.dismiss(),
+  //       },
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to submit form:", error);
+  //     toast.error("Failed to submit form");
+  //   } finally {
+  //     setActiveStep(0);
+  //     router.push("/dashboard/");
+  //   }
+  // };
+
   const onSubmit = async () => {
+    let url: string | undefined;
+    let newTab: Window | null = null;
+    // console.log(paidCall);
+    // console.log("data", data);
+    if (paidCall && !alreadyPaid && !isAdmin) {
+      newTab = window.open("about:blank");
+    }
+
     try {
-      // console.log("organizer mode)");
       setValue("event.state", "submitted");
+      console.log(submissionCost?.price, orgHadFreeCall);
 
       await handleSave(true);
 
-      toast.success(
-        "Successfully updated project!",
-
-        {
-          onClick: () => toast.dismiss(),
-        },
-      );
+      if (paidCall && !alreadyPaid) {
+        const result = await getCheckoutUrl({
+          planKey: formType.toString(),
+          slidingPrice:
+            typeof submissionCost?.price === "number" &&
+            submissionCost?.price > 0
+              ? submissionCost?.price
+              : 50,
+          accountType: "organizer",
+          isEligibleForFree,
+          openCallId: ocData?._id as Id<"openCalls">,
+        });
+        url = result.url;
+      }
+      if (!paidCall) {
+        toast.success(
+          alreadyPaid || alreadyApproved
+            ? "Successfully updated project!"
+            : "Successfully submitted event!",
+          {
+            onClick: () => toast.dismiss(),
+          },
+        );
+      }
+      // console.log("submitting: ", paidCall, isAdmin);
+      if (paidCall && !alreadyPaid && !isAdmin) {
+        if (!newTab) {
+          toast.error(
+            "Stripe redirect blocked. Please enable popups for this site.",
+          );
+          console.error("Popup was blocked");
+          return;
+        }
+        if (url) {
+          newTab.document.write(getExternalRedirectHtml(url, 1));
+          newTab.document.close();
+          newTab.location.href = url;
+        }
+      } else {
+        //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
+      }
+      setTimeout(() => {
+        window.location.href = `/thelist/event/${submissionUrl}`;
+      }, 1000);
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
+      if (!newTab?.closed) {
+        newTab?.document.close();
+      }
     } finally {
       setActiveStep(0);
-      router.push("/dashboard/");
+      // handleReset()
+      if (isAdmin) {
+        router.push("/dashboard/admin/event");
+      } else {
+        router.push("/dashboard/organizer/events");
+      }
     }
   };
-
   const handleNextStep = async () => {
     const isStepValid = handleCheckSchema();
     if (!isStepValid) return;
@@ -1346,10 +1432,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         if (latestSaveId.current === saveId) {
           setPending(false);
         }
-
-        if (isAdmin) {
-          window.location.href = "/dashboard/admin/event";
+        if (isAdmin && finalStep) {
+          handleReset();
         }
+
+        // if (isAdmin && finalStep) {
+        //   window.location.href = "/dashboard/admin/event";
+        // }
       }
     },
     [
@@ -1406,9 +1495,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   // #region -------------UseEffects --------------
   // console.log(eventData);
-  useEffect(() => {
-    console.log(formType, hasUserEditedForm);
-  }, [formType, hasUserEditedForm]);
+  // useEffect(() => {
+  //   console.log(formType, hasUserEditedForm);
+  // }, [formType, hasUserEditedForm]);
   useEffect(() => {
     if (eventFormType === undefined || eventFormType === 0 || formType !== 0)
       return;
@@ -1803,6 +1892,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       <HorizontalLinearStepper
         isAdmin={isAdmin}
         isMobile={isMobile}
+        dashboardView
         onCheckSchema={handleCheckSchema}
         errorMsg={errorMsg}
         activeStep={activeStep}
@@ -1811,7 +1901,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         onBackStep={handleBackStep}
         steps={steps}
         skipped={skipped}
-        className="px-2 xl:px-8"
+        className="px-4 pb-4 xl:px-8"
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
         isDirty={hasUserEditedForm}
@@ -1898,6 +1988,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 existingEvent={existingEvent}
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
+                dashBoardView
               />
             )}
             {/* //------ 4th Step: OC Start & Budget  ------ */}
@@ -1933,21 +2024,19 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             {activeStep === steps.length - 2 && (
               <SubmissionFormOrgStep2
                 handleCheckSchema={() => handleCheckSchema(false)}
+                dashBoardView
               />
             )}
             {/* //------ Final Step: Recap  ------ */}
             {activeStep === steps.length - 1 && (
               <>
-                {/* <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
-                  {JSON.stringify(getValues(), null, 2)}
-                </pre> */}
                 <SubmissionFormRecapDesktop
                   formType={formType}
                   isAdmin={isAdmin}
                   setAcceptedTerms={setAcceptedTerms}
                   acceptedTerms={acceptedTerms}
                   submissionCost={submissionCost?.price}
-                  isEligibleForFree={true}
+                  isEligibleForFree={isAdmin ? true : (orgHadFreeCall ?? false)}
                   alreadyPaid={alreadyPaid}
                 />
                 {isMobile && (
@@ -1957,7 +2046,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     setAcceptedTerms={setAcceptedTerms}
                     acceptedTerms={acceptedTerms}
                     submissionCost={submissionCost?.price}
-                    isEligibleForFree={true}
+                    isEligibleForFree={
+                      isAdmin ? true : (orgHadFreeCall ?? false)
+                    }
                     alreadyPaid={alreadyPaid}
                   />
                 )}

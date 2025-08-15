@@ -43,7 +43,7 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
           role={role}
           userPref={userPref}
         />
-        <main className="scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-200">
+        <main className="scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-100">
           {children}
         </main>
       </div>

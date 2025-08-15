@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplyButton } from "@/features/events/event-apply-btn";
 import { OpenCallCardProps } from "@/types/openCall";
 
+import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
@@ -53,7 +54,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     category: eventCategory,
     type: eventType,
     location,
-
+    state: eventState,
     slug,
   } = event;
   //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
@@ -69,7 +70,12 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     hidden: false,
   };
 
-  const { basicInfo, requirements, _id: openCallId } = openCall;
+  const {
+    basicInfo,
+    requirements,
+    _id: openCallId,
+    state: openCallState,
+  } = openCall;
 
   const appUrl = requirements?.applicationLink;
   const appLinkFormat = requirements?.applicationLinkFormat;
@@ -130,6 +136,12 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
         className,
       )}
     >
+      <DraftPendingBanner
+        format="mobile"
+        openCallState={openCallState}
+        eventState={eventState}
+        eventId={event._id}
+      />
       {appStatus !== null && !manualApplied && (
         <span
           className={cn(
@@ -301,6 +313,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               userPref={userPref}
               id={event._id}
               openCallId={openCallId}
+              openCallState={openCallState}
               slug={slug}
               appUrl={outputAppLink}
               appLinkformat={appLinkFormat}

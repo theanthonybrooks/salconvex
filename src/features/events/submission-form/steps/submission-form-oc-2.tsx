@@ -76,8 +76,8 @@ const SubmissionFormOC2 = ({
 
   const orgCurrency = organizer?.location?.currency;
   const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
-  console.log("existingHasBudget: ", existingHasBudget);
-  console.log("paid call: ", paidCall);
+  // console.log("existingHasBudget: ", existingHasBudget);
+  // console.log("paid call: ", paidCall);
   // const eventName = watch("event.name");
   // const eventId = watch("event._id");
   const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
@@ -87,7 +87,6 @@ const SubmissionFormOC2 = ({
         ? "true"
         : "",
   );
-  console.log("hasBudget: ", hasBudget);
 
   const showBudgetInputs = hasBudget?.trim() === "true";
 
@@ -112,8 +111,8 @@ const SubmissionFormOC2 = ({
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
-  console.log("min budget", budgetMin, "max budget", budgetMax);
-
+  // console.log("min budget", budgetMin, "max budget", budgetMax);
+  // console.log("hasBudget: ", hasBudget, allInclusive);
   useEffect(() => {
     if (!paidCall) return;
     if (paidCall) {
@@ -123,9 +122,9 @@ const SubmissionFormOC2 = ({
 
   useEffect(() => {
     const formValue = hasBudget?.trim();
-    console.log("hasBudget", hasBudget);
+    // console.log("hasBudget", hasBudget);
     const shouldBe = validBudgetMin ? "true" : "";
-    console.log("shouldBe", shouldBe);
+    // console.log("shouldBe", shouldBe);
     if (!formValue && validBudgetMin) {
       setHasBudget(shouldBe);
       setValue("openCall.compensation.budget.max", budgetMin);
@@ -503,65 +502,66 @@ const SubmissionFormOC2 = ({
                   )}
                 />
               </div>
+
+              <div className="input-section">
+                <p className="lg:text-xs">All inclusive</p>
+              </div>
+              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="event.category" className="sr-only">
+                  All inclusive budget selection
+                </Label>
+                <div className="flex flex-col justify-between sm:flex-row sm:items-center">
+                  <span className="mb-2 sm:mb-0">
+                    <p className="text-sm text-foreground">
+                      {isMobile
+                        ? "Is the budget all-inclusive?"
+                        : " Is the budget for this open call all-inclusive?"}
+                    </p>
+                    <p className="text-xs text-foreground/50">
+                      What does this mean?{" "}
+                      <a
+                        href={`${siteUrl[0]}/faq#all-inclusive`}
+                        target="_blank"
+                        className="underline"
+                      >
+                        Learn more
+                      </a>
+                    </p>
+                  </span>
+                  <Controller
+                    name="openCall.compensation.budget.allInclusive"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={pastEvent}
+                        onValueChange={(val: string) =>
+                          field.onChange(val === "true")
+                        }
+                        value={String(field.value) ?? ""}
+                        // value={field.value ? String(field.value) : ""}
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
+                          )}
+                        >
+                          <SelectValue placeholder="All Inclusive Budget?" />
+                        </SelectTrigger>
+                        <SelectContent className="min-w-auto">
+                          <SelectItem fit value="true">
+                            Yes
+                          </SelectItem>
+                          <SelectItem fit value="false">
+                            No
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </div>
             </>
           )}
-          <div className="input-section">
-            <p className="lg:text-xs">All inclusive</p>
-          </div>
-          <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-            <Label htmlFor="event.category" className="sr-only">
-              All inclusive budget selection
-            </Label>
-            <div className="flex flex-col justify-between sm:flex-row sm:items-center">
-              <span className="mb-2 sm:mb-0">
-                <p className="text-sm text-foreground">
-                  {isMobile
-                    ? "Is the budget all-inclusive?"
-                    : " Is the budget for this open call all-inclusive?"}
-                </p>
-                <p className="text-xs text-foreground/50">
-                  What does this mean?{" "}
-                  <a
-                    href={`${siteUrl[0]}/faq#all-inclusive`}
-                    target="_blank"
-                    className="underline"
-                  >
-                    Learn more
-                  </a>
-                </p>
-              </span>
-              <Controller
-                name="openCall.compensation.budget.allInclusive"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    disabled={pastEvent}
-                    onValueChange={(val: string) =>
-                      field.onChange(val === "true")
-                    }
-                    value={String(field.value) ?? ""}
-                    // value={field.value ? String(field.value) : ""}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
-                      )}
-                    >
-                      <SelectValue placeholder="All Inclusive Budget?" />
-                    </SelectTrigger>
-                    <SelectContent className="min-w-auto">
-                      <SelectItem fit value="true">
-                        Yes
-                      </SelectItem>
-                      <SelectItem fit value="false">
-                        No
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
         </>
 
         {(hasBudgetMin || hasRate || noBudget || unknownBudget) && (
@@ -714,7 +714,7 @@ const SubmissionFormOC2 = ({
               <p className="lg:text-xs">More Info</p>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <Label htmlFor="event.type" className="sr-only">
                 Budget More Info
               </Label>
