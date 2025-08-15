@@ -1,9 +1,10 @@
 import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
 import { getTimezoneFormat, toDate } from "@/lib/dateFns";
 import { cn } from "@/lib/utils";
-import { isValid, parseISO, setHours, setMinutes, setSeconds } from "date-fns";
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
-import { forwardRef } from "react";
+import { isValid, parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+import { DateTime } from "luxon";
+import { forwardRef, useRef } from "react";
 import DatePicker from "react-datepicker";
 
 type OcPickerType = "start" | "end";
@@ -15,12 +16,12 @@ export interface OcCustomDatePickerProps {
   placeholder?: string;
   className?: string;
   inputClassName?: string;
-  minDate?: Date | string;
+  minDate?: string | null;
   maxDate?: Date | string;
   tabIndex?: number;
   isAdmin: boolean;
   ocEnd?: string | null;
-  orgTimezone?: string;
+  orgTimezone: string;
   disabled?: boolean;
   showTimeZone?: boolean;
 }
@@ -115,62 +116,138 @@ export const OcCustomDatePicker = ({
   orgTimezone,
   disabled,
 }: OcCustomDatePickerProps) => {
-  const userTimezone =
-    orgTimezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  const parsedDate = value ? toDate(value) : null;
-
+  const dateFormat = "MMM d, yyyy @ h:mm a";
+  const tz = orgTimezone;
   const minToDate = minDate ? toDate(minDate) : null;
   const maxToDate = maxDate ? toDate(maxDate) : null;
-  const today = new Date();
 
-  const isValidSelected =
-    parsedDate &&
-    (!minToDate || parsedDate >= minToDate) &&
-    (!maxToDate || parsedDate <= maxToDate);
+  const selected = value ? toDate(value) : null;
+  const orgSelected = value
+    ? DateTime.fromISO(value, { zone: "utc" }).setZone(tz)
+    : null;
+  const selectedForPicker = orgSelected
+    ? orgSelected.setZone("local", { keepLocalTime: true }).toJSDate()
+    : null;
+  const timeNow = DateTime.now();
+  const nowOrg = timeNow.setZone(tz);
+  const orgTodayStart = nowOrg.startOf("day");
+  const UTCTodayStart = orgTodayStart.toUTC().startOf("day");
+  const openToDate = selected ? selected : (minToDate ?? nowOrg.toJSDate());
 
-  const openToDate =
-    isValidSelected && parsedDate ? parsedDate : (minToDate ?? today);
+  const baseLocal = DateTime.fromJSDate(selected ?? new Date());
+  const baseOrg = baseLocal.setZone(tz);
+  const isBaseOrgToday = baseOrg.hasSame(nowOrg, "day");
 
-  const dateFormat = "MMM d, yyyy @ h:mm a";
+  const computedMinDate = isAdmin
+    ? DateTime.fromISO("2010-01-01", { zone: tz }).toJSDate()
+    : pickerType === "start"
+      ? DateTime.local().startOf("year").toJSDate()
+      : UTCTodayStart.toJSDate();
 
-  //   console.log(parsedDate, value);
+  let minTimeForEnd: Date | undefined;
+  let maxTimeForEnd: Date | undefined;
 
-  const injectedTime = parsedDate
-    ? setHours(setMinutes(setSeconds(new Date(parsedDate), 59), 59), 23)
+  if (pickerType === "end") {
+    const dayStartLocal = baseLocal.startOf("day");
+    const dayEndLocal = baseLocal.endOf("day");
+
+    const minLocal = isBaseOrgToday
+      ? dayStartLocal.set({
+          hour: nowOrg.hour + 1,
+          minute: nowOrg.minute,
+          second: 0,
+          millisecond: 0,
+        })
+      : dayStartLocal;
+
+    minTimeForEnd = minLocal.toJSDate();
+    maxTimeForEnd = dayEndLocal.toJSDate();
+  }
+
+  const lastSelectedRef = useRef<Date | null>(selected);
+
+  const onPickerChange = (date: Date | null) => {
+    if (!date) return onChange(null);
+
+    const pickedLocal = DateTime.fromJSDate(date);
+    // const pickedUTC = pickedLocal.toUTC();
+    // const prevLocal = lastSelectedRef.current
+    //   ? DateTime.fromJSDate(lastSelectedRef.current)
+    //   : null;
+
+    // const pickedOrg = pickedLocal.setZone(tz, { keepLocalTime: true });
+    // const prevOrg = prevLocal
+    //   ? prevLocal.setZone(tz, { keepLocalTime: true })
+    //   : null;
+
+    // const dayChanged = !prevOrg || !pickedOrg.hasSame(prevOrg, "day");
+    let finalLocal = pickedLocal;
+
+    if (pickerType === "end") {
+      // if (dayChanged) {
+      //   const isPickedOrgToday = pickedOrg.hasSame(nowOrg, "day");
+      //   console.log(isPickedOrgToday);
+      //   if (isPickedOrgToday) {
+      //     let targetOrg = nowOrg
+      //       .plus({ hours: 1 })
+      //       .set({ second: 0, millisecond: 0 });
+      //     if (!targetOrg.hasSame(pickedOrg, "day")) {
+      //       targetOrg = pickedOrg.endOf("day");
+      //     }
+      //     finalLocal = pickedLocal.set({
+      //       hour: targetOrg.hour,
+      //       minute: targetOrg.minute,
+      //       second: 0,
+      //       millisecond: 0,
+      //     });
+      //   } else {
+      //     finalLocal = pickedLocal.set({
+      //       hour: 15,
+      //       minute: 1,
+      //       second: 0,
+      //       millisecond: 0,
+      //     });
+      //   }
+      // }
+      // lastSelectedRef.current = pickedOrg.toJSDate();
+    } else if (pickerType === "start") {
+      finalLocal = pickedLocal.set({
+        hour: 12,
+        minute: 1,
+        second: 0,
+        millisecond: 0,
+      });
+    }
+
+    const finalOrg = finalLocal.setZone(tz, { keepLocalTime: true });
+    onChange(finalOrg.toUTC().toISO());
+  };
+
+  const injectedTime = selected
+    ? DateTime.fromJSDate(selected)
+        .endOf("day")
+        .set({ second: 0, millisecond: 0 })
+        .toJSDate()
     : undefined;
 
   return (
     <DatePicker
       disabled={disabled}
-      selected={parsedDate}
-      onChange={(date) => {
-        if (!date || !userTimezone) return onChange(null);
-        if (pickerType === "end") {
-          const zonedDate = fromZonedTime(date, userTimezone);
-          // console.log(zonedDate);
-          onChange(zonedDate.toISOString());
-        } else if (pickerType === "start") {
-          const cleanDate = new Date(date);
-          cleanDate.setHours(12, 0, 0, 0);
-          const zonedDate = fromZonedTime(cleanDate, userTimezone);
-          // console.log(zonedDate);
-          onChange(zonedDate.toISOString());
-        }
+      selected={selectedForPicker}
+      onCalendarOpen={() => {
+        lastSelectedRef.current = selected;
       }}
+      onChange={onPickerChange}
       dateFormat={dateFormat}
       openToDate={openToDate}
       withPortal={true}
       showTimeSelect={pickerType === "end"}
+      shouldCloseOnSelect={true}
       injectTimes={injectedTime ? [injectedTime] : []}
-      minDate={
-        isAdmin
-          ? new Date(2010, 0, 1)
-          : pickerType === "start"
-            ? new Date(new Date().getFullYear(), 0, 1)
-            : (minToDate ?? new Date())
-      }
+      minDate={computedMinDate}
       maxDate={maxToDate ?? new Date(2099, 11, 31)}
+      minTime={pickerType === "end" && !isAdmin ? minTimeForEnd : undefined}
+      maxTime={pickerType === "end" && !isAdmin ? maxTimeForEnd : undefined}
       placeholderText={
         placeholder ??
         (pickerType === "start" ? "Select start date" : "Select deadline")
@@ -181,7 +258,7 @@ export const OcCustomDatePicker = ({
           className={inputClassName}
           pickerType={pickerType}
           ocEnd={ocEnd}
-          timeZone={userTimezone}
+          timeZone={tz}
           showTimeZone={showTimeZone}
         />
       }

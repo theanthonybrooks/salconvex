@@ -82,7 +82,6 @@ const SubmissionFormOrgStep = ({
   const eventName = watch("event.name");
 
   const orgName = orgData?.name ?? "";
-  console.log(orgName, orgName?.includes('"'), orgName?.includes(";"));
   const bottomRef = useRef<HTMLParagraphElement | null>(null);
   const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
   useEffect(() => {

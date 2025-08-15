@@ -461,10 +461,10 @@ export const toYear = (date: Date | null | undefined): string => {
 
 export const toDateString = (date: Date | null | undefined): string => {
   if (!date) return "";
-  console.log(zone);
+  // console.log(zone);
 
   const dt = DateTime.fromJSDate(date, { zone });
-  console.log(dt);
+  // console.log(dt);
   return dt.toFormat("yyyy-MM-dd");
 };
 

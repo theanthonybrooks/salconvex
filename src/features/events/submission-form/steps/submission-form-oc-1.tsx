@@ -36,6 +36,7 @@ import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { autoHttps } from "@/lib/linkFns";
 import "filepond/dist/filepond.min.css";
+import { DateTime } from "luxon";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormOC1Props {
@@ -87,7 +88,10 @@ const SubmissionFormOC1 = ({
 
   const pupstick = eventType?.includes("pup");
   const isDraft = openCall?.state === "draft";
-  const orgTimezone = organizer?.location?.timezone;
+  const orgTimezone =
+    organizer?.location?.timezone ??
+    Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const callFormat = openCall?.basicInfo?.callFormat;
   const fixedType = callType === "Fixed";
   const emailType = callType === "Email";
@@ -110,8 +114,21 @@ const SubmissionFormOC1 = ({
   const ocStart = openCall?.basicInfo?.dates?.ocStart;
   const ocEnd = openCall?.basicInfo?.dates?.ocEnd;
   const noEndRequired = callType && !fixedType;
-  const today = new Date();
-  const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
+  // const today = new Date();
+  // const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
+  const todayDay = DateTime.now().setZone(orgTimezone).startOf("day");
+  const startDay = ocStart
+    ? DateTime.fromISO(ocStart, { setZone: true })
+        .setZone(orgTimezone)
+        .startOf("day")
+    : null;
+  const minDT =
+    startDay && startDay >= todayDay ? startDay.plus({ days: 1 }) : todayDay;
+  const minDate = minDT.toISO();
+  // const minDate =
+  //   ocStart && DateTime.fromISO(ocStart) >= today
+  //     ? DateTime.fromISO(ocStart).plus({ days: 1 }).toISO()
+  //     : today.toISO();
 
   // console.log(ocEligibilityWhom);
 
@@ -604,8 +621,9 @@ const SubmissionFormOC1 = ({
                       }}
                       onBlur={field.onBlur}
                       placeholder={`Please be as specific as possible
-                        ${emailType ? " on what you would like for artists to include in their email submissions." : ""} Minimum 100 characters.`}
+                        ${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={5000}
+                      requiredChars={100}
                       purpose="openCall"
                       asModal={true}
                       title={eventName}

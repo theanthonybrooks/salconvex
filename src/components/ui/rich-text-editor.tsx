@@ -53,6 +53,7 @@ interface Props {
   onChange: (value: string) => void;
   onBlur?: () => void;
   placeholder?: string;
+  requiredChars?: number;
   charLimit?: number;
   purpose?: string;
   asModal?: boolean;
@@ -89,6 +90,7 @@ export const RichTextEditor = ({
   onBlur,
   placeholder = "Start typing…",
   charLimit = 500,
+  requiredChars,
   purpose,
   asModal = true,
   title,
@@ -777,7 +779,12 @@ export const RichTextEditor = ({
               </div>
             ) : (
               <span className="italic text-gray-400">
-                <p>{placeholder}</p>
+                <p className="inline-flex gap-1">{placeholder}</p>
+                {requiredChars && (
+                  <p className="inline-flex gap-1">
+                    {`Minimum (${requiredChars} characters)`}
+                  </p>
+                )}
                 {!inputPreview && <p>{`Limit (${charLimit} characters)`}</p>}
               </span>
             )}

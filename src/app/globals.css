@@ -1339,6 +1339,7 @@ div:has(> div.react-datepicker__input-container) {
 /* .rich-modal-cont {
   max-width: 90vw;
 } */
+
 .rich-text {
   &.rich-modal {
     @media (max-width: 768px) {
@@ -1457,12 +1458,17 @@ div:has(> div.react-datepicker__input-container) {
   font-feature-settings: "liga" 0;
 }
 
-.tiptap p.is-editor-empty:first-child::before {
-  color: #adb5bd;
+.tiptap p.is-editor-empty[data-placeholder]:first-child::before {
   content: attr(data-placeholder);
+  white-space: normal;
+  color: #a6acb1;
+  pointer-events: none;
   float: left;
   height: 0;
-  pointer-events: none;
+  margin-left: 0.25em;
+  /* background-color: hsl(var(--sal-yellow-light));
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem; */
 }
 
 .editor-wrapper {
