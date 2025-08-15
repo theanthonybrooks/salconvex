@@ -24,6 +24,7 @@ interface ApproveBtnProps {
   openCallId?: string;
   openCallState?: OpenCallState;
   openCallStatus: OpenCallStatus;
+  appLink?: string;
   appStatus: ApplicationStatus | null;
   isHidden: boolean;
 }
@@ -37,6 +38,7 @@ export const ApproveBtn = ({
   orgId,
   openCallStatus,
   appStatus,
+  appLink,
   eventCategory,
   isHidden,
 }: ApproveBtnProps) => {
@@ -45,57 +47,78 @@ export const ApproveBtn = ({
   const bothSubmitted = eventSubmitted && openCallSubmitted;
   const approveEvent = useMutation(api.events.event.approveEvent);
   const approveOC = useMutation(api.openCalls.openCall.changeOCStatus);
-  const somethingSubmitted =
-    eventSubmitted || openCallSubmitted || bothSubmitted;
+  // const somethingSubmitted =
+  //   eventSubmitted || openCallSubmitted || bothSubmitted;
+  const eventPublished = eventState === "published";
+
+  const handleCopy = (id: string) => {
+    if (!id) return;
+    navigator.clipboard.writeText(id);
+  };
 
   return (
-    somethingSubmitted && (
-      <div className="flex flex-col items-center gap-y-2">
-        <p className="text-sm">Admin Only Actions</p>
-        <div className="flex w-full items-center justify-center">
-          <Button
-            variant="salWithShadowHiddenLeft"
-            onClick={() => {
-              if (bothSubmitted) {
-                approveOC({
-                  openCallId: openCallId as Id<"openCalls">,
-                  newStatus: "published",
-                  target: "both",
-                });
-                return;
-              }
-              if (eventSubmitted && !openCallSubmitted) {
-                approveEvent({ eventId: eventId as Id<"events"> });
-                return;
-              }
-              if (openCallSubmitted && !eventSubmitted) {
-                approveOC({
-                  openCallId: openCallId as Id<"openCalls">,
-                  newStatus: "published",
-                });
-                return;
-              }
-            }}
-            className={cn("w-full rounded-r-none border-r")}
-          >
-            Approve Both
-          </Button>
+    <div className="flex w-full flex-col items-center gap-y-2">
+      <p className="text-sm">Admin Only Actions</p>
+      <div className="flex w-full items-center justify-center">
+        <Button
+          variant="salWithShadowHiddenLeft"
+          onClick={() => {
+            if (bothSubmitted) {
+              approveOC({
+                openCallId: openCallId as Id<"openCalls">,
+                newStatus: "published",
+                target: "both",
+              });
+              return;
+            }
+            if (eventSubmitted && !openCallSubmitted) {
+              approveEvent({ eventId: eventId as Id<"events"> });
+              return;
+            }
+            if (openCallSubmitted && !eventSubmitted) {
+              approveOC({
+                openCallId: openCallId as Id<"openCalls">,
+                newStatus: "published",
+              });
+              return;
+            }
+            if (eventPublished) {
+              handleCopy(eventId);
+              window.open(
+                `${process.env.NEXT_PUBLIC_CONVEX_DASHBOARD_URL}data?table=events`,
+                "_blank",
+                "noopener, noreferrer",
+              );
+            }
+          }}
+          className={cn("w-full rounded-r-none border-r")}
+        >
+          {eventSubmitted
+            ? "Approve Event"
+            : openCallSubmitted
+              ? "Approve Open Call"
+              : eventPublished
+                ? "Go to Convex"
+                : "Approve Both"}
+        </Button>
 
-          <EventContextMenu
-            user={user}
-            mainOrgId={orgId}
-            eventId={eventId}
-            openCallId={openCallId ?? ""}
-            appStatus={appStatus}
-            openCallStatus={openCallStatus}
-            isHidden={isHidden}
-            eventCategory={eventCategory}
-            buttonTrigger={true}
-            align="end"
-            reviewMode={true}
-          />
-        </div>
+        <EventContextMenu
+          user={user}
+          mainOrgId={orgId}
+          eventId={eventId}
+          openCallId={openCallId ?? ""}
+          appLink={appLink}
+          appStatus={appStatus}
+          eventState={eventState}
+          openCallState={openCallState}
+          openCallStatus={openCallStatus}
+          isHidden={isHidden}
+          eventCategory={eventCategory}
+          buttonTrigger={true}
+          align="end"
+          reviewMode={true}
+        />
       </div>
-    )
+    </div>
   );
 };

@@ -444,12 +444,7 @@ export const columns: ColumnDef<Event>[] = [
                         Open Call ID
                       </CopyableItem>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => navigator.clipboard.writeText(event._id)}
-                      className="flex items-center gap-x-2"
-                    >
-                      <LucideClipboardCopy className="size-4" /> Event ID
-                    </DropdownMenuItem>
+
                     <DataTableOrgInfo orgId={event.mainOrgId} />
                   </>
                 )}

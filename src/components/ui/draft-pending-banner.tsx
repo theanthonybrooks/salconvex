@@ -73,18 +73,37 @@ export const DraftPendingBanner = ({
                 <p className="text-2xl font-bold uppercase">
                   Pending - Preview Only
                 </p>
-                <span className="text-center">
-                  This event is not yet submitted. You can still preview it, but
-                  it will not be listed to the public. Submit via the{" "}
-                  <Link
-                    variant="bold"
-                    href={`/dashboard/organizer/update-event?_id=${eventId}`}
-                    target="_blank"
-                  >
-                    dashboard
-                  </Link>
-                  .
-                </span>
+                {openCallState === "pending" && (
+                  <span className="text-center">
+                    This open call is not yet submitted. You can still preview
+                    it, but{" "}
+                    {`${eventState === "published" ? "only the event/project will" : eventState === "submitted" ? "it will not" : null}`}{" "}
+                    be listed to the public. Submit via the{" "}
+                    <Link
+                      variant="bold"
+                      href={`/dashboard/organizer/update-event?_id=${eventId}`}
+                      target="_blank"
+                    >
+                      dashboard
+                    </Link>
+                    .
+                  </span>
+                )}
+                {openCallState !== "pending" && (
+                  <span className="text-center">
+                    Until it&apos;s approved,{" "}
+                    {`${eventState === "published" ? "only the event/project will" : eventState === "submitted" ? "it will not" : null}`}{" "}
+                    be listed to the public. You can still update it via the{" "}
+                    <Link
+                      variant="bold"
+                      href={`/dashboard/organizer/update-event?_id=${eventId}`}
+                      target="_blank"
+                    >
+                      dashboard
+                    </Link>
+                    .
+                  </span>
+                )}
               </div>
             </>
           )}

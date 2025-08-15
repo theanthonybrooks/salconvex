@@ -477,6 +477,7 @@ export const ApplyButton = ({
         isHidden={isHidden}
         // setIsHidden={setIsHidden}
         publicView={publicView || noSub}
+        appLink={appUrl}
         appStatus={appStatus}
         eventCategory={eventCategory}
         openCallStatus={openCall}

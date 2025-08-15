@@ -95,6 +95,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     callType,
   );
 
+  const isOwner = user?._id === organizer?.ownerId;
   // const hasOpenCall = openCallStatus === "active";
 
   // console.log("has open call", hasOpenCall)
@@ -136,12 +137,14 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
         className,
       )}
     >
-      <DraftPendingBanner
-        format="mobile"
-        openCallState={openCallState}
-        eventState={eventState}
-        eventId={event._id}
-      />
+      {(isAdmin || isOwner) && (
+        <DraftPendingBanner
+          format="mobile"
+          openCallState={openCallState}
+          eventState={eventState}
+          eventId={event._id}
+        />
+      )}
       {appStatus !== null && !manualApplied && (
         <span
           className={cn(

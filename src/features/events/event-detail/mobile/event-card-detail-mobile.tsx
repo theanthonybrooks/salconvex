@@ -59,7 +59,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     state: eventState,
     dates,
   } = event;
-
+  const isOwner = user?._id === organizer?.ownerId;
   // const { bookmarked, hidden } = artist?.listActions?.find(
   //   (la) => la.eventId === event._id,
   // ) ?? {
@@ -131,11 +131,13 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
         className,
       )}
     >
-      <DraftPendingBanner
-        format="mobile"
-        eventState={eventState}
-        eventId={event._id}
-      />
+      {(isAdmin || isOwner) && (
+        <DraftPendingBanner
+          format="mobile"
+          eventState={eventState}
+          eventId={event._id}
+        />
+      )}
       <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3">
         <div className="col-span-1 flex flex-col items-center justify-between space-y-6 pb-3 pt-3">
           <EventOrgLogo imgSrc={eventLogo} type="event" />

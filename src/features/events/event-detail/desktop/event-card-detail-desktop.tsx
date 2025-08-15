@@ -36,7 +36,6 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { EventCardProps } from "@/types/event";
-import { publicStateValues } from "@/types/openCall";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -67,7 +66,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
     dates,
     state: eventState,
   } = event;
-  const validEventState = publicStateValues.includes(eventState ?? "");
+  // const validEventState = publicStateValues.includes(eventState ?? "");
 
   const { bookmarked, hidden } = artist?.listActions?.find(
     (la) => la.eventId === event._id,
@@ -236,7 +235,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 organizer={organizer}
                 abbr={true}
               />
-              {isAdmin && !validEventState && (
+              {isAdmin && (
                 <>
                   <Separator
                     orientation="horizontal"
@@ -299,7 +298,13 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   )}
                 </span>
               </div>
-              <DraftPendingBanner format="desktop" eventState={eventState} eventId={event._id}/>
+              {(isAdmin || isOwner) && (
+                <DraftPendingBanner
+                  format="desktop"
+                  eventState={eventState}
+                  eventId={event._id}
+                />
+              )}
             </div>
             <div className="flex items-center gap-x-4">
               {hidden && hasActiveSubscription ? (

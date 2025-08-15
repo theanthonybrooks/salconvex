@@ -410,6 +410,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   orgId={event.mainOrgId}
                   openCallStatus={openCallStatus}
                   appStatus={appStatus}
+                  appLink={appUrl}
                   isHidden={hidden}
                 />
               </>
@@ -478,12 +479,14 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   )}
                 </span>
               </div>
-              <DraftPendingBanner
-                format="desktop"
-                openCallState={openCallState}
-                eventState={eventState}
-                eventId={event._id}
-              />
+              {(isAdmin || isOwner) && (
+                <DraftPendingBanner
+                  format="desktop"
+                  openCallState={openCallState}
+                  eventState={eventState}
+                  eventId={event._id}
+                />
+              )}
             </div>
             <div className="flex items-center gap-x-4 text-nowrap">
               <div className="flex flex-col items-end gap-1">

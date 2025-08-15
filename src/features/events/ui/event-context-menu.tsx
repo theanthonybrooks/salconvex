@@ -7,7 +7,10 @@ import {
 
 import { capitalize, cn } from "@/lib/utils";
 import {
+  ArrowRightCircle,
+  ArrowRightCircleIcon,
   CheckCircle,
+  CircleCheck,
   CircleX,
   Ellipsis,
   Eye,
@@ -19,7 +22,10 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { ApplicationStatus } from "@/types/applications";
-import { EventCategory } from "@/types/event";
+import {
+  EventCategory,
+  SubmissionFormState as EventState,
+} from "@/types/event";
 import {
   SubmissionFormState as OpenCallState,
   OpenCallStatus,
@@ -30,6 +36,7 @@ import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
+import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import {
   getEventCategoryLabel,
   getEventCategoryLabelAbbr,
@@ -45,8 +52,10 @@ import { Id } from "~/convex/_generated/dataModel";
 
 interface EventContextMenuProps {
   // onHide: () => void;
+  appLink?: string;
   eventId: string;
   openCallId: string;
+  eventState?: EventState;
   openCallState?: OpenCallState;
   isHidden: boolean;
   // setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
@@ -65,9 +74,11 @@ interface EventContextMenuProps {
 }
 
 const EventContextMenu = ({
+  appLink,
   eventId,
   mainOrgId,
   openCallId,
+  eventState,
   openCallState,
   // onHide,
   isHidden,
@@ -88,6 +99,7 @@ const EventContextMenu = ({
   const isAdmin = user?.role?.includes("admin") || false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
+  const approveEvent = useMutation(api.events.event.approveEvent);
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const hasApplied = appStatus !== null;
@@ -149,7 +161,7 @@ const EventContextMenu = ({
         <p className="py-2 pl-4 font-bold">More options</p>
         <Separator />
         <div className="flex flex-col gap-y-1 pb-2">
-          {(openCallStatus === "active" || isAdmin) && (
+          {(openCallStatus === "active" || (isAdmin && !reviewMode)) && (
             <>
               <div
                 onClick={onHide}
@@ -252,6 +264,39 @@ const EventContextMenu = ({
           )}
           {isAdmin && (
             <>
+              {reviewMode &&
+                openCallState === "submitted" &&
+                eventState === "submitted" && (
+                  <span
+                    className="flex cursor-pointer items-center gap-x-1 px-4 py-2 text-sm hover:bg-salPinkLtHover"
+                    onClick={() =>
+                      approveEvent({ eventId: eventId as Id<"events"> })
+                    }
+                  >
+                    <CircleCheck className="size-4" />
+                    Approve Event
+                  </span>
+                )}
+              {reviewMode && appLink && (
+                <Link
+                  href={appLink}
+                  target="_blank"
+                  className="flex items-center gap-x-1 px-4 py-2 text-sm hover:bg-salPinkLtHover"
+                >
+                  <ArrowRightCircle className="size-4" />
+                  Preview Link
+                </Link>
+              )}
+              {openCallId && (
+                <ConvexDashboardLink
+                  table="openCalls"
+                  id={openCallId}
+                  className="flex cursor-pointer items-center gap-x-1 px-4 py-2 text-sm hover:bg-salPinkLtHover"
+                >
+                  <ArrowRightCircleIcon className="size-4" />
+                  Go to Convex
+                </ConvexDashboardLink>
+              )}
               <Link
                 href={`/dashboard/admin/event?_id=${eventId}`}
                 target="_blank"
@@ -286,7 +331,7 @@ const EventContextMenu = ({
               {reviewMode && mainOrgId && (
                 <Link
                   href={`mailto:${orgOwnerEmailData?.orgOwnerEmail ?? ""}?subject=${capitalize(orgOwnerEmailData?.eventName ?? "")} submission`}
-                  className="flex items-center gap-x-1 px-4 py-2 text-sm"
+                  className="flex items-center gap-x-1 px-4 py-2 text-sm hover:bg-salPinkLtHover"
                 >
                   <Mail className="size-4" />
                   Contact Org

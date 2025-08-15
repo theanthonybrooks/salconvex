@@ -18,9 +18,10 @@ export const ConvexDashboardLink = ({
     if (!id) return;
     navigator.clipboard.writeText(id);
   };
+
   return (
     <Link
-      href={`https://dashboard.convex.dev/t/theanthonybrooks/streetartlist/flexible-narwhal-975/data?table=${table}`}
+      href={`${process.env.NEXT_PUBLIC_CONVEX_DASHBOARD_URL}data?table=${table}&id=${id}`}
       target="_blank"
       onClick={handleCopy}
       className={className}
