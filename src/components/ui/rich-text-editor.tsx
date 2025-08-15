@@ -781,9 +781,7 @@ export const RichTextEditor = ({
               <span className="italic text-gray-400">
                 <p className="inline-flex gap-1">{placeholder}</p>
                 {requiredChars && (
-                  <p className="inline-flex gap-1">
-                    {`Minimum (${requiredChars} characters)`}
-                  </p>
+                  <p> {`Minimum (${requiredChars} characters)`}</p>
                 )}
                 {!inputPreview && <p>{`Limit (${charLimit} characters)`}</p>}
               </span>

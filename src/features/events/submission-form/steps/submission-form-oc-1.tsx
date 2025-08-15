@@ -620,7 +620,7 @@ const SubmissionFormOC1 = ({
                         field.onChange(val);
                       }}
                       onBlur={field.onBlur}
-                      placeholder={`Please be as specific as possible
+                      placeholder={`Please be as specific as possible ${!emailType ? " on what artists will need to submit in order to apply." : null}
                         ${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={5000}
                       requiredChars={100}

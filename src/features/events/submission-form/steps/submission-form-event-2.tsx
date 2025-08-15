@@ -130,7 +130,7 @@ const SubmissionFormEventStep2 = ({
         >
           {canNameEvent && (
             <>
-              <div className="input-section">
+              <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
                   Step{" "}
                   {categoryEvent && !eventOnly && !isOngoing
@@ -138,6 +138,51 @@ const SubmissionFormEventStep2 = ({
                     : (!categoryEvent && isOngoing) || noEvent || prodOnly
                       ? 9
                       : 10}
+                  :{" "}
+                </p>
+                <p className="flex items-center gap-1 lg:text-xs">
+                  Other {getEventCategoryLabelAbbr(category)} Info
+                </p>
+              </div>
+
+              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
+                <Label htmlFor="event.name" className="sr-only">
+                  {getEventCategoryLabelAbbr(category)} Other Info
+                </Label>
+
+                <Controller
+                  name="event.otherInfo"
+                  control={control}
+                  render={({ field }) => (
+                    <RichTextEditor
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      placeholder="Add any other info about your project/event. Don't add open call details here."
+                      charLimit={5000}
+                    />
+                  )}
+                />
+                <span className="w-full text-center text-xs italic text-muted-foreground">
+                  (Formatting is for preview and won&apos;t exactly match the
+                  public version)
+                </span>
+              </div>
+              <Separator
+                thickness={2}
+                className="col-span-full mx-auto my-2 block"
+                orientation="horizontal"
+              />
+              <p className="col-span-full mx-auto mb-2 font-medium">
+                Next section: Open Call Details
+              </p>
+              <div className="input-section">
+                <p className="min-w-max font-bold lg:text-xl">
+                  Step{" "}
+                  {categoryEvent && !eventOnly && !isOngoing
+                    ? 12
+                    : (!categoryEvent && isOngoing) || noEvent || prodOnly
+                      ? 10
+                      : 11}
                   :
                 </p>
                 <p className="lg:text-xs">
@@ -230,41 +275,6 @@ const SubmissionFormEventStep2 = ({
                 />
               </div>
 
-              <div className="input-section h-full">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step{" "}
-                  {categoryEvent && !eventOnly && !isOngoing
-                    ? 12
-                    : (!categoryEvent && isOngoing) || noEvent || prodOnly
-                      ? 10
-                      : 11}
-                  :{" "}
-                </p>
-                <p className="lg:text-xs">Other Info</p>
-              </div>
-
-              <div className="mx-auto flex w-full max-w-[74dvw] flex-col gap-2 sm:max-w-md lg:min-w-[300px] lg:max-w-md">
-                <Label htmlFor="event.name" className="sr-only">
-                  {getEventCategoryLabelAbbr(category)} Other Info
-                </Label>
-
-                <Controller
-                  name="event.otherInfo"
-                  control={control}
-                  render={({ field }) => (
-                    <RichTextEditor
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      placeholder="Add any other info about your project/event..."
-                      charLimit={5000}
-                    />
-                  )}
-                />
-                <span className="w-full text-center text-xs italic text-muted-foreground">
-                  (Formatting is for preview and won&apos;t exactly match the
-                  public version)
-                </span>
-              </div>
               {isAdmin && (
                 <>
                   <Separator
