@@ -2036,7 +2036,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   setAcceptedTerms={setAcceptedTerms}
                   acceptedTerms={acceptedTerms}
                   submissionCost={submissionCost?.price}
-                  isEligibleForFree={isAdmin ? true : (orgHadFreeCall ?? false)}
+                  isEligibleForFree={isAdmin ? true : isEligibleForFree}
                   alreadyPaid={alreadyPaid}
                 />
                 {isMobile && (
@@ -2046,9 +2046,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     setAcceptedTerms={setAcceptedTerms}
                     acceptedTerms={acceptedTerms}
                     submissionCost={submissionCost?.price}
-                    isEligibleForFree={
-                      isAdmin ? true : (orgHadFreeCall ?? false)
-                    }
+                    isEligibleForFree={isAdmin ? true : isEligibleForFree}
                     alreadyPaid={alreadyPaid}
                   />
                 )}
