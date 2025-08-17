@@ -46,7 +46,6 @@ export default function Dashboard() {
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const subStatus = subData?.subStatus ?? "none";
-  const hasActiveSubscription = subData?.hasActiveSubscription ?? false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
@@ -55,6 +54,8 @@ export default function Dashboard() {
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");
+  const hasActiveSubscription =
+    (subData?.hasActiveSubscription || isAdmin) ?? false;
   const isArtist =
     (accountType?.includes("artist") && hasActiveSubscription) || isAdmin;
   const isOrganizer = accountType?.includes("organizer") || isAdmin;
