@@ -20,8 +20,11 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
-    unoptimized: true, // 🚀 Completely disables Next.js image optimization
+    unoptimized: true,
   },
+  // experimental: {
+
+  // }
 };
 
 export default withSentryConfig(nextConfig, {

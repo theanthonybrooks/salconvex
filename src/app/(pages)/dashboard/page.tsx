@@ -531,7 +531,8 @@ export default function Dashboard() {
                 variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
-                <Link variant="standard" href="/dashboard/projects">
+                {/* <Link variant="standard" href="/dashboard/projects"> */}
+                <Link variant="standard" href="/dashboard/">
                   <LucideFolderHeart className="size-5" />
                   Manage Portfolio
                 </Link>

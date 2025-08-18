@@ -160,13 +160,12 @@ export const AccountSubscribeForm = ({
           />
         )}
 
-        {isArtist && (
-          <DialogDescription>
-            {isArtist
-              ? "Add information needed to apply for open calls"
-              : "Add open call for your project or event"}
-          </DialogDescription>
-        )}
+        <DialogDescription className={cn(!isArtist && "sr-only")}>
+          {isArtist
+            ? "Add information needed to apply for open calls"
+            : `Add an ${planKey === "1" ? "event" : "open call"} for your project or
+            event`}
+        </DialogDescription>
 
         <></>
         {isArtist ? (
