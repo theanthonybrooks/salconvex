@@ -632,7 +632,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         }
 
         return false;
-      } else if (shouldToast && isAdmin && manualCheck) {
+      } else if (isAdmin && manualCheck) {
         toast.success("Everything is looking good!", {
           toastId: "form-validation-success",
         });
@@ -1878,7 +1878,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         isAdmin={isAdmin}
         isMobile={isMobile}
         dashboardView
-        onCheckSchema={handleCheckSchema}
+        onCheckSchema={() => handleCheckSchema(false, true)}
         errorMsg={errorMsg}
         activeStep={activeStep}
         setActiveStep={setActiveStep}
@@ -1971,7 +1971,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 dashBoardView
               />
@@ -1985,7 +1985,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -1998,7 +1998,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2008,7 +2008,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
             {activeStep === steps.length - 2 && (
               <SubmissionFormOrgStep2
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 dashBoardView
               />
             )}

@@ -734,7 +734,7 @@ export const EventOCForm = ({
 
         return false;
       } else {
-        if (shouldToast && isAdmin && manualCheck) {
+        if (isAdmin && manualCheck) {
           toast.success("Everything is looking good!", {
             toastId: "form-validation-success",
           });
@@ -2017,7 +2017,7 @@ export const EventOCForm = ({
       <HorizontalLinearStepper
         isAdmin={isAdmin}
         isMobile={isMobile}
-        onCheckSchema={handleCheckSchema}
+        onCheckSchema={() => handleCheckSchema(false, true)}
         errorMsg={errorMsg}
         activeStep={activeStep}
         setActiveStep={setActiveStep}
@@ -2130,7 +2130,7 @@ export const EventOCForm = ({
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
               />
             )}
@@ -2143,7 +2143,7 @@ export const EventOCForm = ({
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2156,7 +2156,7 @@ export const EventOCForm = ({
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2166,7 +2166,7 @@ export const EventOCForm = ({
 
             {activeStep === steps.length - 2 && (
               <SubmissionFormOrgStep2
-                handleCheckSchema={() => handleCheckSchema(false, true)}
+                handleCheckSchema={() => handleCheckSchema(false)}
               />
             )}
             {/* //------ Final Step: Recap  ------ */}
