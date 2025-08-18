@@ -10,7 +10,7 @@ import {
 import { Search } from "@/features/Sidebar/Search";
 import { cn } from "@/lib/utils";
 import { User, UserPref } from "@/types/user";
-import clsx from "clsx";
+
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion } from "framer-motion";
@@ -184,7 +184,7 @@ export default function DashboardSideBar({
                   <Link
                     prefetch={true}
                     href={item.href}
-                    className={clsx(
+                    className={cn(
                       "flex items-center gap-2 px-3 py-5 transition-colors",
                       pathname === item.href
                         ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
@@ -342,7 +342,7 @@ export default function DashboardSideBar({
                                 <Link
                                   prefetch={true}
                                   href={sectionItem.href}
-                                  className={clsx(
+                                  className={cn(
                                     "flex items-center justify-between gap-2 rounded-lg px-3 py-2 transition-colors",
                                     fontSize === "text-base"
                                       ? "sm:text-base"
@@ -405,7 +405,7 @@ export default function DashboardSideBar({
                 <Link
                   prefetch={true}
                   href={item.href}
-                  className={clsx(
+                  className={cn(
                     "flex items-center justify-center gap-2 py-5 text-center transition-colors",
                     fontSize === "text-base" ? "sm:text-base" : "text-sm",
                     pathname === item.href

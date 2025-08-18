@@ -1035,7 +1035,7 @@ export const getEventWithOCDetails = query({
     // if (!userIsOrganizer && !hasActiveSubscription)
     // throw new ConvexError("You don't have permission to view this event");
     // console.log("user doesn't have permission to view this event");
-    console.log(source, openCall);
+    // console.log(source, openCall);
     if (source === "ocpage" && !openCall)
       throw new ConvexError("Open Call not found");
     if (!openCall) return null;

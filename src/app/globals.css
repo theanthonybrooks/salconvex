@@ -882,7 +882,7 @@ button:active {
     box-shadow: none;
   }
   & .fc-button-primary:not(:disabled):active {
-    background-color: rgb(202, 132, 203);
+    background-color: rgb(226, 148, 228);
     color: black;
   }
   & .fc-button-primary:not(:disabled):hover {

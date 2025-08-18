@@ -1,5 +1,5 @@
+import { generateNumericToken } from "@/lib/otpFns";
 import Resend from "@auth/core/providers/resend";
-import { alphabet, generateRandomString } from "oslo/crypto";
 import { Resend as ResendAPI } from "resend";
 
 export const ResendOTP = Resend({
@@ -8,7 +8,7 @@ export const ResendOTP = Resend({
   maxAge: 60 * 15, // 15 minutes
 
   async generateVerificationToken() {
-    return generateRandomString(6, alphabet("0-9"));
+    return generateNumericToken(6);
   },
   async sendVerificationRequest({
     identifier: email,
@@ -20,7 +20,7 @@ export const ResendOTP = Resend({
 
     // console.log("expires", expires)
     const expirationTime = Date.now() + 15 * 60 * 1000;
-    const validHours = Math.floor((expirationTime - Date.now()) / (60 * 1000));
+    const validMin = Math.floor((expirationTime - Date.now()) / (60 * 1000));
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -79,7 +79,7 @@ export const ResendOTP = Resend({
               <div class="section">
                   <div class="subtext">Verification code</div>
                   <div class="verification-code">${token}</div>
-                  <div class="subtext">(This code is valid for ${validHours} minutes)</div>
+                  <div class="subtext">(This code is valid for ${validMin} minutes)</div>
               </div>
               <div class="section">
                   <div class="subtext">If you did not request this email, please ignore this message.</div>

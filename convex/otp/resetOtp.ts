@@ -1,5 +1,5 @@
+import { generateNumericToken } from "@/lib/otpFns";
 import Resend from "@auth/core/providers/resend";
-import { alphabet, generateRandomString } from "oslo/crypto";
 import { Resend as ResendAPI } from "resend";
 
 export const ResetOTP = Resend({
@@ -8,7 +8,7 @@ export const ResetOTP = Resend({
   maxAge: 60 * 15, // 15 minutes
 
   async generateVerificationToken() {
-    return generateRandomString(6, alphabet("0-9"));
+    return generateNumericToken(6);
   },
   async sendVerificationRequest({
     identifier: email,
