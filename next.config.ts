@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   typescript: {
     // ignoreBuildErrors: false, // Ensures TypeScript errors block builds
   },
+
   webpack: (config) => {
     // Allow module resolution from the root directory
     config.resolve.modules.push(path.resolve(__dirname));
@@ -22,9 +23,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // experimental: {
-
-  // }
 };
 
 export default withSentryConfig(nextConfig, {

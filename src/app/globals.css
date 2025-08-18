@@ -213,7 +213,7 @@ body {
     --background-hex: #ffe770;
     --dashboard-bg-lt: 50 100% 90%;
 
-    --sal-progress: var(rgb(240, 121, 244));
+    /* --sal-progress: var(rgb(240, 121, 244)); */
     --user-icon: 0, 0%, 100%;
 
     --foreground: 222.2 84% 4.9%;
@@ -270,7 +270,7 @@ body {
     --background-prev: 60 90% 75%; /* #f8f16b */
     --background: 0 0% 100%;
     /* --background: 50 100% 72%; */
-    --sal-progress: var(rgb(240, 121, 244));
+    /* --sal-progress: var(rgb(240, 121, 244)); */
     --user-icon: 0, 0%, 100%;
 
     --foreground: 222.2 84% 4.9%;
@@ -882,6 +882,10 @@ button:active {
     box-shadow: none;
   }
   & .fc-button-primary:not(:disabled):active {
+    background-color: rgb(202, 132, 203);
+    color: black;
+  }
+  & .fc-button-primary:not(:disabled):hover {
     background-color: rgb(226, 148, 228);
     color: black;
   }

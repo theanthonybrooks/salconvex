@@ -45,7 +45,6 @@ export default {
         salYellowLtHover: "hsl(var(--sal-yellow-lt-hover))",
         salYellowHex: "var(--sal-yellow-hex)",
         salYellowDark: "hsl(var(--sal-yellow-dark))",
-        salProgress: "var(--sal-progress)",
         salPink: "hsl(var(--sal-pink))",
         salPinkLt: "hsl(var(--sal-pink-light))",
         salPinkLtHover: "hsl(var(--sal-pink-lt-hover))",

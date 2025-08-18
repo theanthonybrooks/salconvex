@@ -11,7 +11,6 @@ export default function ClientAuthWrapper({
 }) {
   const pathname = usePathname();
 
-
   // const { theme } = useTheme()
   // const { isLoading } = useConvexAuth()
   const targetRef = useRef(null);
@@ -56,26 +55,6 @@ export default function ClientAuthWrapper({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* {isPublicPage && (
-              <motion.div
-                id='scroll-indicator'
-                // initial={{ opacity: 0 }}
-                className={cn(
-                  "z-20",
-                  theme === "default" ? "bg-salPink" : "bg-salProgress"
-                )}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                style={{
-                  scaleX: smoothScrollProgress,
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 10,
-                  originX: 0,
-                }}
-              />
-            )} */}
           {children}
         </motion.div>
       </AnimatePresence>
