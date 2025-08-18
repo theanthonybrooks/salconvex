@@ -73,7 +73,8 @@ export const DataTableAdminOrgStateActions = ({
           }
         }}
         className={cn(
-          "flex w-max min-w-30 items-center justify-center gap-1 rounded border p-2 px-4",
+          "flex w-max min-w-30 items-center justify-center gap-1 rounded p-2 px-4",
+          state && "border",
           state === "draft" && "bg-orange-200",
           state === "pending" && "bg-red-100",
           state === "submitted" && "bg-blue-200",

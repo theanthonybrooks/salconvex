@@ -13,6 +13,20 @@ interface RichTextDisplayProps {
   fontSize?: "text-base" | "text-sm";
 }
 
+export function cleanHtml(
+  html: string = "",
+  totalClean: boolean = false,
+): string {
+  if (html === "") return "";
+  if (totalClean) {
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
+    });
+  }
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR });
+}
+
 export const RichTextDisplay = ({
   html,
   className,

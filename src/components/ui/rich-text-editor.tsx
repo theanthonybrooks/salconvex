@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import {
+  cleanHtml,
   RichTextDisplay,
   trimTrailingEmptyParagraphs,
 } from "@/lib/richTextFns";
@@ -31,7 +32,6 @@ import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
 import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import DOMPurify from "dompurify";
 import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
@@ -245,10 +245,7 @@ export const RichTextEditor = ({
 
   const handleAccept = useCallback(() => {
     setPending(true);
-    let clean = DOMPurify.sanitize(tempContent, {
-      ALLOWED_TAGS,
-      ALLOWED_ATTR,
-    }).trim();
+    let clean = cleanHtml(tempContent).trim();
     clean = trimTrailingEmptyParagraphs(clean);
     onChange(clean === "<p></p>" ? "" : clean);
     onBlur?.();

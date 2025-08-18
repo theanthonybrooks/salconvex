@@ -1,3 +1,4 @@
+import { cleanHtml } from "@/lib/richTextFns";
 import { toMutableEnum } from "@/lib/zodFns";
 import {
   eventCategoryValues,
@@ -306,6 +307,7 @@ export const eventBase = z.object({
 export const eventSchema = eventBase.superRefine((data, ctx) => {
   if (data.name?.trim()) {
     const trimmed = data.name.trim();
+
     if (trimmed.length > 0 && trimmed.length < 3) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -589,82 +591,24 @@ export const openCallCompensationSchema = z.object({
   }),
 });
 
-export const openCallStep1Schema = z
-  .object({
-    organization: z.object({
-      location: z.object({
-        currency: z.optional(
-          z.object({
-            code: z.string(),
-            name: z.string(),
-            symbol: z.string(),
-            format: z.optional(z.string()),
-          }),
-        ),
-      }),
+export const openCallStep1Schema = z.object({
+  organization: z.object({
+    location: z.object({
+      currency: z.optional(
+        z.object({
+          code: z.string(),
+          name: z.string(),
+          symbol: z.string(),
+          format: z.optional(z.string()),
+        }),
+      ),
     }),
-    event: eventBase.extend({
-      hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
-    }),
-    openCall: openCallBaseSchema,
-  })
-  .superRefine((data, ctx) => {
-    const appLinkFormat = data.openCall?.requirements?.applicationLinkFormat;
-    const appLink = data.openCall?.requirements?.applicationLink;
-    if (data.openCall?.eligibility?.type.trim()) {
-      const trimmed = data.openCall?.eligibility?.type.trim();
-      if (
-        trimmed === "National" &&
-        data.openCall?.eligibility?.whom?.length === 0
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Select at least one eligible nationality",
-          path: ["openCall", "eligibility", "details"],
-        });
-      }
-      if (
-        (trimmed === "Other" || trimmed === "Regional/Local") &&
-        (data.openCall?.eligibility?.details?.trim() ?? "")?.length < 22
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "More eligibility info is required (min 25 characters)",
-          path: ["openCall", "eligibility", "details"],
-        });
-      }
-    }
-    if (
-      data.event?.hasOpenCall === "Fixed" &&
-      (!data.openCall?.basicInfo?.dates?.ocStart ||
-        !data.openCall?.basicInfo?.dates?.ocEnd)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Fixed calls must have a start and end date",
-        path: ["openCall", "basicInfo", "dates"],
-      });
-    }
-    if (appLinkFormat === "mailto:") {
-      if (!appLink || !isValidEmail(appLink)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Must be a valid email address",
-          path: ["openCall", "requirements", "applicationLink"],
-        });
-      }
-    }
-
-    if (appLinkFormat === "https://") {
-      if (!appLink || !isValidUrl(appLink)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Must be a valid website URL (https://...)",
-          path: ["openCall", "requirements", "applicationLink"],
-        });
-      }
-    }
-  });
+  }),
+  event: eventBase.extend({
+    hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
+  }),
+  openCall: openCallBaseSchema,
+});
 
 export const openCallFullSchema = openCallBaseSchema.extend({
   compensation: openCallCompensationSchema,
@@ -776,3 +720,114 @@ type EventLinkPath = `event.links.${Exclude<LinkField, "sameAsOrganizer">}`;
 // Only org has primaryContact radio behavior, and "sameAsOrganizer" doesn't apply to individual inputs
 
 export type ValidLinkPath = OrgLinkPath | EventLinkPath;
+
+export const getEventSchema = (isAdmin: boolean = false) => {
+  if (isAdmin) {
+    // return eventBase; // Skip all refinements for admins
+    // console.log("is Admin");
+  }
+  return eventSchema;
+};
+
+export const getEventOnlySchema = (isAdmin: boolean = false) => {
+  return z.object({
+    organization: organizationSchema,
+    event: getEventSchema(isAdmin),
+  });
+};
+
+export const getEventDetailsSchema = (isAdmin: boolean = false) => {
+  void isAdmin; // use me later :)
+  return z.object({
+    organization: organizationSchema,
+    event: eventBase.extend({
+      links: linksSchemaStrict,
+    }),
+  });
+};
+
+export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
+  return openCallStep1Schema.superRefine((data, ctx) => {
+    const appLinkFormat = data.openCall?.requirements?.applicationLinkFormat;
+    const appRequirements = cleanHtml(
+      data.openCall?.requirements?.requirements,
+      true,
+    ).trim();
+
+    const appLink = data.openCall?.requirements?.applicationLink;
+    const eligDetails = cleanHtml(
+      data.openCall?.eligibility?.details,
+      true,
+    ).trim();
+    if (data.openCall?.eligibility?.type.trim()) {
+      const trimmed = data.openCall?.eligibility?.type.trim();
+      if (
+        trimmed === "National" &&
+        data.openCall?.eligibility?.whom?.length === 0
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Select at least one eligible nationality",
+          path: ["openCall", "eligibility", "details"],
+        });
+      }
+      if (trimmed === "Other" || trimmed === "Regional/Local") {
+        if (!isAdmin && eligDetails.length < 25) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "More eligibility info is required (min 25 characters)",
+            path: ["openCall", "eligibility", "details"],
+          });
+        } else if (isAdmin && eligDetails.length < 5) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "More eligibility info is needed (min 5 characters)",
+            path: ["openCall", "eligibility", "details"],
+          });
+        }
+      }
+    }
+    if (
+      data.event?.hasOpenCall === "Fixed" &&
+      (!data.openCall?.basicInfo?.dates?.ocStart ||
+        !data.openCall?.basicInfo?.dates?.ocEnd)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Fixed calls must have a start and end date",
+        path: ["openCall", "basicInfo", "dates"],
+      });
+    }
+    if (appLinkFormat === "mailto:") {
+      if (!appLink || !isValidEmail(appLink)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Must be a valid email address",
+          path: ["openCall", "requirements", "applicationLink"],
+        });
+      }
+    }
+
+    if (appLinkFormat === "https://") {
+      if (!appLink || !isValidUrl(appLink)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Must be a valid website URL (https://...)",
+          path: ["openCall", "requirements", "applicationLink"],
+        });
+      }
+    }
+    if (!isAdmin && appRequirements.length < 50 && appRequirements) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "More requirement info is needed (min 50 characters)",
+        path: ["openCall", "requirements", "requirements"],
+      });
+    }
+  });
+};
+
+export const getEventWithOCSchema = (isAdmin: boolean = false) => {
+  void isAdmin; // use me later :)
+  return eventWithOCSchema;
+};

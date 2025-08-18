@@ -354,7 +354,7 @@ export const MapboxInputFull = ({
   useEffect(() => {
     if (reset) {
       handleReset();
-      console.log("resetting", reset);
+      // console.log("resetting", reset);
     }
   }, [reset, handleReset]);
   // console.log(inputValue, "mapbox", value?.full);

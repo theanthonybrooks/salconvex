@@ -6,7 +6,10 @@ import AvatarUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
 import { supportEmail } from "@/constants/siteInfo";
-import { columns } from "@/features/events/components/events-data-table/columns";
+import {
+  columns,
+  Event as EventType,
+} from "@/features/events/components/events-data-table/columns";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/lib/utils";
@@ -97,6 +100,18 @@ const SubmissionFormOrgStep = ({
   //     unregister("organization.location");
   //   }
   // }, [unregister, orgName]);
+
+  const handleRowSelect = (
+    event: EventType | null,
+    selection: Record<string, boolean>,
+  ) => {
+    const shouldBeNew = Object.keys(selection).length === 0;
+    if (newOrgEvent !== shouldBeNew) {
+      setNewOrgEvent(shouldBeNew);
+    }
+    setExistingEvent(event as EnrichedEvent);
+    setSelectedRow(selection);
+  };
 
   return (
     <div
@@ -331,12 +346,20 @@ const SubmissionFormOrgStep = ({
                     id="newEvent"
                     className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
                     checked={eventsData?.length === 0 ? true : newOrgEvent}
+                    // onCheckedChange={(checked) => {
+                    //   setExistingEvent(null);
+                    //   if (eventsData?.length === 0) {
+                    //     setNewOrgEvent(true);
+                    //   } else {
+                    //     setNewOrgEvent(!!checked);
+                    //   }
+                    // }}
                     onCheckedChange={(checked) => {
                       setExistingEvent(null);
-                      if (eventsData?.length === 0) {
-                        setNewOrgEvent(true);
-                      } else {
-                        setNewOrgEvent(!!checked);
+                      const newValue =
+                        eventsData?.length === 0 ? true : !!checked;
+                      if (newValue !== newOrgEvent) {
+                        setNewOrgEvent(newValue);
                       }
                     }}
                   />
@@ -365,19 +388,7 @@ const SubmissionFormOrgStep = ({
               }}
               minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
-              onRowSelect={(event, selection) => {
-                if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                  // console.log("falsito");
-                  setNewOrgEvent(false);
-                } else if (
-                  !newOrgEvent &&
-                  Object.keys(selectedRow).length === 0
-                ) {
-                  setNewOrgEvent(true);
-                }
-                setExistingEvent(event as EnrichedEvent);
-                setSelectedRow(selection);
-              }}
+              onRowSelect={handleRowSelect}
               selectedRow={selectedRow}
               className="w-full overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn(
@@ -395,19 +406,7 @@ const SubmissionFormOrgStep = ({
               data={eventsData}
               minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
-              onRowSelect={(event, selection) => {
-                if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                  // console.log("falsito");
-                  setNewOrgEvent(false);
-                } else if (
-                  !newOrgEvent &&
-                  Object.keys(selectedRow).length === 0
-                ) {
-                  setNewOrgEvent(true);
-                }
-                setExistingEvent(event as EnrichedEvent);
-                setSelectedRow(selection);
-              }}
+              onRowSelect={handleRowSelect}
               selectedRow={selectedRow}
               className="flex w-full max-w-[90vw] overflow-x-auto"
               tableClassName="sm:max-h-52"
@@ -428,19 +427,7 @@ const SubmissionFormOrgStep = ({
               data={eventsData}
               minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
-              onRowSelect={(event, selection) => {
-                if (newOrgEvent && Object.keys(selectedRow).length > 0) {
-                  // console.log("falsito");
-                  setNewOrgEvent(false);
-                } else if (
-                  !newOrgEvent &&
-                  Object.keys(selectedRow).length === 0
-                ) {
-                  setNewOrgEvent(true);
-                }
-                setExistingEvent(event as EnrichedEvent);
-                setSelectedRow(selection);
-              }}
+              onRowSelect={handleRowSelect}
               selectedRow={selectedRow}
               defaultVisibility={{
                 _id: false,

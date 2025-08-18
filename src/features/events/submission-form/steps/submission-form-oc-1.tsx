@@ -103,7 +103,7 @@ const SubmissionFormOC1 = ({
   const appDetails = openCall?.requirements?.requirements ?? "";
   const showAppFeeInput = hasAppFee?.trim() === "true";
   const hasRequiredEligDetails =
-    eligDetails.trim().length > 25 || isInternational || isNational;
+    eligDetails.trim().length > 25 || isInternational || isNational || isAdmin;
   const hasAppRequiredDetails = appDetails?.trim().length > 50 || isAdmin;
   const appLink = openCall?.requirements?.applicationLink ?? "";
 
@@ -141,7 +141,7 @@ const SubmissionFormOC1 = ({
   // }, [callType, setValue]);
 
   useEffect(() => {
-    // You could also check if it's NOT already mailto
+    // Maybe also check if it's NOT already mailto
     if (callType === "Email" && appLinkFormat !== "mailto:") {
       setValue("openCall.requirements.applicationLinkFormat", "mailto:");
     }
@@ -389,14 +389,19 @@ const SubmissionFormOC1 = ({
                     //   // handleCheckSchema();
                     // }}
                     requiredChars={
-                      !isNational && !isInternational ? 25 : undefined
+                      !isNational && !isInternational
+                        ? isAdmin
+                          ? undefined
+                          : 25
+                        : undefined
                     }
                     onBlur={field.onBlur}
                     placeholder="Please be as specific as possible"
                     charLimit={1200}
                     inputPreviewClassName={cn(
-                      errors?.openCall?.eligibility?.details ||
-                        (!hasRequiredEligDetails && "invalid-field"),
+                      (errors?.openCall?.eligibility?.details ||
+                        !hasRequiredEligDetails) &&
+                        "invalid-field",
                     )}
                   />
                 )}
@@ -627,7 +632,7 @@ const SubmissionFormOC1 = ({
                       placeholder={`Please be as specific as possible ${!emailType ? " on what artists will need to submit in order to apply." : null}
                         ${emailType ? " on what you would like for artists to include in their email submissions." : ""}`}
                       charLimit={5000}
-                      requiredChars={50}
+                      requiredChars={isAdmin ? undefined : 50}
                       purpose="openCall"
                       asModal={true}
                       title={eventName}

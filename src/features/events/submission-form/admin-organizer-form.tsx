@@ -47,7 +47,7 @@ import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
-import { steps } from "@/features/events/event-add-form";
+import { getSteps } from "@/features/events/event-add-form";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
@@ -69,8 +69,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [formType, setFormType] = useState<number>(0);
 
   const eventOnly = formType === 1;
-  const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
+  const steps = getSteps(isAdmin);
+  const finalStep = activeStep === steps.length - 1;
   const paidCall = formType === 3 && !isAdmin;
   // const freeCall = formType === 2;
   const currentStep = steps[activeStep];
@@ -397,29 +398,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     eventSlug || existingEvent?.slug
   }/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
 
-  // const onSubmit = async () => {
-  //   try {
-  //     // console.log("organizer mode)");
-  //     setValue("event.state", "submitted");
-
-  //     await handleSave(true);
-
-  //     toast.success(
-  //       "Successfully updated project!",
-
-  //       {
-  //         onClick: () => toast.dismiss(),
-  //       },
-  //     );
-  //   } catch (error) {
-  //     console.error("Failed to submit form:", error);
-  //     toast.error("Failed to submit form");
-  //   } finally {
-  //     setActiveStep(0);
-  //     router.push("/dashboard/");
-  //   }
-  // };
-
   const onSubmit = async () => {
     let url: string | undefined;
     let newTab: Window | null = null;
@@ -622,7 +600,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   };
 
   const handleCheckSchema = useCallback(
-    (shouldToast: boolean = true): boolean => {
+    (shouldToast: boolean = true, manualCheck: boolean = false): boolean => {
       if (!schema) return true;
       if (!hasUserEditedForm) return true;
 
@@ -654,12 +632,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         }
 
         return false;
+      } else if (shouldToast && isAdmin && manualCheck) {
+        toast.success("Everything is looking good!", {
+          toastId: "form-validation-success",
+        });
       }
 
       setErrorMsg("");
       return true;
     },
-    [schema, currentValues, hasUserEditedForm, setError],
+    [isAdmin, schema, currentValues, hasUserEditedForm, setError],
   );
 
   const handleSave = useCallback(
@@ -988,7 +970,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 pauseOnHover: false,
                 hideProgressBar: true,
               });
-              return;
+              throw new Error("open_call_file_upload_failed");
             }
             openCallFiles = result;
 
@@ -1001,6 +983,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 ? (openCallData._id as Id<"openCalls">)
                 : undefined,
             });
+            unregister("openCall.tempFiles");
           }
           const documents = saveResults.map((saved, i) => {
             const matched = openCallFiles?.find(
@@ -1442,6 +1425,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       }
     },
     [
+      steps.length,
       projectBudget,
       isAdmin,
       finalStep,
@@ -1460,6 +1444,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       createNewOrg,
       existingOrg,
       reset,
+      unregister,
       activeStep,
       hasUserEditedEventSteps,
       hasUserEditedStep0,
@@ -1986,7 +1971,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 formType={formType}
                 dashBoardView
               />
@@ -2000,7 +1985,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2013,7 +1998,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2023,7 +2008,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
             {activeStep === steps.length - 2 && (
               <SubmissionFormOrgStep2
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 dashBoardView
               />
             )}

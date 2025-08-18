@@ -13,6 +13,8 @@ const isAuthPage = createRouteMatcher(["/auth/:path*"]);
 //   "/thelist/event/:slug/:year/call/:path*",
 // ]);
 
+const isSubmitPage = createRouteMatcher(["/submit"]);
+
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
     // const isAuthenticated = await isAuthenticatedNextjs()
@@ -22,6 +24,10 @@ export default convexAuthNextjsMiddleware(
 
     if (isAuthPage(request) && isAuthenticated) {
       return nextjsMiddlewareRedirect(request, "/");
+    }
+
+    if (isSubmitPage(request)) {
+      return NextResponse.redirect(new URL("/pricing?submit", request.url));
     }
 
     // if (isOpenCallPage(request) && !isAuthenticated) {

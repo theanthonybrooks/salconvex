@@ -23,10 +23,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  eventDetailsSchema,
-  eventOnlySchema,
   eventWithOCSchema,
-  openCallStep1Schema,
+  getEventDetailsSchema,
+  getEventOnlySchema,
+  getEventWithOCSchema,
+  getOpenCallStep1Schema,
   openCallStep2Schema,
   orgDetailsSchema,
   step1Schema,
@@ -59,31 +60,76 @@ import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
-export const steps = [
+// export const steps = [
+//   {
+//     id: 1,
+//     label: "Organization Info",
+//     mobileLabel: "Organization Info",
+
+//     schema: step1Schema,
+//   },
+//   {
+//     id: 2,
+//     label: "Event, Project, Fund, etc",
+//     mobileLabel: "Event, Project, Fund, etc",
+//     schema: eventOnlySchema,
+//   },
+//   {
+//     id: 3,
+//     label: "Event/Project Details Pt.2",
+//     mobileLabel: "Event/Project Details",
+//     schema: eventDetailsSchema,
+//   },
+//   {
+//     id: 4,
+//     label: "Open Call",
+//     mobileLabel: "Open Call",
+//     schema: openCallStep1Schema,
+//   },
+//   {
+//     id: 5,
+//     label: "Budget & Compensation",
+//     mobileLabel: "Budget/Compensation",
+//     schema: openCallStep2Schema,
+//   },
+//   {
+//     id: 6,
+//     label: "Organizer Details",
+//     mobileLabel: "Organizer Details",
+//     schema: orgDetailsSchema,
+//   },
+//   {
+//     id: 7,
+//     label: "Recap",
+//     mobileLabel: "Recap",
+//     // schema: eventSubmitSchema,
+//     schema: eventWithOCSchema,
+//   },
+// ];
+export const getSteps = (isAdmin: boolean = false) => [
   {
     id: 1,
     label: "Organization Info",
     mobileLabel: "Organization Info",
-
     schema: step1Schema,
   },
   {
     id: 2,
     label: "Event, Project, Fund, etc",
     mobileLabel: "Event, Project, Fund, etc",
-    schema: eventOnlySchema,
+    schema: getEventOnlySchema(isAdmin),
   },
   {
     id: 3,
     label: "Event/Project Details Pt.2",
     mobileLabel: "Event/Project Details",
-    schema: eventDetailsSchema,
+    schema: getEventDetailsSchema(isAdmin),
   },
   {
     id: 4,
     label: "Open Call",
     mobileLabel: "Open Call",
-    schema: openCallStep1Schema,
+    schema: getOpenCallStep1Schema(isAdmin),
   },
   {
     id: 5,
@@ -101,10 +147,11 @@ export const steps = [
     id: 7,
     label: "Recap",
     mobileLabel: "Recap",
-    // schema: eventSubmitSchema,
-    schema: eventWithOCSchema,
+    schema: getEventWithOCSchema(isAdmin),
   },
 ];
+
+// In your component
 
 interface EventOCFormProps {
   user: User | undefined;
@@ -136,8 +183,9 @@ export const EventOCForm = ({
   isEligibleForFree,
   planKey,
 }: EventOCFormProps) => {
-  const finalStep = activeStep === steps.length - 1;
   const isAdmin = user?.role?.includes("admin") || false;
+  const steps = getSteps(isAdmin);
+  const finalStep = activeStep === steps.length - 1;
   const formType = Number(planKey);
   const eventOnly = formType === 1;
   // const freeCall = formType === 2;
@@ -461,7 +509,6 @@ export const EventOCForm = ({
     }
 
     try {
-   
       setValue("event.state", "submitted");
 
       await handleSave(true);
@@ -647,7 +694,7 @@ export const EventOCForm = ({
   };
 
   const handleCheckSchema = useCallback(
-    (shouldToast: boolean = true): boolean => {
+    (shouldToast: boolean = true, manualCheck: boolean = false): boolean => {
       if (!schema) return true;
       if (!hasUserEditedForm) return true;
 
@@ -686,12 +733,18 @@ export const EventOCForm = ({
         }
 
         return false;
+      } else {
+        if (shouldToast && isAdmin && manualCheck) {
+          toast.success("Everything is looking good!", {
+            toastId: "form-validation-success",
+          });
+        }
       }
 
       setErrorMsg("");
       return true;
     },
-    [schema, currentValues, hasUserEditedForm, setError],
+    [schema, currentValues, hasUserEditedForm, setError, isAdmin],
   );
 
   const handleSave = useCallback(
@@ -737,7 +790,7 @@ export const EventOCForm = ({
           orgLogoStorageId = result.logoStorageId;
           timezone = result.timezone;
           timezoneOffset = result.timezoneOffset;
-          console.log(orgLogoStorageId);
+          // console.log(orgLogoStorageId);
           // const logo =
           //   typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
           // // console.log(result);
@@ -1052,6 +1105,8 @@ export const EventOCForm = ({
                 ? (openCallData._id as Id<"openCalls">)
                 : undefined,
             });
+
+            unregister("openCall.tempFiles");
           }
           const documents = saveResults.map((saved, i) => {
             const matched = openCallFiles?.find(
@@ -1497,6 +1552,7 @@ export const EventOCForm = ({
       }
     },
     [
+      steps.length,
       projectBudget,
       paidCall,
       finalStep,
@@ -1516,6 +1572,7 @@ export const EventOCForm = ({
       getTimezone,
       createNewOrg,
       existingOrg,
+      unregister,
       reset,
       activeStep,
       hasUserEditedEventSteps,
@@ -2073,7 +2130,7 @@ export const EventOCForm = ({
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 formType={formType}
               />
             )}
@@ -2086,7 +2143,7 @@ export const EventOCForm = ({
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2099,7 +2156,7 @@ export const EventOCForm = ({
                 isMobile={isMobile}
                 categoryEvent={categoryEvent}
                 canNameEvent={canNameEvent}
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
                 formType={formType}
                 pastEvent={pastEvent}
               />
@@ -2109,7 +2166,7 @@ export const EventOCForm = ({
 
             {activeStep === steps.length - 2 && (
               <SubmissionFormOrgStep2
-                handleCheckSchema={() => handleCheckSchema(false)}
+                handleCheckSchema={() => handleCheckSchema(false, true)}
               />
             )}
             {/* //------ Final Step: Recap  ------ */}
