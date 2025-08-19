@@ -410,7 +410,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   orgId={event.mainOrgId}
                   openCallStatus={openCallStatus}
                   appStatus={appStatus}
-                  appLink={appUrl}
+                  appLink={outputAppLink}
                   isHidden={hidden}
                 />
               </>

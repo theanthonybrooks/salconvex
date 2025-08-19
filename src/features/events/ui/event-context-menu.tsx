@@ -280,7 +280,7 @@ const EventContextMenu = ({
               {reviewMode && appLink && (
                 <Link
                   href={appLink}
-                  target="_blank"
+                  target={appLink.includes("mailto:") ? "_self" : "_blank"}
                   className="flex items-center gap-x-1 px-4 py-2 text-sm hover:bg-salPinkLtHover"
                 >
                   <ArrowRightCircle className="size-4" />

@@ -93,13 +93,13 @@ export const ApproveBtn = ({
           }}
           className={cn("w-full rounded-r-none border-r")}
         >
-          {eventSubmitted
-            ? "Approve Event"
-            : openCallSubmitted
-              ? "Approve Open Call"
-              : eventPublished
-                ? "Go to Convex"
-                : "Approve Both"}
+          {bothSubmitted
+            ? "Approve Both"
+            : eventSubmitted
+              ? "Approve Event"
+              : openCallSubmitted
+                ? "Approve Open Call"
+                : "Go to Convex"}
         </Button>
 
         <EventContextMenu
