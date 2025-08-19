@@ -216,11 +216,13 @@ export const ArtistProfileForm = ({
             // ...data.artistResidency,
           },
         });
+        toast.success("Successfully updated profile! Forwarding to Stripe...");
+      } else {
+        toast.success("Forwarding to Stripe...");
       }
 
       reset();
 
-      toast.success("Successfully updated profile! Forwarding to Stripe...");
       setTimeout(() => {
         if (!hasCurrentSub) {
           onClick();

@@ -202,22 +202,28 @@ export const ApplyButton = ({
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
 
-    const newTab = window.open("about:blank");
+    setPending(true);
 
-    if (!newTab) {
-      toast.error(
-        "Application redirect blocked. Please enable popups for this site.",
-      );
-      console.error("Popup was blocked");
-      return;
-    }
+    // if (isEmail) {
+    //   console.log("isEmail: ", isEmail);
+    //   return;
+    // }
 
-    newTab.document.write(getExternalRedirectHtml(finalAppUrl));
-    newTab.document.close();
+    // const newTab = window.open("about:blank");
+
+    // if (!newTab) {
+    //   toast.error(
+    //     "Application redirect blocked. Please enable popups for this site.",
+    //   );
+    //   console.error("Popup was blocked");
+    //   return;
+    // }
+
+    // newTab.document.write(getExternalRedirectHtml(finalAppUrl));
+    // newTab.document.close();
+    let newTab: Window | null = null;
 
     try {
-      setPending(true);
-
       if (!appStatus && openCall === "active" && autoApply && !orgPreview) {
         await toggleAppActions({
           openCallId: openCallId as Id<"openCalls">,
@@ -226,10 +232,26 @@ export const ApplyButton = ({
       }
       await updateUserLastActive({ email: user?.email ?? "" });
 
+      if (isEmail && appUrl) {
+        window.location.href = appUrl;
+        return;
+      }
+
+      newTab = window.open("about:blank");
+      if (!newTab) {
+        toast.error(
+          "Application redirect blocked. Please enable popups for this site.",
+        );
+        console.error("Popup was blocked");
+        return;
+      }
+      newTab.document.write(getExternalRedirectHtml(finalAppUrl));
+      newTab.document.close();
+
       newTab.location.href = finalAppUrl;
     } catch (error) {
       console.error("Application update failed:", error);
-      if (!newTab.closed) {
+      if (newTab && !newTab.closed) {
         newTab.document.write(getExternalErrorHtml(finalAppUrl));
         newTab.document.close();
       }
@@ -319,7 +341,7 @@ export const ApplyButton = ({
           </span>
         </Button>
       )}
-      {finalButton && (
+      {finalButton && !isEmail && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
@@ -428,6 +450,35 @@ export const ApplyButton = ({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      )}
+      {finalButton && isEmail && (
+        <Button
+          disabled={
+            (openCall !== "active" && !isAdmin && !orgPreview) ||
+            (noSub && !isAdmin && !orgPreview)
+          }
+          variant="salWithShadowHiddenLeft"
+          size="lg"
+          className={cn(
+            "relative z-[1] h-14 w-full cursor-pointer rounded-r-none border-r sm:h-11 xl:min-w-[150px]",
+            appStatus !== null &&
+              !publicView &&
+              "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",
+          )}
+          onClick={onApply}
+        >
+          <span className="flex items-center gap-x-1 text-base">
+            {buttonText}
+            {appFee > 0 && !publicView && (
+              <CircleDollarSignIcon
+                className={cn(
+                  "size-6 text-red-600",
+                  appStatus !== null && "text-foreground/50",
+                )}
+              />
+            )}
+          </span>
+        </Button>
       )}
 
       {!orgPreview && !hasApplied && (
