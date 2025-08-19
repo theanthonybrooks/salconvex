@@ -1,7 +1,7 @@
 import { DialogTitle } from "@/components/ui/dialog";
 import { DashIcon } from "@radix-ui/react-icons";
 import { Command } from "cmdk";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { CircleX, X } from "lucide-react";
 import Link from "next/link";
 import { IoSearch } from "react-icons/io5";
@@ -127,7 +127,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
     desc: item.desc || "",
   }));
 
-  const dialogVariants = {
+  const dialogVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,

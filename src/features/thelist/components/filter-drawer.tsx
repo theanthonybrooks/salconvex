@@ -24,7 +24,7 @@ import { Filters, SortOptions } from "@/types/thelist";
 import { Command } from "cmdk";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { debounce } from "lodash";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -177,7 +177,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     return () => document.removeEventListener("keydown", down);
   }, [setOpen]);
 
-  const dialogVariants = {
+  const dialogVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,

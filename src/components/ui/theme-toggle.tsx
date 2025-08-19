@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { PendingThemeContext } from "@/providers/themed-provider";
 import { User } from "@/types/user";
 import { useMutation } from "convex/react";
-import { motion as m } from "framer-motion";
+import { motion as m, Variants } from "framer-motion";
 import { debounce } from "lodash";
 import { useTheme } from "next-themes";
 import { useContext, useRef } from "react";
@@ -52,7 +52,7 @@ export default function ThemeToggle({ className, user }: ThemeToggleProps) {
     },
   };
 
-  const rayVariant = {
+  const rayVariant: Variants = {
     hidden: {
       pathLength: 0,
       opacity: 0,
