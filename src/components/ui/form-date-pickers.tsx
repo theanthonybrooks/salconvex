@@ -119,6 +119,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
 
   //   console.log(formatValue);
   //   console.log(formatDatesArray?.[0]?.end);
+  console.log(noProdStart);
 
   // ...
 
@@ -397,6 +398,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                               field.onChange(toDateString(date))
                             }
                             className="w-full rounded border bg-card p-2 text-center"
+                            placeholder={
+                              noProdStart ? "(Flexible/Open)" : undefined
+                            }
+                            disabled={noProdStart}
                             inputClassName={cn(
                               "h-12",
                               isFieldInvalid(
@@ -448,22 +453,18 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                   );
                 })}
 
-                <button
-                  type="button"
-                  disabled={!canAddMore}
-                  onClick={() => append({ start: "", end: "" })}
-                  className={cn(
-                    "text-center text-sm hover:underline",
-                    canAddMore
-                      ? "text-blue-600"
-                      : "cursor-default text-muted-foreground",
-                  )}
-                >
-                  {!noProdStart &&
-                    (canAddMore
-                      ? "Add New Dates +"
-                      : "(Fill out the current date range before adding another)")}
-                </button>
+                {canAddMore && !noProdStart && (
+                  <button
+                    type="button"
+                    onClick={() => append({ start: "", end: "" })}
+                    className={cn(
+                      "text-center text-sm font-medium text-foreground hover:underline",
+                    )}
+                  >
+                    Add More Dates +
+                    {/* {!noProdStart && canAddMore && "Add More Dates +"} */}
+                  </button>
+                )}
               </>
             )}
 

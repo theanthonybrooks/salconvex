@@ -42,13 +42,13 @@ const locationBase = z.object({
 const locationSchema = locationBase.superRefine((data, ctx) => {
   if ((data.city || data.state) && !data.country) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Country is required - please select from the dropdown",
       path: ["country"],
     });
   } else if (!data.country || data.country.trim().length < 3) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Please select from the dropdown",
       path: ["country"],
     });
@@ -290,14 +290,14 @@ export const eventBase = z.object({
 //   //TODO: Change this to require just one of the inputs if not sameAsOrganizer
 //   if (!data.links.sameAsOrganizer) {
 //     ctx.addIssue({
-//       code: z.ZodIssueCode.custom,
+//       code: "custom",
 //       message: "Link to the organizer must be provided",
 //       path: ["links", "website"],
 //     });
 //   }
 //   if (!data.hasOpenCall) {
 //     ctx.addIssue({
-//       code: z.ZodIssueCode.custom,
+//       code: "custom",
 //       message: "Must answer if there's an open call",
 //       path: ["hasOpenCall"],
 //     });
@@ -305,12 +305,20 @@ export const eventBase = z.object({
 // });
 
 export const eventSchema = eventBase.superRefine((data, ctx) => {
+  const prodDates = data.dates?.prodDates;
+  const prodRequired =
+    data.dates?.eventFormat &&
+    (data.category === "event" || data.category === "project");
+
+  const noProdDates =
+    (!prodDates?.[0]?.start || prodDates[0].start === "") &&
+    (!prodDates?.[0]?.end || prodDates[0].end === "");
   if (data.name?.trim()) {
     const trimmed = data.name.trim();
 
     if (trimmed.length > 0 && trimmed.length < 3) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message:
           "Name must be at least 3 characters with no quotes or semicolons",
         path: ["name"],
@@ -318,14 +326,14 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     }
     if (trimmed.length > 90) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Max 90 characters",
         path: ["name"],
       });
     }
     if (trimmed.includes('"') || trimmed.includes(";")) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "No quotes or semicolons allowed in name",
         path: ["name"],
       });
@@ -334,27 +342,27 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   if (data.category === "event") {
     if (!data.type || data.type.length === 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Event type is required when category is 'event'",
         path: ["type"],
       });
     } else if (data.type.length > 2) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "You can select up to 2 event types",
         path: ["type"],
       });
     }
     if (!data.location.city || data.location.city.trim() === "") {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "City is required for events",
         path: ["location", "city"],
       });
     }
     // if (data.name.trim().length > 3 && !data.dates?.eventFormat) {
     //   ctx.addIssue({
-    //     code: z.ZodIssueCode.custom,
+    //     code: "custom",
     //     message: "An event format is required",
     //     path: ["dates", "eventFormat"],
     //   });
@@ -372,7 +380,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       data.dates?.eventDates?.[0]?.end === "")
   ) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Please provide at least one set of event dates",
       path: ["dates", "eventDates"],
     });
@@ -385,42 +393,52 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     data.dates?.prodFormat === undefined
   ) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "All projects/events must have a production date format",
       path: ["dates", "prodFormat"],
     });
   }
 
-  if (
-    data.dates?.eventFormat &&
-    data.category === "event" &&
-    // data.dates?.eventFormat !== "" &&
-    data.dates?.eventFormat !== "ongoing" &&
-    !data.dates?.noProdStart &&
-    (!Array.isArray(data.dates?.prodDates) ||
-      data.dates.prodDates.length === 0 ||
-      !data.dates.prodDates[0].start ||
-      !data.dates.prodDates[0].end)
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "All events must have production dates",
-      path: ["dates", "prodDates"],
-    });
+  if (prodRequired && data.dates?.eventFormat !== "ongoing") {
+    // console.log(prodDates, prodDates?.length);
+    // console.log(noProdDates, !data.dates?.noProdStart);
+    if (
+      !data.dates?.noProdStart &&
+      (!Array.isArray(prodDates) || prodDates.length === 0 || noProdDates)
+    ) {
+      // console.log("true 1");
+      ctx.addIssue({
+        code: "custom",
+        message: "All projects/events must have production dates",
+        path: ["dates", "prodDates"],
+      });
+    } else if (!prodDates?.[0]?.start && !data.dates?.noProdStart) {
+      // console.log("true 2", prodDates?.[0]?.start);
+      ctx.addIssue({
+        code: "custom",
+        message: "All projects/events must have a production start date",
+        path: ["dates", "prodDates"],
+      });
+    } else if (!prodDates?.[0]?.end) {
+      // console.log("true 3");
+      ctx.addIssue({
+        code: "custom",
+        message: "All projects/events must have a production end date",
+        path: ["dates", "prodDates"],
+      });
+    }
   }
 
-  if (
-    data.dates?.noProdStart &&
-    (!Array.isArray(data.dates?.prodDates) ||
-      data.dates.prodDates.length === 0 ||
-      !data.dates.prodDates[0].end)
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "All projects/events must have a production end date",
-      path: ["dates", "prodDates"],
-    });
-  }
+  // if (
+  //   data.dates?.noProdStart &&
+  //   (!Array.isArray(prodDates) || prodDates.length === 0 || !prodDates[0].end)
+  // ) {
+  //   ctx.addIssue({
+  //     code: "custom",
+  //     message: "All projects/events must have a production end date",
+  //     path: ["dates", "prodDates"],
+  //   });
+  // }
 });
 
 // const openCallCheckSchema = z.object({
@@ -439,7 +457,7 @@ export const step1Schema = z
       const trimmedLogo = data.organization.logo.trim();
       if (trimmedLogo.length > 0 && trimmedLogo.length < 5) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Logo is required",
           path: ["logo"],
         });
@@ -462,7 +480,7 @@ export const orgDetailsSchema = z.object({
 
 //   if (!email || email.trim() === "") {
 //     ctx.addIssue({
-//       code: z.ZodIssueCode.custom,
+//       code: "custom",
 //       message: "Email is required",
 //       path: ["organization", "links", "email"],
 //     });
@@ -646,7 +664,7 @@ export const openCallStep2Schema = z
 
     if (missingUnit) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Rate unit is required",
         path: ["openCall", "compensation", "budget", "unit"],
       });
@@ -654,7 +672,7 @@ export const openCallStep2Schema = z
     const paidCall = data.event.formType === 3;
     if (missingBudget && !unknownBudget && (paidCall || hasBudget === true)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Minimum budget or rate is required",
         path: ["openCall", "compensation", "budget"],
       });
@@ -662,14 +680,14 @@ export const openCallStep2Schema = z
 
     if (budgetLg && data.event.formType === 2) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Budget max must be 1,000 or less for free calls",
         path: ["openCall", "compensation", "budget", "max"],
       });
     }
     if (budgetMin && budgetMax && budgetMin > budgetMax) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Budget max must be greater than or equal to min",
         path: ["openCall", "compensation", "budget", "max"],
       });
@@ -697,7 +715,7 @@ export const eventWithOCSchema = z
 
       if (!hasMinimalStructure) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message:
             "Open Call details are required when callType is Fixed, Rolling, or Email.",
           path: ["openCall"],
@@ -730,6 +748,7 @@ export const getEventSchema = (isAdmin: boolean = false) => {
 };
 
 export const getEventOnlySchema = (isAdmin: boolean = false) => {
+  console.log("isAdmin", isAdmin);
   return z.object({
     organization: organizationSchema,
     event: getEventSchema(isAdmin),
@@ -766,7 +785,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
         data.openCall?.eligibility?.whom?.length === 0
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Select at least one eligible nationality",
           path: ["openCall", "eligibility", "details"],
         });
@@ -774,13 +793,13 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
       if (trimmed === "Other" || trimmed === "Regional/Local") {
         if (!isAdmin && eligDetails.length < 25) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "More eligibility info is required (min 25 characters)",
             path: ["openCall", "eligibility", "details"],
           });
         } else if (isAdmin && eligDetails.length < 5) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "More eligibility info is needed (min 5 characters)",
             path: ["openCall", "eligibility", "details"],
           });
@@ -793,7 +812,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
         !data.openCall?.basicInfo?.dates?.ocEnd)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Fixed calls must have a start and end date",
         path: ["openCall", "basicInfo", "dates"],
       });
@@ -801,7 +820,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
     if (appLinkFormat === "mailto:") {
       if (!appLink || !isValidEmail(appLink)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Must be a valid email address",
           path: ["openCall", "requirements", "applicationLink"],
         });
@@ -811,7 +830,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
     if (appLinkFormat === "https://") {
       if (!appLink || !isValidUrl(appLink)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Must be a valid website URL (https://...)",
           path: ["openCall", "requirements", "applicationLink"],
         });
@@ -819,7 +838,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
     }
     if (!isAdmin && appRequirements.length < 50 && appRequirements) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "More requirement info is needed (min 50 characters)",
         path: ["openCall", "requirements", "requirements"],
       });

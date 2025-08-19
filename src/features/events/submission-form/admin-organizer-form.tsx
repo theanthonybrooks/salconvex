@@ -365,7 +365,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const alreadyApprovedEvent = !!eventData?.approvedBy;
   const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
 
-  console.log(submissionCost);
+  // console.log(submissionCost);
   // console.log(finalStep, acceptedTerms, isAdmin);
   // #endregion
   // #endregion

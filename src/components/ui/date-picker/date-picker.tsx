@@ -18,6 +18,7 @@ export interface CustomDatePickerProps {
   tabIndex?: number;
   pickerType: PickerType;
   isAdmin?: boolean;
+  disabled?: boolean;
 }
 
 const getSeasonLabel = (val: string): string => {
@@ -41,10 +42,23 @@ interface DateInputProps extends React.ComponentPropsWithoutRef<"button"> {
   value?: string;
   onClick?: () => void;
   pickerType?: PickerType;
+  placeholderText?: string;
+  disabled?: boolean;
 }
 
 const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
-  ({ value, onClick, className, pickerType, ...rest }, ref) => {
+  (
+    {
+      value,
+      onClick,
+      className,
+      pickerType,
+      placeholderText,
+      disabled,
+      ...rest
+    },
+    ref,
+  ) => {
     const seasonLabel = getSeasonLabel(value ?? "");
     const display =
       pickerType === "month"
@@ -55,10 +69,13 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
             ? "Select season"
             : "Select date";
 
+    console.log(display, placeholderText);
+
     return (
       <Button
         ref={ref}
         onClick={onClick}
+        disabled={disabled}
         type="button"
         className={cn(
           "w-full cursor-pointer rounded-lg border text-base font-normal",
@@ -66,7 +83,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         )}
         {...rest}
       >
-        {seasonLabel || value || display}
+        {placeholderText || seasonLabel || value || display}
       </Button>
     );
   },
@@ -85,6 +102,7 @@ export const CustomDatePicker = ({
   tabIndex,
   pickerType,
   isAdmin,
+  disabled,
 }: CustomDatePickerProps) => {
   const parsedDate =
     pickerType === "season" ? fromSeason(value ?? "") : toDate(value);
@@ -115,6 +133,7 @@ export const CustomDatePicker = ({
 
   return (
     <DatePicker
+      disabled={disabled}
       selected={parsedDate}
       onChange={onChange}
       dateFormat={dateFormat}
@@ -133,18 +152,24 @@ export const CustomDatePicker = ({
             : (minToDate ?? new Date())
       }
       maxDate={maxToDate ?? new Date(2099, 11, 31)}
-      placeholderText={
-        placeholder ??
-        (pickerType === "year"
-          ? "Select year"
-          : pickerType === "month"
-            ? "Select month"
-            : pickerType === "season"
-              ? "Select season"
-              : "Select date")
-      }
+      // placeholderText={
+      //   placeholder ??
+      //   (pickerType === "year"
+      //     ? "Select year"
+      //     : pickerType === "month"
+      //       ? "Select month"
+      //       : pickerType === "season"
+      //         ? "Select season"
+      //         : "Select date")
+
+      // }
       customInput={
-        <DateInput className={inputClassName} pickerType={pickerType} />
+        <DateInput
+          className={inputClassName}
+          pickerType={pickerType}
+          placeholderText={placeholder}
+          disabled={disabled}
+        />
       }
       className={className}
       tabIndex={tabIndex}

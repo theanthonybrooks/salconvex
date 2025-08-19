@@ -95,12 +95,6 @@ const SubmissionFormOrgStep = ({
     }
   }, [scrollTrigger]);
 
-  // useEffect(() => {
-  //   if (orgName === "") {
-  //     unregister("organization.location");
-  //   }
-  // }, [unregister, orgName]);
-
   const handleRowSelect = (
     event: EventType | null,
     selection: Record<string, boolean>,

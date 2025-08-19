@@ -59,53 +59,6 @@ import slugify from "slugify";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
-
-// export const steps = [
-//   {
-//     id: 1,
-//     label: "Organization Info",
-//     mobileLabel: "Organization Info",
-
-//     schema: step1Schema,
-//   },
-//   {
-//     id: 2,
-//     label: "Event, Project, Fund, etc",
-//     mobileLabel: "Event, Project, Fund, etc",
-//     schema: eventOnlySchema,
-//   },
-//   {
-//     id: 3,
-//     label: "Event/Project Details Pt.2",
-//     mobileLabel: "Event/Project Details",
-//     schema: eventDetailsSchema,
-//   },
-//   {
-//     id: 4,
-//     label: "Open Call",
-//     mobileLabel: "Open Call",
-//     schema: openCallStep1Schema,
-//   },
-//   {
-//     id: 5,
-//     label: "Budget & Compensation",
-//     mobileLabel: "Budget/Compensation",
-//     schema: openCallStep2Schema,
-//   },
-//   {
-//     id: 6,
-//     label: "Organizer Details",
-//     mobileLabel: "Organizer Details",
-//     schema: orgDetailsSchema,
-//   },
-//   {
-//     id: 7,
-//     label: "Recap",
-//     mobileLabel: "Recap",
-//     // schema: eventSubmitSchema,
-//     schema: eventWithOCSchema,
-//   },
-// ];
 export const getSteps = (isAdmin: boolean = false) => [
   {
     id: 1,

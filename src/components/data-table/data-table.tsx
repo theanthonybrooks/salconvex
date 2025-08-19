@@ -15,7 +15,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import * as React from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 
 import {
   Table,
@@ -37,7 +37,6 @@ import {
 } from "@/types/applications";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -106,7 +105,7 @@ export function DataTable<TData, TValue>({
     ? selectableTableTypes.includes(tableType)
     : false;
 
-  const defaultFiltersFromUrl: ColumnFiltersState = React.useMemo(() => {
+  const defaultFiltersFromUrl: ColumnFiltersState = useMemo(() => {
     const filters: ColumnFiltersState = [];
 
     searchParams.forEach((value, key) => {
@@ -125,17 +124,18 @@ export function DataTable<TData, TValue>({
 
   const { isAdmin } = adminActions ?? {};
 
-  const [rowSelection, setRowSelection] = React.useState(selectedRow ?? {});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>(defaultVisibility ?? {});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [rowSelection, setRowSelection] = useState(selectedRow ?? {});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    defaultVisibility ?? {},
+  );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     defaultFiltersFromUrl,
   );
-  const initialSort = React.useMemo<SortingState>(() => {
+  const initialSort = useMemo<SortingState>(() => {
     return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
   }, [defaultSort]);
 
-  const [sorting, setSorting] = React.useState<SortingState>(initialSort);
+  const [sorting, setSorting] = useState<SortingState>(initialSort);
 
   const table = useReactTable({
     data,
@@ -196,11 +196,22 @@ export function DataTable<TData, TValue>({
   const hasPreloadedEvent =
     typeof preloadedEvent === "number" && preloadedEvent >= 0;
   const hasRows = table.getRowModel().rows?.length > 0;
+  const hasSelectedPreload = useRef(false);
 
   useEffect(() => {
-    if (!hasPreloadedEvent || Object.keys(rowSelection)?.length > 0) return;
+    if (
+      !hasPreloadedEvent ||
+      Object.keys(rowSelection)?.length > 0 ||
+      hasSelectedPreload.current
+    )
+      return;
     setRowSelection({ [preloadedEvent]: true });
-  }, [table, preloadedEvent, hasPreloadedEvent, rowSelection]);
+    hasSelectedPreload.current = true;
+  }, [preloadedEvent, hasPreloadedEvent, rowSelection]);
+  // useEffect(() => {
+  //   if (!hasPreloadedEvent || Object.keys(rowSelection)?.length > 0) return;
+  //   setRowSelection({ [preloadedEvent]: true });
+  // }, [table, preloadedEvent, hasPreloadedEvent, rowSelection]);
 
   useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {

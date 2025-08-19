@@ -7,7 +7,6 @@ import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
 import { generateSkeletonGroups } from "@/lib/skeletonFns";
-// import { getFourCharMonth } from "@/lib/dateFns"
 import { cn, setParamIfNotDefault } from "@/lib/utils";
 import {
   CombinedEventPreviewCardData,
@@ -15,31 +14,18 @@ import {
   EventType,
 } from "@/types/event";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
-// import { format } from "date-fns"
-// import { CombinedEventPreviewCardData } from "@/types/event";
-
 import { Button } from "@/components/ui/button";
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import type { MergedEventPreviewData } from "@/types/event"; // or define a local merged type inline
+import type { MergedEventPreviewData } from "@/types/event";
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-// interface Props {
 
-// }
-
-const ClientEventList = (
-  {
-    // initialEvents,
-    // publicView,
-    // user,
-  },
-) => {
-  // inside ClientEventList()
+const ClientEventList = () => {
   const initialTitleRef = useRef<string | null>(null);
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -107,6 +93,8 @@ const ClientEventList = (
   const [filters, setFilters] = useState<Filters>(currentFilters);
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const prevPage = Math.max(page - 1, 1);
+
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
     filters,
@@ -122,6 +110,15 @@ const ClientEventList = (
     },
     "thelist",
   );
+  void useFilteredEventsQuery(
+    filters,
+    sortOptions,
+    {
+      page: prevPage,
+    },
+    "thelist",
+  );
+
   const total = queryResult?.total ?? 0;
   const totalOpen = queryResult?.totalOpenCalls ?? 0;
   const isLoading = !queryResult;

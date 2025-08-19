@@ -540,7 +540,7 @@ const SubmissionFormEventStep1 = ({
                   {!prodSameAsEvent && (
                     <label
                       className={cn(
-                        "col-start-2 mx-auto flex cursor-pointer items-center gap-2 py-2",
+                        "col-start-2 mx-auto flex w-full cursor-pointer items-center gap-2 py-2 lg:max-w-md",
                       )}
                     >
                       <Controller
