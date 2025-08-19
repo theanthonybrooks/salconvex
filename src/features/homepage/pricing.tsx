@@ -30,6 +30,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
 
 type SwitchProps = {
   onSwitch: (value: string) => void;
@@ -43,8 +44,8 @@ type PricingCardProps = {
   accountType: string;
 
   prices: {
-    month?: { usd?: { amount: number } };
-    year?: { usd?: { amount: number } };
+    month?: { usd?: { amount: number; stripeId: string } };
+    year?: { usd?: { amount: number; stripeId: string } };
     rate?: number;
   };
 
@@ -53,6 +54,11 @@ type PricingCardProps = {
   notIncluded?: string[];
   popular?: boolean;
   image?: string;
+  stripePriceId?: string;
+  userSubPriceId?: string;
+  hadTrial?: boolean;
+  subscription?: Doc<"userSubscriptions"> | null;
+  activeSub?: boolean;
 };
 
 // const pricingRange = [
@@ -305,6 +311,7 @@ export const AccountTypeSwitch = ({
 
 const PricingCard = ({
   user,
+  activeSub,
   isYearly,
   title,
   planKey,
@@ -315,6 +322,9 @@ const PricingCard = ({
   popular,
   accountType,
   image,
+  stripePriceId,
+
+  subscription,
 }: PricingCardProps) => {
   const [comingSoon, setComingSoon] = useState(false);
   useEffect(() => {
@@ -324,7 +334,6 @@ const PricingCard = ({
       setComingSoon(false);
     }
   }, [features]);
-
   const isArtist = accountType === "artist";
   const isOrganizer = accountType === "organizer";
   const isFree = prices.rate === 0;
@@ -332,10 +341,6 @@ const PricingCard = ({
   // const [sliderPrice, setSliderPrice] = useState(0);
   const getCheckoutUrl = useAction(
     api.stripeSubscriptions.createStripeCheckoutSession,
-  );
-  const hadTrial = useQuery(
-    api.stripeSubscriptions.getUserHadTrial,
-    user ? {} : "skip",
   );
 
   // console.log("had trial:", hadTrial);
@@ -346,7 +351,6 @@ const PricingCard = ({
   );
 
   const isEligibleForFree = (isOrganizer && hadFreeCall === false) || !user;
-
   // const slidingPrice = useMemo(() => {
   //   switch (sliderPrice) {
   //     case 1:
@@ -361,7 +365,13 @@ const PricingCard = ({
   //       return 50;
   //   }
   // }, [sliderPrice]);
-
+  const hadTrial = subscription?.hadTrial;
+  const userSubPriceId = subscription?.stripePriceId;
+  const isCurrentUserPlan =
+    typeof stripePriceId === "string" &&
+    typeof userSubPriceId === "string" &&
+    stripePriceId === userSubPriceId &&
+    activeSub;
   const handleCheckout = async (
     interval: "month" | "year",
     hadTrial: boolean,
@@ -390,15 +400,21 @@ const PricingCard = ({
       className={cn(
         "pricing-card mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 lg:mx-0",
         {
-          relative: popular || isFree,
+          relative: popular || isFree || isCurrentUserPlan,
         },
         isOrganizer && "self-start",
+        isCurrentUserPlan && "border-3",
         // isFree && "self-start",
       )}
     >
-      {popular && (
+      {popular && !activeSub && (
         <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
           <p className="text-sm font-medium text-foreground">Recommended</p>
+        </div>
+      )}
+      {isCurrentUserPlan && (
+        <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
+          <p className="text-sm font-medium text-foreground">Current Plan</p>
         </div>
       )}
       {isFree && (
@@ -518,11 +534,15 @@ const PricingCard = ({
         >
           <Button
             variant={
-              popular || isFree ? "salWithShadowPink" : "salWithShadowHiddenYlw"
+              (!activeSub && (popular || isFree)) || isCurrentUserPlan
+                ? "salWithShadowPink"
+                : "salWithShadowHiddenYlw"
             }
             className={cn("h-14 w-full text-lg sm:h-11 sm:text-base")}
           >
-            {isArtist ? "Get" : "List"} {title}
+            {isCurrentUserPlan && activeSub
+              ? "Update My Plan"
+              : `${isArtist ? "Get" : "List"} ${title}`}
           </Button>
         </AccountSubscribeForm>
       </CardFooter>
@@ -543,7 +563,9 @@ export default function Pricing() {
   const userData = usePreloadedQuery(preloadedUserData);
 
   const hasSub = subData?.hasActiveSubscription;
+  const hadTrial = subData?.hadTrial;
   const subscription = subData?.subscription;
+  const userSubPriceId = subscription?.stripePriceId;
   const handleManageSubscription = useManageSubscription(subscription ?? {});
 
   const user = userData?.user;
@@ -655,6 +677,10 @@ export default function Pricing() {
                 return priceA - priceB;
               })
               .map((plan) => {
+                const stripePriceId = isYearly
+                  ? plan.prices?.year?.usd?.stripeId
+                  : plan.prices?.month?.usd?.stripeId;
+
                 const { key, ...rest } = plan;
                 return (
                   <PricingCard
@@ -665,6 +691,11 @@ export default function Pricing() {
                     {...rest}
                     isYearly={isYearly}
                     accountType={selectedAccountType}
+                    stripePriceId={stripePriceId}
+                    hadTrial={hadTrial}
+                    userSubPriceId={userSubPriceId}
+                    subscription={subscription}
+                    activeSub={hasSub}
                   />
                 );
               })}

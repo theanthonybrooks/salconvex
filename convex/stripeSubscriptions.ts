@@ -13,9 +13,7 @@ import {
 import schema from "./schema";
 
 // Initialize the Stripe client
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // INTERNAL QUERY: Fetch a plan by key from the "userPlans" table.
 export const getPlanByKey = internalQuery({
@@ -94,6 +92,46 @@ export const getUserHasSubscription = query({
   },
 });
 
+export const getUserSubscription = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId } = args;
+    if (!userId) throw new Error("Not authenticated");
+
+    const subscription = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+
+    return subscription;
+  },
+});
+
+export const saveStripeCustomerId = mutation({
+  args: {
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const subscription = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+
+    if (!subscription) {
+      await ctx.db.insert("userSubscriptions", {
+        customerId: args.stripeCustomerId,
+        userId,
+        lastEditedAt: Date.now(),
+      });
+    }
+  },
+});
+
 // ACTION: Create a Stripe Checkout Session.
 export const createStripeCheckoutSession = action({
   args: {
@@ -118,6 +156,7 @@ export const createStripeCheckoutSession = action({
     },
   ): Promise<{ url: string }> => {
     console.log(args);
+
     const isOrganizer = args.accountType === "organizer";
     const identity = await getAuthUserId(ctx);
     if (!identity) throw new Error("Not authenticated");
@@ -126,6 +165,16 @@ export const createStripeCheckoutSession = action({
     const { user } = result;
     if (!user || !user.email)
       throw new Error("User not found or missing email");
+
+    const subscription = await ctx.runQuery(
+      api.stripeSubscriptions.getUserSubscription,
+      {
+        userId: user._id,
+      },
+    );
+
+    let stripeCustomerId = subscription?.customerId;
+
     if (args.accountType === "organizer") {
       if (!args.slidingPrice) throw new Error("Sliding price not provided");
     }
@@ -152,9 +201,9 @@ export const createStripeCheckoutSession = action({
     // console.log("priceId which: ", priceId);
 
     if (!priceId) throw new Error("Stripe price ID not found in plan pricing");
-
+    console.log("userId: ", user._id, user.email);
     const metadata: Record<string, string> = {
-      userId: user.tokenIdentifier,
+      userId: user._id,
       userEmail: user.email,
       plan: args.planKey,
       openCallId: args.openCallId ?? "",
@@ -167,6 +216,22 @@ export const createStripeCheckoutSession = action({
 
     // console.log("hadTrial: ", args.hadTrial);
     // console.log("Meta Data: ", metadata);
+
+    if (!stripeCustomerId && args.accountType === "artist") {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name,
+        metadata: { userId: user._id },
+      });
+      stripeCustomerId = customer.id;
+      console.log("stripeCustomerId: ", stripeCustomerId);
+
+      await ctx.runMutation(api.stripeSubscriptions.saveStripeCustomerId, {
+        stripeCustomerId,
+      });
+
+      // await ctx.db.insert("userSubscriptions")
+    }
 
     // Determine subscription data options
     const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData =
@@ -181,6 +246,7 @@ export const createStripeCheckoutSession = action({
     const session: Stripe.Checkout.Session =
       await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
+        customer: stripeCustomerId,
         line_items: [
           args.accountType === "artist"
             ? {
@@ -201,12 +267,13 @@ export const createStripeCheckoutSession = action({
               },
         ],
         mode: args.accountType === "organizer" ? "payment" : "subscription",
+
         subscription_data:
           args.accountType === "organizer" ? {} : subscriptionData,
         success_url: `${process.env.FRONTEND_URL}/thelist`,
         cancel_url: `${process.env.FRONTEND_URL}/pricing`,
         //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
-        customer_email: user.email,
+        // customer_email: user.email,
         ...(args.accountType === "organizer"
           ? { customer_creation: "always" }
           : {}),
@@ -288,10 +355,158 @@ export const subscriptionStoreWebhook = mutation({
     //   eventType = "customer.subscription.created"
     // }
     console.log("eventType once more: ", eventType);
-    const userId = args.body.data.object.customer ?? null;
-    console.log("customer id: ", userId);
+    const customerId = args.body.data.object.customer ?? null;
+    const userId = args.body.data.object.metadata?.userId ?? null;
+    console.log("customer id: ", customerId);
+    console.log("userId: ", userId);
 
     switch (eventType) {
+      case "checkout.session.completed":
+        const metadata = args.body.data.object.metadata;
+        const metaInterval = metadata?.interval;
+        const oneTime = metaInterval === "One-time";
+        const freeCall =
+          args.body.data.object.discounts[0]?.coupon ===
+          process.env.STRIPE_FREE_COUPON;
+        // args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
+        const createdAt = new Date(
+          args.body.data.object.created * 1000,
+        ).getTime();
+        console.log("createdAt: ", createdAt);
+        const paymentStatus = args.body.data.object.payment_status ?? "unpaid";
+        console.log("paymentStatus: ", paymentStatus);
+
+        // const checkoutCustomer = await ctx.db
+        //   .query("userSubscriptions")
+        //   .withIndex("userId", (q) =>
+        //     q.eq("userId", args.body.data.object.metadata.userId),
+        //   )
+        //   .first();
+        const checkoutCustomer = await ctx.db
+          .query("userSubscriptions")
+          .withIndex("customerId", (q) => q.eq("customerId", customerId))
+          .first();
+
+        const checkoutUser = await ctx.db
+          .query("userSubscriptions")
+          .withIndex("userId", (q) => q.eq("userId", userId))
+          .first();
+
+        const checkoutOrg = await ctx.db
+          .query("organizations")
+          .withIndex("by_ownerId", (q) =>
+            q.eq("ownerId", args.body.data.object.metadata.userId),
+          )
+          .first();
+        console.log("checkoutCustomer: ", checkoutCustomer);
+        console.log("checkoutOrg: ", checkoutOrg);
+
+        if ((checkoutCustomer || checkoutUser) && !oneTime) {
+          console.log("user subscription already exists");
+          console.log("checkout session: ", checkoutCustomer);
+          console.log("metadata: ", args.body.data.object.metadata);
+          if (checkoutUser) {
+            await ctx.db.patch(checkoutUser._id, {
+              userId: args.body.data.object.metadata.userId,
+              metadata: args.body.data.object.metadata ?? {},
+              customerId: args.body.data.object.customer,
+            });
+          } else if (checkoutCustomer) {
+            await ctx.db.patch(checkoutCustomer._id, {
+              userId: args.body.data.object.metadata.userId,
+              metadata: args.body.data.object.metadata ?? {},
+              customerId: args.body.data.object.customer,
+            });
+          }
+        } else if (!checkoutCustomer && !checkoutUser && !oneTime) {
+          console.log("checkoutCustomer didn't exist");
+
+          await ctx.db.insert("userSubscriptions", {
+            userId: metadata.userId,
+            metadata: metadata ?? {},
+            customerId: args.body.data.object.customer,
+            paidStatus: paymentStatus === "paid",
+          });
+        }
+
+        if (oneTime && checkoutOrg) {
+          const checkoutOrgSub = await ctx.db
+            .query("organizationSubscriptions")
+            .withIndex("organizationId", (q) =>
+              q.eq("organizationId", checkoutOrg._id),
+            )
+            .first();
+
+          console.log("one-time checkoutOrgSub: ", checkoutOrgSub);
+
+          await ctx.db.patch(checkoutOrg._id, {
+            updatedAt: Date.now(),
+            lastUpdatedBy: metadata?.userId,
+          });
+
+          if (freeCall) {
+            await ctx.db.patch(checkoutOrg._id, {
+              hadFreeCall: true,
+            });
+          }
+          await ctx.db.insert("organizationSubscriptions", {
+            organizationId: checkoutOrg._id,
+            userId,
+            stripeId: args.body.data.object.id,
+            currency: args.body.data.object.currency,
+            status: args.body.data.object.status,
+            amountSubtotal: args.body.data.object.amount_subtotal,
+            amountTotal: args.body.data.object.amount_total,
+            amountDiscount: args.body.data.object.total_details.amount_discount,
+            metadata,
+            customerId,
+            paidStatus: paymentStatus,
+          });
+        }
+
+        // console.log("should be able to do logic for one-time here");
+
+        const existingUser = await ctx.db
+          .query("users")
+          .withIndex("by_id", (q) =>
+            q.eq("_id", metadata.userId as Id<"users">),
+          )
+          .first();
+        console.log("existingUser checkout: ", existingUser);
+        if (existingUser) {
+          console.log("metadata: ", metadata);
+          console.log("account type: ", metadata?.accountType);
+          console.log("oc id: ", metadata?.openCallId);
+
+          //TODO: Add logic for organizations. Currently, it's adding the metadata in the style of artists plans, which isn't useful or accurate.
+
+          if (metadata?.accountType === "organizer") {
+            console.log("patching user subscription as organizer");
+            // await ctx.db.patch(existingUser._id, {
+            //   subscription: `Organizer-${metadata.interval}`,
+            // });
+            await ctx.db.patch(metadata.openCallId, {
+              paid: paymentStatus === "paid" ? true : false,
+              paidAt: createdAt,
+              state: paymentStatus === "paid" ? "submitted" : "pending",
+            });
+          } else if (metadata?.accountType === "artist") {
+            await ctx.db.patch(existingUser._id, {
+              subscription: `${metadata.interval}ly-${metadata.plan}`,
+            });
+          }
+        }
+
+        break;
+
+      // ...
+      case "subscription_schedule.updated":
+        break;
+      // ...
+      case "invoice.created":
+        console.log("invoice.created:", args.body);
+        break;
+
       case "customer.subscription.created":
         console.log("customer.subscription.created:", args.body);
 
@@ -301,15 +516,19 @@ export const subscriptionStoreWebhook = mutation({
         const userLogId = await ctx.db
           .query("userLog")
           .withIndex("by_userId", (q) => q.eq("userId", userId))
-          .unique();
+          .first();
 
         // Check if there's already a subscription with this customerId
+
+        console.log("sub customerId: ", subscription.customer);
         const existingSubscription = await ctx.db
           .query("userSubscriptions")
           .withIndex("customerId", (q) =>
             q.eq("customerId", subscription.customer),
           )
           .first();
+
+        console.log("existing subscription: ", existingSubscription);
 
         if (existingSubscription) {
           console.log(
@@ -380,7 +599,7 @@ export const subscriptionStoreWebhook = mutation({
             stripePriceId: subscription.plan?.id,
             currency: subscription.currency,
             interval: subscription.plan?.interval,
-            userId: subscription.metadata?.userId,
+            // userId: subscription.metadata?.userId,
             status: subscription.status,
             currentPeriodStart: subscription.current_period_start
               ? new Date(subscription.current_period_start * 1000).getTime()
@@ -406,7 +625,7 @@ export const subscriptionStoreWebhook = mutation({
 
           const existingUser = await ctx.db
             .query("users")
-            .withIndex("by_token", (q) => q.eq("tokenIdentifier", userId))
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
             .first();
           console.log("updating user subscription: ", existingUser);
           if (existingUser) {
@@ -417,133 +636,6 @@ export const subscriptionStoreWebhook = mutation({
           }
         }
         break;
-
-      case "checkout.session.completed":
-        const metadata = args.body.data.object.metadata;
-        const metaInterval = metadata?.interval;
-        const oneTime = metaInterval === "One-time";
-        const freeCall =
-          args.body.data.object.discounts[0]?.coupon ===
-          process.env.STRIPE_FREE_COUPON;
-        // args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
-        const createdAt = new Date(
-          args.body.data.object.created * 1000,
-        ).getTime();
-        console.log("createdAt: ", createdAt);
-        const paymentStatus = args.body.data.object.payment_status;
-        console.log("paymentStatus: ", paymentStatus);
-
-        const checkoutUser = await ctx.db
-          .query("userSubscriptions")
-          .withIndex("userId", (q) =>
-            q.eq("userId", args.body.data.object.metadata.userId),
-          )
-          .first();
-
-        const checkoutOrg = await ctx.db
-          .query("organizations")
-          .withIndex("by_ownerId", (q) =>
-            q.eq("ownerId", args.body.data.object.metadata.userId),
-          )
-          .first();
-        console.log("checkoutUser: ", checkoutUser);
-        console.log("checkoutOrg: ", checkoutOrg);
-
-        if (checkoutUser && !oneTime) {
-          console.log("user subscription already exists");
-          console.log("checkout session: ", checkoutUser);
-
-          await ctx.db.patch(checkoutUser._id, {
-            userId: args.body.data.object.metadata?.userId,
-            metadata: args.body.data.object.metadata ?? {},
-            customerId: args.body.data.object.customer,
-          });
-        } else if (!checkoutUser && !oneTime) {
-          console.log("checkoutUser didn't exist: ", checkoutUser);
-
-          await ctx.db.insert("userSubscriptions", {
-            userId: metadata.userId,
-            metadata: metadata ?? {},
-            customerId: args.body.data.object.customer,
-            paidStatus: args.body.data.object.paid,
-          });
-        }
-
-        if (oneTime && checkoutOrg) {
-          const checkoutOrgSub = await ctx.db
-            .query("organizationSubscriptions")
-            .withIndex("organizationId", (q) =>
-              q.eq("organizationId", checkoutOrg._id),
-            )
-            .first();
-
-          console.log("checkoutOrgSub: ", checkoutOrgSub);
-
-          console.log("one-time: ", oneTime);
-          await ctx.db.patch(checkoutOrg._id, {
-            updatedAt: Date.now(),
-            lastUpdatedBy: metadata?.userId,
-          });
-
-          if (freeCall) {
-            await ctx.db.patch(checkoutOrg._id, {
-              hadFreeCall: true,
-            });
-          }
-          await ctx.db.insert("organizationSubscriptions", {
-            organizationId: checkoutOrg._id,
-            userId: metadata?.userId,
-            stripeId: args.body.data.object.id,
-            currency: args.body.data.object.currency,
-            status: args.body.data.object.status,
-            amountSubtotal: args.body.data.object.amount_subtotal,
-            amountTotal: args.body.data.object.amount_total,
-            amountDiscount: args.body.data.object.total_details.amount_discount,
-            metadata: metadata,
-            customerId: args.body.data.object.customer,
-            paidStatus: args.body.data.object.payment_status,
-          });
-        }
-
-        // console.log("should be able to do logic for one-time here");
-
-        const existingUser = await ctx.db
-          .query("users")
-          .withIndex("by_token", (q) =>
-            q.eq("tokenIdentifier", metadata.userId),
-          )
-          .first();
-        console.log("existingUser checkout: ", existingUser);
-        if (existingUser) {
-          console.log("metadata: ", metadata);
-          console.log(metadata?.accountType);
-          console.log(metadata?.openCallId);
-
-          //TODO: Add logic for organizations. Currently, it's adding the metadata in the style of artists plans, which isn't useful or accurate.
-
-          if (metadata?.accountType === "organizer") {
-            console.log("patching user subscription as organizer");
-            // await ctx.db.patch(existingUser._id, {
-            //   subscription: `Organizer-${metadata.interval}`,
-            // });
-            await ctx.db.patch(metadata.openCallId, {
-              paid: paymentStatus === "paid" ? true : false,
-              paidAt: createdAt,
-              state: paymentStatus === "paid" ? "submitted" : "pending",
-            });
-          } else if (metadata?.accountType === "artist") {
-            await ctx.db.patch(existingUser._id, {
-              subscription: `${metadata.interval}ly-${metadata.plan}`,
-            });
-          }
-        }
-
-        break;
-
-      // ...
-      case "subscription_schedule.updated":
-        break;
-      // ...
 
       case "customer.subscription.updated":
         console.log("customer.subscription.updated:", args.body);
@@ -898,8 +990,10 @@ export const applyCouponToSubscription = action({
     // console.log(metaMinAmount, metaMaxAmount, metaExcludedAmount, subAmount);
     // Check if a discount is already applied
     const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
-    if (stripeSub.discount) {
-      throw new ConvexError("Subscription already has a discount applied.");
+    if (stripeSub.discounts) {
+      throw new ConvexError(
+        `Subscription already has a discount applied: ${stripeSub.discounts.map((d) => d.toString()).join(", ")}`,
+      );
     }
 
     const coupon = await stripe.coupons.retrieve(promoCode.coupon.id);
@@ -944,7 +1038,11 @@ export const applyCouponToSubscription = action({
 
     // Update the subscription to apply the promo
     await stripe.subscriptions.update(stripeSubscriptionId, {
-      promotion_code: promoCode.id,
+      discounts: [
+        {
+          promotion_code: promoCode.id,
+        },
+      ],
     });
 
     await ctx.runMutation(api.stripeSubscriptions.markCouponApplied, {
@@ -1003,7 +1101,7 @@ export const deleteCouponFromSubscription = action({
       throw new Error("Active subscription not found");
 
     const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
-    if (!stripeSub.discount) {
+    if (!stripeSub.discounts) {
       throw new ConvexError("No active coupon found");
     }
 

@@ -54,7 +54,7 @@ export function UserProfile({
   const userRole = user?.role;
   const accountType = user?.accountType;
   const isArtist = accountType?.includes("artist") ?? false;
-  const isOrganizer = accountType?.includes("organizer") ?? false;
+  // const isOrganizer = accountType?.includes("organizer") ?? false;
   const isAdmin = userRole?.includes("admin");
   // console.log("User subscription:", subscription)
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -166,31 +166,30 @@ export function UserProfile({
             </Link>
           )}
 
-          {((subscription !== "none" &&
+          {subscription !== "none" &&
             subscription !== "canceled" &&
-            isArtist) ||
-            isOrganizer) && (
-            <>
-              <Link
-                href="/dashboard/"
-                className="underline-offset-2 hover:cursor-pointer hover:underline"
-              >
-                <DropdownMenuItem className="focus:bg-salYellow/50">
-                  <LucideLayoutDashboard className="mr-2 size-4" />
-                  <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
-                </DropdownMenuItem>
-              </Link>
-              <Link
-                href="/dashboard/account/billing"
-                className="underline-offset-2 hover:cursor-pointer hover:underline"
-              >
-                <DropdownMenuItem className="focus:bg-salYellow/50">
-                  <PiPiggyBank className="mr-2 size-4" />
-                  <span>Manage Membership</span>
-                </DropdownMenuItem>
-              </Link>
-            </>
-          )}
+            isArtist && (
+              <>
+                <Link
+                  href="/dashboard/"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <LucideLayoutDashboard className="mr-2 size-4" />
+                    <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link
+                  href="/dashboard/account/billing"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <PiPiggyBank className="mr-2 size-4" />
+                    <span>Manage Membership</span>
+                  </DropdownMenuItem>
+                </Link>
+              </>
+            )}
           {subscription === "canceled" && (
             <Link
               href="/pricing#plans"

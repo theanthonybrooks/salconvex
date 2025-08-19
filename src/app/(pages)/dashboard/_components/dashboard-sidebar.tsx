@@ -13,7 +13,7 @@ import { User, UserPref } from "@/types/user";
 
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,23 +22,23 @@ import { RiExpandLeftRightLine } from "react-icons/ri";
 
 import { api } from "~/convex/_generated/api";
 
-const sectionVariants = {
+const sectionVariants: Variants = {
   collapsed: {
     height: 0,
     opacity: 0,
-    overflow: "hidden",
+
     transition: { duration: 0.5, ease: "easeInOut" },
   },
   collapsedSidebar: {
     height: 0,
     opacity: 0,
-    overflow: "hidden",
+
     transition: { duration: 0 },
   },
   expanded: {
     height: "auto",
     opacity: 1,
-    overflow: "hidden",
+
     transition: { duration: 0.3, ease: "easeInOut" },
   },
 };
@@ -331,6 +331,7 @@ export default function DashboardSideBar({
                             collapsedSidebar ? "collapsedSidebar" : "collapsed"
                           }
                           variants={sectionVariants}
+                          className="overflow-hidden"
                         >
                           {filteredNavItems
                             .filter(

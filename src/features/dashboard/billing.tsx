@@ -100,8 +100,8 @@ export default function BillingPage() {
   }
 
   const handleManageSubscription = async () => {
+    console.log(currentlyCanceled);
     let url: string | undefined;
-    const newTab = window.open("about:blank");
 
     if (!subscription?.customerId) {
       toast.error(
@@ -114,7 +114,7 @@ export default function BillingPage() {
       router.push("/pricing#plans");
       return;
     }
-
+    const newTab = window.open("about:blank");
     try {
       const result = await getDashboardUrl({
         customerId: subscription.customerId,

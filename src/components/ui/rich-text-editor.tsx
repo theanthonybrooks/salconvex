@@ -30,7 +30,10 @@ import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
-import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
+
+import { BubbleMenu } from "@tiptap/react/menus";
+
 import StarterKit from "@tiptap/starter-kit";
 import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -84,6 +87,8 @@ export const ALLOWED_TAGS = [
 ];
 export const ALLOWED_ATTR = ["href", "target", "rel"];
 
+type EditorInstance = NonNullable<ReturnType<typeof useEditor>>;
+
 export const RichTextEditor = ({
   value,
   onChange,
@@ -123,6 +128,7 @@ export const RichTextEditor = ({
 
   const editor = useEditor({
     content: tempContent,
+    immediatelyRender: false,
     editable: !readOnly,
     extensions: [
       StarterKit.configure({
@@ -261,7 +267,7 @@ export const RichTextEditor = ({
     setEditorOpen(false);
   };
 
-  function selectionHasAnyMarks(editor: Editor) {
+  function selectionHasAnyMarks(editor: EditorInstance) {
     const { from, to } = editor.state.selection;
     let hasMarks = false;
 
@@ -636,7 +642,7 @@ export const RichTextEditor = ({
         </DialogContent>
       </Dialog>
       {editor && (
-        <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+        <BubbleMenu editor={editor} options={{ placement: "top-start" }}>
           <div className="flex gap-1 rounded-lg border border-foreground/40 bg-card p-2">
             <Button
               variant="richTextButton"

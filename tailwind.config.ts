@@ -112,6 +112,7 @@ export default {
       },
       borderWidth: {
         "1.5": "1.5px",
+        "3": "3px",
       },
       borderRadius: {
         lg: "var(--radius)",

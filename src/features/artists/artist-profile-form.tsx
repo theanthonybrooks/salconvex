@@ -65,6 +65,8 @@ export const ArtistProfileForm = ({
   const hasCurrentSub = activeSub || trialingSub;
 
   console.log(activeSub);
+  console.log(hadTrial);
+  console.log(trialEnded, trialingSub);
   // const activeTrial = trialingSub && !trialEnded;
   const subAmount = subData?.subAmount
     ? (subData.subAmount / 100).toFixed(0)
@@ -105,7 +107,8 @@ export const ArtistProfileForm = ({
     mode: "onChange",
   });
 
-  const existingUser = isValid && !activeSub;
+  // const newUser = isValid && !hasCurrentSub;
+  // const existingUser = isValid && hasCurrentSub;
   // const currentValues = getValues();
   // const userNationality = currentValues.artistNationality;
   // NOTE: Generate the upload url to use Convex's storage
@@ -365,7 +368,7 @@ export const ArtistProfileForm = ({
               type="submit"
               size="lg"
               variant="salWithShadowHidden"
-              disabled={!isValid || (!isDirty && !existingUser)}
+              disabled={!isValid}
             >
               {!hadTrial ? (
                 "Start Trial"
@@ -374,6 +377,8 @@ export const ArtistProfileForm = ({
                   Continue to Stripe
                   <IoMdArrowRoundForward className="size-4" />
                 </span>
+              ) : !hasUnsavedChanges && activeSub ? (
+                "View Membership"
               ) : (
                 "Save Changes"
               )}
