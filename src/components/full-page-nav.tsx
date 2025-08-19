@@ -9,7 +9,7 @@ import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,7 +27,7 @@ interface FullPageNavProps {
   subStatus?: string | undefined;
 }
 
-const menuVariants = {
+const menuVariants: Variants = {
   open: {
     width: [0, "100vw", "100vw", "100vw"],
     height: [60, 80, "50vh", "100dvh"],
@@ -85,7 +85,7 @@ const menuVariants = {
   },
 };
 
-const getMobileMenuVariants = (isScrolled: boolean | undefined) => ({
+const getMobileMenuVariants = (isScrolled: boolean | undefined): Variants => ({
   open: {
     width: ["4em", "100vw", "100vw", "100vw"],
     height: isScrolled
@@ -203,7 +203,7 @@ const getMobileMenuVariants = (isScrolled: boolean | undefined) => ({
 //     opacity: [0],
 //   },
 // }
-const mobileTextVariants = {
+const mobileTextVariants: Variants = {
   open: {
     opacity: 1,
 
@@ -225,7 +225,7 @@ const mobileTextVariants = {
   },
 };
 
-const mobileImageVariants = {
+const mobileImageVariants: Variants = {
   open: {
     opacity: 1,
     transition: { duration: 0.75, ease: "easeInOut" },
@@ -250,7 +250,7 @@ const mobileImageVariants = {
 //   },
 // }
 
-const screenOverlayVariants = {
+const screenOverlayVariants: Variants = {
   overlayInitial: {
     display: "none",
     opacity: 0,
