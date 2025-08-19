@@ -13,7 +13,8 @@ import { User } from "@/types/user";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { FunctionReturnType } from "convex/server";
 import { formatDate, isBefore } from "date-fns";
-import React, { useEffect } from "react";
+import { LoaderCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { IoMdArrowRoundForward } from "react-icons/io";
 import { toast } from "react-toastify";
@@ -53,6 +54,8 @@ export const ArtistProfileForm = ({
   hasUnsavedChanges,
   setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
+  const [pending, setPending] = useState(false);
+
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
   const userName = user?.name ? user.name : userFullName;
   const subscription = subData?.subscription;
@@ -64,9 +67,9 @@ export const ArtistProfileForm = ({
   const trialEnded = trialEndsAt && isBefore(new Date(trialEndsAt), new Date());
   const hasCurrentSub = activeSub || trialingSub;
 
-  console.log(activeSub);
-  console.log(hadTrial);
-  console.log(trialEnded, trialingSub);
+  // console.log(activeSub);
+  // console.log(hadTrial);
+  // console.log(trialEnded, trialingSub);
   // const activeTrial = trialingSub && !trialEnded;
   const subAmount = subData?.subAmount
     ? (subData.subAmount / 100).toFixed(0)
@@ -149,6 +152,7 @@ export const ArtistProfileForm = ({
   }, [artistInfo, reset, userName, user]);
 
   const onSubmit = async (data: ArtistFormValues) => {
+    setPending(true);
     let timezone: string | undefined;
     let timezoneOffset: number | undefined;
     let artistLogoStorageId: Id<"_storage"> | undefined;
@@ -233,6 +237,8 @@ export const ArtistProfileForm = ({
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -370,7 +376,7 @@ export const ArtistProfileForm = ({
               type="submit"
               size="lg"
               variant="salWithShadowHidden"
-              disabled={!isValid}
+              disabled={!isValid || pending}
             >
               {!hadTrial ? (
                 "Start Trial"
@@ -381,6 +387,11 @@ export const ArtistProfileForm = ({
                 </span>
               ) : !hasUnsavedChanges && activeSub ? (
                 "View Membership"
+              ) : pending ? (
+                <span>
+                  Saving...
+                  <LoaderCircle className="size-4 animate-spin" />
+                </span>
               ) : (
                 "Save Changes"
               )}

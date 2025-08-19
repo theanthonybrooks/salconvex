@@ -537,7 +537,7 @@ const SubmissionFormEventStep1 = ({
                     type="production"
                     watchPath="event"
                   />
-                  {!prodSameAsEvent && (
+                  {!prodSameAsEvent && prodDatesFormat && (
                     <label
                       className={cn(
                         "col-start-2 mx-auto flex w-full cursor-pointer items-center gap-2 py-2 lg:max-w-md",

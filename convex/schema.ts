@@ -692,17 +692,18 @@ export default defineSchema({
     .index("by_judgeId", ["judgeId"]),
 
   organizationSubscriptions: defineTable({
-    organizationId: v.id("organizations"),
-    userId: v.id("users"),
-    stripeId: v.string(),
-    currency: v.string(),
-    status: v.string(),
-    amountSubtotal: v.number(),
-    amountTotal: v.number(),
-    amountDiscount: v.number(),
-    metadata: v.any(),
-    customerId: v.string(),
-    paidStatus: v.string(),
+    organizationId: v.optional(v.id("organizations")),
+    userId: v.optional(v.string()),
+    stripeId: v.optional(v.string()),
+    currency: v.optional(v.string()),
+    status: v.optional(v.string()),
+    amountSubtotal: v.optional(v.number()),
+    amountTotal: v.optional(v.number()),
+    amountDiscount: v.optional(v.number()),
+    metadata: v.optional(v.any()),
+    customerId: v.optional(v.string()),
+    paidStatus: v.optional(v.string()),
+    lastEditedAt: v.optional(v.number()),
   })
     .index("organizationId", ["organizationId"])
     .index("userId", ["userId"])

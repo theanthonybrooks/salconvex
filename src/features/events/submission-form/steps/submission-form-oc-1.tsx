@@ -396,7 +396,11 @@ const SubmissionFormOC1 = ({
                         : undefined
                     }
                     onBlur={field.onBlur}
-                    placeholder="Please be as specific as possible"
+                    placeholder={
+                      isMobile
+                        ? "Please be as specific as possible"
+                        : "Please be as specific as possible who can apply"
+                    }
                     charLimit={1200}
                     inputPreviewClassName={cn(
                       (errors?.openCall?.eligibility?.details ||
@@ -669,7 +673,11 @@ const SubmissionFormOC1 = ({
                         field.onChange(val);
                       }}
                       onBlur={field.onBlur}
-                      placeholder="Include any other info pertaining to the open call and production requirements"
+                      placeholder={
+                        isMobile
+                          ? "Include any other info pertaining to the open call"
+                          : "Include any other info pertaining to the open call, what you expect from the artists during/after production, additional contact info"
+                      }
                       charLimit={5000}
                       purpose="openCall"
                       asModal={true}

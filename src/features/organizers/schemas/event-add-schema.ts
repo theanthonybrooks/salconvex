@@ -399,7 +399,13 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     });
   }
 
-  if (prodRequired && data.dates?.eventFormat !== "ongoing") {
+  console.log(data.dates?.prodFormat);
+
+  if (
+    prodRequired &&
+    data.dates?.eventFormat !== "ongoing" &&
+    data.dates?.prodFormat
+  ) {
     // console.log(prodDates, prodDates?.length);
     // console.log(noProdDates, !data.dates?.noProdStart);
     if (
@@ -748,7 +754,8 @@ export const getEventSchema = (isAdmin: boolean = false) => {
 };
 
 export const getEventOnlySchema = (isAdmin: boolean = false) => {
-  console.log("isAdmin", isAdmin);
+  // console.log("isAdmin", isAdmin);
+  void isAdmin;
   return z.object({
     organization: organizationSchema,
     event: getEventSchema(isAdmin),

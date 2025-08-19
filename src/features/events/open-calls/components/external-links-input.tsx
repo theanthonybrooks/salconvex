@@ -218,7 +218,10 @@ export const ExternalLinksInput = ({
         ) : (
           <div
             className="mx-auto flex w-full max-w-[74dvw] cursor-pointer flex-col items-center justify-between gap-2 px-4 py-2 lg:min-w-[300px] lg:max-w-md"
-            onClick={() => append({ title: "", href: "" })}
+            onClick={() => {
+              setIsParentOpen(true);
+              append({ title: "", href: "" });
+            }}
           >
             <p className="text-sm text-foreground/60 hover:scale-105 active:scale-95">
               + Add External link

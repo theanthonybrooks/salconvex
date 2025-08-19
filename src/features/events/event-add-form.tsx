@@ -509,9 +509,10 @@ export const EventOCForm = ({
       } else {
         //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
         // handleReset();
-        setOpen(false);
+        setTimeout(() => {}, 1000);
       }
       setTimeout(() => {
+        setOpen(false);
         window.location.href = `/thelist/event/${submissionUrl}`;
       }, 1000);
     } catch (error) {
@@ -1499,9 +1500,6 @@ export const EventOCForm = ({
         if (latestSaveId.current === saveId) {
           setPending(false);
         }
-        if (activeStep === steps.length - 1) {
-          setOpen(false);
-        }
       }
     },
     [
@@ -1513,7 +1511,6 @@ export const EventOCForm = ({
       formType,
       eventOnly,
       saveOrgFile,
-      setOpen,
       hasOpenCall,
       openCallData,
       createOrUpdateOpenCall,

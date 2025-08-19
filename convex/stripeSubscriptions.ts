@@ -98,32 +98,52 @@ export const getUserSubscription = query({
   },
   handler: async (ctx, args) => {
     const { userId } = args;
+
     if (!userId) throw new Error("Not authenticated");
 
-    const subscription = await ctx.db
+    const artistSubscription = await ctx.db
       .query("userSubscriptions")
       .withIndex("userId", (q) => q.eq("userId", userId))
       .first();
 
-    return subscription;
+    const orgSubscription = await ctx.db
+      .query("organizationSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+
+    return { artistSubscription, orgSubscription };
   },
 });
 
 export const saveStripeCustomerId = mutation({
   args: {
     stripeCustomerId: v.string(),
+    userType: v.union(v.literal("artist"), v.literal("organizer")),
   },
   handler: async (ctx, args) => {
+    const isArtist = args.userType === "artist";
+    const isOrganizer = args.userType === "organizer";
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const subscription = await ctx.db
+    const artistSubscription = await ctx.db
       .query("userSubscriptions")
       .withIndex("userId", (q) => q.eq("userId", userId))
       .first();
 
-    if (!subscription) {
+    const orgSubscription = await ctx.db
+      .query("organizationSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+
+    if (!artistSubscription && isArtist) {
       await ctx.db.insert("userSubscriptions", {
+        customerId: args.stripeCustomerId,
+        userId,
+        lastEditedAt: Date.now(),
+      });
+    } else if (!orgSubscription && isOrganizer) {
+      await ctx.db.insert("organizationSubscriptions", {
         customerId: args.stripeCustomerId,
         userId,
         lastEditedAt: Date.now(),
@@ -158,6 +178,7 @@ export const createStripeCheckoutSession = action({
     console.log(args);
 
     const isOrganizer = args.accountType === "organizer";
+    const isArtist = args.accountType === "artist";
     const identity = await getAuthUserId(ctx);
     if (!identity) throw new Error("Not authenticated");
     const result = await ctx.runQuery(api.users.getCurrentUser, {});
@@ -166,14 +187,15 @@ export const createStripeCheckoutSession = action({
     if (!user || !user.email)
       throw new Error("User not found or missing email");
 
-    const subscription = await ctx.runQuery(
+    const { artistSubscription, orgSubscription } = await ctx.runQuery(
       api.stripeSubscriptions.getUserSubscription,
       {
         userId: user._id,
       },
     );
 
-    let stripeCustomerId = subscription?.customerId;
+    let stripeCustomerId =
+      artistSubscription?.customerId || orgSubscription?.customerId;
 
     if (args.accountType === "organizer") {
       if (!args.slidingPrice) throw new Error("Sliding price not provided");
@@ -217,7 +239,7 @@ export const createStripeCheckoutSession = action({
     // console.log("hadTrial: ", args.hadTrial);
     // console.log("Meta Data: ", metadata);
 
-    if (!stripeCustomerId && args.accountType === "artist") {
+    if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.name,
@@ -226,11 +248,18 @@ export const createStripeCheckoutSession = action({
       stripeCustomerId = customer.id;
       console.log("stripeCustomerId: ", stripeCustomerId);
 
+      // await ctx.db.insert("userSubscriptions")
+    }
+
+    if (
+      // (!orgSubscription && isOrganizer) ||
+      !artistSubscription &&
+      isArtist
+    ) {
       await ctx.runMutation(api.stripeSubscriptions.saveStripeCustomerId, {
         stripeCustomerId,
+        userType: isArtist ? "artist" : "organizer",
       });
-
-      // await ctx.db.insert("userSubscriptions")
     }
 
     // Determine subscription data options
@@ -274,9 +303,9 @@ export const createStripeCheckoutSession = action({
         cancel_url: `${process.env.FRONTEND_URL}/pricing`,
         //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
         // customer_email: user.email,
-        ...(args.accountType === "organizer"
-          ? { customer_creation: "always" }
-          : {}),
+        // ...(args.accountType === "organizer"
+        //   ? { customer_creation: "always" }
+        //   : {}),
         metadata: metadata,
         client_reference_id: metadata.userId,
         discounts: args.isEligibleForFree
