@@ -33,13 +33,18 @@ interface SubmittedActionProps extends EventActionProps {
 interface ToEventActionProps {
   slug: string;
   edition: number;
+  hasOpenCall: boolean;
 }
 
-export const GoToEvent = ({ slug, edition }: ToEventActionProps) => {
+export const GoToEvent = ({
+  slug,
+  edition,
+  hasOpenCall,
+}: ToEventActionProps) => {
   return (
     <DropdownMenuItem
       onClick={() => {
-        window.location.href = `/thelist/event/${slug}/${edition}/call`;
+        window.location.href = `/thelist/event/${slug}/${edition}${hasOpenCall ? "/call" : ""}`;
       }}
       className="flex items-center gap-x-1"
     >

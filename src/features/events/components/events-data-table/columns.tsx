@@ -389,7 +389,8 @@ export const columns: ColumnDef<Event>[] = [
                   {isAdmin ? "Event" : "Actions"}
                 </DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
-                <GoToEvent slug={slug} edition={edition} />
+                {/* NOTE: this is the 'View Event' link */}
+                <GoToEvent slug={slug} edition={edition} hasOpenCall={hasOC} />
                 <DuplicateEvent eventId={event._id} />
                 {((state === "draft" && !eventApproved) || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />

@@ -312,10 +312,11 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       const isAdmin = table.options.meta?.isAdmin;
       const edition = event.dates.edition;
       const slug = event.slug;
+      const openCallId = event.openCallId;
+      const hasOC = !!openCallId;
       // console.log(openCallState);
 
       // const openCallState = event.openCallState;
-      // const openCallId = event.openCallId;
       // console.log(table.options)
 
       return (
@@ -349,7 +350,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                   (state === "published" && isAdmin)) && (
                   <ReactivateEvent eventId={event._id} state={state} />
                 )}
-                <GoToEvent slug={slug} edition={edition} />
+                <GoToEvent slug={slug} edition={edition} hasOpenCall={hasOC} />
                 <DropdownMenuSeparator />
                 {/* <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}
