@@ -72,7 +72,7 @@ import {
 } from "@/app/data/timezones";
 import { CanceledBanner } from "@/components/ui/canceled-banner";
 import { Link } from "@/components/ui/custom-link";
-import AvatarUploader from "@/components/ui/logo-uploader";
+import LogoUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { ArtistProfileForm } from "@/features/artists/components/artist-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -512,10 +512,10 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center">
-                  <AvatarUploader
+                  <LogoUploader
                     id="logo-upload"
-                    onChange={handleFileChange}
-                    onRemove={handleImgRemoval}
+                    onChangeAction={handleFileChange}
+                    onRemoveAction={handleImgRemoval}
                     initialImage={user?.image}
                     // imageOnly
                     className="gap-4 pr-8"

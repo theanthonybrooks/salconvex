@@ -6,28 +6,29 @@ import Slider from "@mui/material/Slider";
 
 type DiscreteSliderProps = {
   value: number;
-  onChange: (value: number) => void;
+  onChangeAction: (value: number) => void;
   marks?: { value: number; label: string }[];
   min?: number;
   max?: number;
   prefix?: string;
   suffix?: string;
   width?: number;
-  labelFormatter?: (value: number) => string;
+  labelFormatterAction?: (value: number) => string;
   label?: string;
   labelDisplay?: "auto" | "on" | "off";
   className?: string;
   disabled?: boolean;
   step?: number | null;
+  tabIndex?: number;
 };
 
 export default function DiscreteSlider({
   value,
-  onChange,
+  onChangeAction,
   marks,
   prefix = "",
   suffix = "",
-  labelFormatter,
+  labelFormatterAction,
   labelDisplay = "auto",
   label = "slider",
   className,
@@ -35,13 +36,15 @@ export default function DiscreteSlider({
   step = null,
   min,
   max,
+  tabIndex,
 }: DiscreteSliderProps) {
   const formatValue = (val: number) =>
-    labelFormatter?.(val) ?? `${prefix}${val}${suffix}`;
+    labelFormatterAction?.(val) ?? `${prefix}${val}${suffix}`;
 
   return (
     <Box className={cn("w-full", className)}>
       <Slider
+        tabIndex={tabIndex}
         sx={{
           color: "rgb(244, 169, 246)",
           "& .MuiSlider-thumb": {
@@ -67,7 +70,7 @@ export default function DiscreteSlider({
         }}
         aria-label={label}
         value={value}
-        onChange={(_, newValue) => onChange(newValue as number)}
+        onChange={(_, newValue) => onChangeAction(newValue as number)}
         getAriaValueText={formatValue}
         valueLabelDisplay={labelDisplay}
         step={step}

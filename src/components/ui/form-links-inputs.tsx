@@ -344,7 +344,9 @@ export const FormLinksInput = ({
                             <DebouncedControllerInput
                               disabled={eventSameAsOrg && isEvent}
                               field={field}
-                              placeholder="ex. 1234 (optional)"
+                              placeholder={
+                                isMobile ? "ex. 1234 (optional)" : "ex. 1234"
+                              }
                               className={cn(
                                 "sm:max-w-20",
                                 errors?.[type]?.links?.phoneExt &&
@@ -376,54 +378,62 @@ export const FormLinksInput = ({
               <div
                 className={cn(
                   "flex items-center gap-x-4",
-                  isMobile && "gap-x-3",
+                  isMobile && "items-start gap-x-3",
                 )}
               >
-                <FaPhone className={cn("size-5 shrink-0")} />
-                <Controller
-                  name={`${type}.links.phone`}
-                  control={control}
-                  render={({ field }) => (
-                    <PhoneInput
-                      {...field}
-                      disabled={eventSameAsOrg && isEvent}
-                      international
-                      defaultCountry={(eventCountry as Country) || "US"}
-                      value={field.value ?? ""}
-                      placeholder="+1 (555) 555-5555"
-                      className={cn(
-                        "flex h-10 min-w-[10.5rem] flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
-                        errors?.[type]?.links?.phone && "invalid-field",
-                      )}
-                      onChange={field.onChange}
-                      onBlur={() => {
-                        field.onBlur?.();
-                        handleCheckSchema?.();
-                      }}
-                    />
-                  )}
+                {" "}
+                <FaPhone
+                  className={cn("size-5 shrink-0", isMobile && "mt-2.5")}
                 />
-
-                <p className="text-sm">Ext:</p>
-                <Controller
-                  name={`${type}.links.phoneExt`}
-                  control={control}
-                  render={({ field }) => (
-                    <DebouncedControllerInput
-                      disabled={eventSameAsOrg && isEvent}
-                      field={field}
-                      placeholder={isMobile ? "123" : "ex. 1234 (optional)"}
-                      className={cn(
-                        "max-w-15 sm:max-w-20",
-                        errors?.[type]?.links?.phoneExt && "invalid-field",
+                <div className={cn("flex gap-3", isMobile && "flex-col")}>
+                  <Controller
+                    name={`${type}.links.phone`}
+                    control={control}
+                    render={({ field }) => (
+                      <PhoneInput
+                        {...field}
+                        disabled={eventSameAsOrg && isEvent}
+                        international
+                        defaultCountry={(eventCountry as Country) || "US"}
+                        value={field.value ?? ""}
+                        placeholder="+1 (555) 555-5555"
+                        className={cn(
+                          "flex h-10 min-w-[10.5rem] flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                          errors?.[type]?.links?.phone && "invalid-field",
+                        )}
+                        onChange={field.onChange}
+                        onBlur={() => {
+                          field.onBlur?.();
+                          handleCheckSchema?.();
+                        }}
+                      />
+                    )}
+                  />
+                  <div className="flex items-center gap-x-2">
+                    <p className="text-sm">Ext:</p>
+                    <Controller
+                      name={`${type}.links.phoneExt`}
+                      control={control}
+                      render={({ field }) => (
+                        <DebouncedControllerInput
+                          disabled={eventSameAsOrg && isEvent}
+                          field={field}
+                          placeholder={
+                            isMobile ? "ex. 1234 (optional)" : "ex. 1234"
+                          }
+                          className={cn(
+                            "sm:max-w-25",
+                            errors?.[type]?.links?.phoneExt && "invalid-field",
+                          )}
+                          onBlur={() => {
+                            field.onBlur?.();
+                            handleCheckSchema?.();
+                          }}
+                        />
                       )}
-                      onBlur={() => {
-                        field.onBlur?.();
-                        handleCheckSchema?.();
-                      }}
                     />
-                  )}
-                />
+                  </div>
+                </div>
               </div>
             )}
 

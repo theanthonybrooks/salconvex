@@ -2,7 +2,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { Label } from "@/components/ui/label";
-import AvatarUploader from "@/components/ui/logo-uploader";
+import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
 import { supportEmail } from "@/constants/siteInfo";
@@ -279,10 +279,10 @@ const SubmissionFormOrgStep = ({
                   name="organization.logo"
                   control={control}
                   render={({ field }) => (
-                    <AvatarUploader
+                    <LogoUploader
                       id="organization.logo"
-                      onChange={(file) => field.onChange(file)}
-                      onRemove={() => field.onChange(undefined)}
+                      onChangeAction={(file) => field.onChange(file)}
+                      onRemoveAction={() => field.onChange(undefined)}
                       reset={reset}
                       disabled={!orgNameValid}
                       initialImage={existingOrg?.logo}

@@ -399,8 +399,6 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     });
   }
 
-  console.log(data.dates?.prodFormat);
-
   if (
     prodRequired &&
     data.dates?.eventFormat !== "ongoing" &&
@@ -764,12 +762,22 @@ export const getEventOnlySchema = (isAdmin: boolean = false) => {
 
 export const getEventDetailsSchema = (isAdmin: boolean = false) => {
   void isAdmin; // use me later :)
-  return z.object({
-    organization: organizationSchema,
-    event: eventBase.extend({
-      links: linksSchemaStrict,
-    }),
-  });
+  return z
+    .object({
+      organization: organizationSchema,
+      event: eventBase.extend({
+        links: linksSchemaStrict,
+      }),
+    })
+    .superRefine((data, ctx) => {
+      if (data.event.hasOpenCall === "False" && data.event.formType !== 1) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Open call type is required",
+          path: ["event", "hasOpenCall"],
+        });
+      }
+    });
 };
 
 export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {

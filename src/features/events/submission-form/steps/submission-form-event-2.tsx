@@ -58,12 +58,14 @@ const SubmissionFormEventStep2 = ({
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
   const category = watch("event.category");
+  // const ocFormat = watch("event.hasOpenCall");
   const eventOnly = formType === 1;
   const freeCall = formType === 2;
   const isOngoing = watch("event.dates.eventFormat") === "ongoing";
 
   const noEvent = noEventCategories.includes(category);
   const prodOnly = prodOnlyCategories.includes(category);
+
   // #region ------------- Queries, Actions, and Mutations --------------
 
   // #endregion
@@ -176,7 +178,9 @@ const SubmissionFormEventStep2 = ({
                 orientation="horizontal"
               />
               <p className="col-span-full mx-auto mb-2 font-medium">
-                Next section: Open Call Details
+                {eventOnly
+                  ? "Open Call: Is this an invite-only event?"
+                  : "Next section: Open Call Details"}
               </p>
               <div className="input-section">
                 <p className="min-w-max font-bold lg:text-xl">

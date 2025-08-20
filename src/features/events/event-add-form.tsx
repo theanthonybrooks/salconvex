@@ -43,6 +43,7 @@ import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/subm
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
 import { toSeason, toYear, toYearMonth } from "@/lib/dateFns";
+import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
 import { cn } from "@/lib/utils";
@@ -484,7 +485,7 @@ export const EventOCForm = ({
         toast.success(
           alreadyPaid || alreadyApproved
             ? "Successfully updated project!"
-            : "Successfully submitted event!",
+            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabelAbbr(category) + "and open call"}!`,
           {
             onClick: () => toast.dismiss(),
           },

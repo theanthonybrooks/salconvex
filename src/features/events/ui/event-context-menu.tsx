@@ -128,6 +128,7 @@ const EventContextMenu = ({
     mainOrgId ? { orgId: mainOrgId, eventId: eventId as Id<"events"> } : "skip",
   );
 
+  const isOwner = user?.email === orgOwnerEmailData?.orgOwnerEmail;
   const nonAdminPublicView = publicView && !isAdmin && !orgPreview;
 
   return (
@@ -161,7 +162,10 @@ const EventContextMenu = ({
         <p className="py-2 pl-4 font-bold">More options</p>
         <Separator />
         <div className="flex flex-col gap-y-1 pb-2">
-          {(openCallStatus === "active" || (isAdmin && !reviewMode)) && (
+          {((openCallStatus === "active" &&
+            (openCallState === "published" || openCallState === "archived") &&
+            !isOwner) ||
+            (isAdmin && !reviewMode)) && (
             <>
               <div
                 onClick={onHide}
@@ -234,19 +238,7 @@ const EventContextMenu = ({
               )}
             </div>
           )}
-          {orgPreview && (
-            <div
-              className="flex cursor-pointer items-center gap-x-2 rounded px-4 py-2 text-sm hover:bg-salPinkLtHover"
-              onClick={() =>
-                router.push(`/dashboard/organizer/update-event?_id=${eventId}`)
-              }
-            >
-              <Pencil className="size-4" />{" "}
-              {openCallState === "pending"
-                ? "Finish Submission"
-                : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
-            </div>
-          )}
+
           {nonAdminPublicView && (
             <div
               className={cn(
@@ -261,6 +253,42 @@ const EventContextMenu = ({
                 Become a member to bookmark, hide, or apply
               </Link>
             </div>
+          )}
+          {isOwner && (
+            <>
+              <div
+                className="flex cursor-pointer items-center gap-x-2 rounded px-4 py-2 text-sm hover:bg-salPinkLtHover"
+                onClick={() =>
+                  router.push(
+                    `/dashboard/organizer/update-event?_id=${eventId}`,
+                  )
+                }
+              >
+                <Pencil className="size-4" />{" "}
+                {openCallState === "pending"
+                  ? "Finish Submission"
+                  : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
+              </div>
+
+              {eventId && (
+                <CopyableItem
+                  copyContent={eventId}
+                  className="gap-x-1 rounded px-4 py-2 hover:bg-salPinkLtHover"
+                  defaultIcon={<FaRegCopy className="size-4" />}
+                >
+                  Copy Event ID
+                </CopyableItem>
+              )}
+              {openCallId && (
+                <CopyableItem
+                  copyContent={openCallId}
+                  className="gap-x-1 rounded px-4 py-2 hover:bg-salPinkLtHover"
+                  defaultIcon={<FaRegCopy className="size-4" />}
+                >
+                  Copy Open Call ID
+                </CopyableItem>
+              )}
+            </>
           )}
           {isAdmin && (
             <>

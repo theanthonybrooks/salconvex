@@ -246,7 +246,7 @@ export const createStripeCheckoutSession = action({
         metadata: { userId: user._id },
       });
       stripeCustomerId = customer.id;
-      console.log("stripeCustomerId: ", stripeCustomerId);
+      // console.log("stripeCustomerId: ", stripeCustomerId);
 
       // await ctx.db.insert("userSubscriptions")
     }
@@ -481,6 +481,7 @@ export const subscriptionStoreWebhook = mutation({
           await ctx.db.insert("organizationSubscriptions", {
             organizationId: checkoutOrg._id,
             userId,
+            openCallId: args.body.data.object.metadata?.openCallId,
             stripeId: args.body.data.object.id,
             currency: args.body.data.object.currency,
             status: args.body.data.object.status,

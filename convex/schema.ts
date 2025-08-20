@@ -694,6 +694,7 @@ export default defineSchema({
   organizationSubscriptions: defineTable({
     organizationId: v.optional(v.id("organizations")),
     userId: v.optional(v.string()),
+    openCallId: v.optional(v.id("openCalls")),
     stripeId: v.optional(v.string()),
     currency: v.optional(v.string()),
     status: v.optional(v.string()),
@@ -706,6 +707,7 @@ export default defineSchema({
     lastEditedAt: v.optional(v.number()),
   })
     .index("organizationId", ["organizationId"])
+    .index("openCallId", ["openCallId"])
     .index("userId", ["userId"])
     .index("stripeId", ["stripeId"])
     .index("customerId", ["customerId"]),

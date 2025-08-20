@@ -119,10 +119,7 @@ export default function NavBar({
                 </Unauthenticated>
 
                 {userId !== "guest" && user && (
-                  <UserProfile
-                    className="h-[40px] w-[40px]"
-                    subscription={subStatus}
-                  />
+                  <UserProfile className="h-[40px] w-[40px]" />
                 )}
                 <FullPageNav user={user} subStatus={subStatus} />
               </div>

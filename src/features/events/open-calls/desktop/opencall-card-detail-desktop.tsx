@@ -420,125 +420,128 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       </Card>
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex min-h-20 w-full items-center gap-x-4 divide-x-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
-          <div
-            className={cn(
-              "flex h-14 w-20 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",
-            )}
-          >
-            <span className="text-xs leading-[0.95rem]">Call Type</span>
-            <span className="font-foreground text-2xl font-bold leading-[1.4rem]">
-              {basicInfo && basicInfo.callFormat}
-            </span>
-            {/* // todo: make this dynamic to show project, event, etc for the type */}
-            {/* <span className="text-xs leading-[0.95rem]">
-                {getEventCategoryLabel(eventCategory)}
-              </span> */}
-          </div>
-          <div className="flex w-full items-center justify-between pr-2">
-            <div className="flex items-center gap-x-4 px-4">
-              <EventOrgLogo
-                imgSrc={eventLogo}
-                type="event"
-                size="large"
-                className={cn(
-                  "xl:hidden",
-                  appStatus === "accepted"
-                    ? "ring-4 ring-emerald-500 ring-offset-1"
-                    : appStatus === "rejected"
-                      ? "ring-4 ring-red-500 ring-offset-1"
-                      : appStatus === "pending"
-                        ? "ring-4 ring-foreground/20 ring-offset-1"
-                        : "",
-                )}
-              />
-              <div className="flex flex-col gap-2">
-                <span className="text-balance text-xl font-bold capitalize">
-                  {event?.name}
-                </span>
-                <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
-                  {locationString}
-
-                  <TooltipSimple content="View on Map" side="top">
-                    <MapPin
-                      onClick={() => setActiveTab("event")}
-                      className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
-                    />
-                  </TooltipSimple>
-                </span>
-                <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">
-                  {getEventCategoryLabel(eventCategory)}
-
-                  {eventType && eventCategory === "event" && (
-                    <p className="flex items-center gap-1 text-sm">
-                      {" - "}
-                      {eventType
-                        .map((type) => getEventTypeLabel(type))
-                        .join(" | ")}
-                    </p>
-                  )}
-                </span>
-              </div>
-              {(isAdmin || isOwner) && (
-                <DraftPendingBanner
-                  format="desktop"
-                  openCallState={openCallState}
-                  eventState={eventState}
-                  eventId={event._id}
-                />
+        <div className="flex min-h-20 w-full flex-col rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
+          {(isAdmin || isOwner) && (
+            <DraftPendingBanner
+              format="desktop"
+              openCallState={openCallState}
+              eventState={eventState}
+              eventId={event._id}
+            />
+          )}
+          <div className="flex w-full items-center gap-x-4 divide-x-2">
+            <div
+              className={cn(
+                "flex h-14 w-20 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",
               )}
+            >
+              <span className="text-xs leading-[0.95rem]">Call Type</span>
+              <span className="font-foreground text-2xl font-bold leading-[1.4rem]">
+                {basicInfo && basicInfo.callFormat}
+              </span>
+              {/* // todo: make this dynamic to show project, event, etc for the type */}
+              {/* <span className="text-xs leading-[0.95rem]">
+                  {getEventCategoryLabel(eventCategory)}
+                </span> */}
             </div>
-            <div className="flex items-center gap-x-4 text-nowrap">
-              <div className="flex flex-col items-end gap-1">
-                {openCallState === "published" && (
-                  <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
-                    {openCallStatus === "ended" ? "Ended" : "Deadline"}: &nbsp;
-                    {formatOpenCallDeadline(
-                      ocEnd || "",
-                      deadlineTimezone,
-                      callType,
+            <div className="flex w-full items-center justify-between pr-2">
+              <div className="flex items-center gap-x-4 px-4">
+                <EventOrgLogo
+                  imgSrc={eventLogo}
+                  type="event"
+                  size="large"
+                  className={cn(
+                    "xl:hidden",
+                    appStatus === "accepted"
+                      ? "ring-4 ring-emerald-500 ring-offset-1"
+                      : appStatus === "rejected"
+                        ? "ring-4 ring-red-500 ring-offset-1"
+                        : appStatus === "pending"
+                          ? "ring-4 ring-foreground/20 ring-offset-1"
+                          : "",
+                  )}
+                />
+                <div className="flex flex-col gap-2">
+                  <span className="text-balance text-xl font-bold capitalize">
+                    {event?.name}
+                  </span>
+                  <span className="inline-flex items-end gap-x-1 text-sm leading-[0.95rem]">
+                    {locationString}
+
+                    <TooltipSimple content="View on Map" side="top">
+                      <MapPin
+                        onClick={() => setActiveTab("event")}
+                        className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
+                      />
+                    </TooltipSimple>
+                  </span>
+                  <span className="inline-flex items-end gap-x-1 text-sm xl:hidden">
+                    {getEventCategoryLabel(eventCategory)}
+
+                    {eventType && eventCategory === "event" && (
+                      <p className="flex items-center gap-1 text-sm">
+                        {" - "}
+                        {eventType
+                          .map((type) => getEventTypeLabel(type))
+                          .join(" | ")}
+                      </p>
                     )}
                   </span>
-                )}
-                {application?.applicationTime && hasApplied && (
-                  <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
-                    Applied: {formatSingleDate(application.applicationTime)}
-                  </span>
-                )}
-                {!hasApplied && hidden && (
-                  <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
-                    Event is currently hidden from your feed.{" "}
-                    <p
-                      className="cursor-pointer underline-offset-1 hover:underline"
-                      onClick={onHide}
-                    >
-                      Unhide?
-                    </p>
-                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-x-4 text-nowrap">
+                <div className="flex flex-col items-end gap-1">
+                  {openCallState === "published" && (
+                    <span className="items-center gap-x-2 text-xs xl:flex xl:text-sm">
+                      {openCallStatus === "ended" ? "Ended" : "Deadline"}:
+                      &nbsp;
+                      {formatOpenCallDeadline(
+                        ocEnd || "",
+                        deadlineTimezone,
+                        callType,
+                      )}
+                    </span>
+                  )}
+                  {application?.applicationTime && hasApplied && (
+                    <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
+                      Applied: {formatSingleDate(application.applicationTime)}
+                    </span>
+                  )}
+                  {!hasApplied && hidden && (
+                    <span className="flex items-center gap-x-1 text-xs italic text-muted-foreground xl:text-sm">
+                      Event is currently hidden from your feed.{" "}
+                      <p
+                        className="cursor-pointer underline-offset-1 hover:underline"
+                        onClick={onHide}
+                      >
+                        Unhide?
+                      </p>
+                    </span>
+                  )}
+                </div>
+                {appStatus ? (
+                  <CheckCircleIcon className="size-7 text-emerald-600" />
+                ) : hidden ? (
+                  <EyeOff
+                    className="size-7 cursor-pointer text-muted-foreground"
+                    onClick={onHide}
+                  />
+                ) : bookmarked ? (
+                  <FaBookmark
+                    className="size-7 cursor-pointer text-red-500"
+                    onClick={onBookmark}
+                  />
+                ) : (
+                  <FaRegBookmark
+                    className={cn(
+                      "size-7 cursor-pointer",
+                      !hasActiveSubscription &&
+                        "cursor-default text-foreground/50",
+                    )}
+                    onClick={onBookmark}
+                  />
                 )}
               </div>
-              {appStatus ? (
-                <CheckCircleIcon className="size-7 text-emerald-600" />
-              ) : hidden ? (
-                <EyeOff
-                  className="size-7 cursor-pointer text-muted-foreground"
-                  onClick={onHide}
-                />
-              ) : bookmarked ? (
-                <FaBookmark
-                  className="size-7 cursor-pointer text-red-500"
-                  onClick={onBookmark}
-                />
-              ) : (
-                <FaRegBookmark
-                  className={cn(
-                    "size-7 cursor-pointer",
-                    !hasActiveSubscription &&
-                      "cursor-default text-foreground/50",
-                  )}
-                  onClick={onBookmark}
-                />
-              )}
             </div>
           </div>
         </div>

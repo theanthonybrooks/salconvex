@@ -69,8 +69,6 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
             ? "Select season"
             : "Select date";
 
-    console.log(display, placeholderText);
-
     return (
       <Button
         ref={ref}

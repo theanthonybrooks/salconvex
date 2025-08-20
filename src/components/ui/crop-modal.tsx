@@ -28,12 +28,12 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
     setCroppedAreaPixels(croppedArea);
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!croppedAreaPixels || !paddedImage) return;
     const croppedImage = await getCroppedImg(paddedImage, croppedAreaPixels);
     onSave(croppedImage);
     onClose();
-  };
+  }, [croppedAreaPixels, paddedImage, onSave, onClose]);
 
   useEffect(() => {
     padImageToSquare(imageSrc, paddingColor, paddingSize).then(setPaddedImage);
@@ -58,6 +58,20 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
 
     calculateInitialZoom();
   }, [imageSrc, paddedImage]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSave]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -88,8 +102,9 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
           </label>
 
           <DiscreteSlider
+            tabIndex={1}
             value={zoom}
-            onChange={setZoom}
+            onChangeAction={setZoom}
             marks={[
               { value: 1, label: "Full" },
               { value: 2.5, label: "2.5x" },
@@ -119,6 +134,7 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
             id="color"
             type="color"
             value={paddingColor}
+            tabIndex={2}
             onChange={(e) => setPaddingColor(e.target.value)}
             className="size-10 w-full max-w-40 cursor-pointer rounded-md border border-foreground px-2 py-1 text-sm shadow-sm focus:outline-none"
           />
@@ -135,6 +151,7 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
             min={0}
             max={2000}
             step={50}
+            tabIndex={3}
             value={paddingSize}
             onChange={(e) => setPaddingSize(Number(e.target.value))}
             className="h-10 w-15 cursor-pointer rounded-md border border-foreground px-2 py-1 text-center text-sm shadow-sm focus:outline-none"
@@ -142,6 +159,7 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
           {fitZoom && (
             <button
               type="button"
+              tabIndex={fitZoom ? 4 : undefined}
               onClick={() => setZoom(fitZoom)}
               className={cn(
                 "invisible px-2 hover:scale-105 hover:cursor-pointer active:scale-95",
@@ -159,10 +177,20 @@ export function CropModal({ imageSrc, onClose, onSave }: CropModalProps) {
           )}
         </div>
         <div className="mt-4 flex justify-between">
-          <Button type="button" variant="salWithShadowPink" onClick={onClose}>
+          <Button
+            type="button"
+            variant="salWithShadowPink"
+            onClick={onClose}
+            tabIndex={6}
+          >
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave} variant="salWithShadowYlw">
+          <Button
+            type="button"
+            onClick={handleSave}
+            variant="salWithShadowYlw"
+            tabIndex={5}
+          >
             Crop & Save
           </Button>
         </div>

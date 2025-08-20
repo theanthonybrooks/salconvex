@@ -346,7 +346,7 @@ export default function TheListNavBar(
                 </Authenticated> */}
                 {user && (
                   <div className="flex items-center gap-4">
-                    <UserProfile className="size-10" subscription={subStatus} />
+                    <UserProfile className="size-10" />
                     <FullPageNav user={user} subStatus={subStatus} />
                   </div>
                 )}

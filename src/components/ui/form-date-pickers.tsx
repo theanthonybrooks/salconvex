@@ -119,7 +119,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
 
   //   console.log(formatValue);
   //   console.log(formatDatesArray?.[0]?.end);
-  console.log(noProdStart);
 
   // ...
 

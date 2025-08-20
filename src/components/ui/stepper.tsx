@@ -295,7 +295,11 @@ export default function HorizontalLinearStepper({
                       {pending
                         ? "Saving"
                         : !isDirty || disabled
-                          ? "Saved"
+                          ? !lastSaved
+                            ? "Draft (Unsaved)"
+                            : isDirty
+                              ? "Unsaved Changes"
+                              : "Saved"
                           : "Save Progress"}
                       {pending && (
                         <LoaderCircle className="size-4 animate-spin" />

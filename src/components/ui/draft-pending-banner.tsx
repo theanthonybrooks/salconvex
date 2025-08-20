@@ -1,5 +1,4 @@
 import { Link } from "@/components/ui/custom-link";
-import { Separator } from "@/components/ui/separator";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface DraftPendingBannerProps {
@@ -51,61 +50,49 @@ export const DraftPendingBanner = ({
       ) : (
         <>
           {hasDraft && (
-            <>
-              <Separator
-                orientation="vertical"
-                className="mr-2 h-10 bg-foreground"
-                thickness={2}
-              />
-              <p className="rounded-lg border-2 bg-stone-100 p-4 text-2xl font-bold uppercase text-foreground/60">
-                Draft - Preview Only
-              </p>
-            </>
+            <p className="w-full rounded-lg border-2 bg-stone-100 p-4 text-center text-2xl font-bold uppercase text-foreground/60">
+              Draft - Preview Only
+            </p>
           )}
           {hasPendingState && (
-            <>
-              <Separator
-                orientation="vertical"
-                className="mr-2 h-10 bg-foreground"
-                thickness={2}
-              />
-              <div className="flex max-w-lg flex-col items-center justify-center gap-y-2 rounded-lg border-2 bg-salYellow/70 p-4 text-foreground/60">
-                <p className="text-2xl font-bold uppercase">
-                  Pending - Preview Only
-                </p>
-                {openCallState === "pending" && (
-                  <span className="text-center">
-                    This open call is not yet submitted. You can still preview
-                    it, but{" "}
-                    {`${eventState === "published" ? "only the event/project will" : eventState === "submitted" ? "it will not" : null}`}{" "}
-                    be listed to the public. Submit via the{" "}
-                    <Link
-                      variant="bold"
-                      href={`/dashboard/organizer/update-event?_id=${eventId}`}
-                      target="_blank"
-                    >
-                      dashboard
-                    </Link>
-                    .
-                  </span>
-                )}
-                {openCallState !== "pending" && (
-                  <span className="text-center">
-                    Until it&apos;s approved,{" "}
-                    {`${eventState === "published" ? "only the event/project will" : eventState === "submitted" ? "it will not" : null}`}{" "}
-                    be listed to the public. You can still update it via the{" "}
-                    <Link
-                      variant="bold"
-                      href={`/dashboard/organizer/update-event?_id=${eventId}`}
-                      target="_blank"
-                    >
-                      dashboard
-                    </Link>
-                    .
-                  </span>
-                )}
-              </div>
-            </>
+            <div className="mb-4 flex w-full flex-col items-center justify-center gap-y-2 rounded-lg border-2 bg-salYellow/70 p-4 text-foreground/60">
+              <p className="text-2xl font-bold uppercase">
+                Pending - Preview Only
+              </p>
+              {openCallState === "pending" && (
+                <span className="text-center">
+                  This open call is not yet submitted. You can still preview it,
+                  but{" "}
+                  {`${eventState === "published" ? "only the event/project will" : eventState === "submitted" ? "it will not" : null}`}{" "}
+                  be listed to the public. Submit via the{" "}
+                  <Link
+                    variant="bold"
+                    href={`/dashboard/organizer/update-event?_id=${eventId}`}
+                    target="_blank"
+                    className="underline-offset-2 lg:text-base"
+                  >
+                    dashboard
+                  </Link>
+                  .
+                </span>
+              )}
+              {openCallState !== "pending" && (
+                <span className="text-center">
+                  Until it&apos;s approved,{" "}
+                  {`${eventState === "published" ? "only the event/project will" : eventState === "submitted" ? "it will not" : null}`}{" "}
+                  be listed to the public. You can still update it via the{" "}
+                  <Link
+                    variant="bold"
+                    href={`/dashboard/organizer/update-event?_id=${eventId}`}
+                    target="_blank"
+                    className="underline-offset-2 lg:text-base"
+                  >
+                    dashboard
+                  </Link>
+                  .
+                </span>
+              )}
+            </div>
           )}
         </>
       )}

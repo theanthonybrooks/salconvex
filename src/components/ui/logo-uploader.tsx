@@ -9,11 +9,11 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
-type AvatarUploaderProps = {
+type LogoUploaderProps = {
   // onChange: (base64Image: string) => void;
   id: string;
-  onChange: (imageBlob: Blob) => void;
-  onRemove?: () => void;
+  onChangeAction: (imageBlob: Blob) => void;
+  onRemoveAction?: () => void;
   initialImage?: string;
   imageOnly?: boolean;
   className?: string;
@@ -24,11 +24,11 @@ type AvatarUploaderProps = {
   loading?: boolean;
 };
 
-export default function AvatarUploader({
+export default function LogoUploader({
   id,
   reset,
-  onChange,
-  onRemove,
+  onChangeAction,
+  onRemoveAction,
   initialImage,
   className,
   tabIndex,
@@ -36,7 +36,7 @@ export default function AvatarUploader({
   size = 80,
   imageOnly = false,
   loading = false,
-}: AvatarUploaderProps) {
+}: LogoUploaderProps) {
   const shownErrorUrls = useRef<Set<string>>(new Set());
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,7 +97,7 @@ export default function AvatarUploader({
   const handleSaveCropped = async (blob: Blob) => {
     const base64 = await blobToBase64(blob);
     setCroppedPreviewUrl(base64); // for the UI
-    onChange(blob); // send to react-hook-form
+    onChangeAction(blob); // send to react-hook-form
   };
 
   const handleReset = () => {
@@ -235,7 +235,7 @@ export default function AvatarUploader({
                   onClick={() => {
                     if (originalImage) {
                       handleReset();
-                      onRemove?.();
+                      onRemoveAction?.();
                     }
                   }}
                   className="flex-1 bg-destructive/50"

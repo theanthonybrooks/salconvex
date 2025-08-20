@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormDatePicker } from "@/components/ui/form-date-pickers";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import AvatarUploader from "@/components/ui/logo-uploader";
+import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
@@ -424,10 +424,10 @@ const SubmissionFormEventStep1 = ({
                     name="event.logo"
                     control={control}
                     render={({ field }) => (
-                      <AvatarUploader
+                      <LogoUploader
                         id="event.logo"
-                        onChange={(file) => field.onChange(file)}
-                        onRemove={() =>
+                        onChangeAction={(file) => field.onChange(file)}
+                        onRemoveAction={() =>
                           field.onChange(orgData?.logo ?? "1.jpg")
                         }
                         reset={eventNameExists}

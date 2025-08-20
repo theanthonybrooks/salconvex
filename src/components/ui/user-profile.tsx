@@ -36,19 +36,18 @@ import { api } from "~/convex/_generated/api";
 interface UserProfileProps {
   // user: UserType;
   className?: string;
-  subscription?: string;
 }
 
 export function UserProfile({
   // user,
   className,
-  subscription,
 }: UserProfileProps) {
   const [open, setOpen] = useState(false);
   const [tooltipDisabled, setTooltipDisabled] = useState(false);
 
-  const { preloadedUserData } = useConvexPreload();
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
+  const subData = usePreloadedQuery(preloadedSubStatus);
   const user = userData?.user;
 
   const userRole = user?.role;
@@ -56,6 +55,8 @@ export function UserProfile({
   const isArtist = accountType?.includes("artist") ?? false;
   // const isOrganizer = accountType?.includes("organizer") ?? false;
   const isAdmin = userRole?.includes("admin");
+  const hasActiveSub = subData?.hasActiveSubscription;
+  const subStatus = subData?.subStatus;
   // console.log("User subscription:", subscription)
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
@@ -69,6 +70,7 @@ export function UserProfile({
   const pendingEvents = submittedEventsData ?? 0;
   const pendingOpenCalls = submittedOpenCallsData ?? 0;
   const totalPending = pendingOpenCalls + pendingEvents;
+
   return (
     <DropdownMenu
       onOpenChange={(val) => {
@@ -166,31 +168,29 @@ export function UserProfile({
             </Link>
           )}
 
-          {subscription !== "none" &&
-            subscription !== "canceled" &&
-            isArtist && (
-              <>
-                <Link
-                  href="/dashboard/"
-                  className="underline-offset-2 hover:cursor-pointer hover:underline"
-                >
-                  <DropdownMenuItem className="focus:bg-salYellow/50">
-                    <LucideLayoutDashboard className="mr-2 size-4" />
-                    <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
-                  </DropdownMenuItem>
-                </Link>
-                <Link
-                  href="/dashboard/account/billing"
-                  className="underline-offset-2 hover:cursor-pointer hover:underline"
-                >
-                  <DropdownMenuItem className="focus:bg-salYellow/50">
-                    <PiPiggyBank className="mr-2 size-4" />
-                    <span>Manage Membership</span>
-                  </DropdownMenuItem>
-                </Link>
-              </>
-            )}
-          {subscription === "canceled" && (
+          {hasActiveSub && (
+            <>
+              <Link
+                href="/dashboard/"
+                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              >
+                <DropdownMenuItem className="focus:bg-salYellow/50">
+                  <LucideLayoutDashboard className="mr-2 size-4" />
+                  <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
+                </DropdownMenuItem>
+              </Link>
+              <Link
+                href="/dashboard/account/billing"
+                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              >
+                <DropdownMenuItem className="focus:bg-salYellow/50">
+                  <PiPiggyBank className="mr-2 size-4" />
+                  <span>Manage Membership</span>
+                </DropdownMenuItem>
+              </Link>
+            </>
+          )}
+          {subStatus === "canceled" && isArtist && (
             <Link
               href="/pricing#plans"
               className="underline-offset-2 hover:cursor-pointer hover:underline"

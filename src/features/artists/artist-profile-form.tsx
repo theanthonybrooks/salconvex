@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 
 import { Label } from "@/components/ui/label";
-import AvatarUploader from "@/components/ui/logo-uploader";
+import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
@@ -266,10 +266,10 @@ export const ArtistProfileForm = ({
           name="logo"
           control={control}
           render={({ field }) => (
-            <AvatarUploader
+            <LogoUploader
               id="logo"
-              onChange={(file) => field.onChange(file)}
-              onRemove={() => field.onChange(undefined)}
+              onChangeAction={(file) => field.onChange(file)}
+              onRemoveAction={() => field.onChange(undefined)}
               initialImage={user?.image}
               imageOnly
               className="gap-0 pr-8"
