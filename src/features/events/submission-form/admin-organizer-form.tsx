@@ -347,7 +347,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const preloadFlag = useRef(false);
   const preloadOrgRef = useRef(false);
   const preloadEventRef = useRef(false);
-  // const prevOrgRef = useRef(existingOrg);
+  const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
   const validStep1 =
     activeStep > 0
@@ -1635,34 +1635,34 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   //   return () => clearInterval(interval);
   // }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
 
-  //note-to-self: this was disabled today
-  // useEffect(() => {
-  //   if (!existingOrg) return;
-  //   if (existingOrg?._id === prevOrgRef.current?._id) return;
-  //   const orgReady =
-  //     existingOrg &&
-  //     typeof existingOrg._id === "string" &&
-  //     existingOrg._id.length > 0;
+  //note-to-self: disabling this stops the org from loading when searched for without a prevOrgRef.
+  useEffect(() => {
+    if (!existingOrg) return;
+    if (existingOrg?._id === prevOrgRef.current?._id) return;
+    const orgReady =
+      existingOrg &&
+      typeof existingOrg._id === "string" &&
+      existingOrg._id.length > 0;
 
-  //   const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
+    const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
-  //   if (orgChanged && !preloadOrgRef.current) {
-  //     // console.log("resetting");
-  //     setFurthestStep(0);
-  //     reset({
-  //       organization: {
-  //         ...existingOrg,
-  //       },
-  //       event: {
-  //         formType: 1,
-  //         name: "",
-  //       },
-  //     });
-  //     prevOrgRef.current = existingOrg;
-  //   } else {
-  //     setLastSaved(null);
-  //   }
-  // }, [existingOrg, reset]);
+    if (orgChanged && !preloadOrgRef.current) {
+      // console.log("resetting");
+      setFurthestStep(0);
+      reset({
+        organization: {
+          ...existingOrg,
+        },
+        event: {
+          formType: 1,
+          name: "",
+        },
+      });
+      prevOrgRef.current = existingOrg;
+    } else {
+      setLastSaved(null);
+    }
+  }, [existingOrg, reset]);
   useEffect(() => {
     if (prevEventRef.current?._id === existingEvent?._id) return;
 
