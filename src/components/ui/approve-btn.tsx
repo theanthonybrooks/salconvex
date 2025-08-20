@@ -112,7 +112,7 @@ export const ApproveBtn = ({
                   : "Go to Convex"}
           </Button>
         )}
-        {isOwner && (
+        {isOwner && !isAdmin && (
           <Button
             variant="salWithShadowHiddenLeft"
             onClick={() => {
