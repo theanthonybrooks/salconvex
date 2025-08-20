@@ -376,7 +376,7 @@ export const FormLinksInput = ({
                       value="phone"
                       checked={primaryField === "phone"}
                       onChange={() => primaryFieldControl.onChange("phone")}
-                      className={cn(isMobile && "mt-2.5")}
+                      className={cn(orgPhone && "mt-2.5")}
                     />
                   </div>
                 )}

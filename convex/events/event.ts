@@ -1227,13 +1227,17 @@ export const createOrUpdateEvent = mutation({
 
     const event = isValidEventId(args._id) ? await ctx.db.get(args._id) : null;
 
+    const eventApproved = event?.approvedAt ? true : false;
+
     const eventState = args.finalStep
       ? isAdmin
         ? args.publish
           ? "published"
           : "submitted"
         : "submitted"
-      : "draft";
+      : eventApproved
+        ? "editing"
+        : "draft";
     const eventCategory = args.category || "";
     const isEvent = eventCategory === "event";
     const eventType = isEvent ? args.type || [] : [];
