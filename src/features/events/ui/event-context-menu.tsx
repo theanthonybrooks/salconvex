@@ -251,7 +251,7 @@ const EventContextMenu = ({
               </Link>
             </div>
           )}
-          {isOwner && (
+          {isOwner && !isAdmin && (
             <>
               <div
                 className="flex cursor-pointer items-center gap-x-2 rounded px-4 py-2 text-sm hover:bg-salPinkLtHover"

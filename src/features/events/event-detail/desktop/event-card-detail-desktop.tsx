@@ -49,7 +49,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const user = userData?.user ?? null;
   const userPref = userData?.userPref ?? null;
   const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
-  console.log(fontSize);
   const isAdmin = user?.role?.includes("admin") || false;
 
   const hasActiveSubscription =
@@ -235,7 +234,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 organizer={organizer}
                 abbr={true}
               />
-              {isAdmin && (
+              {(isAdmin || isOwner ) && (
                 <>
                   <Separator
                     orientation="horizontal"
@@ -252,6 +251,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     openCallStatus={null}
                     appStatus={null}
                     isHidden={hidden}
+                    isOwner={isOwner}
                   />
                 </>
               )}

@@ -50,7 +50,7 @@ export const DraftPendingBanner = ({
       ) : (
         <>
           {hasDraft && (
-            <p className="w-full rounded-lg border-2 bg-stone-100 p-4 text-center text-2xl font-bold uppercase text-foreground/60">
+            <p className="mb-4 w-full rounded-lg border-2 bg-stone-100 p-4 text-center text-2xl font-bold uppercase text-foreground/60">
               Draft - Preview Only
             </p>
           )}

@@ -338,7 +338,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 {`$${basicInfo?.appFee}`}
               </p>
             )}
-            {bothValid && (
+            {bothValid && !isOwner && (
               <>
                 <ApplyButton
                   user={user}
@@ -373,7 +373,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 </p>
               </>
             )}
-            {!bothValid && !isAdmin && (
+            {!bothValid && !isAdmin && !isOwner && (
               <ApplyButton
                 user={user}
                 userPref={userPref}
@@ -398,7 +398,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               />
             )}
 
-            {isAdmin && !bothValid && (
+            {((isAdmin && !bothValid) || isOwner) && (
               <>
                 <ApproveBtn
                   user={user}
@@ -412,6 +412,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   appStatus={appStatus}
                   appLink={outputAppLink}
                   isHidden={hidden}
+                  isOwner={isOwner}
                 />
               </>
             )}

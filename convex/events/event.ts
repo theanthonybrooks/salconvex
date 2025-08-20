@@ -1022,6 +1022,8 @@ export const getEventWithOCDetails = query({
       .filter((q) =>
         isAdmin || userIsOrganizer
           ? q.or(
+              q.eq(q.field("state"), "draft"),
+              q.eq(q.field("state"), "editing"),
               q.eq(q.field("state"), "published"),
               q.eq(q.field("state"), "archived"),
               q.eq(q.field("state"), "submitted"),

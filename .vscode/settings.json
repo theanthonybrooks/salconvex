@@ -1,4 +1,9 @@
 {
-  "conventionalCommits.scopes": ["Footer/Layout", "Submission Form", "Search"],
+  "conventionalCommits.scopes": [
+    "Footer/Layout",
+    "Submission Form",
+    "Search",
+    "Open Call View"
+  ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

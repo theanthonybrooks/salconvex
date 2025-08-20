@@ -1080,7 +1080,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               },
               requirements: {
                 requirements: openCallData.requirements.requirements,
-                more: "reqsMore",
+                more: undefined,
                 destination: "reqsDestination",
                 links: openCallData.requirements.links,
                 applicationLink: openCallData.requirements.applicationLink,
