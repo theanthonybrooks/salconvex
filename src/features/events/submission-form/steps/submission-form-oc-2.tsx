@@ -117,8 +117,6 @@ const SubmissionFormOC2 = ({
     }
   }, [paidCall, setValue]);
 
-  console.log(paidCall, currentFormType, initialFormType);
-
   // useEffect(() => {
   //   if (!initialFormType) return;
   //   if (currentFormType !== 3 && budgetLg) {
@@ -148,17 +146,14 @@ const SubmissionFormOC2 = ({
 
   useEffect(() => {
     const isValidNumber = Number.isFinite(budgetMax);
-    console.log(budgetMax, isValidNumber);
 
     if (
       budgetMax === prevBudgetMaxRef.current ||
       (!isValidNumber && typeof budgetMax !== "undefined")
     ) {
-      console.log("exiting early");
       return;
     }
 
-    console.log("setting budget max");
     prevBudgetMaxRef.current = budgetMax;
     budgetMaxRef.current = budgetMax;
 
@@ -179,7 +174,6 @@ const SubmissionFormOC2 = ({
     setValueRef.current = setValue;
   }, [setValue]);
 
-  //TODO: reactivate this
   useEffect(() => {
     if (!initialFormType) return;
     if (initialFormType < currentFormType) {

@@ -339,6 +339,7 @@ const SubmissionFormEventStep1 = ({
                           dirtyFields.event?.name &&
                           "invalid-field",
                       )}
+                      isAdmin={isAdmin}
                     />
                   )}
                 />

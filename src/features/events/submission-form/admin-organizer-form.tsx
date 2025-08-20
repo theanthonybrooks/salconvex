@@ -1502,7 +1502,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   useEffect(() => {
     if (formType === 1 || !initialFormType.current) return;
     if (projectBudgetLg && initialFormType.current < 3 && formType === 2) {
-      console.log("eh");
       setFormType(3);
       setValue("event.formType", 3);
     } else if (

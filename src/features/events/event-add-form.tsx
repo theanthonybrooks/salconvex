@@ -140,7 +140,8 @@ export const EventOCForm = ({
   const isAdmin = user?.role?.includes("admin") || false;
   const steps = getSteps(isAdmin);
   const finalStep = activeStep === steps.length - 1;
-  const formType = Number(planKey);
+  // const formType = Number(planKey);
+  const [formType, setFormType] = useState<number>(Number(planKey));
   const eventOnly = formType === 1;
   // const freeCall = formType === 2;
   const paidCall = formType === 3 && !isAdmin;
@@ -280,16 +281,19 @@ export const EventOCForm = ({
   const isFirstRun = useRef(true);
   const savedState = useRef(false);
   const latestSaveId = useRef<symbol | null>(null);
+  const initialFormType = useRef<number | undefined>(undefined);
+
   // #endregion
   // #region ------------- Watch --------------
   const orgData = watch("organization");
   const eventData = watch("event");
   const openCallData = watch("openCall");
-  const hasEventId = !!eventData?._id;
+  const ocBudget = watch("openCall.compensation.budget");
 
   // const eventDatesWatch = watch("event.dates");
   // #endregion
   // #region ------------- Variables --------------
+  const hasEventId = !!eventData?._id;
   const userAcceptedTerms = acceptedTerms;
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
@@ -418,6 +422,8 @@ export const EventOCForm = ({
   const projectBudget = ocData?.compensation?.budget;
   const projectMaxBudget = projectBudget?.max;
   const projectMinBudget = projectBudget?.min;
+  const projectBudgetLg = ocBudget?.max && ocBudget.max > 1000;
+
   const projectBudgetAmt = (projectMaxBudget || projectMinBudget) ?? 0;
   const submissionCost = getOcPricing(projectBudgetAmt);
 
@@ -1591,6 +1597,26 @@ export const EventOCForm = ({
   // #endregion
 
   // #region -------------UseEffects --------------
+  useEffect(() => {
+    if (!initialFormType.current && hasEventId) {
+      initialFormType.current = formType;
+    }
+  }, [formType, hasEventId]);
+
+  useEffect(() => {
+    if (formType === 1 || !initialFormType.current) return;
+    if (projectBudgetLg && initialFormType.current < 3 && formType === 2) {
+      setFormType(3);
+      setValue("event.formType", 3);
+    } else if (
+      !projectBudgetLg &&
+      initialFormType.current < 3 &&
+      formType === 3
+    ) {
+      setFormType(2);
+      setValue("event.formType", 2);
+    }
+  }, [formType, projectBudgetLg, setValue]);
 
   useEffect(() => {
     if (eventData?.formType) {
@@ -2113,6 +2139,7 @@ export const EventOCForm = ({
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
+                initialFormType={initialFormType.current}
               />
             )}
 

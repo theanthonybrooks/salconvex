@@ -81,10 +81,15 @@ const radioInnerVariants = cva(
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement>,
-    VariantProps<typeof inputVariants> {}
+    VariantProps<typeof inputVariants> {
+  labelClassName?: string;
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ variant, inputHeight, className, type, ...props }, ref) => {
+  (
+    { variant, inputHeight, className, labelClassName, type, ...props },
+    ref,
+  ) => {
     const baseClasses =
       type === "radio"
         ? radioVariants({ variant, inputHeight })
@@ -92,7 +97,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     if (type === "radio") {
       return (
-        <label className="relative inline-flex items-center">
+        <label
+          className={cn("relative inline-flex items-center", labelClassName)}
+        >
           <input
             ref={ref}
             type="radio"
