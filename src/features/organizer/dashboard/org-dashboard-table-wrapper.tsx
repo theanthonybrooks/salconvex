@@ -1,18 +1,16 @@
 "use client";
 
-import { OrgEventData } from "@/types/organizer";
-
 import { DataTable } from "@/components/data-table/data-table";
 import { orgColumns } from "@/features/organizers/dashboard/data-tables/organizer-columns";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex-helpers/react/cache";
+import { api } from "~/convex/_generated/api";
 
-interface OrganizerDashboardTableWrapperProps {
-  orgEventsData: OrgEventData[];
-}
+export function OrganizerDashboardTableWrapper() {
+  const results = useQuery(api.events.event.getUserEvents);
 
-export function OrganizerDashboardTableWrapper({
-  orgEventsData,
-}: OrganizerDashboardTableWrapperProps) {
+  const orgEventsData = results ?? [];
+
   return (
     <>
       <div className="hidden max-h-full w-full px-10 py-10 lg:block">

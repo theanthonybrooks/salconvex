@@ -140,6 +140,7 @@ interface MultiSelectProps
   shiftOffset?: number;
   tabIndex?: number;
   abbreviated?: boolean;
+  showIcon?: boolean;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -174,6 +175,7 @@ export const MultiSelect = React.forwardRef<
       textClassName,
       disabled,
       abbreviated = false,
+      showIcon = true,
       ...props
     },
     ref,
@@ -313,7 +315,7 @@ export const MultiSelect = React.forwardRef<
                             height: `${height * 4 - 8}px`,
                           }}
                         >
-                          {IconComponent && (
+                          {IconComponent && showIcon && (
                             <IconComponent className="mr-2 size-4" />
                           )}
                           <p

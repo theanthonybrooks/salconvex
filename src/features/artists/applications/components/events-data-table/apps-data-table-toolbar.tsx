@@ -6,11 +6,11 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
 import {
   eventCategories,
   eventStates,
-} from "@/components/data-table/data-table-row-actions";
+} from "@/components/data-table/data-table-constants";
+import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";

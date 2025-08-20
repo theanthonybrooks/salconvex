@@ -6,6 +6,7 @@ import {
   CalendarHeart,
   CircleCheck,
   Clock,
+  DollarSign,
   House,
   List,
   LucideBaby,
@@ -18,6 +19,7 @@ import {
   LucideCircleDollarSign,
   Mail,
   Paintbrush,
+  Paintbrush2,
   PaintBucket,
   Pencil,
   Scroll,
@@ -138,6 +140,30 @@ export const eventStates = [
   },
 ];
 
+export const openCallStates = [
+  {
+    value: "draft",
+    label: "Draft",
+    icon: Pencil,
+  },
+  {
+    value: "submitted",
+    label: "Submitted",
+    icon: Clock,
+  },
+  { value: "pending", label: "Pending", icon: DollarSign },
+  {
+    value: "published",
+    label: "Published",
+    icon: CheckCircle,
+  },
+  {
+    value: "archived",
+    label: "Archived",
+    icon: Scroll,
+  },
+];
+
 export const eventCategories = [
   {
     value: "event",
@@ -164,6 +190,15 @@ export const eventCategories = [
     label: "Roster",
     icon: List,
   },
+];
+
+export const eventTypes = [
+  {
+    value: "Graffiti Jam",
+    label: "Graffiti Jam",
+    icon: Paintbrush2,
+  },
+  {},
 ];
 
 export const priorities = [
@@ -252,46 +287,3 @@ export const accountTypeOptions = [
   { value: "organizer", label: "Organizer", icon: User2 },
   { value: "both", label: "Both", icon: Users },
 ];
-
-// export function DataTableRowActions<TData>({
-//   row,
-// }: DataTableRowActionsProps<TData>) {
-//   const task = taskSchema.parse(row.original);
-
-//   return (
-//     <DropdownMenu>
-//       <DropdownMenuTrigger asChild>
-//         <Button
-//           variant="ghost"
-//           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-//         >
-//           <MoreHorizontal />
-//           <span className="sr-only">Open menu</span>
-//         </Button>
-//       </DropdownMenuTrigger>
-//       <DropdownMenuContent align="end" className="w-[160px]">
-//         <DropdownMenuItem>Edit</DropdownMenuItem>
-//         <DropdownMenuItem>Make a copy</DropdownMenuItem>
-//         <DropdownMenuItem>Favorite</DropdownMenuItem>
-//         <DropdownMenuSeparator />
-//         <DropdownMenuSub>
-//           <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
-//           <DropdownMenuSubContent>
-//             <DropdownMenuRadioGroup value={task.label}>
-//               {labels.map((label) => (
-//                 <DropdownMenuRadioItem key={label.value} value={label.value}>
-//                   {label.label}
-//                 </DropdownMenuRadioItem>
-//               ))}
-//             </DropdownMenuRadioGroup>
-//           </DropdownMenuSubContent>
-//         </DropdownMenuSub>
-//         <DropdownMenuSeparator />
-//         <DropdownMenuItem>
-//           Delete
-//           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-//         </DropdownMenuItem>
-//       </DropdownMenuContent>
-//     </DropdownMenu>
-//   );
-// }

@@ -5,6 +5,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   DataTableAdminOrgActions,
   DataTableAdminOrgStateActions,
+  OrgDuplicateEvent,
+  OrgDuplicateOC,
 } from "@/components/data-table/actions/data-table-admin-org-actions";
 import {
   ArchiveEvent,
@@ -16,9 +18,11 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
+import { CopyableItem } from "@/components/ui/copyable-item";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -26,10 +30,10 @@ import {
 import { OrgEventActions } from "@/features/organizers/dashboard/data-tables/orgEventActions";
 import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { EventType, SubmissionFormState } from "@/types/event";
-import { SubmissionFormState as OpenCallState } from "@/types/openCall";
+import { EventCategory, EventType, SubmissionFormState } from "@/types/event";
+import { OpenCallState } from "@/types/openCall";
 import { OrgEventData } from "@/types/organizer";
-import { MoreHorizontal } from "lucide-react";
+import { Clipboard, MoreHorizontal } from "lucide-react";
 
 export const orgEventColumnLabels: Record<string, string> = {
   orgName: "Org Name",
@@ -279,8 +283,21 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
   {
     accessorKey: "type",
-    size: 120,
-    minSize: 120,
+    accessorFn: (row) => row.type,
+    filterFn: (row, columnId, filterValues: string[]) => {
+      const cellValues = row.getValue<string[]>(columnId) ?? [];
+      return filterValues.some((val) => cellValues.includes(val));
+    },
+    // filterFn: (row, columnId, filterValue) => {
+    //   if (!Array.isArray(filterValue)) return true;
+    //   return filterValue.includes(row.getValue(columnId));
+    // },
+    getUniqueValues: (row) => {
+      const values = row.type;
+      return Array.isArray(values) ? values : [values];
+    },
+    size: 200,
+    minSize: 200,
     maxSize: 240,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Type" />
@@ -307,6 +324,8 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
     enableResizing: false,
     cell: ({ row, table }) => {
       const event = row.original as OrgEventData;
+      const eventCategory = event.category as EventCategory;
+
       // const openCallState = event.openCallState;
       const state = event.state as SubmissionFormState;
       const isAdmin = table.options.meta?.isAdmin;
@@ -336,22 +355,53 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                 align="end"
                 className="scrollable mini darkbar max-h-56"
               >
-                <DropdownMenuLabel>{"Actions"}</DropdownMenuLabel>{" "}
+                <DropdownMenuLabel>{"Actions"}</DropdownMenuLabel>
+                <GoToEvent
+                  slug={slug}
+                  edition={edition}
+                  hasOpenCall={hasOC}
+                  category={eventCategory}
+                />
                 <DataTableAdminOrgActions
                   eventId={event._id}
                   userRole={isAdmin ? "admin" : "user"}
                 />
-                <DropdownMenuSeparator />
                 {(state === "draft" || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
                 {state === "published" && <ArchiveEvent eventId={event._id} />}
+
                 {(state === "archived" ||
                   (state === "published" && isAdmin)) && (
                   <ReactivateEvent eventId={event._id} state={state} />
                 )}
-                <GoToEvent slug={slug} edition={edition} hasOpenCall={hasOC} />
+
                 <DropdownMenuSeparator />
+                <OrgDuplicateEvent
+                  eventId={event._id}
+                  category={eventCategory}
+                />
+                {openCallId && <OrgDuplicateOC openCallId={openCallId} />}
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>{"Support"}</DropdownMenuLabel>
+                <DropdownMenuItem>
+                  <div className="flex items-center gap-x-1">
+                    <Clipboard className="size-4" />
+                    <CopyableItem copyContent={event._id}>
+                      Event ID
+                    </CopyableItem>
+                  </div>
+                </DropdownMenuItem>
+                {openCallId && (
+                  <DropdownMenuItem>
+                    <div className="flex items-center gap-x-1">
+                      <Clipboard className="size-4" />
+                      <CopyableItem copyContent={openCallId as string}>
+                        Open Call ID
+                      </CopyableItem>
+                    </div>
+                  </DropdownMenuItem>
+                )}
                 {/* <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}
                   className="flex items-center gap-x-2"

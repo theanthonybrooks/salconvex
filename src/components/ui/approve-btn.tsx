@@ -6,10 +6,7 @@ import {
   EventCategory,
   SubmissionFormState as EventState,
 } from "@/types/event";
-import {
-  SubmissionFormState as OpenCallState,
-  OpenCallStatus,
-} from "@/types/openCall";
+import { OpenCallState, OpenCallStatus } from "@/types/openCall";
 import { User } from "@/types/user";
 import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";

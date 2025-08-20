@@ -17,11 +17,7 @@ import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory } from "@/types/event";
-import {
-  CallType,
-  SubmissionFormState as OpenCallState,
-  OpenCallStatus,
-} from "@/types/openCall";
+import { CallType, OpenCallState, OpenCallStatus } from "@/types/openCall";
 import { User, UserPref } from "@/types/user";
 import {
   getExternalErrorHtml,
@@ -283,7 +279,6 @@ export const ApplyButton = ({
           : !publicView && openCall
             ? `/thelist/event/${slug}/${edition}/call`
             : `/thelist/event/${slug}/${edition}`;
-
   const buttonText =
     openCall === "active"
       ? appStatus !== null && !publicView

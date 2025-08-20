@@ -1,3 +1,4 @@
+import { OpenCallState } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
@@ -225,17 +226,33 @@ export const createOrUpdateOpenCall = mutation({
       return true;
     });
 
+    const ocApproved = existingOpenCall?.approvedBy || args.approved;
+
     const isAdmin = user?.role?.includes("admin");
     // console.log(args.approved, args.finalStep, args.state);
+    // const ocState = isAdmin
+    //   ? args.finalStep && ocApproved
+    //     ? "published"
+    //     : !args.finalStep && ocApproved
+    //       ? "draft"
+    //       : "submitted"
+    //   : args.finalStep && !args.paid
+    //     ? "pending"
+    //     : args.state;
+
     const ocState = isAdmin
-      ? args.finalStep && args.approved
+      ? args.finalStep
         ? "published"
-        : !args.finalStep
-          ? "draft"
-          : "submitted"
-      : args.finalStep && !args.paid
-        ? "pending"
-        : args.state;
+        : ocApproved
+          ? "editing"
+          : "draft"
+      : ocApproved
+        ? args.finalStep
+          ? "submitted"
+          : "editing"
+        : args.finalStep
+          ? "pending"
+          : "draft";
 
     //todo: utilize the patch in stripe subscriptions to update the state from pending to submitted when it's paid
 
@@ -252,7 +269,7 @@ export const createOrUpdateOpenCall = mutation({
         links: args.requirements.links ?? [],
       },
       documents: ocDocs,
-      state: ocState,
+      state: ocState as OpenCallState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),
       paid: args.paid ?? false,
@@ -396,11 +413,32 @@ export const duplicateOC = mutation({
     const existingOcEdition = openCall.basicInfo.dates.edition;
     let eventName = event.name;
     let eventSlug = event.slug;
-    let edition = existingOcEdition;
+    // let edition = existingOcEdition;
+    let edition = event.dates.edition;
+    // const existingEvents = await ctx.db
+    //   .query("events")
+    //   .withIndex("by_slug", (q) => q.eq("slug", event.slug))
+    //   .collect();
 
-    if (existingOcEdition !== new Date().getFullYear()) {
+    // const slugPrefix = event.slug + "-";
+    // const existingVariants = await ctx.db
+    //   .query("events")
+    //   .withIndex("by_slug", (q) =>
+    //     q.gte("slug", slugPrefix).lt("slug", slugPrefix + "\uffff"),
+    //   )
+    //   .collect();
+    // const allExisting = [...existingEvents, ...existingVariants];
+    // console.log(allExisting);
+
+    // if (existingOcEdition !== new Date().getFullYear()) {
+    //   edition = new Date().getFullYear();
+    // }
+    if (event.dates.edition !== new Date().getFullYear()) {
       edition = new Date().getFullYear();
     }
+
+    console.log(edition);
+
     //  else {
     //   edition = existingOcEdition + 1;
     // }
@@ -468,6 +506,7 @@ export const duplicateOC = mutation({
         ...openCall.requirements,
       },
       state: "draft",
+      paid: false,
       lastUpdatedAt: Date.now(),
       lastUpdatedBy: userId,
     });

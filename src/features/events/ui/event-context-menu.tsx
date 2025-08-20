@@ -26,10 +26,7 @@ import {
   EventCategory,
   SubmissionFormState as EventState,
 } from "@/types/event";
-import {
-  SubmissionFormState as OpenCallState,
-  OpenCallStatus,
-} from "@/types/openCall";
+import { OpenCallState, OpenCallStatus } from "@/types/openCall";
 
 import { CopyableItem } from "@/components/ui/copyable-item";
 import { Separator } from "@/components/ui/separator";
@@ -239,7 +236,7 @@ const EventContextMenu = ({
             </div>
           )}
 
-          {nonAdminPublicView && (
+          {nonAdminPublicView && !isOwner && (
             <div
               className={cn(
                 "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",

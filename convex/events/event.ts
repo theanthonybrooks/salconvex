@@ -272,7 +272,12 @@ export async function generateUniqueNameAndSlug(
     )
     .unique();
 
-  if (!existingExact) {
+  const existingSlug = await ctx.db
+    .query("events")
+    .withIndex("by_slug", (q) => q.eq("slug", `${baseName}-${suffix}`))
+    .unique();
+
+  if (!existingExact && !existingSlug) {
     return {
       name: baseName,
       slug: slugify(baseName, { lower: true, strict: true }),
@@ -288,7 +293,12 @@ export async function generateUniqueNameAndSlug(
       )
       .unique();
 
-    if (!exists) {
+    const slugExists = await ctx.db
+      .query("events")
+      .withIndex("by_slug", (q) => q.eq("slug", tryName))
+      .unique();
+
+    if (!exists && !slugExists) {
       return {
         name: tryName,
         slug: slugify(tryName, { lower: true, strict: true }),
@@ -760,7 +770,12 @@ export const checkEventNameExists = query({
       if (sameEvent === true || (sameEdition === false && sameOrg === true))
         continue;
 
-      if (!sameEvent && sameEdition === true && sameOrg === true) {
+      if (
+        sameEvent !== undefined &&
+        !sameEvent &&
+        sameEdition === true &&
+        sameOrg === true
+      ) {
         throw new ConvexError(
           `An event with that name and edition already exists. Please choose a different name or edition`,
         );

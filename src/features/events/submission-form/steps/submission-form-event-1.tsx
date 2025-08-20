@@ -302,6 +302,7 @@ const SubmissionFormEventStep1 = ({
                     hasSearch={false}
                     selectAll={false}
                     tabIndex={4}
+                    showIcon={false}
                   />
                 )}
               />

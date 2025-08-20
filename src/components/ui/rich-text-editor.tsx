@@ -132,6 +132,8 @@ export const RichTextEditor = ({
     editable: !readOnly,
     extensions: [
       StarterKit.configure({
+        link: false,
+        underline: false,
         bold: {},
         italic: {},
         paragraph: {},

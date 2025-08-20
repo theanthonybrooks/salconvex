@@ -37,13 +37,6 @@ export default async function OrganizerPage({
     }
     redirect("/thelist");
   }
-  const orgEventsData = await fetchQuery(
-    api.events.event.getUserEvents,
-    {},
-    {
-      token,
-    },
-  );
 
   // console.log(orgEventsData);
 
@@ -56,6 +49,6 @@ export default async function OrganizerPage({
 
     default:
       //   redirect("/dashboard/admin");
-      return <OrganizerDashboardTableWrapper orgEventsData={orgEventsData} />;
+      return <OrganizerDashboardTableWrapper />;
   }
 }

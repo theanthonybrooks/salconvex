@@ -174,3 +174,33 @@ export {
   AlertDialogTitle,
   AlertDialogTrigger,
 };
+
+export const AlertDialogSimple = ({
+  label,
+  description,
+  onConfirmAction,
+  onCancelAction,
+  children,
+}: {
+  label: string;
+  description?: string;
+  onConfirmAction: () => void;
+  onCancelAction?: () => void;
+  children?: React.ReactNode;
+}) => (
+  <AlertDialog>
+    {children && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
+    <AlertDialogContent overlayClassName="bg-foreground/20">
+      <AlertDialogHeader>
+        <AlertDialogTitle>{label}</AlertDialogTitle>
+        {description && (
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        )}
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel onClick={onCancelAction}>Cancel</AlertDialogCancel>
+        <AlertDialogAction onClick={onConfirmAction}>Confirm</AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+);

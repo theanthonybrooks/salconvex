@@ -68,9 +68,6 @@ export function AdminDashboardTableWrapper({
                 submissionState: false,
                 type: false,
               }}
-              onRowSelect={(row) => {
-                console.log(row);
-              }}
               adminActions={adminActions}
               tableType="events"
               pageType="dashboard"
@@ -88,10 +85,6 @@ export function AdminDashboardTableWrapper({
                 lastEditedAt: false,
                 dates_edition: false,
                 submissionState: false,
-              }}
-              onRowSelect={(row) => {
-                //TODO: make the preview open in new page? Or section below? Or modal? It just needs to have the event/oc data shown with a check mark for each overarching section and a spot for some admin notes and some buttons.
-                console.log(row);
               }}
               adminActions={adminActions}
               tableType="events"
@@ -123,9 +116,6 @@ export function AdminDashboardTableWrapper({
                   // totalPerYear: usersData?.totalPerYear ?? 0,
                 }
               }
-              onRowSelect={(row) => {
-                console.log(row);
-              }}
               adminActions={adminActions}
               tableType="newsletter"
               pageType="dashboard"
@@ -153,11 +143,6 @@ export function AdminDashboardTableWrapper({
                 }
               }
               defaultSort={{ id: `createdAt`, desc: true }}
-              onRowSelect={(row) => {
-                console.log(row);
-                // setExistingEvent(row.getValue("event"));
-                // setExistingOpenCall(row.getValue("openCall"));
-              }}
               adminActions={adminActions}
               tableType="newsletter"
               pageType="dashboard"
@@ -185,9 +170,6 @@ export function AdminDashboardTableWrapper({
                 totalThisMonth: usersData?.totalThisMonth ?? 0,
                 totalThisYear: usersData?.totalThisYear ?? 0,
                 userCount: usersData?.users?.length ?? 0,
-              }}
-              onRowSelect={(row) => {
-                console.log(row);
               }}
               adminActions={adminActions}
               tableType="users"

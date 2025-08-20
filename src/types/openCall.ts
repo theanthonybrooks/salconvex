@@ -17,12 +17,11 @@ export const openCallStates = [
   "draft",
   "editing",
   "submitted",
-
   "pending",
   "published",
   "archived",
 ] as const;
-export type SubmissionFormState = (typeof openCallStates)[number];
+export type OpenCallState = (typeof openCallStates)[number];
 
 export const publicStateValues = ["published", "archived"];
 
@@ -145,7 +144,7 @@ export interface OpenCall {
     href: string;
     archived?: boolean;
   }[];
-  state?: SubmissionFormState;
+  state?: OpenCallState;
   paid?: boolean;
   paidAt?: number;
   publicPreview?: boolean;

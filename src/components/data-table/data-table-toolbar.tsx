@@ -13,12 +13,15 @@ import {
   bookmarkIntents,
   eventCategories,
   eventStates,
+  openCallStates,
   subscriptionOptions,
   subscriptionStatusOptions,
-} from "@/components/data-table/data-table-row-actions";
+} from "@/components/data-table/data-table-constants";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import { AlertDialogSimple } from "@/components/ui/alert-dialog";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { eventTypeOptions } from "@/types/event";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -53,6 +56,8 @@ export function DataTableToolbar<TData>({
   const appsTable = tableType === "applications";
   const bookmarksTable = tableType === "bookmarks";
   const usersTable = tableType === "users";
+  // const organizersTable = tableType === "organizations";
+  const orgEventsTable = tableType === "orgEvents";
   const selectedRowCount = Object.keys(table.getState().rowSelection).length;
   const handleDeleteSelected = async () => {
     const selectedRows = table.getSelectedRowModel().rows;
@@ -165,6 +170,46 @@ export function DataTableToolbar<TData>({
             )}
           </div>
         )}
+        {orgEventsTable && (
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
+            {table.getColumn("category") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("category")}
+                title="Category"
+                options={eventCategories}
+              />
+            )}
+            {table.getColumn("type") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("type")}
+                title="Event Type"
+                options={[...eventTypeOptions]}
+              />
+            )}
+            {table.getColumn("state") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("state")}
+                title="State"
+                options={eventStates}
+              />
+            )}
+            {table.getColumn("openCallState") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("openCallState")}
+                title="Open Call"
+                options={openCallStates}
+              />
+            )}
+          </div>
+        )}
         {usersTable && (
           <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
             {table.getColumn("subscription") && (
@@ -257,13 +302,18 @@ export function DataTableToolbar<TData>({
           isAdmin &&
           pageType === "dashboard" &&
           selectedRowCount > 0 && (
-            <Button
-              variant="ghost"
-              onClick={() => handleDeleteSelected()}
-              className="hidden hover:scale-105 sm:inline-flex"
+            <AlertDialogSimple
+              label="Delete Selection?"
+              description="Are you sure you want to delete the selected events?"
+              onConfirmAction={handleDeleteSelected}
             >
-              Delete Selection
-            </Button>
+              <Button
+                variant="ghost"
+                className="hidden hover:scale-105 sm:inline-flex"
+              >
+                Delete Selection
+              </Button>
+            </AlertDialogSimple>
           )}
         <DataTableViewOptions table={table} />
       </div>

@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 
 interface DebouncedControllerNumInputProps<
@@ -49,22 +49,24 @@ export function DebouncedControllerNumInput<
     return "";
   });
 
-  const debouncedOnChange = useRef(
-    debounce((val: string) => {
-      const numeric = parseFloat(val.replace(/,/g, ""));
-      if (!isNaN(numeric)) {
-        if (typeof min === "number" && numeric < min) {
-          field.onChange(min);
-        } else if (typeof max === "number" && numeric > max) {
-          field.onChange(max);
+  const debouncedOnChange = useMemo(
+    () =>
+      debounce((val: string) => {
+        const numeric = parseFloat(val.replace(/,/g, ""));
+        if (!isNaN(numeric)) {
+          if (typeof min === "number" && numeric < min) {
+            field.onChange(min);
+          } else if (typeof max === "number" && numeric > max) {
+            field.onChange(max);
+          } else {
+            field.onChange(numeric);
+          }
         } else {
-          field.onChange(numeric);
+          field.onChange(undefined);
         }
-      } else {
-        field.onChange(undefined);
-      }
-    }, debounceMs),
-  ).current;
+      }, debounceMs),
+    [debounceMs, min, max, field],
+  );
 
   useEffect(() => {
     // if (typeof field.value === "number") {
@@ -111,6 +113,7 @@ export function DebouncedControllerNumInput<
         const numeric = raw.replace(/,/g, "");
         const display =
           formatNumber && numeric ? formatWithCommas(parseFloat(numeric)) : raw;
+
         setLocalValue(display);
         debouncedOnChange(raw);
       }}

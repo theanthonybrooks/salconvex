@@ -41,6 +41,7 @@ interface SubmissionFormOC2Props {
   canNameEvent: boolean;
   handleCheckSchema: () => void;
   formType: number;
+  initialFormType?: number;
   pastEvent: boolean;
 }
 
@@ -53,8 +54,10 @@ const SubmissionFormOC2 = ({
 
   handleCheckSchema,
   formType,
+  initialFormType,
   pastEvent: pastEventCheck,
 }: SubmissionFormOC2Props) => {
+  const [priceAlert, setPriceAlert] = useState<string | null>(null);
   const pastEvent = pastEventCheck && !isAdmin;
   const paidCall = formType === 3;
   const {
@@ -66,7 +69,7 @@ const SubmissionFormOC2 = ({
     // getValues,
     // formState: { errors },
   } = useFormContext<EventOCFormValues>();
-
+  const currentFormType = watch("event.formType") ?? 0;
   const openCall = watch("openCall");
   const organizer = watch("organization");
   const selectedCategories = watch("openCall.compensation.categories") ?? {};
@@ -76,10 +79,6 @@ const SubmissionFormOC2 = ({
 
   const orgCurrency = organizer?.location?.currency;
   const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
-  // console.log("existingHasBudget: ", existingHasBudget);
-  // console.log("paid call: ", paidCall);
-  // const eventName = watch("event.name");
-  // const eventId = watch("event._id");
   const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
     typeof existingHasBudget === "boolean"
       ? convertBooleanToString(existingHasBudget)
@@ -96,8 +95,6 @@ const SubmissionFormOC2 = ({
   const budgetUnit = openCall?.compensation?.budget?.unit;
   const validBudgetMin =
     typeof budgetMin === "number" && budgetMin > (paidCall ? 1 : 0);
-  // const validBudgetRate = typeof budgetRate === "number" && budgetRate > 0;
-  // const hasMinOrRateBudget = validBudgetMin || validBudgetRate;
   const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
   const hasBudgetMin = hasBudget?.trim() === "true" && validBudgetMin;
   const noBudget = hasBudget?.trim() === "false";
@@ -107,18 +104,30 @@ const SubmissionFormOC2 = ({
   const unknownBudget = openCall?.compensation?.budget?.unknownBudget;
   const prevBudgetMaxRef = useRef<number | undefined>(undefined);
   const budgetMaxRef = useRef(budgetMax);
-  // const budgetLg = typeof budgetMax === "number" && budgetMax >= 1000;
+  // const wasFreeNowPaid = initialFormType === 2 && currentFormType === 3;
+  // const budgetLg = typeof budgetMax === "number" && budgetMax > 1000;
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
-  // console.log("min budget", budgetMin, "max budget", budgetMax);
-  // console.log("hasBudget: ", hasBudget, allInclusive);
+
   useEffect(() => {
     if (!paidCall) return;
     if (paidCall) {
       setHasBudget("true");
     }
   }, [paidCall, setValue]);
+
+  console.log(paidCall, currentFormType, initialFormType);
+
+  // useEffect(() => {
+  //   if (!initialFormType) return;
+  //   if (currentFormType !== 3 && budgetLg) {
+  //     setValue("event.formType", 3);
+  //     setHasBudget("true");
+  //   } else if (currentFormType === 3 && !budgetLg && wasFreeNowPaid) {
+  //     setValue("event.formType", 2);
+  //   }
+  // }, [currentFormType, budgetLg, setValue, wasFreeNowPaid, initialFormType]);
 
   useEffect(() => {
     const formValue = hasBudget?.trim();
@@ -138,15 +147,18 @@ const SubmissionFormOC2 = ({
   }, [validBudgetMin, noBudgetMin, setValue, hasBudget, budgetMin]);
 
   useEffect(() => {
-    const isValidNumber = typeof budgetMax === "number" && !isNaN(budgetMax);
+    const isValidNumber = Number.isFinite(budgetMax);
+    console.log(budgetMax, isValidNumber);
 
     if (
       budgetMax === prevBudgetMaxRef.current ||
       (!isValidNumber && typeof budgetMax !== "undefined")
     ) {
+      console.log("exiting early");
       return;
     }
 
+    console.log("setting budget max");
     prevBudgetMaxRef.current = budgetMax;
     budgetMaxRef.current = budgetMax;
 
@@ -167,9 +179,22 @@ const SubmissionFormOC2 = ({
     setValueRef.current = setValue;
   }, [setValue]);
 
+  //TODO: reactivate this
+  useEffect(() => {
+    if (!initialFormType) return;
+    if (initialFormType < currentFormType) {
+      setPriceAlert(
+        "Note: Budgets over $1,000 will convert this to a paid call",
+      );
+    } else {
+      setPriceAlert(null);
+    }
+  }, [currentFormType, initialFormType, paidCall]);
+
   useEffect(() => {
     const min = budgetMin;
-    const max = budgetMaxRef.current;
+    // const max = budgetMaxRef.current;
+    const max = budgetMax;
 
     if (typeof min !== "number") return;
     if (min <= 0) return;
@@ -181,7 +206,7 @@ const SubmissionFormOC2 = ({
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [budgetMin]);
+  }, [budgetMin, budgetMax]);
 
   // useEffect(() => {
   //   const min = budgetMin;
@@ -365,6 +390,8 @@ const SubmissionFormOC2 = ({
                           field.onChange(isNaN(num) ? 0 : num);
                         },
                       }}
+                      // min={budgetMin}
+                      debounceMs={1500}
                       placeholder="Maximum "
                       className="arrowless h-fit border-none !bg-card px-0 pb-2 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
                     />
@@ -403,6 +430,11 @@ const SubmissionFormOC2 = ({
                 The budget amount is unknown (ie. not provided)
               </span>
             </label>
+          )}
+          {priceAlert && (
+            <span className="col-start-2 mt-2 w-full text-center text-sm text-red-600">
+              {priceAlert}
+            </span>
           )}
           {hasBudget === "true" && (
             <>

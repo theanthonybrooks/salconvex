@@ -210,6 +210,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const canCheckSchema = useRef(false);
   const canClearEventData = useRef(true);
   const isFirstRun = useRef(true);
+  const initialFormType = useRef<number | undefined>(undefined);
+
   const savedState = useRef(false);
   const latestSaveId = useRef<symbol | null>(null);
 
@@ -218,12 +220,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const orgData = watch("organization");
   const eventData = watch("event");
   const openCallData = watch("openCall");
-  const eventFormType = eventData?.formType;
-  const hasEventId = !!eventData?._id;
-
+  const ocBudget = watch("openCall.compensation.budget");
   // const eventDatesWatch = watch("event.dates");
+
   // #endregion
   // #region ------------- Variables --------------
+  const eventFormType = eventData?.formType;
+  const hasEventId = !!eventData?._id;
   const userAcceptedTerms = acceptedTerms;
   const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
@@ -344,7 +347,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const preloadFlag = useRef(false);
   const preloadOrgRef = useRef(false);
   const preloadEventRef = useRef(false);
-  const prevOrgRef = useRef(existingOrg);
+  // const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
   const validStep1 =
     activeStep > 0
@@ -358,12 +361,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const projectBudget = ocData?.compensation?.budget;
   const projectMaxBudget = projectBudget?.max;
   const projectMinBudget = projectBudget?.min;
+  const projectBudgetLg = ocBudget?.max && ocBudget.max > 1000;
+
   const projectBudgetAmt = (projectMaxBudget || projectMinBudget) ?? 0;
   const submissionCost = getOcPricing(projectBudgetAmt);
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
-  const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
+  const alreadyApproved =
+    (alreadyApprovedOC && alreadyApprovedEvent) ||
+    (alreadyApprovedEvent && eventOnly);
 
   // console.log(submissionCost);
   // console.log(finalStep, acceptedTerms, isAdmin);
@@ -373,9 +380,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   //
   // #region ------------- Console Logs --------------
-  // if (errors && Object.keys(errors).length > 0) {
-  //   console.log("errors", errors);
-  // }
+  if (errors && Object.keys(errors).length > 0) {
+    console.log("errors", errors);
+  }
   // console.log(
   //   isValid,
   //   validOrgWZod,
@@ -409,7 +416,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
     try {
       setValue("event.state", "submitted");
-      console.log(submissionCost?.price, orgHadFreeCall);
 
       await handleSave(true);
 
@@ -519,10 +525,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       if (!orgData?.contact?.primaryContact) {
         unregister("organization.contact");
         unregister("organization.links");
-        // console.log(getValues("organization"));
       }
       if (!hasOpenCall) {
-        // console.log("heya");
         unregister("openCall");
         setActiveStep((prev) => prev - 3);
       } else {
@@ -592,8 +596,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             hasOpenCall: !eventOnly ? "Fixed" : "False",
           },
         });
-        // console.log("waffles");
-        // console.log(currentValues, eventData);
       }
       canClearEventData.current = true;
     }
@@ -614,7 +616,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setError(path, { type: "manual", message: issue.message });
         });
 
-        // Prefer first user-meaningful message
         const userRelevantIssues = issues.filter(
           (i) =>
             i.message && !["Required", "Invalid input"].includes(i.message),
@@ -647,6 +648,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const handleSave = useCallback(
     async (direct = false, publish = false) => {
       if (pending) return;
+      console.log(formType, eventData.formType);
+
       setPending(true);
       const saveId = Symbol("save");
       latestSaveId.current = saveId;
@@ -903,6 +906,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
           try {
             const { event } = await createOrUpdateEvent({
+              formType,
               _id: eventData._id || "",
               name: eventData.name,
               slug:
@@ -1209,6 +1213,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
             reset({
               ...currentValues,
+              event: {
+                formType: eventData.formType || formType,
+                ...eventData,
+              },
               openCall: {
                 ...currentValues.openCall,
               },
@@ -1426,6 +1434,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     },
     [
       steps.length,
+
       projectBudget,
       isAdmin,
       finalStep,
@@ -1462,7 +1471,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       pending,
     ],
   );
-
+  //TODO: Find a cleaner way to clear this. I really don't like the page reload.
   const handleReset = () => {
     const newUrl = window.location.origin + window.location.pathname;
     window.history.replaceState({}, "", newUrl);
@@ -1483,6 +1492,29 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // useEffect(() => {
   //   console.log(formType, hasUserEditedForm);
   // }, [formType, hasUserEditedForm]);
+
+  useEffect(() => {
+    if (!initialFormType.current && hasEventId) {
+      initialFormType.current = formType;
+    }
+  }, [formType, hasEventId]);
+
+  useEffect(() => {
+    if (formType === 1 || !initialFormType.current) return;
+    if (projectBudgetLg && initialFormType.current < 3 && formType === 2) {
+      console.log("eh");
+      setFormType(3);
+      setValue("event.formType", 3);
+    } else if (
+      !projectBudgetLg &&
+      initialFormType.current < 3 &&
+      formType === 3
+    ) {
+      setFormType(2);
+      setValue("event.formType", 2);
+    }
+  }, [formType, projectBudgetLg, setValue]);
+
   useEffect(() => {
     if (eventFormType === undefined || eventFormType === 0 || formType !== 0)
       return;
@@ -1497,6 +1529,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     if (!preloadData) return;
     const { event, organization } = preloadData;
     preloadFlag.current = true;
+
     if (organization) {
       preloadOrgRef.current = true;
       setExistingOrg(organization);
@@ -1522,7 +1555,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   useEffect(() => {
     if (scrollTrigger) {
-      // console.log("scrolling");
       if (bottomRef.current) {
         bottomRef.current.scrollIntoView({ behavior: "smooth" });
         setScrollTrigger(false);
@@ -1536,17 +1568,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       setScrollTrigger(true);
     }
   }, [scrollTrigger, canNameEvent, activeStep, firstTimeOnStep, existingEvent]);
-
-  // useEffect(() => {
-  //   if (!schema || !hasUserEditedForm) return;
-  //   const serialized = JSON.stringify(errors);
-
-  //   // Only run handleCheckSchema if error content has changed
-  //   if (serialized !== prevErrorJson.current) {
-  //     prevErrorJson.current = serialized;
-  //     canCheckSchema.current = true;
-  //   }
-  // }, [schema, hasUserEditedForm, errors]);
 
   useEffect(() => {
     if (!schema || !hasUserEditedForm) return;
@@ -1569,7 +1590,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [errors, schema, hasUserEditedForm]);
 
   useEffect(() => {
-    // console.log(isStepValidZod, hasUserEditedForm, canCheckSchema.current);
     if (!canCheckSchema.current) {
       if (isStepValidZod) {
         canCheckSchema.current = true;
@@ -1590,6 +1610,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [isStepValidZod, hasUserEditedForm, handleCheckSchema]);
 
   //NOTE: Removing autosave for admin version of form. For now. I don't want to accidentally save over a submission while viewing it.
+  // TODO: Add back autosave for organizers once I have the errors fixed.
   // useEffect(() => {
   //   if (!isValid || !hasUserEditedForm || pending || activeStep === 0) return;
   //   const interval = setInterval(() => {
@@ -1615,35 +1636,37 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   //   return () => clearInterval(interval);
   // }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
 
+  //note-to-self: this was disabled today
+  // useEffect(() => {
+  //   if (!existingOrg) return;
+  //   if (existingOrg?._id === prevOrgRef.current?._id) return;
+  //   const orgReady =
+  //     existingOrg &&
+  //     typeof existingOrg._id === "string" &&
+  //     existingOrg._id.length > 0;
+
+  //   const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
+
+  //   if (orgChanged && !preloadOrgRef.current) {
+  //     // console.log("resetting");
+  //     setFurthestStep(0);
+  //     reset({
+  //       organization: {
+  //         ...existingOrg,
+  //       },
+  //       event: {
+  //         formType: 1,
+  //         name: "",
+  //       },
+  //     });
+  //     prevOrgRef.current = existingOrg;
+  //   } else {
+  //     setLastSaved(null);
+  //   }
+  // }, [existingOrg, reset]);
   useEffect(() => {
-    if (!existingOrg) return;
-    if (existingOrg?._id === prevOrgRef.current?._id) return;
-    const orgReady =
-      existingOrg &&
-      typeof existingOrg._id === "string" &&
-      existingOrg._id.length > 0;
+    if (prevEventRef.current?._id === existingEvent?._id) return;
 
-    const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
-
-    if (orgChanged && !preloadOrgRef.current) {
-      // console.log("resetting");
-      setFurthestStep(0);
-      reset({
-        organization: {
-          ...existingOrg,
-        },
-        event: {
-          formType: 1,
-          name: "",
-        },
-      });
-      prevOrgRef.current = existingOrg;
-    } else {
-      setLastSaved(null);
-    }
-  }, [existingOrg, reset]);
-
-  useEffect(() => {
     if (
       existingOrg &&
       existingEvent &&
@@ -2001,6 +2024,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
+                initialFormType={initialFormType.current}
               />
             )}
 

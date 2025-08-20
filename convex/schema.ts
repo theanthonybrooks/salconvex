@@ -356,7 +356,16 @@ const eventOpenCallSchema = {
   eventId: v.id("events"),
   openCallId: v.id("openCalls"),
   edition: v.number(),
-  state: v.optional(v.string()), //draft, submitted, published, archived
+  state: v.optional(
+    v.union(
+      v.literal("draft"),
+      v.literal("editing"),
+      v.literal("pending"),
+      v.literal("submitted"),
+      v.literal("published"),
+      v.literal("archived"),
+    ),
+  ),
   lastEdited: v.optional(v.number()),
 };
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
@@ -631,6 +640,7 @@ export default defineSchema({
     })
     .index("by_name", ["name"])
     .index("by_slug", ["slug"])
+    .index("by_slug_and_organizerId", ["slug", "organizerId"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_name_and_edition", ["name", "dates.edition"])

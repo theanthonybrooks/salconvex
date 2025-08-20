@@ -40,8 +40,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { EventType, SubmissionFormState } from "@/types/event";
-import { SubmissionFormState as OpenCallState } from "@/types/openCall";
+import { EventCategory, EventType, SubmissionFormState } from "@/types/event";
+import { OpenCallState } from "@/types/openCall";
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -208,33 +208,6 @@ export const columns: ColumnDef<Event>[] = [
       const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex justify-center">
-          {/* <div
-            className={cn(
-              "flex w-max items-center justify-center gap-1 rounded border p-2 px-4",
-              !ocState && "border-transparent",
-              ocState === "draft" && "bg-orange-200",
-              ocState === "pending" && "bg-indigo-100",
-              ocState === "submitted" && "bg-blue-200",
-              ocState === "published" && "bg-green-200",
-            )}
-          >
-            {ocState ? (
-              ocState === "draft" ? (
-                <FaRegFloppyDisk className="size-4 shrink-0" />
-              ) : ocState === "submitted" ? (
-                <CircleFadingPlus className="size-4 shrink-0" />
-              ) : ocState === "pending" ? (
-                <DollarSign className="size-4 shrink-0" />
-              ) : ocState === "published" ? (
-                <CheckCircle2 className="size-4 shrink-0" />
-              ) : (
-                <CheckCircle2 className="size-4 shrink-0" />
-              )
-            ) : (
-              ""
-            )}
-            <span className="capitalize">{ocState || "-"}</span>
-          </div> */}
           <DataTableAdminOrgStateActions
             eventId={event._id}
             state={ocState}
@@ -351,6 +324,7 @@ export const columns: ColumnDef<Event>[] = [
     enableResizing: false,
     cell: ({ row, table }) => {
       const event = row.original as Event;
+      const eventCategory = event.category as EventCategory;
       const state = event.state as SubmissionFormState;
       const isAdmin = table.options.meta?.isAdmin;
       const ocState = event.openCallState;
@@ -390,7 +364,12 @@ export const columns: ColumnDef<Event>[] = [
                 </DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
                 {/* NOTE: this is the 'View Event' link */}
-                <GoToEvent slug={slug} edition={edition} hasOpenCall={hasOC} />
+                <GoToEvent
+                  slug={slug}
+                  edition={edition}
+                  hasOpenCall={hasOC}
+                  category={eventCategory}
+                />
                 <DuplicateEvent eventId={event._id} />
                 {((state === "draft" && !eventApproved) || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />

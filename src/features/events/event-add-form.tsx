@@ -301,7 +301,9 @@ export const EventOCForm = ({
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
-  const alreadyApproved = alreadyApprovedOC || alreadyApprovedEvent;
+  const alreadyApproved =
+    (alreadyApprovedOC && alreadyApprovedEvent) ||
+    (alreadyApprovedEvent && eventOnly);
 
   const pastEvent = !!openCallEnd && openCallEnd < now && alreadyApproved;
   //note-to-self: this is what's hiding the open call sections from users (non-admins). The idea being that they shouldn't be able to change anything. Perhaps the better way would be to still show it, but have it disabled/read only? It's confusing at the moment.
@@ -1289,6 +1291,7 @@ export const EventOCForm = ({
 
             reset({
               ...currentValues,
+
               openCall: {
                 ...currentValues.openCall,
               },

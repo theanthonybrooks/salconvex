@@ -1,16 +1,35 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { SubmissionFormState } from "@/types/event";
-import { SubmissionFormState as OpenCallState } from "@/types/openCall";
-import { CheckCircle2, Circle, DollarSign, LucidePencil } from "lucide-react";
+import { EventCategory, SubmissionFormState } from "@/types/event";
+import { OpenCallState } from "@/types/openCall";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
+import {
+  CheckCircle2,
+  Circle,
+  DollarSign,
+  LucidePencil,
+  Pencil,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FaRegFloppyDisk } from "react-icons/fa6";
+import { FaRegCopy, FaRegFloppyDisk } from "react-icons/fa6";
+import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
-
-interface DataTableAdminProps {
-  eventId: Id<"events">;
+interface EventActionProps {
+  eventId: string;
+}
+interface DataTableAdminProps extends EventActionProps {
   userRole?: "user" | "admin";
+}
+
+interface OrgDuplicateOCActionProps {
+  openCallId: string;
+}
+interface OrgDuplicateEventActionProps extends EventActionProps {
+  category: EventCategory;
 }
 
 interface DataTableAdminStateProps extends DataTableAdminProps {
@@ -85,6 +104,8 @@ export const DataTableAdminOrgStateActions = ({
         {state ? (
           state === "draft" ? (
             <FaRegFloppyDisk className="size-4 shrink-0" />
+          ) : state === "editing" ? (
+            <Pencil className="size-4 shrink-0" />
           ) : state === "submitted" ? (
             <Circle className="size-4 shrink-0" />
           ) : state === "pending" ? (
@@ -100,5 +121,82 @@ export const DataTableAdminOrgStateActions = ({
         </span>
       </div>
     </TooltipSimple>
+  );
+};
+
+export const OrgDuplicateOC = ({ openCallId }: OrgDuplicateOCActionProps) => {
+  const duplicateOC = useMutation(api.openCalls.openCall.duplicateOC);
+  const router = useRouter();
+
+  const handleOpenCallDuplicate = async () => {
+    let newEventId = null;
+    try {
+      const result = await duplicateOC({
+        openCallId: openCallId as Id<"openCalls">,
+      });
+      toast.success("Open call duplicated successfully!", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+      newEventId = result?.event;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        // console.error(error.data);
+        toast.error(error.data ?? "Failed to duplicate open call");
+        return;
+      }
+      console.error("Failed to duplicate open call:", error);
+    } finally {
+      router.push(`/dashboard/organizer/update-event?_id=${newEventId}`);
+    }
+  };
+  return (
+    <DropdownMenuItem
+      onClick={handleOpenCallDuplicate}
+      className="flex items-center gap-x-1"
+    >
+      <FaRegCopy className="size-4" />
+      Duplicate Open Call
+    </DropdownMenuItem>
+  );
+};
+
+export const OrgDuplicateEvent = ({
+  eventId,
+  category,
+}: OrgDuplicateEventActionProps) => {
+  const duplicateEvent = useMutation(api.events.event.duplicateEvent);
+  const router = useRouter();
+
+  const handleEventDuplicate = async () => {
+    let newEventId = null;
+    try {
+      const result = await duplicateEvent({ eventId: eventId as Id<"events"> });
+      toast.success("Event duplicated successfully!", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+      newEventId = result?.event;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        // console.error(error.data);
+        toast.error(error.data ?? "Failed to duplicate event");
+        return;
+      }
+      console.error("Failed to duplicate event:", error);
+    } finally {
+      router.push(`/dashboard/organizer/update-event?_id=${newEventId}`);
+    }
+  };
+  return (
+    <DropdownMenuItem
+      onClick={handleEventDuplicate}
+      className="flex items-center gap-x-1"
+    >
+      <FaRegCopy className="size-4" />
+      Duplicate {getEventCategoryLabelAbbr(category)}
+    </DropdownMenuItem>
   );
 };
