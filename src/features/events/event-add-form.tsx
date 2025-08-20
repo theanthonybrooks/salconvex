@@ -1510,9 +1510,17 @@ export const EventOCForm = ({
         if (latestSaveId.current === saveId) {
           setPending(false);
         }
+        if (isAdmin && publish) {
+          toast.success("Published!");
+          setTimeout(() => {
+            setOpen(false);
+          }, 1500);
+        }
       }
     },
     [
+      isAdmin,
+      setOpen,
       steps.length,
       projectBudget,
       paidCall,

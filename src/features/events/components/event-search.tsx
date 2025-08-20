@@ -49,6 +49,7 @@ export function EventNameSearch({
           "h-12 border-foreground text-base",
           className,
           isExisting && "border-red-600 ring-red-600",
+          isAdmin && "pr-10",
         )}
         placeholder={placeholder}
         tabIndex={tabIndex}
