@@ -25,7 +25,7 @@ import { Command } from "cmdk";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { debounce } from "lodash";
+import { debounce, random } from "lodash";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -561,7 +561,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                       >
                         {groupItems.map((item) => (
                           <Command.Item
-                            key={item.path}
+                            key={`${item.path}-${random(10)}`}
                             className="group flex cursor-pointer items-center rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
                             onSelect={() => {
                               router.push(item.path || "/thelist");
