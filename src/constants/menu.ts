@@ -11,6 +11,7 @@ export interface FullPageNavMenuItem {
   public?: boolean;
   view?: string;
   sub?: string[];
+  excluded?: string[];
 }
 
 interface FullPageNavMenuSection {
@@ -82,8 +83,77 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       // },
     ],
   },
+  // {
+  //   title: "Dashboard",
+  //   items: [
+  //     {
+  //       title: "My Dashboard",
+  //       path: "/dashboard",
+  //       category: "dashboard",
+  //       public: false,
+  //       view: "dashboard",
+  //       userType: ["artist", "judge"],
+  //       sub: ["active", "trialing"],
+  //     },
+
+  //     {
+  //       title: "My Applications",
+  //       path: "/dashboard/artist",
+  //       category: "dashboard",
+  //       public: false,
+  //       view: "dashboard",
+  //       userType: ["artist"],
+  //       sub: ["active", "trialing"],
+  //     },
+  //     // {
+  //     //   title: "Projects & Events",
+  //     //   path: "/dashboard/events",
+  //     //   category: "dashboard",
+  //     //   public: false,
+  //     //   view: "dashboard",
+  //     //   userType: ["organizer", "judge"],
+  //     // },
+  //     {
+  //       title: "Bookmarks",
+  //       path: "/dashboard/artist/bookmarks",
+  //       category: "dashboard",
+  //       public: false,
+  //       view: "dashboard",
+  //       userType: ["artist"],
+  //       sub: ["active", "trialing"],
+  //     },
+  //     {
+  //       title: "Hidden",
+  //       path: "/dashboard/artist/hidden",
+  //       category: "dashboard",
+  //       public: false,
+  //       view: "dashboard",
+  //       userType: ["artist"],
+  //       sub: ["active", "trialing"],
+  //     },
+  //     {
+  //       title: "Account",
+  //       path: "/dashboard/account/billing",
+  //       category: "dashboard",
+  //       public: false,
+  //       view: "dashboard",
+  //       userType: ["artist"],
+  //       sub: ["active", "trialing"],
+  //     },
+  //     {
+  //       title: "Settings",
+  //       path: "/dashboard/account/settings",
+  //       category: "dashboard",
+  //       public: false,
+  //       view: "dashboard",
+  //       userType: ["artist", "judge"],
+  //       sub: ["active", "trialing"],
+  //     },
+  //   ],
+  // },
+
   {
-    title: "Dashboard",
+    title: "Artist",
     items: [
       {
         title: "My Dashboard",
@@ -91,9 +161,10 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["organizer", "artist", "judge"],
+        userType: ["artist", "judge"],
         sub: ["active", "trialing"],
       },
+
       {
         title: "My Applications",
         path: "/dashboard/artist",
@@ -103,14 +174,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["artist"],
         sub: ["active", "trialing"],
       },
-      // {
-      //   title: "Projects & Events",
-      //   path: "/dashboard/events",
-      //   category: "dashboard",
-      //   public: false,
-      //   view: "dashboard",
-      //   userType: ["organizer", "judge"],
-      // },
+
       {
         title: "Bookmarks",
         path: "/dashboard/artist/bookmarks",
@@ -129,14 +193,26 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["artist"],
         sub: ["active", "trialing"],
       },
+    ],
+  },
+  {
+    title: "Organizer",
+    items: [
       {
-        title: "Account",
-        path: "/dashboard/account/billing",
+        title: "My Events/Projects",
+        path: "/dashboard/organizer/events",
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["artist"],
-        sub: ["active", "trialing"],
+        userType: ["organizer"],
+      },
+      {
+        title: "My Dashboard",
+        path: "/dashboard/organizer",
+        category: "dashboard",
+        public: false,
+        view: "dashboard",
+        userType: ["organizer"],
       },
       {
         title: "Settings",
@@ -144,9 +220,18 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "dashboard",
         public: false,
         view: "dashboard",
-        userType: ["organizer", "artist", "judge"],
-        sub: ["active", "trialing"],
+        userType: ["organizer"],
+        excluded: ["artist"],
       },
+      // {
+      //   title: "Submit",
+      //   path: "/submit",
+      //   category: "dashboard",
+      //   public: false,
+      //   view: "dashboard",
+      //   userType: ["organizer"],
+      //   excluded: ["artist"],
+      // },
     ],
   },
 
@@ -221,6 +306,29 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "admin",
         public: false,
         userType: ["admin"],
+      },
+    ],
+  },
+  {
+    title: "My Account",
+    items: [
+      {
+        title: "Billing",
+        path: "/dashboard/account/billing",
+        category: "dashboard",
+        public: false,
+        view: "dashboard",
+        userType: ["artist"],
+        sub: ["active", "trialing"],
+      },
+      {
+        title: "Settings",
+        path: "/dashboard/account/settings",
+        category: "dashboard",
+        public: false,
+        view: "dashboard",
+        userType: ["artist", "judge"],
+        sub: ["active", "trialing"],
       },
     ],
   },

@@ -512,6 +512,7 @@ const FullPageNav = ({
                   const filteredItems = section.items.filter((item) => {
                     const itemUserType = item?.userType;
                     const itemCategory = item?.category;
+                    const itemExcluded = item?.excluded;
                     const itemSub = item?.sub;
 
                     const adminMatch = isAdmin && itemCategory === "admin";
@@ -525,15 +526,26 @@ const FullPageNav = ({
                           userType.toLowerCase() === type.toLowerCase(),
                       ),
                     );
+                    const excludedMatch = user?.accountType?.some((type) =>
+                      itemExcluded?.some(
+                        (excluded) =>
+                          excluded.toLowerCase() === type.toLowerCase(),
+                      ),
+                    );
+                    // const excludedMatch = itemExcluded?.some(
+                    //   (excluded) =>
+                    //     excluded.toLowerCase() === excluded?.toLowerCase(),
+                    // );
                     const subMatch = itemSub?.some(
                       (sub) => sub.toLowerCase() === subStatus?.toLowerCase(),
                     );
 
                     return (
-                      isPublic ||
-                      (typeMatch && subMatch) ||
-                      adminMatch ||
-                      organizerMatch
+                      (isPublic ||
+                        (typeMatch && subMatch) ||
+                        adminMatch ||
+                        organizerMatch) &&
+                      !excludedMatch
                     );
                   });
 
@@ -733,6 +745,7 @@ const FullPageNav = ({
                           const filteredItems = section.items.filter((item) => {
                             const itemUserType = item?.userType;
                             const itemCategory = item?.category;
+                            const itemExcluded = item?.excluded;
                             const itemSub = item?.sub;
                             const adminMatch =
                               isAdmin && itemCategory === "admin";
@@ -747,16 +760,25 @@ const FullPageNav = ({
                                   userType.toLowerCase() === type.toLowerCase(),
                               ),
                             );
+                            const excludedMatch = user?.accountType?.some(
+                              (type) =>
+                                itemExcluded?.some(
+                                  (excluded) =>
+                                    excluded.toLowerCase() ===
+                                    type.toLowerCase(),
+                                ),
+                            );
                             const subMatch = itemSub?.some(
                               (sub) =>
                                 sub.toLowerCase() === subStatus?.toLowerCase(),
                             );
 
                             return (
-                              isPublic ||
-                              (typeMatch && subMatch) ||
-                              adminMatch ||
-                              organizerMatch
+                              (isPublic ||
+                                (typeMatch && subMatch) ||
+                                adminMatch ||
+                                organizerMatch) &&
+                              !excludedMatch
                             );
                           });
 
@@ -834,6 +856,7 @@ const FullPageNav = ({
                           .filter((item) => {
                             const itemUserType = item?.userType;
                             const itemCategory = item?.category;
+                            const itemExcluded = item?.excluded;
                             const itemSub = item?.sub;
                             const adminMatch =
                               isAdmin && itemCategory === "admin";
@@ -848,6 +871,14 @@ const FullPageNav = ({
                                   userType.toLowerCase() === type.toLowerCase(),
                               ),
                             );
+                            const excludedMatch = user?.accountType?.some(
+                              (type) =>
+                                itemExcluded?.some(
+                                  (excluded) =>
+                                    excluded.toLowerCase() ===
+                                    type.toLowerCase(),
+                                ),
+                            );
 
                             const subMatch = itemSub?.some(
                               (sub) =>
@@ -855,10 +886,11 @@ const FullPageNav = ({
                             );
 
                             return (
-                              isPublic ||
-                              (typeMatch && subMatch) ||
-                              adminMatch ||
-                              organizerMatch
+                              (isPublic ||
+                                (typeMatch && subMatch) ||
+                                adminMatch ||
+                                organizerMatch) &&
+                              !excludedMatch
                             );
                           })
                           .map((item) => (

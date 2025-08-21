@@ -4,7 +4,8 @@
     "Submission Form",
     "Search",
     "Open Call View",
-    "Settings Menu"
+    "Settings Menu",
+    "Main Menu"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }
