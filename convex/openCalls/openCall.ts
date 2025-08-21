@@ -227,20 +227,12 @@ export const createOrUpdateOpenCall = mutation({
     });
 
     const ocApproved = existingOpenCall?.approvedBy || args.approved;
+    // const ocState = existingOpenCall?.state || args.state;
+    const ocPaid = existingOpenCall?.paid || args.paid;
 
     const isAdmin = user?.role?.includes("admin");
-    // console.log(args.approved, args.finalStep, args.state);
-    // const ocState = isAdmin
-    //   ? args.finalStep && ocApproved
-    //     ? "published"
-    //     : !args.finalStep && ocApproved
-    //       ? "draft"
-    //       : "submitted"
-    //   : args.finalStep && !args.paid
-    //     ? "pending"
-    //     : args.state;
 
-    const ocState = isAdmin
+    const openCallState = isAdmin
       ? args.finalStep
         ? "published"
         : ocApproved
@@ -251,7 +243,9 @@ export const createOrUpdateOpenCall = mutation({
           ? "submitted"
           : "editing"
         : args.finalStep
-          ? "pending"
+          ? ocPaid
+            ? "submitted"
+            : "pending"
           : "draft";
 
     //todo: utilize the patch in stripe subscriptions to update the state from pending to submitted when it's paid
@@ -269,7 +263,7 @@ export const createOrUpdateOpenCall = mutation({
         links: args.requirements.links ?? [],
       },
       documents: ocDocs,
-      state: ocState as OpenCallState,
+      state: openCallState as OpenCallState,
       lastUpdatedBy: userId,
       lastUpdatedAt: Date.now(),
       paid: args.paid ?? false,
@@ -288,7 +282,7 @@ export const createOrUpdateOpenCall = mutation({
       await ctx.db.patch(lookup.openCallId, openCallData);
       await ctx.db.patch(lookup._id, {
         edition: args.basicInfo.dates.edition,
-        state: ocState,
+        state: openCallState,
         lastEdited: Date.now(),
       });
       // console.log("lookup updated", lookup, openCallData);
@@ -307,10 +301,11 @@ export const createOrUpdateOpenCall = mutation({
           eventId: args.eventId,
           openCallId: args.openCallId,
           edition: args.basicInfo.dates.edition,
-          state: ocState,
+          state: openCallState,
         });
         // console.log("existing updated", existing, openCallData);
         return openCallData;
+      } else {
       }
 
       throw new ConvexError("Provided openCallId does not exist.");
@@ -323,7 +318,7 @@ export const createOrUpdateOpenCall = mutation({
       eventId: args.eventId,
       openCallId: newId,
       edition: args.basicInfo.dates.edition,
-      state: ocState,
+      state: openCallState,
     });
 
     console.log(openCallData);
@@ -345,6 +340,19 @@ export const getOpenCallByOrgId = query({
       .collect();
 
     return openCalls;
+  },
+});
+
+export const getOpenCallLookupByOCId = query({
+  args: {
+    openCallId: v.id("openCalls"),
+  },
+  handler: async (ctx, args) => {
+    const ocLookup = await ctx.db
+      .query("eventOpenCalls")
+      .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
+      .first();
+    return ocLookup;
   },
 });
 

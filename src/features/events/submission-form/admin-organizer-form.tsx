@@ -48,6 +48,7 @@ import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
 import { getSteps } from "@/features/events/event-add-form";
+import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
@@ -244,6 +245,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   const eventName = eventData?.name;
   const eventSlug = eventData?.slug;
+  const eventCategory = eventData?.category;
+
   // const eventLogo = eventData?.logo;
 
   const clearEventDataTrigger =
@@ -457,8 +460,12 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           newTab.document.close();
           newTab.location.href = url;
         }
-      } else {
+      } else if (paidCall && alreadyPaid) {
         //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
+        // handleReset();
+        toast.success(
+          `You've successfully updated your ${getEventCategoryLabelAbbr(eventCategory)}!`,
+        );
       }
       setTimeout(() => {
         window.location.href = `/thelist/event/${submissionUrl}`;
@@ -648,7 +655,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const handleSave = useCallback(
     async (direct = false, publish = false) => {
       if (pending) return;
-      console.log(formType, eventData.formType);
 
       setPending(true);
       const saveId = Symbol("save");

@@ -53,7 +53,7 @@ export function UserProfile({
   const userRole = user?.role;
   const accountType = user?.accountType;
   const isArtist = accountType?.includes("artist") ?? false;
-  // const isOrganizer = accountType?.includes("organizer") ?? false;
+  const isOrganizer = accountType?.includes("organizer") ?? false;
   const isAdmin = userRole?.includes("admin");
   const hasActiveSub = subData?.hasActiveSubscription;
   const subStatus = subData?.subStatus;
@@ -189,6 +189,17 @@ export function UserProfile({
                 </DropdownMenuItem>
               </Link>
             </>
+          )}
+          {isOrganizer && (
+            <Link
+              href="/dashboard/organizer/events"
+              className="underline-offset-2 hover:cursor-pointer hover:underline"
+            >
+              <DropdownMenuItem className="focus:bg-salYellow/50">
+                <LucideLayoutDashboard className="mr-2 size-4" />
+                <span>Org Dashboard</span>
+              </DropdownMenuItem>
+            </Link>
           )}
           {subStatus === "canceled" && isArtist && (
             <Link

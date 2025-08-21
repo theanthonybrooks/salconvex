@@ -43,7 +43,10 @@ import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/subm
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
 import { toSeason, toYear, toYearMonth } from "@/lib/dateFns";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import {
+  getEventCategoryLabel,
+  getEventCategoryLabelAbbr,
+} from "@/lib/eventFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
 import { cn } from "@/lib/utils";
@@ -315,6 +318,7 @@ export const EventOCForm = ({
 
   const eventName = eventData?.name;
   const eventSlug = eventData?.slug;
+  const eventCategory = eventData?.category;
   // const eventLogo = eventData?.logo;
 
   const clearEventDataTrigger =
@@ -515,10 +519,12 @@ export const EventOCForm = ({
           // onClick();
           // onClick()
         }
-      } else {
+      } else if (paidCall && alreadyPaid) {
         //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
         // handleReset();
-        setTimeout(() => {}, 1000);
+        toast.success(
+          `You've successfully updated your ${getEventCategoryLabel(eventCategory)}!`,
+        );
       }
       setTimeout(() => {
         setOpen(false);

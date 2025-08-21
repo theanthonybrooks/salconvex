@@ -520,6 +520,20 @@ export const subscriptionStoreWebhook = mutation({
               paidAt: createdAt,
               state: paymentStatus === "paid" ? "submitted" : "pending",
             });
+            if (paymentStatus === "paid") {
+              const ocLookup = await ctx.runQuery(
+                api.openCalls.openCall.getOpenCallLookupByOCId,
+                {
+                  openCallId: metadata.openCallId,
+                },
+              );
+              if (ocLookup) {
+                await ctx.db.patch(ocLookup._id, {
+                  lastEdited: createdAt,
+                  state: "submitted",
+                });
+              }
+            }
           } else if (metadata?.accountType === "artist") {
             await ctx.db.patch(existingUser._id, {
               subscription: `${metadata.interval}ly-${metadata.plan}`,
