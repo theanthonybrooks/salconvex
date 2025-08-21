@@ -3,7 +3,8 @@
     "Footer/Layout",
     "Submission Form",
     "Search",
-    "Open Call View"
+    "Open Call View",
+    "Settings Menu"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -1143,46 +1143,51 @@ export default function SettingsPage() {
                     </Button>
                   </div>
                   <Separator />
-                  <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
-                    <div>
-                      <p className="font-medium">Other Sessions</p>
-                      <p className="text-sm text-muted-foreground">
-                        {sessionCount ?? 0} active session
-                        {sessionCount && sessionCount > 1 ? "s" : ""}
-                      </p>
-                    </div>
+                  {isAdmin && (
+                    <>
+                      <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                        <div>
+                          <p className="font-medium">Other Sessions</p>
+                          <p className="text-sm text-muted-foreground">
+                            {sessionCount ?? 0} active session
+                            {sessionCount && sessionCount > 1 ? "s" : ""}
+                          </p>
+                        </div>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full min-w-[150px] font-bold text-red-600 sm:w-auto"
-                        >
-                          Sign Out All
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-foreground">
-                            Sign out all sessions?
-                          </AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <AlertDialogDescription className="text-foreground">
-                          Are you sure you want to sign out of all your
-                          sessions? You&apos;ll need to re-login on all devices.
-                        </AlertDialogDescription>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-full min-w-[150px] font-bold text-red-600 sm:w-auto"
+                            >
+                              Sign Out All
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="text-foreground">
+                                Sign out all sessions?
+                              </AlertDialogTitle>
+                            </AlertDialogHeader>
+                            <AlertDialogDescription className="text-foreground">
+                              Are you sure you want to sign out of all your
+                              sessions? You&apos;ll need to re-login on all
+                              devices.
+                            </AlertDialogDescription>
 
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleDeleteSessions}>
-                            Yes, sign out all
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                  <Separator />
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleDeleteSessions}>
+                                Yes, sign out all
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                      <Separator />
+                    </>
+                  )}
                   <div className="flex flex-col items-start justify-start gap-y-2 rounded-lg bg-destructive/10 p-4 md:flex-row md:items-center md:justify-between md:gap-x-4 md:gap-y-0">
                     <div>
                       <p className="font-medium">Delete Account</p>
