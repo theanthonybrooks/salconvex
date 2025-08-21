@@ -169,26 +169,15 @@ export function UserProfile({
           )}
 
           {hasActiveSub && (
-            <>
-              <Link
-                href="/dashboard/"
-                className="underline-offset-2 hover:cursor-pointer hover:underline"
-              >
-                <DropdownMenuItem className="focus:bg-salYellow/50">
-                  <LucideLayoutDashboard className="mr-2 size-4" />
-                  <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
-                </DropdownMenuItem>
-              </Link>
-              <Link
-                href="/dashboard/account/billing"
-                className="underline-offset-2 hover:cursor-pointer hover:underline"
-              >
-                <DropdownMenuItem className="focus:bg-salYellow/50">
-                  <PiPiggyBank className="mr-2 size-4" />
-                  <span>Manage Membership</span>
-                </DropdownMenuItem>
-              </Link>
-            </>
+            <Link
+              href="/dashboard/"
+              className="underline-offset-2 hover:cursor-pointer hover:underline"
+            >
+              <DropdownMenuItem className="focus:bg-salYellow/50">
+                <LucideLayoutDashboard className="mr-2 size-4" />
+                <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
+              </DropdownMenuItem>
+            </Link>
           )}
           {isOrganizer && (
             <Link
@@ -201,6 +190,18 @@ export function UserProfile({
               </DropdownMenuItem>
             </Link>
           )}
+          {hasActiveSub && (
+            <Link
+              href="/dashboard/account/billing"
+              className="underline-offset-2 hover:cursor-pointer hover:underline"
+            >
+              <DropdownMenuItem className="focus:bg-salYellow/50">
+                <PiPiggyBank className="mr-2 size-4" />
+                <span>Manage Membership</span>
+              </DropdownMenuItem>
+            </Link>
+          )}
+
           {subStatus === "canceled" && isArtist && (
             <Link
               href="/pricing#plans"
