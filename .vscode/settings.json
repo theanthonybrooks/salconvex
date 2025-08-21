@@ -5,7 +5,8 @@
     "Search",
     "Open Call View",
     "Settings Menu",
-    "Main Menu"
+    "Main Menu",
+    "Styling"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }
