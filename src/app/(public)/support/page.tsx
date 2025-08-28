@@ -215,7 +215,7 @@ const SupportPage = () => {
           className={cn("mx-auto flex max-w-[90vw] flex-col gap-3 md:max-w-lg")}
         >
           <p className="text-2xl font-medium text-foreground">
-            Having some ideas for the site or want to work together?
+            Have some ideas for the site or want to work together?
           </p>
           <p>
             The team is currently quite small (just me), and I might take a few
