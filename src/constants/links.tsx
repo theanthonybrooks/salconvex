@@ -31,7 +31,6 @@ import { BsPersonVcard } from "react-icons/bs";
 
 import { TbBrandPatreon } from "react-icons/tb";
 
-import { supportEmail } from "@/constants/siteInfo";
 import { JSX } from "react";
 import { IconType } from "react-icons";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
@@ -507,7 +506,7 @@ export const dashboardNavItems: DashNavItem[] = [
 
   {
     label: "Help & Support",
-    href: `mailto:${supportEmail}?subject=Help%20Request`,
+    href: "/support",
     icon: HelpCircle,
     desc: "Get assistance",
     sub: ["all"],
