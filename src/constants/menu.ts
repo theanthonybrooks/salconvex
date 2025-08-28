@@ -1,4 +1,3 @@
-import { infoEmail } from "@/constants/siteInfo";
 import { LucideIcon } from "lucide-react";
 
 export interface FullPageNavMenuItem {
@@ -351,7 +350,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       },
       {
         title: "Contact",
-        path: `mailto:${infoEmail}&subject=Site%20Contact`,
+        path: "/support",
         category: "about",
         public: true,
         userType: ["public"],
