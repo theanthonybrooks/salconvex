@@ -1,13 +1,14 @@
 import { siteUrl } from "@/constants/siteInfo";
 import { getFourCharMonth } from "@/lib/dateFns";
 import { getEventCategoryLabel } from "@/lib/eventFns";
+import { cleanInput } from "@/lib/utils";
 import { EventCategory } from "@/types/event";
 import slugify from "slugify";
 
 export const generateICSFile = (
   title: string,
-  ocStartDate: string,
-  ocEndDate: string,
+  displayStartDate: string,
+  displayEndDate: string,
   location: string,
   description: string,
   eventCategory: EventCategory,
@@ -33,7 +34,7 @@ export const generateICSFile = (
     const startDate = new Date(start);
     const endDate = new Date(end);
     const startMonth = getFourCharMonth(startDate);
-    const startDay = startDate.getDate() || null; // Handle falsy values
+    const startDay = startDate.getDate() || null;
     const startYear = startDate.getFullYear();
     const endMonth = getFourCharMonth(endDate);
     const endDay = endDate.getDate();
@@ -58,30 +59,31 @@ export const generateICSFile = (
   let formattedEnd: string | null = null;
   let formattedDateFull: string | null = null;
 
-  const formattedIsoOcStart = formatIsoDate(ocStartDate);
-  const formattedIsoOcEnd = formatIsoDate(ocEndDate);
+  const formattedIsoDisplayStart = formatIsoDate(displayStartDate);
+  const formattedIsoDisplayEnd = formatIsoDate(displayEndDate);
 
   formattedStart = startDate && !endDate ? formatDate(startDate) : "";
   formattedEnd = endDate && !startDate ? formatDate(endDate) : "";
   formattedDateFull =
     startDate && endDate ? formatDates(startDate, endDate) : "";
-
-  const descriptionWithEventDates = startDate
-    ? `${getEventCategoryLabel(eventCategory)} Dates: ${
-        formattedStart
-          ? formattedStart
-          : formattedEnd
-            ? formattedEnd
-            : formattedDateFull
-      }\n\n ${description}`
-    : description;
+  const descriptionWithEventDates = cleanInput(
+    startDate
+      ? `${getEventCategoryLabel(eventCategory)} Dates: ${
+          formattedStart
+            ? formattedStart
+            : formattedEnd
+              ? formattedEnd
+              : formattedDateFull
+        }\n\n ${description}`
+      : description,
+  );
   const urlBase = `event/${slug}/${thisYear}`;
   const urlFormatted = url
     ? `${siteUrl[0]}/thelist/${isOpenCall ? `${urlBase}/call` : urlBase}`
     : "";
 
-  // console.log("formattedIsoOcStart", formattedIsoOcStart)
-  // console.log("formattedIsoOcEnd", formattedIsoOcEnd)
+  // console.log("formattedIsoDisplayStart", formattedIsoDisplayStart)
+  // console.log("formattedIsoDisplayEnd", formattedIsoDisplayEnd)
   // console.log("formattedIsoStart", formattedIsoStart)
   // console.log("formattedIsoEnd", formattedIsoEnd)
   // console.log(urlFormatted);
@@ -91,8 +93,8 @@ VERSION:2.0
 PRODID:-//YourApp//EN
 BEGIN:VEVENT
 SUMMARY:${title}
-DTSTART:${formattedIsoOcStart}
-DTEND:${formattedIsoOcEnd}
+DTSTART:${formattedIsoDisplayStart}
+DTEND:${formattedIsoDisplayEnd}
 DESCRIPTION:${descriptionWithEventDates}
 LOCATION:${location}
 URL:${url ? urlFormatted : ""}

@@ -6,7 +6,8 @@
     "Open Call View",
     "Settings Menu",
     "Main Menu",
-    "Styling"
+    "Styling",
+    "Pricing"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

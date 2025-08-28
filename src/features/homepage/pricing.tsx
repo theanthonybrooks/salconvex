@@ -33,7 +33,7 @@ import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 
 type SwitchProps = {
-  onSwitch: (value: string) => void;
+  onSwitchAction: (value: string) => void;
 };
 
 type PricingCardProps = {
@@ -116,7 +116,7 @@ const PricingHeader = ({
 
 //------------------- Pricing Switch -----------------------//
 
-export const PricingSwitch = ({ onSwitch }: SwitchProps) => {
+export const PricingSwitch = ({ onSwitchAction }: SwitchProps) => {
   const [activeTab, setActiveTab] = useState("0");
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -131,7 +131,7 @@ export const PricingSwitch = ({ onSwitch }: SwitchProps) => {
         defaultValue="0"
         className="relative w-[400px]"
         onValueChange={(val) => {
-          onSwitch(val);
+          onSwitchAction(val);
           setActiveTab(val);
         }}
       >
@@ -168,7 +168,7 @@ export const PricingSwitch = ({ onSwitch }: SwitchProps) => {
     </div>
   );
 };
-export const OpenCallSwitch = ({ onSwitch }: SwitchProps) => {
+export const OpenCallSwitch = ({ onSwitchAction }: SwitchProps) => {
   const [activeTab, setActiveTab] = useState("0");
   const [hasMounted, setHasMounted] = useState(false);
   const ocOptions = [
@@ -187,7 +187,7 @@ export const OpenCallSwitch = ({ onSwitch }: SwitchProps) => {
         defaultValue="0"
         className="relative w-[400px]"
         onValueChange={(val) => {
-          onSwitch(val);
+          onSwitchAction(val);
           setActiveTab(val);
         }}
       >
@@ -229,17 +229,17 @@ export const OpenCallSwitch = ({ onSwitch }: SwitchProps) => {
 
 export const AccountTypeSwitch = ({
   isArtist,
-  setSelectedAccountType,
+  setSelectedAccountTypeAction,
   orgAccount,
   // selectedAccountType,
-  setIsYearly,
+  setIsYearlyAction,
   hasSub,
 }: {
   isArtist: boolean;
-  setSelectedAccountType: (value: string) => void;
+  setSelectedAccountTypeAction: (value: string) => void;
   selectedAccountType: string;
   orgAccount: boolean;
-  setIsYearly: (value: boolean) => void;
+  setIsYearlyAction: (value: boolean) => void;
   hasSub: boolean;
 }) => {
   return (
@@ -262,8 +262,8 @@ export const AccountTypeSwitch = ({
           variant="salWithShadowHidden"
           size="lg"
           onClick={() => {
-            setSelectedAccountType(isArtist ? "organizer" : "artist");
-            setIsYearly(false);
+            setSelectedAccountTypeAction(isArtist ? "organizer" : "artist");
+            setIsYearlyAction(false);
             // window.scrollTo({ top: 0, behavior: "smooth" });
             // const firstCard = document.querySelector(".pricing-card");
             // if (firstCard) {
@@ -452,7 +452,8 @@ const PricingCard = ({
                 isArtist ? (
                   `$${
                     isYearly
-                      ? (prices.year?.usd?.amount?.toFixed(0) ?? "N/A")
+                      ? (((prices.year?.usd?.amount ?? 0) / 12).toFixed(2) ??
+                        "N/A")
                       : (prices.month?.usd?.amount?.toFixed(0) ?? "N/A")
                   }`
                 ) : (
@@ -480,9 +481,14 @@ const PricingCard = ({
             </span>
 
             <span className={cn("text-muted-foreground")}>
-              {isArtist && (isYearly ? "/year" : "/month")}
+              {isArtist && "/month"}
             </span>
           </div>
+          {isArtist && isYearly && (
+            <p className={cn("mt-1 text-muted-foreground")}>
+              ( ${prices.year?.usd?.amount?.toFixed(0) ?? "N/A"} billed yearly )
+            </p>
+          )}
           {(!user || isEligibleForFree) && !isFree && isOrganizer && (
             <p className="mt-4 text-lg text-foreground text-green-600">
               First Open Call is free
@@ -626,7 +632,7 @@ export default function Pricing() {
               title="Choose Your Plan"
               subtitle="All plans include a 14-day free trial."
             />
-            <PricingSwitch onSwitch={togglePricingPeriod} />
+            <PricingSwitch onSwitchAction={togglePricingPeriod} />
           </>
         )}
 
@@ -652,7 +658,7 @@ export default function Pricing() {
                 )
               }
             />
-            <OpenCallSwitch onSwitch={toggleOpenCall} />
+            <OpenCallSwitch onSwitchAction={toggleOpenCall} />
           </>
         )}
 
@@ -741,10 +747,10 @@ export default function Pricing() {
 
         <AccountTypeSwitch
           isArtist={isArtist}
-          setSelectedAccountType={setSelectedAccountType}
+          setSelectedAccountTypeAction={setSelectedAccountType}
           selectedAccountType={selectedAccountType}
           orgAccount={orgAccountType}
-          setIsYearly={setIsYearly}
+          setIsYearlyAction={setIsYearly}
           hasSub={hasSub}
         />
 

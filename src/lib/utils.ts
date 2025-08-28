@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import sanitizeHtml from "sanitize-html";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -25,4 +26,11 @@ export function arraysShareValue<T>(arr1: T[], arr2: T[]): boolean {
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function cleanInput(input: string): string {
+  return sanitizeHtml(input, {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
 }
