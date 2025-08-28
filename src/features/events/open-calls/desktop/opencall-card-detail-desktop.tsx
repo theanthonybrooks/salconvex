@@ -345,6 +345,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   userPref={userPref}
                   id={event._id}
                   openCallId={openCallId}
+                  openCallState={openCallState ?? null}
                   mainOrgId={mainOrgId}
                   slug={slug}
                   appUrl={outputAppLink}
@@ -369,7 +370,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   onClick={onHide}
                 >
                   {hidden ? "Marked" : "Mark"} as not interested
-                  {!hidden ? "?" : "."}
+                  {!hidden && "?"}
                 </p>
               </>
             )}
@@ -379,6 +380,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 userPref={userPref}
                 id={event._id}
                 openCallId={openCallId}
+                openCallState={openCallState ?? null}
                 mainOrgId={mainOrgId}
                 slug={slug}
                 appUrl={outputAppLink}
@@ -569,7 +571,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 orgPreview={isOwner}
                 id={event._id}
                 openCallId={openCallId}
-                openCallState={openCallState}
+                openCallState={openCallState ?? null}
                 slug={slug}
                 appUrl={outputAppLink}
                 edition={event.dates.edition}

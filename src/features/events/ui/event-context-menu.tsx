@@ -51,9 +51,9 @@ interface EventContextMenuProps {
   // onHide: () => void;
   appLink?: string;
   eventId: string;
-  openCallId: string;
   eventState?: EventState;
-  openCallState?: OpenCallState;
+  openCallId: string;
+  openCallState: OpenCallState | null;
   isHidden: boolean;
   // setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
   appStatus: ApplicationStatus | null;
@@ -125,7 +125,10 @@ const EventContextMenu = ({
     mainOrgId ? { orgId: mainOrgId, eventId: eventId as Id<"events"> } : "skip",
   );
 
-  const isOwner = user?.email === orgOwnerEmailData?.orgOwnerEmail;
+  const isOwner =
+    typeof user?.email === "string" &&
+    user?.email === orgOwnerEmailData?.orgOwnerEmail;
+
   const nonAdminPublicView = publicView && !isAdmin && !orgPreview;
 
   return (
@@ -153,16 +156,13 @@ const EventContextMenu = ({
       </TooltipSimple>
       <PopoverContent
         showCloseButton={false}
-        className="max-w-max border-1.5 p-0 text-sm"
+        className="z-[19] max-w-max border-1.5 p-0 text-sm"
         align={align}
       >
         <p className="py-2 pl-4 font-bold">More options</p>
         <Separator />
         <div className="flex flex-col gap-y-1 pb-2">
-          {((openCallStatus === "active" &&
-            (openCallState === "published" || openCallState === "archived") &&
-            !isOwner) ||
-            (isAdmin && !reviewMode)) && (
+          {(!isOwner || (isAdmin && !reviewMode)) && (
             <>
               <div
                 onClick={onHide}
@@ -175,7 +175,7 @@ const EventContextMenu = ({
                   <span className="flex items-center gap-x-1 capitalize">
                     <EyeOff className="size-4" />
                     Unhide{" "}
-                    {openCallId !== ""
+                    {openCallId !== "" && openCallStatus === "active"
                       ? "Open Call"
                       : getEventCategoryLabel(eventCategory)}
                   </span>
@@ -183,35 +183,39 @@ const EventContextMenu = ({
                   <span className="flex items-center gap-x-1 capitalize">
                     <Eye className="size-4" />
                     Hide{" "}
-                    {openCallId !== ""
+                    {openCallId !== "" && openCallStatus === "active"
                       ? "Open Call"
                       : getEventCategoryLabel(eventCategory)}
                   </span>
                 )}
               </div>
 
-              <div
-                onClick={onApply}
-                className={cn(
-                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                  nonAdminPublicView && "hidden",
-                  appStatus
-                    ? "text-black/80 hover:text-emerald-700"
-                    : "text-emerald-700 hover:text-black/80",
+              {openCallStatus === "active" &&
+                (openCallState === "published" ||
+                  openCallState === "archived") && (
+                  <div
+                    onClick={onApply}
+                    className={cn(
+                      "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                      nonAdminPublicView && "hidden",
+                      appStatus
+                        ? "text-black/80 hover:text-emerald-700"
+                        : "text-emerald-700 hover:text-black/80",
+                    )}
+                  >
+                    {appStatus ? (
+                      <span className="flex items-center gap-x-1 text-sm">
+                        <CircleX className="size-4" />
+                        Mark as Not Applied
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-x-1 text-sm">
+                        <CheckCircle className="size-4" />
+                        Mark as Applied
+                      </span>
+                    )}
+                  </div>
                 )}
-              >
-                {appStatus ? (
-                  <span className="flex items-center gap-x-1 text-sm">
-                    <CircleX className="size-4" />
-                    Mark as Not Applied
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-x-1 text-sm">
-                    <CheckCircle className="size-4" />
-                    Mark as Applied
-                  </span>
-                )}
-              </div>
             </>
           )}
           {hasApplied && isBookmarked !== undefined && (

@@ -115,7 +115,7 @@ export const ApplyButtonShort = ({
 interface ApplyButtonProps {
   id: string;
   openCallId: string;
-  openCallState?: OpenCallState;
+  openCallState: OpenCallState | null;
   mainOrgId?: Id<"organizations">;
 
   slug: string;

@@ -533,7 +533,6 @@ const PricingCard = ({
           mode={accountType as ModeType}
           onClick={() => {
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false);
-            console.log("handling checkout from here instead");
           }}
           planKey={planKey}
           isEligibleForFree={isEligibleForFree}

@@ -101,6 +101,8 @@ const EventCardPreview = ({
   const compensation = event.hasActiveOpenCall
     ? opencall?.compensation
     : undefined;
+  const ocState = opencall?.state;
+
   const basicInfo = event.hasActiveOpenCall ? opencall?.basicInfo : undefined;
   const eligibility = event.hasActiveOpenCall
     ? opencall?.eligibility
@@ -509,6 +511,7 @@ const EventCardPreview = ({
             appStatus={appStatus}
             eventCategory={eventCategory}
             openCallStatus={openCallStatus}
+            openCallState={ocState ?? null}
             user={user}
             align="start"
           />
@@ -792,6 +795,7 @@ const EventCardPreview = ({
             user={user}
             id={event._id}
             openCallId={opencall ? opencall._id : ""}
+            openCallState={ocState ?? null}
             slug={slug}
             edition={event.dates.edition}
             // status={status}
