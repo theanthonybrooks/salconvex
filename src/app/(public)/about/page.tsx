@@ -43,7 +43,7 @@ const AboutPage = () => {
             width={550}
             height={400}
             priority={true}
-            className="mx-auto"
+            className="[@media(max-width:724px)]:mx-auto"
           />
           <Link
             href="https://theanthonybrooks.com/timejump"
@@ -154,11 +154,11 @@ const AboutPage = () => {
         <h2 className="text-start font-tanker text-4xl lowercase tracking-wide text-foreground">
           Supporters:
         </h2>
-        <div className="mt-4 md:columns-3 lg:columns-5">
+        <div className="mt-4 columns-2 md:columns-3 lg:columns-5">
           {fatCapUsers?.map((user) => (
             <p
               key={user._id}
-              className="mb-2 break-inside-avoid text-center text-lg text-foreground"
+              className="mb-2 break-inside-avoid text-start text-lg text-foreground"
             >
               {user.name}
             </p>

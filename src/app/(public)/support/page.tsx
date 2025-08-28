@@ -94,7 +94,7 @@ const SupportPage = () => {
     return errorFields.includes(field);
   };
   return (
-    <div className="my-12 flex h-full w-full flex-col items-center justify-center gap-4">
+    <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">
       <h1 className="md:mb-25 mb-10 text-center font-tanker text-4xl lowercase tracking-wide md:text-[4rem]">
         Support & Contact
       </h1>
