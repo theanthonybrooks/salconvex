@@ -12,6 +12,12 @@ import {
 } from "./_generated/server";
 import schema from "./schema";
 
+const planMapping: Record<string, number> = {
+  original: 1,
+  banana: 2,
+  fatcap: 3,
+};
+
 // Initialize the Stripe client
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -386,13 +392,17 @@ export const subscriptionStoreWebhook = mutation({
     console.log("eventType once more: ", eventType);
     const customerId = args.body.data.object.customer ?? null;
     const userId = args.body.data.object.metadata?.userId ?? null;
+    const metadata = args.body.data.object.metadata;
+    const metaInterval = metadata?.interval;
+    const metaPlan = metadata?.plan;
+    const metaNumber = planMapping[metaPlan ?? "Unknown"];
     console.log("customer id: ", customerId);
     console.log("userId: ", userId);
+    console.log("metaPlan: ", metaPlan);
+    console.log("metaNumber: ", metaNumber);
 
     switch (eventType) {
       case "checkout.session.completed":
-        const metadata = args.body.data.object.metadata;
-        const metaInterval = metadata?.interval;
         const oneTime = metaInterval === "One-time";
         const freeCall =
           args.body.data.object.discounts[0]?.coupon ===
@@ -402,6 +412,7 @@ export const subscriptionStoreWebhook = mutation({
           args.body.data.object.created * 1000,
         ).getTime();
         console.log("createdAt: ", createdAt);
+        console.log("metaPlan: ", metaPlan);
         const paymentStatus = args.body.data.object.payment_status ?? "unpaid";
         console.log("paymentStatus: ", paymentStatus);
 
@@ -438,12 +449,14 @@ export const subscriptionStoreWebhook = mutation({
             await ctx.db.patch(checkoutUser._id, {
               userId: args.body.data.object.metadata.userId,
               metadata: args.body.data.object.metadata ?? {},
+              plan: metaNumber,
               customerId: args.body.data.object.customer,
             });
           } else if (checkoutCustomer) {
             await ctx.db.patch(checkoutCustomer._id, {
               userId: args.body.data.object.metadata.userId,
               metadata: args.body.data.object.metadata ?? {},
+              plan: metaNumber,
               customerId: args.body.data.object.customer,
             });
           }
@@ -453,6 +466,7 @@ export const subscriptionStoreWebhook = mutation({
           await ctx.db.insert("userSubscriptions", {
             userId: metadata.userId,
             metadata: metadata ?? {},
+
             customerId: args.body.data.object.customer,
             paidStatus: paymentStatus === "paid",
           });
@@ -504,7 +518,6 @@ export const subscriptionStoreWebhook = mutation({
           .first();
         console.log("existingUser checkout: ", existingUser);
         if (existingUser) {
-          console.log("metadata: ", metadata);
           console.log("account type: ", metadata?.accountType);
           console.log("oc id: ", metadata?.openCallId);
 
@@ -536,7 +549,8 @@ export const subscriptionStoreWebhook = mutation({
             }
           } else if (metadata?.accountType === "artist") {
             await ctx.db.patch(existingUser._id, {
-              subscription: `${metadata.interval}ly-${metadata.plan}`,
+              subscription: `${metadata.interval}ly-${metaPlan}`,
+              plan: metaNumber,
             });
           }
         }
@@ -629,9 +643,8 @@ export const subscriptionStoreWebhook = mutation({
             .first();
           console.log("existingUser: ", existingUser);
           if (existingUser) {
-            const metadata = args.body.data.object.metadata;
             await ctx.db.patch(existingUser._id, {
-              subscription: `${metadata.interval}ly-${metadata.plan}`,
+              subscription: `${metadata.interval}ly-${metaPlan}`,
             });
           }
         } else {
@@ -673,9 +686,8 @@ export const subscriptionStoreWebhook = mutation({
             .first();
           console.log("updating user subscription: ", existingUser);
           if (existingUser) {
-            const metadata = args.body.data.object.metadata;
             await ctx.db.patch(existingUser._id, {
-              subscription: `${metadata.interval}ly-${metadata.plan}`,
+              subscription: `${metadata.interval}ly-${metaPlan}`,
             });
           }
         }
@@ -692,6 +704,13 @@ export const subscriptionStoreWebhook = mutation({
           )
           .first();
 
+        const updatedUser = await ctx.db
+          .query("users")
+          .withIndex("by_id", (q) =>
+            q.eq("_id", updatedSub?.userId as Id<"users">),
+          )
+          .unique();
+
         const base = args.body.data;
 
         const discountPercent = base.object?.discount?.coupon?.percent_off;
@@ -703,7 +722,7 @@ export const subscriptionStoreWebhook = mutation({
         const prevInterval = updatedSub?.interval;
         const prevAmount = base.previous_attributes?.plan?.amount;
         const existingMetadata = updatedSub?.metadata || {};
-        const PlanKey = await ctx.runQuery(
+        const planKey = await ctx.runQuery(
           api.stripeSubscriptions.getPlanKeyByPriceId,
           { priceId: base.object.plan?.id },
         );
@@ -711,8 +730,11 @@ export const subscriptionStoreWebhook = mutation({
         const updatedMetadata = {
           ...existingMetadata,
           interval: currentInterval,
-          plan: PlanKey ?? "Unknown",
+          plan: planKey ?? "Unknown",
         };
+
+        const planNumber = planKey ? planMapping[planKey] : undefined;
+        console.log("plan key: ", planKey, "plan number: ", planNumber);
 
         let amount: number | undefined;
         let nextAmount: number | undefined;
@@ -763,6 +785,7 @@ export const subscriptionStoreWebhook = mutation({
             cancelAtPeriodEnd: base.object.cancel_at_period_end ?? false,
             stripeId: args.body.data.object.id,
             metadata: updatedMetadata,
+            plan: planNumber,
             //test if actually needed - the stripeId changes when the subscription is updated, but I don't know if it's able to reference/find the new one in reference to the old one or not. Wait and see.
             lastEditedAt: new Date().getTime(),
           };
@@ -780,6 +803,13 @@ export const subscriptionStoreWebhook = mutation({
 
           await ctx.db.patch(updatedSub._id, updates);
         }
+        console.log("updated user: ", metaNumber, metaInterval, metaPlan);
+        if (updatedUser) {
+          await ctx.db.patch(updatedUser._id, {
+            plan: planNumber,
+            subscription: `${currentInterval}ly-${planKey}`,
+          });
+        }
         break;
 
       case "customer.subscription.deleted":
@@ -790,9 +820,17 @@ export const subscriptionStoreWebhook = mutation({
             q.eq("customerId", args.body.data.object.customer),
           )
           .first();
+
+        const user = await ctx.db
+          .query("users")
+          .withIndex("by_id", (q) =>
+            q.eq("_id", deletedSub?.userId as Id<"users">),
+          )
+          .unique();
         // console.log("sub deleted: ", deletedSub)
         if (deletedSub) {
           await ctx.db.patch(deletedSub._id, {
+            plan: undefined,
             status: args.body.data.object.status,
             cancelAt:
               (deletedSub.cancelAt ?? args.body.data.object.canceled_at)
@@ -813,6 +851,12 @@ export const subscriptionStoreWebhook = mutation({
             discountAmount: undefined,
             discountDuration: undefined,
             adminPromoCode: undefined,
+          });
+        }
+        if (user) {
+          await ctx.db.patch(user._id, {
+            plan: undefined,
+            subscription: undefined,
           });
         }
         break;
@@ -859,6 +903,8 @@ export const subscriptionStoreWebhook = mutation({
 
         break;
       case "invoice.payment_succeeded":
+        const dataObject = args.body.data.object;
+        console.log(dataObject);
         // Find existing subscription
         const invoicePaid = await ctx.db
           .query("userSubscriptions")
@@ -898,6 +944,7 @@ export const subscriptionStoreWebhook = mutation({
 
         if (canceledSub) {
           await ctx.db.patch(canceledSub._id, {
+            plan: undefined,
             status: args.body.data.object.status,
             canceledAt: args.body.data.object.canceled_at
               ? new Date(args.body.data.object.canceled_at).getTime()

@@ -2,6 +2,7 @@
 
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as React from "react";
+import { useRef } from "react";
 
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
@@ -176,6 +177,60 @@ export {
   PopoverTrigger,
 };
 
+// export const PopoverSimple = ({
+//   children,
+//   content,
+//   align = "center",
+//   sideOffset = 4,
+//   showCloseButton = false,
+//   showArrow = true,
+//   className,
+//   triggerClassName,
+//   disabled,
+// }: {
+//   children: React.ReactNode | string;
+//   content: React.ReactNode;
+//   align?: "start" | "center" | "end";
+//   sideOffset?: number;
+//   showCloseButton?: boolean;
+//   showArrow?: boolean;
+//   className?: string;
+//   triggerClassName?: string;
+//   disabled?: boolean;
+// }) => {
+//   const [popoverOpen, setPopoverOpen] = useState(false);
+//   if (disabled) return <>{children}</>;
+//   return (
+//     <Popover open={popoverOpen} onOpenChange={setPopoverOpen} >
+//       <PopoverTrigger
+//         asChild
+//         onMouseOver={() => setPopoverOpen(true)}
+//         onMouseLeave={() => setPopoverOpen(false)}
+//         className={cn(triggerClassName, "hover:cursor-pointer")}
+//       >
+//         {typeof children === "string" ? (
+//           <span className="inline-flex items-center gap-1">{children}</span>
+//         ) : (
+//           children
+//         )}
+//       </PopoverTrigger>
+
+//       <PopoverContent
+//         align={align}
+//         sideOffset={sideOffset}
+//         showCloseButton={showCloseButton}
+//         showArrow={showArrow}
+//         className={cn(
+//           "outline-hidden relative z-40 w-72 rounded-md border bg-popover p-5 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+//           className,
+//         )}
+//       >
+//         {content}
+//       </PopoverContent>
+//     </Popover>
+//   );
+// };
+
 export const PopoverSimple = ({
   children,
   content,
@@ -186,8 +241,10 @@ export const PopoverSimple = ({
   className,
   triggerClassName,
   disabled,
+  stayOpenOnHover = false,
+  closeDelay = 200, // default: 200ms delay
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode | string;
   content: React.ReactNode;
   align?: "start" | "center" | "end";
   sideOffset?: number;
@@ -196,18 +253,44 @@ export const PopoverSimple = ({
   className?: string;
   triggerClassName?: string;
   disabled?: boolean;
+  stayOpenOnHover?: boolean;
+  closeDelay?: number;
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const closeTimer = useRef<NodeJS.Timeout | null>(null);
+
   if (disabled) return <>{children}</>;
+
+  const handleMouseLeave = () => {
+    if (stayOpenOnHover) {
+      // close after a delay
+      closeTimer.current = setTimeout(() => setPopoverOpen(false), closeDelay);
+    } else {
+      setPopoverOpen(false);
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setPopoverOpen(true);
+  };
+
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger
         asChild
-        onMouseOver={() => setPopoverOpen(true)}
-        onMouseLeave={() => setPopoverOpen(false)}
+        onMouseOver={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={cn(triggerClassName, "hover:cursor-pointer")}
       >
-        {children}
+        {typeof children === "string" ? (
+          <span className="inline-flex items-center gap-1">{children}</span>
+        ) : (
+          children
+        )}
       </PopoverTrigger>
 
       <PopoverContent
@@ -215,8 +298,10 @@ export const PopoverSimple = ({
         sideOffset={sideOffset}
         showCloseButton={showCloseButton}
         showArrow={showArrow}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={cn(
-          "outline-hidden relative z-40 w-72 rounded-md bg-popover p-5 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          "outline-hidden relative z-40 w-72 rounded-md border bg-popover p-5 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out",
           className,
         )}
       >

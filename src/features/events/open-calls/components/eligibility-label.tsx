@@ -192,7 +192,7 @@ export const EligibilityLabel = ({
             <span className="font-medium">
               <PopoverSimple
                 content={parts.join(" ")}
-                className="w-full max-w-xl border"
+                className="w-full max-w-xl"
                 disabled={preview}
               >
                 <span className="flex items-center gap-1">

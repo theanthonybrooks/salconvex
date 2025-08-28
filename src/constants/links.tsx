@@ -117,7 +117,7 @@ export const FOOTER_LINKS: FooterSection[] = [
       { name: "Calendar", href: "/calendar" },
       { name: "Archive", href: "https://thestreetartlist.helioho.st/archive" },
       { name: "Submit", href: "/pricing?submit" },
-      { name: "About", href: "https://thestreetartlist.helioho.st/about" },
+      { name: "About", href: "/about" },
       // { name: "Changelog", href: "/changelog" },
       // { name: "Careers", href: "/careers" },
     ],

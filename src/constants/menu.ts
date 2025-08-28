@@ -377,13 +377,13 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: true,
         userType: ["public"],
       },
-      // {
-      //   title: 'About "The List"',
-      //   path: "/about",
-      //   category: "about",
-      //   public: true,
-      //   userType: ["public"],
-      // },
+      {
+        title: 'About "The List"',
+        path: "/about",
+        category: "about",
+        public: true,
+        userType: ["public"],
+      },
       // {
       //   title: "Collaborators",
       //   path: "/collaborators",

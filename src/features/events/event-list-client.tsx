@@ -1,25 +1,25 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { BasicPagination } from "@/components/ui/pagination2";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
+import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { generateSkeletonGroups } from "@/lib/skeletonFns";
 import { cn, setParamIfNotDefault } from "@/lib/utils";
+import type { MergedEventPreviewData } from "@/types/event";
 import {
   CombinedEventPreviewCardData,
   EventCategory,
   EventType,
 } from "@/types/event";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
-import { Button } from "@/components/ui/button";
-import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import type { MergedEventPreviewData } from "@/types/event";
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -278,7 +278,7 @@ const ClientEventList = () => {
     <>
       {!publicView && (
         <>
-          {/* todo: make this public with some features that are only available to logged in users */}
+          {/* TODO: make this public with some features that are only available to logged in users */}
           <EventFilters
             filters={filters}
             sortOptions={sortOptions}

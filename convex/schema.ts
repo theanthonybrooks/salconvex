@@ -80,6 +80,7 @@ const customUserSchema = {
   userId: v.string(),
   role: v.array(v.string()),
   subscription: v.optional(v.string()),
+  plan: v.optional(v.number()),
   tokenIdentifier: v.string(),
   image: v.optional(v.string()),
   imageStorageId: v.optional(v.id("_storage")),
@@ -540,6 +541,8 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_role", ["role"])
     .index("by_token", ["tokenIdentifier"])
+    .index("by_subscription", ["subscription"])
+    .index("by_plan", ["plan"])
     .index("by_createdAt", ["createdAt"]),
 
   userLog: defineTable(userLogSchema)
@@ -845,6 +848,7 @@ export default defineSchema({
     customerCancellationReason: v.optional(v.string()),
     customerCancellationComment: v.optional(v.string()),
     metadata: v.optional(v.any()),
+    plan: v.optional(v.number()),
     customFieldData: v.optional(v.any()),
     customerId: v.optional(v.string()),
     lastEditedAt: v.optional(v.number()),

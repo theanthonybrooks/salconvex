@@ -93,7 +93,6 @@ const SupportPage = () => {
   const fieldHasError = (field: string) => {
     return errorFields.includes(field);
   };
-  //TODO: Create ticket numbers for each contact submission. This should also be attached to any uploaded images/files and should be entered into the db.
   return (
     <div className="my-12 flex h-full w-full flex-col items-center justify-center gap-4">
       <h1 className="md:mb-25 mb-10 text-center font-tanker text-4xl lowercase tracking-wide md:text-[4rem]">
@@ -218,8 +217,8 @@ const SupportPage = () => {
             Have some ideas for the site or want to work together?
           </p>
           <p>
-            The team is currently quite small (just me), and I might take a few
-            days to reply. Thanks for your patience!
+            The team is currently quite small and might take a few days to
+            reply. Thanks for your patience!
           </p>
           <p className="mt-2 text-foreground">
             Shoot me an email at{" "}

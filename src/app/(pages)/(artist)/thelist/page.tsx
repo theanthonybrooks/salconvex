@@ -1,7 +1,8 @@
-import SalHeader from "@/components/ui/sal-header";
+import SalHeader from "@/components/ui/headers/sal-header";
 import ClientEventList from "@/features/events/event-list-client";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "The List",
   description: "See the latest mural open calls and public art opportunities.",
   openGraph: {

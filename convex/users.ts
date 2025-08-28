@@ -42,6 +42,17 @@ export const updateUserLastActive = mutation({
   },
 });
 
+export const getFatcapUsers = query({
+  handler: async (ctx) => {
+    const fatcaps = await ctx.db
+      .query("users")
+      .withIndex("by_plan", (q) => q.eq("plan", 3))
+      .collect();
+
+    return fatcaps;
+  },
+});
+
 export const getTotalUsers = query({
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();

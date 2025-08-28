@@ -1,4 +1,4 @@
-import SalHeader from "@/components/ui/sal-header";
+import SalHeader from "@/components/ui/headers/sal-header";
 import ClientThisWeekList from "@/features/events/thisweek-list-client";
 
 export const metadata = {

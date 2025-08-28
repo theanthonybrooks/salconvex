@@ -31,6 +31,32 @@ export const runAUIDTK = migrations.runner(
   internal.migrations.addUserIdToKanban,
 );
 
+export const backfillUserPlan = migrations.define({
+  table: "users",
+  migrateOne: async (ctx, user) => {
+    if (typeof user.plan === "number") return;
+
+    const planStr: string | undefined = user?.subscription;
+    if (!planStr) return;
+
+    const mapping: Record<string, number> = {
+      "monthly-original": 1,
+      "monthly-banana": 2,
+      "monthly-fatcap": 3,
+      "yearly-original": 1,
+      "yearly-banana": 2,
+      "yearly-fatcap": 3,
+    };
+
+    const numeric = mapping[planStr];
+    if (numeric === undefined) return;
+
+    await ctx.db.patch(user._id, { plan: numeric });
+  },
+});
+
+export const runBUP = migrations.runner(internal.migrations.backfillUserPlan);
+
 // export const copyUpdatedAtToCompletedAt = migrations.define({
 //   table: "todoKanban",
 //   migrateOne: async (ctx, todo) => {
