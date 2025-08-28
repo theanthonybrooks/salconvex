@@ -21,6 +21,12 @@ importers:
       '@convex-dev/migrations':
         specifier: ^0.2.9
         version: 0.2.9(convex@1.25.4(react@19.1.1))
+      '@convex-dev/sharded-counter':
+        specifier: ^0.1.8
+        version: 0.1.8(convex@1.25.4(react@19.1.1))
+      '@convex-dev/workpool':
+        specifier: ^0.2.18
+        version: 0.2.18(convex-helpers@0.1.104(convex@1.25.4(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(zod@4.0.17))(convex@1.25.4(react@19.1.1))
       '@fullcalendar/core':
         specifier: ^6.1.19
         version: 6.1.19
@@ -514,6 +520,17 @@ packages:
     resolution: {integrity: sha512-HfIv6/F8VbtJ1NVT2bQRTumJGdaqROl/+s5IOnubHm7vvgie0RjcfO6YiB7JoLFWwS19vjDQDKl63ihoA08zOA==}
     peerDependencies:
       convex: ~1.16.5 || >=1.17.0 <1.35.0
+
+  '@convex-dev/sharded-counter@0.1.8':
+    resolution: {integrity: sha512-kcv9BAvqrtBAvtzBsqLVz5Elzf0xe7sio3QX5eXvk+ZVIJb+rIeF9h4ZI6qH2RuW/qQvwY5stNZghDbGzLIvDw==}
+    peerDependencies:
+      convex: ~1.16.5 || >=1.17.0 <1.35.0
+
+  '@convex-dev/workpool@0.2.18':
+    resolution: {integrity: sha512-tfRfBCukaRiybxwy4/W3rLWpIRhPivFH9tC5++d0XE1sV627vw2mAwOM9SnpY1k+BWVoNrHrHrxBheklSbuAag==}
+    peerDependencies:
+      convex: '>=1.25.0 <1.35.0'
+      convex-helpers: ^0.1.94
 
   '@csstools/selector-resolve-nested@3.1.0':
     resolution: {integrity: sha512-mf1LEW0tJLKfWyvn5KdDrhpxHyuxpbNwTIwOYLIvsTffeyOf85j5oIzfG0yosxDgx/sswlqBnESYUcQH0vgZ0g==}
@@ -5727,6 +5744,15 @@ snapshots:
   '@convex-dev/migrations@0.2.9(convex@1.25.4(react@19.1.1))':
     dependencies:
       convex: 1.25.4(react@19.1.1)
+
+  '@convex-dev/sharded-counter@0.1.8(convex@1.25.4(react@19.1.1))':
+    dependencies:
+      convex: 1.25.4(react@19.1.1)
+
+  '@convex-dev/workpool@0.2.18(convex-helpers@0.1.104(convex@1.25.4(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(zod@4.0.17))(convex@1.25.4(react@19.1.1))':
+    dependencies:
+      convex: 1.25.4(react@19.1.1)
+      convex-helpers: 0.1.104(convex@1.25.4(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(zod@4.0.17)
 
   '@csstools/selector-resolve-nested@3.1.0(postcss-selector-parser@7.1.0)':
     dependencies:

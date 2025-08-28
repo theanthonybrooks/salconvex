@@ -517,6 +517,22 @@ const newsletterSchema = {
   lastAttempt: v.number(),
 };
 
+const supportSchema = {
+  userId: v.union(v.id("users"), v.null()),
+  ticketNumber: v.number(),
+  name: v.string(),
+  email: v.string(),
+  category: v.string(),
+  message: v.string(),
+  status: v.union(
+    v.literal("open"),
+    v.literal("resolved"),
+    v.literal("closed"),
+  ),
+  createdAt: v.number(),
+  updatedAt: v.optional(v.number()),
+};
+
 export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
@@ -869,4 +885,9 @@ export default defineSchema({
     .index("by_openCallId", ["openCallId"])
     .index("by_userId", ["uploadedBy"])
     .index("by_organizationId", ["organizationId"]),
+
+  support: defineTable(supportSchema)
+    .index("by_ticketNumber", ["ticketNumber"])
+    .index("by_userId", ["userId"])
+    .index("by_email", ["email"]),
 });

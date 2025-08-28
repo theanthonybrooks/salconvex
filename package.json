@@ -12,6 +12,8 @@
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.88",
     "@convex-dev/migrations": "^0.2.9",
+    "@convex-dev/sharded-counter": "^0.1.8",
+    "@convex-dev/workpool": "^0.2.18",
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.19",
     "@fullcalendar/interaction": "^6.1.19",

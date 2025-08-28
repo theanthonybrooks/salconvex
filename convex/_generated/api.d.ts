@@ -9,7 +9,9 @@
  */
 
 import type * as actions_getTimezone from "../actions/getTimezone.js";
+import type * as actions_resend from "../actions/resend.js";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
+import type * as admin from "../admin.js";
 import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as artists_artistProfile from "../artists/artistProfile.js";
@@ -54,7 +56,9 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   "actions/getTimezone": typeof actions_getTimezone;
+  "actions/resend": typeof actions_resend;
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
+  admin: typeof admin;
   "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
   "artists/artistProfile": typeof artists_artistProfile;
@@ -177,6 +181,116 @@ export declare const components: {
           processed: number;
           state: "inProgress" | "success" | "failed" | "canceled" | "unknown";
         }
+      >;
+    };
+  };
+  shardedCounter: {
+    public: {
+      add: FunctionReference<
+        "mutation",
+        "internal",
+        { count: number; name: string; shard?: number; shards?: number },
+        number
+      >;
+      count: FunctionReference<"query", "internal", { name: string }, number>;
+      estimateCount: FunctionReference<
+        "query",
+        "internal",
+        { name: string; readFromShards?: number; shards?: number },
+        any
+      >;
+      rebalance: FunctionReference<
+        "mutation",
+        "internal",
+        { name: string; shards?: number },
+        any
+      >;
+      reset: FunctionReference<"mutation", "internal", { name: string }, any>;
+    };
+  };
+  ticketCounterPool: {
+    lib: {
+      cancel: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          id: string;
+          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+        },
+        any
+      >;
+      cancelAll: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          before?: number;
+          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+        },
+        any
+      >;
+      enqueue: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config: {
+            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+            maxParallelism: number;
+          };
+          fnArgs: any;
+          fnHandle: string;
+          fnName: string;
+          fnType: "action" | "mutation" | "query";
+          onComplete?: { context?: any; fnHandle: string };
+          retryBehavior?: {
+            base: number;
+            initialBackoffMs: number;
+            maxAttempts: number;
+          };
+          runAt: number;
+        },
+        string
+      >;
+      enqueueBatch: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config: {
+            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+            maxParallelism: number;
+          };
+          items: Array<{
+            fnArgs: any;
+            fnHandle: string;
+            fnName: string;
+            fnType: "action" | "mutation" | "query";
+            onComplete?: { context?: any; fnHandle: string };
+            retryBehavior?: {
+              base: number;
+              initialBackoffMs: number;
+              maxAttempts: number;
+            };
+            runAt: number;
+          }>;
+        },
+        Array<string>
+      >;
+      status: FunctionReference<
+        "query",
+        "internal",
+        { id: string },
+        | { previousAttempts: number; state: "pending" }
+        | { previousAttempts: number; state: "running" }
+        | { state: "finished" }
+      >;
+      statusBatch: FunctionReference<
+        "query",
+        "internal",
+        { ids: Array<string> },
+        Array<
+          | { previousAttempts: number; state: "pending" }
+          | { previousAttempts: number; state: "running" }
+          | { state: "finished" }
+        >
       >;
     };
   };

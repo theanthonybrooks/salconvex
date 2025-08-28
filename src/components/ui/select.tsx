@@ -170,3 +170,55 @@ export {
   SelectTrigger,
   SelectValue,
 };
+
+export const SelectSimple = ({
+  options,
+  onChangeAction,
+  value,
+  className,
+  contentClassName,
+  itemClassName,
+  placeholder,
+  tabIndex,
+  invalid,
+}: {
+  options: {
+    label: string;
+    value: string;
+  }[];
+  onChangeAction: (value: string) => void;
+  value: string;
+  placeholder: string;
+  className?: string;
+  contentClassName?: string;
+  itemClassName?: string;
+  tabIndex?: number;
+  invalid?: boolean;
+}) => {
+  return (
+    <Select value={value} onValueChange={onChangeAction}>
+      <SelectTrigger
+        className={cn(
+          className,
+          "*:data-[slot=select-value]:pr-4",
+
+          invalid && "invalid-field",
+        )}
+        tabIndex={tabIndex}
+      >
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className={cn(contentClassName)}>
+        {options.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+            className={cn(itemClassName)}
+          >
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
