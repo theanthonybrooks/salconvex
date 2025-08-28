@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { supportEmail } from "@/constants/siteInfo";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
@@ -225,7 +224,7 @@ export function UserProfile({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <Link
-          href={`mailto:${supportEmail}`}
+          href="/support"
           className="underline-offset-2 hover:cursor-pointer hover:underline"
         >
           <DropdownMenuItem className="focus:bg-salYellow/50">

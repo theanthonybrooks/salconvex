@@ -31,7 +31,7 @@ import { BsPersonVcard } from "react-icons/bs";
 
 import { TbBrandPatreon } from "react-icons/tb";
 
-import { infoEmail, supportEmail } from "@/constants/siteInfo";
+import { supportEmail } from "@/constants/siteInfo";
 import { JSX } from "react";
 import { IconType } from "react-icons";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
@@ -158,8 +158,8 @@ export const FOOTER_LINKS: FooterSection[] = [
       { name: "Changelog", href: "/changelog" },
       { name: "Collaborations", href: "/collabs" },
       {
-        name: "Contact",
-        href: `mailto:${infoEmail}&subject=Site%20Contact`,
+        name: "Contact & Support",
+        href: "/support",
       },
     ],
   },
