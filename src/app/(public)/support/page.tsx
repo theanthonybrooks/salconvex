@@ -96,10 +96,10 @@ const SupportPage = () => {
   //TODO: Create ticket numbers for each contact submission. This should also be attached to any uploaded images/files and should be entered into the db.
   return (
     <div className="my-12 flex h-full w-full flex-col items-center justify-center gap-4">
-      <h1 className="text-center font-tanker text-4xl lowercase tracking-wide md:text-[4rem]">
+      <h1 className="md:mb-25 mb-10 text-center font-tanker text-4xl lowercase tracking-wide md:text-[4rem]">
         Support & Contact
       </h1>
-      <div className="mt-8 flex h-full w-full grid-cols-[1fr_auto_1fr] flex-col items-start gap-x-2 px-6 md:grid md:px-8">
+      <div className="flex h-full w-full grid-cols-[1fr_auto_1fr] flex-col items-start gap-x-2 px-6 md:grid md:px-8">
         <section
           className={cn(
             "mx-auto flex max-w-[90vw] flex-col items-center gap-3 md:max-w-sm",
@@ -209,7 +209,7 @@ const SupportPage = () => {
         <Separator
           orientation={isMobile ? "horizontal" : "vertical"}
           thickness={2}
-          className="mx-auto my-12 md:my-0"
+          className="mx-auto my-12 max-h-[80%] md:my-auto"
         />
         <section
           className={cn("mx-auto flex max-w-[90vw] flex-col gap-3 md:max-w-lg")}

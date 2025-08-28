@@ -154,6 +154,8 @@ export default {
         "16": "4rem",
         "18": "4.5rem",
         "20": "5rem",
+        "25": "6.25rem",
+        "30": "7.5rem",
       },
       width: {
         "100dvh": "100dvh",
