@@ -335,6 +335,20 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
     title: "About",
     items: [
       {
+        title: 'About "The List"',
+        path: "/about",
+        category: "about",
+        public: true,
+        userType: ["public"],
+      },
+      {
+        title: "Contact",
+        path: "/support",
+        category: "about",
+        public: true,
+        userType: ["public"],
+      },
+      {
         title: "Pricing",
         path: "/pricing",
         category: "thelist",
@@ -347,13 +361,6 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "about",
         public: true,
         userType: ["public", "admin"],
-      },
-      {
-        title: "Contact",
-        path: "/support",
-        category: "about",
-        public: true,
-        userType: ["public"],
       },
       {
         title: "Changelog",
@@ -377,13 +384,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: true,
         userType: ["public"],
       },
-      {
-        title: 'About "The List"',
-        path: "/about",
-        category: "about",
-        public: true,
-        userType: ["public"],
-      },
+
       // {
       //   title: "Collaborators",
       //   path: "/collaborators",
