@@ -37,7 +37,6 @@ export const getFilteredEventsPublic = query({
     ),
     viewType: v.optional(
       v.union(
-        v.literal("all"),
         v.literal("event"),
         v.literal("openCall"),
         v.literal("organizer"),

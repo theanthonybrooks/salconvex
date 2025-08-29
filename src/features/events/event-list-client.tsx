@@ -46,8 +46,18 @@ export const viewOptionValues = [
 export type ViewOptions = (typeof viewOptionValues)[number]["value"];
 
 const ClientEventList = () => {
+  const searchParams = useSearchParams();
   const initialTitleRef = useRef<string | null>(null);
-  const [view, setView] = useState<ViewOptions>("openCall");
+
+  const [view, setView] = useState<ViewOptions>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("salView") as ViewOptions | null;
+      if (saved && viewOptionValues.some((opt) => opt.value === saved)) {
+        return saved;
+      }
+    }
+    return "openCall";
+  });
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -70,7 +80,6 @@ const ClientEventList = () => {
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
-  const searchParams = useSearchParams();
 
   const defaultFilters: Filters = useMemo(
     () => ({
@@ -169,6 +178,10 @@ const ClientEventList = () => {
   }, [defaultFilters, defaultSort]);
 
   useEffect(() => {
+    sessionStorage.setItem("salView", view);
+  }, [view]);
+
+  useEffect(() => {
     handleResetFilters();
     if (view === "event") {
       setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
@@ -202,7 +215,7 @@ const ClientEventList = () => {
       params.delete("page");
     }
 
-    setParamIfNotDefault(params, "sb", sortOptions.sortBy, "openCall");
+    setParamIfNotDefault(params, "sb", sortOptions.sortBy, defaultSort.sortBy);
     setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc");
 
     const queryString = params.toString();
@@ -216,7 +229,7 @@ const ClientEventList = () => {
       "",
       baseUrl + (queryString ? `?${queryString}` : ""),
     );
-  }, [filters, sortOptions, page]);
+  }, [filters, sortOptions, page, defaultSort]);
 
   useEffect(() => {
     window.scroll({ top: 0 });
