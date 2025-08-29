@@ -3,7 +3,7 @@
 import MenuToggle from "@/components/ui/hamburger-icon";
 import SocialsRow from "@/components/ui/socials";
 import ThemeToggle from "@/components/ui/theme-toggle";
-import { mainMenuItems } from "@/constants/menu";
+import { DeviceOptions, mainMenuItems } from "@/constants/menu";
 import { footerCRText } from "@/constants/text";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/lib/utils";
@@ -514,6 +514,10 @@ const FullPageNav = ({
                     const itemCategory = item?.category;
                     const itemExcluded = item?.excluded;
                     const itemSub = item?.sub;
+                    const deviceType = item?.deviceType;
+                    const deviceTypeMatch = ["mobile", "all"].some((type) =>
+                      deviceType?.includes(type as DeviceOptions),
+                    );
 
                     const adminMatch = isAdmin && itemCategory === "admin";
                     const isPublic = itemUserType?.includes("public");
@@ -545,7 +549,8 @@ const FullPageNav = ({
                         (typeMatch && subMatch) ||
                         adminMatch ||
                         organizerMatch) &&
-                      !excludedMatch
+                      !excludedMatch &&
+                      deviceTypeMatch
                     );
                   });
 
@@ -624,17 +629,17 @@ const FullPageNav = ({
                 })}
               </ul>
 
-              <div
+              {/* <div
                 className={cn(
                   "font-foreground m-x-auto w-full border-b-2 border-foreground px-9 py-5 text-center font-tanker text-[4rem] lowercase",
                 )}
               >
-                <Link onClick={onHandleLinkClick} href={"/pricing?submit"}>
+                <Link onClick={onHandleLinkClick} href={"/submit"}>
                   <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
                     Submit
                   </p>
                 </Link>
-              </div>
+              </div> */}
               <Unauthenticated>
                 {!isPricingPage && (
                   <div
@@ -827,10 +832,7 @@ const FullPageNav = ({
                             </p>
                           </Link>
                         )}
-                        <Link
-                          onClick={onHandleLinkClick}
-                          href={"/pricing?submit"}
-                        >
+                        <Link onClick={onHandleLinkClick} href={"/submit"}>
                           <p
                             className={cn(
                               "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",

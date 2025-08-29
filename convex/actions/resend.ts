@@ -81,7 +81,7 @@ export const sendEmail = action({
 
       await resend.emails.send({
         from: "The Street Art List <user@support.thestreetartlist.com>",
-        to: email,
+        to: "internal@thestreetartlist.com",
         subject: `${subject} from ${name}`,
         html: `
      <p >Ahoy there! Seems ya have some problems on the site. Fix em before they get worse!</p>

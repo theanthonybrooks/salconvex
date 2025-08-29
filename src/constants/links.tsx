@@ -114,10 +114,11 @@ export const FOOTER_LINKS: FooterSection[] = [
     items: [
       { name: "The List", href: "/thelist" },
       { name: "Map", href: "https://thestreetartlist.helioho.st/map" },
+      { name: "This Week", href: "/thisweek" },
       { name: "Calendar", href: "/calendar" },
       { name: "Archive", href: "https://thestreetartlist.helioho.st/archive" },
-      { name: "Submit", href: "/pricing?submit" },
-      { name: "About", href: "/about" },
+      { name: "Submit", href: "/submit" },
+
       // { name: "Changelog", href: "/changelog" },
       // { name: "Careers", href: "/careers" },
     ],
@@ -153,9 +154,10 @@ export const FOOTER_LINKS: FooterSection[] = [
   {
     section: "Misc",
     items: [
+      { name: "About", href: "/about" },
       { name: "FAQ", href: "/faq" },
       { name: "Changelog", href: "/changelog" },
-      { name: "Collaborations", href: "/collabs" },
+      // { name: "Collaborations", href: "/collabs" },
       {
         name: "Contact & Support",
         href: "/support",

@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 
+export type DeviceOptions = "mobile" | "tablet" | "desktop" | "all";
 export interface FullPageNavMenuItem {
   title: string;
   path: string;
@@ -11,6 +12,7 @@ export interface FullPageNavMenuItem {
   view?: string;
   sub?: string[];
   excluded?: string[];
+  deviceType: DeviceOptions[];
 }
 
 interface FullPageNavMenuSection {
@@ -28,6 +30,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "The List",
@@ -35,6 +38,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "This Week",
@@ -42,6 +46,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "Calendar",
@@ -49,6 +54,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "Archive",
@@ -57,6 +63,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "Map",
@@ -64,6 +71,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       // {
       //   title: "Calendar",
@@ -162,6 +170,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["artist", "judge"],
         sub: ["active", "trialing"],
+        deviceType: ["all"],
       },
 
       {
@@ -172,6 +181,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["artist"],
         sub: ["active", "trialing"],
+        deviceType: ["all"],
       },
 
       {
@@ -182,6 +192,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["artist"],
         sub: ["active", "trialing"],
+        deviceType: ["all"],
       },
       {
         title: "Hidden",
@@ -191,6 +202,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["artist"],
         sub: ["active", "trialing"],
+        deviceType: ["all"],
       },
     ],
   },
@@ -204,6 +216,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["organizer"],
+        deviceType: ["all"],
       },
       {
         title: "My Dashboard",
@@ -212,6 +225,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         public: false,
         view: "dashboard",
         userType: ["organizer"],
+        deviceType: ["all"],
       },
       {
         title: "Settings",
@@ -221,6 +235,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["organizer"],
         excluded: ["artist"],
+        deviceType: ["all"],
       },
       // {
       //   title: "Submit",
@@ -284,6 +299,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "admin",
         public: false,
         userType: ["admin"],
+        deviceType: ["all"],
       },
       {
         title: "Users",
@@ -291,6 +307,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "admin",
         public: false,
         userType: ["admin"],
+        deviceType: ["all"],
       },
       {
         title: "Todos",
@@ -298,6 +315,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "admin",
         public: false,
         userType: ["admin"],
+        deviceType: ["all"],
       },
       {
         title: "Analytics",
@@ -305,6 +323,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "admin",
         public: false,
         userType: ["admin"],
+        deviceType: ["all"],
       },
     ],
   },
@@ -319,6 +338,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["artist"],
         sub: ["active", "trialing"],
+        deviceType: ["all"],
       },
       {
         title: "Settings",
@@ -328,18 +348,20 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         view: "dashboard",
         userType: ["artist", "judge"],
         sub: ["active", "trialing"],
+        deviceType: ["all"],
       },
     ],
   },
   {
-    title: "About",
+    title: "Misc",
     items: [
       {
-        title: 'About "The List"',
+        title: "About ",
         path: "/about",
         category: "about",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "Contact",
@@ -347,6 +369,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "about",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "Pricing",
@@ -354,6 +377,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "thelist",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "FAQ",
@@ -361,6 +385,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "about",
         public: true,
         userType: ["public", "admin"],
+        deviceType: ["all"],
       },
       {
         title: "Changelog",
@@ -368,6 +393,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "about",
         public: true,
         userType: ["public"],
+        deviceType: ["desktop"],
       },
 
       {
@@ -376,6 +402,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "about",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
       {
         title: "Privacy",
@@ -383,6 +410,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         category: "about",
         public: true,
         userType: ["public"],
+        deviceType: ["all"],
       },
 
       // {
