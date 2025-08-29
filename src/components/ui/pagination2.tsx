@@ -7,10 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { viewOptions } from "@/features/events/event-list-client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
 
 interface BasicPaginationProps {
@@ -20,8 +21,10 @@ interface BasicPaginationProps {
   totalOpenCalls?: number;
   bottomPag?: boolean;
   className?: string;
+  eventOnly?: boolean;
 
   onPageChange: (page: number) => void;
+  setViewAction: Dispatch<SetStateAction<viewOptions>>;
 }
 
 export const BasicPagination = ({
@@ -31,8 +34,10 @@ export const BasicPagination = ({
   totalOpenCalls,
   bottomPag = false,
   className,
+  eventOnly,
 
   onPageChange: setPage,
+  // setViewAction,
 }: BasicPaginationProps) => {
   const firstPage = page === 1;
   const lastPage = page === totalPages;
@@ -65,9 +70,11 @@ export const BasicPagination = ({
               <p className={cn("mx-auto text-nowrap text-center")}>
                 Results: {totalResults}
               </p>
-              <p className={cn("mx-auto text-nowrap text-center")}>
-                Open Calls: {totalOpenCalls}
-              </p>
+              {!eventOnly && (
+                <p className={cn("mx-auto text-nowrap text-center")}>
+                  Open Calls: {totalOpenCalls}
+                </p>
+              )}
             </div>
           )}
           {totalPages !== 0 ? (
@@ -147,17 +154,45 @@ export const BasicPagination = ({
             </section>
           )}
           {!bottomPag && (
-            <p
-              className={cn(
-                "col-start-3 hidden opacity-0 sm:block",
-                backTrigger && totalPages > 2
-                  ? "cursor-pointer decoration-2 underline-offset-2 opacity-100 hover:underline"
-                  : "pointer-events-none",
-              )}
-              onClick={() => setPage(1)}
-            >
-              (Back to Start)
-            </p>
+            <>
+              <p
+                className={cn(
+                  "col-start-3 hidden opacity-0 sm:block",
+                  backTrigger && totalPages > 2
+                    ? "cursor-pointer decoration-2 underline-offset-2 opacity-100 hover:underline"
+                    : "pointer-events-none",
+                )}
+                onClick={() => setPage(1)}
+              >
+                (Back to Start)
+              </p>
+              {/* <div className={cn("flex items-center gap-2")}>
+                <p
+                  className="text-sm text-gray-500"
+                  onClick={() => setViewAction("event")}
+                >
+                  Events
+                </p>
+                <p
+                  className="text-sm text-gray-500"
+                  onClick={() => setViewAction("openCall")}
+                >
+                  Open Calls
+                </p>
+                <p
+                  className="text-sm text-gray-500"
+                  onClick={() => setViewAction("archive")}
+                >
+                  Archive
+                </p>
+                <p
+                  className="text-sm text-gray-500"
+                  onClick={() => setViewAction("organizer")}
+                >
+                  Org
+                </p>
+              </div> */}
+            </>
           )}
         </motion.div>
       )}

@@ -1,3 +1,4 @@
+import { viewOptions } from "@/features/events/event-list-client";
 import {
   getFourCharMonthFromLuxon,
   getOrdinalSuffix,
@@ -16,6 +17,7 @@ export function getGroupKeyFromEvent(
   sortBy: string,
   timeZone: string,
   hasTZPref: boolean,
+  viewType: viewOptions,
 ): {
   raw: string;
   subHeading?: string;
@@ -182,6 +184,9 @@ export function getGroupKeyFromEvent(
     const country = event.location?.country ?? "Unknown";
     const countryAbbr = event.location?.countryAbbr;
     const state = event.location?.state;
+    const orgName = event.orgName ?? undefined;
+
+    console.log(event.name, orgName);
 
     const isUS =
       country.toLowerCase() === "united states" ||
@@ -206,13 +211,33 @@ export function getGroupKeyFromEvent(
 
     const isBrazil = country.toLowerCase() === "brazil" || countryAbbr === "BR";
 
-    const hasSubHeading = isUS || isCanada || isUK || isAustralia || isBrazil;
+    const hasSubHeading =
+      isUS ||
+      isCanada ||
+      isUK ||
+      isAustralia ||
+      isBrazil ||
+      viewType === "organizer";
 
     const displayCountryAbbr = countryAbbr === "US" ? "USA" : countryAbbr;
 
+    let subHeading: string | undefined;
+
+    if (hasSubHeading) {
+      switch (viewType) {
+        case "organizer":
+          subHeading = orgName;
+          break;
+        case "event":
+          subHeading = state;
+          break;
+        default:
+          subHeading = undefined;
+      }
+    }
     return {
       raw: countryAbbr ? `${country} (${displayCountryAbbr})` : country,
-      subHeading: hasSubHeading ? (state ?? undefined) : undefined,
+      subHeading,
     };
   }
 

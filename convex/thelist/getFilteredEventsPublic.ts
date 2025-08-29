@@ -40,6 +40,7 @@ export const getFilteredEventsPublic = query({
         v.literal("event"),
         v.literal("openCall"),
         v.literal("organizer"),
+        v.literal("archive"),
       ),
     ),
   },
@@ -105,7 +106,7 @@ export const getFilteredEventsPublic = query({
 
     const hiddenIds = listActions.filter((a) => a.hidden).map((a) => a.eventId);
     let events = [];
-    if (thisWeekPg || nextWeekPg) {
+    if (thisWeekPg || nextWeekPg || view === "archive") {
       const publishedEvents = await ctx.db
         .query("events")
         .withIndex("by_state", (q) => q.eq("state", "published"))
@@ -182,6 +183,12 @@ export const getFilteredEventsPublic = query({
 
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;
+        let orgName: string | null = null;
+
+        if (event.mainOrgId) {
+          const org = await ctx.db.get(event.mainOrgId);
+          orgName = org?.name ?? null;
+        }
 
         const now = Date.now();
         const ocType = openCall?.basicInfo?.callType;
@@ -235,6 +242,7 @@ export const getFilteredEventsPublic = query({
 
         return {
           ...event,
+          orgName,
           _creationTime: event._creationTime,
           openCall: openCall ?? null,
           openCallStatus,
@@ -296,7 +304,7 @@ export const getFilteredEventsPublic = query({
     let viewFiltered = sorted;
     if (view === "event") {
       viewFiltered = sorted.filter((e) => !e.openCall);
-    } else if (view === "openCall") {
+    } else if (view === "openCall" || view === "archive") {
       viewFiltered = sorted.filter((e) => e.openCall);
     } else if (view === "organizer") {
       viewFiltered = sorted.filter((e) => e.organizerId);

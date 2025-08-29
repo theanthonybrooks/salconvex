@@ -26,13 +26,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Dispatch,
   SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 
-export type viewOptions = "event" | "openCall" | "organizer" | "all";
+export type viewOptions =
+  | "event"
+  | "openCall"
+  | "organizer"
+  | "archive"
+  | "all";
 
 const ClientEventList = () => {
   const initialTitleRef = useRef<string | null>(null);
@@ -40,7 +46,6 @@ const ClientEventList = () => {
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -61,22 +66,33 @@ const ClientEventList = () => {
   const hasTZPref = !!userPref?.timezone;
   const searchParams = useSearchParams();
 
-  const defaultFilters: Filters = {
-    showHidden: false,
-    bookmarkedOnly: false,
-    limit: 10,
+  const defaultFilters: Filters = useMemo(
+    () => ({
+      showHidden: false,
+      bookmarkedOnly: false,
+      limit: 10,
 
-    eventTypes: [],
-    eventCategories: [],
-    eligibility: [],
-    callType: [],
-    callFormat: "",
-  };
+      eventTypes: [],
+      eventCategories: [],
+      eligibility: [],
+      callType: [],
+      callFormat: "",
+    }),
+    [],
+  );
 
-  const defaultSort: SortOptions = {
-    sortBy: view === "event" ? "eventStart" : "openCall",
-    sortDirection: "asc",
-  };
+  const defaultSort: SortOptions = useMemo(
+    () => ({
+      sortBy:
+        view === "event" || view === "archive"
+          ? "eventStart"
+          : view === "organizer"
+            ? "country"
+            : "openCall",
+      sortDirection: "asc",
+    }),
+    [view],
+  );
 
   const currentFilters: Filters = {
     showHidden: searchParams.get("h") === "true",
@@ -138,19 +154,20 @@ const ClientEventList = () => {
   const totalOpen = queryResult?.totalOpenCalls ?? 0;
   const isLoading = !queryResult;
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setSortOptions(defaultSort);
     setPage(1);
-  };
+  }, [defaultFilters, defaultSort]);
 
   useEffect(() => {
+    handleResetFilters();
     if (view === "event") {
       setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
     } else if (view === "openCall" || view === "all") {
       setSortOptions({ sortBy: "openCall", sortDirection: "asc" });
     }
-  }, [view]);
+  }, [view, handleResetFilters]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -279,6 +296,7 @@ const ClientEventList = () => {
         sortOptions.sortBy,
         userTimeZone,
         hasTZPref,
+        view,
       );
 
       const mainKey = title.raw || "Ungrouped";
@@ -299,7 +317,7 @@ const ClientEventList = () => {
     }
 
     return Object.values(groups);
-  }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);
+  }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref, view]);
 
   const totalCards = groupedEvents.reduce(
     (sum, group) => sum + group.events.length,
@@ -377,11 +395,13 @@ const ClientEventList = () => {
               totalOpenCalls={totalOpen}
               totalResults={totalResults}
               onPageChange={setPage}
+              eventOnly={view === "event"}
+              setViewAction={setView}
             />
           )}
         </>
       )}
-      {publicView && (
+      {/* {publicView && (
         <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:py-8">
           <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:gap-2 lg:text-xl">
             <Button
@@ -415,7 +435,8 @@ const ClientEventList = () => {
             </p>
           </div>
         </div>
-      )}
+      )} */}
+      {publicView && <PublicHeader view={view} setViewAction={setView} />}
 
       {isLoading ? (
         <div className="mb-10 w-full max-w-[90vw] space-y-4 sm:space-y-6">
@@ -644,6 +665,8 @@ const ClientEventList = () => {
           onPageChange={setPage}
           bottomPag
           className={cn("mb-6", !publicView && "mb-12")}
+          eventOnly={view === "event"}
+          setViewAction={setView}
         />
       )}
       {isLoading && (

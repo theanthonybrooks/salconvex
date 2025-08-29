@@ -205,6 +205,7 @@ export type PublicEventPreviewData = EventData & {
   openCall: OpenCall | null;
   openCallStatus: OpenCallStatus | null;
   hasActiveOpenCall: boolean;
+  orgName: string | null;
   eventId: Id<"events">;
   slug: string;
   tabs: {
