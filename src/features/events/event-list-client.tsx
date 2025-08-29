@@ -585,7 +585,7 @@ const ClientEventList = () => {
         </>
       )}
 
-      {!publicView && hasResults && (
+      {(!publicView || publicEventOnly) && hasResults && (
         <BasicPagination
           page={page}
           totalPages={totalPages}

@@ -109,6 +109,8 @@ export const compareEnrichedEvents = (
       const ocState = item.tabs.opencall?.state;
       const isPublished = ocState === "published" && item.state === "published";
       const isArchivedOC = ocState === "archived" && item.state === "published";
+      //TODO: Include archived events in the sort.
+      // const isArchivedEvent = item.state === "archived";
       const isApproved = isPublished || isArchivedOC;
       const ocStatus = item.openCallStatus;
       const isRolling = callType === "Rolling";
