@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import {
   SearchType,
   TheListFilterCommandItem,
@@ -74,7 +74,7 @@ export interface FilterBaseProps {
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
   className?: string;
-  view: viewOptions;
+  view: ViewOptions;
 }
 
 export const FilterBase = ({
@@ -335,6 +335,7 @@ export const FilterBase = ({
                   )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="organizer">Organizer</SelectItem>
                 </SelectContent>
               </Select>
             </section>
@@ -688,6 +689,7 @@ export const FilterBase = ({
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
                   <SelectItem value="country">Country</SelectItem>
+                  <SelectItem value="organizer">Organizer</SelectItem>
                 </SelectContent>
               </Select>
             </section>

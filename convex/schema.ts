@@ -662,6 +662,7 @@ export default defineSchema({
     .index("by_slug_and_organizerId", ["slug", "organizerId"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
+    .index("by_mainOrgId_and_state", ["mainOrgId", "state"])
     .index("by_name_and_edition", ["name", "dates.edition"])
     .index("by_state_hasOpenCall_approvedAt", [
       "state",

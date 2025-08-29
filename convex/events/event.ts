@@ -921,6 +921,7 @@ export const getEventWithDetails = query({
     const event = events.find((e) => e.dates.edition === args.edition);
     const eventState = event?.state as SubmissionFormState;
     const eventPublished = eventState === "published" || isAdmin;
+    const eventArchived = eventState === "archived";
 
     if (!event) throw new ConvexError("No event found");
 
@@ -932,7 +933,9 @@ export const getEventWithDetails = query({
       ctx.db.get(event.mainOrgId),
     ]);
 
-    if (organizer?.ownerId !== userId && !eventPublished)
+    console.log(eventState);
+
+    if (organizer?.ownerId !== userId && !eventPublished && !eventArchived)
       throw new ConvexError("You don't have permission to view this event");
 
     const openCall = openCalls.find(

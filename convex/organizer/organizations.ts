@@ -767,10 +767,20 @@ export const getOrganizerBySlug = query({
       }
       throw new ConvexError(`No organizer found for ${args.slug}`);
     }
-    const rawEvents = await ctx.db
+    const publishedEvents = await ctx.db
       .query("events")
-      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", organizer._id))
+      .withIndex("by_mainOrgId_and_state", (q) =>
+        q.eq("mainOrgId", organizer._id).eq("state", "published"),
+      )
       .collect();
+    const archivedEvents = await ctx.db
+      .query("events")
+      .withIndex("by_mainOrgId_and_state", (q) =>
+        q.eq("mainOrgId", organizer._id).eq("state", "archived"),
+      )
+      .collect();
+
+    const rawEvents = [...publishedEvents, ...archivedEvents];
 
     events = rawEvents.map((e) => ({
       ...e,

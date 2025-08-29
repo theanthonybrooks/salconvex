@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getSearchLocationString } from "@/lib/locations";
@@ -69,7 +69,7 @@ export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   onResetFilters: () => void;
   // user: User | null;
   hasActiveFilters: boolean | undefined;
-  view: viewOptions;
+  view: ViewOptions;
 }
 
 export type SearchType = "events" | "orgs" | "loc" | "all";

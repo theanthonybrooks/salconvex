@@ -132,6 +132,7 @@ const ClientThisWeekList = (
         sortOptions.sortBy,
         userTimeZone,
         hasTZPref,
+        "all",
       );
       const groupKey = title.raw;
 

@@ -1,4 +1,4 @@
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import { Filters, Pagination, SortOptions } from "@/types/thelist";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "~/convex/_generated/api";
@@ -16,7 +16,7 @@ export const useFilteredEventsQuery = (
   sortOptions: SortOptions,
   pagination: Pagination,
   source: Source,
-  viewType?: viewOptions,
+  viewType?: ViewOptions,
 ) => {
   return useQuery(api.thelist.getFilteredEventsPublic.getFilteredEventsPublic, {
     filters,

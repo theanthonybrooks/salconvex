@@ -1,4 +1,4 @@
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import {
   getFourCharMonthFromLuxon,
   getOrdinalSuffix,
@@ -17,7 +17,7 @@ export function getGroupKeyFromEvent(
   sortBy: string,
   timeZone: string,
   hasTZPref: boolean,
-  viewType: viewOptions,
+  viewType: ViewOptions,
 ): {
   raw: string;
   subHeading?: string;
@@ -186,8 +186,6 @@ export function getGroupKeyFromEvent(
     const state = event.location?.state;
     const orgName = event.orgName ?? undefined;
 
-    console.log(event.name, orgName);
-
     const isUS =
       country.toLowerCase() === "united states" ||
       countryAbbr?.toUpperCase() === "US" ||
@@ -239,6 +237,11 @@ export function getGroupKeyFromEvent(
       raw: countryAbbr ? `${country} (${displayCountryAbbr})` : country,
       subHeading,
     };
+  }
+
+  if (sortBy === "organizer") {
+    const orgName = event.orgName ?? "";
+    return { raw: orgName };
   }
 
   return { raw: "Ungrouped" };

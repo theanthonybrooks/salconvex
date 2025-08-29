@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { BasicPagination } from "@/components/ui/pagination2";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
@@ -21,8 +22,10 @@ import {
 } from "@/types/event";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
 import { usePreloadedQuery } from "convex/react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import {
   Dispatch,
   SetStateAction,
@@ -33,16 +36,18 @@ import {
   useState,
 } from "react";
 
-export type viewOptions =
-  | "event"
-  | "openCall"
-  | "organizer"
-  | "archive"
-  | "all";
+export const viewOptionValues = [
+  { value: "openCall", label: "Open Calls" },
+  { value: "organizer", label: "Organizers" },
+  { value: "event", label: "Events Only" },
+  { value: "archive", label: "Archive" },
+] as const;
+
+export type ViewOptions = (typeof viewOptionValues)[number]["value"];
 
 const ClientEventList = () => {
   const initialTitleRef = useRef<string | null>(null);
-  const [view, setView] = useState<viewOptions>("all");
+  const [view, setView] = useState<ViewOptions>("openCall");
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -59,8 +64,9 @@ const ClientEventList = () => {
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
   const isAdmin = user?.role?.includes("admin");
-  const publicView =
-    (!hasActiveSubscription || !isArtist) && view !== "event" && !isAdmin;
+
+  const publicView = (!hasActiveSubscription || !isArtist) && !isAdmin;
+  const publicEventOnly = publicView && view === "event";
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
@@ -87,7 +93,7 @@ const ClientEventList = () => {
         view === "event" || view === "archive"
           ? "eventStart"
           : view === "organizer"
-            ? "country"
+            ? "organizer"
             : "openCall",
       sortDirection: "asc",
     }),
@@ -151,7 +157,9 @@ const ClientEventList = () => {
   );
 
   const total = queryResult?.total ?? 0;
-  const totalOpen = queryResult?.totalOpenCalls ?? 0;
+  const totalOpen = queryResult?.totalOpenCalls;
+  const totalActive = queryResult?.totalActive;
+  const totalArchived = queryResult?.totalArchived;
   const isLoading = !queryResult;
 
   const handleResetFilters = useCallback(() => {
@@ -164,7 +172,7 @@ const ClientEventList = () => {
     handleResetFilters();
     if (view === "event") {
       setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
-    } else if (view === "openCall" || view === "all") {
+    } else if (view === "openCall") {
       setSortOptions({ sortBy: "openCall", sortDirection: "asc" });
     }
   }, [view, handleResetFilters]);
@@ -239,46 +247,11 @@ const ClientEventList = () => {
 
   const paginatedEvents = enrichedEvents;
 
-  {
-    /*  const groupedEvents = useMemo(() => {
-    const groups: Record<
-      string,
-      {
-        title: ReturnType<typeof getGroupKeyFromEvent>;
-        events: CombinedEventPreviewCardData[];
-      }
-    > = {};
-    const orderedGroupKeys: string[] = [];
-
-    const list = publicView ? paginatedEvents.slice(0, 6) : paginatedEvents;
-
-    for (const event of list) {
-      const title = getGroupKeyFromEvent(
-        event,
-        sortOptions.sortBy,
-        userTimeZone,
-        hasTZPref,
-      );
-      // const groupKey = title.raw;
-      const groupKey =
-        sortOptions.sortBy === "country" && title.subHeading
-          ? `${title.raw}__${title.subHeading}`
-          : title.raw;
-
-      if (!groups[groupKey]) {
-        groups[groupKey] = { title, events: [] };
-        orderedGroupKeys.push(groupKey);
-      }
-
-      groups[groupKey].events.push(event);
-    }
-
-    return orderedGroupKeys.map((key) => groups[key]);
-  }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);*/
-  }
-
   const groupedEvents = useMemo(() => {
-    const list = publicView ? paginatedEvents.slice(0, 6) : paginatedEvents;
+    const list =
+      publicView && view !== "event"
+        ? paginatedEvents.slice(0, 6)
+        : paginatedEvents;
 
     // Step 1: Group by main raw key
     const groups: Record<
@@ -365,16 +338,16 @@ const ClientEventList = () => {
   // }, [page]);
   return (
     <>
-      {!publicView && (
+      {publicView && (
+        <PublicHeader
+          subStatus={userSubStatus}
+          setViewAction={setView}
+          view={view}
+        />
+      )}
+      {(!publicView || publicEventOnly) && (
         <>
           {/* TODO: make this public with some features that are only available to logged in users */}
-          {view === "event" && !hasActiveSubscription && (
-            <PublicHeader
-              subStatus={userSubStatus}
-              setViewAction={setView}
-              view={view}
-            />
-          )}
 
           <EventFilters
             filters={filters}
@@ -388,56 +361,63 @@ const ClientEventList = () => {
             view={view}
           />
 
+          {hasActiveSubscription && (
+            <Tabs
+              defaultValue={view}
+              className="relative w-max max-w-[90vw]"
+              // value={view}
+              onValueChange={(val) => setView(val as ViewOptions)}
+            >
+              <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
+                {(isMobile
+                  ? viewOptionValues.slice(0, 3)
+                  : viewOptionValues
+                ).map((opt) => (
+                  <TabsTrigger
+                    key={opt.value}
+                    value={opt.value}
+                    className={cn(
+                      "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium hover:font-bold",
+                      view === opt.value
+                        ? "font-bold text-black"
+                        : "text-foreground/80",
+                    )}
+                  >
+                    {view === opt.value && (
+                      <motion.div
+                        exit={{ opacity: 0 }}
+                        layoutId="tab-bg"
+                        className="absolute inset-0 z-0 flex items-center justify-center rounded-md border-2 bg-background shadow-sm"
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+
+                    <span className="z-10"> {opt.label}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          )}
+
           {!isLoading && hasResults && (
             <BasicPagination
               page={page}
               totalPages={totalPages}
               totalOpenCalls={totalOpen}
+              totalActive={totalActive}
+              totalArchived={totalArchived}
               totalResults={totalResults}
               onPageChange={setPage}
-              eventOnly={view === "event"}
               setViewAction={setView}
               viewType={view}
             />
           )}
         </>
       )}
-      {/* {publicView && (
-        <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:py-8">
-          <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:gap-2 lg:text-xl">
-            <Button
-              variant="salWithShadowHiddenBg"
-              className="text-lg font-bold lg:text-xl"
-              onClick={() => {
-                setView((prev) => (prev === "event" ? "all" : "event"));
-              }}
-            >
-              {"View Events Only"}
-            </Button>
-            <p>or</p>
-            <Button
-              variant="salWithShadowHiddenBg"
-              className="text-lg font-bold lg:text-xl"
-              onClick={() => {
-                if (subStatus?.subStatus === "past_due") {
-                  router.push("/dashboard/account/billing");
-                } else {
-                  router.push("/pricing");
-                }
-              }}
-            >
-              {subStatus?.subStatus === "past_due"
-                ? "Resume your membership"
-                : "Become a member"}
-            </Button>
-            <p className="sm:hidden">for the full list & open call details</p>
-            <p className="hidden sm:block">
-              to view the full list and open call details
-            </p>
-          </div>
-        </div>
-      )} */}
-      {publicView && <PublicHeader view={view} setViewAction={setView} />}
 
       {isLoading ? (
         <div className="mb-10 w-full max-w-[90vw] space-y-4 sm:space-y-6">
@@ -473,76 +453,6 @@ const ClientEventList = () => {
                 isEndedGroup &&
                 !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);
 
-              {
-                /*            return (
-                <div key={group.title.raw} className="mb-6">
-                  {isFirstEnded && sortOptions.sortBy === "openCall" && (
-                    <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
-                      Ended Calls
-                    </h2>
-                  )}
-
-                  <h3 className="mb-3 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
-                    {group.title.parts ? (
-                      <>
-                        {group.title.parts.month}
-                        <span className="flex items-start">
-                          {group.title.parts.day}
-                          <p className="align-super text-sm">
-                            {group.title.parts.suffix}
-                          </p>
-                        </span>
-                        {group.title.parts.year &&
-                          ` (${group.title.parts.year})`}
-                      </>
-                    ) : group.title.label ? (
-                      group.title.label
-                    ) : (
-                      group.title.raw
-                    )}
-                  </h3>
-                  {sortOptions.sortBy === "country" &&
-                    group.title.subHeading && (
-                      <h4 className="mb-4 mt-5 text-center text-xl font-semibold">
-                        {group.title.subHeading}
-                      </h4>
-                    )}
-                  <div className="space-y-4 sm:space-y-6">
-                    {group.events.map((event, index) => {
-                      const showPublic = publicView
-                        ? flatIndex < 1
-                        : publicView;
-                      const isMaskedCard =
-                        publicView && flatIndex === totalCards - 1;
-
-                      const card = (
-                        <div
-                          key={index}
-                          className={cn(
-                            isMaskedCard &&
-                              "masked-card pointer-events-none blur-[1px]",
-                          )}
-                        >
-                          <EventCardPreview
-                            key={index}
-                            event={event}
-                            publicView={publicView}
-                            publicPreview={showPublic}
-                            user={user}
-                            userPref={userPref}
-                          />
-                        </div>
-                      );
-
-                      flatIndex++;
-                      return card;
-                    })}
-                  </div>
-                </div>
-              );
-            })
-          ) : (*/
-              }
               return (
                 <div key={group.title.raw} className="mb-6">
                   {isFirstEnded && sortOptions.sortBy === "openCall" && (
@@ -666,7 +576,6 @@ const ClientEventList = () => {
           onPageChange={setPage}
           bottomPag
           className={cn("mb-6", !publicView && "mb-12")}
-          eventOnly={view === "event"}
           setViewAction={setView}
           viewType={view}
         />
@@ -703,9 +612,9 @@ const ClientEventList = () => {
 export default ClientEventList;
 
 type publicHeaderProps = {
-  view: viewOptions;
+  view: ViewOptions;
   subStatus?: string;
-  setViewAction: Dispatch<SetStateAction<viewOptions>>;
+  setViewAction: Dispatch<SetStateAction<ViewOptions>>;
 };
 
 const PublicHeader = ({
@@ -721,8 +630,8 @@ const PublicHeader = ({
           variant="salWithShadowHiddenBg"
           className="text-lg font-bold lg:text-xl"
           onClick={() => {
-            setViewAction((prev: viewOptions) =>
-              prev === "event" ? "all" : "event",
+            setViewAction((prev: ViewOptions) =>
+              prev === "event" ? "openCall" : "event",
             );
           }}
         >

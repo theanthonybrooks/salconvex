@@ -7,8 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -19,13 +18,15 @@ interface BasicPaginationProps {
   totalPages: number;
   totalResults: number;
   totalOpenCalls?: number;
+  totalActive?: number;
+  totalArchived?: number;
   bottomPag?: boolean;
   className?: string;
-  eventOnly?: boolean;
+  
 
   onPageChange: (page: number) => void;
-  viewType: viewOptions;
-  setViewAction: Dispatch<SetStateAction<viewOptions>>;
+  viewType: ViewOptions;
+  setViewAction: Dispatch<SetStateAction<ViewOptions>>;
 }
 
 export const BasicPagination = ({
@@ -33,19 +34,20 @@ export const BasicPagination = ({
   totalPages,
   totalResults,
   totalOpenCalls,
+  totalActive,
+  // totalArchived,
   bottomPag = false,
   className,
-  eventOnly,
 
   onPageChange: setPage,
   viewType,
-  setViewAction,
+  // setViewAction,
 }: BasicPaginationProps) => {
+  const showOCTotal = viewType === "openCall";
   const firstPage = page === 1;
   const lastPage = page === totalPages;
   const singlePage = totalPages === 1;
   const backTrigger = page > 2;
-  const showToggle = false;
 
   // const [prevTotal, setPrevTotal] = useState(totalPages);
 
@@ -73,9 +75,14 @@ export const BasicPagination = ({
               <p className={cn("mx-auto text-nowrap text-center")}>
                 Results: {totalResults}
               </p>
-              {!eventOnly && (
+              {showOCTotal && totalOpenCalls && (
                 <p className={cn("mx-auto text-nowrap text-center")}>
-                  Open Calls: {totalOpenCalls}
+                  Active Calls: {totalOpenCalls}
+                </p>
+              )}
+              {viewType === "archive" && totalActive && (
+                <p className={cn("mx-auto text-nowrap text-center")}>
+                  Total Active: {totalActive}
                 </p>
               )}
             </div>
@@ -169,46 +176,20 @@ export const BasicPagination = ({
               >
                 (Back to Start)
               </p>
-              {/* <div className={cn("flex items-center gap-2")}>
-                <p
-                  className="text-sm text-gray-500"
-                  onClick={() => setViewAction("event")}
-                >
-                  Events
-                </p>
-                <p
-                  className="text-sm text-gray-500"
-                  onClick={() => setViewAction("openCall")}
-                >
-                  Open Calls
-                </p>
-                <p
-                  className="text-sm text-gray-500"
-                  onClick={() => setViewAction("archive")}
-                >
-                  Archive
-                </p>
-                <p
-                  className="text-sm text-gray-500"
-                  onClick={() => setViewAction("organizer")}
-                >
-                  Org
-                </p>
-              </div> */}
-              {showToggle && (
-                <Tabs
-                  value={viewType}
-                  onValueChange={(val) => setViewAction(val as viewOptions)}
-                  className="w-full sm:w-auto"
-                >
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="event">Events</TabsTrigger>
-                    <TabsTrigger value="openCall">Open Calls</TabsTrigger>
-                    <TabsTrigger value="archive">Archive</TabsTrigger>
-                    <TabsTrigger value="organizer">Org</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              )}
+
+              {/* 
+              <Tabs
+                value={viewType}
+                onValueChange={(val) => setViewAction(val as viewOptions)}
+                className="w-full sm:w-auto"
+              >
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="event">Events</TabsTrigger>
+                  <TabsTrigger value="openCall">Open Calls</TabsTrigger>
+                  <TabsTrigger value="archive">Archive</TabsTrigger>
+                  <TabsTrigger value="organizer">Org</TabsTrigger>
+                </TabsList>
+              </Tabs> */}
             </>
           )}
         </motion.div>

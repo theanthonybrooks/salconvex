@@ -2,7 +2,7 @@
 
 import { Separator } from "@/components/ui/separator";
 import { dashboardNavItems } from "@/constants/links";
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
 import { Filters, SortOptions } from "@/types/thelist";
 import { User, UserPref } from "@/types/user";
@@ -16,7 +16,7 @@ interface Props {
   onResetFilters: () => void;
   userPref: UserPref | null;
   isMobile: boolean;
-  view: viewOptions;
+  view: ViewOptions;
 }
 
 export const EventFilters = ({

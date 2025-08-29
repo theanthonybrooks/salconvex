@@ -6,6 +6,7 @@ import { OpenCall, OpenCallStatus } from "@/types/openCall";
 
 export type EnrichedEventsCardData = EventData & {
   tabs: { opencall: OpenCall | null };
+  orgName: string | null;
   hasActiveOpenCall: boolean;
   appFee?: number;
   openCallStatus: OpenCallStatus | null;
@@ -249,6 +250,14 @@ export const compareEnrichedEvents = (
     return sortDirection === "asc"
       ? aName.localeCompare(bName)
       : bName.localeCompare(aName);
+  }
+  if (sortBy === "organizer") {
+    const aOrg = (a.orgName ?? "").toLowerCase();
+    const bOrg = (b.orgName ?? "").toLowerCase();
+
+    return sortDirection === "asc"
+      ? aOrg.localeCompare(bOrg)
+      : bOrg.localeCompare(aOrg);
   }
 
   if (sortBy === "country") {

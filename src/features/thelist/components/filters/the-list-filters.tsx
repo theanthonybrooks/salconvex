@@ -1,6 +1,6 @@
 "use client";
 
-import { viewOptions } from "@/features/events/event-list-client";
+import { ViewOptions } from "@/features/events/event-list-client";
 import {
   SearchType,
   TheListFilterCommandItem,
@@ -29,7 +29,7 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
   hasActiveFilters: boolean | undefined;
-  view: viewOptions;
+  view: ViewOptions;
   // userPref: UserPref | null;
 }
 

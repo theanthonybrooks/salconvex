@@ -24,6 +24,7 @@ export const getFilteredEventsPublic = query({
         v.literal("openCall"),
         v.literal("name"),
         v.literal("country"),
+        v.literal("organizer"),
       ),
       sortDirection: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
     }),
@@ -36,7 +37,6 @@ export const getFilteredEventsPublic = query({
     ),
     viewType: v.optional(
       v.union(
-        v.literal("all"),
         v.literal("event"),
         v.literal("openCall"),
         v.literal("organizer"),
@@ -49,7 +49,7 @@ export const getFilteredEventsPublic = query({
     const nextWeekPg = source === "nextweek";
     const theListPg = source === "thelist";
 
-    const view = viewType ?? "all";
+    const view = viewType ?? "openCall";
 
     let refDate = new Date();
     const userId = await getAuthUserId(ctx);
@@ -106,7 +106,7 @@ export const getFilteredEventsPublic = query({
 
     const hiddenIds = listActions.filter((a) => a.hidden).map((a) => a.eventId);
     let events = [];
-    if (thisWeekPg || nextWeekPg || view === "archive") {
+    if (thisWeekPg || nextWeekPg || view === "archive" || view === "openCall") {
       const publishedEvents = await ctx.db
         .query("events")
         .withIndex("by_state", (q) => q.eq("state", "published"))
@@ -310,6 +310,20 @@ export const getFilteredEventsPublic = query({
       viewFiltered = sorted.filter((e) => e.organizerId);
     }
 
+    let totalActive = 0;
+    let totalArchived = 0;
+
+    if (view === "archive") {
+      for (const e of viewFiltered) {
+        if (!e.openCall) continue;
+        if (e.openCallStatus === "active") {
+          totalActive++;
+        } else if (e.openCallStatus === "ended") {
+          totalArchived++;
+        }
+      }
+    }
+
     const pg = page ?? 1;
     const limit = filters.limit ?? 10;
     const start = (pg - 1) * limit;
@@ -321,6 +335,7 @@ export const getFilteredEventsPublic = query({
       totalOpenCalls: filteredTotalOpenCalls,
       weekStartISO,
       weekEndISO,
+      ...(view === "archive" ? { totalActive, totalArchived } : {}),
     };
   },
 });
