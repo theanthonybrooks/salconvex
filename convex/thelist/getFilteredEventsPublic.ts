@@ -165,7 +165,7 @@ export const getFilteredEventsPublic = query({
           filters.continent!.includes(e.location.continent),
       );
     }
-
+    let totalResults = 0;
     let totalOpenCalls = 0;
 
     const enriched = await Promise.all(
@@ -304,10 +304,18 @@ export const getFilteredEventsPublic = query({
     let viewFiltered = sorted;
     if (view === "event") {
       viewFiltered = sorted.filter((e) => !e.openCall);
-    } else if (view === "openCall" || view === "archive") {
+    } else if (view === "openCall") {
       viewFiltered = sorted.filter((e) => e.openCall);
-    } else if (view === "organizer") {
+    }
+
+    if (view === "organizer") {
       viewFiltered = sorted.filter((e) => e.organizerId);
+      const uniqueOrganizerIds = new Set(
+        viewFiltered.map((e) => e.mainOrgId).filter(Boolean),
+      );
+      totalResults = uniqueOrganizerIds.size;
+    } else {
+      totalResults = viewFiltered.length;
     }
 
     let totalActive = 0;
@@ -331,7 +339,7 @@ export const getFilteredEventsPublic = query({
 
     return {
       results: paginated,
-      total: viewFiltered.length,
+      total: totalResults,
       totalOpenCalls: filteredTotalOpenCalls,
       weekStartISO,
       weekEndISO,

@@ -501,7 +501,9 @@ const ClientEventList = () => {
                           ? flatIndex < 1
                           : publicView;
                         const isMaskedCard =
-                          publicView && flatIndex === totalCards - 1;
+                          publicView &&
+                          !publicEventOnly &&
+                          flatIndex === totalCards - 1;
                         flatIndex++;
 
                         return (
@@ -537,7 +539,9 @@ const ClientEventList = () => {
                               ? flatIndex < 1
                               : publicView;
                             const isMaskedCard =
-                              publicView && flatIndex === totalCards - 1;
+                              publicView &&
+                              !publicEventOnly &&
+                              flatIndex === totalCards - 1;
                             flatIndex++;
 
                             return (
@@ -609,7 +613,12 @@ const ClientEventList = () => {
       )}
       {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
       {publicView && (
-        <div className="mx-auto mb-20 max-w-[90vw] -translate-y-14">
+        <div
+          className={cn(
+            "mx-auto mb-20 max-w-[90vw] -translate-y-14",
+            publicEventOnly && "translate-y-0",
+          )}
+        >
           <h2 className="text-balance text-center">
             Become a member to view the full list and apply to open calls.
             <br />
