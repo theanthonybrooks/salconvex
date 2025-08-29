@@ -1,7 +1,7 @@
 import { EventCategory, EventType } from "@/types/event";
 import { Id } from "~/convex/_generated/dataModel";
 
-type SortBy = "openCall" | "name" | "eventStart";
+type SortBy = "openCall" | "name" | "eventStart" | "country";
 type SortDirection = "asc" | "desc";
 export type Continents =
   | "North America"

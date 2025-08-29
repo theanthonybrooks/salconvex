@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { viewOptions } from "@/features/events/event-list-client";
 import {
   SearchType,
   TheListFilterCommandItem,
@@ -51,6 +52,9 @@ import {
   LiaSortNumericDownSolid,
 } from "react-icons/lia";
 
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { usePreloadedQuery } from "convex/react";
+
 export interface FilterBaseProps {
   isMobile: boolean;
   filters: Filters;
@@ -70,6 +74,7 @@ export interface FilterBaseProps {
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
   className?: string;
+  view: viewOptions;
 }
 
 export const FilterBase = ({
@@ -90,12 +95,20 @@ export const FilterBase = ({
   shortcut,
   hasShortcut,
   groupedResults,
+  view,
   // user,
 }: FilterBaseProps) => {
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showFull, setShowFull] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const eventOnly = view === "event";
+  const hasActiveSubscription = subData?.hasActiveSubscription;
+  const isArtist = userData?.user?.accountType?.includes("artist");
+  const paidUser = isArtist && hasActiveSubscription;
   const notEvent =
     filters.eventCategories?.length !== 0 &&
     !filters.eventCategories?.includes("event");
@@ -317,7 +330,9 @@ export const FilterBase = ({
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
-                  <SelectItem value="openCall">Open Call</SelectItem>
+                  {!eventOnly && (
+                    <SelectItem value="openCall">Open Call</SelectItem>
+                  )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
                 </SelectContent>
@@ -370,28 +385,30 @@ export const FilterBase = ({
             </section>
           </div>
 
-          <section className="flex flex-col gap-2">
-            <Label
-              htmlFor="eventCategories"
-              className="flex items-center gap-2"
-            >
-              Category:
-            </Label>
-            <MultiSelect
-              options={[...eventCategoryOptions]}
-              value={filters.eventCategories ?? []}
-              onValueChange={(value) =>
-                onChange({ eventCategories: value as EventCategory[] })
-              }
-              placeholder="Category"
-              variant="basic"
-              selectAll={false}
-              hasSearch={false}
-              className="w-full border bg-card sm:h-9"
-              maxCount={1}
-              showArrow={false}
-            />
-          </section>
+          {!eventOnly && (
+            <section className="flex flex-col gap-2">
+              <Label
+                htmlFor="eventCategories"
+                className="flex items-center gap-2"
+              >
+                Category:
+              </Label>
+              <MultiSelect
+                options={[...eventCategoryOptions]}
+                value={filters.eventCategories ?? []}
+                onValueChange={(value) =>
+                  onChange({ eventCategories: value as EventCategory[] })
+                }
+                placeholder="Category"
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                className="w-full border bg-card sm:h-9"
+                maxCount={1}
+                showArrow={false}
+              />
+            </section>
+          )}
           {(filters.eventCategories?.includes("event") ||
             filters.eventCategories?.length === 0) && (
             <section className="flex flex-col gap-2">
@@ -417,19 +434,47 @@ export const FilterBase = ({
               />
             </section>
           )}
-          <div
-            onClick={() => setShowFull((prev) => !prev)}
-            className="flex w-full flex-col items-center justify-center gap-2"
-          >
-            <Separator
-              orientation="horizontal"
-              className="mx-auto h-2 w-full text-foreground/50"
-            />
-            {showFull && <ChevronUp className="size-5 text-foreground/50" />}
+          {eventOnly && (
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="continents" className="flex items-center gap-2">
+                Continent:
+              </Label>
+              <MultiSelect
+                options={select_continents}
+                value={filters.continent ?? []}
+                onValueChange={(value) =>
+                  onChange({ continent: value as Continents[] })
+                }
+                placeholder="--Continent--"
+                variant="basic"
+                selectAll={false}
+                hasSearch={false}
+                textClassName="text-center"
+                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+                badgeClassName="h-9"
+                maxCount={1}
+                // shortResults
+                showArrow={false}
+              />
+            </section>
+          )}
+          {!eventOnly && (
+            <div
+              onClick={() => setShowFull((prev) => !prev)}
+              className="flex w-full flex-col items-center justify-center gap-2"
+            >
+              <Separator
+                orientation="horizontal"
+                className="mx-auto h-2 w-full text-foreground/50"
+              />
+              {showFull && <ChevronUp className="size-5 text-foreground/50" />}
 
-            {showFull ? "Hide Open Call Filters" : "Show Open Call Filters"}
-            {!showFull && <ChevronDown className="size-5text-foreground/50" />}
-          </div>
+              {showFull ? "Hide Open Call Filters" : "Show Open Call Filters"}
+              {!showFull && (
+                <ChevronDown className="size-5text-foreground/50" />
+              )}
+            </div>
+          )}
           {showFull && (
             <>
               <section className="flex w-full flex-col gap-2">
@@ -541,31 +586,33 @@ export const FilterBase = ({
           )}
 
           <div className="mt-2 flex w-full justify-between">
-            <section className="flex flex-col gap-4">
-              <label className="flex cursor-pointer items-center gap-2">
-                <Checkbox
-                  id="bookmarkedOnly"
-                  checked={filters.bookmarkedOnly}
-                  onCheckedChange={(checked) =>
-                    onChange({ bookmarkedOnly: Boolean(checked) })
-                  }
-                />
-                <span className="text-sm">Bookmarked Only</span>
-              </label>
+            {paidUser && (
+              <section className="flex flex-col gap-4">
+                <label className="flex cursor-pointer items-center gap-2">
+                  <Checkbox
+                    id="bookmarkedOnly"
+                    checked={filters.bookmarkedOnly}
+                    onCheckedChange={(checked) =>
+                      onChange({ bookmarkedOnly: Boolean(checked) })
+                    }
+                  />
+                  <span className="text-sm">Bookmarked Only</span>
+                </label>
 
-              <label className="flex cursor-pointer items-center gap-2">
-                <Checkbox
-                  id="showHidden"
-                  checked={filters.showHidden}
-                  onCheckedChange={(checked) =>
-                    onChange({ showHidden: Boolean(checked) })
-                  }
-                />
-                <span className="text-sm">
-                  {filters.showHidden ? "Hide" : "Show"} Hidden
-                </span>
-              </label>
-            </section>
+                <label className="flex cursor-pointer items-center gap-2">
+                  <Checkbox
+                    id="showHidden"
+                    checked={filters.showHidden}
+                    onCheckedChange={(checked) =>
+                      onChange({ showHidden: Boolean(checked) })
+                    }
+                  />
+                  <span className="text-sm">
+                    {filters.showHidden ? "Hide" : "Show"} Hidden
+                  </span>
+                </label>
+              </section>
+            )}
             {hasActiveFilters && (
               <Button
                 variant="salWithoutShadow"
@@ -635,9 +682,12 @@ export const FilterBase = ({
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
-                  <SelectItem value="openCall">Open Call</SelectItem>
+                  {!eventOnly && (
+                    <SelectItem value="openCall">Open Call</SelectItem>
+                  )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="country">Country</SelectItem>
                 </SelectContent>
               </Select>
             </section>
@@ -685,30 +735,32 @@ export const FilterBase = ({
                 </SelectContent>
               </Select>
             </section>
-            <section className="flex flex-col gap-2">
-              <Label
-                htmlFor="eventCategories"
-                className="flex items-center gap-2"
-              >
-                Category:
-              </Label>
-              <MultiSelect
-                options={[...eventCategoryOptions]}
-                value={filters.eventCategories ?? []}
-                onValueChange={(value) =>
-                  onChange({ eventCategories: value as EventCategory[] })
-                }
-                placeholder="--Category--"
-                variant="basic"
-                selectAll={false}
-                hasSearch={false}
-                textClassName="text-center"
-                className="w-40 border bg-transparent hover:bg-white/30 sm:h-12"
-                badgeClassName="h-9"
-                shortResults
-                showArrow={false}
-              />
-            </section>
+            {!eventOnly && (
+              <section className="flex flex-col gap-2">
+                <Label
+                  htmlFor="eventCategories"
+                  className="flex items-center gap-2"
+                >
+                  Category:
+                </Label>
+                <MultiSelect
+                  options={[...eventCategoryOptions]}
+                  value={filters.eventCategories ?? []}
+                  onValueChange={(value) =>
+                    onChange({ eventCategories: value as EventCategory[] })
+                  }
+                  placeholder="--Category--"
+                  variant="basic"
+                  selectAll={false}
+                  hasSearch={false}
+                  textClassName="text-center"
+                  className="w-40 border bg-transparent hover:bg-white/30 sm:h-12"
+                  badgeClassName="h-9"
+                  shortResults
+                  showArrow={false}
+                />
+              </section>
+            )}
 
             <section className="flex flex-col gap-2">
               <Label htmlFor="eventTypes" className="flex items-center gap-2">
@@ -732,6 +784,29 @@ export const FilterBase = ({
                 showArrow={false}
               />
             </section>
+            {eventOnly && (
+              <section className="flex flex-col gap-2">
+                <Label htmlFor="continents" className="flex items-center gap-2">
+                  Continent:
+                </Label>
+                <MultiSelect
+                  options={select_continents}
+                  value={filters.continent ?? []}
+                  onValueChange={(value) =>
+                    onChange({ continent: value as Continents[] })
+                  }
+                  placeholder="--Continent--"
+                  variant="basic"
+                  selectAll={false}
+                  hasSearch={false}
+                  textClassName="text-center"
+                  className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+                  badgeClassName="h-9"
+                  shortResults
+                  showArrow={false}
+                />
+              </section>
+            )}
             <section className="flex flex-col gap-2">
               <Label htmlFor="limit" className="flex items-center gap-2">
                 Per page:
@@ -762,7 +837,7 @@ export const FilterBase = ({
                 </SelectContent>
               </Select>
             </section>
-            <section className="ml-2 flex flex-col gap-2 self-end">
+            <section className={cn("ml-2 flex flex-col gap-2 self-end")}>
               <span
                 className={cn(
                   "flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline",
@@ -779,19 +854,21 @@ export const FilterBase = ({
                 Clear filters
               </span>
 
-              <div onClick={() => setShowFull((prev) => !prev)}>
-                {showFull ? (
-                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
-                    <ChevronUp className="size-4" />
-                    Less Filters
-                  </span>
-                ) : (
-                  <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
-                    <ChevronDown className="size-4" />
-                    More Filters
-                  </span>
-                )}
-              </div>
+              {!eventOnly && (
+                <div onClick={() => setShowFull((prev) => !prev)}>
+                  {showFull ? (
+                    <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
+                      <ChevronUp className="size-4" />
+                      Less Filters
+                    </span>
+                  ) : (
+                    <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
+                      <ChevronDown className="size-4" />
+                      More Filters
+                    </span>
+                  )}
+                </div>
+              )}
             </section>
           </div>
           {showFull && (

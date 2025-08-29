@@ -237,12 +237,6 @@ export const pricingFaqs: AccordionSection = {
 
   items: [
     {
-      id: "trial",
-      subtitle: "Is there a free trial?",
-      text: "Yes, there is a free trial. You can sign up for a free trial and then cancel at any time. The trial will last for 14 days and you can decide whether you want to continue your membership or not at any time.",
-    },
-
-    {
       id: "paid",
       subtitle: "Why is it paid? It was free",
       text: (
@@ -268,6 +262,12 @@ export const pricingFaqs: AccordionSection = {
         </p>
       ),
     },
+    {
+      id: "trial",
+      subtitle: "Is there a free trial?",
+      text: "Yes, there is a free trial. You can sign up for a free trial and then cancel at any time. The trial will last for 14 days and you can decide whether you want to continue your membership or not at any time.",
+    },
+
     {
       id: "benefits",
       subtitle: "What do I get if I become a member?",

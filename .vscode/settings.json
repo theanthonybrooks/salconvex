@@ -9,7 +9,8 @@
     "Styling",
     "Pricing",
     "Artist Actions",
-    "Support"
+    "Support",
+    "The List"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

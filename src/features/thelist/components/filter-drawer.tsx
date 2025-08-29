@@ -16,7 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { viewOptions } from "@/features/events/event-list-client";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getSearchLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { EventCategory, EventType } from "@/types/event";
@@ -24,6 +26,7 @@ import { Filters, SortOptions } from "@/types/thelist";
 import { Command } from "cmdk";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { debounce } from "lodash";
 import { X } from "lucide-react";
@@ -56,7 +59,6 @@ export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   placeholder?: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   userType?: string[];
-  subStatus?: string | undefined;
   userRole?: string[] | undefined;
   filters: Filters;
   sortOptions: SortOptions;
@@ -67,6 +69,7 @@ export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   onResetFilters: () => void;
   // user: User | null;
   hasActiveFilters: boolean | undefined;
+  view: viewOptions;
 }
 
 export type SearchType = "events" | "orgs" | "loc" | "all";
@@ -119,10 +122,17 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   onResetFilters,
   searchType,
   setSearchType,
-
   hasActiveFilters,
+  view,
 }: FilterDrawerProps<T>) => {
   const router = useRouter();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+
+  const hasActiveSubscription = subData?.hasActiveSubscription;
+  const isArtist = userData?.user?.accountType?.includes("artist");
+  const paidUser = isArtist && hasActiveSubscription;
   // console.log(subStatus);
   const shortcutRef = useRef(shortcut);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -137,6 +147,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       ? {
           searchTerm: debouncedValue,
           searchType,
+          activeSub: paidUser,
         }
       : "skip",
   );
@@ -423,6 +434,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 onSortChange={onSortChange}
                 onResetFilters={onResetFilters}
                 groupedResults={groupedItems}
+                view={view}
               />
             </div>
           </div>

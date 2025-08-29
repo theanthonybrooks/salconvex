@@ -24,8 +24,9 @@ export const globalSearch = query({
       v.literal("loc"),
       v.literal("all"),
     ),
+    activeSub: v.optional(v.boolean()),
   },
-  handler: async (ctx, { searchTerm, searchType }) => {
+  handler: async (ctx, { searchTerm, searchType, activeSub }) => {
     const term = searchTerm.trim();
     if (!term) return { results: [], label: null };
     const searchTerms = term.toLowerCase().split(/\s+/);
@@ -33,7 +34,9 @@ export const globalSearch = query({
     const today = new Date().toISOString();
     const now = Date.parse(today);
 
-    const allOpenCalls = await ctx.db.query("openCalls").collect();
+    const allOpenCalls = activeSub
+      ? await ctx.db.query("openCalls").collect()
+      : [];
 
     //note-to-self: Flagging logic: 0 = none ever, 1 = expired, 2 = active, 3 = future (optional) for now
     const attachOpenCallStatusFlag = <T extends { _id: Id<"events"> }>(

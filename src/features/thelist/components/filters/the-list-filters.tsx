@@ -1,5 +1,6 @@
 "use client";
 
+import { viewOptions } from "@/features/events/event-list-client";
 import {
   SearchType,
   TheListFilterCommandItem,
@@ -9,9 +10,7 @@ import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { cn } from "@/lib/utils";
 import { Filters, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
-import { useQuery } from "convex-helpers/react/cache";
 import { useState } from "react";
-import { api } from "~/convex/_generated/api";
 
 interface ListFilterProps<T extends TheListFilterCommandItem> {
   title: string;
@@ -30,10 +29,11 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
   hasActiveFilters: boolean | undefined;
+  view: viewOptions;
   // userPref: UserPref | null;
 }
 
-export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
+export const TheListFilters = <T extends TheListFilterCommandItem>({
   title,
   source,
   shortcut = "/",
@@ -49,9 +49,8 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
   onChange,
   onSortChange,
   onResetFilters,
+  view,
 }: ListFilterProps<T>) => {
-  const subscription = useQuery(api.subscriptions.getUserSubscriptionStatus);
-  const subStatus = subscription?.subStatus;
   const [searchType, setSearchType] = useState<SearchType>("all");
 
   const [open, setOpen] = useState(false);
@@ -79,6 +78,7 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
           className={cn("flex h-12")}
           searchType={searchType}
           setSearchType={setSearchType}
+          view={view}
         />
       )}
 
@@ -93,7 +93,6 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
         setSearch={setValue}
         isMobile={isMobile}
         userType={userType}
-        subStatus={subStatus}
         userRole={userRole}
         filters={filters}
         sortOptions={sortOptions}
@@ -103,6 +102,7 @@ export const TheListFilterDrawerIcon = <T extends TheListFilterCommandItem>({
         hasActiveFilters={hasActiveFilters}
         searchType={searchType}
         setSearchType={setSearchType}
+        view={view}
       />
     </div>
   );

@@ -18,6 +18,7 @@ export function getGroupKeyFromEvent(
   hasTZPref: boolean,
 ): {
   raw: string;
+  subHeading?: string;
   label?: JSX.Element;
   parts?: {
     month: string;
@@ -167,6 +168,48 @@ export function getGroupKeyFromEvent(
         raw: "",
       };
     }
+  }
+
+  // if (sortBy === "country") {
+  //   const country = event.location?.country;
+  //   const countryAbbr = event.location?.countryAbbr;
+  //   return {
+  //     raw: countryAbbr ? `${country} (${countryAbbr})` : (country ?? "Unknown"),
+  //   };
+  // }
+
+  if (sortBy === "country") {
+    const country = event.location?.country ?? "Unknown";
+    const countryAbbr = event.location?.countryAbbr;
+    const state = event.location?.state;
+
+    const isUS =
+      country.toLowerCase() === "united states" ||
+      countryAbbr?.toUpperCase() === "US" ||
+      countryAbbr?.toUpperCase() === "USA";
+
+    const isCanada =
+      country.toLowerCase() === "canada" ||
+      countryAbbr?.toUpperCase() === "CA" ||
+      countryAbbr?.toUpperCase() === "CAN";
+
+    const isUK =
+      country.toLowerCase() === "united kingdom" ||
+      countryAbbr?.toUpperCase() === "UK" ||
+      countryAbbr?.toUpperCase() === "GB" ||
+      countryAbbr?.toUpperCase() === "GBR";
+
+    const isAustralia =
+      country.toLowerCase() === "australia" ||
+      countryAbbr?.toUpperCase() === "AU" ||
+      countryAbbr?.toUpperCase() === "AUS";
+
+    const hasSubHeading = isUS || isCanada || isUK || isAustralia;
+
+    return {
+      raw: countryAbbr ? `${country} (${countryAbbr})` : country,
+      subHeading: hasSubHeading ? (state ?? undefined) : undefined,
+    };
   }
 
   return { raw: "Ungrouped" };

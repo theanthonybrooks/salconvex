@@ -2,7 +2,8 @@
 
 import { Separator } from "@/components/ui/separator";
 import { dashboardNavItems } from "@/constants/links";
-import { TheListFilterDrawerIcon } from "@/features/thelist/components/mobile/filter-drawer-icon";
+import { viewOptions } from "@/features/events/event-list-client";
+import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
 import { Filters, SortOptions } from "@/types/thelist";
 import { User, UserPref } from "@/types/user";
 
@@ -15,6 +16,7 @@ interface Props {
   onResetFilters: () => void;
   userPref: UserPref | null;
   isMobile: boolean;
+  view: viewOptions;
 }
 
 export const EventFilters = ({
@@ -25,6 +27,7 @@ export const EventFilters = ({
   onSortChange,
   onResetFilters,
   isMobile,
+  view,
 }: Props) => {
   const hasActiveFilters =
     filters.bookmarkedOnly ||
@@ -41,7 +44,7 @@ export const EventFilters = ({
     <div className="mx-auto mb-6 flex w-[min(90vw,1280px)] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-12">
       <Separator className="mx-auto" thickness={2} />
 
-      <TheListFilterDrawerIcon
+      <TheListFilters
         title={"Search"}
         source={dashboardNavItems}
         className="flex"
@@ -57,6 +60,7 @@ export const EventFilters = ({
         onResetFilters={onResetFilters}
         hasActiveFilters={hasActiveFilters}
         isMobile={isMobile}
+        view={view}
       />
 
       <Separator className="mx-auto" thickness={2} />

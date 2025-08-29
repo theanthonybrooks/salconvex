@@ -1,5 +1,4 @@
 import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
-import { PublicEventPreviewData } from "@/types/event";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
@@ -24,6 +23,7 @@ export const getFilteredEventsPublic = query({
         v.literal("eventStart"),
         v.literal("openCall"),
         v.literal("name"),
+        v.literal("country"),
       ),
       sortDirection: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
     }),
@@ -34,11 +34,21 @@ export const getFilteredEventsPublic = query({
       v.literal("thisweek"),
       v.literal("nextweek"),
     ),
+    viewType: v.optional(
+      v.union(
+        v.literal("all"),
+        v.literal("event"),
+        v.literal("openCall"),
+        v.literal("organizer"),
+      ),
+    ),
   },
-  handler: async (ctx, { filters, sortOptions, page, source }) => {
+  handler: async (ctx, { filters, sortOptions, page, source, viewType }) => {
     const thisWeekPg = source === "thisweek";
     const nextWeekPg = source === "nextweek";
     const theListPg = source === "thelist";
+
+    const view = viewType ?? "all";
 
     let refDate = new Date();
     const userId = await getAuthUserId(ctx);
@@ -107,6 +117,14 @@ export const getFilteredEventsPublic = query({
         .collect();
 
       events = [...publishedEvents, ...archivedEvents];
+    } else if (view === "event") {
+      //TODO: later, add the ability to view published or archived events (when archive is made and functional)
+      events = await ctx.db
+        .query("events")
+        .withIndex("by_state_category", (q) =>
+          q.eq("state", "published").eq("category", "event"),
+        )
+        .collect();
     } else {
       events = await ctx.db
         .query("events")
@@ -275,14 +293,23 @@ export const getFilteredEventsPublic = query({
       0,
     );
 
+    let viewFiltered = sorted;
+    if (view === "event") {
+      viewFiltered = sorted.filter((e) => !e.openCall);
+    } else if (view === "openCall") {
+      viewFiltered = sorted.filter((e) => e.openCall);
+    } else if (view === "organizer") {
+      viewFiltered = sorted.filter((e) => e.organizerId);
+    }
+
     const pg = page ?? 1;
     const limit = filters.limit ?? 10;
     const start = (pg - 1) * limit;
-    const paginated = sorted.slice(start, start + limit);
+    const paginated = viewFiltered.slice(start, start + limit);
 
     return {
-      results: paginated as PublicEventPreviewData[],
-      total: sorted.length,
+      results: paginated,
+      total: viewFiltered.length,
       totalOpenCalls: filteredTotalOpenCalls,
       weekStartISO,
       weekEndISO,

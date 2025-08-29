@@ -251,5 +251,34 @@ export const compareEnrichedEvents = (
       : bName.localeCompare(aName);
   }
 
+  if (sortBy === "country") {
+    const getPriority = (item: EnrichedEventsCardData) => {
+      const eventStatePriority =
+        item.state === "published" ? 0 : item.state === "archived" ? 1 : 2;
+
+      const country = item.location?.country ?? "ZZZ";
+      const state = item.location?.state ?? "ZZZ";
+
+      return {
+        eventStatePriority,
+        country: country.toLowerCase(),
+        locState: state.toLowerCase(),
+      };
+    };
+
+    const aP = getPriority(a);
+    const bP = getPriority(b);
+
+    if (aP.eventStatePriority !== bP.eventStatePriority) {
+      return aP.eventStatePriority - bP.eventStatePriority;
+    }
+
+    if (aP.country !== bP.country) {
+      return directionMultiplier * aP.country.localeCompare(bP.country);
+    }
+
+    return directionMultiplier * aP.locState.localeCompare(bP.locState);
+  }
+
   return 0;
 };

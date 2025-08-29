@@ -23,10 +23,20 @@ import { Continents, Filters, SortOptions } from "@/types/thelist";
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+export type viewOptions = "event" | "openCall" | "organizer" | "all";
 
 const ClientEventList = () => {
   const initialTitleRef = useRef<string | null>(null);
+  const [view, setView] = useState<viewOptions>("all");
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -36,6 +46,8 @@ const ClientEventList = () => {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const { subStatus: userSubStatus, hasActiveSubscription } = subStatus;
+
   const artistData = usePreloadedQuery(preloadedArtistData);
   // console.log(artistData);
   const user = userData?.user || null;
@@ -43,7 +55,7 @@ const ClientEventList = () => {
   const isArtist = accountType?.includes("artist");
   const isAdmin = user?.role?.includes("admin");
   const publicView =
-    (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
+    (!hasActiveSubscription || !isArtist) && view !== "event" && !isAdmin;
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
@@ -62,7 +74,7 @@ const ClientEventList = () => {
   };
 
   const defaultSort: SortOptions = {
-    sortBy: "openCall",
+    sortBy: view === "event" ? "eventStart" : "openCall",
     sortDirection: "asc",
   };
 
@@ -101,6 +113,7 @@ const ClientEventList = () => {
     sortOptions,
     { page },
     "thelist",
+    view,
   );
   void useFilteredEventsQuery(
     filters,
@@ -109,6 +122,7 @@ const ClientEventList = () => {
       page: page + 1,
     },
     "thelist",
+    view,
   );
   void useFilteredEventsQuery(
     filters,
@@ -117,6 +131,7 @@ const ClientEventList = () => {
       page: prevPage,
     },
     "thelist",
+    view,
   );
 
   const total = queryResult?.total ?? 0;
@@ -128,6 +143,14 @@ const ClientEventList = () => {
     setSortOptions(defaultSort);
     setPage(1);
   };
+
+  useEffect(() => {
+    if (view === "event") {
+      setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
+    } else if (view === "openCall" || view === "all") {
+      setSortOptions({ sortBy: "openCall", sortDirection: "asc" });
+    }
+  }, [view]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -279,6 +302,14 @@ const ClientEventList = () => {
       {!publicView && (
         <>
           {/* TODO: make this public with some features that are only available to logged in users */}
+          {view === "event" && !hasActiveSubscription && (
+            <PublicHeader
+              subStatus={userSubStatus}
+              setViewAction={setView}
+              view={view}
+            />
+          )}
+
           <EventFilters
             filters={filters}
             sortOptions={sortOptions}
@@ -288,6 +319,7 @@ const ClientEventList = () => {
             userPref={userPref}
             user={user}
             isMobile={isMobile}
+            view={view}
           />
 
           {!isLoading && hasResults && (
@@ -308,6 +340,16 @@ const ClientEventList = () => {
               variant="salWithShadowHiddenBg"
               className="text-lg font-bold lg:text-xl"
               onClick={() => {
+                setView((prev) => (prev === "event" ? "all" : "event"));
+              }}
+            >
+              {"View Events Only"}
+            </Button>
+            <p>or</p>
+            <Button
+              variant="salWithShadowHiddenBg"
+              className="text-lg font-bold lg:text-xl"
+              onClick={() => {
                 if (subStatus?.subStatus === "past_due") {
                   router.push("/dashboard/account/billing");
                 } else {
@@ -318,7 +360,7 @@ const ClientEventList = () => {
               {subStatus?.subStatus === "past_due"
                 ? "Resume your membership"
                 : "Become a member"}
-            </Button>{" "}
+            </Button>
             <p className="sm:hidden">for the full list & open call details</p>
             <p className="hidden sm:block">
               to view the full list and open call details
@@ -368,6 +410,7 @@ const ClientEventList = () => {
                       Ended Calls
                     </h2>
                   )}
+
                   <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
                     {group.title.parts ? (
                       <>
@@ -387,6 +430,12 @@ const ClientEventList = () => {
                       group.title.raw
                     )}
                   </h3>
+                  {sortOptions.sortBy === "country" &&
+                    group.title.subHeading && (
+                      <h4 className="mb-4 mt-6 text-center text-xl font-semibold">
+                        {group.title.subHeading}
+                      </h4>
+                    )}
                   <div className="space-y-4 sm:space-y-6">
                     {group.events.map((event, index) => {
                       const showPublic = publicView
@@ -477,3 +526,54 @@ const ClientEventList = () => {
 };
 
 export default ClientEventList;
+
+type publicHeaderProps = {
+  view: viewOptions;
+  subStatus?: string;
+  setViewAction: Dispatch<SetStateAction<viewOptions>>;
+};
+
+const PublicHeader = ({
+  view,
+  subStatus,
+  setViewAction,
+}: publicHeaderProps) => {
+  const router = useRouter();
+  return (
+    <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:py-8">
+      <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:gap-2 lg:text-xl">
+        <Button
+          variant="salWithShadowHiddenBg"
+          className="text-lg font-bold lg:text-xl"
+          onClick={() => {
+            setViewAction((prev: viewOptions) =>
+              prev === "event" ? "all" : "event",
+            );
+          }}
+        >
+          {view === "event" ? "Go Back" : "View Events Only"}
+        </Button>
+        <p>or</p>
+        <Button
+          variant="salWithShadowHiddenBg"
+          className="text-lg font-bold lg:text-xl"
+          onClick={() => {
+            if (subStatus === "past_due") {
+              router.push("/dashboard/account/billing");
+            } else {
+              router.push("/pricing");
+            }
+          }}
+        >
+          {subStatus === "past_due"
+            ? "Resume your membership"
+            : "Become a member"}
+        </Button>
+        <p className="sm:hidden">for the full list & open call details</p>
+        <p className="hidden sm:block">
+          to view the full list and open call details
+        </p>
+      </div>
+    </div>
+  );
+};
