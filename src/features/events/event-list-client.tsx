@@ -397,6 +397,7 @@ const ClientEventList = () => {
               onPageChange={setPage}
               eventOnly={view === "event"}
               setViewAction={setView}
+              viewType={view}
             />
           )}
         </>
@@ -667,6 +668,7 @@ const ClientEventList = () => {
           className={cn("mb-6", !publicView && "mb-12")}
           eventOnly={view === "event"}
           setViewAction={setView}
+          viewType={view}
         />
       )}
       {isLoading && (

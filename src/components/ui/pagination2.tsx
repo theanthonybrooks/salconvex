@@ -7,13 +7,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { viewOptions } from "@/features/events/event-list-client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
-
 interface BasicPaginationProps {
   page: number;
   totalPages: number;
@@ -24,6 +24,7 @@ interface BasicPaginationProps {
   eventOnly?: boolean;
 
   onPageChange: (page: number) => void;
+  viewType: viewOptions;
   setViewAction: Dispatch<SetStateAction<viewOptions>>;
 }
 
@@ -37,12 +38,14 @@ export const BasicPagination = ({
   eventOnly,
 
   onPageChange: setPage,
-  // setViewAction,
+  viewType,
+  setViewAction,
 }: BasicPaginationProps) => {
   const firstPage = page === 1;
   const lastPage = page === totalPages;
   const singlePage = totalPages === 1;
   const backTrigger = page > 2;
+  const showToggle = false;
 
   // const [prevTotal, setPrevTotal] = useState(totalPages);
 
@@ -192,6 +195,20 @@ export const BasicPagination = ({
                   Org
                 </p>
               </div> */}
+              {showToggle && (
+                <Tabs
+                  value={viewType}
+                  onValueChange={(val) => setViewAction(val as viewOptions)}
+                  className="w-full sm:w-auto"
+                >
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="event">Events</TabsTrigger>
+                    <TabsTrigger value="openCall">Open Calls</TabsTrigger>
+                    <TabsTrigger value="archive">Archive</TabsTrigger>
+                    <TabsTrigger value="organizer">Org</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
             </>
           )}
         </motion.div>
