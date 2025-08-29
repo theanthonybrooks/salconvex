@@ -204,10 +204,14 @@ export function getGroupKeyFromEvent(
       countryAbbr?.toUpperCase() === "AU" ||
       countryAbbr?.toUpperCase() === "AUS";
 
-    const hasSubHeading = isUS || isCanada || isUK || isAustralia;
+    const isBrazil = country.toLowerCase() === "brazil" || countryAbbr === "BR";
+
+    const hasSubHeading = isUS || isCanada || isUK || isAustralia || isBrazil;
+
+    const displayCountryAbbr = countryAbbr === "US" ? "USA" : countryAbbr;
 
     return {
-      raw: countryAbbr ? `${country} (${countryAbbr})` : country,
+      raw: countryAbbr ? `${country} (${displayCountryAbbr})` : country,
       subHeading: hasSubHeading ? (state ?? undefined) : undefined,
     };
   }

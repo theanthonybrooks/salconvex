@@ -837,7 +837,12 @@ export const FilterBase = ({
                 </SelectContent>
               </Select>
             </section>
-            <section className={cn("ml-2 flex flex-col gap-2 self-end")}>
+            <section
+              className={cn(
+                "ml-2 flex flex-col gap-2 self-end",
+                eventOnly && "self-center",
+              )}
+            >
               <span
                 className={cn(
                   "flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline",
