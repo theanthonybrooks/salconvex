@@ -222,7 +222,8 @@ const ClientEventList = () => {
 
   const paginatedEvents = enrichedEvents;
 
-  const groupedEvents = useMemo(() => {
+  {
+    /*  const groupedEvents = useMemo(() => {
     const groups: Record<
       string,
       {
@@ -241,7 +242,11 @@ const ClientEventList = () => {
         userTimeZone,
         hasTZPref,
       );
-      const groupKey = title.raw;
+      // const groupKey = title.raw;
+      const groupKey =
+        sortOptions.sortBy === "country" && title.subHeading
+          ? `${title.raw}__${title.subHeading}`
+          : title.raw;
 
       if (!groups[groupKey]) {
         groups[groupKey] = { title, events: [] };
@@ -252,7 +257,50 @@ const ClientEventList = () => {
     }
 
     return orderedGroupKeys.map((key) => groups[key]);
+  }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);*/
+  }
+
+  const groupedEvents = useMemo(() => {
+    const list = publicView ? paginatedEvents.slice(0, 6) : paginatedEvents;
+
+    // Step 1: Group by main raw key
+    const groups: Record<
+      string,
+      {
+        title: ReturnType<typeof getGroupKeyFromEvent>;
+        subgroups: Record<string, CombinedEventPreviewCardData[]>;
+        events: CombinedEventPreviewCardData[];
+      }
+    > = {};
+
+    for (const event of list) {
+      const title = getGroupKeyFromEvent(
+        event,
+        sortOptions.sortBy,
+        userTimeZone,
+        hasTZPref,
+      );
+
+      const mainKey = title.raw || "Ungrouped";
+      const subKey = title.subHeading ?? null;
+
+      if (!groups[mainKey]) {
+        groups[mainKey] = { title, subgroups: {}, events: [] };
+      }
+
+      if (subKey) {
+        if (!groups[mainKey].subgroups[subKey]) {
+          groups[mainKey].subgroups[subKey] = [];
+        }
+        groups[mainKey].subgroups[subKey].push(event);
+      } else {
+        groups[mainKey].events.push(event);
+      }
+    }
+
+    return Object.values(groups);
   }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref]);
+
   const totalCards = groupedEvents.reduce(
     (sum, group) => sum + group.events.length,
     0,
@@ -399,11 +447,12 @@ const ClientEventList = () => {
           {hasResults ? (
             groupedEvents.map((group, index) => {
               const isEndedGroup = !!group.title.parts?.year;
-
               const isFirstEnded =
                 isEndedGroup &&
                 !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);
-              return (
+
+              {
+                /*            return (
                 <div key={group.title.raw} className="mb-6">
                   {isFirstEnded && sortOptions.sortBy === "openCall" && (
                     <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
@@ -411,7 +460,7 @@ const ClientEventList = () => {
                     </h2>
                   )}
 
-                  <h3 className="mb-2 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
+                  <h3 className="mb-3 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
                     {group.title.parts ? (
                       <>
                         {group.title.parts.month}
@@ -432,7 +481,7 @@ const ClientEventList = () => {
                   </h3>
                   {sortOptions.sortBy === "country" &&
                     group.title.subHeading && (
-                      <h4 className="mb-4 mt-6 text-center text-xl font-semibold">
+                      <h4 className="mb-4 mt-5 text-center text-xl font-semibold">
                         {group.title.subHeading}
                       </h4>
                     )}
@@ -467,6 +516,107 @@ const ClientEventList = () => {
                       return card;
                     })}
                   </div>
+                </div>
+              );
+            })
+          ) : (*/
+              }
+              return (
+                <div key={group.title.raw} className="mb-6">
+                  {isFirstEnded && sortOptions.sortBy === "openCall" && (
+                    <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
+                      Ended Calls
+                    </h2>
+                  )}
+
+                  <h3 className="mb-3 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
+                    {group.title.parts ? (
+                      <>
+                        {group.title.parts.month}
+                        <span className="flex items-start">
+                          {group.title.parts.day}
+                          <p className="align-super text-sm">
+                            {group.title.parts.suffix}
+                          </p>
+                        </span>
+                        {group.title.parts.year &&
+                          ` (${group.title.parts.year})`}
+                      </>
+                    ) : group.title.label ? (
+                      group.title.label
+                    ) : (
+                      group.title.raw
+                    )}
+                  </h3>
+
+                  {group.events.length > 0 && (
+                    <div className="space-y-4 sm:space-y-6">
+                      {group.events.map((event) => {
+                        const showPublic = publicView
+                          ? flatIndex < 1
+                          : publicView;
+                        const isMaskedCard =
+                          publicView && flatIndex === totalCards - 1;
+                        flatIndex++;
+
+                        return (
+                          <div
+                            key={event._id}
+                            className={cn(
+                              isMaskedCard &&
+                                "masked-card pointer-events-none blur-[1px]",
+                            )}
+                          >
+                            <EventCardPreview
+                              event={event}
+                              publicView={publicView}
+                              publicPreview={showPublic}
+                              user={user}
+                              userPref={userPref}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {Object.entries(group.subgroups).map(
+                    ([subHeading, subEvents]) => (
+                      <div key={subHeading} className="mb-4">
+                        <h4 className="mb-4 mt-5 text-center text-xl font-semibold">
+                          {subHeading}
+                        </h4>
+                        <div className="space-y-4 sm:space-y-6">
+                          {subEvents.map((event) => {
+                            const showPublic = publicView
+                              ? flatIndex < 1
+                              : publicView;
+                            const isMaskedCard =
+                              publicView && flatIndex === totalCards - 1;
+                            flatIndex++;
+
+                            return (
+                              <div
+                                key={event._id}
+                                className={cn(
+                                  isMaskedCard &&
+                                    "masked-card pointer-events-none blur-[1px]",
+                                )}
+                              >
+                                <EventCardPreview
+                                  event={event}
+                                  publicView={publicView}
+                                  publicPreview={showPublic}
+                                  user={user}
+                                  userPref={userPref}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ),
+                  )}
                 </div>
               );
             })
