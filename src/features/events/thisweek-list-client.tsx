@@ -132,7 +132,7 @@ const ClientThisWeekList = (
         sortOptions.sortBy,
         userTimeZone,
         hasTZPref,
-        "all",
+        "openCall",
       );
       const groupKey = title.raw;
 
