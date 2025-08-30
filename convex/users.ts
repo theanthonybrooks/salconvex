@@ -216,9 +216,9 @@ export const isAdmin = query({
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
-    if (!user) throw new ConvexError("User not found");
+    // if (!user) throw new ConvexError("User not found");
 
-    if (user.role.includes("admin")) {
+    if (user?.role.includes("admin")) {
       return true;
     }
 

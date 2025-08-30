@@ -29,8 +29,8 @@ import { Eye, EyeOff, InfoIcon, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ReactNode, useState } from "react";
-import { useForm } from "react-hook-form";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 
@@ -43,15 +43,15 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
   const convex = useConvex();
   const updatePassword = useMutation(api.users.updatePassword);
   const { signIn } = useAuthActions();
+  const prevOtp = useRef<string>("");
   const [step, setStep] = useState<string>("forgot");
   const [email, setEmail] = useState<string>("");
   // const [newPassword, setNewPassword] = useState<string>("")
-  const [otp, setOtp] = useState<string>("");
+  // const [otp, setOtp] = useState<string>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [error, setError] = useState<ReactNode | undefined>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const forgotForm = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
@@ -70,17 +70,20 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
   } = forgotForm;
 
   const {
-    formState: { errors: resetErrors },
+    watch,
+    formState: { errors: resetErrors, isValid: isResetValid },
   } = resetForm;
 
-  const handleOtpChange = (value: string) => {
-    setOtp(value);
-  };
+  const otp = watch("code");
+
+  // const handleOtpChange = (value: string) => {
+  //   setOtp(value);
+  // };
 
   const handleForgotSubmit = async (
     data: z.infer<typeof ForgotPasswordSchema>,
   ) => {
-    setError(undefined);
+    setError("");
     try {
       const isNewUser = await convex.query(api.users.isNewUser, {
         email: data.email,
@@ -119,34 +122,34 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
       console.error("Error checking for existing user:", queryError);
     }
     try {
-      setIsLoading(true);
+      setPending(true);
       const formData = new FormData();
       formData.append("email", data.email);
       formData.append("flow", "reset");
       // console.log("formData", formData)
       await signIn("password", formData);
-      setOtp("");
+      // setOtp("");
       setStep("reset");
       setEmail(data.email);
       setSuccess("Code sent!");
-      setIsLoading(false);
+
       forgotForm.reset();
     } catch {
       setError("Failed to send code. Please try again.");
-      setIsLoading(false);
+    } finally {
+      setPending(false);
     }
   };
 
   const handleResetSubmit = async (
     data: z.infer<typeof ResetPasswordSchema>,
   ) => {
-    setIsLoading(true);
     setPending(true);
-    setError(undefined);
+    setError("");
     try {
       const formData = {
         ...data,
-        code: otp,
+        // code: otp,
         flow: "reset-verification",
         email: email,
       };
@@ -157,19 +160,34 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
         method: "forgot",
       });
       // console.log("formData", formData)
-      setPending(false);
-      setIsLoading(false);
+
       setSuccess("Password reset!");
       resetForm.reset();
       setTimeout(() => {
         router.push("/");
       }, 2000);
-    } catch {
-      setError("Failed to reset password");
-      setIsLoading(false);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Could not verify code")
+      ) {
+        setError("Invalid code. Please try again.");
+      } else {
+        setError("Failed to reset password. Please try again.");
+      }
+      setSuccess("");
+    } finally {
       setPending(false);
     }
   };
+
+  useEffect(() => {
+    if (otp === prevOtp.current || otp.length !== 6) return;
+    if (otp.length === 6) {
+      prevOtp.current = otp;
+      setError("");
+    }
+  }, [otp]);
 
   return step === "forgot" ? (
     <Card className="w-full border-none border-foreground bg-salYellow p-8 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
@@ -208,7 +226,6 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
               className="ml-2"
             />
           </section>
-          {/* <CardTitle>Forget your password?</CardTitle> */}
           <CardDescription className="text-center text-base text-foreground">
             {error ? (
               <FormError message={error} />
@@ -242,13 +259,15 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
             </div>
 
             <Button
-              variant="salWithShadow"
+              variant={isForgotValid ? "salWithShadow" : "salWithShadowHidden"}
               type="submit"
               size="lg"
               disabled={!isForgotValid}
             >
-              {isLoading ? (
+              {pending ? (
                 <LoaderCircle className="animate-spin" />
+              ) : Boolean(success) ? (
+                "Code sent!"
               ) : (
                 "Send code"
               )}
@@ -308,10 +327,8 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
               </div>
             </div>
           )}
-          {error === "Failed to reset password" && (
-            <FormError message={error} />
-          )}
-          {/* {success && <FormSuccess message={success} />} */}
+          {error && <FormError message={error} className="w-auto md:mx-10" />}
+
           <form
             onSubmit={resetForm.handleSubmit(handleResetSubmit)}
             className="flex flex-col justify-center space-y-6 px-8"
@@ -322,46 +339,41 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
             >
               Please enter the code sent to your email
             </Label>
-            <InputOTP
-              {...resetForm.register("code")}
-              id="code"
+            <Controller
+              control={resetForm.control}
               name="code"
-              maxLength={6}
-              pattern={REGEXP_ONLY_DIGITS}
-              value={otp}
-              onChange={handleOtpChange}
-              disabled={pending}
-              // tabIndex={step !== 'forgot' && 1}
-              tabIndex={1}
-              className="border-foreground"
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} className="bg-white" />
-                <InputOTPSlot index={1} className="bg-white" />
-                <InputOTPSlot index={2} className="bg-white" />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
-                <InputOTPSlot index={3} className="bg-white" />
-                <InputOTPSlot index={4} className="bg-white" />
-                <InputOTPSlot index={5} className="bg-white" />
-              </InputOTPGroup>
-            </InputOTP>
+              render={({ field }) => (
+                <InputOTP
+                  {...field}
+                  id="code"
+                  maxLength={6}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  // value={otp}
+                  // onChange={handleOtpChange}
+                  disabled={pending}
+                  // tabIndex={step !== 'forgot' && 1}
+                  tabIndex={1}
+                  className="border-foreground"
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} className="bg-white" />
+                    <InputOTPSlot index={1} className="bg-white" />
+                    <InputOTPSlot index={2} className="bg-white" />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} className="bg-white" />
+                    <InputOTPSlot index={4} className="bg-white" />
+                    <InputOTPSlot index={5} className="bg-white" />
+                  </InputOTPGroup>
+                </InputOTP>
+              )}
+            />
             {resetErrors.code && (
-              <p className="text-sm text-red-500">{resetErrors.code.message}</p>
+              <p className="w-full text-center text-sm text-red-500">
+                {resetErrors.code.message}
+              </p>
             )}
-            {/* <Input
-              {...resetForm.register("code")}
-              placeholder='Code'
-              type='text'
-            /> */}
-
-            {/* <Input
-              id='newPassword'
-              {...resetForm.register("newPassword")}
-              placeholder='New password'
-              type='password'
-            /> */}
             <ResendTimer
               initialTime={60}
               onResend={() => handleForgotSubmit({ email })}
@@ -414,7 +426,7 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
               value={step.email}
               {...resetForm.register("email")}
             /> */}
-            {error && <div className="error">{error}</div>}
+            {/* {error && <div className="error">{error}</div>} */}
             <div className="flex justify-center gap-x-4">
               <DialogCloseBtn
                 title="Are you sure?"
@@ -429,12 +441,22 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
                 triggerVariant="salWithShadowHiddenYlw"
               />
               <Button
-                variant="salWithShadowHidden"
+                variant={
+                  !isResetValid || Boolean(error)
+                    ? "salWithShadowHidden"
+                    : "salWithShadowYlw"
+                }
                 type="submit"
                 size="lg"
                 className="w-full md:bg-salYellow"
+                disabled={
+                  pending ||
+                  !isResetValid ||
+                  Boolean(error) ||
+                  success === "Password reset!"
+                }
               >
-                {isLoading ? (
+                {pending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
                   "Continue"

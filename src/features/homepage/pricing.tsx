@@ -645,7 +645,7 @@ export default function Pricing() {
                     Graffiti jams and low-budget calls are always free to list
                     and mural projects are priced on a sliding scale. See{" "}
                     <Link
-                      href="/pricing?submit#submission-costs"
+                      href="/submit#submission-costs"
                       className="font-semibold underline underline-offset-2"
                     >
                       Pricing FAQ

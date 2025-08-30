@@ -129,7 +129,7 @@ const isValidVK = (value: string) => /^@?[a-z][a-z0-9._-]{4,31}$/i.test(value);
 const linksSchemaLoose = z.object({
   sameAsOrganizer: z.boolean().optional(),
   website: z.string().optional(),
-  email: z.string().optional(),
+  email: z.email().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
   threads: z.string().optional(),
@@ -150,7 +150,7 @@ const linksSchemaStrict = z.object({
       message: "Must be a valid URL (https://...)",
     }),
 
-  email: z.string().email("Must be a valid email address").optional(),
+  email: z.email("Must be a valid email address").optional(),
 
   instagram: z
     .string()

@@ -44,9 +44,8 @@ import { ExternalLink, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { api } from "../../../../convex/_generated/api";
@@ -67,7 +66,8 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const otpInputRef = useRef<HTMLInputElement>(null);
   const prevOtp = useRef<string>("");
   const { signIn } = useAuthActions();
-  const [isPending, startTransition] = useTransition();
+  // const [isPending1, startTransition] = useTransition();
+  const [isPending, setPending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<React.ReactNode | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -79,7 +79,6 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const [email, setEmail] = useState<string>("");
   const [obsEmail, setObsEmail] = useState("");
   const [otp, setOtp] = useState<string>("");
-  console.log(otp.length);
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
@@ -95,8 +94,12 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       source: "",
       accountType: ["artist"],
     },
-    mode: "onBlur",
+    mode: "onChange",
   });
+
+  const {
+    formState: { isValid },
+  } = form;
 
   useEffect(() => {
     const accountType = form.getValues("accountType");
@@ -109,13 +112,15 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       organizationName !== ""
     ) {
       form.setValue("organizationName", "");
+    } else if (selectedOption.includes("organizer")) {
+      form.trigger("organizationName");
     }
   }, [selectedOption, form]);
 
   const handleStep1Submit = async (values: z.infer<typeof RegisterSchema>) => {
     setError("");
     setSuccess("");
-
+    setPending(true);
     try {
       const isNewUser = await convex.query(api.users.isNewUser, {
         email: values.email,
@@ -124,6 +129,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
         setError("A user with that email already exists.");
         return;
       }
+
       if (values.organizationName?.trim()) {
         const isNewOrg = await convex.query(
           api.organizer.organizations.isNewOrg,
@@ -140,17 +146,31 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
           return;
         }
       }
+
+      const formData = {
+        ...values,
+        accountType: selectedOption,
+        userId: userId,
+        flow: "signUp",
+      };
+
+      setSubmitData(formData);
+      setEmail(values.email);
+      onEmailChange(values.email, setObsEmail);
+
+      await signIn("password", { ...formData, flow: "signUp" });
+      setStep("verifyOtp");
     } catch (error) {
       if (error instanceof ConvexError) {
-        // toast.error(error.data ?? "Organization Exists");
-        // setError(error.data ?? "Organization Exists");
         const data = error.data as { message: string; contactUrl: string };
         setError(
           data.contactUrl ? (
             <>
               {data.message.split("contact us")[0]}
               <Link
-                href={`mailto:${data.contactUrl}?subject=${values.organizationName?.trim() + " -" || ""} Organization Signup`}
+                href={`mailto:${data.contactUrl}?subject=${
+                  values.organizationName?.trim() + " -" || ""
+                } Organization Signup`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold underline-offset-2 hover:cursor-pointer hover:underline"
@@ -164,49 +184,18 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
           ),
         );
       } else {
-        toast.error("An error occurred while checking for organization.");
+        console.error(error);
+        setError("Something went wrong. Please try again.");
       }
-      return;
+    } finally {
+      setPending(false);
     }
-
-    const formData = {
-      ...values,
-      accountType: selectedOption,
-      userId: userId,
-      flow: "signUp",
-    };
-
-    setSubmitData(formData);
-    setEmail(values.email);
-    onEmailChange(values.email, setObsEmail);
-    startTransition(() => {
-      signIn("password", {
-        ...formData,
-        flow: "signUp",
-      })
-        .then(() => {
-          // setSuccess("OTP sent to your email!")
-          setStep("verifyOtp");
-        })
-        .catch((err) => {
-          if (err && err.name === "ConvexError") {
-            console.error(err.data);
-            setError(err.data);
-          } else if (err instanceof ConvexError) {
-            console.error(err.data);
-            setError(err.data);
-          } else {
-            console.error(err);
-            setError("Something went wrong. Please try again.");
-          }
-        });
-    });
   };
   const handleOtpChange = (value: string) => {
     setOtp(value);
     setError("");
   };
-  // const handleOtpResend =
+
   const handleResendCode = async () => {
     if (!email) {
       setError("No email found. Please try signing up again.");
@@ -217,31 +206,21 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
     setSuccess("");
 
     try {
-      // Step 1: Delete the existing account
       await DeleteAccount({ method: "resentOtp", email });
+      await signIn("password", { ...submitData, flow: "signUp" });
 
-      // Step 2: Resubmit the signup request with stored `submitData`
-      startTransition(() => {
-        signIn("password", { ...submitData, flow: "signUp" })
-          .then(() => {
-            setSuccess("Verification code resent!");
-            setTimeout(() => {
-              setSuccess("");
-            }, 3000);
-          })
-          .catch((err) => {
-            if (err instanceof ConvexError) {
-              console.error(err.data);
-              setError(err.data);
-            } else {
-              console.error(err);
-              setError("Something went wrong while resending the code.");
-            }
-          });
-      });
+      setSuccess("Verification code resent!");
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
     } catch (err) {
-      console.error("Error resending verification code:", err);
-      setError("Could not resend verification code. Please try again.");
+      if (err instanceof ConvexError) {
+        console.error(err.data);
+        setError(err.data);
+      } else {
+        console.error("Error resending verification code:", err);
+        setError("Could not resend verification code. Please try again.");
+      }
     }
   };
 
@@ -660,11 +639,13 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                 )}
               </AnimatePresence>
               <Button
-                disabled={isPending}
+                disabled={isPending || !isValid}
                 className="mt-6 w-full bg-white text-base md:bg-salYellow"
                 size="lg"
                 type="submit"
-                variant="salWithShadowYlw"
+                variant={
+                  !isValid ? "salWithShadowHiddenYlw" : "salWithShadowYlw"
+                }
                 tabIndex={
                   step === "signUp" && selectedOption.includes("organizer")
                     ? 10
@@ -673,6 +654,8 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
               >
                 {isPending ? (
                   <LoaderCircle className="animate-spin" />
+                ) : Boolean(success) ? (
+                  "Account Created!"
                 ) : (
                   "Create Account"
                 )}

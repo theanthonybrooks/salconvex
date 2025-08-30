@@ -65,7 +65,7 @@ const OrganizerDetail = () => {
             </p>
             <p className="text-sm">
               Please{" "}
-              <Link href="/pricing?submit" className="font-bold">
+              <Link href="/submit" className="font-bold">
                 do so
               </Link>{" "}
               to make your organization&apos;s profile public.

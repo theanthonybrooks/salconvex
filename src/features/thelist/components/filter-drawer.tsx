@@ -545,10 +545,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                         <p className="text-sm italic text-foreground/60">
                           If you&apos;re an organizer, you can submit your
                           event, project, or open call{" "}
-                          <Link
-                            href="/pricing?submit"
-                            className="font-bold uppercase"
-                          >
+                          <Link href="/submit" className="font-bold uppercase">
                             here
                           </Link>
                           .

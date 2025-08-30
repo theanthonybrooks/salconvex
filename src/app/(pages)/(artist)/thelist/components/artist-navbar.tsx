@@ -262,7 +262,7 @@ export default function TheListNavBar(
 
           {!isMobile && (
             <div className="flex items-center gap-2">
-              <Link href="/pricing?submit">
+              <Link href="/submit">
                 <Button className="hidden h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground hover:bg-background active:scale-95 sm:text-base lg:inline-flex">
                   Submit
                 </Button>
