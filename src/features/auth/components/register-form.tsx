@@ -247,7 +247,6 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
         });
 
         if (result) {
-          setIsLoading(false);
           setSuccess("Successfully signed up and verified!");
           form.reset();
           const callBackSrc = sessionStorage.getItem("src");
@@ -263,9 +262,18 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
           }
         }
       } catch (error) {
+        if (error instanceof ConvexError) {
+          if (error.data.includes("User not found")) {
+            setStep("signUp");
+            setOtp("");
+            setError("Signup timed out. Please try again.");
+          }
+        } else {
+          console.error("Error in handleOtpSubmit:", error);
+          setError("Invalid code or verification failed. Please try again.");
+        }
+      } finally {
         setIsLoading(false);
-        console.error("Error in handleOtpSubmit:", error);
-        setError("Invalid OTP or verification failed. Please try again.");
       }
 
       // void signIn("password", {
@@ -733,7 +741,11 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
               <FormSuccess message={success} />
               <FormError message={error} />
               <Button
-                variant="salWithShadowYlw"
+                variant={
+                  otp.length === 6 && !Boolean(error)
+                    ? "salWithShadowYlw"
+                    : "salWithShadowHidden"
+                }
                 disabled={
                   isLoading ||
                   otp.length !== 6 ||

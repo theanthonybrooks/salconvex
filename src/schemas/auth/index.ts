@@ -8,7 +8,13 @@ export const LoginSchema = z.object({
   email: z
     .email({ message: "Email is required" })
     .transform((val) => val.toLowerCase()),
-  password: z.string().min(8, { message: "Password is required" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." })
+    .regex(passwordValidation, {
+      message:
+        "Password must contain at least one uppercase letter, one number, and one symbol.",
+    }),
 });
 
 export const RegisterSchema = z

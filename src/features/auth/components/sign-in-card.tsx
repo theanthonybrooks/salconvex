@@ -2,6 +2,8 @@
 
 import { useAuthActions } from "@convex-dev/auth/react";
 
+import { FormError } from "@/components/form-error";
+import { FormSuccess } from "@/components/form-success";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,24 +11,21 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoginSchema } from "@/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import {
-  Eye,
-  EyeOff,
-  Heart,
-  LoaderCircle,
-  TriangleAlert,
-  X,
-} from "lucide-react";
+import { Eye, EyeOff, Heart, LoaderCircle, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
-import { toast } from "react-toastify";
+import z from "zod";
 import { api } from "~/convex/_generated/api";
 
 interface SignInCardProps {
@@ -36,14 +35,31 @@ interface SignInCardProps {
 }
 
 const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const convex = useConvex();
   const { signIn } = useAuthActions();
   const DeleteAccount = useMutation(api.users.deleteAccount);
-
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onChange",
+  });
+
+  const {
+    watch,
+    formState: { errors, isValid },
+  } = form;
+
+  const email = watch("email");
+
+  console.log(errors, isValid);
+
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [isLoading, setIsLoading] = useState("");
@@ -52,33 +68,53 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
   const [callBackSrc, setCallBackSrc] = useState<string | null>(null);
   const [prevSalPage, setPrevSalPage] = useState<string | null>(null);
 
-  const searchParams = useSearchParams();
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
   const isNewUser = callBackSrc === "newUser";
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
-  const onPasswordSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handlePasswordSignIn = async (values: z.infer<typeof LoginSchema>) => {
     setPending(true);
     setError("");
     setSuccess("");
-    const formData = new FormData(e.currentTarget);
     try {
       const hasVerifiedEmail = await convex.query(api.users.hasVerifiedEmail, {
         email,
       });
       if (!hasVerifiedEmail) {
         await DeleteAccount({ method: "cancelSignup", email });
-        setError("No account found. Sign up with email and password first.");
-        return;
+        throw new Error("unverified");
+      }
+
+      const formData = {
+        ...values,
+        flow: "signIn",
+        redirectTo: "/dashboard",
+      };
+
+      await signIn("password", formData);
+
+      setSuccess("Successfully signed in!");
+
+      if (isNewUser) {
+        sessionStorage.removeItem("src");
+        router.replace("/pricing");
+      } else if (prevSalPage) {
+        router.replace(prevSalPage);
+      } else {
+        router.replace("/");
+      }
+      if (!isNewUser) {
+        await updateUserLastActive({ email });
       }
     } catch (error) {
+      console.log(error);
       if (error instanceof ConvexError) {
         const data = error.data as { message: string; contactUrl: string };
-        if (error.data === "User not found") {
-          console.log("User not found - continuing");
+        console.log(data, error);
+        if (error.data.includes("User not found")) {
+          setError("User not found. Check your email/password and try again");
         } else {
           setError(
             data.contactUrl ? (
@@ -95,49 +131,27 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                 {data.message.split("contact us")[1]}
               </>
             ) : (
-              "An error occurred while checking for user."
+              "An error occurred. Please try again."
             ),
           );
-          // setError(error.data ?? "An error occurred while checking for user.");
-          return;
         }
       } else {
-        toast.error("An error occurred while checking for user.");
-        console.error("Unexpected error:", error);
-        return;
+        if (error instanceof Error) {
+          if (error.message.includes("InvalidSecret")) {
+            setError("Incorrect email/password. Please try again.");
+          } else if (error.message.includes("unverified")) {
+            setError(
+              "Your previous signup was never completed. Please sign up again",
+            );
+          }
+        } else {
+          setError("An error occurred. Please try again.");
+          console.error("Unexpected error:", error);
+        }
       }
     } finally {
       setPending(false);
     }
-
-    formData.append("redirectTo", "/dashboard");
-    formData.append("flow", "signIn");
-    signIn("password", formData)
-      .then(() => {
-        setSuccess("Successfully signed in!");
-
-        if (isNewUser) {
-          sessionStorage.removeItem("src");
-          router.replace("/pricing");
-        } else if (prevSalPage) {
-          router.replace(prevSalPage);
-        } else {
-          router.replace("/");
-        }
-      })
-      .catch((err) => {
-        const errorMessage =
-          err instanceof ConvexError
-            ? (err.data as { message: string }).message
-            : "Check your email/password and try again.";
-        setError(errorMessage);
-      })
-      .finally(async () => {
-        if (!isNewUser) {
-          await updateUserLastActive({ email: email });
-        }
-        setPending(false);
-      });
   };
 
   const onProviderSignIn = (value: "github" | "google" | "apple") => {
@@ -215,17 +229,18 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
           </span>
         </CardDescription>
       </CardHeader>
-      {!!error && (
-        <div className="mx-auto mb-6 flex max-w-[90%] items-center justify-center gap-x-2 text-balance rounded-md bg-destructive/15 p-3 text-center text-sm text-destructive">
-          <TriangleAlert className="size-6" />
-          <p>{error}</p>
-        </div>
+      {error && (
+        <FormError
+          message={error}
+          className="mx-auto mb-6 w-auto max-w-[90%]"
+        />
       )}
-      {!!success && (
-        <div className="mx-auto mb-6 flex max-w-[90%] items-center justify-center gap-x-2 rounded-md bg-emerald-500/15 p-3 text-center text-sm">
-          <Heart className="size-4" />
-          <p>{success}</p>
-        </div>
+      {success && (
+        <FormSuccess
+          message={success}
+          className="mx-auto mb-6 w-auto max-w-[90%]"
+          icon={<Heart className="size-4" />}
+        />
       )}
       <CardContent className="grid gap-y-4 px-4 sm:px-6">
         <Button
@@ -249,87 +264,105 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
         <p className="flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
           or
         </p>
-        <form className="flex flex-col" onSubmit={(e) => onPasswordSignIn(e)}>
-          <div className="space-y-4 sm:space-y-2.5">
-            <Label htmlFor="email" className="text-foreground">
-              Email address
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              disabled={pending}
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError("");
-              }}
-              placeholder=" "
-              type="email"
-              className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
-              required
-              tabIndex={3}
-            />
-            <div className="flex flex-col space-y-2.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-foreground">
-                  Password
-                </Label>
-                <span
-                  onClick={forgotPasswordHandler}
-                  className="cursor-pointer text-sm text-foreground hover:underline"
-                >
-                  Forgot password?
-                </span>
-              </div>
-              <div className="relative">
-                <Input
-                  id="password"
-                  name="password"
-                  disabled={pending}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError("");
-                  }}
-                  placeholder=" "
-                  type={showPassword ? "text" : "password"}
-                  // inputHeight='sm'
-                  className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
-                  required
-                  tabIndex={4}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
-                  tabIndex={5}
-                >
-                  {showPassword ? (
-                    <Eye className="size-4 text-foreground" />
-                  ) : (
-                    <EyeOff className="size-4 text-foreground" />
-                  )}
-                </button>
+        <Form {...form}>
+          <form
+            className="flex flex-col"
+            onSubmit={form.handleSubmit(handlePasswordSignIn)}
+          >
+            <div className="space-y-4 sm:space-y-2.5">
+              <Label htmlFor="email" className="text-foreground">
+                Email address
+              </Label>
+
+              <Controller
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    disabled={pending}
+                    id="email"
+                    placeholder=" "
+                    type="email"
+                    className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
+                    required
+                    tabIndex={3}
+                  />
+                )}
+              />
+
+              <div className="flex flex-col space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-foreground">
+                    Password
+                  </Label>
+                  <span
+                    onClick={forgotPasswordHandler}
+                    className="cursor-pointer text-sm text-foreground hover:underline"
+                  >
+                    Forgot password?
+                  </span>
+                </div>
+                <div className="relative">
+                  <Controller
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="password"
+                        disabled={pending}
+                        // value={password}
+                        // onChange={(e) => {
+                        //   setPassword(e.target.value);
+                        //   setError("");
+                        // }}
+                        placeholder=" "
+                        type={showPassword ? "text" : "password"}
+                        // inputHeight='sm'
+                        className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
+                        required
+                        tabIndex={4}
+                      />
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    tabIndex={5}
+                  >
+                    {showPassword ? (
+                      <Eye className="size-4 text-foreground" />
+                    ) : (
+                      <EyeOff className="size-4 text-foreground" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          <Button
-            className="mt-8 w-full bg-white py-6 text-base sm:mt-6 sm:py-0 md:bg-salYellow"
-            size="lg"
-            type="submit"
-            variant="salWithShadowYlw"
-            disabled={pending || Boolean(success || Boolean(error))}
-            tabIndex={6}
-          >
-            {pending ? (
-              <LoaderCircle className="size-5 animate-spin" />
-            ) : Boolean(success) ? (
-              "Success!"
-            ) : (
-              "Continue"
-            )}
-          </Button>
-        </form>
+            <Button
+              className="mt-8 w-full bg-white py-6 text-base sm:mt-6 sm:py-0 md:bg-salYellow"
+              size="lg"
+              type="submit"
+              variant={
+                !isValid || pending || Boolean(success)
+                  ? "salWithShadowHidden"
+                  : "salWithShadowYlw"
+              }
+              disabled={pending || Boolean(success || !isValid)}
+              tabIndex={6}
+            >
+              {pending ? (
+                <LoaderCircle className="size-5 animate-spin" />
+              ) : Boolean(success) ? (
+                "Success!"
+              ) : (
+                "Continue"
+              )}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

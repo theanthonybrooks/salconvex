@@ -419,29 +419,6 @@ export const updateUserPrefs = mutation({
   },
 });
 
-// export const updateUserPrefs = mutation({
-//   args: {
-//     currency: v.optional(v.string()),
-//     timezone: v.optional(v.string()),
-//     theme: v.optional(v.string()),
-//   },
-//   handler: async (ctx, args) => {
-//     const userId = await getAuthUserId(ctx)
-//     if (!userId) throw new ConvexError("Not authenticated")
-//     const user = await ctx.db
-//       .query("users")
-//       .withIndex("by_userId", (q) => q.eq("userId", userId))
-
-//     if (!user) throw new ConvexError("User not found")
-
-//       await ctx.db.patch(user._id, {
-//         currency: args.currency,
-//         timezone: args.timezone,
-//         theme: args.theme
-//       })
-//   },
-// })
-
 export const hasVerifiedEmail = query({
   args: {
     email: v.string(),
@@ -450,7 +427,7 @@ export const hasVerifiedEmail = query({
     console.log("args", args);
     const user = await findUserByEmail(ctx, args.email);
     if (!user) {
-      throw new ConvexError("User not found");
+      throw new ConvexError("User not found: " + args.email);
     }
     console.log("verified", user?.emailVerified);
     return user?.emailVerified;
@@ -463,9 +440,8 @@ export const updateUserEmailVerification = mutation({
   },
   handler: async (ctx, args) => {
     const user = await findUserByEmail(ctx, args.email);
-    //TODO: Check if this should be null or if this is okay
     if (!user) {
-      throw new ConvexError("User not found");
+      throw new ConvexError("User not found: " + args.email);
     }
     await ctx.db.patch(user._id, {
       emailVerified: true,
