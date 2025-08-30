@@ -3,7 +3,7 @@
 import MenuToggle from "@/components/ui/hamburger-icon";
 import SocialsRow from "@/components/ui/socials";
 import ThemeToggle from "@/components/ui/theme-toggle";
-import { DeviceOptions, mainMenuItems } from "@/constants/menu";
+import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
 import { footerCRText } from "@/constants/text";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/lib/utils";

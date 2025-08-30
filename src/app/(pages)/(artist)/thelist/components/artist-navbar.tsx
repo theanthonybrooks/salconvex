@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/navigation-menu";
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
-import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbars";
+import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbarsLinks";
 import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
+import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-import { Unauthenticated, usePreloadedQuery } from "convex/react";
+import { usePreloadedQuery } from "convex/react";
 
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
@@ -311,39 +312,8 @@ export default function TheListNavBar(
                   </NavigationMenuList>
                 </NavigationMenu>
                 {/* Right Side */}
-                <Unauthenticated>
-                  <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
-                    <div className="flex items-center gap-4">
-                      <Link
-                        href="/auth/sign-in"
-                        prefetch={true}
-                        className="font-bold lg:text-base"
-                      >
-                        Sign in
-                      </Link>
-                      <Link
-                        href="/auth/register"
-                        prefetch={true}
-                        className="hover:no-underline"
-                      >
-                        <Button
-                          variant="salWithShadowHiddenBg"
-                          className="hidden rounded-full font-bold sm:text-base lg:block"
-                        >
-                          Sign up
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </Unauthenticated>
-                {/* <Authenticated>
-                  <UserProfile
-                    user={user}
-                    className="size-10"
-                    subscription={subStatus}
-                  />
-                  
-                </Authenticated> */}
+                {!user && <NavbarSigninSection />}
+
                 {user && (
                   <div className="flex items-center gap-4">
                     <UserProfile className="size-10" />

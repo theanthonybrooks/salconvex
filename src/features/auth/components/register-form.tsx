@@ -44,7 +44,7 @@ import { ExternalLink, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
@@ -65,6 +65,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const updateVerification = useMutation(api.users.updateUserEmailVerification);
   const DeleteAccount = useMutation(api.users.deleteAccount);
   const otpInputRef = useRef<HTMLInputElement>(null);
+  const prevOtp = useRef<string>("");
   const { signIn } = useAuthActions();
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
@@ -78,6 +79,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const [email, setEmail] = useState<string>("");
   const [obsEmail, setObsEmail] = useState("");
   const [otp, setOtp] = useState<string>("");
+  console.log(otp.length);
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
@@ -202,6 +204,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   };
   const handleOtpChange = (value: string) => {
     setOtp(value);
+    setError("");
   };
   // const handleOtpResend =
   const handleResendCode = async () => {
@@ -242,55 +245,68 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
     }
   };
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setIsLoading(true);
+  const handleOtpSubmit = useCallback(
+    async (e?: React.FormEvent) => {
+      e?.preventDefault();
+      setError("");
+      setSuccess("");
+      setIsLoading(true);
 
-    if (!otp || otp.length !== 6) {
-      setIsLoading(false);
-      setError("Please enter a valid 6-digit code");
-      return;
-    }
-
-    try {
-      await updateVerification({ email });
-
-      const result = await signIn("password", {
-        email,
-        code: otp,
-        flow: "email-verification",
-      });
-
-      if (result) {
+      if (!otp || otp.length !== 6) {
         setIsLoading(false);
-        setSuccess("Successfully signed up and verified!");
-        form.reset();
-        const callBackSrc = sessionStorage.getItem("src");
-        const prevSalPage = sessionStorage.getItem("previousSalPage");
-
-        if (callBackSrc && callBackSrc === "newUser") {
-          sessionStorage.removeItem("src");
-          router.replace("/pricing");
-        } else if (prevSalPage) {
-          router.replace(prevSalPage);
-        } else {
-          router.replace("/");
-        }
+        setError("Please enter a valid 6-digit code");
+        return;
       }
-    } catch (error) {
-      setIsLoading(false);
-      console.error("Error in handleOtpSubmit:", error);
-      setError("Invalid OTP or verification failed. Please try again.");
-    }
 
-    // void signIn("password", {
-    //   email,
-    //   code: otp,
-    //   flow: "email-verification",
-    // })
-  };
+      try {
+        await updateVerification({ email });
+
+        const result = await signIn("password", {
+          email,
+          code: otp,
+          flow: "email-verification",
+        });
+
+        if (result) {
+          setIsLoading(false);
+          setSuccess("Successfully signed up and verified!");
+          form.reset();
+          const callBackSrc = sessionStorage.getItem("src");
+          const prevSalPage = sessionStorage.getItem("previousSalPage");
+
+          if (callBackSrc && callBackSrc === "newUser") {
+            sessionStorage.removeItem("src");
+            router.replace("/pricing");
+          } else if (prevSalPage) {
+            router.replace(prevSalPage);
+          } else {
+            router.replace("/");
+          }
+        }
+      } catch (error) {
+        setIsLoading(false);
+        console.error("Error in handleOtpSubmit:", error);
+        setError("Invalid OTP or verification failed. Please try again.");
+      }
+
+      // void signIn("password", {
+      //   email,
+      //   code: otp,
+      //   flow: "email-verification",
+      // })
+    },
+    [
+      otp,
+      setError,
+      setIsLoading,
+      setSuccess,
+      router,
+      email,
+      form,
+      signIn,
+      updateVerification,
+    ],
+  );
 
   const onCancelSignup = async () => {
     if (step === "signUp") {
@@ -321,6 +337,14 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       otpInputRef.current.focus();
     }
   }, [step]);
+
+  useEffect(() => {
+    if (otp === prevOtp.current || otp.length !== 6) return;
+    if (otp.length === 6) {
+      prevOtp.current = otp;
+      handleOtpSubmit();
+    }
+  }, [otp, handleOtpSubmit]);
 
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
@@ -703,7 +727,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                     pattern={REGEXP_ONLY_DIGITS}
                     value={otp}
                     onChange={handleOtpChange}
-                    disabled={isPending}
+                    disabled={isLoading}
                     // tabIndex={step !== 'forgot' && 1}
                     tabIndex={1}
                     className="border-foreground"
@@ -727,13 +751,20 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
               <FormError message={error} />
               <Button
                 variant="salWithShadowYlw"
-                disabled={isPending || otp.length !== 6}
+                disabled={
+                  isLoading ||
+                  otp.length !== 6 ||
+                  Boolean(error) ||
+                  Boolean(success)
+                }
                 size="lg"
                 type="submit"
                 className="w-full bg-white text-base sm:bg-salYellow sm:text-base"
               >
                 {isLoading ? (
                   <LoaderCircle className="animate-spin" />
+                ) : Boolean(success) ? (
+                  "Success!"
                 ) : (
                   "Verify"
                 )}

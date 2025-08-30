@@ -14,16 +14,18 @@ import {
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import {
+  landingPageNavbarMenuLinksAbout as aboutItems,
   landingPageNavbarLinks,
   landingPageNavbarMenuLinksResources as resources,
   theListNavbarMenuLinks as thelistitems,
-} from "@/constants/navbars";
+} from "@/constants/navbarsLinks";
 import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-import { Unauthenticated, usePreloadedQuery } from "convex/react";
+import { usePreloadedQuery } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
@@ -47,6 +49,7 @@ export default function NavBar(
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const user = userData?.user ?? null;
+  const userType = user?.accountType ?? [];
   // const userPref = userData?.userPref ?? null;
   // const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { subStatus, hasActiveSubscription } = subData ?? {};
@@ -69,15 +72,32 @@ export default function NavBar(
   });
 
   const statusKey = subStatus ? subStatus : "none";
-  const filteredNavbarLinks = landingPageNavbarLinks.filter(
-    (link) =>
-      link.sub.includes(statusKey) ||
-      link.sub.includes("all") ||
-      (link.userType?.includes("organizer") && isOrganizer) ||
-      (link.sub.includes("public") &&
-        (subStatus === "none" || subStatus === "canceled")),
-  );
+
+  const filteredNavbarLinks = landingPageNavbarLinks.filter((link) => {
+    const isPublic =
+      link.sub.includes("public") &&
+      (statusKey === "none" || statusKey === "canceled");
+    const organizerLink = link.userType?.includes("organizer") && isOrganizer;
+    const userTypeMatch = link.userType?.some((type) =>
+      userType.includes(type),
+    );
+    const userTypeExcluded =
+      link.excluded?.some((excluded) => userType.includes(excluded)) &&
+      !userTypeMatch;
+    const isMatch =
+      (link.sub.includes(statusKey) ||
+        link.sub.includes("all") ||
+        organizerLink ||
+        isPublic) &&
+      !userTypeExcluded;
+
+    return isMatch;
+  });
+
   const filteredNavbarMenuResources = resources.filter(
+    (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
+  );
+  const filteredNavbarMenuAbout = aboutItems.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
   );
   const filteredNavbarMenuTheList = thelistitems.filter(
@@ -88,6 +108,9 @@ export default function NavBar(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
   const isActiveResources = filteredNavbarMenuResources.some(
+    (component) => component.href.includes(currentPage) && currentPage !== "",
+  );
+  const isActiveAbout = filteredNavbarMenuAbout.some(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
 
@@ -325,6 +348,42 @@ export default function NavBar(
                         </ul>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        isCurrent={isActiveAbout}
+                        className={cn(
+                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                          isActiveAbout &&
+                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                        )}
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        About
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
+                          {filteredNavbarMenuAbout.map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                              className={cn(
+                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                component.href.includes(currentPage) &&
+                                  currentPage !== "" &&
+                                  "bg-background",
+                              )}
+                            >
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
                   </NavigationMenuList>
                 </NavigationMenu>
 
@@ -347,29 +406,8 @@ export default function NavBar(
                 ))}
               </motion.div>
 
-              {/* Right Side */}
-              <Unauthenticated>
-                <div className="hidden h-15 w-fit items-center justify-self-end lg:flex">
-                  <div className="flex items-center gap-4">
-                    <Link href="/auth/sign-in" prefetch={true}>
-                      <Button
-                        variant="link"
-                        className="hidden rounded-full font-bold sm:text-base lg:block"
-                      >
-                        Sign in
-                      </Button>
-                    </Link>
-                    <Link href="/auth/register" prefetch={true}>
-                      <Button
-                        variant="salWithShadowHiddenBg"
-                        className="hidden rounded-full font-bold sm:text-base lg:block"
-                      >
-                        Sign up
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </Unauthenticated>
+              {!user && <NavbarSigninSection />}
+
               {user && (
                 <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
                   <UserProfile className="size-10" />

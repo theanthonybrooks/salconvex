@@ -73,8 +73,6 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
         await DeleteAccount({ method: "cancelSignup", email });
         setError("No account found. Sign up with email and password first.");
         return;
-      } else {
-        console.log("hasVerifiedEmail", hasVerifiedEmail);
       }
     } catch (error) {
       if (error instanceof ConvexError) {
@@ -248,47 +246,6 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
             </>
           )}
         </Button>
-        {/* <div className="grid grid-cols-2 gap-x-4">
-          <Button
-            variant="salWithShadowHidden"
-            size="lg"
-            type="button"
-            className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 md:bg-white"
-            onClick={() => onProviderSignIn("google")}
-            disabled={pending}
-            tabIndex={1}
-          >
-            {isLoading === "google" ? (
-              <LoaderCircle className="size-4 animate-spin" />
-            ) : (
-              <>
-                <FaGoogle className="size-4" />
-                Google
-              </>
-            )}
-          </Button>
-
-          <Button
-            variant="salWithShadowHidden"
-            size="lg"
-            type="button"
-            className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 md:bg-white"
-            onClick={() => onProviderSignIn("apple")}
-            // disabled={pending}
-            //TODO: Add Apple OAuth
-            disabled={true}
-            tabIndex={2}
-          >
-            {isLoading === "apple" ? (
-              <LoaderCircle className="size-4 animate-spin" />
-            ) : (
-              <>
-                <FaApple className="size-5" />
-                Apple
-              </>
-            )}
-          </Button>
-        </div> */}
         <p className="flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
           or
         </p>
@@ -302,10 +259,12 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
               name="email"
               disabled={pending}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
               placeholder=" "
               type="email"
-              // inputHeight='sm'
               className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
               required
               tabIndex={3}
@@ -328,7 +287,10 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                   name="password"
                   disabled={pending}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
                   placeholder=" "
                   type={showPassword ? "text" : "password"}
                   // inputHeight='sm'
@@ -356,11 +318,13 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
             size="lg"
             type="submit"
             variant="salWithShadowYlw"
-            disabled={pending}
+            disabled={pending || Boolean(success || Boolean(error))}
             tabIndex={6}
           >
             {pending ? (
               <LoaderCircle className="size-5 animate-spin" />
+            ) : Boolean(success) ? (
+              "Success!"
             ) : (
               "Continue"
             )}

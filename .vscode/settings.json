@@ -10,7 +10,8 @@
     "Pricing",
     "Artist Actions",
     "Support",
-    "The List"
+    "The List",
+    "Auth"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

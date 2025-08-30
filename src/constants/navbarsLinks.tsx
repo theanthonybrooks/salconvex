@@ -33,6 +33,39 @@ export const landingPageNavbarMenuLinksResources: {
     sub: ["admin"],
   },
 ];
+export const landingPageNavbarMenuLinksAbout: {
+  title: string;
+  href: string;
+  description: string;
+  isIcon?: boolean;
+  sub: string[];
+  excluded?: string[];
+}[] = [
+  {
+    title: "About",
+    href: "/about",
+    description: "About The Street Art List.",
+    sub: ["all"],
+  },
+  {
+    title: "FAQ",
+    href: "/faq",
+    description: "Frequently Asked Questions.",
+    sub: ["all"],
+  },
+  {
+    title: "Contact",
+    href: "/support",
+    description: "Contact/Help & Support.",
+    sub: ["all"],
+  },
+  // {
+  //   title: "Pricing",
+  //   href: "/pricing",
+  //   description: "The price of job security.",
+  //   sub: ["all"],
+  // },
+];
 
 export const landingPageNavbarLinks: {
   title: string;
@@ -43,6 +76,7 @@ export const landingPageNavbarLinks: {
   target?: string;
   sub: string[];
   userType?: string[];
+  excluded?: string[];
 }[] = [
   // {
   //   title: "The List",
@@ -70,9 +104,11 @@ export const landingPageNavbarLinks: {
   },
   {
     title: "Submit",
-    href: "/pricing?submit",
+    href: "/submit",
     description: "Submit an event/open call",
-    sub: ["all"],
+    sub: ["public"],
+    userType: ["organizer"],
+    excluded: ["artist"],
   },
   {
     title: "Dashboard",

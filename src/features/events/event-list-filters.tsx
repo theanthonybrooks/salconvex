@@ -41,7 +41,7 @@ export const EventFilters = ({
 
   //TODO: Add filters for: applied, open calls, budget range?, eligibility, ... ?
   return (
-    <div className="mx-auto mb-6 flex w-[min(95vw,1280px)] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-8">
+    <div className="mx-auto mb-6 flex w-full max-w-[min(95vw,1280px)] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-8">
       <Separator className="mx-auto" thickness={2} />
 
       <TheListFilters
