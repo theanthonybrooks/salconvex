@@ -238,8 +238,6 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       }
 
       try {
-        await updateVerification({ email });
-
         const result = await signIn("password", {
           email,
           code: otp,
@@ -247,6 +245,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
         });
 
         if (result) {
+          await updateVerification({ email });
           setSuccess("Successfully signed up and verified!");
           form.reset();
           const callBackSrc = sessionStorage.getItem("src");

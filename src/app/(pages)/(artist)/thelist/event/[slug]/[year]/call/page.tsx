@@ -3,14 +3,13 @@ import { capitalize } from "@/lib/utils";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 
 import { fetchQuery } from "convex/nextjs";
-import { Metadata } from "next";
 import { api } from "~/convex/_generated/api";
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string; year: string };
-}): Promise<Metadata> {
+  params: Promise<{ slug: string; year: string }>;
+}) {
   const token = await convexAuthNextjsToken();
   const { slug, year } = await params;
 
