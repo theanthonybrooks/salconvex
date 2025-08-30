@@ -118,14 +118,14 @@ export const getArtistApplications2 = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) return null;
 
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
 
-    if (!user) throw new Error("User not found");
+    if (!user) return null;
 
     const applications = await ctx.db
       .query("applications")

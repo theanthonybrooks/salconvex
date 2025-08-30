@@ -62,6 +62,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const userId = uuidv4();
   const convex = useConvex();
   const updateVerification = useMutation(api.users.updateUserEmailVerification);
+
   const DeleteAccount = useMutation(api.users.deleteAccount);
   const otpInputRef = useRef<HTMLInputElement>(null);
   const prevOtp = useRef<string>("");
@@ -238,6 +239,8 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       }
 
       try {
+        await convex.query(api.users.hasVerifiedEmail, { email });
+
         const result = await signIn("password", {
           email,
           code: otp,
@@ -291,6 +294,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       form,
       signIn,
       updateVerification,
+      convex,
     ],
   );
 
