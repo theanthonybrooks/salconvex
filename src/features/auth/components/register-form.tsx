@@ -378,7 +378,10 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
           <p className="py-5 text-center text-lg text-foreground">
             Already have an account?{" "}
             <span
-              onClick={switchFlow}
+              onClick={() => {
+                sessionStorage.removeItem("src");
+                switchFlow();
+              }}
               className="outline-hidden focus:outline-hidden cursor-pointer font-black text-zinc-950 decoration-foreground underline-offset-4 hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline"
               tabIndex={
                 step === "signUp" && selectedOption.includes("organizer")

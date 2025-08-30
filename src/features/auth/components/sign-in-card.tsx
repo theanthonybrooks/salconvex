@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
+import { CloseBtn } from "@/components/ui/close-btn";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +19,7 @@ import { LoginSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import { Eye, EyeOff, Heart, LoaderCircle, X } from "lucide-react";
+import { Eye, EyeOff, Heart, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -53,12 +54,10 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const {
     watch,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = form;
 
   const email = watch("email");
-
-  console.log(errors, isValid);
 
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
@@ -158,12 +157,16 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
     }
   };
 
-  const onProviderSignIn = (value: "github" | "google" | "apple") => {
+  const onProviderSignIn = async (value: "github" | "google" | "apple") => {
     setIsLoading(value);
-    signIn(value, { redirectTo: "/auth/sign-up?err=newUser" }).finally(() => {
+    try {
+      await signIn(value, { redirectTo: "/auth/sign-up?err=newUser" });
+    } catch (error) {
+      throw new Error("Error signing in", { cause: error });
+    } finally {
       setPending(false);
-      setIsLoading("");
-    });
+      setSuccess("Redirecting...");
+    }
   };
 
   useEffect(() => {
@@ -192,14 +195,11 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
-      <button
-        className="absolute right-5 top-4 z-10 text-lg font-bold text-foreground hover:text-red-600 focus:text-red-600"
-        aria-label="Back to homepage"
-        tabIndex={8}
-        onClick={() => router.push("/")}
-      >
-        <X size={25} />
-      </button>
+      <CloseBtn
+        ariaLabel="Back to homepage"
+        type="icon"
+        onAction={() => router.push("/")}
+      />
       <CardHeader className="items-center px-0 pt-0">
         <Link
           href="/"
@@ -225,7 +225,10 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
         <CardDescription className="mt-1 flex items-center gap-x-2 text-center text-lg text-foreground">
           Don&apos;t have an account?
           <span
-            onClick={switchFlow}
+            onClick={() => {
+              sessionStorage.setItem("src", "newUser");
+              switchFlow();
+            }}
             className="outline-hidden focus:outline-hidden cursor-pointer font-black text-foreground decoration-foreground underline-offset-4 hover:underline focus:underline focus:decoration-foreground focus:decoration-2 focus-visible:underline"
             tabIndex={7}
           >

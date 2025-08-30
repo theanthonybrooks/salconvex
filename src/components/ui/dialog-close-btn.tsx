@@ -34,6 +34,8 @@ interface DialogCloseBtnProps {
   triggerClassName?: string;
   triggerVariant?: ButtonVariant;
   triggerSize?: ButtonSize;
+
+  ariaLabel?: string;
 }
 
 export const DialogCloseBtn = ({
@@ -52,6 +54,8 @@ export const DialogCloseBtn = ({
   triggerClassName,
   triggerVariant = "salWithShadowHiddenYlw",
   triggerSize = "lg",
+
+  ariaLabel = "Close modal",
 }: DialogCloseBtnProps) => {
   const [hidden, setHidden] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -95,7 +99,7 @@ export const DialogCloseBtn = ({
 
               triggerClassName,
             )}
-            aria-label="Close modal"
+            aria-label={ariaLabel}
           >
             <X size={25} />
           </Button>
@@ -104,7 +108,7 @@ export const DialogCloseBtn = ({
             size={triggerSize}
             variant={triggerVariant}
             className={cn(triggerClassName)}
-            aria-label="Close modal"
+            aria-label={ariaLabel}
           >
             {triggerTitle}
           </Button>
