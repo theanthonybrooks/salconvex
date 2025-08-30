@@ -473,6 +473,11 @@ const ClientEventList = () => {
                       Ended Calls
                     </h2>
                   )}
+                  {isFirstEnded && sortOptions.sortBy === "eventStart" && (
+                    <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
+                      Past Events
+                    </h2>
+                  )}
 
                   <h3 className="mb-3 flex items-center justify-center gap-x-2 text-center text-3xl font-semibold sm:mt-4">
                     {group.title.parts ? (
