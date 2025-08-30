@@ -988,12 +988,10 @@ export const getEventWithOCDetails = query({
     source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const { slug, edition } = args;
     const source = args.source ?? "eventpage";
     const userId = await getAuthUserId(ctx);
-    // if (!userId) {
-    //   console.log("user not authenticated");
-    // }
-    // if (!userId) throw new ConvexError("Not authenticated");
+
     const user = userId ? await ctx.db.get(userId) : null;
     const isAdmin = user?.role?.includes("admin");
     const subscription = user
@@ -1002,19 +1000,22 @@ export const getEventWithOCDetails = query({
           .withIndex("userId", (q) => q.eq("userId", user._id))
           .first()
       : null;
-    // const hasActiveSubscription =
-    //   subscription?.status === "active" ||
-    //   subscription?.status === "trialing" ||
-    //   isAdmin;
+    const activeSub =
+      subscription?.status === "active" ||
+      subscription?.status === "trialing" ||
+      isAdmin;
     let application = null;
 
     const event = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
       .filter((q) => q.eq(q.field("dates.edition"), args.edition))
       .first();
 
-    if (!event) throw new ConvexError("Event not found");
+    if (!event)
+      throw new ConvexError(
+        "Event not found: " + `${slug}/${edition}` + `- Source:${source}`,
+      );
 
     const organizer = await ctx.db.get(event.mainOrgId);
 
@@ -1023,7 +1024,7 @@ export const getEventWithOCDetails = query({
     const openCall = await ctx.db
       .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-      .filter((q) => q.eq(q.field("basicInfo.dates.edition"), args.edition))
+      .filter((q) => q.eq(q.field("basicInfo.dates.edition"), edition))
       // .filter((q) => q.eq(q.field("state"), "published"))
       .filter((q) =>
         isAdmin || userIsOrganizer
@@ -1043,7 +1044,7 @@ export const getEventWithOCDetails = query({
 
       .first();
 
-    if (userId && openCall) {
+    if (userId && openCall && activeSub) {
       application = await ctx.db
         .query("applications")
         .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))

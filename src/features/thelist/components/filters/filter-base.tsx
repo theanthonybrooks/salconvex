@@ -627,7 +627,7 @@ export const FilterBase = ({
         </div>
       ) : (
         <div className="hidden flex-col gap-5 px-5 sm:flex">
-          <div className="flex max-w-[80vw] flex-wrap items-center gap-3">
+          <div className="flex max-w-[90vw] flex-wrap items-center gap-3">
             <section className="flex flex-col gap-2">
               <Label htmlFor="list-search" className="flex items-center gap-2">
                 Search:

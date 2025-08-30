@@ -595,12 +595,12 @@ const Card = ({
             <DetailsDialog
               user={user}
               isAdmin={isAdmin ?? false}
-              onClick={() => setIsPreviewing(true)}
-              onClose={() => {
+              onClickAction={() => setIsPreviewing(true)}
+              onCloseAction={() => {
                 setIsPreviewing(false);
                 setIsHovered(false);
               }}
-              onEdit={() => {
+              onEditAction={() => {
                 if (!isAdmin) return;
                 setIsEditing(true);
               }}
@@ -724,9 +724,9 @@ type DetailsDialogProps = {
   id: Id<"todoKanban">;
   trigger: React.ReactNode;
   initialValues: BaseTaskValues;
-  onClick?: () => void;
-  onClose?: () => void;
-  onEdit?: () => void;
+  onClickAction?: () => void;
+  onCloseAction?: () => void;
+  onEditAction?: () => void;
   isAdmin: boolean;
   user: User | null;
 };
@@ -968,9 +968,9 @@ export const DetailsDialog = ({
   trigger,
   initialValues,
 
-  onClick,
-  onClose,
-  onEdit,
+  onClickAction,
+  onCloseAction,
+  onEditAction,
 }: DetailsDialogProps) => {
   const title = initialValues?.title || "";
   const description = initialValues?.description || "";
@@ -992,7 +992,7 @@ export const DetailsDialog = ({
 
   const onCloseDialog = () => {
     setTimeout(() => {
-      onClose?.();
+      onCloseAction?.();
       return;
     }, 500);
   };
@@ -1017,7 +1017,7 @@ export const DetailsDialog = ({
 
   return (
     <Dialog onOpenChange={(open) => !open && onCloseDialog()}>
-      <DialogTrigger asChild onClick={onClick}>
+      <DialogTrigger asChild onClick={onClickAction}>
         {trigger}
       </DialogTrigger>
       <DialogContent className="bg-card">
@@ -1105,7 +1105,7 @@ export const DetailsDialog = ({
                   <TooltipSimple content="Edit task">
                     <Pencil
                       className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4"
-                      onClick={onEdit}
+                      onClick={onEditAction}
                     />
                   </TooltipSimple>
                   <p className="absolute -top-3 left-0.5 bg-card text-xs text-foreground/50">

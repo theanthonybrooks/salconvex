@@ -54,10 +54,12 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const {
     watch,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = form;
 
   const email = watch("email");
+
+  console.log(isValid, errors);
 
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
@@ -319,14 +321,8 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                         {...field}
                         id="password"
                         disabled={pending}
-                        // value={password}
-                        // onChange={(e) => {
-                        //   setPassword(e.target.value);
-                        //   setError("");
-                        // }}
                         placeholder=" "
                         type={showPassword ? "text" : "password"}
-                        // inputHeight='sm'
                         className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
                         required
                         tabIndex={4}
