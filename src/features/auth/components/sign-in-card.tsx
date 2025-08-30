@@ -143,6 +143,10 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
             setError(
               "Your previous signup was never completed. Please sign up again",
             );
+            form.reset();
+            setTimeout(() => {
+              setError("");
+            }, 5000);
           }
         } else {
           setError("An error occurred. Please try again.");
