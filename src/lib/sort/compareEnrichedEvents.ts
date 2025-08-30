@@ -108,7 +108,9 @@ export const compareEnrichedEvents = (
       const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd;
       const ocState = item.tabs.opencall?.state;
       const isPublished = ocState === "published" && item.state === "published";
-      const isArchivedOC = ocState === "archived" && item.state === "published";
+      const isArchivedOC =
+        ocState === "archived" &&
+        (item.state === "published" || item.state === "archived");
       //TODO: Include archived events in the sort.
       // const isArchivedEvent = item.state === "archived";
       const isApproved = isPublished || isArchivedOC;
