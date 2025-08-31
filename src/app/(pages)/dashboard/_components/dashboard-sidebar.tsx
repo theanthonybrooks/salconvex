@@ -1,7 +1,6 @@
 "use client";
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   dashboardNavItems,
@@ -17,7 +16,7 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { RiExpandLeftRightLine } from "react-icons/ri";
 
 import { api } from "~/convex/_generated/api";
@@ -130,7 +129,7 @@ export default function DashboardSideBar({
 
   const handleCollapseSidebar = () => {
     setCollapsedSidebar((prev) => !prev);
-    setOpenSection(null);
+    // setOpenSection(null);
   };
 
   return (
@@ -173,10 +172,10 @@ export default function DashboardSideBar({
           {filteredNavItems
             .filter((item) => !item.sectionCat)
             .map((item) => (
-              <React.Fragment key={item.href}>
+              <div key={item.href} className={cn("mb-1 px-2")}>
                 <TooltipSimple
                   content={item.label}
-                  side="top"
+                  side="right"
                   align="start"
                   alignOffset={3}
                   disabled={!collapsedSidebar}
@@ -185,7 +184,7 @@ export default function DashboardSideBar({
                     prefetch={true}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-5 transition-colors",
+                      "flex items-center gap-2 rounded-lg p-3 transition-colors",
                       pathname === item.href
                         ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
                         : "text-primary hover:bg-primary/10 hover:text-foreground",
@@ -204,45 +203,47 @@ export default function DashboardSideBar({
                     {!collapsedSidebar && <> {item.label}</>}
                   </Link>
                 </TooltipSimple>
-                {pathname !== item.href && (
+                {/* {pathname !== item.href && (
                   <Separator thickness={2} className="border-foreground/20" />
-                )}
-              </React.Fragment>
+                )} */}
+              </div>
             ))}
 
           {/* Render sections */}
           {filteredNavItems
             .filter((item) => item.sectionHead)
-            .map((section, index, arr) => {
+            .map((section) => {
               return (
-                <div key={section.sectionCat} className="space-y-2">
+                <div
+                  key={section.sectionCat}
+                  className={cn("space-y-2", collapsedSidebar && "px-2")}
+                >
                   {/* Section header */}
                   <section
-                    className={cn(
-                      pathname.includes(section.href) && "hover:bg-primary/10",
-                    )}
+                    className={
+                      cn("mt-2")
+                      // pathname.includes(section.href) && "hover:bg-primary/10",
+                    }
                   >
                     <TooltipSimple
                       content={section.heading}
-                      side="top"
+                      side="right"
                       align="start"
                       alignOffset={3}
                       disabled={!collapsedSidebar}
                     >
                       <div
                         className={cn(
-                          "flex flex-col gap-2 py-4 transition-colors",
+                          "mb-1 flex cursor-pointer flex-col gap-2 rounded-lg py-3 transition-colors",
                           fontSize,
                           pathname.includes(section.href)
-                            ? "font-bold"
+                            ? "bg-primary/5 font-bold"
                             : "text-primary hover:bg-primary/10 hover:text-foreground",
-                          activeSection === section.sectionCat
-                            ? "cursor-default font-bold"
-                            : "cursor-pointer",
-                          collapsedSidebar && "cursor-pointer px-3",
+                          activeSection === section.sectionCat && "font-bold",
+                          collapsedSidebar && "px-3",
                           activeSection === section.sectionCat &&
                             collapsedSidebar &&
-                            "bg-primary/10",
+                            "border-2 border-primary/10 bg-primary/5",
                           !collapsedSidebar && "pl-5 pr-3",
                         )}
                         onClick={() => handleSectionToggle(section.sectionCat!)}
@@ -250,7 +251,7 @@ export default function DashboardSideBar({
                         <div
                           className={cn(
                             "space-between flex justify-between gap-2",
-                            collapsedSidebar && "px-3",
+                            // collapsedSidebar && "px-3",
                           )}
                         >
                           <div className="relative flex items-center justify-between gap-2">
@@ -316,9 +317,6 @@ export default function DashboardSideBar({
                         </div>
                       </div>
                     </TooltipSimple>
-                    {index !== arr.length - 1 && (
-                      <Separator thickness={2} className="w-full" />
-                    )}
                   </section>
 
                   {!collapsedSidebar && (
@@ -331,26 +329,27 @@ export default function DashboardSideBar({
                             collapsedSidebar ? "collapsedSidebar" : "collapsed"
                           }
                           variants={sectionVariants}
-                          className="overflow-hidden"
+                          className="ml-[1.65rem] overflow-hidden border-l-2 border-foreground/10"
                         >
-                          {filteredNavItems
-                            .filter(
-                              (navItem) =>
-                                navItem.sectionCat === section.sectionCat,
-                            )
-                            .map((sectionItem, index, arr) => (
-                              <div key={sectionItem.href} className="pl-4">
+                          <div className={cn("flex flex-col gap-1")}>
+                            {filteredNavItems
+                              .filter(
+                                (navItem) =>
+                                  navItem.sectionCat === section.sectionCat,
+                              )
+                              .map((sectionItem) => (
                                 <Link
+                                  key={sectionItem.href}
                                   prefetch={true}
                                   href={sectionItem.href}
                                   className={cn(
-                                    "flex items-center justify-between gap-2 rounded-lg px-3 py-2 transition-colors",
+                                    "ml-2 flex items-center justify-between gap-2 rounded-lg px-3 py-2 transition-colors",
                                     fontSize === "text-base"
                                       ? "sm:text-base"
                                       : "text-sm",
                                     pathname === sectionItem.href
-                                      ? "bg-primary/10 pl-3 text-primary hover:bg-primary/20"
-                                      : "pl-3 text-primary hover:bg-primary/10 hover:text-foreground",
+                                      ? "cursor-default bg-primary/5 font-medium text-primary"
+                                      : "text-primary hover:bg-primary/10 hover:text-foreground",
                                   )}
                                 >
                                   <span className="flex items-center gap-2">
@@ -372,16 +371,8 @@ export default function DashboardSideBar({
                                       </span>
                                     )}
                                 </Link>
-
-                                {index === arr.length - 1 &&
-                                  filteredNavItems.length > 2 && (
-                                    <Separator
-                                      thickness={2}
-                                      className="w-full"
-                                    />
-                                  )}
-                              </div>
-                            ))}
+                              ))}
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -392,10 +383,10 @@ export default function DashboardSideBar({
         </div>
 
         {/* Help Items */}
-        <div>
+        <div className={cn("border-t-2 border-foreground/20 p-2")}>
           {helpNavItems.map((item) => (
-            <React.Fragment key={item.href}>
-              <Separator thickness={2} className="w-full" />
+            <Fragment key={item.href}>
+              {/* <Separator thickness={2} className="w-full" /> */}
               <TooltipSimple
                 content={item.label}
                 side="top"
@@ -407,11 +398,10 @@ export default function DashboardSideBar({
                   prefetch={true}
                   href={item.href}
                   className={cn(
-                    "flex items-center justify-center gap-2 py-5 text-center transition-colors",
+                    "flex items-center justify-center gap-2 rounded-lg py-3 text-center transition-colors",
                     fontSize === "text-base" ? "sm:text-base" : "text-sm",
-                    pathname === item.href
-                      ? "bg-primary/10 text-primary hover:bg-primary/20"
-                      : "text-primary hover:bg-primary/10 hover:text-foreground",
+
+                    "text-primary hover:bg-primary/10 hover:text-foreground",
                     // collapsedSidebar && "pl-0",
                   )}
                 >
@@ -421,7 +411,7 @@ export default function DashboardSideBar({
                   {!collapsedSidebar && <> {item.label}</>}
                 </Link>
               </TooltipSimple>
-            </React.Fragment>
+            </Fragment>
           ))}
         </div>
       </nav>

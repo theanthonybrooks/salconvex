@@ -43,25 +43,32 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, children, ...props }, ref) => (
-  <TooltipPrimitive.Portal>
-    <TooltipPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
-        "opacity-0 transition-opacity duration-200",
-        "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
-        className,
-      )}
-      {...props}
-    >
-      <CustomArrow />
-      {children}
-    </TooltipPrimitive.Content>
-  </TooltipPrimitive.Portal>
-));
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
+    withArrow?: boolean;
+  }
+>(
+  (
+    { className, sideOffset = 4, children, withArrow = true, ...props },
+    ref,
+  ) => (
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Content
+        ref={ref}
+        sideOffset={sideOffset}
+        className={cn(
+          "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
+          "opacity-0 transition-opacity duration-200",
+          "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
+          className,
+        )}
+        {...props}
+      >
+        {withArrow && <CustomArrow />}
+        {children}
+      </TooltipPrimitive.Content>
+    </TooltipPrimitive.Portal>
+  ),
+);
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
@@ -114,9 +121,9 @@ export const TooltipSimple = ({
               "pointer-events-none",
               className,
             )}
+            withArrow={showArrow}
             {...props}
           >
-            {showArrow && <CustomArrow />}
             {content}
           </TooltipContent>
         ) : null}

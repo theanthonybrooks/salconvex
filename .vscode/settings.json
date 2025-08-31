@@ -11,7 +11,8 @@
     "Artist Actions",
     "Support",
     "The List",
-    "Auth"
+    "Auth",
+    "Dashboard"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

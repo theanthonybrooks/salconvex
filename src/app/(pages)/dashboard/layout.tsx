@@ -1,6 +1,7 @@
 import { DashboardWrapper } from "@/app/(pages)/dashboard/_components/dashboard-wrapper";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { api } from "~/convex/_generated/api";
@@ -9,7 +10,7 @@ interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Dashboard",
   description:
     "View your account information, track your applications, bookmarks, and events/open calls, and manage your membership.",
