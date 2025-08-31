@@ -12,7 +12,8 @@
     "Support",
     "The List",
     "Auth",
-    "Dashboard"
+    "Dashboard",
+    "Theme"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

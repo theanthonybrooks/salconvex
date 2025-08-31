@@ -1,11 +1,12 @@
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Dispatch, SetStateAction } from "react";
 import styles from "./hamburger-icon.module.css";
 
 interface MenuToggleProps {
   className?: string;
   menuState: string;
-  setState: React.Dispatch<React.SetStateAction<string>>;
+  setState: Dispatch<SetStateAction<string>>;
 }
 
 const MenuToggle = ({ className, menuState, setState }: MenuToggleProps) => {

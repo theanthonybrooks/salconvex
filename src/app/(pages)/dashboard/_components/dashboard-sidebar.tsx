@@ -250,7 +250,7 @@ export default function DashboardSideBar({
                       >
                         <div
                           className={cn(
-                            "space-between flex justify-between gap-2",
+                            "space-between flex items-center justify-between gap-2",
                             // collapsedSidebar && "px-3",
                           )}
                         >

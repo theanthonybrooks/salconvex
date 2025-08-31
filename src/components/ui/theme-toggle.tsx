@@ -5,8 +5,9 @@ import { PendingThemeContext } from "@/providers/themed-provider";
 import { User, UserPref } from "@/types/user";
 import { useMutation } from "convex/react";
 import { motion as m, Variants } from "framer-motion";
+import { debounce } from "lodash";
 import { useTheme } from "next-themes";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { api } from "~/convex/_generated/api";
 
 interface ThemeToggleProps {
@@ -32,11 +33,27 @@ export default function ThemeToggle({
   //   }, 400),
   // ).current;
 
+  const debouncedUpdate = useRef(
+    debounce(
+      (
+        themeValue: string,
+        resolve: (v?: unknown) => void,
+        reject: (e: unknown) => void,
+      ) => {
+        updateUserPref({ theme: themeValue }).then(resolve).catch(reject);
+      },
+      400,
+    ),
+  ).current;
+
   const handleClick = async (nextTheme: string) => {
     setPendingTheme(nextTheme);
     setTheme(nextTheme);
     try {
-      await updateUserPref({ theme: nextTheme }); // send mutation
+      await new Promise((resolve, reject) => {
+        debouncedUpdate(nextTheme, resolve, reject);
+      });
+      // await updateUserPref({ theme: nextTheme }); // send mutation
       // Wait for userTheme to update (from backend)
       // You may need a useEffect in ThemedProvider to watch for this:
       // When userTheme === pendingTheme, clear pendingTheme
