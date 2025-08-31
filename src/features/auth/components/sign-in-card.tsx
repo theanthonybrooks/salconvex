@@ -152,6 +152,8 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
             setTimeout(() => {
               setError("");
             }, 5000);
+          } else {
+            setError("Incorrect email/password. Please try again.");
           }
         } else {
           setError("An error occurred. Please try again.");
