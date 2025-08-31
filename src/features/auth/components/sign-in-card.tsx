@@ -270,7 +270,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
           variant="salWithShadowHidden"
           size="lg"
           type="button"
-          className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 md:bg-white"
+          className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 focus-visible:translate-x-[3px] focus-visible:translate-y-[-3px] focus-visible:shadow-slg md:bg-white"
           onClick={() => onProviderSignIn("google")}
           disabled={pending}
           tabIndex={1}
@@ -322,7 +322,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                       <FormLabel className="font-bold">Password</FormLabel>
                       <span
                         onClick={forgotPasswordHandler}
-                        className="cursor-pointer text-sm text-foreground hover:underline"
+                        className="cursor-pointer text-sm text-foreground hover:underline focus-visible:underline"
                         tabIndex={5}
                       >
                         Forgot password?
@@ -341,13 +341,13 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                         <button
                           type="button"
                           onClick={() => setShowPassword((prev) => !prev)}
-                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                          className="group absolute inset-y-0 right-0 flex items-center pr-3"
                           tabIndex={4}
                         >
                           {showPassword ? (
-                            <Eye className="size-4 text-foreground" />
+                            <Eye className="size-4 rounded-sm text-foreground outline-offset-2 group-focus-visible:outline" />
                           ) : (
-                            <EyeOff className="size-4 text-foreground" />
+                            <EyeOff className="size-4 rounded-sm text-foreground outline-offset-2 group-focus-visible:outline" />
                           )}
                         </button>
                       </div>
@@ -390,7 +390,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
               </div> */}
             </div>
             <Button
-              className="mt-8 w-full bg-white py-6 text-base sm:mt-6 sm:py-0 md:bg-salYellow"
+              className="mt-8 w-full bg-white py-6 text-base focus-visible:bg-salPinkLt sm:mt-6 sm:py-0 md:bg-salYellow"
               size="lg"
               type="submit"
               variant={
