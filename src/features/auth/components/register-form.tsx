@@ -249,7 +249,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
 
         if (result) {
           await updateVerification({ email });
-          setSuccess("Successfully signed up and verified!");
+          setSuccess("Successfully signed up and verified! Signing in...");
           form.reset();
           const callBackSrc = sessionStorage.getItem("src");
           const prevSalPage = sessionStorage.getItem("previousSalPage");
@@ -273,16 +273,11 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
         } else {
           console.error("Error in handleOtpSubmit:", error);
           setError("Invalid code or verification failed. Please try again.");
+          setOtp("");
         }
       } finally {
         setIsLoading(false);
       }
-
-      // void signIn("password", {
-      //   email,
-      //   code: otp,
-      //   flow: "email-verification",
-      // })
     },
     [
       otp,
@@ -317,6 +312,12 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
     { value: "artist", label: "Artist" },
     { value: "organizer", label: "Organizer" },
   ];
+
+  useEffect(() => {
+    if (otp === "") {
+      otpInputRef.current?.focus();
+    }
+  }, [otp]);
 
   useEffect(() => {
     form.setValue("accountType", selectedOption);
@@ -760,7 +761,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                 }
                 size="lg"
                 type="submit"
-                className="w-full bg-white text-base sm:bg-salYellow sm:text-base"
+                className="hidden w-full bg-white text-base sm:bg-salYellow sm:text-base"
               >
                 {isLoading ? (
                   <LoaderCircle className="animate-spin" />

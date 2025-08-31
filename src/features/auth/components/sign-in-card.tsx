@@ -114,7 +114,8 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
         await updateUserLastActive({ email });
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      //TODO: Add handling of errors for rate limiting and incorrect password. Need to create custom auth provider for this (atm as of Aug 31, 2025)
       if (error instanceof ConvexError) {
         const data = error.data as { message: string; contactUrl: string };
         console.log(data, error);
