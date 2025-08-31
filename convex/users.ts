@@ -3,7 +3,7 @@ import { action, QueryCtx } from "./_generated/server";
 
 import { formatSubscriptionLabel } from "@/lib/subscriptionFns";
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+import { ConvexError, Infer, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
 import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
@@ -366,58 +366,112 @@ export const updateUser = mutation({
   },
 });
 
+function pickDefined<T extends object>(obj: T, keys: (keyof T)[]) {
+  const out: Partial<T> = {};
+  for (const key of keys) {
+    const value = obj[key];
+    if (value !== undefined) {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
+const prefsArgs = v.object({
+  autoApply: v.optional(v.boolean()),
+  currency: v.optional(v.string()),
+  timezone: v.optional(v.string()),
+  theme: v.optional(v.string()),
+  fontSize: v.optional(v.string()),
+  language: v.optional(v.string()),
+});
+type UpdateUserPrefsArgs = Infer<typeof prefsArgs>;
+
 export const updateUserPrefs = mutation({
-  args: {
-    autoApply: v.optional(v.boolean()),
-    currency: v.optional(v.string()),
-    timezone: v.optional(v.string()),
-    theme: v.optional(v.string()),
-    fontSize: v.optional(v.string()),
-    language: v.optional(v.string()),
-  },
+  args: prefsArgs,
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
-    // console.log("args", args)
-    // console.log("args.currency", args.currency)
-    // console.log("args.timezone", args.timezone)
-    // console.log("args.theme", args.theme)
-    // console.log("args.language", args.language)
-    // console.log("userId", userId)
+    if (!userId) return null;
+
     const userPref = await ctx.db
       .query("userPreferences")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
+    if (!userPref) throw new ConvexError("User pref not found");
 
-    if (!userPref) {
-      throw new ConvexError("User pref not found");
+    const keys = Object.keys(prefsArgs.fields) as (keyof UpdateUserPrefsArgs)[];
+    const update = pickDefined(args, keys);
+
+    if (Object.keys(update).length > 0) {
+      await ctx.db.patch(userPref._id, {
+        ...update,
+        lastUpdated: Date.now(),
+      });
     }
-
-    // console.log("userPref._id", userPref._id)
-    // console.log("userPref", userPref)
-
-    await ctx.db.patch(userPref._id, {
-      autoApply: args.autoApply,
-      currency: args.currency,
-      timezone: args.timezone,
-      theme: args.theme,
-      language: args.language,
-      fontSize: args.fontSize,
-    });
 
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
+    if (!user) throw new ConvexError("User not found");
 
-    if (!user) {
-      throw new ConvexError("User not found");
-    }
-    await ctx.db.patch(user._id, {
-      updatedAt: Date.now(),
-    });
+    await ctx.db.patch(user._id, { updatedAt: Date.now() });
   },
 });
+
+// export const updateUserPrefs = mutation({
+//   args: {
+//     autoApply: v.optional(v.boolean()),
+//     currency: v.optional(v.string()),
+//     timezone: v.optional(v.string()),
+//     theme: v.optional(v.string()),
+//     fontSize: v.optional(v.string()),
+//     language: v.optional(v.string()),
+//   },
+//   handler: async (ctx, args) => {
+//     const userId = await getAuthUserId(ctx);
+//     // if (!userId) throw new ConvexError("Not authenticated");
+//     if (!userId) return null;
+//     // console.log("args", args)
+//     // console.log("args.currency", args.currency)
+//     // console.log("args.timezone", args.timezone)
+//     // console.log("args.theme", args.theme)
+//     // console.log("args.language", args.language)
+//     // console.log("userId", userId)
+//     const userPref = await ctx.db
+//       .query("userPreferences")
+//       .withIndex("by_userId", (q) => q.eq("userId", userId))
+//       .unique();
+
+//     if (!userPref) {
+//       throw new ConvexError("User pref not found");
+//     }
+
+//     // console.log("userPref._id", userPref._id)
+//     // console.log("userPref", userPref)
+
+//     await ctx.db.patch(userPref._id, {
+//       autoApply: args.autoApply,
+//       currency: args.currency,
+//       timezone: args.timezone,
+//       theme: args.theme,
+//       language: args.language,
+//       fontSize: args.fontSize,
+//     });
+
+//     const user = await ctx.db
+//       .query("users")
+//       .withIndex("by_userId", (q) => q.eq("userId", userId))
+//       .unique();
+
+//     if (!user) {
+//       throw new ConvexError("User not found");
+//     }
+//     await ctx.db.patch(user._id, {
+//       updatedAt: Date.now(),
+//     });
+//   },
+// });
 
 export const hasVerifiedEmail = query({
   args: {

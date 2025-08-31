@@ -11,7 +11,11 @@ interface MenuToggleProps {
 const MenuToggle = ({ className, menuState, setState }: MenuToggleProps) => {
   const isActive = menuState === "open";
   return (
-    <TooltipSimple content="Open Menu" side="bottom" align="end">
+    <TooltipSimple
+      content={isActive ? "Close Menu" : "Open Menu"}
+      side="bottom"
+      align="end"
+    >
       <button
         className={cn(
           styles.hamburger,

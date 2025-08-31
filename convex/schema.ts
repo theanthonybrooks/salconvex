@@ -878,6 +878,7 @@ export default defineSchema({
     language: v.optional(v.string()),
     theme: v.optional(v.string()),
     fontSize: v.optional(v.string()),
+    lastUpdated: v.optional(v.number()),
   }).index("by_userId", ["userId"]),
 
   newsletter: defineTable(newsletterSchema)
