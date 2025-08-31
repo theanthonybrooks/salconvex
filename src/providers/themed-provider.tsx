@@ -68,17 +68,19 @@ function ThemeSync({
   children: ReactNode;
 }) {
   const { theme, setTheme } = useTheme();
-  const { pendingTheme } = useContext(PendingThemeContext);
+  const { pendingTheme, setPendingTheme } = useContext(PendingThemeContext);
 
-  // useEffect(() => {
-  //   if (pendingTheme && userTheme === pendingTheme) setPendingTheme(null);
-  // }, [pendingTheme, userTheme, setPendingTheme]);
+  useEffect(() => {
+    if (pendingTheme && userTheme === pendingTheme) setPendingTheme(null);
+  }, [pendingTheme, userTheme, setPendingTheme]);
 
   useEffect(() => {
     if (pendingTheme) return;
 
     if (!hasUser) setTheme("default");
-    else if (userTheme && theme !== userTheme) setTheme(userTheme);
+    else if (userTheme && theme !== userTheme) {
+      setTheme(userTheme);
+    }
   }, [theme, userTheme, setTheme, hasUser, pendingTheme]);
 
   return <>{children}</>;

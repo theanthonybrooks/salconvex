@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { infoEmail } from "@/constants/siteInfo";
 import { supportCategoryOptions } from "@/constants/support";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { ContactFormValues, contactSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction, usePreloadedQuery } from "convex/react";
@@ -25,7 +25,7 @@ const SupportPage = () => {
   const userData = usePreloadedQuery(preloadedUserData);
   const userId = userData?.userId ?? null;
   const user = userData?.user;
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { isMobile } = useDevice();
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -95,7 +95,7 @@ const SupportPage = () => {
   };
   return (
     <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">
-      <h1 className="md:mb-25 mb-10 text-center font-tanker text-4xl lowercase tracking-wide md:text-[4rem]">
+      <h1 className="mb-10 text-center font-tanker text-4xl lowercase tracking-wide md:mb-25 md:text-[4rem]">
         Support & Contact
       </h1>
       <div className="flex h-full w-full grid-cols-[1fr_auto_1fr] flex-col items-start gap-x-2 px-6 md:grid md:px-8">

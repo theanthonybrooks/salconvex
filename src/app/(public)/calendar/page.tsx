@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 const Calendar = () => {
-  // const isMobile = useMediaQuery("(max-width: 768px)");
+  // const {isMobile} = useDevice()
   const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);

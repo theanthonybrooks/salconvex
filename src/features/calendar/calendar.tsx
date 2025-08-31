@@ -1,6 +1,6 @@
 "use client";
 
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useDevice } from "@/providers/device-provider";
 import type {
   EventClickArg,
   EventInput,
@@ -18,7 +18,7 @@ type Props = {
 };
 
 const Calendar = ({ events, onEventClick, onMoreLinkClick }: Props) => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { isMobile } = useDevice();
   return (
     <FullCalendar
       plugins={[dayGridPlugin, interactionPlugin, listPlugin]}

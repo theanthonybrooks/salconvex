@@ -19,8 +19,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
@@ -73,7 +73,7 @@ export default function Home() {
   // });
   // const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
 
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { isMobile } = useDevice();
 
   useEffect(() => {
     const errorDesc = searchParams.get("err");

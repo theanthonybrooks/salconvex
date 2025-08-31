@@ -11,9 +11,9 @@ import Pricing from "@/features/homepage/pricing";
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { generateSkeletonGroups } from "@/lib/skeletonFns";
 import { cn, setParamIfNotDefault } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import type { MergedEventPreviewData } from "@/types/event";
 import {
   CombinedEventPreviewCardData,
@@ -61,7 +61,7 @@ const ClientEventList = () => {
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { isMobile } = useDevice();
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);

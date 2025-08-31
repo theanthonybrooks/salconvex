@@ -22,8 +22,8 @@ import {
 import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { User } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
@@ -45,19 +45,19 @@ export default function NavBar(
     // subStatus,
   }: NavBarProps,
 ) {
+  const { isMobile } = useDevice();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const user = userData?.user ?? null;
   const userType = user?.accountType ?? [];
-  // const userPref = userData?.userPref ?? null;
+  const userPref = userData?.userPref ?? null;
   // const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { subStatus, hasActiveSubscription } = subData ?? {};
   const isAdmin = user?.role?.includes("admin");
   const isOrganizer = user?.accountType?.includes("organizer");
   const pathname = usePathname();
   const { scrollY } = useScroll();
-  const isMobile = useMediaQuery("(max-width: 768px)");
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
@@ -412,7 +412,11 @@ export default function NavBar(
                 <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
                   <UserProfile className="size-10" />
 
-                  <FullPageNav user={user} subStatus={subStatus} />
+                  <FullPageNav
+                    user={user}
+                    subStatus={subStatus}
+                    userPref={userPref}
+                  />
                   {hasActiveSubscription && (
                     <Search
                       // invisible
@@ -447,7 +451,7 @@ export default function NavBar(
               isMobile={isMobile}
               isScrolled={isScrolled}
               user={user}
-              // userPref={userPref}
+              userPref={userPref}
               subStatus={subStatus}
             />
           </div>

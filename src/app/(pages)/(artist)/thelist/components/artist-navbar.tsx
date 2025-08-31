@@ -19,6 +19,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { User } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
 
@@ -44,15 +45,16 @@ export default function TheListNavBar(
   // userPref,
   TheListNavBarProps,
 ) {
+  const { isMobile } = useDevice();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const user = userData?.user ?? null;
+  const userPref = userData?.userPref ?? null;
   const { subStatus } = subData ?? {};
   const pathname = usePathname();
   const { scrollY, scrollYProgress } = useScroll();
   const [canGoToTop, setCanGoToTop] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // useMotionValueEvent(scrollY, "change", (latest) => {
@@ -89,23 +91,6 @@ export default function TheListNavBar(
       behavior: "instant",
     });
   };
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1024px)");
-    setIsMobile(mediaQuery.matches);
-
-    let timeoutId: NodeJS.Timeout;
-    const handleChange = (e: MediaQueryListEvent) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-      clearTimeout(timeoutId);
-    };
-  }, []);
 
   useEffect(() => {
     if (canGoToTop) {
@@ -317,7 +302,11 @@ export default function TheListNavBar(
                 {user && (
                   <div className="flex items-center gap-4">
                     <UserProfile className="size-10" />
-                    <FullPageNav user={user} subStatus={subStatus} />
+                    <FullPageNav
+                      user={user}
+                      subStatus={subStatus}
+                      userPref={userPref}
+                    />
                   </div>
                 )}
               </div>
@@ -328,11 +317,10 @@ export default function TheListNavBar(
 
           <div className="z-20 flex w-full items-center justify-end lg:hidden">
             <FullPageNav
-              // userId={userId}
               isMobile={isMobile}
               isScrolled={isScrolled}
               user={user}
-              // userPref={userPref}
+              userPref={userPref}
               subStatus={subStatus}
             />
           </div>

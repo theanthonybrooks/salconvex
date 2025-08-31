@@ -5,55 +5,35 @@ import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import { Search } from "@/features/Sidebar/Search";
-import { User } from "@/types/user";
+import { useDevice } from "@/providers/device-provider";
+import { User, UserPref } from "@/types/user";
 import { Unauthenticated } from "convex/react";
-// import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface NavBarProps {
   userId: string | undefined;
   user: User | undefined | null;
-  // userPref: UserPref | null
+  userPref: UserPref | null;
   subStatus: string | undefined;
 }
 
 export default function NavBar({
   userId,
   subStatus,
-  // userPref,
+  userPref,
   user,
 }: NavBarProps) {
   const { scrollY } = useScroll();
-  const [isMobile, setIsMobile] = useState(false);
+  const { isMobile } = useDevice();
 
   const [isScrolled, setIsScrolled] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    //   console.log("Page scroll: ", latest)
     setIsScrolled(latest > 150);
   });
-
-  useEffect(() => {
-    sessionStorage.removeItem("previousSalPage");
-
-    const mediaQuery = window.matchMedia("(max-width: 1024px)");
-    setIsMobile(mediaQuery.matches);
-
-    let timeoutId: NodeJS.Timeout;
-    const handleChange = (e: MediaQueryListEvent) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-      clearTimeout(timeoutId);
-    };
-  }, []);
 
   return (
     <>
@@ -121,7 +101,11 @@ export default function NavBar({
                 {userId !== "guest" && user && (
                   <UserProfile className="h-[40px] w-[40px]" />
                 )}
-                <FullPageNav user={user} subStatus={subStatus} />
+                <FullPageNav
+                  user={user}
+                  subStatus={subStatus}
+                  userPref={userPref}
+                />
               </div>
             </>
           )}
@@ -148,7 +132,7 @@ export default function NavBar({
                 isScrolled={isScrolled}
                 user={user}
                 isDashboard={true}
-                // userPref={userPref}
+                userPref={userPref}
                 subStatus={subStatus}
               />
             </>

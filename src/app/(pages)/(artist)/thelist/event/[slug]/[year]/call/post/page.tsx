@@ -2,14 +2,15 @@ import { capitalize, cn } from "@/lib/utils";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 
 import { fetchQuery } from "convex/nextjs";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 
-export async function generateMetadata({
-  params,
-}: {
+type Props = {
   params: Promise<{ slug: string; year: string }>;
-}) {
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const token = await convexAuthNextjsToken();
   const { slug, year } = await params;
 

@@ -10,6 +10,7 @@ import { siteUrl } from "@/constants/siteInfo";
 import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
 import { isAppleUA } from "@/lib/appleFns";
 import { cn } from "@/lib/utils";
+import { DeviceProvider } from "@/providers/device-provider";
 import { PostHogProvider } from "@/providers/posthog-provider";
 import { ThemedProvider } from "@/providers/themed-provider";
 import {
@@ -22,6 +23,7 @@ import { GeistSans } from "geist/font/sans";
 import "leaflet/dist/leaflet.css";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { ReactNode } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer } from "react-toastify";
 import { api } from "~/convex/_generated/api";
@@ -62,10 +64,16 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
-  const ua = (await headers()).get("user-agent") ?? "";
+  const h = await headers();
+  const ua = h.get("user-agent") ?? "";
   const appleClass = isAppleUA(ua) ? "apple-webkit-fix" : "";
+  const deviceType = h.get("x-device-type");
+  const osName = h.get("x-os-name");
+  const browserName = h.get("x-browser-name");
+  const deviceVendor = h.get("x-device-vendor");
+  const deviceModel = h.get("x-device-model");
 
   const token = await convexAuthNextjsToken();
   const preloadedUserData = await preloadQuery(
@@ -109,7 +117,20 @@ export default async function RootLayout({
             >
               <ConvexQueryCacheProvider>
                 <ThemedProvider>
-                  <PostHogProvider> {children}</PostHogProvider>
+                  <PostHogProvider>
+                    <DeviceProvider
+                      value={{
+                        deviceType,
+                        osName,
+                        browserName,
+                        deviceVendor,
+                        deviceModel,
+                        isMobile: deviceType === "mobile",
+                      }}
+                    >
+                      {children}
+                    </DeviceProvider>
+                  </PostHogProvider>
                   <ToastContainer
                     position="top-right"
                     autoClose={5000}

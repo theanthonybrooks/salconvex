@@ -34,7 +34,12 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
 
   return (
     <DashboardProvider>
-      <DashboardTopNav user={user} subStatus={subStatus} userId={userId} />
+      <DashboardTopNav
+        user={user}
+        subStatus={subStatus}
+        userId={userId}
+        userPref={userPref}
+      />
 
       <div className="flex flex-1">
         <DashboardSideBar

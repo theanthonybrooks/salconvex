@@ -13,7 +13,7 @@ import { HiArrowTurnRightDown } from "react-icons/hi2";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { ValidLinkPath } from "@/features/organizers/schemas/event-add-schema";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useDevice } from "@/providers/device-provider";
 import { Control, Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   FaEnvelope,
@@ -93,7 +93,8 @@ export const FormLinksInput = ({
     setValue,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const isMobile = useIsMobile();
+  const { isMobile } = useDevice();
+
   const isEvent = type === "event";
   const isOrg = type === "organization";
   const eventData = watch("event");

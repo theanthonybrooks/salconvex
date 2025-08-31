@@ -2,38 +2,49 @@
 
 import { cn } from "@/lib/utils";
 import { PendingThemeContext } from "@/providers/themed-provider";
-import { User } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 import { useMutation } from "convex/react";
 import { motion as m, Variants } from "framer-motion";
-import { debounce } from "lodash";
 import { useTheme } from "next-themes";
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { api } from "~/convex/_generated/api";
 
 interface ThemeToggleProps {
   className?: string;
   user: User | null;
+  userPref: UserPref | null;
 }
 
-export default function ThemeToggle({ className, user }: ThemeToggleProps) {
+export default function ThemeToggle({
+  className,
+  user,
+  userPref,
+}: ThemeToggleProps) {
   const { setTheme, theme } = useTheme();
   const { setPendingTheme } = useContext(PendingThemeContext);
 
   const updateUserPref = useMutation(api.users.updateUserPrefs);
   const isAdmin = user?.role?.includes("admin");
 
-  const debouncedUpdate = useRef(
-    debounce((themeValue: string) => {
-      return updateUserPref({ theme: themeValue });
-    }, 400),
-  ).current;
+  // const debouncedUpdate = useRef(
+  //   debounce((themeValue: string) => {
+  //     return updateUserPref({ theme: themeValue });
+  //   }, 400),
+  // ).current;
 
   const handleClick = async (nextTheme: string) => {
     setPendingTheme(nextTheme);
     setTheme(nextTheme);
-    debouncedUpdate(nextTheme);
-    await debouncedUpdate.flush();
-    setPendingTheme(null);
+    try {
+      await updateUserPref({ theme: nextTheme }); // send mutation
+      // Wait for userTheme to update (from backend)
+      // You may need a useEffect in ThemedProvider to watch for this:
+      // When userTheme === pendingTheme, clear pendingTheme
+    } catch (error) {
+      console.error("Error updating user theme:", error);
+      // If mutation fails, rollback
+      setTheme(userPref?.theme || "default");
+    }
   };
 
   const raysVariants = {

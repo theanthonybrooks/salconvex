@@ -30,7 +30,6 @@ export function EventNameSearch({
   const textFormatted = useRef(false);
   const [localValue, setLocalValue] = useState(value);
   const debouncedValue = useDebounce(localValue, 300);
-  // const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     onChange(debouncedValue);

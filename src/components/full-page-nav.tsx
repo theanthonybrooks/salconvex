@@ -7,7 +7,7 @@ import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
 import { footerCRText } from "@/constants/text";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/lib/utils";
-import { User } from "@/types/user";
+import { User, UserPref } from "@/types/user";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import Image from "next/image";
@@ -23,7 +23,7 @@ interface FullPageNavProps {
   isMobile?: boolean;
   // className?: string
   isDashboard?: boolean;
-  // userPref?: UserPref | null
+  userPref: UserPref | null;
   subStatus?: string | undefined;
 }
 
@@ -275,6 +275,7 @@ const screenOverlayVariants: Variants = {
 
 const FullPageNav = ({
   user,
+  userPref,
   subStatus,
   isScrolled,
   isMobile = false,
@@ -367,7 +368,7 @@ const FullPageNav = ({
                   />
                 </Link>
               </motion.section>
-              <ThemeToggle user={user ?? null} />
+              <ThemeToggle user={user ?? null} userPref={userPref} />
             </>
           )}
         </AnimatePresence>

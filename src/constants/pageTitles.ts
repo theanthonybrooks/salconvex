@@ -19,6 +19,7 @@ export const DEFAULT_IMAGES = [
 export const DEFAULT_ICON = {
   icon: "https://thestreetartlist.com/public/favicon.ico",
   shortcut: "favicon.ico",
+  apple: "favicon.ico",
 };
 
 export const DEFAULT_DESCRIPTION =
@@ -38,11 +39,11 @@ interface PageTitles {
     title: string;
     description: string;
     url: string;
-    type: string;
+    type: OGType;
     images: string[];
   }>;
   twitter?: Partial<{
-    card: string;
+    card: TwitterCard;
     title: string;
     description: string;
     siteId?: string;
@@ -230,3 +231,19 @@ export const publicPageTitles = {
   "/collabs": "Collaborations",
   "/contact": "Contact",
 };
+
+export type OGType =
+  | "website"
+  | "article"
+  | "book"
+  | "profile"
+  | "music.song"
+  | "music.album"
+  | "music.playlist"
+  | "music.radio_station"
+  | "video.movie"
+  | "video.episode"
+  | "video.tv_show"
+  | "video.other";
+
+export type TwitterCard = "summary_large_image" | "summary" | "player" | "app";

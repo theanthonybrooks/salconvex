@@ -19,8 +19,8 @@ import {
 } from "@/components/data-table/data-table-constants";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { eventTypeOptions } from "@/types/event";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -40,8 +40,7 @@ export function DataTableToolbar<TData>({
   setRowSelection,
   initialSearchTerm,
 }: DataTableToolbarProps<TData>) {
-  const isMobile = useMediaQuery("(max-width: 768px)");
-
+  const { isMobile } = useDevice();
   const router = useRouter();
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,

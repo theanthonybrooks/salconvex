@@ -7,10 +7,11 @@ import {
 import { siteUrl } from "@/constants/siteInfo";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
+import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
   const meta = getPageMeta(pathname);
@@ -31,7 +32,7 @@ export async function generateMetadata() {
       description: meta.description || DEFAULT_DESCRIPTION,
       images: meta.images || DEFAULT_IMAGES,
     },
-    icon: DEFAULT_ICON,
+    icons: DEFAULT_ICON,
   };
 }
 
