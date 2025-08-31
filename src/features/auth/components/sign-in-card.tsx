@@ -12,9 +12,15 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { CloseBtn } from "@/components/ui/close-btn";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { LoginSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
@@ -24,7 +30,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
 import z from "zod";
 import { api } from "~/convex/_generated/api";
@@ -54,12 +60,10 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const {
     watch,
-    formState: { isValid, errors },
+    formState: { isValid },
   } = form;
 
   const email = watch("email");
-
-  console.log(isValid, errors);
 
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
@@ -195,12 +199,20 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
     }
   }, []);
 
+  useEffect(() => {
+    const subscription = watch(() => {
+      if (error) setError("");
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, error]);
+
   return (
     <Card className="w-full border-none border-foreground bg-salYellow p-6 shadow-none md:relative md:border-2 md:border-solid md:bg-white">
       <CloseBtn
         ariaLabel="Back to homepage"
         type="icon"
         onAction={() => router.push("/")}
+        tabIndex={8}
       />
       <CardHeader className="items-center px-0 pt-0">
         <Link
@@ -279,28 +291,70 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
             onSubmit={form.handleSubmit(handlePasswordSignIn)}
           >
             <div className="space-y-4 sm:space-y-2.5">
-              <Label htmlFor="email" className="text-foreground">
-                Email address
-              </Label>
-
-              <Controller
+              <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <Input
-                    {...field}
-                    disabled={pending}
-                    id="email"
-                    placeholder=" "
-                    type="email"
-                    className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
-                    required
-                    tabIndex={3}
-                  />
+                  <FormItem>
+                    <FormLabel className="font-bold">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={pending}
+                        {...field}
+                        type="email"
+                        inputHeight="default"
+                        variant="basic"
+                        tabIndex={2}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
-
-              <div className="flex flex-col space-y-2.5">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="font-bold">Password</FormLabel>
+                      <span
+                        onClick={forgotPasswordHandler}
+                        className="cursor-pointer text-sm text-foreground hover:underline"
+                        tabIndex={5}
+                      >
+                        Forgot password?
+                      </span>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          disabled={pending}
+                          {...field}
+                          type={showPassword ? "text" : "password"}
+                          inputHeight="default"
+                          variant="basic"
+                          tabIndex={3}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                          tabIndex={4}
+                        >
+                          {showPassword ? (
+                            <Eye className="size-4 text-foreground" />
+                          ) : (
+                            <EyeOff className="size-4 text-foreground" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* <div className="flex flex-col space-y-2.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-foreground">
                     Password
@@ -329,31 +383,22 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                       />
                     )}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3"
-                    tabIndex={5}
-                  >
-                    {showPassword ? (
-                      <Eye className="size-4 text-foreground" />
-                    ) : (
-                      <EyeOff className="size-4 text-foreground" />
-                    )}
-                  </button>
+              
                 </div>
-              </div>
+              </div> */}
             </div>
             <Button
               className="mt-8 w-full bg-white py-6 text-base sm:mt-6 sm:py-0 md:bg-salYellow"
               size="lg"
               type="submit"
               variant={
-                !isValid || pending || Boolean(success)
+                !isValid || pending || Boolean(success) || Boolean(error)
                   ? "salWithShadowHidden"
                   : "salWithShadowYlw"
               }
-              disabled={pending || Boolean(success || !isValid)}
+              disabled={
+                pending || Boolean(success) || !isValid || Boolean(error)
+              }
               tabIndex={6}
             >
               {pending ? (

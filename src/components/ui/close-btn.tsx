@@ -12,6 +12,7 @@ interface CloseBtnProps {
   hidden?: boolean;
   btnVariant?: ButtonVariant;
   btnSize?: ButtonSize;
+  tabIndex?: number;
 }
 
 export const CloseBtn = ({
@@ -24,6 +25,7 @@ export const CloseBtn = ({
   hidden = false,
   btnVariant = "salWithShadowHiddenYlw",
   btnSize,
+  tabIndex,
 }: CloseBtnProps) => {
   return type === "icon" ? (
     <Button
@@ -36,6 +38,7 @@ export const CloseBtn = ({
       )}
       aria-label={ariaLabel}
       onClick={onAction}
+      tabIndex={tabIndex}
     >
       <X size={25} />
     </Button>
@@ -46,6 +49,7 @@ export const CloseBtn = ({
       className={cn(className)}
       aria-label={ariaLabel}
       onClick={onAction}
+      tabIndex={tabIndex}
     >
       {children}
     </Button>

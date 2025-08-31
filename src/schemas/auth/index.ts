@@ -10,11 +10,11 @@ export const LoginSchema = z.object({
     .transform((val) => val.toLowerCase()),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters." })
     .regex(passwordValidation, {
       message:
-        "Password must contain at least one uppercase letter, one number, and one symbol.",
-    }),
+        "Password must contain at least 8 characters, one uppercase letter, one number, and one symbol.",
+    })
+    .min(8, { message: "Password must be at least 8 characters." }),
 });
 
 export const RegisterSchema = z
@@ -26,14 +26,11 @@ export const RegisterSchema = z
       .transform((val) => val.toLowerCase()),
     password: z
       .string()
-      .min(8, {
-        message:
-          "Password must contain at least one uppercase letter, one number, and one symbol.",
-      })
       .regex(passwordValidation, {
         message:
-          "Password must contain at least one uppercase letter, one number, and one symbol.",
-      }),
+          "Password must contain at least 8 characters, one uppercase letter, one number, and one symbol.",
+      })
+      .min(8, { message: "Password must be at least 8 characters." }),
     accountType: z
       .array(z.string())
       .min(1, { message: "At least one account type is required" }),
