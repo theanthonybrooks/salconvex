@@ -9,13 +9,21 @@ import {
 import { footerCRText } from "@/constants/text";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { infoEmail } from "@/constants/siteInfo";
-import { isValidEmail } from "@/lib/linkFns";
+import { NewsletterFormValues, newsletterSignupSchema } from "@/schemas/public";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,28 +32,43 @@ import { PiHeartBold } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
-interface NewsletterFormProps {
-  email: string;
-  firstName: string;
-}
-
 export default function Footer({ className }: { className?: string }) {
+  const form = useForm<NewsletterFormValues>({
+    resolver: zodResolver(newsletterSignupSchema),
+    defaultValues: {
+      email: "",
+      firstName: "",
+    },
+    mode: "onChange",
+  });
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   watch,
+  //   // formState: { errors },
+  //   reset,
+  // } = useForm<NewsletterFormProps>({ mode: "onChange" });
   const {
-    register,
     handleSubmit,
-    watch,
-    // formState: { errors },
     reset,
-  } = useForm<NewsletterFormProps>({ mode: "onChange" });
-  const emailVals = watch("email");
+    formState: { isValid },
+    getFieldState,
+  } = form;
+
+  const emailState = getFieldState("email");
+  const emailValid = !emailState?.invalid;
+  const emailDirty = emailState?.isDirty;
   const links = footerLinks;
   const footerText = footerCRText();
   const numColumns = Object.keys(links).length;
   const [subAction, setSubAction] = useState("cta");
   const subscription = useQuery(api.subscriptions.getUserSubscription);
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
-  const subscribeToNewsletter = useMutation(
-    api.newsletter.subscriber.subscribeToNewsletter,
+  // const subscribeToNewsletter = useMutation(
+  //   api.newsletter.subscriber.subscribeToNewsletter,
+  // );
+  const subscribeToNewsletter = useAction(
+    api.actions.resend.sendNewsletterConfirmation,
   );
 
   const subStatus = subscription?.status || "none";
@@ -56,7 +79,7 @@ export default function Footer({ className }: { className?: string }) {
     }))
     .filter(({ items }) => items.length > 0);
 
-  const onSubscribe = async (data: NewsletterFormProps) => {
+  const handleSubscribe = async (data: NewsletterFormValues) => {
     if (!data.email) return;
 
     try {
@@ -64,7 +87,6 @@ export default function Footer({ className }: { className?: string }) {
       const result = await subscribeToNewsletter({
         email: data.email,
         firstName: data.firstName,
-        newsletter: true,
       });
       if (result?.status === "too_many_attempts") {
         toast.error(
@@ -82,6 +104,9 @@ export default function Footer({ className }: { className?: string }) {
         toast.error(
           "This email is already in use. Please use a different email or contact support.",
         );
+        setSubAction("cta");
+      } else if (result?.status === "unknown_error") {
+        toast.error("An unknown error occurred. Please try again later.");
         setSubAction("cta");
       } else {
         toast.success("You're now subscribed to the newsletter!");
@@ -205,48 +230,72 @@ export default function Footer({ className }: { className?: string }) {
                   Subscribe to the newsletter for regular updates
                 </p>
               </div> */}
-              <form
-                onSubmit={handleSubmit(onSubscribe)}
-                className="mt-4 sm:flex md:w-full md:max-w-md"
-              >
-                <div className="flex flex-1 flex-col gap-3">
-                  <Input
-                    {...register("email", { required: true })}
-                    type="email"
-                    placeholder="Enter your email"
-                    className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
-                  />
-                  {emailVals !== "" && isValidEmail(emailVals) && (
-                    <Input
-                      {...register("firstName", { required: true })}
-                      type="text"
-                      placeholder="Enter your first name"
-                      className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground"
+              <Form {...form}>
+                <form
+                  onSubmit={handleSubmit(handleSubscribe)}
+                  className="mt-4 sm:flex md:w-full md:max-w-md"
+                >
+                  <div className="flex flex-1 flex-col gap-3">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="Enter your email"
+                              className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
-                </div>
-                <div className="mt-3 sm:ml-3 sm:mt-0">
-                  <Button
-                    type="submit"
-                    variant="salWithShadowHidden"
-                    className="flex w-full items-center justify-center gap-2 font-bold md:w-[150px]"
-                    disabled={subAction === "subbing"}
-                  >
-                    {subAction === "cta"
-                      ? "Subscribe"
-                      : subAction === "subbing"
-                        ? "Subscribing..."
-                        : "Subscribed"}
-                    {subAction === "cta" ? (
-                      <ArrowRight className="ml-2 size-4" />
-                    ) : subAction === "subbing" ? (
-                      <LoaderCircle className="size-4 animate-spin" />
-                    ) : (
-                      <CheckCircle className="size-4" />
+                    {emailValid && emailDirty && (
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="text"
+                                placeholder="Enter your first name"
+                                className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     )}
-                  </Button>
-                </div>
-              </form>
+                  </div>
+                  <div className="mt-3 sm:ml-3 sm:mt-0">
+                    <Button
+                      type="submit"
+                      variant="salWithShadowHidden"
+                      className="flex w-full items-center justify-center gap-2 font-bold md:w-[150px]"
+                      disabled={subAction === "subbing" || !isValid}
+                    >
+                      {subAction === "cta"
+                        ? "Subscribe"
+                        : subAction === "subbing"
+                          ? "Subscribing..."
+                          : "Subscribed"}
+                      {subAction === "cta" ? (
+                        <ArrowRight className="ml-2 size-4" />
+                      ) : subAction === "subbing" ? (
+                        <LoaderCircle className="size-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
               <Image
                 src="/newsletter_bubble.png"
                 alt="Newsletter sign up. Sign up to receive updates and news about the Street Art List."

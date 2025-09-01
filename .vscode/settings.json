@@ -13,7 +13,8 @@
     "The List",
     "Auth",
     "Dashboard",
-    "Theme"
+    "Theme",
+    "Newsletter"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

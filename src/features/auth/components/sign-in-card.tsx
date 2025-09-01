@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LoginSchema } from "@/schemas/auth";
+import { LoginFormValues, LoginSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -32,7 +32,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
-import z from "zod";
 import { api } from "~/convex/_generated/api";
 
 interface SignInCardProps {
@@ -49,7 +48,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
   const DeleteAccount = useMutation(api.users.deleteAccount);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
@@ -79,7 +78,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
   // const callBackSrc = sessionStorage.getItem("src");
   // const prevSalPage = sessionStorage.getItem("previousSalPage");
 
-  const handlePasswordSignIn = async (values: z.infer<typeof LoginSchema>) => {
+  const handlePasswordSignIn = async (values: LoginFormValues) => {
     setPending(true);
     setError("");
     setSuccess("");

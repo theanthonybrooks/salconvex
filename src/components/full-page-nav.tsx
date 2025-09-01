@@ -793,7 +793,7 @@ const FullPageNav = ({
                           return (
                             <li
                               key={`${section.title}-desktopCat`}
-                              className="cursor-pointer"
+                              className="cursor-pointer select-none"
                             >
                               <div
                                 onClick={() => setActiveCategory(section.title)}

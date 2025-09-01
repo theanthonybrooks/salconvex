@@ -17,6 +17,8 @@ export const LoginSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters." }),
 });
 
+export type LoginFormValues = z.infer<typeof LoginSchema>;
+
 export const RegisterSchema = z
   .object({
     firstName: z.string().min(1, { message: "First name is required" }),

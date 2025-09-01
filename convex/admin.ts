@@ -1,7 +1,7 @@
 import { ShardedCounter } from "@convex-dev/sharded-counter";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { components } from "~/convex/_generated/api";
-import { mutation } from "~/convex/_generated/server";
+import { mutation, query } from "~/convex/_generated/server";
 
 const counter = new ShardedCounter(components.shardedCounter);
 
@@ -53,3 +53,21 @@ export const updateSupportTicket = mutation({
     return { support };
   },
 });
+
+export const getSupportTicketStatus = query({
+  args: {
+    ticketNumber: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const support = await ctx.db
+      .query("support")
+      .withIndex("by_ticketNumber", (q) => q.eq("ticketNumber", args.ticketNumber))
+      .first();
+
+      if (!support) {
+        throw new ConvexError("No support ticket found");
+      }
+
+    return support;
+  },
+})

@@ -29,8 +29,6 @@ import {
 } from "lucide-react";
 import { BsPersonVcard } from "react-icons/bs";
 
-import { TbBrandPatreon } from "react-icons/tb";
-
 import { JSX } from "react";
 import { IconType } from "react-icons";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
@@ -77,11 +75,11 @@ export const SOCIAL_MEDIA_LINKS: SocialProps[] = [
     icon: FaFacebookF,
     path: "https://facebook.com/thestreetartlist",
   },
-  {
-    label: "Patreon",
-    icon: TbBrandPatreon,
-    path: "https://www.patreon.com/thestreetartlist",
-  },
+  // {
+  //   label: "Patreon",
+  //   icon: TbBrandPatreon,
+  //   path: "https://www.patreon.com/thestreetartlist",
+  // },
 ];
 
 export const LANDING_PAGE_MENU: MenuProps[] = [

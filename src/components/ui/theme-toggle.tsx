@@ -5,9 +5,8 @@ import { PendingThemeContext } from "@/providers/themed-provider";
 import { User, UserPref } from "@/types/user";
 import { useMutation } from "convex/react";
 import { motion as m, Variants } from "framer-motion";
-import { debounce } from "lodash";
 import { useTheme } from "next-themes";
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { api } from "~/convex/_generated/api";
 
 interface ThemeToggleProps {
@@ -33,33 +32,13 @@ export default function ThemeToggle({
   //   }, 400),
   // ).current;
 
-  const debouncedUpdate = useRef(
-    debounce(
-      (
-        themeValue: string,
-        resolve: (v?: unknown) => void,
-        reject: (e: unknown) => void,
-      ) => {
-        updateUserPref({ theme: themeValue }).then(resolve).catch(reject);
-      },
-      400,
-    ),
-  ).current;
-
   const handleClick = async (nextTheme: string) => {
     setPendingTheme(nextTheme);
     setTheme(nextTheme);
     try {
-      await new Promise((resolve, reject) => {
-        debouncedUpdate(nextTheme, resolve, reject);
-      });
-      // await updateUserPref({ theme: nextTheme }); // send mutation
-      // Wait for userTheme to update (from backend)
-      // You may need a useEffect in ThemedProvider to watch for this:
-      // When userTheme === pendingTheme, clear pendingTheme
+      await updateUserPref({ theme: nextTheme });
     } catch (error) {
       console.error("Error updating user theme:", error);
-      // If mutation fails, rollback
       setTheme(userPref?.theme || "default");
     }
   };
@@ -128,14 +107,6 @@ export default function ThemeToggle({
           xmlns="http://www.w3.org/2000/svg"
           className="relative size-[30px] overflow-visible md:size-7"
         >
-          {/* <m.path
-            variants={shineVariant}
-            d={moonPath}
-            className={"stroke-foreground"}
-            initial='hidden'
-            animate={theme === "default" ? "visible" : "hidden"}
-          /> */}
-
           <m.g
             variants={raysVariants}
             initial="hidden"

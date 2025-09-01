@@ -1,14 +1,14 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "~/convex/_generated/server";
 
 export const subscribeToNewsletter = mutation({
   args: {
     email: v.string(),
     firstName: v.string(),
-    newsletter: v.boolean(),
   },
   handler: async (ctx, args) => {
+    const { firstName } = args;
     let userPlan = 0;
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
@@ -42,12 +42,24 @@ export const subscribeToNewsletter = mutation({
     }
 
     if (newsletterSubscription) {
+      const wasCanceled = newsletterSubscription.newsletter === false;
+
       await ctx.db.patch(newsletterSubscription._id, {
-        timesAttempted: newsletterSubscription.timesAttempted + 1,
+        timesAttempted: wasCanceled
+          ? 0
+          : newsletterSubscription.timesAttempted + 1,
         lastAttempt: Date.now(),
         userPlan,
+        firstName,
+        newsletter: true,
+        ...(wasCanceled && { email: args.email }),
       });
-      if (args.email !== newsletterSubscription.email) {
+      if (wasCanceled) {
+        return {
+          subscriptionId: newsletterSubscription._id,
+          status: "success",
+        };
+      } else if (args.email !== newsletterSubscription.email) {
         return {
           status: "already_subscribed diff email",
           emailMismatch: args.email !== newsletterSubscription.email,
@@ -60,12 +72,20 @@ export const subscribeToNewsletter = mutation({
       }
     }
     if (emailSubscription) {
+      const wasCanceled = emailSubscription.newsletter === false;
       await ctx.db.patch(emailSubscription._id, {
-        timesAttempted: emailSubscription.timesAttempted + 1,
+        timesAttempted: wasCanceled ? 0 : emailSubscription.timesAttempted + 1,
         lastAttempt: Date.now(),
         userPlan,
+        firstName,
+        newsletter: true,
       });
-      if (user && user.email !== args.email) {
+      if (wasCanceled) {
+        return {
+          subscriptionId: emailSubscription._id,
+          status: "success",
+        };
+      } else if (user && user.email !== args.email) {
         return {
           status: "diff user has email",
           emailMismatch: args.email !== user.email,
@@ -77,15 +97,19 @@ export const subscribeToNewsletter = mutation({
         };
       }
     } else {
-      await ctx.db.insert("newsletter", {
+      const subscriptionId = await ctx.db.insert("newsletter", {
         userId: user?._id ?? null,
-        firstName: args.firstName,
+        firstName,
         email: args.email,
-        newsletter: args.newsletter,
+        newsletter: true,
         timesAttempted: 1,
         lastAttempt: Date.now(),
         userPlan,
       });
+      return {
+        subscriptionId,
+        status: "success",
+      };
     }
   },
 });
@@ -113,5 +137,135 @@ export const getNewsletterSubscribers = query({
       subscribers: results,
       totalSubscribers,
     };
+  },
+});
+
+export const updateNewsletterStatus = mutation({
+  args: {
+    email: v.string(),
+    newsletter: v.boolean(),
+    frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
+    userPlan: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { email, newsletter, frequency } = args;
+    const wasCanceled = newsletter === false;
+
+    const userId = await getAuthUserId(ctx);
+
+    const newsletterSubscription = userId
+      ? await ctx.db
+          .query("newsletter")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+      : null;
+
+    const emailSubscription = await ctx.db
+      .query("newsletter")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+
+    if (!newsletterSubscription && !emailSubscription) {
+      throw new ConvexError("No newsletter subscription found" + email);
+    }
+
+    if (emailSubscription && emailSubscription.userId && !userId) {
+      throw new ConvexError("Log in to update your newsletter preferences");
+    }
+
+    if (newsletterSubscription) {
+      await ctx.db.patch(newsletterSubscription._id, {
+        newsletter,
+        frequency,
+        timesAttempted: 0,
+        lastAttempt: Date.now(),
+      });
+    } else if (emailSubscription) {
+      await ctx.db.patch(emailSubscription._id, {
+        newsletter,
+        frequency,
+        timesAttempted: 0,
+        lastAttempt: Date.now(),
+      });
+    }
+
+    return { success: true, canceled: wasCanceled, frequency };
+  },
+});
+
+export const getNewsletterStatus = query({
+  args: {
+    email: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
+    subscriberId: v.optional(v.id("newsletter")),
+  },
+  handler: async (ctx, args) => {
+    const { email, userId, subscriberId } = args;
+
+    const newsletterSubscription = subscriberId
+      ? await ctx.db
+          .query("newsletter")
+          .withIndex("by_id", (q) => q.eq("_id", subscriberId))
+          .unique()
+      : null;
+
+    const userSubscription = userId
+      ? await ctx.db
+          .query("newsletter")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+      : null;
+
+    const emailSubscription = email
+      ? await ctx.db
+          .query("newsletter")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .unique()
+      : null;
+
+    if (emailSubscription && emailSubscription.userId && !userId) {
+      throw new ConvexError("Log in to update your newsletter preferences");
+    }
+
+    if (!userSubscription && !emailSubscription && !subscriberId) {
+      throw new ConvexError("No newsletter subscription found: " + email);
+    }
+
+    if (
+      newsletterSubscription?.newsletter === false ||
+      userSubscription?.newsletter === false ||
+      emailSubscription?.newsletter === false
+    ) {
+      throw new ConvexError(
+        "No newsletter subscription found: " + email + " / " + subscriberId,
+      );
+    }
+    if (subscriberId && !newsletterSubscription) {
+      throw new ConvexError(
+        "No newsletter subscription found: " + subscriberId,
+      );
+    }
+    if (newsletterSubscription) {
+      return {
+        newsletter: newsletterSubscription.newsletter,
+        userPlan: newsletterSubscription.userPlan ?? 0,
+        frequency: newsletterSubscription.frequency ?? "monthly",
+        email: newsletterSubscription.email ?? "",
+      };
+    } else if (userSubscription) {
+      return {
+        newsletter: userSubscription.newsletter,
+        userPlan: userSubscription.userPlan ?? 0,
+        frequency: userSubscription.frequency ?? "monthly",
+        email: userSubscription.email ?? "",
+      };
+    } else if (emailSubscription) {
+      return {
+        newsletter: emailSubscription.newsletter,
+        userPlan: 0,
+        frequency: emailSubscription.frequency ?? "monthly",
+        email: emailSubscription.email ?? "",
+      };
+    }
   },
 });

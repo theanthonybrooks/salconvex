@@ -1,5 +1,7 @@
+import { generalStyling } from "@/constants/emailStyling";
 import { generateNumericToken } from "@/lib/otpFns";
 import Resend from "@auth/core/providers/resend";
+import { html } from "common-tags";
 import { Resend as ResendAPI } from "resend";
 
 export const ResendOTP = Resend({
@@ -18,74 +20,86 @@ export const ResendOTP = Resend({
   }) {
     const resend = new ResendAPI(provider.apiKey);
 
-    // console.log("expires", expires)
     const expirationTime = Date.now() + 15 * 60 * 1000;
     const validMin = Math.floor((expirationTime - Date.now()) / (60 * 1000));
 
-    const htmlContent = `
+    const htmlContent = html`
       <!DOCTYPE html>
       <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Verify your email</title>
-          <style>
-              body {
-                  font-family: sans-serif;
-                  padding: 20px;
-                  background-color: #f9fafb;
-              }
-              .container {
-                  max-width: 600px;
-                  margin: auto;
-                  background-color: #ffffff;
-                  border-radius: 8px;
-                  border: 4px solid #000000;
-                 box-shadow: -10px 10px #000000;
-                  padding: 40px 0;
-              }
-              .heading {
-                  font-size: 1.5rem;
-                  font-weight: bold;
-                  margin-bottom: 1rem;
-                  margin-block: auto;
-                  text-align:center;
+        <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
+          <title>Password Reset</title>
+          ${generalStyling}
+        </head>
+        <body style="margin:0; padding:20px; ; font-family:sans-serif;">
+          <table
+            role="presentation"
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+          >
+            <tr>
+              <td align="center">
+                <table
+                  role="presentation"
+                  border="0"
+                  cellpadding="0"
+                  cellspacing="0"
+                  width="600"
+                  style="background-color:#ffffff; border-radius:8px; border:4px solid #000000; box-shadow:-10px 10px #000000;"
+                >
+                  <tr>
+                    <td
+                      style="padding:40px 20px; text-align:center; font-family:sans-serif;"
+                    >
+                      <img
+                        src="https://thestreetartlist.com/saltext.png"
+                        alt="The Street Art List"
+                        width="300"
+                        style="display:block; margin:0 auto; padding-bottom:20px;"
+                      />
 
-              }
-              .text-sm {
-                  font-size: 0.875rem;
-                  margin-bottom: 1rem;
-                  text-align:center;
-              }
-              .section {
-                  text-align: center;
-                  margin-top: 2rem;
-              }
-              .verification-code {
-                  font-size: 2.5rem;
-                  font-weight: bold;
-                  margin: 1rem 0;
-              }
-              .subtext {
-                  font-size: 1rem;
-              }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-          
-              <img src="https://thestreetartlist.com/saltext.png" alt="The Street Art List" width="300" height="auto" style="display: block; margin: 0 auto; padding-bottom:20px;">
-              <div class="text-sm">Please enter the following code to finish signing up.</div>
-              <div class="section">
-                  <div class="subtext">Verification code</div>
-                  <div class="verification-code">${token}</div>
-                  <div class="subtext">(This code is valid for ${validMin} minutes)</div>
-              </div>
-              <div class="section">
-                  <div class="subtext">If you did not request this email, please ignore this message.</div>
-              </div>
-          </div>
-      </body>
+                      <p
+                        style="font-size:0.875rem; margin:0 0 20px; text-align:center; color:#333333;"
+                      >
+                        Please enter the following code to continue signing up.
+                      </p>
+
+                      <p
+                        style="font-size:1rem; margin:0 0 10px; text-align:center; color:#333333;"
+                      >
+                        Verification code:
+                      </p>
+                      <h1
+                        style="font-size:2.5rem; font-weight:bold; margin:10px 0; text-align:center; color:#000000;"
+                      >
+                        ${token}
+                      </h1>
+                      <p
+                        style="font-size:0.875rem; margin:0 0 20px; text-align:center; color:#666666;"
+                      >
+                        (This code is valid for ${validMin} minutes)
+                      </p>
+                      <p
+                        style="font-size:12px; margin-top:20px; text-align:center; color:#999999;"
+                      >
+                        If you did not request this email, please ignore this
+                        message.
+                      </p>
+
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
       </html>
     `;
 
