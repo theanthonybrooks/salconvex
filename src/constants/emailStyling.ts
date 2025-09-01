@@ -70,6 +70,7 @@ export const generalStyling = html`
     a {
       text-decoration: none;
       font-weight: 700;
+      color: black;
     }
     a:hover {
       text-decoration: underline;
@@ -205,6 +206,7 @@ export const newsletterStyling = html`
     a {
       text-decoration: none;
       font-weight: 700;
+      color: black;
     }
     a:hover {
       text-decoration: underline;

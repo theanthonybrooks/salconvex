@@ -14,7 +14,8 @@
     "Auth",
     "Dashboard",
     "Theme",
-    "Newsletter"
+    "Newsletter",
+    "Notifications"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }
