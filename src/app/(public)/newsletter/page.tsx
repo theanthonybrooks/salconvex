@@ -175,14 +175,14 @@ const NewsletterPage = () => {
             Update your newsletter preferences
           </p>
           <span className="text-foreground">
-            {newsletterStatusPending && !success ? (
-              <span className="flex items-center gap-1">
-                Loading... <LoaderCircle className="size-4 animate-spin" />
-              </span>
-            ) : newsletterSubStatusActive ? (
+            {newsletterSubStatusActive ? (
               "Select your desired frequency or click unsubscribe to stop receiving emails."
             ) : !user ? (
               "Login or enter your email address to update your preferences."
+            ) : newsletterStatusPending && !success ? (
+              <span className="flex items-center gap-1">
+                Loading... <LoaderCircle className="size-4 animate-spin" />
+              </span>
             ) : (
               "You don't have a newsletter subscription. Fill out the form at the bottom of the page to subscribe."
             )}

@@ -223,10 +223,6 @@ export const getNewsletterStatus = query({
           .unique()
       : null;
 
-    if (emailSubscription && emailSubscription.userId && !userId) {
-      throw new ConvexError("Log in to update your newsletter preferences");
-    }
-
     if (!userSubscription && !emailSubscription && !subscriberId) {
       throw new ConvexError("No newsletter subscription found: " + email);
     }
@@ -246,6 +242,9 @@ export const getNewsletterStatus = query({
       );
     }
     if (newsletterSubscription) {
+      if (newsletterSubscription.userId && !userId) {
+        throw new ConvexError("Log in to update your newsletter preferences");
+      }
       return {
         newsletter: newsletterSubscription.newsletter,
         userPlan: newsletterSubscription.userPlan ?? 0,
@@ -260,6 +259,9 @@ export const getNewsletterStatus = query({
         email: userSubscription.email ?? "",
       };
     } else if (emailSubscription) {
+      if (emailSubscription.userId && !userId) {
+        throw new ConvexError("Log in to update your newsletter preferences");
+      }
       return {
         newsletter: emailSubscription.newsletter,
         userPlan: 0,
