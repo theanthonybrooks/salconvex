@@ -40,8 +40,9 @@ const NewsletterPage = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const existingNewsletterSubscription =
-    (searchParams?.get("subscription") as Id<"newsletter">) ?? undefined;
+  const existingNewsletterSubscription = searchParams?.get("subscription")
+    ? (searchParams?.get("subscription") as Id<"newsletter">)
+    : undefined;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const { preloadedUserData } = useConvexPreload();
@@ -49,7 +50,6 @@ const NewsletterPage = () => {
   const userId = userData?.userId ?? null;
   const user = userData?.user;
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
   const [frequency, setFrequency] = useState<NewsletterFrequency>("monthly");
   const [success, setSuccess] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -121,12 +121,6 @@ const NewsletterPage = () => {
     }
     return null;
   })();
-
-  useEffect(() => {
-    if (newsletterStatusData && error) {
-      setError("");
-    }
-  }, [newsletterStatusData, error]);
 
   const handleUpdateSubscription = async (
     newsletterActive: boolean = true,
@@ -274,7 +268,7 @@ const NewsletterPage = () => {
           )}
           {errorMessage && !success && (
             <FormError
-              message={error}
+              message={errorMessage}
               className="mx-auto mb-14 text-center text-red-700"
             />
           )}
