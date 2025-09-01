@@ -84,9 +84,6 @@ const SupportPage = () => {
   const ticketStatus = ticketData?.status;
   const ticketCreatedAt = ticketData?.createdAt;
   const ticketUpdatedAt = ticketData?.updatedAt;
-  const ticketErrorMessage = ticketError?.message;
-
-  console.log(ticketErrorMessage);
 
   const handleReset = () => {
     setSubmitCounter(0);
