@@ -1065,8 +1065,8 @@ div:has(> .react-datepicker__input-container) {
 }
 
 .react-datepicker__navigation--next--with-time:not(
-    .react-datepicker__navigation--next--with-today-button
-  ) {
+  .react-datepicker__navigation--next--with-today-button
+) {
   right: 7.75em;
 }
 

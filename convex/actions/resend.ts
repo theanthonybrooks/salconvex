@@ -1,6 +1,6 @@
 "use node";
 
-import { generalStyling } from "@/constants/emailStyling";
+import { generalStyling, newsletterStyling } from "@/constants/emailStyling";
 import { NewsletterFrequency } from "@/constants/newsletter";
 import { cleanInput } from "@/lib/utils";
 import { html } from "common-tags";
@@ -237,16 +237,7 @@ export const sendNewsletterConfirmation = action({
               href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap"
               rel="stylesheet"
             />
-            <style>
-              a {
-                text-decoration: none;
-                font-weight: bold;
-                color: black;
-              }
-              a:hover {
-                text-decoration: underline;
-              }
-            </style>
+            ${newsletterStyling}
           </head>
           <body style="margin:0; padding:20px; background-color:#ffe770; ">
             <table
@@ -362,21 +353,16 @@ export const sendNewsletterConfirmation = action({
                           reserved.
                         </p>
                         <p
-                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#999999;"
+                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
                         >
                           You are receiving this email because you or someone
                           with your email opted in via the newsletter signup
-                          form.
-                        </p>
-                        <p
-                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#999999;"
-                        >
-                          If you didn&apos;t sign up or no longer wish to
+                          form.If you didn&apos;t sign up or no longer wish to
                           receive emails, you can unsubscribe
                           <a
                             href="https://thestreetartlist.com/newsletter?subscription=${subId}"
                             target="_blank"
-                            style="color:#0000ee; text-decoration:underline; font-family:'Space Grotesk', Helvetica, Arial, sans-serif;"
+                            style=" text-decoration:underline; font-family:'Space Grotesk', Helvetica, Arial, sans-serif;"
                             >here</a
                           >.
                         </p>
@@ -466,16 +452,7 @@ export const sendNewsletterUpdateConfirmation = action({
               href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap"
               rel="stylesheet"
             />
-            <style>
-              a {
-                text-decoration: none;
-                font-weight: bold;
-                color: black;
-              }
-              a:hover {
-                text-decoration: underline;
-              }
-            </style>
+            ${newsletterStyling}
           </head>
           <body style="margin:0; padding:20px; background-color:#ffe770; ">
             <table
@@ -536,7 +513,7 @@ export const sendNewsletterUpdateConfirmation = action({
 
                         ${newsletter &&
                         `  <p
-                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#999999;"
+                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
                         >
                           If you didn&apos;t sign up or no longer wish to
                           receive emails, you can unsubscribe

@@ -77,7 +77,8 @@ export const generalStyling = html`
   </style>
 `;
 
-export const newsletterStyling = html` <style>
+export const newsletterStyling = html`
+  <style>
     img {
       border: none;
       -ms-interpolation-mode: bicubic;
@@ -313,4 +314,4 @@ export const newsletterStyling = html` <style>
       margin: 20px auto;
     }
   </style>
-  }`;
+`;
