@@ -28,6 +28,7 @@ import {
   NewsletterFrequency,
   newsletterFrequencyOptions,
 } from "@/constants/newsletter";
+import { ConvexError } from "convex/values";
 import { LoaderCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -48,6 +49,7 @@ const NewsletterPage = () => {
   const userId = userData?.userId ?? null;
   const user = userData?.user;
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
   const [frequency, setFrequency] = useState<NewsletterFrequency>("monthly");
   const [success, setSuccess] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -72,11 +74,14 @@ const NewsletterPage = () => {
 
   const {
     data: newsletterStatusData,
+    isPending: newsletterStatusPending,
+
     // isError,
     error: newsletterStatusError,
   } = useQueryWithStatus(
     api.newsletter.subscriber.getNewsletterStatus,
-    existingNewsletterSubscription || (emailValid && emailDirty) || user
+    (existingNewsletterSubscription || (emailValid && emailDirty) || user) &&
+      !Boolean(success)
       ? {
           email,
           userId: userId ?? undefined,
@@ -87,7 +92,41 @@ const NewsletterPage = () => {
   const newsletterSubEmail = newsletterStatusData?.email;
   const newsletterSubFrequency = newsletterStatusData?.frequency;
   const newsletterSubStatusActive = newsletterStatusData?.newsletter === true;
-  const newsletterStatusErrorMsg = newsletterStatusError?.message;
+
+  // if (newsletterStatusError instanceof ConvexError) {
+  //   const ErrorData = newsletterStatusError.data;
+  //   if (ErrorData?.includes("No newsletter subscription found")) {
+  //     setError(
+  //       "No newsletter subscription found. Please sign up to receive newsletters.",
+  //     );
+  //   } else if (ErrorData?.includes("Log in to update")) {
+  //     setError("Please log in to update your newsletter preferences.");
+  //   } else {
+  //     setError("Unknown error. Please contact support.");
+  //   }
+  // }
+  const errorMessage = (() => {
+    if (newsletterStatusError instanceof ConvexError) {
+      const data = newsletterStatusError.data;
+      if (data?.includes("No newsletter subscription found")) {
+        return "No newsletter subscription found. Subscribe to receive newsletters.";
+      }
+      if (data?.includes("Log in to update")) {
+        return "Please log in to update your newsletter preferences.";
+      }
+      return "Unknown error. Please contact support.";
+    }
+    if (newsletterStatusError) {
+      return "Unexpected error. Please contact support.";
+    }
+    return null;
+  })();
+
+  useEffect(() => {
+    if (newsletterStatusData && error) {
+      setError("");
+    }
+  }, [newsletterStatusData, error]);
 
   const handleUpdateSubscription = async (
     newsletterActive: boolean = true,
@@ -107,6 +146,7 @@ const NewsletterPage = () => {
       } else if (result?.frequency) {
         setSuccess("Updated newsletter preferences");
       }
+
       setTimeout(() => {
         setSuccess("");
       }, 4000);
@@ -134,13 +174,19 @@ const NewsletterPage = () => {
           <p className="w-full text-xl font-medium text-foreground">
             Update your newsletter preferences
           </p>
-          <p className="text-foreground">
-            {newsletterSubStatusActive
-              ? "Select your desired frequency or click unsubscribe to stop receiving emails."
-              : !user
-                ? "Login or enter your email address to update your preferences."
-                : "You don't have a newsletter subscription. Fill out the form at the bottom of the page to subscribe."}
-          </p>
+          <span className="text-foreground">
+            {newsletterStatusPending && !success ? (
+              <span className="flex items-center gap-1">
+                Loading... <LoaderCircle className="size-4 animate-spin" />
+              </span>
+            ) : newsletterSubStatusActive ? (
+              "Select your desired frequency or click unsubscribe to stop receiving emails."
+            ) : !user ? (
+              "Login or enter your email address to update your preferences."
+            ) : (
+              "You don't have a newsletter subscription. Fill out the form at the bottom of the page to subscribe."
+            )}
+          </span>
           {!newsletterSubStatusActive && !existingNewsletterSubscription && (
             <Form {...form}>
               <form
@@ -220,21 +266,15 @@ const NewsletterPage = () => {
               </Button>
             </div>
           )}
-          <FormSuccess
-            message={success}
-            className="text-success mx-auto mb-14 w-full py-6 text-center"
-          />
-          {newsletterStatusError && !Boolean(success) && (
+          {success && (
+            <FormSuccess
+              message={success}
+              className="text-success mx-auto mb-14 w-full py-6 text-center"
+            />
+          )}
+          {errorMessage && !success && (
             <FormError
-              message={
-                newsletterStatusErrorMsg?.includes(
-                  "No newsletter subscription found",
-                )
-                  ? "No newsletter subscription found. Please sign up to receive newsletters."
-                  : newsletterStatusErrorMsg?.includes("Log in to update")
-                    ? "Please log in to update your newsletter preferences."
-                    : "Unknown error. Please contact support."
-              }
+              message={error}
               className="mx-auto mb-14 text-center text-red-700"
             />
           )}

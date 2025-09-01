@@ -357,7 +357,7 @@ export const sendNewsletterConfirmation = action({
                         >
                           You are receiving this email because you or someone
                           with your email opted in via the newsletter signup
-                          form.If you didn&apos;t sign up or no longer wish to
+                          form. If you didn&apos;t sign up or no longer wish to
                           receive emails, you can unsubscribe
                           <a
                             href="https://thestreetartlist.com/newsletter?subscription=${subId}"
