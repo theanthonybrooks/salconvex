@@ -1019,8 +1019,8 @@ export default function SettingsPage() {
                       <div>
                         <Label className={fontSize}>Newsletter Type(s)</Label>
                         <p className="text-sm text-muted-foreground">
-                          Receive {userPlan > 1 ? "monthly/weekly" : "monthly"}{" "}
-                          newsletters
+                          Choose general and/or open call newsletters (1
+                          minimum)
                         </p>
                       </div>
                     </div>
