@@ -1,7 +1,10 @@
 "use node";
 
 import { generalStyling, newsletterStyling } from "@/constants/emailStyling";
-import { NewsletterFrequency } from "@/constants/newsletter";
+import {
+  NewsletterFrequency,
+  NewsletterType,
+} from "@/constants/newsletterConsts";
 import { cleanInput } from "@/lib/utils";
 import { html } from "common-tags";
 import { ConvexError, v } from "convex/values";
@@ -320,11 +323,11 @@ export const sendNewsletterConfirmation = action({
                           paid version will be be up to the user's preference.
                           You will be able to set it to weekly or monthly
                           updates, whichever works best for you. You can
-                          unsubscribe at any time or change your preferences at
-                          any time. All previous newsletters will be available
-                          in an archive on the site for any user with a
-                          membership (from $3 upward) starting at the end of the
-                          first week of each month.
+                          unsubscribe or change your preferences at any time.
+                          All previous newsletters will be available in an
+                          archive on the site for any user with a membership
+                          (from $3 upward) starting at the end of the first week
+                          of each month.
                         </p>
                         <p style="margin-bottom:30px;">
                           Glad you&apos;re here and hope that you find my work
@@ -332,8 +335,8 @@ export const sendNewsletterConfirmation = action({
                           to reach out to
                           <a href="mailto:heythere@thestreetartlist.com"
                             >heythere@thestreetartlist.com</a
-                          >. I&apos;d love to your thoughts and feedback as it
-                          helps me make the site better for everyone!
+                          >. I&apos;d love to hear your thoughts and feedback as
+                          it helps me make the site better for everyone!
                         </p>
                         <span>
                           <p style="line-height:1;">
@@ -397,6 +400,9 @@ export const sendNewsletterUpdateConfirmation = action({
   args: {
     newsletter: v.boolean(),
     frequency: v.union(v.literal("monthly"), v.literal("weekly")),
+    type: v.optional(
+      v.array(v.union(v.literal("openCall"), v.literal("general"))),
+    ),
     email: v.string(),
     userPlan: v.number(),
   },
@@ -407,12 +413,14 @@ export const sendNewsletterUpdateConfirmation = action({
     success: boolean;
     canceled: boolean;
     frequency: NewsletterFrequency;
+    type: NewsletterType[];
   }> {
-    const { newsletter, frequency, email, userPlan } = args;
+    const { newsletter, frequency, email, userPlan, type } = args;
     let subId: Id<"newsletter"> | null = null;
 
     let canceled: boolean = false;
     let resultFrequency: NewsletterFrequency = "monthly";
+    let resultType: NewsletterType[] = [];
 
     try {
       const result = await ctx.runMutation(
@@ -420,6 +428,7 @@ export const sendNewsletterUpdateConfirmation = action({
         {
           newsletter,
           frequency,
+          type,
           email,
           userPlan,
         },
@@ -427,6 +436,7 @@ export const sendNewsletterUpdateConfirmation = action({
 
       canceled = result.canceled ?? false;
       resultFrequency = result.frequency ?? "monthly";
+      resultType = result.type ?? [];
 
       // frequency = result.frequency ?? "monthly";
       // status = result.status
@@ -543,7 +553,12 @@ export const sendNewsletterUpdateConfirmation = action({
         });
       }
 
-      return { success: true, canceled, frequency: resultFrequency };
+      return {
+        success: true,
+        canceled,
+        frequency: resultFrequency,
+        type: resultType,
+      };
     } catch (error) {
       console.error("Failed to send message:", error);
       throw new ConvexError("Could not send message. Please try again.");

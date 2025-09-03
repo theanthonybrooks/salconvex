@@ -102,6 +102,7 @@ export const subscribeToNewsletter = mutation({
         firstName,
         email: args.email,
         newsletter: true,
+        type: ["general"],
         timesAttempted: 1,
         lastAttempt: Date.now(),
         userPlan,
@@ -145,10 +146,15 @@ export const updateNewsletterStatus = mutation({
     email: v.string(),
     newsletter: v.boolean(),
     frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
+    type: v.optional(
+      v.array(v.union(v.literal("openCall"), v.literal("general"))),
+    ),
     userPlan: v.number(),
   },
   handler: async (ctx, args) => {
-    const { email, newsletter, frequency } = args;
+    const { email, newsletter, frequency, type } = args;
+
+    console.log(args);
     const wasCanceled = newsletter === false;
 
     const userId = await getAuthUserId(ctx);
@@ -176,20 +182,22 @@ export const updateNewsletterStatus = mutation({
     if (newsletterSubscription) {
       await ctx.db.patch(newsletterSubscription._id, {
         newsletter,
-        frequency,
         timesAttempted: 0,
         lastAttempt: Date.now(),
+        ...(frequency && { frequency }),
+        ...(type && { type }),
       });
     } else if (emailSubscription) {
       await ctx.db.patch(emailSubscription._id, {
         newsletter,
-        frequency,
         timesAttempted: 0,
         lastAttempt: Date.now(),
+        ...(frequency && { frequency }),
+        ...(type && { type }),
       });
     }
 
-    return { success: true, canceled: wasCanceled, frequency };
+    return { success: true, canceled: wasCanceled, frequency, type };
   },
 });
 
@@ -224,6 +232,7 @@ export const getNewsletterStatus = query({
       : null;
 
     if (!userSubscription && !emailSubscription && !subscriberId) {
+      // console.error("No newsletter subscription found: " + email);
       throw new ConvexError("No newsletter subscription found: " + email);
     }
 
@@ -232,6 +241,9 @@ export const getNewsletterStatus = query({
       userSubscription?.newsletter === false ||
       emailSubscription?.newsletter === false
     ) {
+      // console.error(
+      //   "No newsletter subscription found: " + email + " / " + subscriberId,
+      // );
       throw new ConvexError(
         "No newsletter subscription found: " + email + " / " + subscriberId,
       );
@@ -249,6 +261,7 @@ export const getNewsletterStatus = query({
         newsletter: newsletterSubscription.newsletter,
         userPlan: newsletterSubscription.userPlan ?? 0,
         frequency: newsletterSubscription.frequency ?? "monthly",
+        type: newsletterSubscription.type ?? [],
         email: newsletterSubscription.email ?? "",
       };
     } else if (userSubscription) {
@@ -256,6 +269,7 @@ export const getNewsletterStatus = query({
         newsletter: userSubscription.newsletter,
         userPlan: userSubscription.userPlan ?? 0,
         frequency: userSubscription.frequency ?? "monthly",
+        type: userSubscription.type ?? [],
         email: userSubscription.email ?? "",
       };
     } else if (emailSubscription) {
@@ -266,8 +280,11 @@ export const getNewsletterStatus = query({
         newsletter: emailSubscription.newsletter,
         userPlan: 0,
         frequency: emailSubscription.frequency ?? "monthly",
+        type: emailSubscription.type ?? [],
         email: emailSubscription.email ?? "",
       };
     }
+
+    throw new ConvexError("No newsletter subscription found: " + email);
   },
 });

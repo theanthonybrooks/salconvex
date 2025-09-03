@@ -56,12 +56,14 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
   const forgotForm = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
     defaultValues: { email: "" },
+    delayError: 1000,
     mode: "onChange",
   });
 
   const resetForm = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: { code: "", newPassword: "" },
+    delayError: 1000,
     mode: "onChange",
   });
 

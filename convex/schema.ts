@@ -513,6 +513,9 @@ const newsletterSchema = {
   firstName: v.string(),
   email: v.string(),
   newsletter: v.boolean(),
+  type: v.optional(
+    v.array(v.union(v.literal("openCall"), v.literal("general"))),
+  ),
   frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
   userPlan: v.optional(v.number()),
   timesAttempted: v.number(),

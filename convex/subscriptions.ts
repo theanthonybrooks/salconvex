@@ -53,10 +53,12 @@ export const getUserSubscriptionStatus = query({
     const subAmount = subscription?.amount;
     const subInterval = subscription?.interval || "none";
     const trialEndsAt = subscription?.trialEndsAt;
+    const subPlan = subscription?.plan;
     // console.log("Sub status: ", subStatus)
     return {
       subscription,
       hasActiveSubscription,
+      subPlan,
       subStatus,
       hadTrial,
       trialEndsAt,

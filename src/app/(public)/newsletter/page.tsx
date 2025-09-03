@@ -4,16 +4,25 @@ import { Input } from "@/components/ui/input";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import {
-  NewsletterStatusValues,
   newsletterStatusSchema,
+  NewsletterStatusValues,
+  newsletterUpdateSchema,
+  NewsletterUpdateValues,
 } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
-import { useAction, usePreloadedQuery } from "convex/react";
+import {
+  useAction,
+  useConvex,
+  useMutation,
+  usePreloadedQuery,
+} from "convex/react";
 
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "@/components/ui/custom-link";
 import {
   Form,
   FormControl,
@@ -27,37 +36,54 @@ import { SelectSimple } from "@/components/ui/select";
 import {
   NewsletterFrequency,
   newsletterFrequencyOptions,
-} from "@/constants/newsletter";
+  NewsletterType,
+} from "@/constants/newsletterConsts";
 import { ConvexError } from "convex/values";
 import { LoaderCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 const NewsletterPage = () => {
+  const convex = useConvex();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  //TODO: add an email check? Maybe? Perhaps it doesn't need it now.
   const existingNewsletterSubscription = searchParams?.get("subscription")
     ? (searchParams?.get("subscription") as Id<"newsletter">)
     : undefined;
+  const subUpdateRef = useRef<HTMLFormElement>(null);
+
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
-  const { preloadedUserData } = useConvexPreload();
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const userId = userData?.userId ?? null;
   const user = userData?.user;
+  const userPlan = subData?.subPlan ?? 0;
   const [pending, setPending] = useState(false);
-  const [frequency, setFrequency] = useState<NewsletterFrequency>("monthly");
+
+  const [emailSubscriptionActive, setEmailSubscriptionActive] = useState(false);
   const [success, setSuccess] = useState("");
-  const formRef = useRef<HTMLFormElement>(null);
+  const [error, setError] = useState("");
   const sendEmail = useAction(
     api.actions.resend.sendNewsletterUpdateConfirmation,
   );
+  const updateNewsletterSubscription = useMutation(
+    api.newsletter.subscriber.updateNewsletterStatus,
+  );
 
-  const form = useForm<NewsletterStatusValues>({
+  const { data: userNewsletterSub, error: userNewsletterSubError } =
+    useQueryWithStatus(
+      api.newsletter.subscriber.getNewsletterStatus,
+      userId ? { userId } : "skip",
+    );
+
+  const subSearchForm = useForm<NewsletterStatusValues>({
     resolver: zodResolver(newsletterStatusSchema),
     defaultValues: {
       email: user?.email ?? "",
@@ -65,49 +91,99 @@ const NewsletterPage = () => {
     mode: "onChange",
   });
 
-  const { handleSubmit, watch, getFieldState } = form;
+  const {
+    handleSubmit: handleSearchSubmit,
+    watch: watchSearch,
+    getFieldState: getFieldStateSearch,
+    formState: { isValid: isValidSearch },
+  } = subSearchForm;
 
-  const email = watch("email");
-  const emailState = getFieldState("email");
+  const email = watchSearch("email");
+  const emailState = getFieldStateSearch("email");
   const emailValid = !emailState?.invalid;
   const emailDirty = emailState?.isDirty;
 
   const {
     data: newsletterStatusData,
     isPending: newsletterStatusPending,
-
-    // isError,
     error: newsletterStatusError,
   } = useQueryWithStatus(
     api.newsletter.subscriber.getNewsletterStatus,
-    (existingNewsletterSubscription || (emailValid && emailDirty) || user) &&
-      !Boolean(success)
+    existingNewsletterSubscription && !Boolean(success) && !email
       ? {
-          email,
-          userId: userId ?? undefined,
           subscriberId: existingNewsletterSubscription,
         }
       : "skip",
   );
-  const newsletterSubEmail = newsletterStatusData?.email;
-  const newsletterSubFrequency = newsletterStatusData?.frequency;
-  const newsletterSubStatusActive = newsletterStatusData?.newsletter === true;
 
-  // if (newsletterStatusError instanceof ConvexError) {
-  //   const ErrorData = newsletterStatusError.data;
-  //   if (ErrorData?.includes("No newsletter subscription found")) {
-  //     setError(
-  //       "No newsletter subscription found. Please sign up to receive newsletters.",
-  //     );
-  //   } else if (ErrorData?.includes("Log in to update")) {
-  //     setError("Please log in to update your newsletter preferences.");
-  //   } else {
-  //     setError("Unknown error. Please contact support.");
-  //   }
-  // }
+  const subUpdateform = useForm<NewsletterUpdateValues>({
+    resolver: zodResolver(newsletterUpdateSchema),
+    // defaultValues: {
+    //   frequency: userNewsletterSub?.frequency ?? "monthly",
+    //   type: userNewsletterSub?.type ?? ["general"],
+    // },
+    defaultValues: async () => {
+      let result = {
+        frequency: "monthly" as NewsletterFrequency,
+        type: ["general"] as NewsletterType[],
+      };
+      if (userId) {
+        result = await convex.query(
+          api.newsletter.subscriber.getNewsletterStatus,
+          { userId },
+        );
+      } else if (existingNewsletterSubscription) {
+        result = await convex.query(
+          api.newsletter.subscriber.getNewsletterStatus,
+          { subscriberId: existingNewsletterSubscription },
+        );
+      }
+      return {
+        frequency: result?.frequency ?? "monthly",
+        type: result?.type ?? ["general"],
+      };
+    },
+    mode: "onChange",
+    shouldUnregister: false,
+  });
+
+  const {
+    handleSubmit: handleUpdateSubmit,
+    // watch: watchUpdate,
+    // getFieldState: getFieldStateUpdate,
+    formState: {
+      isValid: isValidUpdate,
+      isDirty: isDirtyUpdate,
+      errors: errorUpdate,
+    },
+  } = subUpdateform;
+
+  const currentFrequency = subUpdateform.getValues("frequency");
+  const currentType = subUpdateform.getValues("type");
+
+  //NOTE: runs on page load if search params exist
+
+  const userNewsletterSubStatusActive = userNewsletterSub?.newsletter === true;
+  const newsletterSubEmail = newsletterStatusData?.email;
+  const newsletterSubStatusActive = newsletterStatusData?.newsletter === true;
+  const noActiveSubscription =
+    !newsletterSubStatusActive &&
+    !userNewsletterSubStatusActive &&
+    !emailSubscriptionActive;
+  const activeSubscription =
+    newsletterSubStatusActive ||
+    userNewsletterSubStatusActive ||
+    emailSubscriptionActive;
+
   const errorMessage = (() => {
-    if (newsletterStatusError instanceof ConvexError) {
-      const data = newsletterStatusError.data;
+    const newsletterError = newsletterStatusError instanceof ConvexError;
+    const userError = userNewsletterSubError instanceof ConvexError;
+    if (newsletterError || userError) {
+      const data = newsletterError
+        ? newsletterStatusError.data
+        : userError
+          ? userNewsletterSubError?.data
+          : null;
       if (data?.includes("No newsletter subscription found")) {
         return "No newsletter subscription found. Subscribe to receive newsletters.";
       }
@@ -116,64 +192,176 @@ const NewsletterPage = () => {
       }
       return "Unknown error. Please contact support.";
     }
-    if (newsletterStatusError) {
+    if (newsletterStatusError || userNewsletterSubError) {
       return "Unexpected error. Please contact support.";
     }
     return null;
   })();
 
-  const handleUpdateSubscription = async (
-    newsletterActive: boolean = true,
-    newsletterSubFrequency: NewsletterFrequency = "monthly",
-    email: string,
-  ) => {
+  const handleUnsubscribe = async () => {
+    handleResetMessages();
     setPending(true);
     try {
       const result = await sendEmail({
-        newsletter: newsletterActive,
-        frequency: newsletterSubFrequency,
+        newsletter: false,
+        frequency: currentFrequency ?? "monthly",
+        type: currentType ?? ["general"],
         email: newsletterSubEmail ?? email ?? "",
         userPlan: user?.plan ?? 0,
       });
       if (result?.canceled) {
         setSuccess("Unsubscribed from all newsletters");
-      } else if (result?.frequency) {
-        setSuccess("Updated newsletter preferences");
       }
-
-      setTimeout(() => {
-        setSuccess("");
-      }, 4000);
+      if (emailSubscriptionActive) setEmailSubscriptionActive(false);
+      subSearchForm.reset();
     } catch (err) {
       console.error("Failed to update newsletter subscription:", err);
+    } finally {
+      setPending(false);
+      if (searchParams?.get("subscription")) {
+        router.replace(pathname);
+      }
+    }
+  };
+
+  const handleUpdateSubscription = async (values: NewsletterUpdateValues) => {
+    handleResetMessages();
+    setPending(true);
+    try {
+      await updateNewsletterSubscription({
+        email: newsletterSubEmail ?? "",
+        newsletter: true,
+        frequency: values.frequency ?? "monthly",
+        type: values.type ?? ["general"],
+        userPlan: user?.plan ?? 0,
+      });
+      setSuccess("Successfully updated newsletter preferences");
+    } catch (err) {
+      if (err instanceof ConvexError) {
+        if (err.data.includes("Log in to update")) {
+          setError("Please log in to update your newsletter preferences");
+        } else {
+          setError("An unknown error occurred. Please contact support.");
+        }
+      }
     } finally {
       setPending(false);
     }
   };
 
-  useEffect(() => {
-    if (newsletterSubFrequency && newsletterSubFrequency !== frequency) {
-      setFrequency(newsletterSubFrequency);
+  const handleSearchSubscription = async (values: NewsletterStatusValues) => {
+    handleResetMessages();
+    setPending(true);
+    try {
+      const result = await convex.query(
+        api.newsletter.subscriber.getNewsletterStatus,
+        { email: values.email },
+      );
+      if (!result) {
+        throw new ConvexError(
+          "No newsletter subscription found. Please sign up to receive newsletters.",
+        );
+      }
+      setEmailSubscriptionActive(result.newsletter);
+      subUpdateform.reset({
+        frequency: result.frequency ?? "monthly",
+        type: result.type ?? ["general"],
+      });
+    } catch (err) {
+      if (err instanceof ConvexError) {
+        if (err.data.includes("Log in to update")) {
+          setError("Please log in to update your newsletter preferences");
+        } else if (err.data.includes("No newsletter subscription found")) {
+          setError(
+            "No newsletter subscription found. Please sign up to receive newsletters.",
+          );
+        } else {
+          setError("An unknown error occurred. Please contact support.");
+        }
+      }
+    } finally {
+      setPending(false);
     }
-  }, [newsletterSubFrequency, frequency]);
+  };
+
+  const handleResetMessages = () => {
+    setError("");
+    setSuccess("");
+  };
+
+  // useEffect(() => {
+  //   if (!newsletterStatusData) return;
+
+  //   // subUpdateform.reset({
+  //   //   frequency: newsletterStatusData.frequency ?? "monthly",
+  //   //   type: newsletterStatusData.type ?? ["general"],
+  //   // });
+  //   subUpdateform.setValue(
+  //     "frequency",
+  //     newsletterStatusData.frequency || "monthly",
+  //   );
+  //   subUpdateform.setValue("type", newsletterStatusData.type || ["general"]);
+  //   console.log(
+  //     "before reset:",
+  //     newsletterStatusData.frequency,
+  //     newsletterStatusData.type,
+  //     subUpdateform.getValues("type"),
+  //     subUpdateform.getValues("frequency"),
+  //   );
+  // }, [newsletterStatusData, subUpdateform]);
+
+  // useEffect(() => {
+  //   if (!userNewsletterSub || userNewsletterSub?.newsletter !== true) return;
+
+  //   subUpdateform.reset({
+  //     frequency: userNewsletterSub.frequency ?? "monthly",
+  //     type: userNewsletterSub.type ?? ["general"],
+  //   });
+
+  //   console.log(
+  //     "after reset:",
+  //     userNewsletterSub.frequency,
+  //     userNewsletterSub.type,
+  //     subUpdateform.getValues("type"),
+  //     subUpdateform.getValues("frequency"),
+  //   );
+  // }, [userNewsletterSub, subUpdateform]);
+
+  // useEffect(() => {
+  //   if (
+  //     !userNewsletterSub ||
+  //     userNewsletterSub.newsletter !== true ||
+  //     !subUpdateRef.current
+  //   )
+  //     return;
+
+  //   const values = {
+  //     frequency: userNewsletterSub.frequency || "monthly",
+  //     type: userNewsletterSub.type || ["general"],
+  //   };
+
+  //   subUpdateform.reset(values);
+  // }, [userNewsletterSub, subUpdateform]);
 
   return (
     <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">
       <div className="flex h-full w-full flex-col items-center gap-x-2 px-6 md:px-8">
         <section
-          className={cn(
-            "mx-auto flex max-w-[90vw] flex-col items-center gap-3 md:max-w-sm",
-          )}
+          className={cn("mx-auto flex max-w-[90vw] flex-col gap-3 md:max-w-sm")}
         >
           <p className="w-full text-xl font-medium text-foreground">
             Update your newsletter preferences
           </p>
-          <span className="text-foreground">
-            {newsletterSubStatusActive ? (
-              "Select your desired frequency or click unsubscribe to stop receiving emails."
+          <span className="text-sm text-foreground">
+            {activeSubscription ? (
+              userPlan > 1 ? (
+                "Select your desired frequency and newsletter type(s)."
+              ) : null
             ) : !user ? (
               "Login or enter your email address to update your preferences."
-            ) : newsletterStatusPending && !success ? (
+            ) : existingNewsletterSubscription &&
+              newsletterStatusPending &&
+              !success ? (
               <span className="flex items-center gap-1">
                 Loading... <LoaderCircle className="size-4 animate-spin" />
               </span>
@@ -181,96 +369,244 @@ const NewsletterPage = () => {
               "You don't have a newsletter subscription. Fill out the form at the bottom of the page to subscribe."
             )}
           </span>
-          {!newsletterSubStatusActive && !existingNewsletterSubscription && (
-            <Form {...form}>
+          {!user && noActiveSubscription && (
+            <Form {...subSearchForm}>
               <form
-                ref={formRef}
-                className="mt-4 flex w-full max-w-sm flex-col gap-4"
-                onSubmit={handleSubmit(() => {})}
+                className="mb-2 flex w-full max-w-sm flex-col gap-4"
+                onSubmit={handleSearchSubmit(handleSearchSubscription)}
               >
-                {!userId && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
+                <>
+                  <FormField
+                    control={subSearchForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
 
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="email"
-                              placeholder="ex. email@mail.com"
-                              className={cn("w-full border-foreground bg-card")}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="email"
+                            placeholder="ex. email@mail.com"
+                            className={cn("w-full border-foreground bg-card")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+
+                <Button
+                  variant={
+                    isValidSearch ? "salWithShadow" : "salWithShadowHidden"
+                  }
+                  type="submit"
+                  size="lg"
+                  className="w-full bg-white py-6 text-base focus-visible:bg-salPinkLt sm:py-0 md:bg-salYellow"
+                  disabled={pending || !isValidSearch}
+                >
+                  {pending ||
+                  (newsletterStatusPending &&
+                    existingNewsletterSubscription) ? (
+                    <span className="flex items-center gap-1">
+                      Checking for subscription...
+                      <LoaderCircle className="size-4 animate-spin" />
+                    </span>
+                  ) : (
+                    "Load Subscription"
+                  )}
+                </Button>
               </form>
             </Form>
           )}
+          {success && !pending && (
+            <FormSuccess
+              message={success}
+              className="text-success mx-auto w-full py-6 text-center"
+            />
+          )}
+          {(errorMessage || error) && !success && !pending && (
+            <FormError
+              message={errorMessage || error}
+              className="mx-auto text-center text-red-700"
+            />
+          )}
+          {activeSubscription && (
+            <div className={cn("flex w-full max-w-sm flex-col gap-4")}>
+              {userPlan > 1 ? (
+                <>
+                  <Form {...subUpdateform}>
+                    <form
+                      ref={subUpdateRef}
+                      className="flex w-full max-w-sm flex-col gap-4"
+                      onSubmit={handleUpdateSubmit(handleUpdateSubscription)}
+                    >
+                      <FormField
+                        control={subUpdateform.control}
+                        name="type"
+                        render={({ field }) => (
+                          <FormItem>
+                            <fieldset className="mb-5 flex flex-col gap-3">
+                              <legend className="mb-4 text-sm font-medium">
+                                Which newsletter(s) would you like to receive?
+                              </legend>
 
-          {newsletterSubStatusActive && (
-            <div className="mt-4 flex w-full max-w-sm flex-col gap-4">
-              <Label htmlFor="frequency">
-                How often would you like to receive newsletters?
-              </Label>
-              <SelectSimple
-                options={[...newsletterFrequencyOptions]}
-                value={frequency}
-                onChangeAction={(value) => {
-                  handleUpdateSubscription(
-                    true,
-                    value as NewsletterFrequency,
-                    newsletterSubEmail ?? "",
-                  );
-                  setFrequency(value as NewsletterFrequency);
-                }}
-                placeholder="Select a category"
-                className="w-full bg-card placeholder:text-foreground sm:h-11"
-                itemClassName="justify-center"
-              />
-              <p className="flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
-                or
-              </p>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id="newsletter-openCall"
+                                  checked={field.value?.includes("openCall")}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      field.onChange([
+                                        ...field.value,
+                                        "openCall",
+                                      ]);
+                                    } else {
+                                      field.onChange(
+                                        field.value.filter(
+                                          (t) => t !== "openCall",
+                                        ),
+                                      );
+                                    }
+                                  }}
+                                />
+                                <Label htmlFor="newsletter-openCall">
+                                  Open Calls
+                                </Label>
+                              </div>
+
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id="newsletter-general"
+                                  checked={field.value?.includes("general")}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      field.onChange([
+                                        ...field.value,
+                                        "general",
+                                      ]);
+                                    } else {
+                                      field.onChange(
+                                        field.value.filter(
+                                          (t) => t !== "general",
+                                        ),
+                                      );
+                                    }
+                                  }}
+                                />
+                                <Label htmlFor="newsletter-general">
+                                  General Updates
+                                </Label>
+                              </div>
+                            </fieldset>
+                            <FormMessage emptyError />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={subUpdateform.control}
+                        name="frequency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              How often would you like to receive newsletters?
+                            </FormLabel>
+                            <FormControl>
+                              <SelectSimple
+                                disabled={!currentType?.length}
+                                options={[...newsletterFrequencyOptions]}
+                                value={field.value}
+                                onChangeAction={field.onChange}
+                                placeholder="Select frequency"
+                                className="w-full bg-card placeholder:text-foreground sm:h-11"
+                                itemClassName="justify-center"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        disabled={pending || !isValidUpdate || !isDirtyUpdate}
+                        variant={
+                          isValidUpdate && isDirtyUpdate && !pending
+                            ? "salWithShadow"
+                            : "salWithShadowHidden"
+                        }
+                      >
+                        {pending ? (
+                          <LoaderCircle className="size-4 animate-spin" />
+                        ) : (
+                          " Update preferences"
+                        )}
+                      </Button>
+                    </form>
+                  </Form>
+                  <p className="my-4 flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
+                    or
+                  </p>
+                  <p className="text-sm">
+                    If you&apos;re not interested in receiving any newsletters
+                    anymore, you can unsubscribe below.
+                  </p>
+                </>
+              ) : (
+                <span className="mb-2 flex flex-col gap-2 text-sm italic text-foreground">
+                  <p>
+                    There currently aren&apos;t any additional options for free
+                    newsletters.
+                  </p>
+                  <p>
+                    You can always sign up for a paid membership if you want
+                    more (especially those related to open calls)
+                  </p>
+
+                  <Link href="/pricing">
+                    <Button variant="salWithShadow" className="mt-4 w-full">
+                      Choose a membership{" "}
+                    </Button>
+                  </Link>
+
+                  <p className="my-4 flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
+                    or
+                  </p>
+                  <p className="text-sm">
+                    If you&apos;re not interested in receiving any newsletters
+                    anymore, you can unsubscribe below.
+                  </p>
+                </span>
+              )}
+
               <Button
                 disabled={pending}
-                variant="salWithShadowHidden"
+                variant="salWithShadowHiddenPink"
                 onClick={() => {
-                  handleUpdateSubscription(
-                    false,
-                    frequency,
-                    newsletterSubEmail ?? "",
-                  );
-                  setTimeout(() => {
-                    router.replace(pathname);
-                  }, 3500);
+                  handleUnsubscribe();
                 }}
+                className="group bg-salPinkLt"
               >
                 {pending ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : (
-                  " Unsubscribe from all newsletters"
+                  <>
+                    {/* Default text */}
+                    {/* <span className="block group-hover:hidden"> */}
+                    Unsubscribe from all newsletters
+                    {/*          </span>
+                    /~ Hover text ~/
+                    <span className="hidden items-center gap-x-1 group-hover:flex group-active:hidden">
+                      Really?
+                      <IoMdSad className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </span>
+                    <span className="hidden group-hover:hidden group-active:block">
+                      Ok bye!
+                    </span>*/}
+                  </>
                 )}
               </Button>
             </div>
-          )}
-          {success && (
-            <FormSuccess
-              message={success}
-              className="text-success mx-auto mb-14 w-full py-6 text-center"
-            />
-          )}
-          {errorMessage && !success && (
-            <FormError
-              message={errorMessage}
-              className="mx-auto mb-14 text-center text-red-700"
-            />
           )}
         </section>
       </div>

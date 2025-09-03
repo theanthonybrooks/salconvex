@@ -168,7 +168,7 @@ export {
   SelectScrollUpButton,
   SelectSeparator,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 };
 
 export const SelectSimple = ({
@@ -181,6 +181,7 @@ export const SelectSimple = ({
   placeholder,
   tabIndex,
   invalid,
+  disabled,
 }: {
   options: {
     label: string;
@@ -194,10 +195,12 @@ export const SelectSimple = ({
   itemClassName?: string;
   tabIndex?: number;
   invalid?: boolean;
+  disabled?: boolean;
 }) => {
   return (
     <Select value={value} onValueChange={onChangeAction}>
       <SelectTrigger
+        disabled={disabled}
         className={cn(
           className,
           "*:data-[slot=select-value]:pr-4",

@@ -15,7 +15,7 @@ import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { infoEmail } from "@/constants/siteInfo";
-import { supportCategoryOptions } from "@/constants/support";
+import { supportCategoryOptions } from "@/constants/supportConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";

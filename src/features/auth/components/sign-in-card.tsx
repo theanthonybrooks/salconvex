@@ -55,6 +55,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
       password: "",
     },
     mode: "onChange",
+    delayError: 1000,
   });
 
   const {
@@ -167,6 +168,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const onProviderSignIn = async (value: "github" | "google" | "apple") => {
     setIsLoading(value);
+    setPending(true);
     try {
       await signIn(value, { redirectTo: "/auth/sign-up?err=newUser" });
     } catch (error) {

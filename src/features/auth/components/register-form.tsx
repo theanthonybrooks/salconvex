@@ -96,6 +96,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       accountType: ["artist"],
     },
     mode: "onChange",
+    delayError: 1000,
   });
 
   const {
