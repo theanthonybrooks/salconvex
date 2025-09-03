@@ -24,6 +24,51 @@ export const addDefaultNewsletterTypeandFrequency = migrations.define({
   },
 });
 
+export const findUsersWithActiveNewsletterAndUpdateUserPref = migrations.define(
+  {
+    table: "users",
+    migrateOne: async (ctx, user) => {
+      const userId = user._id;
+      const subscriptionByUserId = await ctx.db
+        .query("newsletter")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .first();
+
+      const subscriptionByEmail = await ctx.db
+        .query("newsletter")
+        .withIndex("by_email", (q) => q.eq("email", user.email))
+        .first();
+
+      const userPrefs = await ctx.db
+        .query("userPreferences")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .unique();
+
+      if (!userPrefs) return;
+
+      if (subscriptionByUserId?.newsletter) {
+        await ctx.db.patch(userPrefs._id, {
+          notifications: {
+            newsletter: true,
+          },
+          lastUpdated: Date.now(),
+        });
+      } else if (subscriptionByEmail?.newsletter) {
+        await ctx.db.patch(userPrefs._id, {
+          notifications: {
+            newsletter: true,
+          },
+          lastUpdated: Date.now(),
+        });
+      }
+    },
+  },
+);
+
+export const runFUWA = migrations.runner(
+  internal.migrations.findUsersWithActiveNewsletterAndUpdateUserPref,
+);
+
 export const runANPBU = migrations.runner(
   internal.migrations.addDefaultNewsletterTypeandFrequency,
 );

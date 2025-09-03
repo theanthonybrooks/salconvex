@@ -60,6 +60,7 @@ import {
   LoaderCircle,
   Mail,
   Mailbox,
+  MailSearch,
   Palette,
   Shield,
 } from "lucide-react";
@@ -1014,7 +1015,7 @@ export default function SettingsPage() {
 
                   <div className="flex flex-col items-center gap-2 md:flex-row md:justify-between">
                     <div className="flex items-center gap-4">
-                      <Mailbox className="size-5 shrink-0 text-muted-foreground" />
+                      <MailSearch className="size-5 shrink-0 text-muted-foreground" />
                       <div>
                         <Label className={fontSize}>Newsletter Type(s)</Label>
                         <p className="text-sm text-muted-foreground">
