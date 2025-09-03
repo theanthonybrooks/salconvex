@@ -12,6 +12,21 @@ import { DataModel, Id } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
+export const addDefaultNewsletterTypeandFrequency = migrations.define({
+  table: "newsletter",
+  migrateOne: async (ctx, user) => {
+    //gather all newsletter subscriptions
+    //everyone gets a monthly frequency and general newsletter type
+    await ctx.db.patch(user._id, {
+      type: ["general"],
+      frequency: "monthly",
+    });
+  },
+});
+
+export const runANPBU = migrations.runner(
+  internal.migrations.addDefaultNewsletterTypeandFrequency,
+);
 export const addVotersArrayToKanban = migrations.define({
   table: "todoKanban",
   migrateOne: async (ctx, todo) => {

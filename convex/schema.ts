@@ -882,6 +882,13 @@ export default defineSchema({
     language: v.optional(v.string()),
     theme: v.optional(v.string()),
     fontSize: v.optional(v.string()),
+    notifications: v.optional(
+      v.object({
+        newsletter: v.optional(v.boolean()),
+        general: v.optional(v.boolean()),
+        applications: v.optional(v.boolean()),
+      }),
+    ),
     lastUpdated: v.optional(v.number()),
   }).index("by_userId", ["userId"]),
 

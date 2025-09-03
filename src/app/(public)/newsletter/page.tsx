@@ -51,7 +51,6 @@ const NewsletterPage = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  //TODO: add an email check? Maybe? Perhaps it doesn't need it now.
   const existingNewsletterSubscription = searchParams?.get("subscription")
     ? (searchParams?.get("subscription") as Id<"newsletter">)
     : undefined;
@@ -70,18 +69,22 @@ const NewsletterPage = () => {
   const [emailSubscriptionActive, setEmailSubscriptionActive] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const sendEmail = useAction(
+  const unsubscribe = useAction(
     api.actions.resend.sendNewsletterUpdateConfirmation,
   );
   const updateNewsletterSubscription = useMutation(
     api.newsletter.subscriber.updateNewsletterStatus,
   );
+  const updateNotifications = useMutation(api.users.updateUserNotifications);
 
-  const { data: userNewsletterSub, error: userNewsletterSubError } =
-    useQueryWithStatus(
-      api.newsletter.subscriber.getNewsletterStatus,
-      userId ? { userId } : "skip",
-    );
+  const {
+    data: userNewsletterSub,
+    error: userNewsletterSubError,
+    isPending: userNewsletterSubPending,
+  } = useQueryWithStatus(
+    api.newsletter.subscriber.getNewsletterStatus,
+    userId ? { userId } : "skip",
+  );
 
   const subSearchForm = useForm<NewsletterStatusValues>({
     resolver: zodResolver(newsletterStatusSchema),
@@ -94,14 +97,14 @@ const NewsletterPage = () => {
   const {
     handleSubmit: handleSearchSubmit,
     watch: watchSearch,
-    getFieldState: getFieldStateSearch,
+    // getFieldState: getFieldStateSearch,
     formState: { isValid: isValidSearch },
   } = subSearchForm;
 
   const email = watchSearch("email");
-  const emailState = getFieldStateSearch("email");
-  const emailValid = !emailState?.invalid;
-  const emailDirty = emailState?.isDirty;
+  // const emailState = getFieldStateSearch("email");
+  // const emailValid = !emailState?.invalid;
+  // const emailDirty = emailState?.isDirty;
 
   const {
     data: newsletterStatusData,
@@ -154,14 +157,12 @@ const NewsletterPage = () => {
     formState: {
       isValid: isValidUpdate,
       isDirty: isDirtyUpdate,
-      errors: errorUpdate,
+      // errors: errorUpdate,
     },
   } = subUpdateform;
 
-  const currentFrequency = subUpdateform.getValues("frequency");
+  // const currentFrequency = subUpdateform.getValues("frequency");
   const currentType = subUpdateform.getValues("type");
-
-  //NOTE: runs on page load if search params exist
 
   const userNewsletterSubStatusActive = userNewsletterSub?.newsletter === true;
   const newsletterSubEmail = newsletterStatusData?.email;
@@ -202,15 +203,17 @@ const NewsletterPage = () => {
     handleResetMessages();
     setPending(true);
     try {
-      const result = await sendEmail({
+      const emailValue = email ?? newsletterSubEmail ?? user?.email;
+      if (!emailValue) throw new Error("No email found");
+      const result = await unsubscribe({
         newsletter: false,
-        frequency: currentFrequency ?? "monthly",
-        type: currentType ?? ["general"],
-        email: newsletterSubEmail ?? email ?? "",
-        userPlan: user?.plan ?? 0,
+        email: emailValue,
       });
       if (result?.canceled) {
         setSuccess("Unsubscribed from all newsletters");
+        await updateNotifications({
+          newsletter: false,
+        });
       }
       if (emailSubscriptionActive) setEmailSubscriptionActive(false);
       subSearchForm.reset();
@@ -257,7 +260,7 @@ const NewsletterPage = () => {
         api.newsletter.subscriber.getNewsletterStatus,
         { email: values.email },
       );
-      if (!result) {
+      if (!result?.newsletter) {
         throw new ConvexError(
           "No newsletter subscription found. Please sign up to receive newsletters.",
         );
@@ -289,59 +292,6 @@ const NewsletterPage = () => {
     setSuccess("");
   };
 
-  // useEffect(() => {
-  //   if (!newsletterStatusData) return;
-
-  //   // subUpdateform.reset({
-  //   //   frequency: newsletterStatusData.frequency ?? "monthly",
-  //   //   type: newsletterStatusData.type ?? ["general"],
-  //   // });
-  //   subUpdateform.setValue(
-  //     "frequency",
-  //     newsletterStatusData.frequency || "monthly",
-  //   );
-  //   subUpdateform.setValue("type", newsletterStatusData.type || ["general"]);
-  //   console.log(
-  //     "before reset:",
-  //     newsletterStatusData.frequency,
-  //     newsletterStatusData.type,
-  //     subUpdateform.getValues("type"),
-  //     subUpdateform.getValues("frequency"),
-  //   );
-  // }, [newsletterStatusData, subUpdateform]);
-
-  // useEffect(() => {
-  //   if (!userNewsletterSub || userNewsletterSub?.newsletter !== true) return;
-
-  //   subUpdateform.reset({
-  //     frequency: userNewsletterSub.frequency ?? "monthly",
-  //     type: userNewsletterSub.type ?? ["general"],
-  //   });
-
-  //   console.log(
-  //     "after reset:",
-  //     userNewsletterSub.frequency,
-  //     userNewsletterSub.type,
-  //     subUpdateform.getValues("type"),
-  //     subUpdateform.getValues("frequency"),
-  //   );
-  // }, [userNewsletterSub, subUpdateform]);
-
-  // useEffect(() => {
-  //   if (
-  //     !userNewsletterSub ||
-  //     userNewsletterSub.newsletter !== true ||
-  //     !subUpdateRef.current
-  //   )
-  //     return;
-
-  //   const values = {
-  //     frequency: userNewsletterSub.frequency || "monthly",
-  //     type: userNewsletterSub.type || ["general"],
-  //   };
-
-  //   subUpdateform.reset(values);
-  // }, [userNewsletterSub, subUpdateform]);
 
   return (
     <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">
@@ -359,10 +309,10 @@ const NewsletterPage = () => {
               ) : null
             ) : !user ? (
               "Login or enter your email address to update your preferences."
-            ) : existingNewsletterSubscription &&
-              newsletterStatusPending &&
+            ) : ((existingNewsletterSubscription && newsletterStatusPending) ||
+                userNewsletterSubPending) &&
               !success ? (
-              <span className="flex items-center gap-1">
+              <span className="flex w-full items-center justify-center gap-1">
                 Loading... <LoaderCircle className="size-4 animate-spin" />
               </span>
             ) : (
@@ -559,8 +509,8 @@ const NewsletterPage = () => {
                     newsletters.
                   </p>
                   <p>
-                    You can always sign up for a paid membership if you want
-                    more (especially those related to open calls)
+                    Sign up for a Banana or Fatcap membership if you want more
+                    (especially those related to open calls)
                   </p>
 
                   <Link href="/pricing">

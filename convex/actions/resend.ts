@@ -399,12 +399,11 @@ export const sendNewsletterConfirmation = action({
 export const sendNewsletterUpdateConfirmation = action({
   args: {
     newsletter: v.boolean(),
-    frequency: v.union(v.literal("monthly"), v.literal("weekly")),
+    frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
     type: v.optional(
       v.array(v.union(v.literal("openCall"), v.literal("general"))),
     ),
     email: v.string(),
-    userPlan: v.number(),
   },
   async handler(
     ctx,
@@ -415,7 +414,7 @@ export const sendNewsletterUpdateConfirmation = action({
     frequency: NewsletterFrequency;
     type: NewsletterType[];
   }> {
-    const { newsletter, frequency, email, userPlan, type } = args;
+    const { newsletter, frequency, email, type } = args;
     let subId: Id<"newsletter"> | null = null;
 
     let canceled: boolean = false;
@@ -430,7 +429,6 @@ export const sendNewsletterUpdateConfirmation = action({
           frequency,
           type,
           email,
-          userPlan,
         },
       );
 

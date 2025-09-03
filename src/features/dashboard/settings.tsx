@@ -35,6 +35,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSimple,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -49,15 +50,16 @@ import {
 } from "@/schemas/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
-  Bell,
+  Clock,
   Eye,
   EyeOff,
   Globe,
   LoaderCircle,
   Mail,
+  Mailbox,
   Palette,
   Shield,
 } from "lucide-react";
@@ -70,13 +72,21 @@ import {
   Timezone,
   timezones,
 } from "@/app/data/timezones";
+import { MultiSelect } from "@/components/multi-select";
 import { CanceledBanner } from "@/components/ui/canceled-banner";
 import { Link } from "@/components/ui/custom-link";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import {
+  NewsletterFrequency,
+  newsletterFrequencyOptions,
+  NewsletterType,
+  newsletterTypeOptions,
+} from "@/constants/newsletterConsts";
 import { ArtistProfileForm } from "@/features/artists/components/artist-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { FontSizeIcon } from "@radix-ui/react-icons";
 import { usePreloadedQuery } from "convex/react";
@@ -96,20 +106,43 @@ export default function SettingsPage() {
   const userType = user?.accountType;
   const isAdmin = user?.role?.includes("admin");
   const isArtist = userType?.includes("artist");
+  const { isMobile } = useDevice();
 
   const userPrefs = userData?.userPref;
   const fontSize = userPrefs?.fontSize === "large" ? "text-base" : "text-sm";
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
   const subStatus = subData?.subStatus ?? "none";
+  const userPlan = subData?.subPlan ?? 0;
+  const signedUpForNewsletter = userPrefs?.notifications?.newsletter ?? false;
+
+  const newsletterInfo = useQuery(
+    api.newsletter.subscriber.getNewsletterStatus,
+    userId
+      ? {
+          userId,
+        }
+      : "skip",
+  );
 
   const sessionCount = useQuery(
     api.users.countSessions,
     userId ? { userId } : "skip",
   );
-
+  const subscribeToNewsletter = useAction(
+    api.actions.resend.sendNewsletterConfirmation,
+  );
+  const unsubscribeFromNewsletter = useAction(
+    api.actions.resend.sendNewsletterUpdateConfirmation,
+  );
   const updatePassword = useMutation(api.users.updatePassword);
   const updateUserPrefs = useMutation(api.users.updateUserPrefs);
+  const updateUserNotifications = useMutation(
+    api.users.updateUserNotifications,
+  );
+  const updateNewsletterSubscription = useMutation(
+    api.newsletter.subscriber.updateNewsletterStatus,
+  );
   const deleteSessions = useMutation(api.users.deleteSessions);
   const updateUser = useMutation(api.users.updateUser);
   const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage);
@@ -357,6 +390,86 @@ export default function SettingsPage() {
     [user, updateUserPrefs, reset], // Dependencies: Only re-create function if these change
   );
 
+  const handleUpdateNotifications = async (
+    type: "newsletter" | "general" | "applications",
+    value: boolean,
+  ) => {
+    setPending(true);
+    setError("");
+
+    if (!user || !user.email) {
+      throw new Error("No user found");
+    }
+    try {
+      const updated = {
+        ...userPrefs?.notifications,
+        [type]: value,
+      };
+
+      await updateUserNotifications({ ...updated });
+      if (type === "newsletter") {
+        if (value) {
+          await subscribeToNewsletter({
+            email: user.email,
+            firstName: user.firstName,
+          });
+        } else {
+          await unsubscribeFromNewsletter({
+            newsletter: false,
+            email: user.email,
+          });
+        }
+      }
+
+      // console.log("formData", formData)
+      setPending(false);
+      setSuccess("Successfully updated user preferences!");
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        console.log(error.data);
+        setError(error.data?.message ?? "Unexpected error.");
+      } else if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred.");
+        console.error(error);
+      }
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const handleUpdateNewsletterPrefs = async (
+    handlerType: "frequency" | "type",
+    value: NewsletterFrequency | NewsletterType[],
+  ) => {
+    setPending(true);
+    try {
+      const values = {
+        email: newsletterInfo?.email ?? user?.email ?? "",
+        newsletter: true,
+        ...(handlerType === "frequency" && {
+          frequency: value as NewsletterFrequency,
+        }),
+        ...(handlerType === "type" && { type: value as NewsletterType[] }),
+        userPlan: userPlan ?? 0,
+      };
+
+      await updateNewsletterSubscription(values);
+      setSuccess("Successfully updated newsletter preferences");
+    } catch (err) {
+      if (err instanceof ConvexError) {
+        if (err.data.includes("Log in to update")) {
+          setError("Please log in to update your newsletter preferences");
+        } else {
+          setError("An unknown error occurred. Please contact support.");
+        }
+      }
+    } finally {
+      setPending(false);
+    }
+  };
+
   const handleUpdatePasswordSubmit = async (
     data: z.infer<typeof UpdatePasswordSchema>,
   ) => {
@@ -489,7 +602,15 @@ export default function SettingsPage() {
           <TabsTrigger value="account" className="h-9 px-4" border>
             Account
           </TabsTrigger>
-          {/* /~ <TabsTrigger value="notifications">Notifications</TabsTrigger> ~/ */}
+
+          <TabsTrigger
+            value="notifications"
+            className="hidden h-9 px-4 lg:block"
+            border
+          >
+            Notifications
+          </TabsTrigger>
+
           {/* /~ //NOTE: in order to disabled, just add "disabled" to the tabs    trigger ~/ */}
 
           <TabsTrigger value="appearance" className="h-9 px-4" border>
@@ -758,7 +879,7 @@ export default function SettingsPage() {
                     />
                   </div>*/}
                   {isArtist && (
-                    <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
                       <div className="space-y-0.5">
                         <Label className={fontSize}>Auto-Apply</Label>
 
@@ -800,7 +921,7 @@ export default function SettingsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="notifications">
+        <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Notifications</CardTitle>
@@ -810,47 +931,155 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <Separator />
+                <div className="pointer-events-none flex items-center justify-between gap-4 text-muted-foreground/50">
                   <div className="flex items-center gap-4">
-                    <Bell className="h-5 w-5 text-muted-foreground" />
+                    <Mail className="size-5 shrink-0" />
                     <div>
-                      <Label className={fontSize}>Push Notifications</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receive push notifications
+                      <Label
+                        className={cn(
+                          fontSize,
+                          "flex flex-col items-baseline gap-1 sm:flex-row",
+                        )}
+                      >
+                        Application Notifications{" "}
+                        <p className="text-xs italic">(*coming soon)</p>
+                      </Label>
+                      <p className="text-sm">
+                        Receive email updates for applications
                       </p>
                     </div>
                   </div>
-                  <Switch />
+                  <Switch
+                    disabled
+                    checked={!!userPrefs?.notifications?.applications}
+                    onCheckedChange={(value) =>
+                      handleUpdateNotifications("applications", value)
+                    }
+                  />
+                </div>
+
+                <Separator />
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Mailbox className="size-5 shrink-0 text-muted-foreground" />
+                    <div>
+                      <Label className={fontSize}>Newsletter</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive {userPlan > 1 ? "weekly/monthly" : "monthly"}{" "}
+                        newsletter
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={!!userPrefs?.notifications?.newsletter}
+                    onCheckedChange={(value) =>
+                      handleUpdateNotifications("newsletter", value)
+                    }
+                  />
                 </div>
                 <Separator />
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <Globe className="size-5 shrink-0 text-muted-foreground" />
                     <div>
-                      <Label className={fontSize}>Email Notifications</Label>
+                      <Label className={fontSize}>General Emails</Label>
                       <p className="text-sm text-muted-foreground">
-                        Receive email updates
+                        Emails about upcoming updates to the site, user surveys,
+                        and other news related to The Street Art List
                       </p>
                     </div>
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Globe className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <Label className={fontSize}>Marketing Emails</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receive marketing emails
-                      </p>
-                    </div>
-                  </div>
-                  <Switch />
+                  <Switch
+                    checked={!!userPrefs?.notifications?.general}
+                    onCheckedChange={(value) =>
+                      handleUpdateNotifications("general", value)
+                    }
+                  />
                 </div>
               </div>
             </CardContent>
           </Card>
+          {userPlan > 1 && signedUpForNewsletter && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Newsletter</CardTitle>
+                <CardDescription>
+                  Manage your newsletter preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <Separator />
+
+                  <div className="flex flex-col items-center gap-2 md:flex-row md:justify-between">
+                    <div className="flex items-center gap-4">
+                      <Mailbox className="size-5 shrink-0 text-muted-foreground" />
+                      <div>
+                        <Label className={fontSize}>Newsletter Type(s)</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive {userPlan > 1 ? "monthly/weekly" : "monthly"}{" "}
+                          newsletters
+                        </p>
+                      </div>
+                    </div>
+                    <MultiSelect
+                      options={[...newsletterTypeOptions]}
+                      onValueChange={(value) => {
+                        handleUpdateNewsletterPrefs(
+                          "type",
+
+                          value.length === 0
+                            ? ["general"]
+                            : (value as NewsletterType[]),
+                        );
+                      }}
+                      value={newsletterInfo?.type || ["general"]}
+                      placeholder="Select account type(s)"
+                      variant="basic"
+                      maxCount={2}
+                      shortResults={isMobile}
+                      fallbackValue={["general"]}
+                      height={11}
+                      hasSearch={false}
+                      selectAll={false}
+                      className={cn(
+                        "w-full max-w-60 border-1.5 border-foreground/20 sm:h-11 sm:max-w-[19rem]",
+                      )}
+                      // tabIndex={step === "signUp" ? 5 : -1}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col items-center gap-2 md:flex-row md:justify-between">
+                    {" "}
+                    <div className="flex items-center gap-4">
+                      <Clock className="size-5 shrink-0 text-muted-foreground" />
+                      <div>
+                        <Label className={fontSize}>Preferred Frequency</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Emails about upcoming updates to the site, user
+                          surveys, and other news related to The Street Art List
+                        </p>
+                      </div>
+                    </div>
+                    <SelectSimple
+                      options={[...newsletterFrequencyOptions]}
+                      value={newsletterInfo?.frequency ?? "monthly"}
+                      onChangeAction={(value) =>
+                        handleUpdateNewsletterPrefs(
+                          "frequency",
+                          value as NewsletterFrequency,
+                        )
+                      }
+                      placeholder="Select frequency"
+                      className="w-full max-w-60 border-1.5 border-foreground/20 bg-card placeholder:text-foreground sm:h-11 sm:max-w-40"
+                      itemClassName="justify-center"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="appearance">
@@ -863,7 +1092,7 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 {/* <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-4'>
-                    <Moon className='h-5 w-5 text-muted-foreground' />
+                    <Moon className='size-5 text-muted-foreground' />
                     <div>
                       <Label className={fontSize}>Dark Mode</Label>
                       <p className='text-sm text-muted-foreground'>
@@ -871,12 +1100,13 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
-                  <Switch defaultChecked disabled />
+                  <Switch defaultChecked disabled   
+ />
                 </div> */}
                 <Separator />
                 <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                   <div className="flex items-center gap-4">
-                    <Palette className="h-5 w-5 text-muted-foreground" />
+                    <Palette className="size-5 text-muted-foreground" />
                     <div>
                       <Label className={fontSize}>Theme Color</Label>
                       <p className="text-sm text-muted-foreground">
@@ -925,7 +1155,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                   <div className="flex items-center gap-4">
-                    <FontSizeIcon className="h-5 w-5 text-muted-foreground" />
+                    <FontSizeIcon className="size-5 text-muted-foreground" />
                     <div>
                       <Label className={fontSize}>Text Size</Label>
                       <p className="text-sm text-muted-foreground">
@@ -974,7 +1204,7 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   {/* <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
-                      <Lock className='h-5 w-5 text-muted-foreground' />
+                      <Lock className='size-5 text-muted-foreground' />
                       <div>
                         <Label className={fontSize}>Two-Factor Authentication</Label>
                         <p className='text-sm text-muted-foreground'>
@@ -990,7 +1220,7 @@ export default function SettingsPage() {
                   <Separator />*/}
                   <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="flex items-center gap-4">
-                      <Shield className="h-5 w-5 text-muted-foreground" />
+                      <Shield className="size-5 text-muted-foreground" />
                       <div>
                         <Label className={fontSize}>Password</Label>
                         <p className="text-sm text-muted-foreground">

@@ -1,3 +1,7 @@
+import {
+  NewsletterFrequency,
+  NewsletterType,
+} from "@/constants/newsletterConsts";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "~/convex/_generated/server";
@@ -149,10 +153,10 @@ export const updateNewsletterStatus = mutation({
     type: v.optional(
       v.array(v.union(v.literal("openCall"), v.literal("general"))),
     ),
-    userPlan: v.number(),
+    userPlan: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { email, newsletter, frequency, type } = args;
+    const { email, newsletter, frequency, type, userPlan } = args;
 
     console.log(args);
     const wasCanceled = newsletter === false;
@@ -186,6 +190,8 @@ export const updateNewsletterStatus = mutation({
         lastAttempt: Date.now(),
         ...(frequency && { frequency }),
         ...(type && { type }),
+        ...(userPlan &&
+          userPlan !== newsletterSubscription.userPlan && { userPlan }),
       });
     } else if (emailSubscription) {
       await ctx.db.patch(emailSubscription._id, {
@@ -194,6 +200,8 @@ export const updateNewsletterStatus = mutation({
         lastAttempt: Date.now(),
         ...(frequency && { frequency }),
         ...(type && { type }),
+        ...(userPlan &&
+          userPlan !== emailSubscription.userPlan && { userPlan }),
       });
     }
 
@@ -209,6 +217,10 @@ export const getNewsletterStatus = query({
   },
   handler: async (ctx, args) => {
     const { email, userId, subscriberId } = args;
+    const defaultValues = {
+      frequency: "monthly" as NewsletterFrequency,
+      type: ["general"] as NewsletterType[],
+    };
 
     const newsletterSubscription = subscriberId
       ? await ctx.db
@@ -231,10 +243,14 @@ export const getNewsletterStatus = query({
           .unique()
       : null;
 
-    if (!userSubscription && !emailSubscription && !subscriberId) {
-      // console.error("No newsletter subscription found: " + email);
-      throw new ConvexError("No newsletter subscription found: " + email);
-    }
+    // if (!userSubscription && !emailSubscription && !subscriberId) {
+    //   // console.error("No newsletter subscription found: " + email);
+    //   return {
+    //     newsletter: false,
+    //     status: "no_subscription_found",
+    //     ...defaultValues,
+    //   };
+    // }
 
     if (
       newsletterSubscription?.newsletter === false ||
@@ -244,15 +260,25 @@ export const getNewsletterStatus = query({
       // console.error(
       //   "No newsletter subscription found: " + email + " / " + subscriberId,
       // );
-      throw new ConvexError(
-        "No newsletter subscription found: " + email + " / " + subscriberId,
-      );
+      // throw new ConvexError(
+      //   "No newsletter subscription found: " + email + " / " + subscriberId,
+      // );
+      return {
+        newsletter: false,
+        status: "no_subscription_found",
+        ...defaultValues,
+      };
     }
-    if (subscriberId && !newsletterSubscription) {
-      throw new ConvexError(
-        "No newsletter subscription found: " + subscriberId,
-      );
-    }
+    // if (subscriberId && !newsletterSubscription) {
+    //   // throw new ConvexError(
+    //   //   "No newsletter subscription found: " + subscriberId,
+    //   // );
+    //   return {
+    //     newsletter: false,
+    //     status: "no_subscription_found",
+    //     ...defaultValues,
+    //   };
+    // }
     if (newsletterSubscription) {
       if (newsletterSubscription.userId && !userId) {
         throw new ConvexError("Log in to update your newsletter preferences");
@@ -282,6 +308,12 @@ export const getNewsletterStatus = query({
         frequency: emailSubscription.frequency ?? "monthly",
         type: emailSubscription.type ?? [],
         email: emailSubscription.email ?? "",
+      };
+    } else if (!userSubscription) {
+      return {
+        newsletter: false,
+        status: "no_subscription_found",
+        ...defaultValues,
       };
     }
 

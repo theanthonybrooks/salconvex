@@ -141,6 +141,7 @@ interface MultiSelectProps
   tabIndex?: number;
   abbreviated?: boolean;
   showIcon?: boolean;
+  fallbackValue?: string[];
 }
 
 export const MultiSelect = React.forwardRef<
@@ -149,6 +150,7 @@ export const MultiSelect = React.forwardRef<
 >(
   (
     {
+      fallbackValue,
       limit,
       id,
       value,
@@ -205,17 +207,25 @@ export const MultiSelect = React.forwardRef<
       if (lockedValue.includes(option)) return;
       const isSelected = selectedValues.includes(option);
       if (!isSelected && limit && selectedValues.length >= limit) return;
-      const newSelectedValues = selectedValues.includes(option)
+      let newSelectedValues = selectedValues.includes(option)
         ? selectedValues.filter((value) => value !== option)
         : [...selectedValues, option];
+
+      if (newSelectedValues.length === 0 && fallbackValue?.length) {
+        newSelectedValues = [...fallbackValue];
+      }
       setSelectedValues(newSelectedValues);
       onValueChange(newSelectedValues);
     };
 
     const handleClear = useCallback(() => {
-      setSelectedValues([...lockedValue]);
+      let newSelectedValues = [...lockedValue];
+      if (newSelectedValues.length === 0 && fallbackValue?.length) {
+        newSelectedValues = [...fallbackValue];
+      }
+      setSelectedValues(newSelectedValues);
       onValueChange([]);
-    }, [lockedValue, onValueChange]);
+    }, [lockedValue, onValueChange, fallbackValue]);
 
     const handleTogglePopover = () => {
       setIsPopoverOpen((prev) => !prev);
@@ -287,10 +297,10 @@ export const MultiSelect = React.forwardRef<
             disabled={disabled}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-11 w-full min-w-40 items-center justify-between truncate rounded-md border border-red-500 bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
+              "flex h-11 w-full min-w-40 items-center justify-between truncate rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
-              className,
               variant === "basic" ? "border-foreground" : "",
+              className,
             )}
           >
             {selectedValues.length > 0 ? (
@@ -499,7 +509,6 @@ export const MultiSelect = React.forwardRef<
                           limit &&
                           selectedValues.length >= limit
                         );
-                        console.log(isDisabled, "if");
                         return (
                           <CommandItem
                             ref={idx === 0 ? firstItemRef : null}

@@ -9,7 +9,7 @@ import {
 import { footerCRText } from "@/constants/text";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
@@ -64,6 +64,7 @@ export default function Footer({ className }: { className?: string }) {
   const [subAction, setSubAction] = useState("cta");
   const subscription = useQuery(api.subscriptions.getUserSubscription);
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
+  const updateNotifications = useMutation(api.users.updateUserNotifications);
   // const subscribeToNewsletter = useMutation(
   //   api.newsletter.subscriber.subscribeToNewsletter,
   // );
@@ -112,6 +113,9 @@ export default function Footer({ className }: { className?: string }) {
         toast.success("You're now subscribed to the newsletter!");
         setSubAction("subscribed");
       }
+      await updateNotifications({
+        newsletter: true,
+      });
     } catch (err: unknown) {
       console.error(err);
       toast.error(

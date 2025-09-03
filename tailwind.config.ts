@@ -119,6 +119,9 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      ringWidth: {
+        "1.5": "1.5px",
+      },
       boxShadow: {
         sxl: "-7px 7px 0 0 #000000",
         slgHover: "-4px 4px 0 0 #000000",
