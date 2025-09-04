@@ -337,9 +337,10 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
+input:not(:placeholder-shown):not(:valid):not(:read-only):not(:focus),
 .invalid-field {
-  @apply border-red-600 ring-1 ring-red-600;
+  @apply border-red-600;
+  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2); /* outer offset outline */
 }
 
 .mt-mobile {
@@ -581,10 +582,6 @@ input {
   -moz-appearance: none;
   appearance: none;
   font-size: 16px;
-}
-
-input:not(:placeholder-shown):not(:valid):not(:read-only) {
-  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2); /* outer offset outline */
 }
 
 ::selection {

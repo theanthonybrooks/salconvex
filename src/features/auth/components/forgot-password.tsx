@@ -9,7 +9,14 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   InputOTP,
@@ -18,6 +25,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { supportEmail } from "@/constants/siteInfo";
 import { ForgotPasswordSchema, ResetPasswordSchema } from "@/schemas/auth";
@@ -25,7 +33,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { Eye, EyeOff, InfoIcon, LoaderCircle } from "lucide-react";
+import { InfoIcon, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,7 +58,6 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
   // const [otp, setOtp] = useState<string>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [error, setError] = useState<ReactNode | undefined>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
 
   const forgotForm = useForm<z.infer<typeof ForgotPasswordSchema>>({
@@ -380,55 +387,28 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
               initialTime={60}
               onResend={() => handleForgotSubmit({ email })}
             />
-            <div className="mb-6 flex flex-col space-y-2.5">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="newPassword"
-                  className="text-base text-foreground"
-                >
-                  Enter your new password
-                </Label>
-              </div>
-              <div className="relative">
-                <Input
-                  id="newPassword"
-                  {...resetForm.register("newPassword")}
-                  name="newPassword"
-                  disabled={pending}
-                  // value={password}
-                  // onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder=" "
-                  type={showPassword ? "text" : "password"}
-                  // inputHeight='sm'
-                  className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
-                  required
-                  tabIndex={4}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
-                  tabIndex={5}
-                >
-                  {showPassword ? (
-                    <Eye className="size-4 text-foreground" />
-                  ) : (
-                    <EyeOff className="size-4 text-foreground" />
-                  )}
-                </button>
-              </div>
-              {resetErrors.newPassword && (
-                <p className="text-sm text-red-500">
-                  {resetErrors.newPassword.message}
-                </p>
+            <FormField
+              control={resetForm.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-base">
+                    Enter your new password
+                  </FormLabel>
+
+                  <FormControl>
+                    <PasswordInput
+                      isPending={pending}
+                      tabIndex={4}
+                      visibilityTabIndex={5}
+                      field={field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            {/* <input
-              type='hidden'
-              value={step.email}
-              {...resetForm.register("email")}
-            /> */}
-            {/* {error && <div className="error">{error}</div>} */}
+            />
+
             <div className="flex justify-center gap-x-4">
               <DialogCloseBtn
                 title="Are you sure?"

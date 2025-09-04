@@ -1,8 +1,24 @@
-import * as z from "zod";
-
-const passwordValidation = new RegExp(
+import { z } from "zod";
+export const passwordValidation = new RegExp(
   /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
 );
+
+export const passwordRules = [
+  { label: "At least 8 characters", test: (pw: string) => pw.length >= 8 },
+  {
+    label: "At least one uppercase letter",
+    test: (pw: string) => /[A-Z]/.test(pw),
+  },
+  {
+    label: "At least one lowercase letter",
+    test: (pw: string) => /[a-z]/.test(pw),
+  },
+  { label: "At least one number", test: (pw: string) => /[0-9]/.test(pw) },
+  {
+    label: "At least one symbol",
+    test: (pw: string) => /[^A-Za-z0-9]/.test(pw),
+  },
+];
 
 export const LoginSchema = z.object({
   email: z
@@ -75,6 +91,8 @@ export const UpdateUserSchema = z.object({
   organizationName: z.string().optional(),
 });
 
+export type UpdateUserSchemaValues = z.infer<typeof UpdateUserSchema>;
+
 export const ResendOtpSchema = z.object({
   email: z
     .email({ message: "Email is required" })
@@ -104,16 +122,48 @@ export const ResetPasswordSchema = z.object({
         "Password must contain at least one uppercase letter, one number, and one symbol.",
     }),
 });
-export const UpdatePasswordSchema = z.object({
-  oldPassword: z.string().min(8, { message: "Password is required" }),
-  newPassword: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." })
-    .regex(passwordValidation, {
-      message:
-        "Password must contain at least one uppercase letter, one number, and one symbol.",
-    }),
-});
+export const UpdatePasswordSchema = z
+  .object({
+    oldPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .regex(passwordValidation, {
+        message:
+          "Password must contain at least one uppercase letter, one number, and one symbol.",
+      }),
+    newPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .regex(passwordValidation, {
+        message:
+          "Password must contain at least one uppercase letter, one number, and one symbol.",
+      }),
+    repeatNewPassword: z
+      .string()
+      .regex(passwordValidation, {
+        message:
+          "Password must contain at least one uppercase letter, one number, and one symbol.",
+      })
+      .min(8, { message: "Password must be at least 8 characters." }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.repeatNewPassword) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Passwords do not match",
+        path: ["repeatNewPassword"],
+      });
+    }
+    if (data.oldPassword === data.newPassword) {
+      ctx.addIssue({
+        code: "custom",
+        message: "New password cannot be the same as the old one.",
+        path: ["newPassword"],
+      });
+    }
+  });
+
+export type UpdatePasswordSchemaValues = z.infer<typeof UpdatePasswordSchema>;
 
 export const UpdateUserPrefsSchema = z.object({
   autoApply: z.boolean().optional(),

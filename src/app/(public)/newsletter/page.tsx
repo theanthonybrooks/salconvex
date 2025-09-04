@@ -397,7 +397,7 @@ const NewsletterPage = () => {
                         control={subUpdateform.control}
                         name="type"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem emptyError>
                             <fieldset className="mb-5 flex flex-col gap-3">
                               <legend className="mb-4 text-sm font-medium">
                                 Which newsletter(s) would you like to receive?
@@ -451,7 +451,7 @@ const NewsletterPage = () => {
                                 </Label>
                               </div>
                             </fieldset>
-                            <FormMessage emptyError />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />

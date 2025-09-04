@@ -32,6 +32,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
+import { PasswordInput } from "@/components/ui/password-input";
 import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
 import { onEmailChange } from "@/lib/privacy";
@@ -40,7 +41,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { ExternalLink, Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { ExternalLink, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -72,7 +73,6 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<React.ReactNode | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
-  const [showPassword, setShowPassword] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string[]>(["artist"]);
   const [submitData, setSubmitData] = useState<object>({});
   // const [step, setStep] = useState<StepType>("verifyOtp")
@@ -498,31 +498,16 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                       <FormLabel className="font-bold">Password</FormLabel>
 
                       <FormControl>
-                        <div className="relative">
-                          <Input
-                            disabled={isPending}
-                            {...field}
-                            placeholder={
-                              !showPassword ? "*********" : "ex. Password1!"
-                            }
-                            type={showPassword ? "text" : "password"}
-                            inputHeight="sm"
-                            variant="basic"
-                            tabIndex={step === "signUp" ? 4 : -1}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword((prev) => !prev)}
-                            className="absolute inset-y-0 right-0 flex items-center pr-3"
-                            tabIndex={-1}
-                          >
-                            {showPassword ? (
-                              <Eye className="size-4 text-foreground" />
-                            ) : (
-                              <EyeOff className="size-4 text-foreground" />
-                            )}
-                          </button>
-                        </div>
+                        <PasswordInput
+                          isPending={isPending}
+                          placeholder={{
+                            default: "*********",
+                            show: "Password1!",
+                          }}
+                          inputHeight="sm"
+                          tabIndex={step === "signUp" ? 4 : -1}
+                          field={field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -533,7 +518,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                   control={form.control}
                   name="accountType"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem emptyError>
                       <FormLabel className="font-bold">Account Type</FormLabel>
                       <FormControl>
                         <MultiSelect
@@ -587,7 +572,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                     control={form.control}
                     name="organizationName"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem emptyError>
                         <FormLabel className="font-bold">
                           Organization Name
                         </FormLabel>

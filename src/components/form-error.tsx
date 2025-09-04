@@ -5,9 +5,14 @@ import { FaExclamationTriangle } from "react-icons/fa";
 interface FormErrorProps {
   message?: ReactNode;
   className?: string;
+  icon?: boolean;
 }
 
-export const FormError = ({ message, className }: FormErrorProps) => {
+export const FormError = ({
+  message,
+  className,
+  icon = true,
+}: FormErrorProps) => {
   if (!message) return null;
   return (
     <div
@@ -16,7 +21,7 @@ export const FormError = ({ message, className }: FormErrorProps) => {
         className,
       )}
     >
-      <FaExclamationTriangle className={cn("size-10 shrink-0")} />
+      {icon && <FaExclamationTriangle className={cn("size-10 shrink-0")} />}
       <span className="text-balance text-center"> {message}</span>
     </div>
   );

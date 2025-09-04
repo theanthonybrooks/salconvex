@@ -21,11 +21,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { LoginFormValues, LoginSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import { Eye, EyeOff, Heart, LoaderCircle } from "lucide-react";
+import { Heart, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -65,7 +66,6 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const email = watch("email");
 
-  const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [isLoading, setIsLoading] = useState("");
   const [error, setError] = useState<React.ReactNode | undefined>("");
@@ -331,65 +331,17 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                       </span>
                     </div>
                     <FormControl>
-                      <div className="relative">
-                        <Input
-                          disabled={pending}
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          inputHeight="default"
-                          variant="basic"
-                          tabIndex={3}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((prev) => !prev)}
-                          className="group absolute inset-y-0 right-0 flex items-center pr-3"
-                          tabIndex={4}
-                        >
-                          {showPassword ? (
-                            <Eye className="size-4 rounded-sm text-foreground outline-offset-2 group-focus-visible:outline" />
-                          ) : (
-                            <EyeOff className="size-4 rounded-sm text-foreground outline-offset-2 group-focus-visible:outline" />
-                          )}
-                        </button>
-                      </div>
+                      <PasswordInput
+                        isPending={pending}
+                        tabIndex={3}
+                        visibilityTabIndex={4}
+                        field={field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {/* <div className="flex flex-col space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-foreground">
-                    Password
-                  </Label>
-                  <span
-                    onClick={forgotPasswordHandler}
-                    className="cursor-pointer text-sm text-foreground hover:underline"
-                  >
-                    Forgot password?
-                  </span>
-                </div>
-                <div className="relative">
-                  <Controller
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id="password"
-                        disabled={pending}
-                        placeholder=" "
-                        type={showPassword ? "text" : "password"}
-                        className="border-[1.5px] border-foreground bg-white text-foreground focus:bg-white"
-                        required
-                        tabIndex={4}
-                      />
-                    )}
-                  />
-              
-                </div>
-              </div> */}
             </div>
             <Button
               className="mt-8 w-full bg-white py-6 text-base focus-visible:bg-salPinkLt sm:mt-6 sm:py-0 md:bg-salYellow"

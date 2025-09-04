@@ -1,3 +1,5 @@
+//TODO: Redo the user pref loading. Just use the values as the defaultts for each input? they load async anyways and I don't need all of the useEffects. Just need to figure out how best to fire the handler, though I think that honestly shouldn't be much of an issue as each input can independently call it using a type prop.
+
 "use client";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
@@ -18,6 +20,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 import {
   AlertDialog,
@@ -45,8 +55,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   UpdatePasswordSchema,
+  UpdatePasswordSchemaValues,
   UpdateUserPrefsSchema,
   UpdateUserSchema,
+  UpdateUserSchemaValues,
 } from "@/schemas/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,8 +66,6 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
   Clock,
-  Eye,
-  EyeOff,
   Globe,
   LoaderCircle,
   Mail,
@@ -78,6 +88,8 @@ import { CanceledBanner } from "@/components/ui/canceled-banner";
 import { Link } from "@/components/ui/custom-link";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import { PasswordChecklist } from "@/components/ui/password-checklist";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   NewsletterFrequency,
   newsletterFrequencyOptions,
@@ -163,8 +175,7 @@ export default function SettingsPage() {
     undefined,
   );
   // const [selectedLanguage, setLanguage] = useState("en")
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -198,14 +209,35 @@ export default function SettingsPage() {
       setPending(false);
     }
   };
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<z.infer<typeof UpdatePasswordSchema>>({
+  const passwordForm = useForm<UpdatePasswordSchemaValues>({
     resolver: zodResolver(UpdatePasswordSchema),
+    defaultValues: {
+      oldPassword: "",
+      newPassword: "",
+      repeatNewPassword: "",
+    },
+    mode: "onChange",
+    delayError: 300,
   });
+
+  const { getFieldState, watch } = passwordForm;
+  const newPassword = watch("newPassword");
+  const newRepeatedPassword = watch("repeatNewPassword");
+  const currentPasswordState = getFieldState("oldPassword");
+  const newPasswordState = getFieldState("newPassword");
+  const currentPasswordValid =
+    !currentPasswordState?.invalid && currentPasswordState?.isDirty;
+  const newPasswordValid =
+    !newPasswordState?.invalid && newPasswordState?.isDirty;
+
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   reset,
+  //   formState: { errors },
+  // } = useForm<UpdatePasswordSchemaValues>({
+  //   resolver: zodResolver(UpdatePasswordSchema),
+  // });
 
   const {
     register: updateRegister,
@@ -304,9 +336,7 @@ export default function SettingsPage() {
     // });
   };
 
-  const handleUpdateUserSubmit = async (
-    data: z.infer<typeof UpdateUserSchema>,
-  ) => {
+  const handleUpdateUserSubmit = async (data: UpdateUserSchemaValues) => {
     setPending(true);
     setIsSaving(true);
     setError("");
@@ -371,7 +401,7 @@ export default function SettingsPage() {
 
         setPending(false);
         setSuccess("User updated!");
-        reset();
+        // reset();
       } catch (err: unknown) {
         if (err instanceof ConvexError) {
           setError(err.data || "An unexpected error occurred.");
@@ -388,7 +418,7 @@ export default function SettingsPage() {
         }, 5000);
       }
     },
-    [user, updateUserPrefs, reset], // Dependencies: Only re-create function if these change
+    [user, updateUserPrefs],
   );
 
   const handleUpdateNotifications = async (
@@ -472,7 +502,7 @@ export default function SettingsPage() {
   };
 
   const handleUpdatePasswordSubmit = async (
-    data: z.infer<typeof UpdatePasswordSchema>,
+    data: UpdatePasswordSchemaValues,
   ) => {
     setPending(true);
     setError("");
@@ -488,9 +518,16 @@ export default function SettingsPage() {
         userId: user.userId as Id<"users">,
         method: "userUpdate",
       });
-      // console.log("formData", formData)
+
       setPending(false);
       setSuccess("Password reset!");
+      passwordForm?.reset();
+
+      setTimeout(() => {
+        setSuccess("");
+        setError("");
+        setPwOpen(false);
+      }, 2000);
     } catch (err: unknown) {
       if (err instanceof ConvexError) {
         setError(err.data || "An unexpected error occurred.");
@@ -501,13 +538,6 @@ export default function SettingsPage() {
       }
     } finally {
       setPending(false);
-      reset();
-
-      setTimeout(() => {
-        setSuccess("");
-        setError("");
-        setPwOpen(false);
-      }, 2000);
     }
   };
 
@@ -1241,108 +1271,116 @@ export default function SettingsPage() {
                       <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                           <DialogTitle>Edit password</DialogTitle>
-                          <DialogDescription>
+                          <DialogDescription className="sr-only">
                             New password must be at least 8 characters long and
                             must include at least one number, one uppercase
                             letter, and one lowercase letter.
                           </DialogDescription>
-                          {success && <FormSuccess message={success} />}
-                          {error && <FormError message={error} />}
                         </DialogHeader>
 
-                        <form
-                          onSubmit={handleSubmit(handleUpdatePasswordSubmit)}
-                          className="space-y-2"
-                        >
-                          <div className="space-y-1">
-                            <Label
-                              htmlFor="current"
-                              className={cn("text-right", fontSize)}
-                            >
-                              Current password
-                            </Label>
-                            <div className="relative">
-                              <Input
-                                id="current"
-                                type={showCurrentPassword ? "text" : "password"}
-                                placeholder={
-                                  !showCurrentPassword
-                                    ? "********"
-                                    : "Old Password"
-                                }
-                                {...register("oldPassword", {
-                                  required: true,
-                                })}
-                                tabIndex={1}
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setShowCurrentPassword((prev) => !prev)
-                                }
-                                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                              >
-                                {showCurrentPassword ? (
-                                  <Eye className="size-4 text-foreground" />
-                                ) : (
-                                  <EyeOff className="size-4 text-foreground" />
-                                )}
-                              </button>
-                            </div>
-                            {errors.oldPassword && (
-                              <p className="text-sm text-destructive">
-                                {errors.oldPassword.message}
-                              </p>
+                        <Form {...passwordForm}>
+                          <form
+                            onSubmit={passwordForm?.handleSubmit(
+                              handleUpdatePasswordSubmit,
                             )}
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="new" className="text-right">
-                              New password
-                            </Label>
-                            <div className="relative">
-                              <Input
-                                id="new"
-                                type={showNewPassword ? "text" : "password"}
-                                placeholder={
-                                  !showNewPassword ? "********" : "New Password"
-                                }
-                                {...register("newPassword", {
-                                  required: true,
-                                })}
-                                tabIndex={2}
-                              />
-                              <button
-                                tabIndex={3}
-                                type="button"
-                                onClick={() =>
-                                  setShowNewPassword((prev) => !prev)
-                                }
-                                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                              >
-                                {showNewPassword ? (
-                                  <Eye className="size-4 text-foreground" />
-                                ) : (
-                                  <EyeOff className="size-4 text-foreground" />
-                                )}
-                              </button>
-                            </div>
-                            {errors.newPassword && (
-                              <p className="text-sm text-destructive">
-                                {errors.newPassword.message}
-                              </p>
-                            )}
-                          </div>
+                            className="space-y-2"
+                          >
+                            {success && <FormSuccess message={success} />}
+                            {error && <FormError message={error} />}
+                            <FormField
+                              control={passwordForm.control}
+                              name="oldPassword"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel
+                                    className={cn("text-right", fontSize)}
+                                  >
+                                    Current Password
+                                  </FormLabel>
 
-                          <DialogFooter>
-                            <Button
-                              className="mt-3 w-full"
-                              variant="salWithShadow"
-                              type="submit"
-                            >
-                              Update Password
-                            </Button>
-                          </DialogFooter>
-                        </form>
+                                  <FormControl>
+                                    <PasswordInput
+                                      isPending={pending}
+                                      tabIndex={1}
+                                      field={field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={passwordForm.control}
+                              name="newPassword"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel
+                                    className={cn("text-right", fontSize)}
+                                  >
+                                    New Password
+                                  </FormLabel>
+
+                                  <FormControl>
+                                    <PasswordInput
+                                      disabled={!currentPasswordValid}
+                                      isPending={pending}
+                                      tabIndex={2}
+                                      field={field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={passwordForm.control}
+                              name="repeatNewPassword"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel
+                                    className={cn("text-right", fontSize)}
+                                  >
+                                    Repeat New Password
+                                  </FormLabel>
+
+                                  <FormControl>
+                                    <PasswordInput
+                                      disabled={
+                                        !newPasswordValid ||
+                                        !currentPasswordValid
+                                      }
+                                      isPending={pending}
+                                      tabIndex={3}
+                                      field={field}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+
+                            {currentPasswordValid && (
+                              <PasswordChecklist
+                                password={newPassword ?? ""}
+                                checkPassword={newRepeatedPassword ?? ""}
+                              />
+                            )}
+
+                            <DialogFooter>
+                              <Button
+                                className="mt-3 w-full"
+                                variant={
+                                  passwordForm.formState?.isValid
+                                    ? "salWithShadow"
+                                    : "salWithShadowHidden"
+                                }
+                                type="submit"
+                                disabled={!passwordForm.formState?.isValid}
+                              >
+                                Update Password
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </Form>
                       </DialogContent>
                     </Dialog>
                   </div>

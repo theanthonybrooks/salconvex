@@ -12,6 +12,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 
+import { FormError } from "@/components/form-error";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
@@ -53,7 +54,7 @@ const useFormField = () => {
     throw new Error("useFormField should be used within <FormField>");
   }
 
-  const { id } = itemContext;
+  const { id, emptyError } = itemContext;
 
   return {
     id,
@@ -62,12 +63,14 @@ const useFormField = () => {
     formDescriptionId: `${id}-form-item-description`,
     formMessageId: `${id}-form-item-message`,
     value,
+    emptyError,
     ...fieldState,
   };
 };
 
 type FormItemContextValue = {
   id: string;
+  emptyError?: boolean;
 };
 
 const FormItemContext = React.createContext<FormItemContextValue>(
@@ -76,12 +79,14 @@ const FormItemContext = React.createContext<FormItemContextValue>(
 
 const FormItem = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & {
+    emptyError?: boolean;
+  }
+>(({ className, emptyError = false, ...props }, ref) => {
   const id = React.useId();
 
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={{ id, emptyError }}>
       <div ref={ref} className={cn("space-y-2", className)} {...props} />
     </FormItemContext.Provider>
   );
@@ -89,12 +94,13 @@ const FormItem = React.forwardRef<
 FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const { error, formItemId, value } = useFormField();
+  const { error, formItemId, value, emptyError } = useFormField();
 
-  const hasErrorAndValue = error && String(value)?.length > 0;
+  const hasErrorAndValue =
+    error && ((!emptyError && String(value)?.length > 0) || emptyError);
 
   return (
     <Label
@@ -108,11 +114,20 @@ const FormLabel = React.forwardRef<
 FormLabel.displayName = "FormLabel";
 
 const FormControl = React.forwardRef<
-  React.ElementRef<typeof Slot>,
+  React.ComponentRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const {
+    value,
+    error,
+    formItemId,
+    formDescriptionId,
+    formMessageId,
+    emptyError,
+  } = useFormField();
+
+  const hasErrorAndValue =
+    error && ((!emptyError && String(value)?.length > 0) || emptyError);
 
   return (
     <Slot
@@ -124,6 +139,7 @@ const FormControl = React.forwardRef<
           : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
+      className={cn(hasErrorAndValue && "invalid-field")}
       {...props}
     />
   );
@@ -149,11 +165,9 @@ FormDescription.displayName = "FormDescription";
 
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement> & {
-    emptyError?: boolean;
-  }
->(({ className, children, emptyError = false, ...props }, ref) => {
-  const { error, formMessageId, value } = useFormField();
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, children, ...props }, ref) => {
+  const { error, formMessageId, value, emptyError } = useFormField();
   const hasErrorAndValue =
     (!emptyError && String(value)?.length > 0) || emptyError;
   const body = error && hasErrorAndValue ? String(error.message) : children;
@@ -173,10 +187,46 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
+const FormErrors = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  const { formState, getValues } = useFormContext();
+  const errors = formState.errors;
+
+  if (!errors || Object.keys(errors).length === 0) return null;
+
+  // First error entry
+  const [firstField, firstError] = Object.entries(errors)[0];
+
+  // Current value of the errored field
+  const value = getValues(firstField);
+
+  // See if emptyError was set on this field’s FormItem (optional context lookup)
+  // If you want to support per-field emptyError here, you’ll need to extend
+  // your FormItem/FormField context to expose it globally.
+  const shouldShow = String(value)?.length > 0 || /* fallback */ false;
+
+  if (!shouldShow) return null;
+
+  return (
+    <FormError
+      message={
+        <div ref={ref} className={cn(className)} {...props}>
+          {String(firstError?.message ?? `${firstField} is invalid`)}
+        </div>
+      }
+      icon={false}
+    />
+  );
+});
+FormErrors.displayName = "FormErrors";
+
 export {
   Form,
   FormControl,
   FormDescription,
+  FormErrors,
   FormField,
   FormItem,
   FormLabel,

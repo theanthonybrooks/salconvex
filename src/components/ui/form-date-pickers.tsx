@@ -480,6 +480,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="month"
+                        placeholder={
+                          noProdStart ? "(Flexible/Open)" : undefined
+                        }
+                        disabled={noProdStart}
                         // value={field.value as CustomDatePickerProps["value"]}
                         value={watchedStart as CustomDatePickerProps["value"]}
                         onChange={(date) => field.onChange(toYearMonth(date))}
@@ -528,6 +532,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                         pickerType="year"
                         value={watchedStart as CustomDatePickerProps["value"]}
                         // onChange={(date) => field.onChange(toYear(date))}
+                        placeholder={
+                          noProdStart ? "(Flexible/Open)" : undefined
+                        }
+                        disabled={noProdStart}
                         onChange={(date) => {
                           const y = toYear(date);
                           field.onChange(y);
@@ -585,6 +593,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <CustomDatePicker
                         isAdmin={isAdmin}
                         pickerType="season"
+                        placeholder={
+                          noProdStart ? "(Flexible/Open)" : undefined
+                        }
+                        disabled={noProdStart}
                         value={watchedStart as CustomDatePickerProps["value"]}
                         onChange={(date) => {
                           field.onChange(toSeason(date));
