@@ -4,20 +4,9 @@ import {
   lastUpdatedTermsRaw,
   supportEmail,
 } from "@/constants/siteInfo";
-import { formatDateWithOrdinal } from "@/lib/dateFns";
+import { DateWrapper } from "@/lib/dateFns";
 
-export function LastUpdated() {
-  return (
-    <time
-      dateTime={lastUpdatedTermsRaw}
-      dangerouslySetInnerHTML={{
-        __html: formatDateWithOrdinal(lastUpdatedTermsRaw),
-      }}
-    />
-  );
-}
-
-const TermsPage = () => {
+export default function TermsPage() {
   return (
     <div className="mx-auto mb-10 mt-8 flex h-full w-full max-w-[80vw] flex-col gap-y-3 px-4 lg:max-w-[60vw]">
       <span className="mb-8">
@@ -25,7 +14,7 @@ const TermsPage = () => {
           Terms of Service
         </h1>
         <p className="text-center text-sm">
-          Last updated: <LastUpdated />
+          Last updated: <DateWrapper rawTerm={lastUpdatedTermsRaw} />
         </p>
       </span>
 
@@ -260,6 +249,4 @@ const TermsPage = () => {
       </p>
     </div>
   );
-};
-
-export default TermsPage;
+}

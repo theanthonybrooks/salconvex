@@ -399,17 +399,6 @@ export function formatToZonedISOString(
   return zoned.toISO() ?? "";
 }
 
-// export const toDate = (
-//   value: string | Date | null | undefined,
-// ): Date | null => {
-//   // console.log("toDate", value);
-//   if (!value) return null;
-//   if (value instanceof Date) return value;
-//   const date = new Date(value);
-//   // console.log("toDate", date);
-//   return isNaN(date.getTime()) ? null : date;
-// };
-
 export const toDate = (
   value: string | Date | null | undefined,
 ): Date | null => {
@@ -566,4 +555,15 @@ export function formatDatePlain(dateString: string): string {
   const year = date.getFullYear();
   const month = date.toLocaleString("default", { month: "long" });
   return `${month} ${day}, ${year}`;
+}
+
+export function DateWrapper({ rawTerm }: { rawTerm: string }) {
+  return (
+    <time
+      dateTime={rawTerm}
+      dangerouslySetInnerHTML={{
+        __html: formatDateWithOrdinal(rawTerm),
+      }}
+    />
+  );
 }

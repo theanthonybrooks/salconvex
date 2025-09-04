@@ -4,20 +4,9 @@ import {
   lastUpdatedPrivacyRaw,
   siteUrl,
 } from "@/constants/siteInfo";
-import { formatDateWithOrdinal } from "@/lib/dateFns";
+import { DateWrapper } from "@/lib/dateFns";
 
-export function LastUpdated() {
-  return (
-    <time
-      dateTime={lastUpdatedPrivacyRaw}
-      dangerouslySetInnerHTML={{
-        __html: formatDateWithOrdinal(lastUpdatedPrivacyRaw),
-      }}
-    />
-  );
-}
-
-const PrivacyPage = () => {
+export default function PrivacyPage() {
   return (
     <div className="mx-auto mb-10 mt-8 flex h-full w-full max-w-[80vw] flex-col gap-y-3 px-4 lg:max-w-[60vw]">
       <span className="mb-8">
@@ -25,7 +14,7 @@ const PrivacyPage = () => {
           Privacy Policy
         </h1>
         <p className="text-center text-sm">
-          Last updated: <LastUpdated />
+          Last updated: <DateWrapper rawTerm={lastUpdatedPrivacyRaw} />
         </p>
       </span>
       <section className="mb-5 rounded-lg border-2 border-dotted border-foreground/20 p-3">
@@ -554,6 +543,4 @@ const PrivacyPage = () => {
       </section>
     </div>
   );
-};
-
-export default PrivacyPage;
+}
