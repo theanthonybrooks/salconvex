@@ -158,9 +158,6 @@ export default function SettingsPage() {
   const uploadProfileImage = useMutation(api.uploads.user.uploadProfileImage);
   const removeProfileImage = useMutation(api.uploads.user.removeProfileImage);
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
-  const [selectedTimezone, setTimezone] = useState<string | undefined>(
-    undefined,
-  );
 
   const [pwOpen, setPwOpen] = useState(false);
   const { setTheme, theme } = useTheme();
@@ -741,8 +738,10 @@ export default function SettingsPage() {
                         "gmtAbbreviation",
                         "iana",
                       ]}
-                      value={selectedTimezone ?? "Europe/Berlin"}
-                      onChange={setTimezone}
+                      value={userPrefs?.timezone ?? ""}
+                      onChange={(value) =>
+                        handleUpdateUserPrefs({ timezone: value })
+                      }
                       className={cn(
                         fontSize === "text-base" ? "sm:text-base" : "",
                         "sm:w-[350px]",
