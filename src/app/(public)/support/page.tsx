@@ -59,6 +59,7 @@ const SupportPage = () => {
       message: "",
     },
     mode: "onChange",
+    delayError: 1000,
   });
 
   const {

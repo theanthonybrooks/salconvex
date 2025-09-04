@@ -92,6 +92,7 @@ const NewsletterPage = () => {
       email: user?.email ?? "",
     },
     mode: "onChange",
+    delayError: 1000,
   });
 
   const {
@@ -148,6 +149,7 @@ const NewsletterPage = () => {
     },
     mode: "onChange",
     shouldUnregister: false,
+    delayError: 1000,
   });
 
   const {
@@ -291,7 +293,6 @@ const NewsletterPage = () => {
     setError("");
     setSuccess("");
   };
-
 
   return (
     <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">

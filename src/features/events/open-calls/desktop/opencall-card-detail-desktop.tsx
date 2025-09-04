@@ -338,7 +338,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 {`$${basicInfo?.appFee}`}
               </p>
             )}
-            {bothValid && !isOwner && (
+            {bothValid && (!isOwner || isAdmin) && (
               <>
                 <ApplyButton
                   user={user}
