@@ -352,20 +352,23 @@ export const CommandMenuCustom = <T extends CommandItem>({
                       {groupItems.map((item) => (
                         <Command.Item
                           key={item.path}
-                          className="group flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
+                          className="group flex cursor-pointer items-start gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
                           onSelect={() => router.push(item.path)}
                         >
-                          {item.icon && <item.icon className="h-4 w-4" />}
-                          <Link
-                            href={item.path}
-                            prefetch={true}
-                            onClick={handleLinkClick}
-                          >
-                            <span>{item.title}</span>
-                          </Link>
+                          <div className={cn("flex items-center gap-2")}>
+                            {item.icon && <item.icon className="size-4" />}
+                            <Link
+                              href={item.path}
+                              prefetch={true}
+                              onClick={handleLinkClick}
+                              className="text-nowrap"
+                            >
+                              <span>{item.title}</span>
+                            </Link>
+                          </div>
                           {item.desc && !isMobile && (
-                            <span className="inline-flex items-center gap-2 text-stone-600 opacity-0 transition-opacity ease-in-out group-hover:opacity-100">
-                              <DashIcon />
+                            <span className="inline-flex gap-2 text-stone-600 opacity-0 transition-opacity ease-in-out group-hover:opacity-100">
+                              <DashIcon className={cn("mt-1")} />
                               <span>{item.desc}</span>
                             </span>
                           )}
