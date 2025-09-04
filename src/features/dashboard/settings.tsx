@@ -1,5 +1,3 @@
-//TODO: Redo the user pref loading. Just use the values as the defaultts for each input? they load async anyways and I don't need all of the useEffects. Just need to figure out how best to fire the handler, though I think that honestly shouldn't be much of an issue as each input can independently call it using a type prop.
-
 "use client";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
@@ -56,7 +54,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   UpdatePasswordSchema,
   UpdatePasswordSchemaValues,
-  UpdateUserPrefsSchema,
+  UpdateUserPrefsSchemaValues,
   UpdateUserSchema,
   UpdateUserSchemaValues,
 } from "@/schemas/auth";
@@ -74,7 +72,7 @@ import {
   Palette,
   Shield,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -104,7 +102,6 @@ import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { FontSizeIcon } from "@radix-ui/react-icons";
 import { usePreloadedQuery } from "convex/react";
 import { useTheme } from "next-themes";
-import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -164,16 +161,10 @@ export default function SettingsPage() {
   const [selectedTimezone, setTimezone] = useState<string | undefined>(
     undefined,
   );
-  const [selectedCurrency, setCurrency] = useState<string | undefined>(
-    undefined,
-  );
-  const [selectedAutoApply, setAutoApply] = useState<boolean>(true);
+
   const [pwOpen, setPwOpen] = useState(false);
   const { setTheme, theme } = useTheme();
-  const [selectedTheme, setThemePref] = useState<string | undefined>(undefined);
-  const [selectedFontSize, setFontSize] = useState<string | undefined>(
-    undefined,
-  );
+
   // const [selectedLanguage, setLanguage] = useState("en")
 
   const [pending, setPending] = useState(false);
@@ -183,14 +174,6 @@ export default function SettingsPage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [hoverSave, setHoverSave] = useState(false);
-
-  const prevPrefs = useRef({
-    autoApply: selectedAutoApply,
-    timezone: selectedTimezone,
-    currency: selectedCurrency,
-    theme: selectedTheme,
-    fontSize: selectedFontSize,
-  });
 
   const DeleteAccount = useMutation(api.users.deleteAccount);
   const onDeleteAccount = async () => {
@@ -229,15 +212,6 @@ export default function SettingsPage() {
     !currentPasswordState?.invalid && currentPasswordState?.isDirty;
   const newPasswordValid =
     !newPasswordState?.invalid && newPasswordState?.isDirty;
-
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   reset,
-  //   formState: { errors },
-  // } = useForm<UpdatePasswordSchemaValues>({
-  //   resolver: zodResolver(UpdatePasswordSchema),
-  // });
 
   const {
     register: updateRegister,
@@ -362,7 +336,6 @@ export default function SettingsPage() {
       });
       updateReset();
     } catch (err: unknown) {
-      // Type assertion: Explicitly check if it's a ConvexError
       if (err instanceof ConvexError) {
         toast.error(err.data || "An unexpected error occurred.", {
           autoClose: 2000,
@@ -381,45 +354,35 @@ export default function SettingsPage() {
     }
   };
 
-  const handleUpdateUserPrefs = useCallback(
-    async (data: z.infer<typeof UpdateUserPrefsSchema>) => {
-      setPending(true);
-      setError("");
+  const handleUpdateUserPrefs = async (
+    update: Partial<UpdateUserPrefsSchemaValues>,
+  ) => {
+    setPending(true);
+    setError("");
 
-      if (!user || !user.email) {
-        throw new Error("No user found");
-      }
-      try {
-        await updateUserPrefs({
-          autoApply: data.autoApply ?? true,
-          currency: data.currency ?? "",
-          timezone: data.timezone ?? "",
-          language: data.language ?? "",
-          theme: data.theme ?? "",
-          fontSize: data.fontSize ?? "",
-        });
+    if (!user) {
+      throw new Error("No user found");
+    }
 
-        setPending(false);
-        setSuccess("User updated!");
-        // reset();
-      } catch (err: unknown) {
-        if (err instanceof ConvexError) {
-          setError(err.data || "An unexpected error occurred.");
-        } else if (err instanceof Error) {
-          setError(err.message || "An unexpected error occurred.");
-        } else {
-          setError("An unknown error occurred.");
-        }
-      } finally {
-        setPending(false);
-        setTimeout(() => {
-          setSuccess("");
-          setError("");
-        }, 5000);
+    try {
+      await updateUserPrefs(update);
+      setSuccess("User updated!");
+    } catch (err: unknown) {
+      if (err instanceof ConvexError) {
+        setError(err.data || "An unexpected error occurred.");
+      } else if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred.");
+      } else {
+        setError("An unknown error occurred.");
       }
-    },
-    [user, updateUserPrefs],
-  );
+    } finally {
+      setPending(false);
+      setTimeout(() => {
+        setSuccess("");
+        setError("");
+      }, 5000);
+    }
+  };
 
   const handleUpdateNotifications = async (
     type: "newsletter" | "general" | "applications",
@@ -452,7 +415,6 @@ export default function SettingsPage() {
         }
       }
 
-      // console.log("formData", formData)
       setPending(false);
       setSuccess("Successfully updated user preferences!");
     } catch (error) {
@@ -563,55 +525,6 @@ export default function SettingsPage() {
       setPending(false);
     }
   };
-
-  useEffect(() => {
-    if (userPrefs) {
-      setTimezone(userPrefs.timezone ?? "GMT");
-      setCurrency(userPrefs.currency ?? "USD");
-      setThemePref(userPrefs.theme ?? "light");
-      setFontSize(userPrefs.fontSize ?? "normal");
-      setAutoApply(userPrefs.autoApply ?? true);
-      // setTheme(userPrefs.theme ?? "light")
-    }
-  }, [userPrefs]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      const hasChanged =
-        prevPrefs.current.timezone !== selectedTimezone ||
-        prevPrefs.current.currency !== selectedCurrency ||
-        prevPrefs.current.theme !== selectedTheme ||
-        prevPrefs.current.fontSize !== selectedFontSize ||
-        prevPrefs.current.autoApply !== selectedAutoApply;
-
-      if (hasChanged) {
-        handleUpdateUserPrefs({
-          currency: selectedCurrency,
-          timezone: selectedTimezone,
-          theme: selectedTheme,
-          fontSize: selectedFontSize,
-          autoApply: selectedAutoApply,
-        });
-
-        prevPrefs.current = {
-          timezone: selectedTimezone,
-          currency: selectedCurrency,
-          theme: selectedTheme,
-          fontSize: selectedFontSize,
-          autoApply: selectedAutoApply,
-        };
-      }
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [
-    selectedTheme,
-    selectedFontSize,
-    selectedTimezone,
-    selectedCurrency,
-    selectedAutoApply,
-    handleUpdateUserPrefs,
-  ]);
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -920,9 +833,9 @@ export default function SettingsPage() {
                         </p>
                       </div>
                       <Select
-                        value={String(selectedAutoApply)}
+                        value={String(userPrefs?.autoApply)}
                         onValueChange={(value) =>
-                          setAutoApply(value === "true")
+                          handleUpdateUserPrefs({ autoApply: value === "true" })
                         }
                       >
                         <SelectTrigger
@@ -1121,19 +1034,6 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                {/* <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-4'>
-                    <Moon className='size-5 text-muted-foreground' />
-                    <div>
-                      <Label className={fontSize}>Dark Mode</Label>
-                      <p className='text-sm text-muted-foreground'>
-                        Toggle dark mode <i>(coming soon)</i>
-                      </p>
-                    </div>
-                  </div>
-                  <Switch defaultChecked disabled   
- />
-                </div> */}
                 <Separator />
                 <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                   <div className="flex items-center gap-4">
@@ -1147,10 +1047,10 @@ export default function SettingsPage() {
                   </div>
 
                   <Select
-                    value={selectedTheme ?? theme}
+                    value={userPrefs?.theme ?? theme}
                     onValueChange={(value) => {
                       setTheme(value);
-                      setThemePref(value);
+                      handleUpdateUserPrefs({ theme: value });
                     }}
                   >
                     <SelectTrigger
@@ -1196,9 +1096,9 @@ export default function SettingsPage() {
                   </div>
 
                   <Select
-                    value={selectedFontSize ?? "normal"}
+                    value={userPrefs?.fontSize ?? "normal"}
                     onValueChange={(value) => {
-                      setFontSize(value);
+                      handleUpdateUserPrefs({ fontSize: value });
                     }}
                   >
                     <SelectTrigger

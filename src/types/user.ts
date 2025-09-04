@@ -1,5 +1,26 @@
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
+export const userPrefValues = [
+  { label: "Auto Apply", value: "autoApply", type: "boolean" },
+  { label: "Currency", value: "currency", type: "string" },
+  { label: "Timezone", value: "timezone", type: "string" },
+  // { label: "Language", value: "language", type: "string" },
+  { label: "Theme", value: "theme", type: "string" },
+  { label: "Font Size", value: "fontSize", type: "string" },
+] as const;
+
+type UserPrefEntry = (typeof userPrefValues)[number];
+
+export type UserPref = {
+  [K in UserPrefEntry as K["value"]]?: K["type"] extends "boolean"
+    ? boolean
+    : K["type"] extends "string"
+      ? string
+      : never;
+};
+
+export type UserPrefType = (typeof userPrefValues)[number]["value"];
+
 export interface User {
   createdAt: number;
   email: string;
@@ -17,14 +38,6 @@ export interface User {
   role: string[];
   subscription?: string;
   tokenIdentifier: string;
-}
-
-export interface UserPref {
-  timezone?: string;
-  currency?: string;
-  autoApply?: boolean;
-  theme?: string;
-  fontSize?: string;
 }
 
 export type UserData = {

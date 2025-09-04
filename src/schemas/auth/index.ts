@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 export const passwordValidation = new RegExp(
   /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
 );
@@ -173,3 +174,5 @@ export const UpdateUserPrefsSchema = z.object({
   theme: z.string().optional(),
   fontSize: z.string().optional(),
 });
+
+export type UpdateUserPrefsSchemaValues = z.infer<typeof UpdateUserPrefsSchema>;
