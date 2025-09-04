@@ -520,7 +520,7 @@ export default function SettingsPage() {
       });
 
       setPending(false);
-      setSuccess("Password reset!");
+      setSuccess("Password updated!");
       passwordForm?.reset();
 
       setTimeout(() => {
@@ -1285,7 +1285,9 @@ export default function SettingsPage() {
                             )}
                             className="space-y-2"
                           >
-                            {success && <FormSuccess message={success} />}
+                            {success && success === "Password updated!" && (
+                              <FormSuccess message={success} />
+                            )}
                             {error && <FormError message={error} />}
                             <FormField
                               control={passwordForm.control}
