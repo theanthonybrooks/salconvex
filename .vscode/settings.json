@@ -15,7 +15,8 @@
     "Dashboard",
     "Theme",
     "Newsletter",
-    "Notifications"
+    "Notifications",
+    "General"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

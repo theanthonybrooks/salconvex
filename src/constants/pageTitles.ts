@@ -1,7 +1,9 @@
 //List the page titles, descriptions, seo, meta tags, and other social media metadata here. Favicons as well. TBD
 
-import { lastUpdatedPrivacyRaw } from "@/app/(public)/privacy/page";
-import { lastUpdatedTermsRaw } from "@/app/(public)/terms/page";
+import {
+  lastUpdatedPrivacyRaw,
+  lastUpdatedTermsRaw,
+} from "@/constants/siteInfo";
 import { formatDatePlain } from "@/lib/dateFns";
 
 export function getPageMeta(pathname: string | null) {
@@ -98,11 +100,41 @@ export const pageTitles: PageTitles[] = [
     },
   },
   {
+    path: "/newsletter",
+    title: "Newsletter",
+    externalTitle: "Newsletter | The Street Art List",
+    description:
+      "Weekly/monthly newsletters from The Street Art List. Subscribe to receive updates on new projects, upcoming events, and more.",
+    images: DEFAULT_IMAGES,
+    openGraph: {
+      url: "https://thestreetartlist.com/newsletter",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+  },
+  {
+    path: "/support",
+    title: "Support & Contact",
+    externalTitle: "Support & Contact | The Street Art List",
+    description:
+      "Contact us for support, questions, or feedback. We're here to help!",
+    images: DEFAULT_IMAGES,
+    openGraph: {
+      url: "https://thestreetartlist.com/support",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+  },
+  {
     path: "/calendar",
     title: "Calendar",
     externalTitle: "Calendar | The Street Art List",
     description:
-      "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
+      "Calendar of upcoming events and open calls. Keep up with the latest street art and graffiti projects happening around the world.",
     images: DEFAULT_IMAGES,
     openGraph: {
       url: "https://thestreetartlist.com/calendar",
@@ -117,7 +149,7 @@ export const pageTitles: PageTitles[] = [
     title: "Global Map",
     externalTitle: "Global Map | The Street Art List",
     description:
-      "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
+      "Global map of street art, graffiti, & mural projects. Find your favorite street art and mural events and projects around the world.",
     images: DEFAULT_IMAGES,
     openGraph: {
       url: "https://thestreetartlist.com/map",
@@ -132,7 +164,7 @@ export const pageTitles: PageTitles[] = [
     title: "Changelog",
     externalTitle: "Changelog | The Street Art List",
     description:
-      "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
+      "List of changes made on the The Street Art List. For full history, see the GitHub repository.",
     images: DEFAULT_IMAGES,
     openGraph: {
       url: "https://thestreetartlist.com/changelog",
@@ -147,7 +179,7 @@ export const pageTitles: PageTitles[] = [
     title: "Pricing",
     externalTitle: "Pricing | The Street Art List",
     description:
-      "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
+      "Pricing for memberships and subscriptions. Learn more about the costs and benefits of joining The Street Art List.",
     images: DEFAULT_IMAGES,
     openGraph: {
       url: "https://thestreetartlist.com/pricing",
@@ -163,7 +195,7 @@ export const pageTitles: PageTitles[] = [
     title: "Collaborations",
     externalTitle: "Collaborations | The Street Art List",
     description:
-      "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
+      "Have some ideas for the site or want to work together? Join our collaborations page to find other artists and creatives working on The Street Art List.",
     images: DEFAULT_IMAGES,
     openGraph: {
       url: "https://thestreetartlist.com/collabs",
@@ -173,21 +205,21 @@ export const pageTitles: PageTitles[] = [
       card: "summary_large_image",
     },
   },
-  {
-    path: "/contact",
-    title: "Contact",
-    externalTitle: "Contact | The Street Art List",
-    description:
-      "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
-    images: DEFAULT_IMAGES,
-    openGraph: {
-      url: "https://thestreetartlist.com/contact",
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-    },
-  },
+  // {
+  //   path: "/contact",
+  //   title: "Contact",
+  //   externalTitle: "Contact | The Street Art List",
+  //   description:
+  //     "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart",
+  //   images: DEFAULT_IMAGES,
+  //   openGraph: {
+  //     url: "https://thestreetartlist.com/contact",
+  //     type: "website",
+  //   },
+  //   twitter: {
+  //     card: "summary_large_image",
+  //   },
+  // },
   {
     path: "/faq",
     title: "FAQ",

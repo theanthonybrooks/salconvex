@@ -6,3 +6,6 @@ export const siteUrl = [
 export const supportEmail = "support@thestreetartlist.com";
 export const infoEmail = "info@thestreetartlist.com";
 export const contactEmail = "contact@thestreetartlist.com";
+
+export const lastUpdatedTermsRaw = "2025-05-23";
+export const lastUpdatedPrivacyRaw = "2025-04-07";

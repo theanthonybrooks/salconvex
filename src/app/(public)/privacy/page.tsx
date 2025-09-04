@@ -1,8 +1,11 @@
 import { Link } from "@/components/ui/custom-link";
-import { infoEmail, siteUrl } from "@/constants/siteInfo";
+import {
+  infoEmail,
+  lastUpdatedPrivacyRaw,
+  siteUrl,
+} from "@/constants/siteInfo";
 import { formatDateWithOrdinal } from "@/lib/dateFns";
 
-export const lastUpdatedPrivacyRaw = "2025-04-07";
 export function LastUpdated() {
   return (
     <time
