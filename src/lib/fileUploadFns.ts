@@ -101,6 +101,7 @@ export async function handleOrgFileUrl({
         fileSize: file.size,
         fileType: file.type,
       });
+      // console.log(uploadedFiles);
     } catch (err) {
       console.error("Upload failed:", err);
       toast.error(

@@ -285,6 +285,7 @@ export const EventOCForm = ({
   const savedState = useRef(false);
   const latestSaveId = useRef<symbol | null>(null);
   const initialFormType = useRef<number | undefined>(undefined);
+  const prevFileCount = useRef(0);
 
   // #endregion
   // #region ------------- Watch --------------
@@ -292,6 +293,7 @@ export const EventOCForm = ({
   const eventData = watch("event");
   const openCallData = watch("openCall");
   const ocBudget = watch("openCall.compensation.budget");
+  const tempFiles = watch("openCall.tempFiles");
 
   // const eventDatesWatch = watch("event.dates");
   // #endregion
@@ -1747,6 +1749,16 @@ export const EventOCForm = ({
 
     return () => clearInterval(interval);
   }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
+
+  useEffect(() => {
+    const count = tempFiles?.length ?? 0;
+
+    if (count > prevFileCount.current) {
+      handleSave(true);
+    }
+
+    prevFileCount.current = count;
+  }, [tempFiles, handleSave]);
 
   useEffect(() => {
     if (!existingOrg) return;

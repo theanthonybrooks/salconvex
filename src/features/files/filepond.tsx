@@ -3,6 +3,11 @@ import { FilePond, registerPlugin } from "react-filepond";
 
 import "filepond/dist/filepond.min.css";
 
+import {
+  BOTH_TYPES,
+  DOC_TYPES,
+  FILE_TYPE_LABELS,
+} from "@/constants/fileConsts";
 import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
 import FilePondPluginFileRename from "filepond-plugin-file-rename";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
@@ -15,32 +20,6 @@ registerPlugin(
   FilePondPluginFileRename,
   FilePondPluginFileMetadata,
 );
-
-const DOC_TYPES = [
-  "application/pdf",
-  "application/msword", // .doc
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-  "application/vnd.ms-powerpoint", // .ppt
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
-  "application/vnd.ms-excel", // .xls
-];
-
-const FILE_TYPE_LABELS: Record<string, string> = {
-  "application/pdf": "PDF document",
-  "application/msword": "Word document (.doc)",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-    "Word document (.docx)",
-  "application/vnd.ms-powerpoint": "PowerPoint presentation (.ppt)",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-    "PowerPoint presentation (.pptx)",
-  "application/vnd.ms-excel": "Excel spreadsheet (.xlsx)",
-  "image/png": "PNG image",
-  "image/jpeg": "JPEG image",
-  "image/gif": "GIF",
-};
-
-const IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif"];
-const BOTH_TYPES = [...DOC_TYPES, ...IMAGE_TYPES];
 
 type ActualFileObject = FilePondFile["file"];
 
@@ -102,6 +81,7 @@ export function FilePondInput({
           "image/png": 2,
           "image/jpeg": 2,
           "image/gif": 2,
+          "image/webp": 2,
         };
 
         const filteredItems = fileItems.filter((item) => {

@@ -5,6 +5,11 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DOC_TYPES,
+  FILE_TYPE_LABELS,
+  IMAGE_TYPES,
+} from "@/constants/fileConsts";
 import { cn } from "@/lib/utils";
 import { Download, Eye } from "lucide-react";
 import { useState } from "react";
@@ -27,7 +32,10 @@ export function FilePreviewer({
   isPublic = false,
 }: FilePreviewerProps) {
   const [open, setOpen] = useState(false);
-  const isImage = type?.startsWith("image/");
+  const isImage = IMAGE_TYPES.includes(type);
+  const isDoc = DOC_TYPES.includes(type);
+  console.log(href);
+  console.log(type);
   return (
     <>
       {icon ? (
@@ -68,9 +76,18 @@ export function FilePreviewer({
                 className="scrollable mini h-full w-full"
                 title="PDF Preview"
               />
+            ) : isDoc ? (
+              <iframe
+                src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+                  href,
+                )}`}
+                className="h-full w-full"
+                title={FILE_TYPE_LABELS[type] ?? "Office Preview"}
+              />
             ) : (
               <p className="p-4 text-center text-muted-foreground">
-                Preview not supported
+                Preview not supported for
+                <b>{FILE_TYPE_LABELS[type] ?? ` this file type: "${type}"`}</b>
               </p>
             )}
           </div>
