@@ -497,7 +497,7 @@ export const EventOCForm = ({
         toast.success(
           alreadyPaid || alreadyApproved
             ? "Successfully updated project!"
-            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabelAbbr(category) + "and open call"}!`,
+            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabelAbbr(category) + " and open call"}!`,
           {
             onClick: () => toast.dismiss(),
           },

@@ -22,6 +22,7 @@ const DOC_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
   "application/vnd.ms-powerpoint", // .ppt
   "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+  "application/vnd.ms-excel", // .xls
 ];
 
 const FILE_TYPE_LABELS: Record<string, string> = {
@@ -32,6 +33,7 @@ const FILE_TYPE_LABELS: Record<string, string> = {
   "application/vnd.ms-powerpoint": "PowerPoint presentation (.ppt)",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation":
     "PowerPoint presentation (.pptx)",
+  "application/vnd.ms-excel": "Excel spreadsheet (.xlsx)",
   "image/png": "PNG image",
   "image/jpeg": "JPEG image",
   "image/gif": "GIF",

@@ -183,7 +183,7 @@ export const usersWithSubscriptions = query({
           cancelComment,
           cancelReason,
           canceledAt,
-          lastActive: user.lastActive,
+          lastActive: user.lastActive ?? 0,
           role: user.role ?? "user",
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,
