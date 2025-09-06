@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { LightboxGallery } from "@/components/ui/lightbox-gallery";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { DOC_TYPES, IMAGE_TYPES } from "@/constants/fileConsts";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
 import {
   OpenCallProvided,
@@ -24,6 +25,7 @@ import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
 import { formatCurrency, formatRate } from "@/lib/eventFns";
+import { getMimeTypeFromHref } from "@/lib/fileFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { ArtistFull } from "@/types/artist";
@@ -398,7 +400,7 @@ const OpenCallCard = ({
             {reqsDocs && reqsDocs.length > 0 && (
               <>
                 {reqsDocs.some((doc) =>
-                  /\.(pdf|docx?|pptx?)$/i.test(doc.title),
+                  DOC_TYPES.includes(getMimeTypeFromHref(doc.title)),
                 ) && (
                   <AccordionItem value="Docs">
                     <AccordionTrigger title="Documents:" fontSize={fontSize} />
@@ -416,7 +418,9 @@ const OpenCallCard = ({
                   </AccordionItem>
                 )}
 
-                {reqsDocs.some((doc) => /\.(jpe?g|png)$/i.test(doc.title)) && (
+                {reqsDocs.some((doc) =>
+                  IMAGE_TYPES.includes(getMimeTypeFromHref(doc.title)),
+                ) && (
                   <AccordionItem value="Images">
                     <AccordionTrigger title="Images:" fontSize={fontSize} />
                     <AccordionContent>
@@ -715,7 +719,7 @@ const OpenCallCard = ({
           {reqsDocs && reqsDocs.length > 0 && (
             <>
               {reqsDocs.some((doc) =>
-                /\.(pdf|docx?|pptx?)$/i.test(doc.title),
+                DOC_TYPES.includes(getMimeTypeFromHref(doc.title)),
               ) && (
                 <AccordionItem
                   value="AppDocs"
@@ -737,7 +741,9 @@ const OpenCallCard = ({
                 </AccordionItem>
               )}
 
-              {reqsDocs.some((doc) => /\.(jpe?g|png)$/i.test(doc.title)) && (
+              {reqsDocs.some((doc) =>
+                IMAGE_TYPES.includes(getMimeTypeFromHref(doc.title)),
+              ) && (
                 <AccordionItem
                   value="AppImgs"
                   className="rounded-lg border-2 bg-white/30 px-4"
