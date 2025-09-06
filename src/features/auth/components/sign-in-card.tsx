@@ -29,7 +29,7 @@ import { ConvexError } from "convex/values";
 import { Heart, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
@@ -42,7 +42,7 @@ interface SignInCardProps {
 }
 
 const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const router = useRouter();
   const convex = useConvex();
   const { signIn } = useAuthActions();
@@ -170,7 +170,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
     setIsLoading(value);
     setPending(true);
     try {
-      await signIn(value, { redirectTo: "/auth/sign-up?err=newUser" });
+      await signIn(value, { redirectTo: "/auth/sign-in" });
     } catch (error) {
       throw new Error("Error signing in", { cause: error });
     } finally {
@@ -179,22 +179,22 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
     }
   };
 
-  useEffect(() => {
-    const errorDesc = searchParams.get("err");
-    if (errorDesc) {
-      if (errorDesc === "newUser") {
-        setError("No account found. Sign up with email and password first.");
-        setTimeout(() => {
-          setError("");
-          const url = new URL(window.location.href);
-          url.searchParams.delete("err");
-          window.history.replaceState({}, "", url.toString());
-        }, 10000);
+  // useEffect(() => {
+  //   const errorDesc = searchParams.get("err");
+  //   if (errorDesc) {
+  //     if (errorDesc === "newUser") {
+  //       setError("No account found. Sign up with email and password first.");
+  //       setTimeout(() => {
+  //         setError("");
+  //         const url = new URL(window.location.href);
+  //         url.searchParams.delete("err");
+  //         window.history.replaceState({}, "", url.toString());
+  //       }, 10000);
 
-        return;
-      }
-    }
-  }, [searchParams]);
+  //       return;
+  //     }
+  //   }
+  // }, [searchParams]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

@@ -1,16 +1,12 @@
 import { Link } from "@/components/ui/custom-link";
+import { SubmissionFormState as EventState } from "@/types/event";
+import { OpenCallState } from "@/types/openCall";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface DraftPendingBannerProps {
   format: "desktop" | "mobile";
-  openCallState?:
-    | "draft"
-    | "editing"
-    | "submitted"
-    | "pending"
-    | "published"
-    | "archived";
-  eventState?: "draft" | "editing" | "submitted" | "published" | "archived";
+  openCallState?: OpenCallState;
+  eventState?: EventState;
   eventId: Id<"events">;
 }
 
