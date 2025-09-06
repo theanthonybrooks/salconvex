@@ -181,150 +181,155 @@ export const createStripeCheckoutSession = action({
       openCallId?: Id<"openCalls"> | undefined | null;
     },
   ): Promise<{ url: string }> => {
-    console.log(args);
+    try {
+      console.log(args);
 
-    const isOrganizer = args.accountType === "organizer";
-    const isArtist = args.accountType === "artist";
-    const identity = await getAuthUserId(ctx);
-    if (!identity) throw new Error("Not authenticated");
-    const result = await ctx.runQuery(api.users.getCurrentUser, {});
-    if (!result) throw new Error("User not found");
-    const { user } = result;
-    if (!user || !user.email)
-      throw new Error("User not found or missing email");
+      const isOrganizer = args.accountType === "organizer";
+      const isArtist = args.accountType === "artist";
+      const identity = await getAuthUserId(ctx);
+      if (!identity) throw new Error("Not authenticated");
+      const result = await ctx.runQuery(api.users.getCurrentUser, {});
+      if (!result) throw new Error("User not found");
+      const { user } = result;
+      if (!user || !user.email)
+        throw new Error("User not found or missing email");
 
-    const { artistSubscription, orgSubscription } = await ctx.runQuery(
-      api.stripeSubscriptions.getUserSubscription,
-      {
-        userId: user._id,
-      },
-    );
+      const { artistSubscription, orgSubscription } = await ctx.runQuery(
+        api.stripeSubscriptions.getUserSubscription,
+        {
+          userId: user._id,
+        },
+      );
 
-    let stripeCustomerId =
-      artistSubscription?.customerId || orgSubscription?.customerId;
+      let stripeCustomerId =
+        artistSubscription?.customerId || orgSubscription?.customerId;
 
-    if (args.accountType === "organizer") {
-      if (!args.slidingPrice) throw new Error("Sliding price not provided");
-    }
-
-    const plan: any = await ctx.runQuery(
-      internal.stripeSubscriptions.getPlanByKey,
-      {
-        key: args.planKey,
-      },
-    );
-    // console.log(plan);
-    if (args.accountType === "artist") {
-      if (!plan || !plan.prices || !plan.prices.month) {
-        throw new Error("Plan not found or missing pricing info");
+      if (args.accountType === "organizer") {
+        if (!args.slidingPrice) throw new Error("Sliding price not provided");
       }
-    }
 
-    const priceId =
-      args.slidingPrice && isOrganizer
-        ? args.slidingPrice
-        : (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
-          plan.prices.month.usd.stripeId;
+      const plan: any = await ctx.runQuery(
+        internal.stripeSubscriptions.getPlanByKey,
+        {
+          key: args.planKey,
+        },
+      );
+      // console.log(plan);
+      if (args.accountType === "artist") {
+        if (!plan || !plan.prices || !plan.prices.month) {
+          throw new Error("Plan not found or missing pricing info");
+        }
+      }
 
-    // console.log("priceId which: ", priceId);
+      const priceId =
+        args.slidingPrice && isOrganizer
+          ? args.slidingPrice
+          : (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
+            plan.prices.month.usd.stripeId;
 
-    if (!priceId) throw new Error("Stripe price ID not found in plan pricing");
-    console.log("userId: ", user._id, user.email);
-    const metadata: Record<string, string> = {
-      userId: user._id,
-      userEmail: user.email,
-      plan: args.planKey,
-      openCallId: args.openCallId ?? "",
-      accountType: args.accountType ?? "",
-      interval:
-        args.accountType === "organizer"
-          ? "One-time"
-          : args.interval || "month",
-    };
+      // console.log("priceId which: ", priceId);
 
-    // console.log("hadTrial: ", args.hadTrial);
-    // console.log("Meta Data: ", metadata);
-
-    if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.name,
-        metadata: { userId: user._id },
-      });
-      stripeCustomerId = customer.id;
-      // console.log("stripeCustomerId: ", stripeCustomerId);
-
-      // await ctx.db.insert("userSubscriptions")
-    }
-
-    if (
-      // (!orgSubscription && isOrganizer) ||
-      !artistSubscription &&
-      isArtist
-    ) {
-      await ctx.runMutation(api.stripeSubscriptions.saveStripeCustomerId, {
-        stripeCustomerId,
-        userType: isArtist ? "artist" : "organizer",
-      });
-    }
-
-    // Determine subscription data options
-    const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData =
-      {
-        ...(args.hadTrial || (args.slidingPrice && isOrganizer)
-          ? {}
-          : { trial_period_days: 14 }),
+      if (!priceId)
+        throw new Error("Stripe price ID not found in plan pricing");
+      console.log("userId: ", user._id, user.email);
+      const metadata: Record<string, string> = {
+        userId: user._id,
+        userEmail: user.email,
+        plan: args.planKey,
+        openCallId: args.openCallId ?? "",
+        accountType: args.accountType ?? "",
+        interval:
+          args.accountType === "organizer"
+            ? "One-time"
+            : args.interval || "month",
       };
-    //TODO: Make some sort of trial/one-off for organizers of events. Could just check if they already have an open call? Would prefer to add a flag, though.
 
-    // Create a Stripe Checkout Session.
-    const session: Stripe.Checkout.Session =
-      await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        customer: stripeCustomerId,
-        line_items: [
-          args.accountType === "artist"
-            ? {
-                price: priceId,
-                quantity: 1,
-              }
-            : {
-                price_data: {
-                  currency: "usd",
-                  unit_amount: args.slidingPrice
-                    ? args.slidingPrice * 100
-                    : 5000,
-                  product_data: {
-                    name: "Open Call Listing - – One-Time",
+      // console.log("hadTrial: ", args.hadTrial);
+      // console.log("Meta Data: ", metadata);
+
+      if (!stripeCustomerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.name,
+          metadata: { userId: user._id },
+        });
+        stripeCustomerId = customer.id;
+        // console.log("stripeCustomerId: ", stripeCustomerId);
+
+        // await ctx.db.insert("userSubscriptions")
+      }
+
+      if (
+        // (!orgSubscription && isOrganizer) ||
+        !artistSubscription &&
+        isArtist
+      ) {
+        await ctx.runMutation(api.stripeSubscriptions.saveStripeCustomerId, {
+          stripeCustomerId,
+          userType: isArtist ? "artist" : "organizer",
+        });
+      }
+
+      // Determine subscription data options
+      const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData =
+        {
+          ...(args.hadTrial || (args.slidingPrice && isOrganizer)
+            ? {}
+            : { trial_period_days: 14 }),
+        };
+      //TODO: Make some sort of trial/one-off for organizers of events. Could just check if they already have an open call? Would prefer to add a flag, though.
+
+      // Create a Stripe Checkout Session.
+      const session: Stripe.Checkout.Session =
+        await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          customer: stripeCustomerId,
+          line_items: [
+            args.accountType === "artist"
+              ? {
+                  price: priceId,
+                  quantity: 1,
+                }
+              : {
+                  price_data: {
+                    currency: "usd",
+                    unit_amount: args.slidingPrice
+                      ? args.slidingPrice * 100
+                      : 5000,
+                    product_data: {
+                      name: "Open Call Listing - – One-Time",
+                    },
                   },
+                  quantity: 1,
                 },
-                quantity: 1,
-              },
-        ],
-        mode: args.accountType === "organizer" ? "payment" : "subscription",
+          ],
+          mode: args.accountType === "organizer" ? "payment" : "subscription",
 
-        subscription_data:
-          args.accountType === "organizer" ? {} : subscriptionData,
-        success_url: `${process.env.FRONTEND_URL}/thelist`,
-        cancel_url: `${process.env.FRONTEND_URL}/pricing`,
-        //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
-        // customer_email: user.email,
-        // ...(args.accountType === "organizer"
-        //   ? { customer_creation: "always" }
-        //   : {}),
-        metadata: metadata,
-        client_reference_id: metadata.userId,
-        discounts: args.isEligibleForFree
-          ? [{ coupon: process.env.STRIPE_FREE_COUPON }]
-          : undefined,
-      });
+          subscription_data:
+            args.accountType === "organizer" ? {} : subscriptionData,
+          success_url: `${process.env.FRONTEND_URL}/thelist`,
+          cancel_url: `${process.env.FRONTEND_URL}/pricing`,
+          //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
+          // customer_email: user.email,
+          // ...(args.accountType === "organizer"
+          //   ? { customer_creation: "always" }
+          //   : {}),
+          metadata: metadata,
+          client_reference_id: metadata.userId,
+          discounts: args.isEligibleForFree
+            ? [{ coupon: process.env.STRIPE_FREE_COUPON }]
+            : undefined,
+        });
 
-    // console.log("checkout session created: ", session);
+      // console.log("checkout session created: ", session);
 
-    // Ensure session.url is not null.
-    if (!session.url) throw new Error("Stripe session URL is null");
-
-    return { url: session.url };
+      // Ensure session.url is not null.
+      if (!session.url) throw new Error("Stripe session URL is null");
+      return { url: session.url };
+    } catch (err) {
+      console.error("Error creating Stripe Checkout Session:", err);
+      throw new Error("Error creating Stripe Checkout Session", { cause: err });
+    }
   },
 });
 

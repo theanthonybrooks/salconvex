@@ -221,13 +221,9 @@ export const ArtistProfileForm = ({
           },
         });
         if (hasCurrentSub) {
-          toast.success(
-            "Successfully updated profile! Forwarding to Stripe...",
-          );
+          toast.success("Successfully updated profile!");
         } else {
-          toast.success(
-            "Successfully created profile! Forwarding to Stripe...",
-          );
+          toast.success("Successfully created profile!");
         }
       } else {
         toast.success("Forwarding to Stripe...");

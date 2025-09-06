@@ -29,6 +29,7 @@ import { CheckCircle2, CircleX } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 
@@ -389,8 +390,10 @@ const PricingCard = ({
       if (url) {
         window.location.href = url;
       }
+      toast.success("Forwarding to Stripe...");
     } catch (error) {
       console.error("Failed to get checkout URL:", error);
+      toast.error("Failed to redirect. Please contact support");
     }
   };
 

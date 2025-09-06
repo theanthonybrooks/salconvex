@@ -16,7 +16,8 @@
     "Theme",
     "Newsletter",
     "Notifications",
-    "General"
+    "General",
+    "Membership"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

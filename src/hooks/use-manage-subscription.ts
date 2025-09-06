@@ -19,6 +19,9 @@ export function useManageSubscription(subscription: { customerId?: string }) {
       const result = await getDashboardUrl({
         customerId: subscription.customerId,
       });
+      if (result) {
+        toast.success("Successfully forwardeing to Stripe!");
+      }
       if (result?.url) {
         window.location.href = result.url;
       }
