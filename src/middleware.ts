@@ -26,7 +26,17 @@ export default convexAuthNextjsMiddleware(
     // console.log("isAuthenticatedNextjs:", isAuthenticated)
 
     if (isAuthPage(request) && isAuthenticated) {
-      // return nextjsMiddlewareRedirect(request, "/");
+      const path = request.nextUrl.pathname;
+
+      if (path.startsWith("/auth/register")) {
+        return NextResponse.redirect(new URL("/pricing", request.url));
+      }
+
+      if (path.startsWith("/auth/sign-in")) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+
+      // fallback for any other /auth/* page
       return NextResponse.redirect(new URL("/", request.url));
     }
 
