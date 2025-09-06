@@ -1,7 +1,6 @@
 import {
   convexAuthNextjsMiddleware,
   createRouteMatcher,
-  nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
 import { NextResponse } from "next/server";
 import { UAParser } from "ua-parser-js";
@@ -27,7 +26,8 @@ export default convexAuthNextjsMiddleware(
     // console.log("isAuthenticatedNextjs:", isAuthenticated)
 
     if (isAuthPage(request) && isAuthenticated) {
-      return nextjsMiddlewareRedirect(request, "/");
+      // return nextjsMiddlewareRedirect(request, "/");
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     if (isSubmitPage(request)) {
