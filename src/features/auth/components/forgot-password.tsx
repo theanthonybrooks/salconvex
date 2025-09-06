@@ -15,13 +15,11 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
@@ -358,7 +356,10 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
                   maxLength={6}
                   pattern={REGEXP_ONLY_DIGITS}
                   // value={otp}
-                  // onChange={handleOtpChange}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    if (success) setSuccess("");
+                  }}
                   disabled={pending}
                   // tabIndex={step !== 'forgot' && 1}
                   tabIndex={1}
@@ -368,9 +369,6 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
                     <InputOTPSlot index={0} className="bg-white" />
                     <InputOTPSlot index={1} className="bg-white" />
                     <InputOTPSlot index={2} className="bg-white" />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
                     <InputOTPSlot index={3} className="bg-white" />
                     <InputOTPSlot index={4} className="bg-white" />
                     <InputOTPSlot index={5} className="bg-white" />
@@ -402,9 +400,12 @@ const ForgotPassword = ({ switchFlow }: ForgotPasswordProps) => {
                       tabIndex={4}
                       visibilityTabIndex={5}
                       field={field}
+                      showChecklist
+                      type="forgot"
                     />
                   </FormControl>
-                  <FormMessage />
+                  {/* <FormMessage />
+                   */}
                 </FormItem>
               )}
             />

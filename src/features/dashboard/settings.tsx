@@ -1263,6 +1263,7 @@ export default function SettingsPage() {
                               <PasswordChecklist
                                 password={newPassword ?? ""}
                                 checkPassword={newRepeatedPassword ?? ""}
+                                type="update"
                               />
                             )}
 
