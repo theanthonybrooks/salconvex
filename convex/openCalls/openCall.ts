@@ -1,4 +1,11 @@
-import { OpenCallState } from "@/types/openCall";
+import {
+  CallFormat,
+  CallType,
+  EligibilityType,
+  OpenCallLinkFormat,
+  OpenCallState,
+  RateUnit,
+} from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
@@ -101,11 +108,114 @@ export const archiveExpiredOpenCalls = internalMutation({
   },
 });
 
+export const lookupOpenCall = query({
+  args: {
+    eventId: v.union(v.id("events"), v.null()),
+  },
+  handler: async (ctx, args) => {
+    const { eventId } = args;
+    if (!eventId) return null;
+
+    const openCall = await ctx.db
+      .query("eventOpenCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .unique();
+
+    return openCall;
+  },
+});
+
+export const createNewOpenCall = mutation({
+  args: {
+    orgId: v.id("organizations"),
+    eventId: v.id("events"),
+    edition: v.number(),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    const openCallData = {
+      eventId: args.eventId,
+      organizerId: [args.orgId],
+      mainOrgId: args.orgId,
+      basicInfo: {
+        appFee: 0,
+        callFormat: "RFQ" as CallFormat,
+        callType: "Unknown" as CallType,
+        dates: {
+          ocStart: "",
+          ocEnd: "",
+          timezone: "",
+          edition: args.edition,
+        },
+      },
+      eligibility: {
+        type: "International" as EligibilityType,
+        whom: [],
+      },
+      compensation: {
+        budget: {
+          min: 0,
+          rate: 0,
+          unit: "" as RateUnit,
+          currency: "",
+          allInclusive: false,
+        },
+        categories: {},
+      },
+      requirements: {
+        requirements: "",
+        links: [],
+        applicationLink: "",
+        applicationLinkFormat: "https://" as OpenCallLinkFormat,
+      },
+      state: "initial" as OpenCallState,
+      lastUpdatedBy: userId,
+    };
+
+    //TODO: update this later to account for multiple open calls per event. For now, just one is allowed/used.
+    const lookup = await ctx.db
+      .query("eventOpenCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .unique();
+
+    if (lookup) {
+      //TODO: determine whether I should throw an error here or just update and return the existing call. Probably just update/return?
+      await ctx.db.patch(lookup.openCallId, openCallData);
+      await ctx.db.patch(lookup._id, {
+        edition: args.edition,
+        state: openCallData.state,
+        lastEdited: Date.now(),
+      });
+      return lookup.openCallId;
+    }
+
+    const newId = await ctx.db.insert("openCalls", openCallData);
+
+    await ctx.db.insert("eventOpenCalls", {
+      eventId: args.eventId,
+      openCallId: newId,
+      edition: args.edition,
+      state: openCallData.state,
+    });
+
+    return newId;
+  },
+});
+
 export const createOrUpdateOpenCall = mutation({
   args: {
     orgId: v.id("organizations"),
     eventId: v.id("events"),
-    openCallId: v.optional(v.id("openCalls")),
+    openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
     basicInfo: v.object({
       appFee: v.number(),
       callFormat: v.union(v.literal("RFQ"), v.literal("RFP"), v.literal("RFA")),
@@ -284,6 +394,7 @@ export const createOrUpdateOpenCall = mutation({
         edition: args.basicInfo.dates.edition,
         state: openCallState,
         lastEdited: Date.now(),
+        ...(args.openCallId && { openCallId: args.openCallId }),
       });
       // console.log("lookup updated", lookup, openCallData);
       return openCallData;
@@ -380,6 +491,8 @@ export const getOpenCallByEventId = query({
       .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .first();
+
+    if (openCall?.state === "initial") return null;
 
     return openCall;
   },
@@ -598,5 +711,23 @@ export const changeOCStatus = mutation({
     });
 
     return { oc };
+  },
+});
+
+export const getOpenCallDocuments = query({
+  args: {
+    openCallId: v.id("openCalls"),
+  },
+  handler: async (ctx, args) => {
+    const openCallFiles = await ctx.db
+      .query("openCallFiles")
+      .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
+      .collect();
+
+    const openCall = await ctx.db.get(args.openCallId);
+    if (!openCall) return null;
+    if (openCall.documents?.length === 0) return null;
+
+    return { files: openCallFiles, documents: openCall.documents };
   },
 });

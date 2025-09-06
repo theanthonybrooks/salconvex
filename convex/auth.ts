@@ -164,6 +164,9 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         language: "EN",
         currency: "USD",
         theme: "default",
+        notifications: {
+          general: true,
+        },
       });
 
       await ctx.db.insert("userLog", {

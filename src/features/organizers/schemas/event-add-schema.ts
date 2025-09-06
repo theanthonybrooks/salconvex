@@ -529,7 +529,7 @@ export const openCallBaseSchema = z.object({
         ocStart: z.optional(z.union([z.string(), z.null()])),
         ocEnd: z.optional(z.union([z.string(), z.null()])),
         timezone: z.optional(z.string()), //todo: make not optional later
-        // edition: z.number(), //note-to-self: this is used for the event's edition. Not sure if it's needed here. Could also just take from the event if it is necessary for some reason.
+        edition: z.optional(z.number()),
       }),
     ),
   }),

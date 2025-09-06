@@ -20,6 +20,7 @@ export const openCallStates = [
   "pending",
   "published",
   "archived",
+  "initial",
 ] as const;
 export type OpenCallState = (typeof openCallStates)[number];
 
@@ -86,6 +87,17 @@ export const RateUnitValues = ["ft²", "m²", ""] as const;
 
 export type RateUnit = (typeof RateUnitValues)[number];
 
+export const openCallLinkFormatValues = ["https://", "mailto:"] as const;
+
+export type OpenCallLinkFormat = (typeof openCallLinkFormatValues)[number];
+
+export type openCallFileType = {
+  id?: Id<"openCallFiles">;
+  title: string;
+  href: string;
+  archived?: boolean;
+};
+
 export interface OpenCall {
   _id: Id<"openCalls">;
   _creationTime: number;
@@ -135,15 +147,10 @@ export interface OpenCall {
     }[];
     otherInfo?: string;
     applicationLink?: string;
-    applicationLinkFormat?: "https://" | "mailto:";
+    applicationLinkFormat?: OpenCallLinkFormat;
     applicationLinkSubject?: string;
   };
-  documents?: {
-    id?: Id<"openCallFiles">;
-    title: string;
-    href: string;
-    archived?: boolean;
-  }[];
+  documents?: openCallFileType[];
   state?: OpenCallState;
   paid?: boolean;
   paidAt?: number;

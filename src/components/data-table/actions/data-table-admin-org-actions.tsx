@@ -9,6 +9,7 @@ import { ConvexError } from "convex/values";
 import {
   CheckCircle2,
   Circle,
+  CircleDashed,
   DollarSign,
   LucidePencil,
   Pencil,
@@ -112,12 +113,18 @@ export const DataTableAdminOrgStateActions = ({
             <DollarSign className="size-4 shrink-0" />
           ) : state === "published" ? (
             <CheckCircle2 className="size-4 shrink-0" />
+          ) : state === "initial" ? (
+            <CircleDashed className="size-4 shrink-0" />
           ) : (
             <CheckCircle2 className="size-4 shrink-0" />
           )
         ) : null}
         <span className="capitalize">
-          {state === "pending" ? "Unpaid" : state || "-"}
+          {state === "pending"
+            ? "Unpaid"
+            : state === "initial"
+              ? "Started"
+              : state || "-"}
         </span>
       </div>
     </TooltipSimple>

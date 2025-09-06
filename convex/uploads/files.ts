@@ -24,7 +24,7 @@ export const saveOrgFile = mutation({
     reason: v.union(v.literal("docs"), v.literal("images")),
     organizationId: v.id("organizations"),
     eventId: v.id("events"),
-    openCallId: v.optional(v.id("openCalls")),
+    openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
   },
 
   handler: async (ctx, args) => {
@@ -97,7 +97,7 @@ export const saveOrgFile = mutation({
         uploadedAt: Date.now(),
         organizationId: args.organizationId,
         eventId: args.eventId,
-        openCallId: args.openCallId,
+        ...(args.openCallId && { openCallId: args.openCallId }),
       });
 
       uploadedRecords.push({

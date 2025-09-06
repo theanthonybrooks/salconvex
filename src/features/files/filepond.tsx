@@ -12,6 +12,7 @@ import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
 import FilePondPluginFileRename from "filepond-plugin-file-rename";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { useCallback, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 
 registerPlugin(
@@ -44,6 +45,12 @@ export function FilePondInput({
   disabled,
   currentFileList,
 }: FilePondInputProps) {
+  const currentFileListRef = useRef<string[] | undefined>(currentFileList);
+
+  useEffect(() => {
+    currentFileListRef.current = currentFileList;
+  }, [currentFileList]);
+
   //   const UserAcceptedFileTypes = purpose === "docs" ? DOC_TYPES : ["image/*"];
   const docsOnly = purpose === "docs";
   //   const imagesOnly = purpose === "images";
@@ -53,6 +60,54 @@ export function FilePondInput({
     : multiPurpose
       ? BOTH_TYPES
       : ["image/*"];
+
+  const handleUpdateFiles = useCallback(
+    (fileItems: FilePondFile[]) => {
+      const maxSizeByType: Record<string, number> = {
+        "application/pdf": 2.5,
+        "application/msword": 2.5,
+        "application/docx": 2.5,
+        "application/doc": 2.5,
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation": 2.5,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": 2.5,
+        "application/vnd.ms-powerpoint": 2.5,
+        "image/png": 2,
+        "image/jpeg": 2,
+        "image/gif": 2,
+        "image/webp": 2,
+      };
+
+      const filteredItems = fileItems.filter((item) => {
+        const file = item.file;
+        const sizeMB = file.size / (1024 * 1024);
+        const allowedSize = maxSizeByType[file.type] ?? 1;
+        const label = FILE_TYPE_LABELS[file.type] ?? file.type;
+
+        const latestList = currentFileListRef.current ?? [];
+
+        if (latestList?.includes(file.name)) {
+          toast.error(`${file.name} already exists in your file list`, {
+            toastId: "filename-duplicate",
+          });
+          return false;
+        }
+
+        if (sizeMB > allowedSize) {
+          toast.error(
+            `${file.name} exceeds the ${allowedSize}MB limit for ${label}s`,
+            { toastId: "file-upload-error" },
+          );
+          return false;
+        }
+
+        return true;
+      });
+
+      onChange(filteredItems.map((item) => item.file));
+    },
+    [onChange],
+  );
+
   return (
     <FilePond
       disabled={disabled}
@@ -69,52 +124,7 @@ export function FilePondInput({
       //     const files = fileItems.map((item) => item.file);
       //     onChange(files);
       //   }}
-      onupdatefiles={(fileItems) => {
-        const maxSizeByType: Record<string, number> = {
-          "application/pdf": 2.5, // MB
-          "application/msword": 2.5, // MB
-          "application/docx": 2.5, // MB
-          "application/doc": 2.5, // MB
-          "application/vnd.openxmlformats-officedocument.presentationml.presentation": 2.5, // MB
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": 2.5, // MB
-          "application/vnd.ms-powerpoint": 2.5, // MB
-          "image/png": 2,
-          "image/jpeg": 2,
-          "image/gif": 2,
-          "image/webp": 2,
-        };
-
-        const filteredItems = fileItems.filter((item) => {
-          const file = item.file;
-          const sizeMB = file.size / (1024 * 1024);
-          const allowedSize = maxSizeByType[file.type] ?? 1;
-          const label = FILE_TYPE_LABELS[file.type] ?? file.type;
-
-          // console.log(file.type, allowedSize, sizeMB, label);
-          if (currentFileList?.includes(file.name)) {
-            toast.error(`${file.name} already exists in your file list`, {
-              toastId: "filename-duplicate",
-            });
-
-            return false;
-          }
-
-          if (sizeMB > allowedSize) {
-            toast.error(
-              `${file.name} exceeds the ${allowedSize}MB limit for ${label}s`,
-              {
-                toastId: "file-upload-error",
-              },
-            );
-
-            return false;
-          }
-
-          return true;
-        });
-
-        onChange(filteredItems.map((item) => item.file));
-      }}
+      onupdatefiles={handleUpdateFiles}
       server={null}
       instantUpload={false}
     />

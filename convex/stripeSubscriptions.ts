@@ -167,7 +167,7 @@ export const createStripeCheckoutSession = action({
     accountType: v.optional(v.string()),
     slidingPrice: v.optional(v.number()),
     isEligibleForFree: v.optional(v.boolean()),
-    openCallId: v.optional(v.id("openCalls")),
+    openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
   },
   handler: async (
     ctx,
@@ -178,7 +178,7 @@ export const createStripeCheckoutSession = action({
       accountType?: string;
       slidingPrice?: number;
       isEligibleForFree?: boolean;
-      openCallId?: Id<"openCalls"> | undefined;
+      openCallId?: Id<"openCalls"> | undefined | null;
     },
   ): Promise<{ url: string }> => {
     console.log(args);

@@ -1,4 +1,5 @@
 import { Input, InputProps } from "@/components/ui/input";
+import { PasswordChecklist } from "@/components/ui/password-checklist";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +22,8 @@ export interface PasswordInputProps<
   className?: string;
   inputClassName?: string;
   inputHeight?: InputProps["inputHeight"];
+  showChecklist?: boolean;
+  type?: "register" | "update" | "forgot";
 }
 
 export function PasswordInput<
@@ -36,42 +39,55 @@ export function PasswordInput<
   placeholder,
   className,
   inputClassName,
+  showChecklist = false,
+  type,
 }: PasswordInputProps<TFieldValues, TName>) {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <div
-      className={cn(
-        "relative rounded-lg border-1.5 border-foreground focus-within:bg-white focus-within:ring-1 focus-within:ring-foreground",
-        className,
-      )}
-    >
-      <Input
-        disabled={isPending || disabled}
-        {...field}
-        placeholder={
-          placeholder &&
-          (!showPassword ? placeholder?.default : placeholder?.show)
-        }
-        type={showPassword ? "text" : "password"}
-        inputHeight={inputHeight}
-        variant="basic"
-        tabIndex={tabIndex}
-        className={cn("border-none !shadow-none", inputClassName)}
-        required
-      />
-      <button
-        type="button"
-        onClick={() => setShowPassword((prev) => !prev)}
-        className="absolute inset-y-0 right-0 flex items-center pr-3"
-        tabIndex={visibilityTabIndex}
-      >
-        {showPassword ? (
-          <Eye className="size-4 text-foreground" />
-        ) : (
-          <EyeOff className="size-4 text-foreground" />
+    <div className={cn("flex flex-col gap-2")}>
+      <div
+        className={cn(
+          "relative rounded-lg border-1.5 border-foreground focus-within:bg-white focus-within:ring-1 focus-within:ring-foreground",
+          className,
         )}
-      </button>
+      >
+        <Input
+          disabled={isPending || disabled}
+          {...field}
+          placeholder={
+            placeholder &&
+            (!showPassword ? placeholder?.default : placeholder?.show)
+          }
+          type={showPassword ? "text" : "password"}
+          inputHeight={inputHeight}
+          variant="basic"
+          tabIndex={tabIndex}
+          className={cn("border-none !shadow-none", inputClassName)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => {
+            field.onBlur();
+            setIsFocused(false);
+          }}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute inset-y-0 right-0 flex items-center pr-3"
+          tabIndex={visibilityTabIndex}
+        >
+          {showPassword ? (
+            <Eye className="size-4 text-foreground" />
+          ) : (
+            <EyeOff className="size-4 text-foreground" />
+          )}
+        </button>
+      </div>
+      {showChecklist && isFocused && (
+        <PasswordChecklist password={field.value} type={type} />
+      )}
     </div>
   );
 }

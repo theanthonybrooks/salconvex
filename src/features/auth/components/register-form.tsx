@@ -45,7 +45,7 @@ import { ExternalLink, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -71,8 +71,8 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   // const [isPending1, startTransition] = useTransition();
   const [isPending, setPending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<React.ReactNode | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
+  const [error, setError] = useState<ReactNode | undefined>("");
+  const [success, setSuccess] = useState<ReactNode | undefined>("");
   const [selectedOption, setSelectedOption] = useState<string[]>(["artist"]);
   const [submitData, setSubmitData] = useState<object>({});
   // const [step, setStep] = useState<StepType>("verifyOtp")
@@ -250,7 +250,15 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
 
         if (result) {
           await updateVerification({ email });
-          setSuccess("Successfully signed up and verified! Signing in...");
+          setSuccess("Successfully signed up and verified!");
+          setTimeout(() => {
+            setSuccess(
+              <span className="flex items-center gap-1">
+                Signing in...
+                <LoaderCircle className="size-3 animate-spin" />
+              </span>,
+            );
+          }, 1500);
           form.reset();
           const callBackSrc = sessionStorage.getItem("src");
           const prevSalPage = sessionStorage.getItem("previousSalPage");
@@ -261,7 +269,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
           } else if (prevSalPage) {
             router.replace(prevSalPage);
           } else {
-            router.replace("/");
+            router.replace("/pricing");
           }
         }
       } catch (error) {
@@ -507,9 +515,11 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                           inputHeight="sm"
                           tabIndex={step === "signUp" ? 4 : -1}
                           field={field}
+                          showChecklist
+                          type="register"
                         />
                       </FormControl>
-                      <FormMessage />
+                      {/* <FormMessage /> */}
                     </FormItem>
                   )}
                 />

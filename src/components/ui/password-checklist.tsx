@@ -4,11 +4,13 @@ import { Check, X } from "lucide-react";
 interface PasswordChecklistProps {
   password: string;
   checkPassword?: string;
+  type?: "register" | "update" | "forgot";
 }
 
 export const PasswordChecklist = ({
   password,
   checkPassword,
+  type,
 }: PasswordChecklistProps) => {
   const isRepeatValid = password === checkPassword && password.length > 0;
 
@@ -30,18 +32,20 @@ export const PasswordChecklist = ({
         );
       })}
 
-      <li className="flex items-center gap-2">
-        {isRepeatValid ? (
-          <Check className="size-4 text-green-700" />
-        ) : (
-          <X className="size-4 text-red-500" />
-        )}
-        <span
-          className={isRepeatValid ? "text-green-700" : "text-foreground/70"}
-        >
-          New passwords match
-        </span>
-      </li>
+      {type !== "register" && (
+        <li className="flex items-center gap-2">
+          {isRepeatValid ? (
+            <Check className="size-4 text-green-700" />
+          ) : (
+            <X className="size-4 text-red-500" />
+          )}
+          <span
+            className={isRepeatValid ? "text-green-700" : "text-foreground/70"}
+          >
+            New passwords match
+          </span>
+        </li>
+      )}
     </ul>
   );
 };

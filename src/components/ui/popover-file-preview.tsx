@@ -34,8 +34,7 @@ export function FilePreviewer({
   const [open, setOpen] = useState(false);
   const isImage = IMAGE_TYPES.includes(type);
   const isDoc = DOC_TYPES.includes(type);
-  console.log(href);
-  console.log(type);
+
   return (
     <>
       {icon ? (

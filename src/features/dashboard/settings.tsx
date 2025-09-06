@@ -875,6 +875,45 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <Separator />
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Globe className="size-5 shrink-0 text-muted-foreground" />
+                    <div>
+                      <Label className={fontSize}>General Emails</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Emails about upcoming updates to the site, user surveys,
+                        and other news related to The Street Art List
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={!!userPrefs?.notifications?.general}
+                    onCheckedChange={(value) =>
+                      handleUpdateNotifications("general", value)
+                    }
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Mailbox className="size-5 shrink-0 text-muted-foreground" />
+                    <div>
+                      <Label className={fontSize}>Newsletter</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive {userPlan > 1 ? "weekly/monthly" : "monthly"}{" "}
+                        newsletter
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={!!userPrefs?.notifications?.newsletter}
+                    onCheckedChange={(value) =>
+                      handleUpdateNotifications("newsletter", value)
+                    }
+                  />
+                </div>
+
+                <Separator />
                 <div className="pointer-events-none flex items-center justify-between gap-4 text-muted-foreground/50">
                   <div className="flex items-center gap-4">
                     <Mail className="size-5 shrink-0" />
@@ -898,45 +937,6 @@ export default function SettingsPage() {
                     checked={!!userPrefs?.notifications?.applications}
                     onCheckedChange={(value) =>
                       handleUpdateNotifications("applications", value)
-                    }
-                  />
-                </div>
-
-                <Separator />
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <Mailbox className="size-5 shrink-0 text-muted-foreground" />
-                    <div>
-                      <Label className={fontSize}>Newsletter</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receive {userPlan > 1 ? "weekly/monthly" : "monthly"}{" "}
-                        newsletter
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={!!userPrefs?.notifications?.newsletter}
-                    onCheckedChange={(value) =>
-                      handleUpdateNotifications("newsletter", value)
-                    }
-                  />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <Globe className="size-5 shrink-0 text-muted-foreground" />
-                    <div>
-                      <Label className={fontSize}>General Emails</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Emails about upcoming updates to the site, user surveys,
-                        and other news related to The Street Art List
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={!!userPrefs?.notifications?.general}
-                    onCheckedChange={(value) =>
-                      handleUpdateNotifications("general", value)
                     }
                   />
                 </div>

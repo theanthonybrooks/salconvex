@@ -18,7 +18,11 @@ import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { enhancedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { CallFormat, EligibilityType } from "@/types/openCall";
+import {
+  CallFormat,
+  EligibilityType,
+  openCallFileType,
+} from "@/types/openCall";
 import { User } from "@/types/user";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
@@ -48,6 +52,7 @@ interface SubmissionFormOC1Props {
   handleCheckSchema: () => void;
   formType: number;
   pastEvent: boolean;
+  documents?: openCallFileType[];
 }
 
 const SubmissionFormOC1 = ({
@@ -60,6 +65,7 @@ const SubmissionFormOC1 = ({
 
   handleCheckSchema,
   pastEvent: pastEventCheck,
+  documents,
 }: SubmissionFormOC1Props) => {
   const {
     control,
@@ -841,9 +847,7 @@ const SubmissionFormOC1 = ({
                           maxFileSize="5MB"
                           maxFiles={10}
                           disabled={pastEvent}
-                          currentFileList={openCall?.documents?.map(
-                            (doc) => doc.title,
-                          )}
+                          currentFileList={documents?.map((doc) => doc.title)}
                         />
                       )}
                     />

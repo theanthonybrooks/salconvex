@@ -91,8 +91,6 @@ export const ResendOTP = Resend({
                         If you did not request this email, please ignore this
                         message.
                       </p>
-
-                      >
                     </td>
                   </tr>
                 </table>

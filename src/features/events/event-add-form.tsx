@@ -1,6 +1,11 @@
+//TODO: Replace current loading/reloading logic with queries first, then using that data in the default values. Reset when the search param is changed. perhaps also just combine multiple forms rather than one giant one. I don't know why I went that approach anyways?
+
 import HorizontalLinearStepper from "@/components/ui/stepper";
 import { User } from "@/types/user";
-import React, {
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -50,11 +55,13 @@ import {
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { getOcPricing } from "@/lib/pricingFns";
 import { cn } from "@/lib/utils";
+import { useDevice } from "@/providers/device-provider";
 import { EnrichedEvent, EventCategory } from "@/types/event";
 import { validOCVals } from "@/types/openCall";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
 import { debounce, merge } from "lodash";
@@ -114,13 +121,13 @@ interface EventOCFormProps {
   user: User | undefined;
   onClick: () => void;
   shouldClose: boolean;
-  setShouldClose: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  children?: React.ReactNode;
+  setShouldClose: Dispatch<SetStateAction<boolean>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  children?: ReactNode;
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: (value: boolean) => void;
   activeStep: number;
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  setActiveStep: Dispatch<SetStateAction<number>>;
   isEligibleForFree: boolean;
   planKey: string;
 }
@@ -140,13 +147,13 @@ export const EventOCForm = ({
   isEligibleForFree,
   planKey,
 }: EventOCFormProps) => {
+  // const convex = useConvex();
+  const { isMobile } = useDevice();
   const isAdmin = user?.role?.includes("admin") || false;
   const steps = getSteps(isAdmin);
   const finalStep = activeStep === steps.length - 1;
-  // const formType = Number(planKey);
   const [formType, setFormType] = useState<number>(Number(planKey));
   const eventOnly = formType === 1;
-  // const freeCall = formType === 2;
   const paidCall = formType === 3 && !isAdmin;
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
@@ -205,12 +212,15 @@ export const EventOCForm = ({
     api.stripeSubscriptions.createStripeCheckoutSession,
   );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
-  const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
-
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
-  const createOrUpdateOpenCall = useMutation(
+  const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+  const createNewOpenCall = useMutation(
+    api.openCalls.openCall.createNewOpenCall,
+  );
+  const updateOpenCall = useMutation(
     api.openCalls.openCall.createOrUpdateOpenCall,
   );
+
   const updateEventLastEditedAt = useMutation(
     api.events.event.updateEventLastEditedAt,
   );
@@ -223,7 +233,6 @@ export const EventOCForm = ({
   // #endregion
   // #region ------------- State --------------
   const [acceptedTerms, setAcceptedTerms] = useState(isAdmin);
-  const [isMobile, setIsMobile] = useState(false);
   const [furthestStep, setFurthestStep] = useState(0);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
 
@@ -236,6 +245,7 @@ export const EventOCForm = ({
   const [existingEvent, setExistingEvent] = useState<EnrichedEvent | null>(
     null,
   );
+  const [openCallId, setOpenCallId] = useState<Id<"openCalls"> | null>(null);
 
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const isSelectedRowEmpty =
@@ -285,7 +295,7 @@ export const EventOCForm = ({
   const savedState = useRef(false);
   const latestSaveId = useRef<symbol | null>(null);
   const initialFormType = useRef<number | undefined>(undefined);
-  const prevFileCount = useRef(0);
+  const prevFilesRef = useRef<string>("");
 
   // #endregion
   // #region ------------- Watch --------------
@@ -372,6 +382,17 @@ export const EventOCForm = ({
     api.openCalls.openCall.getOpenCallByEventId,
     existingEvent && hasOpenCall ? { eventId: existingEvent._id } : "skip",
   );
+
+  const openCallDocs = useQuery(
+    api.openCalls.openCall.getOpenCallDocuments,
+    ocData?._id ? { openCallId: ocData._id } : "skip",
+  );
+  const currentDocs = openCallDocs?.documents;
+  const normalizedCurrentDocs = (currentDocs ?? []).filter(
+    (doc): doc is { id: Id<"openCallFiles">; title: string; href: string } =>
+      !!doc.id,
+  );
+
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
@@ -491,7 +512,7 @@ export const EventOCForm = ({
               : 50,
           accountType: "organizer",
           isEligibleForFree,
-          openCallId: ocData?._id as Id<"openCalls">,
+          openCallId,
         });
         url = result.url;
       }
@@ -548,11 +569,24 @@ export const EventOCForm = ({
       await handleSave();
     }
     handleFirstStep();
-    if (activeStep === 2 && !hasOpenCall) {
-      unregister("openCall");
+    if (activeStep === 2) {
+      if (!hasOpenCall) {
+        unregister("openCall");
+        setActiveStep((prev) => prev + 3);
+        setValue("event.state", eventData?.state ?? "draft");
+      } else {
+        if (!openCallId) {
+          const openCallResult = await createNewOpenCall({
+            orgId: orgData._id as Id<"organizations">,
+            eventId: eventData._id as Id<"events">,
+            edition: eventData.dates.edition,
+          });
 
-      setActiveStep((prev) => prev + 3);
-      setValue("event.state", "draft");
+          setOpenCallId(openCallResult);
+        }
+
+        setActiveStep((prev) => prev + 1);
+      }
     } else {
       setActiveStep((prev) => prev + 1);
     }
@@ -893,6 +927,7 @@ export const EventOCForm = ({
           }
         }
         // await handleFormValues();
+        //TODO: Check if any of these 'has user edited' things are even doing anything, since the handleNext/BackStep already has the check.
         if (activeStep === 1 && hasUserEditedEventSteps) {
           let result = {
             logoStorageId: eventData?.logoStorageId as
@@ -1039,65 +1074,95 @@ export const EventOCForm = ({
             throw new Error("event_update_failed");
           }
         }
+
         if (activeStep === 3 && hasUserEditedStep3) {
-          let openCallFiles = null;
-          let saveResults: {
-            id: Id<"openCallFiles">;
-            url: string;
-            fileName?: string;
-            storageId: Id<"_storage">;
-          }[] = [];
+          try {
+            let openCallFiles = null;
+            let saveResults: {
+              id: Id<"openCallFiles">;
+              url: string;
+              fileName?: string;
+              storageId: Id<"_storage">;
+            }[] = [];
 
-          if (!openCallData) return;
+            if (!openCallData) return;
+            console.log(openCallData.tempFiles);
 
-          if (openCallData.tempFiles && openCallData.tempFiles?.length > 0) {
-            const result = await handleOrgFileUrl({
-              data: { files: openCallData.tempFiles },
-              generateUploadUrl,
-            });
+            if (openCallData.tempFiles) {
+              if (openCallData.tempFiles?.length > 0) {
+                const result = await handleOrgFileUrl({
+                  data: { files: openCallData.tempFiles },
+                  generateUploadUrl,
+                });
 
-            if (!result) {
-              toast.error("Failed to upload files", {
-                autoClose: 2000,
-                pauseOnHover: false,
-                hideProgressBar: true,
-              });
-              throw new Error("open_call_file_upload_failed");
-              // return;
+                if (!result) {
+                  toast.error("Failed to upload files", {
+                    autoClose: 2000,
+                    pauseOnHover: false,
+                    hideProgressBar: true,
+                  });
+                  throw new Error("open_call_file_upload_failed");
+                  // return;
+                }
+                openCallFiles = result;
+
+                saveResults = await saveOrgFile({
+                  files: result,
+                  reason: "docs",
+                  organizationId: orgData._id as Id<"organizations">,
+                  eventId: eventData._id as Id<"events">,
+                  openCallId,
+                });
+              } else {
+                unregister("openCall.tempFiles");
+              }
             }
-            openCallFiles = result;
+            // const documents = saveResults.map((saved, i) => {
+            //   const matched = openCallFiles?.find(
+            //     (original) => original.storageId === saved.storageId,
+            //   );
 
-            saveResults = await saveOrgFile({
-              files: result,
-              reason: "docs",
-              organizationId: orgData._id as Id<"organizations">,
-              eventId: eventData._id as Id<"events">,
-              openCallId: openCallData._id
-                ? (openCallData._id as Id<"openCalls">)
-                : undefined,
+            //   return {
+            //     id: saved.id,
+            //     title:
+            //       matched?.fileName ??
+            //       `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
+            //     href: saved.url,
+            //   };
+            // });
+            // Build documents from fresh uploads
+            const newDocs = saveResults.map((saved, i) => {
+              const matched = openCallFiles?.find(
+                (original) => original.storageId === saved.storageId,
+              );
+
+              return {
+                id: saved.id,
+                title:
+                  matched?.fileName ??
+                  `${eventData.name} (${eventData.dates.edition}) - Document ${i + 1}`,
+                href: saved.url,
+              };
             });
 
-            unregister("openCall.tempFiles");
-          }
-          const documents = saveResults.map((saved, i) => {
-            const matched = openCallFiles?.find(
-              (original) => original.storageId === saved.storageId,
+            // Merge with currentDocs from query
+            const mergedDocs = [
+              ...(normalizedCurrentDocs ?? []),
+              ...newDocs,
+            ].reduce(
+              (acc, doc) => {
+                if (!acc.find((d) => d.id === doc.id)) {
+                  acc.push(doc);
+                }
+                return acc;
+              },
+              [] as typeof newDocs,
             );
 
-            return {
-              id: saved.id,
-              title:
-                matched?.fileName ??
-                `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
-              href: saved.url,
-            };
-          });
-
-          try {
-            const ocResult = await createOrUpdateOpenCall({
+            const ocResult = await updateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
-              openCallId: openCallData?._id as Id<"openCalls">,
+              openCallId,
               basicInfo: {
                 appFee: paidCall ? openCallData.basicInfo.appFee : 0,
                 callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
@@ -1180,7 +1245,7 @@ export const EventOCForm = ({
                   openCallData.requirements.applicationLinkSubject,
                 otherInfo: openCallData.requirements.otherInfo,
               },
-              documents,
+              documents: mergedDocs,
               paid: openCallData.paid ?? false,
             });
 
@@ -1218,10 +1283,10 @@ export const EventOCForm = ({
           if (!openCallData) return;
 
           try {
-            await createOrUpdateOpenCall({
+            await updateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
-              openCallId: openCallData?._id as Id<"openCalls">,
+              openCallId,
               basicInfo: {
                 appFee: paidCall ? openCallData.basicInfo.appFee : 0,
                 callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
@@ -1276,14 +1341,7 @@ export const EventOCForm = ({
                   openCallData.requirements.applicationLinkSubject,
                 otherInfo: openCallData.requirements.otherInfo,
               },
-              documents: openCallData.documents as
-                | {
-                    id: Id<"openCallFiles">;
-                    title: string;
-                    href: string;
-                  }[]
-                | undefined,
-
+              documents: normalizedCurrentDocs,
               paid: openCallData.paid ?? false,
             });
             let lastEditedResult = null;
@@ -1426,10 +1484,10 @@ export const EventOCForm = ({
               orgId: orgData._id as Id<"organizations">,
             });
             if (hasOpenCall && openCallData) {
-              await createOrUpdateOpenCall({
+              await updateOpenCall({
                 orgId: orgData._id as Id<"organizations">,
                 eventId: eventData._id as Id<"events">,
-                openCallId: openCallData?._id as Id<"openCalls">,
+                openCallId,
                 basicInfo: {
                   appFee: paidCall ? openCallData.basicInfo.appFee : 0,
                   callFormat: openCallData.basicInfo.callFormat,
@@ -1486,14 +1544,7 @@ export const EventOCForm = ({
                     openCallData.requirements.applicationLinkSubject,
                   otherInfo: openCallData.requirements.otherInfo,
                 },
-                documents: openCallData.documents as
-                  | {
-                      id: Id<"openCallFiles">;
-                      title: string;
-                      href: string;
-                    }[]
-                  | undefined,
-
+                documents: normalizedCurrentDocs,
                 state: publish ? "published" : "submitted",
                 finalStep,
                 approved: publish,
@@ -1530,6 +1581,7 @@ export const EventOCForm = ({
       isAdmin,
       setOpen,
       steps.length,
+      openCallId,
       projectBudget,
       paidCall,
       finalStep,
@@ -1539,7 +1591,8 @@ export const EventOCForm = ({
       saveOrgFile,
       hasOpenCall,
       openCallData,
-      createOrUpdateOpenCall,
+      normalizedCurrentDocs,
+      updateOpenCall,
       hasUserEditedStep0,
       hasUserEditedStep3,
       hasUserEditedStep4,
@@ -1575,6 +1628,7 @@ export const EventOCForm = ({
     isFirstRun.current = true;
     lastChangedRef.current = null;
     setExistingEvent(null);
+    setOpenCallId(null);
     setNewOrgEvent(true);
     // reset();
     reset({
@@ -1751,14 +1805,21 @@ export const EventOCForm = ({
   }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
 
   useEffect(() => {
-    const count = tempFiles?.length ?? 0;
+    if (!tempFiles) return;
+    const currentFiles = JSON.stringify(
+      (tempFiles ?? []).map((f) => ({
+        name: f?.name,
+        size: f?.size,
+        lastModified: f?.lastModified,
+      })),
+    );
 
-    if (count > prevFileCount.current) {
+    if (currentFiles !== prevFilesRef.current) {
       handleSave(true);
+      prevFilesRef.current = currentFiles;
+      unregister("openCall.tempFiles");
     }
-
-    prevFileCount.current = count;
-  }, [tempFiles, handleSave]);
+  }, [tempFiles, handleSave, unregister]);
 
   useEffect(() => {
     if (!existingOrg) return;
@@ -1843,23 +1904,6 @@ export const EventOCForm = ({
   }, [eventLastEditedAt, lastSaved]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1024px)");
-    setIsMobile(mediaQuery.matches);
-
-    let timeoutId: NodeJS.Timeout;
-    const handleChange = (e: MediaQueryListEvent) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
-  useEffect(() => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
   }, [activeStep, furthestStep]);
 
@@ -1884,6 +1928,7 @@ export const EventOCForm = ({
       // console.log("hmm");
       setFurthestStep(0);
       setSelectedRow({});
+      setOpenCallId(null);
       // console.log("clearing event data", eventData);
       reset({
         organization: {
@@ -1977,14 +2022,12 @@ export const EventOCForm = ({
     }
   }, [orgData, activeStep, setActiveStep]);
 
-  // 1. Create a stable callback that saves and then closes:
   const saveAndClose = useCallback(async () => {
     await handleSave(true);
     setShouldClose(false);
     setOpen(false);
   }, [handleSave, setOpen, setShouldClose]);
 
-  // 2. Fire it only when shouldClose goes true:
   useEffect(() => {
     if (shouldClose && !hasClosed.current) {
       hasClosed.current = true;
@@ -2007,8 +2050,11 @@ export const EventOCForm = ({
     if (ocData) {
       // console.log(ocData);
       setValue("openCall", ocData);
+      setOpenCallId(ocData._id);
+    } else {
+      setOpenCallId(null);
     }
-  }, [openCallSuccess, ocData, setValue, reset]);
+  }, [openCallSuccess, ocData, setValue]);
 
   useEffect(() => {
     const prodStart = getValues("event.dates.prodDates.0.start");
@@ -2152,6 +2198,7 @@ export const EventOCForm = ({
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
+                documents={currentDocs}
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}
@@ -2179,9 +2226,6 @@ export const EventOCForm = ({
             {/* //------ Final Step: Recap  ------ */}
             {activeStep === steps.length - 1 && (
               <>
-                {/* <pre className="max-w-[74dvw] whitespace-pre-wrap break-words rounded bg-muted p-4 text-sm lg:max-w-[90dvw]">
-                  {JSON.stringify(getValues(), null, 2)}
-                </pre> */}
                 <SubmissionFormRecapDesktop
                   formType={formType}
                   isAdmin={isAdmin}

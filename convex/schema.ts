@@ -365,6 +365,7 @@ const eventOpenCallSchema = {
       v.literal("submitted"),
       v.literal("published"),
       v.literal("archived"),
+      v.literal("initial"),
     ),
   ),
   lastEdited: v.optional(v.number()),
@@ -462,6 +463,7 @@ const openCallSchema = {
       v.literal("submitted"),
       v.literal("published"),
       v.literal("archived"),
+      v.literal("initial"),
     ),
   ), //draft, submitted, published, archived
   lastUpdatedBy: v.optional(v.id("users")),

@@ -556,13 +556,13 @@ export const getUserEvents = query({
   handler: async (ctx) => {
     let organizations = [];
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
+    if (!userId) return null;
 
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
-    if (!user) throw new ConvexError("User not found");
+    if (!user) return null;
 
     // const isAdmin = user.role.includes("admin");
 
@@ -681,10 +681,14 @@ export const updateEdition = mutation({
     edition: v.number(),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    console.log(event?.dates?.edition, args.edition);
-
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
     // Skip if edition hasn't changed
     if (event.dates.edition === args.edition) return null;
 
@@ -695,8 +699,6 @@ export const updateEdition = mutation({
         q.eq("name", event.name).eq("dates.edition", args.edition),
       )
       .collect();
-
-    console.log("duplicate", duplicate);
 
     const conflict = duplicate.find((e) => e._id !== event._id);
     if (conflict) {
@@ -715,6 +717,19 @@ export const updateEdition = mutation({
         edition: args.edition,
       },
     });
+    if (openCall) {
+      await ctx.db.patch(openCall._id, {
+        lastUpdatedAt: Date.now(),
+        lastUpdatedBy: userId,
+        basicInfo: {
+          ...openCall.basicInfo,
+          dates: {
+            ...openCall.basicInfo.dates,
+            edition: args.edition,
+          },
+        },
+      });
+    }
   },
 });
 

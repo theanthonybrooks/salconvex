@@ -1,3 +1,5 @@
+//TODO: Add all of the openCallId logic to this. There's some in the next step part, some in a useEffect that loads it, and... who knows what else. Just look. Update the handleSave to use that openCallId rather than the formData, though. Also update the updateOpenCall to just be an updater. No need to do both.
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -49,6 +51,7 @@ import { Doc, Id } from "~/convex/_generated/dataModel";
 
 import { getSteps } from "@/features/events/event-add-form";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import { useDevice } from "@/providers/device-provider";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
@@ -65,6 +68,8 @@ interface AdminEventOCFormProps {
 export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
+  const { isMobile } = useDevice();
+
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
   const [formType, setFormType] = useState<number>(0);
@@ -135,7 +140,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
-  const createOrUpdateOpenCall = useMutation(
+  const createNewOpenCall = useMutation(
+    api.openCalls.openCall.createNewOpenCall,
+  );
+  const updateOpenCall = useMutation(
     api.openCalls.openCall.createOrUpdateOpenCall,
   );
   const updateEventLastEditedAt = useMutation(
@@ -152,7 +160,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
   // #region ------------- State --------------
   const [acceptedTerms, setAcceptedTerms] = useState(isAdmin);
-  const [isMobile, setIsMobile] = useState(false);
   const [furthestStep, setFurthestStep] = useState(0);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
 
@@ -165,6 +172,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [existingEvent, setExistingEvent] = useState<EnrichedEvent | null>(
     null,
   );
+  const [openCallId, setOpenCallId] = useState<Id<"openCalls"> | null>(null);
 
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const isSelectedRowEmpty =
@@ -215,13 +223,15 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   const savedState = useRef(false);
   const latestSaveId = useRef<symbol | null>(null);
-  const prevFileCount = useRef(0);
+  const prevFilesRef = useRef<string>("");
 
   // #endregion
   // #region ------------- Watch --------------
   const orgData = watch("organization");
   const eventData = watch("event");
+  const eventEdition = watch("event.dates.edition");
   const openCallData = watch("openCall");
+  const ocEdition = watch("openCall.basicInfo.dates.edition");
   const ocBudget = watch("openCall.compensation.budget");
   const tempFiles = watch("openCall.tempFiles");
   // const eventDatesWatch = watch("event.dates");
@@ -307,6 +317,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const { data: ocData, isSuccess: openCallSuccess } = useQueryWithStatus(
     api.openCalls.openCall.getOpenCallByEventId,
     existingEvent && hasOpenCall ? { eventId: existingEvent._id } : "skip",
+  );
+
+  const openCallDocs = useQuery(
+    api.openCalls.openCall.getOpenCallDocuments,
+    ocData?._id ? { openCallId: ocData._id } : "skip",
+  );
+  const currentDocs = openCallDocs?.documents;
+  const normalizedCurrentDocs = (currentDocs ?? []).filter(
+    (doc): doc is { id: Id<"openCallFiles">; title: string; href: string } =>
+      !!doc.id,
   );
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
@@ -434,7 +454,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               : 50,
           accountType: "organizer",
           isEligibleForFree,
-          openCallId: ocData?._id as Id<"openCalls">,
+          openCallId,
         });
         url = result.url;
       }
@@ -499,11 +519,27 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       setValue("event.hasOpenCall", "False");
     }
     handleFirstStep();
-    if (activeStep === 2 && !hasOpenCall) {
-      unregister("openCall");
+    if (activeStep === 2) {
+      if (!hasOpenCall) {
+        unregister("openCall");
+        setActiveStep((prev) => prev + 3);
+        setValue("event.state", eventData?.state ?? "draft");
+      } else {
+        if (!openCallId) {
+          const openCallResult = await createNewOpenCall({
+            orgId: orgData._id as Id<"organizations">,
+            eventId: eventData._id as Id<"events">,
+            edition: eventData.dates.edition,
+          });
 
-      setActiveStep((prev) => prev + 3);
-      setValue("event.state", "draft");
+          setOpenCallId(openCallResult);
+        }
+        if (eventEdition !== ocEdition) {
+          setValue("openCall.basicInfo.dates.edition", eventEdition);
+        }
+
+        setActiveStep((prev) => prev + 1);
+      }
     } else {
       setActiveStep((prev) => prev + 1);
     }
@@ -960,62 +996,78 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           }
         }
         if (activeStep === 3 && hasUserEditedStep3) {
-          let openCallFiles = null;
-          let saveResults: {
-            id: Id<"openCallFiles">;
-            url: string;
-            fileName?: string;
-            storageId: Id<"_storage">;
-          }[] = [];
+          try {
+            let openCallFiles = null;
+            let saveResults: {
+              id: Id<"openCallFiles">;
+              url: string;
+              fileName?: string;
+              storageId: Id<"_storage">;
+            }[] = [];
 
-          if (!openCallData) return;
+            if (!openCallData) return;
 
-          if (openCallData.tempFiles && openCallData.tempFiles?.length > 0) {
-            const result = await handleOrgFileUrl({
-              data: { files: openCallData.tempFiles },
-              generateUploadUrl,
-            });
+            if (openCallData.tempFiles) {
+              if (openCallData.tempFiles?.length > 0) {
+                const result = await handleOrgFileUrl({
+                  data: { files: openCallData.tempFiles },
+                  generateUploadUrl,
+                });
 
-            if (!result) {
-              toast.error("Failed to upload files", {
-                autoClose: 2000,
-                pauseOnHover: false,
-                hideProgressBar: true,
-              });
-              throw new Error("open_call_file_upload_failed");
+                if (!result) {
+                  toast.error("Failed to upload files", {
+                    autoClose: 2000,
+                    pauseOnHover: false,
+                    hideProgressBar: true,
+                  });
+                  throw new Error("open_call_file_upload_failed");
+                  // return;
+                }
+                openCallFiles = result;
+
+                saveResults = await saveOrgFile({
+                  files: result,
+                  reason: "docs",
+                  organizationId: orgData._id as Id<"organizations">,
+                  eventId: eventData._id as Id<"events">,
+                  openCallId,
+                });
+              } else {
+                unregister("openCall.tempFiles");
+              }
             }
-            openCallFiles = result;
+            const newDocs = saveResults.map((saved, i) => {
+              const matched = openCallFiles?.find(
+                (original) => original.storageId === saved.storageId,
+              );
 
-            saveResults = await saveOrgFile({
-              files: result,
-              reason: "docs",
-              organizationId: orgData._id as Id<"organizations">,
-              eventId: eventData._id as Id<"events">,
-              openCallId: openCallData._id
-                ? (openCallData._id as Id<"openCalls">)
-                : undefined,
+              return {
+                id: saved.id,
+                title:
+                  matched?.fileName ??
+                  `${eventData.name} (${eventData.dates.edition}) - Document ${i + 1}`,
+                href: saved.url,
+              };
             });
-            unregister("openCall.tempFiles");
-          }
-          const documents = saveResults.map((saved, i) => {
-            const matched = openCallFiles?.find(
-              (original) => original.storageId === saved.storageId,
+
+            // Merge with currentDocs from query
+            const mergedDocs = [
+              ...(normalizedCurrentDocs ?? []),
+              ...newDocs,
+            ].reduce(
+              (acc, doc) => {
+                if (!acc.find((d) => d.id === doc.id)) {
+                  acc.push(doc);
+                }
+                return acc;
+              },
+              [] as typeof newDocs,
             );
 
-            return {
-              id: saved.id,
-              title:
-                matched?.fileName ??
-                `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
-              href: saved.url,
-            };
-          });
-
-          try {
-            const ocResult = await createOrUpdateOpenCall({
+            const ocResult = await updateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
-              openCallId: openCallData?._id as Id<"openCalls">,
+              openCallId,
               basicInfo: {
                 appFee: openCallData.basicInfo?.appFee ?? 0,
                 callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
@@ -1098,7 +1150,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   openCallData.requirements.applicationLinkSubject,
                 otherInfo: openCallData.requirements.otherInfo,
               },
-              documents,
+              documents: mergedDocs,
               paid: openCallData.paid ?? false,
             });
 
@@ -1136,10 +1188,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           if (!openCallData) return;
 
           try {
-            await createOrUpdateOpenCall({
+            await updateOpenCall({
               orgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
-              openCallId: openCallData?._id as Id<"openCalls">,
+              openCallId,
               basicInfo: {
                 appFee: openCallData.basicInfo?.appFee ?? 0,
                 callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
@@ -1193,13 +1245,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   openCallData.requirements.applicationLinkSubject,
                 otherInfo: openCallData.requirements.otherInfo,
               },
-              documents: openCallData.documents as
-                | {
-                    id: Id<"openCallFiles">;
-                    title: string;
-                    href: string;
-                  }[]
-                | undefined,
+              documents: normalizedCurrentDocs,
               paid: openCallData.paid ?? false,
             });
             let lastEditedResult = null;
@@ -1342,10 +1388,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               orgId: orgData._id as Id<"organizations">,
             });
             if (hasOpenCall && openCallData) {
-              await createOrUpdateOpenCall({
+              await updateOpenCall({
                 orgId: orgData._id as Id<"organizations">,
                 eventId: eventData._id as Id<"events">,
-                openCallId: openCallData?._id as Id<"openCalls">,
+                openCallId,
                 basicInfo: {
                   appFee: openCallData.basicInfo?.appFee ?? 0,
                   callFormat: openCallData.basicInfo.callFormat,
@@ -1401,13 +1447,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     openCallData.requirements.applicationLinkSubject,
                   otherInfo: openCallData.requirements.otherInfo,
                 },
-                documents: openCallData.documents as
-                  | {
-                      id: Id<"openCallFiles">;
-                      title: string;
-                      href: string;
-                    }[]
-                  | undefined,
+                documents: normalizedCurrentDocs,
                 state: publish ? "published" : "submitted",
                 finalStep,
                 approved: publish,
@@ -1452,7 +1492,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       saveOrgFile,
       hasOpenCall,
       openCallData,
-      createOrUpdateOpenCall,
+      openCallId,
+      normalizedCurrentDocs,
+      updateOpenCall,
       markOrganizationComplete,
 
       orgData,
@@ -1644,14 +1686,21 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // }, [isValid, lastSaved, hasUserEditedForm, pending, handleSave, activeStep]);
 
   useEffect(() => {
-    const count = tempFiles?.length ?? 0;
+    if (!tempFiles) return;
+    const currentFiles = JSON.stringify(
+      (tempFiles ?? []).map((f) => ({
+        name: f?.name,
+        size: f?.size,
+        lastModified: f?.lastModified,
+      })),
+    );
 
-    if (count > prevFileCount.current) {
+    if (currentFiles !== prevFilesRef.current) {
       handleSave(true);
+      prevFilesRef.current = currentFiles;
+      unregister("openCall.tempFiles");
     }
-
-    prevFileCount.current = count;
-  }, [tempFiles, handleSave]);
+  }, [tempFiles, handleSave, unregister]);
 
   //note-to-self: disabling this stops the org from loading when searched for without a prevOrgRef.
   useEffect(() => {
@@ -1768,23 +1817,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [eventLastEditedAt, lastSaved]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1024px)");
-    setIsMobile(mediaQuery.matches);
-
-    let timeoutId: NodeJS.Timeout;
-    const handleChange = (e: MediaQueryListEvent) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => setIsMobile(e.matches), 150);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
-  useEffect(() => {
     setFurthestStep((prev) => Math.max(prev, activeStep));
   }, [activeStep, furthestStep]);
 
@@ -1802,6 +1834,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       // console.log("hmm");
       setFurthestStep(0);
       setSelectedRow({});
+      setOpenCallId(null);
       // console.log("clearing event data", eventData);
       reset({
         organization: {
@@ -1901,8 +1934,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     if (ocData) {
       // console.log(ocData);
       setValue("openCall", ocData);
+      setOpenCallId(ocData._id);
+    } else {
+      setOpenCallId(null);
     }
-  }, [openCallSuccess, ocData, setValue, reset]);
+  }, [openCallSuccess, ocData, setValue]);
 
   useEffect(() => {
     const prodStart = getValues("event.dates.prodDates.0.start");
@@ -2028,6 +2064,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 handleCheckSchema={() => handleCheckSchema(false)}
                 formType={formType}
                 pastEvent={pastEvent}
+                documents={currentDocs}
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}

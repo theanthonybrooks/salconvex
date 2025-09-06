@@ -310,10 +310,11 @@ export const newsletterStyling = html`
     }
 
     hr {
-      border: 0;
-      border-bottom: 2px solid black;
+      border: none;
+      border-top: 2px solid black;
       max-width: 80vw;
       margin: 20px auto;
+      height: 0;
     }
   </style>
 `;

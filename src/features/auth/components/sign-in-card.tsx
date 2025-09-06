@@ -357,7 +357,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
               }
               tabIndex={6}
             >
-              {pending ? (
+              {pending || Boolean(isLoading) ? (
                 <LoaderCircle className="size-5 animate-spin" />
               ) : Boolean(success) ? (
                 "Success!"
