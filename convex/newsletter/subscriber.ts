@@ -55,6 +55,7 @@ export const subscribeToNewsletter = mutation({
         lastAttempt: Date.now(),
         userPlan,
         firstName,
+        frequency: newsletterSubscription.frequency ?? "monthly",
         newsletter: true,
         ...(wasCanceled && { email: args.email }),
       });
@@ -82,6 +83,7 @@ export const subscribeToNewsletter = mutation({
         lastAttempt: Date.now(),
         userPlan,
         firstName,
+        frequency: emailSubscription.frequency ?? "monthly",
         newsletter: true,
       });
       if (wasCanceled) {
@@ -107,6 +109,7 @@ export const subscribeToNewsletter = mutation({
         email: args.email,
         newsletter: true,
         type: ["general"],
+        frequency: "monthly",
         timesAttempted: 1,
         lastAttempt: Date.now(),
         userPlan,

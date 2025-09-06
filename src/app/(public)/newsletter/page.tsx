@@ -41,7 +41,7 @@ import {
 import { ConvexError } from "convex/values";
 import { LoaderCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -55,6 +55,7 @@ const NewsletterPage = () => {
     ? (searchParams?.get("subscription") as Id<"newsletter">)
     : undefined;
   const subUpdateRef = useRef<HTMLFormElement>(null);
+  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
@@ -225,6 +226,8 @@ const NewsletterPage = () => {
       setPending(false);
       if (searchParams?.get("subscription")) {
         router.replace(pathname);
+      } else {
+        scheduleResetMessages();
       }
     }
   };
@@ -251,6 +254,7 @@ const NewsletterPage = () => {
       }
     } finally {
       setPending(false);
+      scheduleResetMessages();
     }
   };
 
@@ -286,13 +290,34 @@ const NewsletterPage = () => {
       }
     } finally {
       setPending(false);
+      scheduleResetMessages(10000);
     }
   };
 
   const handleResetMessages = () => {
     setError("");
     setSuccess("");
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
   };
+
+  const scheduleResetMessages = (delay = 5000) => {
+    // clear any existing timer before scheduling a new one
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => {
+      handleResetMessages();
+    }, delay);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">

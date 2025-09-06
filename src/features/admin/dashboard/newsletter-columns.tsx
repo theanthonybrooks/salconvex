@@ -35,7 +35,7 @@ export const newsletterColumnLabels: Record<string, string> = {
   active: "Active",
   type: "Type",
   frequency: "Frequency",
-  userPlan: "Subscription",
+  userPlan: "Plan",
   timesAttempted: "Attempts",
   lastAttempt: "Last Attempt",
   createdAt: "Created",
@@ -104,8 +104,8 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
   },
   {
     accessorKey: "active",
-    minSize: 120,
-    maxSize: 400,
+    minSize: 60,
+    maxSize: 90,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Active" />
     ),
@@ -132,7 +132,7 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
     cell: ({ row }) => {
       const types = row.getValue("type") as NewsletterType[] | undefined;
       return (
-        <div className="truncate text-sm text-muted-foreground">
+        <div className="truncate text-center text-sm capitalize text-muted-foreground">
           {types?.join(", ")}
         </div>
       );
@@ -151,7 +151,7 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
         | NewsletterFrequency
         | undefined;
       return (
-        <div className="truncate text-sm text-muted-foreground">
+        <div className="truncate text-center text-sm capitalize text-muted-foreground">
           {frequency}
         </div>
       );
@@ -159,25 +159,25 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
   },
   {
     accessorKey: "userPlan",
-    minSize: 120,
-    maxSize: 200,
+    minSize: 80,
+    maxSize: 120,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Subscription" />
+      <DataTableColumnHeader column={column} title="Plan" />
     ),
     cell: ({ row }) => {
-      const subscription = row.getValue("userPlan") as number | undefined;
-      // console.log(subscription);
+      const plan = row.getValue("userPlan") as number | undefined;
+      // console.log(plan);
       return (
         <div
           className={cn(
             "rounded px-2 py-1 text-xs font-medium",
-            subscription === 1 && "bg-green-100 text-green-800",
-            subscription === 2 && "bg-gray-100 text-gray-800",
-            subscription === 3 && "bg-indigo-100 text-indigo-800",
-            !subscription && "italic text-muted-foreground",
+            plan === 1 && "bg-green-100 text-green-800",
+            plan === 2 && "bg-gray-100 text-gray-800",
+            plan === 3 && "bg-indigo-100 text-indigo-800",
+            !plan && "italic text-muted-foreground",
           )}
         >
-          <p className="capitalize"> {subscription || "none"}</p>
+          <p className="capitalize"> {plan || "none"}</p>
         </div>
       );
     },
