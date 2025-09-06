@@ -351,12 +351,12 @@ export const sendNewsletterConfirmation = action({
                           </p>
                         </span>
                         <hr />
-                        <p>
+                        <p style="width:100%; text-align:center;">
                           Copyright © The Street Art List ${year}. All rights
                           reserved.
                         </p>
                         <p
-                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
+                          style="font-size:12px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
                         >
                           You are receiving this email because you or someone
                           with your email opted in via the newsletter signup
@@ -514,14 +514,14 @@ export const sendNewsletterUpdateConfirmation = action({
                         </p>
 
                         <hr />
-                        <p>
+                        <p style="width:100%; text-align:center;">
                           Copyright © The Street Art List ${year}. All rights
                           reserved.
                         </p>
 
                         ${newsletter &&
                         `  <p
-                          style="font-size:13px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
+                          style="font-size:12px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
                         >
                           If you didn&apos;t sign up or no longer wish to
                           receive emails, you can unsubscribe

@@ -624,7 +624,10 @@ export const duplicateOC = mutation({
         ...openCall.compensation,
       },
       requirements: {
-        ...openCall.requirements,
+        requirements: openCall.requirements.requirements,
+        applicationLink: "",
+        applicationLinkFormat: "https://",
+        links: [],
       },
       state: "draft",
       paid: false,

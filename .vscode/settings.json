@@ -17,7 +17,8 @@
     "Newsletter",
     "Notifications",
     "General",
-    "Membership"
+    "Membership",
+    "This Week"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

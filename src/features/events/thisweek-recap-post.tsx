@@ -12,6 +12,7 @@ import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { waitForImagesToLoad } from "@/lib/thisWeekFns";
+import { cn } from "@/lib/utils";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { formatInTimeZone } from "date-fns-tz";
@@ -22,6 +23,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Clipboard,
+  Eye,
+  EyeOff,
   Image as ImageIcon,
   X,
 } from "lucide-react";
@@ -41,6 +44,8 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const [copiedAlt, setCopiedAlt] = useState(false);
 
   const [captionText, setCaptionText] = useState("");
+  const [excludedIds, setExcludedIds] = useState<string[]>([]);
+
   const [altText, setAltText] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [altCharCount, setAltCharCount] = useState(0);
@@ -67,14 +72,43 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     source,
   );
 
+  const now = useMemo(() => new Date(), []);
+
+  const activeResults = useMemo(() => {
+    return (
+      queryResult?.results
+        ?.filter((event) => {
+          const dueDate = event.openCall?.basicInfo?.dates?.ocEnd;
+          if (!dueDate) return false;
+          return new Date(dueDate) >= now;
+        })
+        .sort((a, b) => {
+          const aDate = new Date(
+            a.openCall?.basicInfo?.dates?.ocEnd ?? 0,
+          ).getTime();
+          const bDate = new Date(
+            b.openCall?.basicInfo?.dates?.ocEnd ?? 0,
+          ).getTime();
+          return aDate - bDate;
+        }) ?? []
+    );
+  }, [queryResult?.results, now]);
+
+  const filteredResults = useMemo(() => {
+    return activeResults.filter((event) => !excludedIds.includes(event._id));
+  }, [activeResults, excludedIds]);
+
   const { data: totalOpenCallsData } = useQueryWithStatus(
     api.openCalls.openCall.getTotalNumberOfOpenCalls,
   );
 
   const openCallsThisWeek = queryResult?.results.length ?? 0;
+  const pastOpenCalls = openCallsThisWeek - activeResults.length;
   const activeOpenCalls = totalOpenCallsData?.activeOpenCalls ?? 0;
 
-  const otherOpenCallCount = activeOpenCalls - openCallsThisWeek;
+  const otherOpenCallCount =
+    activeOpenCalls - openCallsThisWeek + excludedIds.length + pastOpenCalls;
+
   const displayRange =
     queryResult?.weekStartISO && queryResult?.weekEndISO
       ? formatCondensedDateRange(
@@ -88,14 +122,13 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     if (!folder) return;
 
-    // const nodes = refs.current.filter(Boolean); // clean nulls
     const nodes = refs.current.filter(Boolean) as HTMLElement[];
 
     await waitForImagesToLoad(nodes);
     for (let i = 0; i < nodes.length; i++) {
       try {
         const dataUrl = await toJpeg(nodes[i]!, { quality: 0.95 });
-        const base64 = dataUrl.split(",")[1]; // strip header
+        const base64 = dataUrl.split(",")[1];
         folder.file(`${i + 1}.jpg`, base64, { base64: true });
       } catch (err) {
         console.error(`Error rendering node ${i}`, err);
@@ -133,11 +166,11 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   };
 
   useEffect(() => {
-    if (!queryResult?.results?.length) return;
+    if (!filteredResults?.length) return;
 
     const grouped: Record<string, { events: string[]; timeZone: string }> = {};
 
-    for (const event of queryResult.results) {
+    for (const event of filteredResults) {
       const name = event.name;
       const dueDate = event.openCall?.basicInfo.dates?.ocEnd ?? "";
       const timeZone =
@@ -185,16 +218,16 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     setCaptionText(content);
     setCharCount(content.length);
-  }, [queryResult]);
+  }, [filteredResults]);
 
   useEffect(() => {
-    if (!queryResult?.results?.length) return;
+    if (!filteredResults?.length) return;
 
     const altText = `Weekly post for ${displayRange}. The links are on The Street Art List website (thestreetartlist.com)`;
 
     setAltText(altText);
     setAltCharCount(altText.length);
-  }, [queryResult, displayRange]);
+  }, [filteredResults, displayRange]);
 
   return (
     <>
@@ -216,7 +249,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
         </Button>
       </div>
 
-      <div className="scrollable mini flex w-full max-w-[90vw] flex-col-reverse gap-6 py-6 sm:grid sm:grid-cols-2">
+      <div className="scrollable mini flex w-full max-w-[90vw] flex-col-reverse gap-6 p-6 sm:grid sm:grid-cols-2">
         <div className="mx-auto flex w-fit flex-col gap-y-6">
           <div className="group relative">
             <RecapCover
@@ -263,69 +296,82 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             </div>
           </div>
 
-          {queryResult?.results
-            ?.slice()
-            .sort((a, b) => {
-              const aDate = new Date(
-                a.openCall?.basicInfo?.dates?.ocEnd ?? 0,
-              ).getTime();
-              const bDate = new Date(
-                b.openCall?.basicInfo?.dates?.ocEnd ?? 0,
-              ).getTime();
-              return aDate - bDate;
-            })
-            .map((event, index) => (
-              <div className="group relative" key={event._id}>
-                <RecapPost
-                  ref={(el) => {
-                    refs.current[index + 1] = el;
-                  }}
-                  event={event}
-                  index={index}
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                  onClick={() => handleDownloadSingle(index + 1)}
-                  title="Download image"
-                >
-                  <ImageIcon className="size-5" />
-                </button>
-              </div>
-            ))}
-          {queryResult?.results && (
+          {activeResults?.map((event, index) => (
+            <div
+              className={cn(
+                "group relative",
+                excludedIds.includes(event._id) && "opacity-50 grayscale",
+              )}
+              key={event._id}
+            >
+              <RecapPost
+                ref={(el) => {
+                  refs.current[index + 1] = el;
+                }}
+                event={event}
+                index={index}
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                onClick={() => handleDownloadSingle(index + 1)}
+                title="Download image"
+              >
+                <ImageIcon className="size-5" />
+              </button>
+              <button
+                type="button"
+                className="absolute right-10 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                title={
+                  excludedIds.includes(event._id)
+                    ? "Add to list"
+                    : "Remove from list"
+                }
+                onClick={() =>
+                  setExcludedIds((prev) =>
+                    prev.includes(event._id)
+                      ? prev.filter((id) => id !== event._id)
+                      : [...prev, event._id],
+                  )
+                }
+              >
+                {excludedIds.includes(event._id) ? (
+                  <EyeOff className="size-5 shrink-0" />
+                ) : (
+                  <Eye className="size-5 shrink-0" />
+                )}
+              </button>
+            </div>
+          ))}
+          {filteredResults && (
             <div className="group relative">
               <RecapLastPage
                 openCallCount={otherOpenCallCount}
                 ref={(el) => {
-                  refs.current[queryResult.results.length + 1] = el;
+                  refs.current[filteredResults.length + 1] = el;
                 }}
               />
               <button
                 type="button"
                 className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                onClick={() =>
-                  handleDownloadSingle(queryResult.results.length + 1)
-                }
+                onClick={() => handleDownloadSingle(filteredResults.length + 1)}
                 title="Download image"
               >
                 <ImageIcon className="size-5" />
               </button>
             </div>
           )}
-          {queryResult?.results && (
+          {filteredResults && (
             <div className="group relative">
               <RecapEndCover
                 ref={(el) => {
-                  refs.current[queryResult.results.length + 2] = el;
+                  refs.current[filteredResults.length + 2] = el;
                 }}
               />
               <button
                 type="button"
                 className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                onClick={() =>
-                  handleDownloadSingle(queryResult.results.length + 2)
-                }
+                onClick={() => handleDownloadSingle(filteredResults.length + 2)}
                 title="Download image"
               >
                 <ImageIcon className="size-5" />
