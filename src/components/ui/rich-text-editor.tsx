@@ -60,12 +60,15 @@ interface Props {
   charLimit?: number;
   purpose?: string;
   asModal?: boolean;
+  bgClassName?: string;
   title?: string;
   subtitle?: string;
   noList?: boolean;
   readOnly?: boolean;
   inputPreview?: boolean;
-  inputPreviewClassName?: string;
+  inputPreviewContainerClassName?: string;
+  formInputPreview?: boolean;
+  formInputPreviewClassName?: string;
   tabIndex?: number;
   withTaskList?: boolean;
 }
@@ -98,12 +101,15 @@ export const RichTextEditor = ({
   requiredChars,
   purpose,
   asModal = true,
+  // bgClassName,
   title,
   subtitle,
   noList,
   readOnly,
   inputPreview,
-  inputPreviewClassName,
+  inputPreviewContainerClassName,
+  formInputPreview,
+  formInputPreviewClassName,
   tabIndex,
   withTaskList,
 }: Props) => {
@@ -415,9 +421,10 @@ export const RichTextEditor = ({
   const EditorUI = (
     <div
       className={cn(
-        "relativè flex flex-col rounded p-2",
+        "relative flex flex-col rounded p-2",
         !asModal && "border",
         asModal && "rich-modal-cont",
+        // bgClassName,
       )}
     >
       {/* Toolbar */}
@@ -729,7 +736,12 @@ export const RichTextEditor = ({
         )}
       />
 
-      <div className="absolute bottom-4 right-4 flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-1 sm:w-auto">
+      <div
+        className={cn(
+          "absolute bottom-4 right-4 flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-1 sm:w-auto",
+          // bgClassName,
+        )}
+      >
         <p
           className={cn(
             "mr-1 flex items-center justify-end gap-1 text-right text-sm text-gray-500",
@@ -788,7 +800,8 @@ export const RichTextEditor = ({
             "relative cursor-pointer rounded border bg-card p-2",
             readOnly && "pointer-events-none border-foreground/50 opacity-50",
             "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
-            inputPreviewClassName,
+
+            inputPreviewContainerClassName,
           )}
           tabIndex={tabIndex}
           onClick={() => setEditorOpen(true)}
@@ -804,8 +817,10 @@ export const RichTextEditor = ({
           <div
             className={cn(
               "scrollable justy mini min-h-14 text-sm text-muted-foreground",
-              (inputPreview || !editorOpen) && "line-clamp-3 max-h-25 min-h-10",
               !value && "line-clamp-5",
+              ((formInputPreview && !editorOpen) || inputPreview) &&
+                "line-clamp-3 max-h-25",
+              formInputPreviewClassName,
             )}
           >
             {value ? (
@@ -851,7 +866,9 @@ export const RichTextEditor = ({
 
         <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
-            className="h-[90dvh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:w-[95vw]"
+            className={cn(
+              "h-[90dvh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:w-[95vw]",
+            )}
             overlayClassName="z-[31]"
           >
             <DialogTitle className="sr-only">Text Editor</DialogTitle>

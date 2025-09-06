@@ -390,10 +390,6 @@ const SubmissionFormOC1 = ({
                     readOnly={pastEvent}
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    // onChange={(val) => {
-                    //   field.onChange(val);
-                    //   // handleCheckSchema();
-                    // }}
                     requiredChars={
                       !isNational && !isInternational
                         ? isAdmin
@@ -408,11 +404,13 @@ const SubmissionFormOC1 = ({
                         : "Please be as specific as possible who can apply"
                     }
                     charLimit={1200}
-                    inputPreviewClassName={cn(
+                    inputPreviewContainerClassName={cn(
                       (errors?.openCall?.eligibility?.details ||
                         !hasRequiredEligDetails) &&
                         "invalid-field",
                     )}
+                    formInputPreview
+                    formInputPreviewClassName="min-h-12"
                   />
                 )}
               />
@@ -647,10 +645,11 @@ const SubmissionFormOC1 = ({
                       asModal={true}
                       title={eventName}
                       subtitle="Application Requirements"
-                      inputPreviewClassName={cn(
+                      inputPreviewContainerClassName={cn(
                         errors?.openCall?.requirements?.requirements &&
                           "invalid-field",
                       )}
+                      formInputPreview
                       tabIndex={10}
                     />
                   )}
@@ -689,10 +688,11 @@ const SubmissionFormOC1 = ({
                       asModal={true}
                       title={eventName}
                       subtitle="Other Info"
-                      inputPreviewClassName={cn(
+                      inputPreviewContainerClassName={cn(
                         errors?.openCall?.requirements?.otherInfo &&
                           "invalid-field",
                       )}
+                      formInputPreview
                       tabIndex={11}
                     />
                   )}

@@ -164,6 +164,7 @@ const SubmissionFormEventStep2 = ({
                       onChange={field.onChange}
                       placeholder="Add any other info about your project/event. Don't add open call details here."
                       charLimit={5000}
+                      formInputPreview
                     />
                   )}
                 />
@@ -307,6 +308,7 @@ const SubmissionFormEventStep2 = ({
                           onChange={field.onChange}
                           charLimit={2000}
                           placeholder="Notes to self (or other admins)"
+                          formInputPreview
                         />
                       )}
                     />

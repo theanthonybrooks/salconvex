@@ -266,7 +266,7 @@ export const OrgSearch = ({
             e.preventDefault();
             containerRef.current?.querySelector("input")?.focus();
           }}
-          className="absolute left-2 top-1/2 size-4 -translate-y-1/2 transform cursor-pointer text-foreground/50 hover:text-foreground/100 lg:ml-2 lg:size-7"
+          className="absolute left-2 top-1/2 size-4 -translate-y-1/2 transform cursor-pointer text-muted-foreground hover:text-foreground lg:ml-2 lg:size-7"
         />
         {/* {focused && inputValue === "" && (
           <span className='absolute left-10 top-1/2 -translate-y-1/2 h-10 w-[2px] bg-foreground animate-caret-blink pointer-events-none' />

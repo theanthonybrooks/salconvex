@@ -134,8 +134,10 @@ const SubmissionFormOrgStep2 = ({
                     value={field.value ?? ""}
                     onChange={field.onChange}
                     placeholder="Add any info about your organization... "
-                    charLimit={1500}
+                    charLimit={2000}
                     purpose="organizerAbout"
+                    formInputPreview
+                    formInputPreviewClassName="min-h-12 max-h-50 "
                   />
                 )}
               />

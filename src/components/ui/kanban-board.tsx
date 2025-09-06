@@ -841,7 +841,7 @@ export const TaskDialog = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={60}
-            className="scrollable mini w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+            className="scrollable mini w-full resize-none rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
           <Label htmlFor="description" className="sr-only">
             Description
@@ -852,8 +852,10 @@ export const TaskDialog = ({
             placeholder="Task description..."
             charLimit={5000}
             asModal={true}
+            // bgClassName="bg-violet-400/10"
             withTaskList={true}
-            inputPreviewClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+            inputPreview={false}
+            inputPreviewContainerClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
           {/* <input autoFocus className="sr-only" /> */}
 

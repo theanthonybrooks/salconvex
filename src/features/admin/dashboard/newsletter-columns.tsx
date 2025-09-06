@@ -14,15 +14,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NewsletterFrequency,
+  NewsletterType,
+} from "@/constants/newsletterConsts";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+import {
+  CheckCircle2,
+  LucideClipboardCopy,
+  MoreHorizontal,
+  X,
+} from "lucide-react";
 import { FaEnvelope } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const newsletterColumnLabels: Record<string, string> = {
   name: "Name",
   email: "Email",
+  active: "Active",
+  type: "Type",
+  frequency: "Frequency",
   userPlan: "Subscription",
   timesAttempted: "Attempts",
   lastAttempt: "Last Attempt",
@@ -33,6 +45,9 @@ interface NewsletterColumnsProps {
   _id: Id<"newsletter">;
   name: string;
   email: string;
+  active: boolean;
+  type?: NewsletterType[];
+  frequency?: NewsletterFrequency;
   userPlan?: number;
   timesAttempted: number;
   lastAttempt: number;
@@ -86,6 +101,61 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
         {row.getValue("email")}
       </div>
     ),
+  },
+  {
+    accessorKey: "active",
+    minSize: 120,
+    maxSize: 400,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Active" />
+    ),
+    cell: ({ row }) => {
+      const active = row.getValue("active") as boolean | undefined;
+      return (
+        <div className="flex justify-center">
+          {active ? (
+            <CheckCircle2 className="size-4 text-emerald-600" />
+          ) : (
+            <X className="size-4 text-red-500" />
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "type",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Type" />
+    ),
+    cell: ({ row }) => {
+      const types = row.getValue("type") as NewsletterType[] | undefined;
+      return (
+        <div className="truncate text-sm text-muted-foreground">
+          {types?.join(", ")}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "frequency",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Frequency" />
+    ),
+    cell: ({ row }) => {
+      const frequency = row.getValue("frequency") as
+        | NewsletterFrequency
+        | undefined;
+      return (
+        <div className="truncate text-sm text-muted-foreground">
+          {frequency}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "userPlan",

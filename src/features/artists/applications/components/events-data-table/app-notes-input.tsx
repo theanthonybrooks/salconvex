@@ -24,7 +24,8 @@ export const AppNotesInput = ({ notes, application }: AppNotesInputProps) => {
       value={notes}
       onChange={handleChange}
       inputPreview
-      placeholder="(optional)"
+      // placeholder="(optional)"
+      formInputPreviewClassName="line-clamp-1 min-h-5 max-h-20"
     />
   );
 };

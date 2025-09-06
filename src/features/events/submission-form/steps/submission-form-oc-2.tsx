@@ -754,6 +754,7 @@ const SubmissionFormOC2 = ({
                     placeholder="Please list any other compensation-related info here"
                     charLimit={2000}
                     readOnly={pastEvent}
+                    formInputPreview
                   />
                 )}
               />

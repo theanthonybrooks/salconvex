@@ -471,6 +471,7 @@ const SubmissionFormEventStep1 = ({
                             placeholder="Short blurb about your project/event... "
                             charLimit={2500}
                             noList={true}
+                            formInputPreview
                           />
                         )}
                       />
@@ -622,6 +623,7 @@ const SubmissionFormEventStep1 = ({
                         placeholder="Important dates: open call, production, judging/selection, etc"
                         charLimit={2500}
                         noList={false}
+                        formInputPreview
                       />
                     )}
                   />
