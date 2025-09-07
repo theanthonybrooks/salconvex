@@ -339,6 +339,9 @@ const eventSchema = {
     v.literal("published"),
     v.literal("archived"),
   ),
+  posted: v.optional(v.union(v.literal("toPost"), v.literal("posted"))),
+  postedAt: v.optional(v.number()),
+  postedBy: v.optional(v.id("users")),
   active: v.optional(v.boolean()),
   lastEditedAt: v.optional(v.number()),
   approvedBy: v.optional(v.id("users")),
@@ -891,6 +894,7 @@ export default defineSchema({
         applications: v.optional(v.boolean()),
       }),
     ),
+    cookiePefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
     lastUpdated: v.optional(v.number()),
   }).index("by_userId", ["userId"]),
 

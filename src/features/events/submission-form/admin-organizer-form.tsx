@@ -2102,17 +2102,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   isEligibleForFree={isAdmin ? true : isEligibleForFree}
                   alreadyPaid={alreadyPaid}
                 />
-                {isMobile && (
-                  <SubmissionFormRecapMobile
-                    formType={formType}
-                    isAdmin={isAdmin}
-                    setAcceptedTerms={setAcceptedTerms}
-                    acceptedTerms={acceptedTerms}
-                    submissionCost={submissionCost?.price}
-                    isEligibleForFree={isAdmin ? true : isEligibleForFree}
-                    alreadyPaid={alreadyPaid}
-                  />
-                )}
+
+                <SubmissionFormRecapMobile
+                  formType={formType}
+                  isAdmin={isAdmin}
+                  setAcceptedTerms={setAcceptedTerms}
+                  acceptedTerms={acceptedTerms}
+                  submissionCost={submissionCost?.price}
+                  isEligibleForFree={isAdmin ? true : isEligibleForFree}
+                  alreadyPaid={alreadyPaid}
+                />
               </>
             )}
 

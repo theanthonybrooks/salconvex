@@ -2235,17 +2235,16 @@ export const EventOCForm = ({
                   isEligibleForFree={isEligibleForFree}
                   alreadyPaid={alreadyPaid}
                 />
-                {isMobile && (
-                  <SubmissionFormRecapMobile
-                    formType={formType}
-                    isAdmin={isAdmin}
-                    setAcceptedTerms={setAcceptedTerms}
-                    acceptedTerms={acceptedTerms}
-                    submissionCost={submissionCost?.price}
-                    isEligibleForFree={isEligibleForFree}
-                    alreadyPaid={alreadyPaid}
-                  />
-                )}
+
+                <SubmissionFormRecapMobile
+                  formType={formType}
+                  isAdmin={isAdmin}
+                  setAcceptedTerms={setAcceptedTerms}
+                  acceptedTerms={acceptedTerms}
+                  submissionCost={submissionCost?.price}
+                  isEligibleForFree={isEligibleForFree}
+                  alreadyPaid={alreadyPaid}
+                />
               </>
             )}
 
