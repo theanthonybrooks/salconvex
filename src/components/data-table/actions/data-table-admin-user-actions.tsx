@@ -51,7 +51,7 @@ export const DeleteNewsletterSubscription = ({ userId }: UserActionProps) => {
             "Are you sure you want to remove this user's newsletter subscription?",
           onConfirm: () => {
             deleteSubscription({
-              subscriberId: userId as Id<"users">,
+              subscriberId: userId as Id<"newsletter">,
             });
           },
         });

@@ -8,23 +8,41 @@ import { mutation, query } from "~/convex/_generated/server";
 
 export const deleteSubscription = mutation({
   args: {
-    subscriberId: v.id("users"),
+    subscriberId: v.id("newsletter"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) throw new ConvexError("Not authenticated");
     const user = await ctx.db
       .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", currentUserId))
       .unique();
     if (!user) throw new ConvexError("User not found");
 
     const subscriber = await ctx.db
       .query("newsletter")
-      .withIndex("by_userId", (q) => q.eq("userId", args.subscriberId))
+      .withIndex("by_id", (q) => q.eq("_id", args.subscriberId))
       .unique();
 
     if (!subscriber) throw new ConvexError("Subscriber not found");
+
+    const userId = subscriber.userId;
+
+    const userPreferences = userId
+      ? await ctx.db
+          .query("userPreferences")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+      : null;
+
+    if (userPreferences?.notifications?.newsletter) {
+      await ctx.db.patch(userPreferences._id, {
+        notifications: {
+          ...userPreferences.notifications,
+          newsletter: false,
+        },
+      });
+    }
 
     await ctx.db.delete(subscriber._id);
   },
