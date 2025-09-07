@@ -18,18 +18,16 @@ export const RecapCover = forwardRef<HTMLDivElement, RecapCoverProps>(
     return (
       <div
         ref={ref}
-        className="relative w-[500px] bg-[#feee1f] bg-cover bg-center"
+        className="relative flex h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
       >
-        <section className="post-header">
-          <img
-            className="-z-1 h-full w-full p-10 pl-12"
-            src="/branding/weeklybgsalupdate.png"
-            alt="Open Calls Ending this Week Background"
-            height={400}
-            width={400}
-            crossOrigin="anonymous"
-          />
-        </section>
+        <img
+          className="m-auto max-h-full max-w-full"
+          src="/branding/weeklybgsalupdate.png"
+          alt="Open Calls Ending this Week Background"
+          height={400}
+          width={400}
+          crossOrigin="anonymous"
+        />
         <section className="absolute bottom-1/2 flex w-full translate-y-[12.3em] flex-col">
           <section className="filler">
             <h2
@@ -62,18 +60,17 @@ export const RecapEndCover = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div
       ref={ref}
-      className="relative w-[500px] bg-[#feee1f] bg-cover bg-center"
+      className="relative flex h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
     >
-      <section className="post-header">
-        <img
-          className="-z-1 h-full w-full -translate-y-6 p-10 pl-12"
-          src="/branding/weekly-back-cover2.png"
-          alt="Open Calls Ending this Week Background"
-          height={400}
-          width={400}
-          crossOrigin="anonymous"
-        />
-      </section>
+      <img
+        className="m-auto max-h-full max-w-full"
+        src="/branding/weekly-back-cover2.png"
+        alt="Open Calls Ending this Week Background"
+        height={400}
+        width={400}
+        crossOrigin="anonymous"
+      />
+
       <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
         TheStreetArtList.com
       </section>
@@ -85,9 +82,9 @@ export const RecapLastPage = forwardRef<HTMLDivElement, RecapLastPageProps>(
     return (
       <div
         ref={ref}
-        className="relative flex aspect-square w-[500px] flex-col items-center justify-center bg-[#feee1f] bg-cover bg-center"
+        className="relative flex aspect-square h-[625px] w-[500px] flex-col items-center justify-center bg-[#feee1f] bg-cover bg-center"
       >
-        <section className="flex w-full flex-col px-8">
+        <section className="m-auto max-h-full max-w-full">
           <span className={cn("text-center font-tanker lowercase", "text-4xl")}>
             <p className="text-[4em] leading-[1em]">+{openCallCount} </p>
             <p>more open calls</p>{" "}

@@ -29,7 +29,7 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
   return (
     <div
       ref={ref}
-      className="relative h-[500px] w-[500px] bg-[#feee1f] bg-cover bg-center"
+      className="relative h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
     >
       <section className="post-header">
         <p className="absolute -left-9 top-24 -rotate-90 text-base font-black">
