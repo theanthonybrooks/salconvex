@@ -1,5 +1,9 @@
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
+export const cookiePrefTypes = ["all", "required"] as const;
+
+export type CookiePref = (typeof cookiePrefTypes)[number];
+
 export const userPrefValues = [
   { label: "Auto Apply", value: "autoApply", type: "boolean" },
   { label: "Currency", value: "currency", type: "string" },
@@ -7,6 +11,7 @@ export const userPrefValues = [
   // { label: "Language", value: "language", type: "string" },
   { label: "Theme", value: "theme", type: "string" },
   { label: "Font Size", value: "fontSize", type: "string" },
+  { label: "Cookies", value: "cookiePrefs", type: "string" },
 ] as const;
 
 type UserPrefEntry = (typeof userPrefValues)[number];

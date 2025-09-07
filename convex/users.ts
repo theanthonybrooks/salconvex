@@ -384,6 +384,7 @@ const prefsArgs = v.object({
   theme: v.optional(v.string()),
   fontSize: v.optional(v.string()),
   language: v.optional(v.string()),
+  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
 });
 type UpdateUserPrefsArgs = Infer<typeof prefsArgs>;
 

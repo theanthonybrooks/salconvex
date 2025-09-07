@@ -173,6 +173,7 @@ export const UpdateUserPrefsSchema = z.object({
   language: z.string().optional(),
   theme: z.string().optional(),
   fontSize: z.string().optional(),
+  cookiePrefs: z.union([z.literal("all"), z.literal("required")]).optional(),
 });
 
 export type UpdateUserPrefsSchemaValues = z.infer<typeof UpdateUserPrefsSchema>;

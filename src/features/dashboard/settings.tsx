@@ -64,6 +64,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
   Clock,
+  Cookie,
   Globe,
   LoaderCircle,
   Mail,
@@ -98,6 +99,7 @@ import { ArtistProfileForm } from "@/features/artists/components/artist-profile-
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
+import { CookiePref } from "@/types/user";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { FontSizeIcon } from "@radix-ui/react-icons";
 import { usePreloadedQuery } from "convex/react";
@@ -743,8 +745,8 @@ export default function SettingsPage() {
                         handleUpdateUserPrefs({ timezone: value })
                       }
                       className={cn(
-                        fontSize === "text-base" ? "sm:text-base" : "",
-                        "sm:w-[350px]",
+                        fontSize === "text-base" ? "sm:text-base" : fontSize,
+                        "max-w-[72vw] sm:w-[350px]",
                       )}
                       data={timezones[0]}
                       getItemLabel={(timezone) =>
@@ -1125,6 +1127,53 @@ export default function SettingsPage() {
 
         <TabsContent value="security">
           <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Privacy</CardTitle>
+                <CardDescription>Manage your privacy settings</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="flex items-center gap-4">
+                      <Cookie className="size-5 text-muted-foreground" />
+                      <div>
+                        <Label className={fontSize}>Cookies</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Change your cookie preferences
+                        </p>
+                      </div>
+                    </div>
+
+                    <Select
+                      value={userPrefs?.cookiePrefs}
+                      onValueChange={(value) =>
+                        handleUpdateUserPrefs({
+                          cookiePrefs: value as CookiePref,
+                        })
+                      }
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                          fontSize === "text-base" ? "sm:text-base" : fontSize,
+                        )}
+                      >
+                        <SelectValue placeholder="Select One" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all" center>
+                          All Cookies
+                        </SelectItem>
+                        <SelectItem value="required" center>
+                          Required Only
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>Security</CardTitle>
