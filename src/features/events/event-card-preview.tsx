@@ -40,7 +40,13 @@ import {
   Info,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FaBookmark, FaMapLocationDot, FaRegBookmark } from "react-icons/fa6";
+import { FaRegCheckSquare } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaMapLocationDot,
+  FaRegBookmark,
+  FaRegSquare,
+} from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
 
 export interface EventCardPreviewProps {
@@ -51,8 +57,6 @@ export interface EventCardPreviewProps {
   publicPreview?: boolean;
 }
 
-
-
 const EventCardPreview = ({
   event,
   publicView,
@@ -60,6 +64,7 @@ const EventCardPreview = ({
   userPref,
   publicPreview,
 }: EventCardPreviewProps) => {
+  const isAdmin = user?.role?.includes("admin");
   const userTZ = !!userPref?.timezone ? userPref.timezone : undefined;
   const router = useRouter();
   const {
@@ -83,6 +88,7 @@ const EventCardPreview = ({
     status: appStatus,
     slug,
     artistNationality,
+    posted,
   } = event;
   const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { opencall } = tabs;
@@ -173,6 +179,9 @@ const EventCardPreview = ({
 
   const { toggleListAction } = useToggleListAction(event._id);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
+  const updateEventPostStatus = useMutation(
+    api.events.event.updateEventPostStatus,
+  );
 
   const onBookmark = async () => {
     if (publicView) {
@@ -197,6 +206,15 @@ const EventCardPreview = ({
       } catch (error) {
         console.error("Error updating last active:", error);
       }
+    }
+  };
+
+  const handlePostEvent = async () => {
+    if (!user) return;
+    try {
+      await updateEventPostStatus({ eventId: event._id });
+    } catch (error) {
+      console.error("Error updating event post status:", error);
     }
   };
 
@@ -437,6 +455,23 @@ const EventCardPreview = ({
                 </Tooltip>
               </TooltipProvider>
             )}
+            {isAdmin &&
+              (posted !== "posted" ? (
+                <FaRegSquare
+                  className={cn(
+                    "size-6 hover:scale-105 hover:cursor-pointer active:scale-95",
+                    posted === "toPost" && "text-red-600",
+                  )}
+                  onClick={handlePostEvent}
+                />
+              ) : (
+                <FaRegCheckSquare
+                  className={cn(
+                    "size-6 text-emerald-600 hover:scale-105 hover:cursor-pointer active:scale-95",
+                  )}
+                  onClick={handlePostEvent}
+                />
+              ))}
             {appStatus === null ? (
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
@@ -569,7 +604,7 @@ const EventCardPreview = ({
 
                 <RichTextDisplay
                   html={event.about}
-                  className="line-clamp-3 text-sm"
+                  className="line-clamp-3 max-h-20 text-sm"
                   maxChars={100}
                   fontSize={fontSize}
                 />

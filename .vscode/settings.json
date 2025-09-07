@@ -18,7 +18,8 @@
     "Notifications",
     "General",
     "Membership",
-    "This Week"
+    "This Week",
+    "Admin"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

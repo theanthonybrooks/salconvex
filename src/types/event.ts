@@ -183,6 +183,9 @@ export interface EventData {
   state: SubmissionFormState;
   active?: boolean;
   lastEditedAt?: number;
+  posted?: "posted" | "toPost";
+  postedAt?: number;
+  postedBy?: string;
 }
 
 export interface EventCardDetailProps {
