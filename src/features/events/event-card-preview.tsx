@@ -30,7 +30,7 @@ import { getCallFormatLabel } from "@/lib/openCallFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 
 import { cn } from "@/lib/utils";
-import { CombinedEventPreviewCardData } from "@/types/event";
+import { CombinedEventPreviewCardData, PostStatus } from "@/types/event";
 import { User, UserPref } from "@/types/user";
 import { useMutation } from "convex/react";
 import {
@@ -209,10 +209,10 @@ const EventCardPreview = ({
     }
   };
 
-  const handlePostEvent = async () => {
+  const handlePostEvent = async (postStatus: PostStatus | null) => {
     if (!user) return;
     try {
-      await updateEventPostStatus({ eventId: event._id });
+      await updateEventPostStatus({ eventId: event._id, posted: postStatus });
     } catch (error) {
       console.error("Error updating event post status:", error);
     }
@@ -456,22 +456,21 @@ const EventCardPreview = ({
               </TooltipProvider>
             )}
             {isAdmin &&
-              (posted !== "posted" ? (
+              (posted === "toPost" ? (
                 <FaRegSquare
                   className={cn(
-                    "size-6 hover:scale-105 hover:cursor-pointer active:scale-95",
-                    posted === "toPost" && "text-red-600",
+                    "size-6 text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95",
                   )}
-                  onClick={handlePostEvent}
+                  onClick={() => handlePostEvent("posted")}
                 />
-              ) : (
+              ) : posted === "posted" ? (
                 <FaRegCheckSquare
                   className={cn(
                     "size-6 text-emerald-600 hover:scale-105 hover:cursor-pointer active:scale-95",
                   )}
-                  onClick={handlePostEvent}
+                  onClick={() => handlePostEvent(null)}
                 />
-              ))}
+              ) : null)}
             {appStatus === null ? (
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
@@ -537,6 +536,8 @@ const EventCardPreview = ({
             openCallState={ocState ?? null}
             user={user}
             align="start"
+            postStatus={posted}
+            postOptions={true}
           />
         </div>
 

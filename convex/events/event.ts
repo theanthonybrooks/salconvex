@@ -1621,6 +1621,9 @@ export const deleteMultipleEvents = mutation({
 export const updateEventPostStatus = mutation({
   args: {
     eventId: v.id("events"),
+    posted: v.optional(
+      v.union(v.literal("posted"), v.literal("toPost"), v.null()),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -1629,10 +1632,10 @@ export const updateEventPostStatus = mutation({
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
 
-    const posted = event.posted;
+    const posted = args.posted ?? undefined;
 
     await ctx.db.patch(event._id, {
-      posted: posted === "posted" ? undefined : "posted",
+      posted,
       postedAt: Date.now(),
       postedBy: userId,
     });

@@ -115,6 +115,10 @@ export const eventFormatValues = [
 ] as const;
 export type EventFormat = (typeof eventFormatValues)[number];
 
+export const PostStatusValues = ["posted", "toPost"] as const;
+
+export type PostStatus = (typeof PostStatusValues)[number];
+
 export interface EventData {
   _id: Id<"events">;
   adminNote?: string;
@@ -183,7 +187,7 @@ export interface EventData {
   state: SubmissionFormState;
   active?: boolean;
   lastEditedAt?: number;
-  posted?: "posted" | "toPost";
+  posted?: PostStatus;
   postedAt?: number;
   postedBy?: string;
 }

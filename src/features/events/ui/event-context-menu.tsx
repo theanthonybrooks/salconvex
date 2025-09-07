@@ -17,6 +17,7 @@ import {
   EyeOff,
   Mail,
   Pencil,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -25,6 +26,7 @@ import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
   SubmissionFormState as EventState,
+  PostStatus,
 } from "@/types/event";
 import { OpenCallState, OpenCallStatus } from "@/types/openCall";
 
@@ -44,6 +46,7 @@ import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
+import { MdPhoto } from "react-icons/md";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -68,6 +71,8 @@ interface EventContextMenuProps {
   isBookmarked?: boolean;
   reviewMode?: boolean;
   orgPreview?: boolean;
+  postStatus?: PostStatus;
+  postOptions?: boolean;
 }
 
 const EventContextMenu = ({
@@ -91,11 +96,16 @@ const EventContextMenu = ({
   isBookmarked,
   reviewMode = false,
   orgPreview,
+  postStatus,
+  postOptions = false,
 }: EventContextMenuProps) => {
   const router = useRouter();
   const isAdmin = user?.role?.includes("admin") || false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
+  const updateEventPostStatus = useMutation(
+    api.events.event.updateEventPostStatus,
+  );
   const approveEvent = useMutation(api.events.event.approveEvent);
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -130,6 +140,18 @@ const EventContextMenu = ({
     user?.email === orgOwnerEmailData?.orgOwnerEmail;
 
   const nonAdminPublicView = publicView && !isAdmin && !orgPreview;
+
+  const handlePostEvent = async (postStatus: PostStatus | null) => {
+    if (!user) return;
+    try {
+      await updateEventPostStatus({
+        eventId: eventId as Id<"events">,
+        posted: postStatus,
+      });
+    } catch (error) {
+      console.error("Error updating event post status:", error);
+    }
+  };
 
   return (
     <Popover>
@@ -217,6 +239,33 @@ const EventContextMenu = ({
                   </div>
                 )}
             </>
+          )}
+          {isAdmin && postOptions && (
+            <div
+              className={cn(
+                "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                nonAdminPublicView && "hidden",
+              )}
+            >
+              {/* //TODO: Make this link to the socials page as well as updating the post status  */}
+              {!postStatus ? (
+                <span
+                  className="flex items-center gap-x-1 text-sm"
+                  onClick={() => handlePostEvent("toPost")}
+                >
+                  <MdPhoto className="size-4" />
+                  Make Post
+                </span>
+              ) : (
+                <span
+                  className="flex items-center gap-x-1 text-sm"
+                  onClick={() => handlePostEvent(null)}
+                >
+                  <X className="size-4" />
+                  Cancel Post
+                </span>
+              )}
+            </div>
           )}
           {hasApplied && isBookmarked !== undefined && (
             <div
