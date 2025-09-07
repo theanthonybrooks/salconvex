@@ -74,7 +74,8 @@ export const getFilteredEventsPublic = query({
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
     // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
     // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 0);
-    const startDay = startOfWeek(refDate, { weekStartsOn: 1 });
+    //TODO: Decide if it should start on Sunday or Monday.
+    const startDay = startOfWeek(refDate, { weekStartsOn: 0 });
     // const startDay = addHours(startOfWeek(refDate, { weekStartsOn: 1 }), 4);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
 

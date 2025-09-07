@@ -894,7 +894,7 @@ export default defineSchema({
         applications: v.optional(v.boolean()),
       }),
     ),
-    cookiePefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
+    cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
     lastUpdated: v.optional(v.number()),
   }).index("by_userId", ["userId"]),
 

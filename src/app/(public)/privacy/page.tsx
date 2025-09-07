@@ -148,7 +148,7 @@ export default function PrivacyPage() {
           Collecting and Using Your Personal Data
         </h2>
         <h3 className="privacy mt-5">Types of Data Collected</h3>
-        <h4 className="font-medium">Personal Data</h4>
+        <h4 className="mt-2 font-medium">Personal Data</h4>
         <p className="text-sm">
           While using Our Service, We may ask You to provide Us with certain
           personally identifiable information that can be used to contact or
@@ -166,7 +166,7 @@ export default function PrivacyPage() {
             <p className="text-sm">Usage Data</p>
           </li>
         </ul>
-        <h4 className="font-medium">Usage Data</h4>
+        <h4 className="mt-2 font-medium">Usage Data</h4>
         <p className="text-sm">
           Usage Data is collected automatically when using the Service.
         </p>
@@ -181,16 +181,15 @@ export default function PrivacyPage() {
           When You access the Service by or through a mobile device, We may
           collect certain information automatically, including, but not limited
           to, the type of mobile device You use, Your mobile device unique ID,
-          the IP address of Your mobile device, Your mobile operating system,
-          the type of mobile Internet browser You use, unique device identifiers
-          and other diagnostic data.
+          Your mobile operating system, the type of mobile Internet browser You
+          use, unique device identifiers and other diagnostic data.
         </p>
         <p className="text-sm">
           We may also collect information that Your browser sends whenever You
           visit our Service or when You access the Service by or through a
           mobile device.
         </p>
-        <h4 className="font-medium">
+        <h4 className="mt-2 font-medium">
           Information from Third-Party Social Media Services
         </h4>
         <p className="text-sm">
@@ -199,7 +198,7 @@ export default function PrivacyPage() {
         </p>
         <ul className="list-disc text-sm [&>li:not(:last-of-type)]:pb-3 [&>li]:ml-8">
           <li>Google</li>
-          <li>Apple</li>
+          {/* <li>Apple</li> */}
         </ul>
         <p className="text-sm">
           If You decide to register through or otherwise grant us access to a
@@ -231,7 +230,9 @@ export default function PrivacyPage() {
             all Cookies or to indicate when a Cookie is being sent. However, if
             You do not accept Cookies, You may not be able to use some parts of
             our Service. Unless you have adjusted Your browser setting so that
-            it will refuse Cookies, our Service may use Cookies.
+            it will refuse Cookies, our Service may use Cookies. Non-essential
+            cookies are opt-in only and can be changed or opted out of at any
+            time.
           </li>
           <li>
             <strong>Web Beacons.</strong> Certain sections of our Service and
@@ -302,11 +303,26 @@ export default function PrivacyPage() {
             </p>
           </li>
         </ul>
-        <p className="text-sm">
-          For more information about the cookies we use and your choices
-          regarding cookies, please visit our Cookies Policy or the Cookies
-          section of our Privacy Policy.
-        </p>
+        <span className="text-sm">
+          Currently, we use the following cookies:
+          <ul className="mt-2 list-disc text-sm [&>li:not(:last-of-type)]:pb-3 [&>li]:ml-8">
+            <li>
+              Convex JWT: We use Convex JWT for authentication and
+              authorization. This enables us to securely identify and manage
+              user sessions. (essential)
+            </li>
+            <li>
+              Posthog: We use PostHog for analytics and error tracking on user
+              sessions. This enables us to understand where client-side errors
+              are occurring and how best to improve the service. (non-essential)
+            </li>
+            <li>
+              Sentry.io: We use Sentry for error tracking and monitoring. This
+              enables us to track server-side errors that otherwise hinder the
+              service and are not visible to the user. (non-essential)
+            </li>
+          </ul>
+        </span>
         <h3 className="privacy mt-5">Use of Your Personal Data</h3>
         <p className="text-sm">
           The Company may use Personal Data for the following purposes:
@@ -347,11 +363,8 @@ export default function PrivacyPage() {
           </li>
           <li>
             <p className="text-sm">
-              <strong>To provide You</strong> with news, special offers and
-              general information about other goods, services and events which
-              we offer that are similar to those that you have already purchased
-              or enquired about unless You have opted not to receive such
-              information.
+              <strong>To provide You</strong> with news about the Company unless
+              You have opted not to receive such information.
             </p>
           </li>
           <li>

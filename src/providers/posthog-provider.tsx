@@ -4,13 +4,18 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { Suspense, useEffect } from "react";
 
-import { useQuery } from "convex-helpers/react/cache";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { usePreloadedQuery } from "convex/react";
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
-import { api } from "~/convex/_generated/api";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  const isAdmin = useQuery(api.users.isAdmin);
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const userPrefs = userData?.userPref;
+  const cookiePreferences = userPrefs?.cookiePrefs;
+  const isAdmin = userData?.user?.role?.includes("admin");
+
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") {
       return;
@@ -21,6 +26,11 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
           process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
         person_profiles: "identified_only",
         capture_pageview: false,
+        disable_session_recording: false,
+
+        disable_persistence: cookiePreferences !== "all",
+        persistence:
+          cookiePreferences === "all" ? "localStorage+cookie" : "memory",
       });
       if (isAdmin) {
         posthog.opt_out_capturing();
@@ -37,7 +47,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         console.error("PostHog error:", error);
       }
     }
-  }, [isAdmin]);
+  }, [isAdmin, cookiePreferences]);
 
   return (
     <PHProvider client={posthog}>

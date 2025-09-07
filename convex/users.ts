@@ -419,6 +419,29 @@ export const updateUserPrefs = mutation({
   },
 });
 
+export const updateUserCookiePreferences = mutation({
+  args: {
+    cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const userPrefs = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!userPrefs) {
+      throw new ConvexError("User pref not found" + userId);
+    }
+
+    await ctx.db.patch(userPrefs._id, {
+      cookiePrefs: args.cookiePrefs,
+      lastUpdated: Date.now(),
+    });
+  },
+});
+
 export const updateUserNotifications = mutation({
   args: {
     newsletter: v.optional(v.boolean()),

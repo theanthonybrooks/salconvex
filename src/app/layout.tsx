@@ -7,6 +7,7 @@ import {
 } from "@/assets/fonts";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { siteUrl } from "@/constants/siteInfo";
+import { CookieBanner } from "@/features/auth/components/cookie-banner";
 import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
 import { isAppleUA } from "@/lib/appleFns";
 import { cn } from "@/lib/utils";
@@ -128,6 +129,7 @@ export default async function RootLayout({
                         isMobile: deviceType === "mobile",
                       }}
                     >
+                      <CookieBanner />
                       {children}
                     </DeviceProvider>
                   </PostHogProvider>
