@@ -6,6 +6,30 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "~/convex/_generated/server";
 
+export const deleteSubscription = mutation({
+  args: {
+    subscriberId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new ConvexError("User not found");
+
+    const subscriber = await ctx.db
+      .query("newsletter")
+      .withIndex("by_userId", (q) => q.eq("userId", args.subscriberId))
+      .unique();
+
+    if (!subscriber) throw new ConvexError("Subscriber not found");
+
+    await ctx.db.delete(subscriber._id);
+  },
+});
+
 export const subscribeToNewsletter = mutation({
   args: {
     email: v.string(),
@@ -129,7 +153,9 @@ export const getNewsletterSubscribers = query({
     const subscribers = await ctx.db.query("newsletter").collect();
     const results = await Promise.all(
       subscribers.map(async (subscriber) => {
-        totalSubscribers += 1;
+        if (subscriber.newsletter) {
+          totalSubscribers += 1;
+        }
         return {
           _id: subscriber._id,
           name: subscriber.firstName,

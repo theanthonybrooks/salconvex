@@ -36,3 +36,30 @@ export const DeleteUser = ({ userId }: UserActionProps) => {
     </DropdownMenuItem>
   );
 };
+
+export const DeleteNewsletterSubscription = ({ userId }: UserActionProps) => {
+  const confirm = useConfirmAction().confirm;
+  const deleteSubscription = useMutation(
+    api.newsletter.subscriber.deleteSubscription,
+  );
+  return (
+    <DropdownMenuItem
+      onClick={() => {
+        confirm({
+          label: "Delete Newsletter Subscription",
+          description:
+            "Are you sure you want to remove this user's newsletter subscription?",
+          onConfirm: () => {
+            deleteSubscription({
+              subscriberId: userId as Id<"users">,
+            });
+          },
+        });
+      }}
+      className="flex items-center gap-x-2"
+    >
+      <FaUserSlash className="size-4" />
+      Delete
+    </DropdownMenuItem>
+  );
+};

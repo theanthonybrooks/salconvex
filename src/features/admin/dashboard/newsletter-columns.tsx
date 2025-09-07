@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
+import { DeleteNewsletterSubscription } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -239,7 +239,7 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
                 {/* <DuplicateEvent eventId={event._id} /> */}
-                <DeleteUser userId={user._id} />
+                <DeleteNewsletterSubscription userId={user._id} />
                 <DropdownMenuItem>
                   <Link
                     href={`mailto:${user.email}`}
