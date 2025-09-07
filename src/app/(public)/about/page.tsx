@@ -103,16 +103,17 @@ const AboutPage = () => {
                   >
                     Anthony Brooks
                   </PopoverSimple>
-                  . I&apos;m a painter and visual artist based in Berlin (this
-                  is largely my motivation for making The List in the first
-                  place - For my own professional use). Since 2016, I&apos;ve
-                  painted more than 70 murals in 15 countries and the one thing
-                  that always made this profession difficult was just the lack
-                  of public and accessible info. Which, again, led to the first
-                  iterations of this list :). In addition to being an artist, I
-                  really like lists and making/organizing projects like this and
-                  since I dabble in web dev, I decided in 2023 to just make a
-                  website for it. Many, many, many hours later, here we are!
+                  . I&apos;m a painter and visual artist based between the
+                  Midwestern United States and Berlin, Germany. Since 2016,
+                  I&apos;ve painted more than 70 murals in 15 countries and have
+                  spent many, many hours applying for projects and grants. The
+                  one thing that always made this profession difficult was the
+                  lack of public and accessible info. Which, again, led to the
+                  first iterations of this list :). In addition to being an
+                  artist, I really like lists and making/organizing projects
+                  like this and since I dabble in web dev, I decided in 2023 to
+                  just make a website for it. Many, many, many hours later, here
+                  we are!
                 </span>
               </>
             }
