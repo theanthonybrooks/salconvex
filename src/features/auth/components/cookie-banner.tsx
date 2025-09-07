@@ -39,7 +39,7 @@ export const CookieBanner = () => {
           <DialogTitle className="flex items-center gap-2 text-xl">
             <CookieIcon className="size-7 text-foreground" /> Cookie Preferences
           </DialogTitle>
-          <DialogDescription className="border-t-2 border-foreground/50 pt-3">
+          <DialogDescription className="border-t-2 border-foreground/50 pt-3 text-start">
             This website uses cookies strictly for user authentication and
             account functionality, ensuring the site operates smoothly. We do
             not use cookies for advertising or share your personal data with
@@ -47,7 +47,9 @@ export const CookieBanner = () => {
             of cookies. You can learn more in our{" "}
             <Link
               href="/privacy"
-              className={cn("inline-flex items-center gap-1 font-semibold")}
+              className={cn(
+                "inline-flex items-center gap-1 text-sm font-semibold",
+              )}
             >
               privacy policy <ExternalLink className="size-4" />
             </Link>
@@ -55,7 +57,7 @@ export const CookieBanner = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="flex w-full items-center justify-between gap-2 sm:flex-col sm:justify-between sm:space-x-0">
+        <DialogFooter className="flex w-full flex-col items-center justify-between gap-2 sm:flex-col sm:justify-between sm:space-x-0">
           <DialogClose asChild>
             <Button
               type="button"
