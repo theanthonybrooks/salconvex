@@ -30,7 +30,7 @@ export const CookieBanner = () => {
   return (
     <Dialog defaultOpen={!cookiePreferences}>
       <DialogContent
-        className="bg-card"
+        className="max-w-[90vw] bg-card sm:max-w-2xl"
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
@@ -39,7 +39,7 @@ export const CookieBanner = () => {
           <DialogTitle className="flex items-center gap-2 text-xl">
             <CookieIcon className="size-7 text-foreground" /> Cookie Preferences
           </DialogTitle>
-          <DialogDescription className="border-t-2 border-foreground/50 pt-3 text-start">
+          <DialogDescription className="sr-only border-t-2 border-foreground/50 pt-3 text-start">
             This website uses cookies strictly for user authentication and
             account functionality, ensuring the site operates smoothly. We do
             not use cookies for advertising or share your personal data with
@@ -48,7 +48,7 @@ export const CookieBanner = () => {
             <Link
               href="/privacy"
               className={cn(
-                "inline-flex items-center gap-1 text-sm font-semibold",
+                "inline-flex items-center gap-1 text-base font-semibold sm:text-sm",
               )}
             >
               privacy policy <ExternalLink className="size-4" />
@@ -56,8 +56,30 @@ export const CookieBanner = () => {
             .
           </DialogDescription>
         </DialogHeader>
+        <section
+          className={cn(
+            "flex flex-col gap-2 border-t-2 border-foreground/50 pt-4 text-start",
+          )}
+        >
+          <span>
+            This website uses cookies strictly for user authentication and
+            account functionality, ensuring the site operates smoothly. We do
+            not use cookies for advertising or share your personal data with
+            third parties.
+          </span>
+          <span>
+            By continuing to use this site, you agree to our use of cookies. You
+            can learn more in our{" "}
+            <Link
+              href="/privacy"
+              className={cn("inline-flex items-center gap-1 font-semibold")}
+            >
+              privacy policy <ExternalLink className="size-4" />
+            </Link>
+          </span>
+        </section>
 
-        <DialogFooter className="flex w-full flex-col items-center justify-between gap-2 sm:flex-col sm:justify-between sm:space-x-0">
+        <DialogFooter className="mt-2 flex w-full flex-col items-center justify-between gap-2 sm:flex-col sm:justify-between sm:space-x-0">
           <DialogClose asChild>
             <Button
               type="button"
