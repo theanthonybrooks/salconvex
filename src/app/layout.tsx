@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { DeviceProvider } from "@/providers/device-provider";
 import { PostHogProvider } from "@/providers/posthog-provider";
 import { ThemedProvider } from "@/providers/themed-provider";
+import { CookiePref } from "@/types/user";
 import {
   ConvexAuthNextjsServerProvider,
   convexAuthNextjsToken,
@@ -23,7 +24,7 @@ import { preloadQuery } from "convex/nextjs";
 import { GeistSans } from "geist/font/sans";
 import "leaflet/dist/leaflet.css";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { ReactNode } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer } from "react-toastify";
@@ -76,6 +77,9 @@ export default async function RootLayout({
   const deviceVendor = h.get("x-device-vendor");
   const deviceModel = h.get("x-device-model");
 
+  const cookieStore = await cookies();
+  const localCookiePrefs = cookieStore.get("cookie_preferences")?.value ?? null;
+
   const token = await convexAuthNextjsToken();
   const preloadedUserData = await preloadQuery(
     api.users.getCurrentUser,
@@ -118,7 +122,9 @@ export default async function RootLayout({
             >
               <ConvexQueryCacheProvider>
                 <ThemedProvider>
-                  <PostHogProvider>
+                  <PostHogProvider
+                    localCookiePrefs={localCookiePrefs as CookiePref}
+                  >
                     <DeviceProvider
                       value={{
                         deviceType,
@@ -129,7 +135,9 @@ export default async function RootLayout({
                         isMobile: deviceType === "mobile",
                       }}
                     >
-                      <CookieBanner />
+                      <CookieBanner
+                        localCookiePrefs={localCookiePrefs as CookiePref}
+                      />
                       {children}
                     </DeviceProvider>
                   </PostHogProvider>

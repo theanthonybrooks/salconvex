@@ -2,39 +2,53 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
-import { Suspense, useEffect } from "react";
+import { ReactNode, Suspense, useEffect } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { CookiePref } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
+interface PostHogProviderProps {
+  children: ReactNode;
+  localCookiePrefs: CookiePref | null;
+}
+
+export function PostHogProvider({
+  children,
+  localCookiePrefs,
+}: PostHogProviderProps) {
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const userPrefs = userData?.userPref;
-  const cookiePreferences = userPrefs?.cookiePrefs;
   const isAdmin = userData?.user?.role?.includes("admin");
+  const cookiePreferences = userPrefs?.cookiePrefs ?? localCookiePrefs ?? null;
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV !== "production" || isAdmin) {
       return;
     }
     try {
-      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY as string, {
-        api_host:
-          process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
-        person_profiles: "identified_only",
-        capture_pageview: false,
-        disable_session_recording: false,
-
-        disable_persistence: cookiePreferences !== "all",
-        persistence:
-          cookiePreferences === "all" ? "localStorage+cookie" : "memory",
-      });
-      if (isAdmin) {
-        posthog.opt_out_capturing();
-        posthog.stopSessionRecording();
+      if (cookiePreferences === "all") {
+        posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY as string, {
+          api_host:
+            process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+          person_profiles: "identified_only",
+          capture_pageview: false,
+          disable_session_recording: false,
+          persistence: "localStorage+cookie",
+        });
+      } else {
+        posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY as string, {
+          api_host:
+            process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+          person_profiles: "identified_only",
+          capture_pageview: false,
+          disable_session_recording: false,
+          disable_persistence: true,
+          persistence: "memory",
+        });
       }
     } catch (error) {
       if (error instanceof Error) {

@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
+import Cookies from "js-cookie";
+
 import {
   Dialog,
   DialogClose,
@@ -12,23 +14,40 @@ import {
 } from "@/components/ui/dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
+import { CookiePref } from "@/types/user";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { CookieIcon, ExternalLink } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
 
-export const CookieBanner = () => {
+interface CookieBannerProps {
+  localCookiePrefs: CookiePref | null;
+}
+
+export const CookieBanner = ({ localCookiePrefs }: CookieBannerProps) => {
   const { preloadedUserData } = useConvexPreload();
+  const pathname = usePathname();
   const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user;
+  const userPrefs = userData?.userPref;
   const updateCookiePreferences = useMutation(
     api.users.updateUserCookiePreferences,
   );
-  const user = userData?.user;
-  const cookiePreferences = userData?.userPref?.cookiePrefs;
+  const cookiePreferences =
+    userData?.userPref?.cookiePrefs ?? localCookiePrefs ?? null;
 
-  if (!user) return null;
+  const authPage = pathname?.includes("auth");
+
+  useEffect(() => {
+    if (!user) return;
+    if (user && !userPrefs?.cookiePrefs && cookiePreferences) {
+      updateCookiePreferences({ cookiePrefs: cookiePreferences });
+    }
+  }, [user, cookiePreferences, userPrefs, updateCookiePreferences]);
 
   return (
-    <Dialog defaultOpen={!cookiePreferences}>
+    <Dialog defaultOpen={!cookiePreferences && !authPage}>
       <DialogContent
         className="max-w-[90vw] bg-card sm:max-w-2xl"
         showCloseButton={false}
@@ -85,7 +104,16 @@ export const CookieBanner = () => {
               type="button"
               variant="salWithShadowHiddenYlw"
               className={cn("w-full")}
-              onClick={() => updateCookiePreferences({ cookiePrefs: "all" })}
+              onClick={() => {
+                if (user) {
+                  updateCookiePreferences({ cookiePrefs: "all" });
+                } else {
+                  Cookies.set("cookie_preferences", "all", {
+                    expires: 365,
+                    sameSite: "lax",
+                  });
+                }
+              }}
             >
               Accept Cookies
             </Button>
@@ -95,9 +123,16 @@ export const CookieBanner = () => {
               type="button"
               variant="salWithShadowHidden"
               className={cn("w-full")}
-              onClick={() =>
-                updateCookiePreferences({ cookiePrefs: "required" })
-              }
+              onClick={() => {
+                if (user) {
+                  updateCookiePreferences({ cookiePrefs: "required" });
+                } else {
+                  Cookies.set("cookie_preferences", "required", {
+                    expires: 365,
+                    sameSite: "lax",
+                  });
+                }
+              }}
             >
               Reject Non-Essential
             </Button>

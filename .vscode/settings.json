@@ -19,7 +19,8 @@
     "General",
     "Membership",
     "This Week",
-    "Admin"
+    "Admin",
+    "Cookies"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

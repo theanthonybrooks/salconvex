@@ -553,6 +553,7 @@ export const subscriptionStoreWebhook = mutation({
               }
             }
           } else if (metadata?.accountType === "artist") {
+            // TODO: Update this to run a query and update for the user plan in all places. It's getting a bit hectic, so I'd rather not do it like this and would prefer to just have a lookup table or something.
             await ctx.db.patch(existingUser._id, {
               subscription: `${metadata.interval}ly-${metaPlan}`,
               plan: metaNumber,
@@ -573,15 +574,11 @@ export const subscriptionStoreWebhook = mutation({
       case "customer.subscription.created":
         console.log("customer.subscription.created:", args.body);
 
-        // Extract subscription object from the event
         const subscription = args.body.data.object;
-        // const currentUser =
         const userLogId = await ctx.db
           .query("userLog")
           .withIndex("by_userId", (q) => q.eq("userId", userId))
           .first();
-
-        // Check if there's already a subscription with this customerId
 
         console.log("sub customerId: ", subscription.customer);
         const existingSubscription = await ctx.db
