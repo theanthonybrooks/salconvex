@@ -41,10 +41,24 @@ export const CookieBanner = ({ localCookiePrefs }: CookieBannerProps) => {
 
   useEffect(() => {
     if (!user) return;
-    if (user && !userPrefs?.cookiePrefs && cookiePreferences) {
+    if (!userPrefs?.cookiePrefs && cookiePreferences) {
       updateCookiePreferences({ cookiePrefs: cookiePreferences });
+    } else if (
+      (userPrefs?.cookiePrefs && !localCookiePrefs) ||
+      (userPrefs?.cookiePrefs !== localCookiePrefs && localCookiePrefs)
+    ) {
+      Cookies.set("cookie_preferences", cookiePreferences as CookiePref, {
+        expires: 365,
+        sameSite: "lax",
+      });
     }
-  }, [user, cookiePreferences, userPrefs, updateCookiePreferences]);
+  }, [
+    user,
+    cookiePreferences,
+    userPrefs,
+    updateCookiePreferences,
+    localCookiePrefs,
+  ]);
 
   return (
     <Dialog defaultOpen={!cookiePreferences && !authPage}>
