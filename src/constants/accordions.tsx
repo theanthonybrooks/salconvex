@@ -205,26 +205,41 @@ export const openCallFaqs: AccordionSection = {
       id: "submission-costs",
       subtitle: "Submission Costs (for organizers)",
       text: (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <span>
             <p>
               <b>Events</b> are always fee to submit.
             </p>
             <p>
-              {" "}
               <b>Open calls</b> are free for Graffiti Jams, Pasteup/Sticker
               Projects, Street Art Festivals, and Mural Projects with a budget
               less than or equal to $1,000.
             </p>
           </span>
 
-          <span>
-            <p>
-              Otherwise, the fee is on a sliding scale with breakpoints being
-              $50 (up to $10,000 budget), $125 (up to $20,000 budget), $250 (up
-              to $50,000 budget), and $500 (anything above $50,000).
+          <span className={cn("mt-2")}>
+            <p className="mb-2">
+              Otherwise, the fee is on a sliding scale with breakpoints being:
             </p>
+            <ul className="flex list-inside flex-col gap-1 pl-5">
+              <li>
+                <b>$50</b> - (up to $10,000 budget)
+              </li>
+              <li>
+                <b>$125</b> - (up to $20,000 budget)
+              </li>
+              <li>
+                <b>$250</b> - (up to $50,000 budget)
+              </li>
+              <li>
+                <b>$500</b> - (anything above $50,000)
+              </li>
+            </ul>
           </span>
+          <i>
+            The first open call listing is free so you can see how the system
+            works.
+          </i>
         </div>
       ),
     },
@@ -374,31 +389,41 @@ export const pricingFaqs: AccordionSection = {
       id: "submission-costs",
       subtitle: "Submission Costs (for organizers)",
       text: (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <span>
             <p>
               <b>Events</b> are always fee to submit.
             </p>
             <p>
-              {" "}
               <b>Open calls</b> are free for Graffiti Jams, Pasteup/Sticker
               Projects, Street Art Festivals, and Mural Projects with a budget
               less than or equal to $1,000.
             </p>
           </span>
 
-          <span>
-            <p>
-              Otherwise, the fee is on a sliding scale with breakpoints being
-              $50 (up to $10,000 budget), $125 (up to $20,000 budget), $250 (up
-              to $50,000 budget), and $500 (anything above $50,000).
+          <span className={cn("mt-2")}>
+            <p className="mb-2">
+              Otherwise, the fee is on a sliding scale with breakpoints being:
             </p>
-
-            {/* <p>
-              Beyond that, there are no additional fees and the first open call
-              listing is always free so you can see how the system works.
-            </p> */}
+            <ul className="flex list-inside flex-col gap-1 pl-5">
+              <li>
+                <b>$50</b> - (up to $10,000 budget)
+              </li>
+              <li>
+                <b>$125</b> - (up to $20,000 budget)
+              </li>
+              <li>
+                <b>$250</b> - (up to $50,000 budget)
+              </li>
+              <li>
+                <b>$500</b> - (anything above $50,000)
+              </li>
+            </ul>
           </span>
+          <i>
+            The first open call listing is free so you can see how the system
+            works.
+          </i>
         </div>
       ),
     },
