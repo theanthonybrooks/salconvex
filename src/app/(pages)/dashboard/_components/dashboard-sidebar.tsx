@@ -172,7 +172,10 @@ export default function DashboardSideBar({
           {filteredNavItems
             .filter((item) => !item.sectionCat)
             .map((item) => (
-              <div key={item.href} className={cn("mb-1")}>
+              <div
+                key={item.href}
+                className={cn("mb-1", collapsedSidebar && "px-2")}
+              >
                 <TooltipSimple
                   content={item.label}
                   side="right"

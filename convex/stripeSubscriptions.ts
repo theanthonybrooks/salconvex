@@ -570,7 +570,7 @@ export const subscriptionStoreWebhook = mutation({
           .withIndex("customerId", (q) => q.eq("customerId", customerId))
           .first();
         console.log("customer", customer);
-        if (customer) {
+        if (customer && !customer.status) {
           await ctx.db.delete(customer._id);
           console.log("deleted customer", customer);
         } else {

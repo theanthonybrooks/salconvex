@@ -488,7 +488,7 @@ export const updateOrganization = mutation({
     lastUpdatedBy: v.optional(v.string()),
     name: v.string(),
     slug: v.string(),
-    isComplete: v.optional(v.boolean()),
+    isComplete: v.boolean(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -516,13 +516,6 @@ export const updateOrganization = mutation({
           : args.links?.email,
     };
 
-    let orgIsComplete = false;
-    if (organization.isComplete !== true) {
-      if (args.isComplete === true) {
-        orgIsComplete = true;
-      }
-    }
-
     await ctx.db.patch(organization._id, {
       name: args.name.trim(),
       slug: args.slug,
@@ -541,7 +534,7 @@ export const updateOrganization = mutation({
       links: sanitizedLinks,
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
-      isComplete: orgIsComplete,
+      isComplete: args.isComplete,
     });
 
     const updatedOrg = await ctx.db.get(organization._id);

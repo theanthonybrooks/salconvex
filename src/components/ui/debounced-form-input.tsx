@@ -28,7 +28,7 @@ export function DebouncedControllerInput<
   transform,
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
-  const { setValue, trigger } = useFormContext();
+  const { setValue } = useFormContext();
   const [localValue, setLocalValue] = useState(field.value ?? "");
 
   const latestTransform = useRef(transform);
@@ -88,7 +88,8 @@ export function DebouncedControllerInput<
         // requestAnimationFrame(() => {
         //   field.onBlur();
         // });
-        trigger(field.name);
+        // trigger(field.name);
+        e.currentTarget.blur();
       }}
       onBlur={(e) => {
         field.onBlur();
