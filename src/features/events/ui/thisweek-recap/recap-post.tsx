@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 import { PublicEventPreviewData } from "@/types/event";
 import Image from "next/image";
 import { forwardRef } from "react";
+import { PiSkullBold } from "react-icons/pi";
 import { TiMinus } from "react-icons/ti";
 
 interface RecapPostProps {
   event: PublicEventPreviewData;
-  index: number;
+  index: number | null;
 }
 
 const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
@@ -43,7 +44,11 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
           width={90}
         />
         <h1 className="absolute left-[15%] top-[5.5%] font-tanker text-[7.5rem]">
-          {index + 1}.
+          {typeof index === "number" ? (
+            `${index + 1}.`
+          ) : (
+            <PiSkullBold className="size-30 mt-8" />
+          )}
         </h1>
       </section>
       <section className="absolute left-[15%] top-[40%] flex flex-col gap-6">

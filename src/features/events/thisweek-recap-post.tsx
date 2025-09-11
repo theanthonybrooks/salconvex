@@ -296,53 +296,60 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             </div>
           </div>
 
-          {activeResults?.map((event, index) => (
-            <div
-              className={cn(
-                "group relative",
-                excludedIds.includes(event._id) && "opacity-50 grayscale",
-              )}
-              key={event._id}
-            >
-              <RecapPost
-                ref={(el) => {
-                  refs.current[index + 1] = el;
-                }}
-                event={event}
-                index={index}
-              />
-              <button
-                type="button"
-                className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                onClick={() => handleDownloadSingle(index + 1)}
-                title="Download image"
-              >
-                <ImageIcon className="size-5" />
-              </button>
-              <button
-                type="button"
-                className="absolute right-10 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                title={
-                  excludedIds.includes(event._id)
-                    ? "Add to list"
-                    : "Remove from list"
-                }
-                onClick={() =>
-                  setExcludedIds((prev) =>
-                    prev.includes(event._id)
-                      ? prev.filter((id) => id !== event._id)
-                      : [...prev, event._id],
-                  )
-                }
-              >
-                {excludedIds.includes(event._id) ? (
-                  <EyeOff className="size-5 shrink-0" />
-                ) : (
-                  <Eye className="size-5 shrink-0" />
+          {activeResults?.map((event, index) => {
+            const visibleIndex = excludedIds.includes(event._id)
+              ? null
+              : activeResults
+                  .slice(0, index)
+                  .filter((e) => !excludedIds.includes(e._id)).length;
+            return (
+              <div
+                className={cn(
+                  "group relative",
+                  excludedIds.includes(event._id) && "opacity-50 grayscale",
                 )}
-              </button>
-            </div>
-          ))}
+                key={event._id}
+              >
+                <RecapPost
+                  ref={(el) => {
+                    refs.current[index + 1] = el;
+                  }}
+                  event={event}
+                  index={visibleIndex}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                  onClick={() => handleDownloadSingle(index + 1)}
+                  title="Download image"
+                >
+                  <ImageIcon className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  className="absolute right-10 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                  title={
+                    excludedIds.includes(event._id)
+                      ? "Add to list"
+                      : "Remove from list"
+                  }
+                  onClick={() =>
+                    setExcludedIds((prev) =>
+                      prev.includes(event._id)
+                        ? prev.filter((id) => id !== event._id)
+                        : [...prev, event._id],
+                    )
+                  }
+                >
+                  {excludedIds.includes(event._id) ? (
+                    <EyeOff className="size-5 shrink-0" />
+                  ) : (
+                    <Eye className="size-5 shrink-0" />
+                  )}
+                </button>
+              </div>
+            );
+          })}
           {filteredResults && (
             <div className="group relative">
               <RecapLastPage
