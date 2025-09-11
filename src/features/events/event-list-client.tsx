@@ -433,7 +433,7 @@ const ClientEventList = () => {
       )}
 
       {isLoading ? (
-        <div className="mb-10 w-full max-w-[90vw] space-y-4 sm:space-y-6">
+        <div className="mb-10 w-full space-y-4 sm:max-w-[min(100rem,85vw)] sm:space-y-6">
           <div className="mx-auto mb-10 mt-6 flex w-full max-w-[min(70vw,1200px)] grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:grid sm:gap-0">
             <Skeleton className="h-10 w-40 rounded-xl bg-black/20" />
             <div className="mx-auto mb-2 flex items-center gap-x-2">
