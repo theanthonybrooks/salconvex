@@ -564,6 +564,20 @@ export const subscriptionStoreWebhook = mutation({
         break;
 
       // ...
+      case "checkout.session.expired":
+        const customer = await ctx.db
+          .query("userSubscriptions")
+          .withIndex("customerId", (q) => q.eq("customerId", customerId))
+          .first();
+        console.log("customer", customer);
+        if (customer) {
+          await ctx.db.delete(customer._id);
+          console.log("deleted customer", customer);
+        } else {
+          throw new ConvexError("Customer not found" + customerId);
+        }
+
+        break;
       case "subscription_schedule.updated":
         break;
       // ...
