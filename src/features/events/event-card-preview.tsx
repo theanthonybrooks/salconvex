@@ -415,7 +415,7 @@ const EventCardPreview = ({
       {/* //---------------------- (Desktop) Layout ---------------------- */}
       <Card
         className={cn(
-          "mb-10 hidden min-h-[15em] w-[95vw] min-w-[640px] grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg sm:max-w-[min(100rem,85vw)] lg:grid xl:grid-cols-[60px_minmax(0,auto)_15%_27%_25%] 2xl:w-[90vw]",
+          "mb-10 hidden min-h-[15em] w-[95vw] min-w-[640px] grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg sm:max-w-[min(100rem,90vw)] lg:grid xl:grid-cols-[60px_minmax(0,auto)_15%_27%_25%] 2xl:w-[90vw]",
         )}
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
