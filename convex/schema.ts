@@ -543,6 +543,21 @@ const supportSchema = {
   updatedAt: v.optional(v.number()),
 };
 
+const paletteSchema = v.object({
+  name: v.string(),
+  value: v.string(),
+  createdAt: v.number(),
+  updatedAt: v.optional(v.number()),
+});
+
+const swatchSchema = v.object({
+  paletteId: v.id("palettes"),
+  value: v.string(),
+  gradient: v.boolean(),
+  createdAt: v.number(),
+  updatedAt: v.optional(v.number()),
+});
+
 export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
@@ -913,4 +928,13 @@ export default defineSchema({
     .index("by_ticketNumber", ["ticketNumber"])
     .index("by_userId", ["userId"])
     .index("by_email", ["email"]),
+
+  palettes: defineTable(paletteSchema)
+    .index("by_name", ["name"])
+    .index("by_value", ["value"]),
+
+  swatches: defineTable(swatchSchema)
+    .index("by_paletteId", ["paletteId"])
+    .index("by_paletteId_value", ["paletteId", "value"])
+    .index("by_value", ["value"]),
 });

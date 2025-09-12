@@ -15,7 +15,7 @@ import {
   ApplyButton,
   ApplyButtonShort,
 } from "@/features/events/event-apply-btn";
-import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
+import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { OpenCallProvidedPreview } from "@/features/events/open-calls/components/open-call-provided";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { formatOpenCallDeadline } from "@/lib/dateFns";

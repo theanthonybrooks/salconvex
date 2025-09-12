@@ -1003,6 +1003,7 @@ export const getEventWithOCDetails = query({
     source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    console.log(args);
     const { slug, edition } = args;
     const source = args.source ?? "eventpage";
     const userId = await getAuthUserId(ctx);

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/state-accordion-test";
 import EventDates from "@/features/events/components/event-dates";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
+import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { OpenCallProvided } from "@/features/events/open-calls/components/open-call-provided";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OrganizerCardLogoName } from "@/features/organizers/components/organizer-logo-name-card";
@@ -349,7 +349,9 @@ export const SubmissionFormRecapDesktop = ({
                     <th className="pr-4 align-top font-medium">Eligibility</th>
                     <td>
                       <EligibilityLabel
-                        type={ocData?.eligibility?.type as EligibilityType}
+                        type={
+                          (ocData?.eligibility?.type as EligibilityType) ?? null
+                        }
                         whom={ocData?.eligibility?.whom ?? []}
                         format="desktop"
                       />

@@ -1,12 +1,5 @@
-/* OpenCallPostDetail.module.css */
-
-.container {
-  background-color: #fafafa;
-  border: 2px solid #333;
-}
-
 .title {
-  font-size: 3.8rem;
+  font-size: 4rem;
   letter-spacing: -1px;
   font-variation-settings:
     "slnt" 0,
@@ -26,4 +19,3 @@
   letter-spacing: 0px;
   color: white;
 }
-

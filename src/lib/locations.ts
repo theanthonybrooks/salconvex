@@ -279,6 +279,15 @@ rawCountries.forEach((country) => {
   }
 });
 
+export function getDemonym(countryName: string): string {
+  const country = rawCountries.find(
+    (c) =>
+      c.name.common.toLowerCase() === countryName.toLowerCase() ||
+      c.name.official.toLowerCase() === countryName.toLowerCase(),
+  );
+  return country?.demonyms?.eng?.m || countryName; // fallback to name if not found
+}
+
 export const usRegions = {
   Midwest: [
     "IL",

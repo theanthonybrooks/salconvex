@@ -1,5 +1,5 @@
 import EventDates from "@/features/events/components/event-dates";
-import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
+import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
 import { formatCurrency } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
@@ -105,7 +105,7 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
                 >
                   {
                     <EligibilityLabel
-                      type={eligibility?.type || null}
+                      type={eligibility?.type ?? null}
                       whom={eligibility?.whom || []}
                       format="desktop"
                       preview={true}

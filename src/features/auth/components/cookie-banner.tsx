@@ -38,6 +38,7 @@ export const CookieBanner = ({ localCookiePrefs }: CookieBannerProps) => {
     userData?.userPref?.cookiePrefs ?? localCookiePrefs ?? null;
 
   const authPage = pathname?.includes("auth");
+  const renderPage = pathname?.includes("render");
 
   useEffect(() => {
     if (!user) return;
@@ -59,9 +60,10 @@ export const CookieBanner = ({ localCookiePrefs }: CookieBannerProps) => {
     updateCookiePreferences,
     localCookiePrefs,
   ]);
+  const hiddenPage = authPage || renderPage;
 
   return (
-    <Dialog defaultOpen={!cookiePreferences && !authPage}>
+    <Dialog defaultOpen={!cookiePreferences && !hiddenPage}>
       <DialogContent
         className="max-w-[90vw] bg-card sm:max-w-2xl"
         showCloseButton={false}

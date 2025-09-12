@@ -1,4 +1,4 @@
-import OpenCallPostDetail from "@/app/(pages)/(artist)/thelist/components/open-call-post-detail";
+import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
 import { capitalize } from "@/lib/utils";
 import { OpenCallData } from "@/types/openCall";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function OpenCallPostPage({
+export default async function OpenCallSocialsPage({
   params,
 }: {
   params: Promise<{ slug: string; year: string }>;
@@ -93,5 +93,5 @@ export default async function OpenCallPostPage({
     );
   }
 
-  return <OpenCallPostDetail data={ocData} />;
+  return <OpenCallSocials data={ocData} />;
 }

@@ -9,19 +9,25 @@ import {
   EuropeanCountries,
   EuropeanEUCountries,
   EuropeanNonEUCountries,
+  getDemonym,
 } from "@/lib/locations";
 import { cn } from "@/lib/utils";
+import { EligibilityType } from "@/types/openCall";
 import { CheckIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
-interface EligibilityLabelProps {
-  type: string | null;
+export interface EligibilityLabelBaseProps {
+  type: EligibilityType | null;
   whom: string[];
+  hasDetails?: boolean;
+}
+interface EligibilityLabelProps extends EligibilityLabelBaseProps {
   format?: "desktop" | "mobile";
   preview?: boolean;
   eligible?: boolean;
-  hasDetails?: boolean;
+
   publicView?: boolean;
+  socialPost?: boolean;
 }
 
 function getGroupEligibilityLabel(whom: string[]): string | null {
@@ -48,6 +54,7 @@ export const EligibilityLabel = ({
   eligible,
   hasDetails,
   publicView,
+  socialPost,
 }: EligibilityLabelProps) => {
   const internationalType = type === "International";
   const nationalType = type === "National";
@@ -60,6 +67,36 @@ export const EligibilityLabel = ({
   if (!type || !whom) return null;
   const parts: string[] = [];
   const groupLabel = getGroupEligibilityLabel(whom);
+
+  if (socialPost) {
+    if (internationalType) {
+      return (
+        <p>
+          International (All)
+          {hasDetails && <sup>*</sup>}
+        </p>
+      );
+    } else if (nationalType) {
+      if (whom.length === 1) {
+        return (
+          <p>
+            {getDemonym(whom[0])} Artists
+            {hasDetails && <sup>*</sup>}
+          </p>
+        );
+      } else {
+        return "See Caption for more details";
+      }
+    } else if (type === "Regional/Local") {
+      return (
+        <p>
+          Regional/Local<sup>*</sup>
+        </p>
+      );
+    } else {
+      return "See Caption for more details";
+    }
+  }
 
   if (type !== "International" && type !== "Other" && !groupLabel) {
     if (nationalType) {
@@ -224,3 +261,4 @@ export const EligibilityLabel = ({
     </div>
   );
 };
+

@@ -15,7 +15,7 @@ import { Link } from "@/components/ui/custom-link";
 import { LightboxGallery } from "@/components/ui/lightbox-gallery";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { DOC_TYPES, IMAGE_TYPES } from "@/constants/fileConsts";
-import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label";
+import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import {
   OpenCallProvided,
   OpenCallProvidedPreview,
