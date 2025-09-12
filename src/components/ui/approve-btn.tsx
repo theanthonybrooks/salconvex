@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
+  EventData,
   SubmissionFormState as EventState,
 } from "@/types/event";
 import { OpenCallState, OpenCallStatus } from "@/types/openCall";
@@ -17,6 +18,7 @@ import { Id } from "~/convex/_generated/dataModel";
 interface ApproveBtnProps {
   user: User | null;
   orgId: Id<"organizations">;
+  event: EventData;
   eventId: string;
   eventState?: EventState;
   eventCategory: EventCategory;
@@ -31,6 +33,7 @@ interface ApproveBtnProps {
 
 export const ApproveBtn = ({
   user,
+  event,
   eventState,
   openCallState,
   eventId,
@@ -141,6 +144,7 @@ export const ApproveBtn = ({
         <EventContextMenu
           user={user}
           mainOrgId={orgId}
+          event={event}
           eventId={eventId}
           openCallId={openCallId ?? ""}
           appLink={appLink}

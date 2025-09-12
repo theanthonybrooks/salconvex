@@ -315,6 +315,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               user={user}
               userPref={userPref}
               id={event._id}
+              event={event}
               openCallId={openCallId}
               openCallState={openCallState ?? null}
               slug={slug}

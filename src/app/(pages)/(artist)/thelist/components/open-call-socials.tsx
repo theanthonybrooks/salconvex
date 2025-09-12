@@ -80,7 +80,6 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
   const handleDownloadSingle = async () => {
     const { origin } = window.location;
 
-    // encode each param ONCE
     const fontSize = postSettings.fontSize.toString();
     const bgColor = encodeURIComponent(postSettings.bgColor);
     const budget = postSettings.budget.toString();
@@ -89,7 +88,6 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
 
     const pageUrl = `${origin}/render/post?slug=${slug}&year=${year}&fontSize=${fontSize}&bgColor=${bgColor}&budget=${budget}`;
 
-    // don't re-encode the whole thing here
     const res = await fetch(
       `/api/screenshot?url=${encodeURIComponent(pageUrl)}`,
     );

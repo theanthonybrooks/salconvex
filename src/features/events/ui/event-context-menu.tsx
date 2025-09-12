@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
+  EventData,
   SubmissionFormState as EventState,
   PostStatus,
 } from "@/types/event";
@@ -53,6 +54,7 @@ import { Id } from "~/convex/_generated/dataModel";
 interface EventContextMenuProps {
   // onHide: () => void;
   appLink?: string;
+  event: EventData;
   eventId: string;
   eventState?: EventState;
   openCallId: string;
@@ -78,6 +80,7 @@ interface EventContextMenuProps {
 const EventContextMenu = ({
   appLink,
   eventId,
+  event,
   mainOrgId,
   openCallId,
   eventState,
@@ -100,6 +103,7 @@ const EventContextMenu = ({
   postOptions = false,
 }: EventContextMenuProps) => {
   const router = useRouter();
+
   const isAdmin = user?.role?.includes("admin") || false;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
@@ -110,6 +114,8 @@ const EventContextMenu = ({
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const hasApplied = appStatus !== null;
+  const { slug, dates } = event;
+
   const onHide = async () => {
     toggleListAction({ hidden: !isHidden });
     await updateUserLastActive({ email: user?.email ?? "" });
@@ -241,31 +247,62 @@ const EventContextMenu = ({
             </>
           )}
           {isAdmin && postOptions && (
-            <div
-              className={cn(
-                "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                nonAdminPublicView && "hidden",
-              )}
-            >
-              {/* //TODO: Make this link to the socials page as well as updating the post status  */}
-              {!postStatus ? (
-                <span
-                  className="flex items-center gap-x-1 text-sm"
-                  onClick={() => handlePostEvent("toPost")}
-                >
-                  <MdPhoto className="size-4" />
-                  Make Post
-                </span>
-              ) : (
-                <span
-                  className="flex items-center gap-x-1 text-sm"
-                  onClick={() => handlePostEvent(null)}
-                >
-                  <X className="size-4" />
-                  Cancel Post
-                </span>
-              )}
-            </div>
+            <>
+              <div
+                className={cn(
+                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                  nonAdminPublicView && "hidden",
+                )}
+              >
+                {!postStatus ? (
+                  <span
+                    className="flex items-center gap-x-1 text-sm"
+                    onClick={() => {
+                      handlePostEvent("toPost");
+                      if (!openCallState) return;
+                      window.open(
+                        `/thelist/event/${slug}/${dates.edition}/call/social`,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                    }}
+                  >
+                    <MdPhoto className="size-4" />
+                    Make Post
+                  </span>
+                ) : (
+                  <span
+                    className="flex items-center gap-x-1 text-sm"
+                    onClick={() => handlePostEvent(null)}
+                  >
+                    <X className="size-4" />
+                    Cancel Post
+                  </span>
+                )}
+              </div>
+              <div
+                className={cn(
+                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                  nonAdminPublicView && "hidden",
+                )}
+              >
+                {postStatus && (
+                  <span
+                    className="flex items-center gap-x-1 text-sm"
+                    onClick={() => {
+                      window.open(
+                        `/thelist/event/${slug}/${dates.edition}/call/social`,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                    }}
+                  >
+                    <MdPhoto className="size-4" />
+                    View Socials
+                  </span>
+                )}
+              </div>
+            </>
           )}
           {hasApplied && isBookmarked !== undefined && (
             <div

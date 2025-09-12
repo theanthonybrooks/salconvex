@@ -344,6 +344,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   user={user}
                   userPref={userPref}
                   id={event._id}
+                  event={event}
                   openCallId={openCallId}
                   openCallState={openCallState ?? null}
                   mainOrgId={mainOrgId}
@@ -379,6 +380,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 user={user}
                 userPref={userPref}
                 id={event._id}
+                event={event}
                 openCallId={openCallId}
                 openCallState={openCallState ?? null}
                 mainOrgId={mainOrgId}
@@ -404,6 +406,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               <>
                 <ApproveBtn
                   user={user}
+                  event={event}
                   eventState={eventState}
                   eventCategory={eventCategory}
                   openCallState={openCallState}
@@ -570,6 +573,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 userPref={userPref}
                 orgPreview={isOwner}
                 id={event._id}
+                event={event}
                 openCallId={openCallId}
                 openCallState={openCallState ?? null}
                 slug={slug}

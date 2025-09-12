@@ -234,7 +234,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 organizer={organizer}
                 abbr={true}
               />
-              {(isAdmin || isOwner ) && (
+              {(isAdmin || isOwner) && (
                 <>
                   <Separator
                     orientation="horizontal"
@@ -243,6 +243,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                   />
                   <ApproveBtn
                     user={user}
+                    event={event}
                     eventState={eventState}
                     eventCategory={eventCategory}
                     eventId={event._id}

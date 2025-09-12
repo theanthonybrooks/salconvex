@@ -525,6 +525,7 @@ const EventCardPreview = ({
             )}
           </div>
           <EventContextMenu
+            event={event}
             eventId={event._id}
             mainOrgId={mainOrgId}
             openCallId={opencall ? opencall._id : ""}
@@ -818,6 +819,7 @@ const EventCardPreview = ({
           <ApplyButton
             user={user}
             id={event._id}
+            event={event}
             openCallId={opencall ? opencall._id : ""}
             openCallState={ocState ?? null}
             slug={slug}

@@ -16,7 +16,7 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/types/applications";
-import { EventCategory } from "@/types/event";
+import { EventCategory, EventData } from "@/types/event";
 import { CallType, OpenCallState, OpenCallStatus } from "@/types/openCall";
 import { User, UserPref } from "@/types/user";
 import {
@@ -114,6 +114,7 @@ export const ApplyButtonShort = ({
 
 interface ApplyButtonProps {
   id: string;
+  event: EventData;
   openCallId: string;
   openCallState: OpenCallState | null;
   mainOrgId?: Id<"organizations">;
@@ -146,6 +147,7 @@ interface ApplyButtonProps {
 
 export const ApplyButton = ({
   id,
+  event,
   openCallId,
   openCallState,
   mainOrgId,
@@ -299,6 +301,7 @@ export const ApplyButton = ({
           ? "Test Apply"
           : "Read More";
   const hasApplied = appStatus !== null;
+
   return (
     <div
       className={cn(
@@ -514,6 +517,7 @@ export const ApplyButton = ({
       )}
 
       <EventContextMenu
+        event={event}
         user={user}
         eventId={id}
         mainOrgId={mainOrgId}
@@ -532,6 +536,8 @@ export const ApplyButton = ({
         align="end"
         isBookmarked={isBookmarked}
         orgPreview={orgPreview}
+        postStatus={event.posted}
+        postOptions={isAdmin}
       />
     </div>
   );
