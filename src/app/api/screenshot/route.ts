@@ -1,7 +1,5 @@
 import chromium from "@sparticuz/chromium";
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
-import puppeteerCore from "puppeteer-core";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +12,16 @@ export async function GET(req: NextRequest) {
 
   const isDev = process.env.NODE_ENV !== "production";
 
+  const puppeteer = isDev
+    ? (await import("puppeteer")).default
+    : (await import("puppeteer-core")).default;
+
   const browser = await (isDev
     ? puppeteer.launch({
         headless: true,
         defaultViewport: { width: 500, height: 625, deviceScaleFactor: 2 },
       })
-    : puppeteerCore.launch({
+    : puppeteer.launch({
         args: chromium.args,
         defaultViewport: { width: 500, height: 625, deviceScaleFactor: 2 },
         executablePath: await chromium.executablePath(),
