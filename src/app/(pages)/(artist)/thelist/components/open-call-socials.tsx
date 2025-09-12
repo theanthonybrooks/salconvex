@@ -8,6 +8,7 @@ import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-cal
 import { LucideIcon, Settings2 } from "lucide-react";
 import { ComponentType, useEffect, useRef, useState } from "react";
 import { BiPhotoAlbum } from "react-icons/bi";
+import { toast } from "react-toastify";
 
 interface OpenCallSocialsProps {
   data: OpenCallData | null;
@@ -88,24 +89,33 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
 
     const pageUrl = `${origin}/render/post?slug=${slug}&year=${year}&fontSize=${fontSize}&bgColor=${bgColor}&budget=${budget}`;
 
-    const res = await fetch(
-      `/api/screenshot?url=${encodeURIComponent(pageUrl)}`,
+    await toast.promise(
+      (async () => {
+        const res = await fetch(
+          `/api/screenshot?url=${encodeURIComponent(pageUrl)}`,
+        );
+        if (!res.ok) throw new Error("Failed to fetch screenshot");
+
+        const blob = await res.blob();
+        const urlBlob = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = urlBlob;
+        link.download = `${event.name}.jpg`;
+        link.click();
+
+        URL.revokeObjectURL(urlBlob);
+      })(),
+      {
+        pending: "Creating post...",
+        success: "Post created successfully!",
+        error: "Failed to create post.",
+      },
+      {
+        autoClose: 2000,
+        pauseOnHover: false,
+      },
     );
-
-    if (!res.ok) {
-      console.error("Failed to fetch screenshot");
-      return;
-    }
-
-    const blob = await res.blob();
-    const urlBlob = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = urlBlob;
-    link.download = `${event.name}.jpg`;
-    link.click();
-
-    URL.revokeObjectURL(urlBlob);
   };
 
   return (
