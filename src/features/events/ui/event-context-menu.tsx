@@ -280,13 +280,13 @@ const EventContextMenu = ({
                   </span>
                 )}
               </div>
-              <div
-                className={cn(
-                  "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
-                  nonAdminPublicView && "hidden",
-                )}
-              >
-                {postStatus && (
+              {postStatus && (
+                <div
+                  className={cn(
+                    "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                    nonAdminPublicView && "hidden",
+                  )}
+                >
                   <span
                     className="flex items-center gap-x-1 text-sm"
                     onClick={() => {
@@ -300,8 +300,8 @@ const EventContextMenu = ({
                     <MdPhoto className="size-4" />
                     View Socials
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
           {hasApplied && isBookmarked !== undefined && (
