@@ -17,17 +17,15 @@ interface OpenCallPostDetailProps {
 
 const OpenCallPostDetail = ({ data }: OpenCallPostDetailProps) => {
   if (!data) return <p>No Data</p>;
-  const { event, openCall, organizer, application } = data;
+  const { event, openCall, organizer } = data;
   const {
     logo: eventLogo,
     category: eventCategory,
-    type: eventType,
+
     location,
-    dates,
-    slug,
-    mainOrgId,
-    state: eventState,
   } = event;
+  console.log("organizer: ", organizer);
+  void eventLogo;
 
   const { basicInfo, eligibility } = openCall;
   const locationString = getFormattedLocationString(location);
