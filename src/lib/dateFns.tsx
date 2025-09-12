@@ -215,6 +215,28 @@ export function formatTimeConditionalMinutes(date: DateTime<true>) {
   return date.toFormat("h:mma");
 }
 
+export const formatOpenCallDeadlineForPost = (
+  dateString: string,
+  timezone: string,
+  callType: CallType,
+) => {
+  if (callType === "Invite") return "Invite-only";
+  if (callType === "Rolling") return "Ongoing";
+  if (callType === "Email") return "No Deadline; Email Submissions";
+  if (callType === "False") return "No Open Call";
+
+  if (!dateString) return "Unknown Deadline";
+
+  const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone);
+  if (!dt.isValid) return "Invalid date";
+
+  const month = dt.monthShort;
+  const day = dt.day;
+  const year = dt.year;
+
+  return ` ${day} ${month} ${year}`;
+};
+
 export const formatOpenCallDeadline = (
   dateString: string,
   timezone: string,

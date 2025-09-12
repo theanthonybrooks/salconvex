@@ -1,4 +1,6 @@
-import { capitalize, cn } from "@/lib/utils";
+import OpenCallPostDetail from "@/app/(pages)/(artist)/thelist/components/open-call-post-detail";
+import { capitalize } from "@/lib/utils";
+import { OpenCallData } from "@/types/openCall";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 
 import { fetchQuery } from "convex/nextjs";
@@ -37,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function OpenCallPost({
+export default async function OpenCallPostPage({
   params,
 }: {
   params: Promise<{ slug: string; year: string }>;
@@ -63,6 +65,7 @@ export default async function OpenCallPost({
 
   const isAdmin = user?.role?.includes("admin");
   let organizerId: string | null = null;
+  let ocData: OpenCallData | null = null;
 
   try {
     const data = await fetchQuery(
@@ -77,6 +80,9 @@ export default async function OpenCallPost({
     if (data?.organizer?.ownerId) {
       organizerId = data.organizer.ownerId;
     }
+    if (data) {
+      ocData = data;
+    }
   } catch {
     redirect(`/404-not-found`);
   }
@@ -87,18 +93,5 @@ export default async function OpenCallPost({
     );
   }
 
-  return (
-    <div
-      className={cn("my-10 w-full justify-items-center lg:grid lg:grid-cols-2")}
-    >
-      <section className={cn("flex flex-col gap-3")}>
-        <h1>Social Media Post</h1>
-        <div className="h-[500px] w-[400px] rounded-sm border"></div>
-      </section>
-      <section className={cn("flex flex-col gap-3")}>
-        <h1>Social Media Story</h1>
-        <div className="h-[500px] w-[250px] rounded-sm border"></div>
-      </section>
-    </div>
-  );
+  return <OpenCallPostDetail data={ocData} />;
 }

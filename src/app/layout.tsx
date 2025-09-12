@@ -96,7 +96,10 @@ export default async function RootLayout({
     <ConvexAuthNextjsServerProvider>
       <html lang="en" suppressHydrationWarning>
         <head>
-          {/* <link rel='stylesheet' href='https://use.typekit.net/dck7qmb.css' /> */}
+          <link
+            rel="stylesheet"
+            href="https://use.typekit.net/dck7qmb.css"
+          ></link>
         </head>
         <body
           className={cn(

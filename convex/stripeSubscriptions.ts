@@ -570,11 +570,17 @@ export const subscriptionStoreWebhook = mutation({
           .withIndex("customerId", (q) => q.eq("customerId", customerId))
           .first();
         console.log("customer", customer);
-        if (customer && !customer.status) {
-          await ctx.db.delete(customer._id);
-          console.log("deleted customer", customer);
+        if (customer) {
+          if (!customer.status) {
+            await ctx.db.delete(customer._id);
+            console.log("deleted incomplete customer: ", customer);
+          } else {
+            throw new ConvexError(
+              "Customer has active subscription: " + customerId,
+            );
+          }
         } else {
-          throw new ConvexError("Customer not found" + customerId);
+          throw new ConvexError("Customer not found: " + customerId);
         }
 
         break;

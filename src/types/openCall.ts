@@ -168,13 +168,15 @@ export interface OpenCall {
 
 export type OpenCallApplication = Doc<"applications">;
 
+export interface OpenCallData {
+  event: EventData;
+  openCall: OpenCall;
+  organizer: Organizer;
+  application?: OpenCallApplication | null;
+}
+
 export interface OpenCallCardProps {
-  data: {
-    event: EventData;
-    openCall: OpenCall;
-    organizer: Organizer;
-    application?: OpenCallApplication | null;
-  };
+  data: OpenCallData;
   userPref: UserPref | null;
   artist?: ArtistFull | null; //todo:make this required
   className?: string;

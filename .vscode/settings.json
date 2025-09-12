@@ -20,7 +20,8 @@
     "Membership",
     "This Week",
     "Admin",
-    "Cookies"
+    "Cookies",
+    "Social"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -19,6 +19,7 @@ export default {
         spaceMono: ["var(--font-space-mono)", ...fontFamily.mono],
         libreFranklin: ["var(--font-libre-franklin)", ...fontFamily.sans],
         bebasNeue: ["var(--font-bebas-neue)", ...fontFamily.sans],
+        acumin: ['"acumin-variable"', "sans-serif"],
         ramaE: ["rama-gothic-e", ...fontFamily.sans],
         ramaM: ["rama-gothic-m", ...fontFamily.sans],
         ramaC: ["rama-gothic-c", ...fontFamily.sans],
@@ -112,6 +113,7 @@ export default {
       },
       borderWidth: {
         "1.5": "1.5px",
+        "2.5": "2.5px",
         "3": "3px",
       },
       borderRadius: {

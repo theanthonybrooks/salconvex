@@ -1,0 +1,29 @@
+/* OpenCallPostDetail.module.css */
+
+.container {
+  background-color: #fafafa;
+  border: 2px solid #333;
+}
+
+.title {
+  font-size: 3.8rem;
+  letter-spacing: -1px;
+  font-variation-settings:
+    "slnt" 0,
+    "wdth" 115,
+    "wght" 900;
+
+  font-stretch: expanded;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scaleY(0.9) scaleX(1);
+  /* font-family: var(--font-acumin); */
+}
+
+.light {
+  -webkit-text-stroke: 2.5px black;
+  letter-spacing: 0px;
+  color: white;
+}
+
