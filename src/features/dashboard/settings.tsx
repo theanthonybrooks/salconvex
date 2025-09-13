@@ -104,11 +104,18 @@ import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { FontSizeIcon } from "@radix-ui/react-icons";
 import { usePreloadedQuery } from "convex/react";
 import { useTheme } from "next-themes";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 export default function SettingsPage() {
+  const pathname = usePathname();
+  const params = useParams<{ slug?: string[] }>();
+  const activeTab = params?.slug?.[0] ?? "account";
+
+  const router = useRouter();
+
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -525,6 +532,16 @@ export default function SettingsPage() {
     }
   };
 
+  const handleTabChange = (value: string) => {
+    const segments = pathname.split("/").filter(Boolean);
+    if (segments.length > 2) {
+      segments[segments.length - 1] = value;
+    } else {
+      segments.push(value);
+    }
+    router.replace("/" + segments.join("/"));
+  };
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <CanceledBanner
@@ -540,7 +557,11 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="account" className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="space-y-6"
+      >
         <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border bg-white/80 md:w-auto md:justify-start">
           <TabsTrigger value="account" className="h-9 px-4" border>
             Account

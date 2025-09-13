@@ -499,7 +499,7 @@ export default function BillingPage() {
                       </span>
                     </div>
                   ) :  */}
-                    {canceledAt && (
+                    {canceledAt && isCanceled && (
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-muted-foreground">
                           Cancellation Date:
@@ -508,7 +508,8 @@ export default function BillingPage() {
                           {subscription?.canceledAt
                             ? format(
                                 new Date(subscription.canceledAt),
-                                "MMM do, yyyy @ h:mm a",
+                                // "MMM do, yyyy @ h:mm a",
+                                "MMM do, yyyy",
                               )
                             : "N/A"}
                         </span>

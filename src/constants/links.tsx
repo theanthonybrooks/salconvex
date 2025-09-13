@@ -220,7 +220,7 @@ export const dashboardNavItems: DashNavItem[] = [
   // },
   {
     label: "Settings",
-    href: "/dashboard/account/settings",
+    href: "/dashboard/settings",
     icon: Settings,
     section: true,
     sectionCat: "account",
@@ -234,7 +234,7 @@ export const dashboardNavItems: DashNavItem[] = [
 
   {
     label: "Billing",
-    href: "/dashboard/account/billing",
+    href: "/dashboard/billing",
     icon: CreditCard,
     subsection: true,
     sectionCat: "account",

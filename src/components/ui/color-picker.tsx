@@ -7,7 +7,6 @@ import {
   Minus,
   Plus,
   SwatchBook,
-  X,
 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -179,13 +178,21 @@ export const ColorPicker = ({
           />
         </div>
       ) : (
-        <div className="relative w-full space-y-8 rounded-3xl bg-white/80 p-8 shadow-lg backdrop-blur-xl dark:bg-neutral-900 sm:min-w-[400px]">
-          <X
+        <div className="relative w-full space-y-8 rounded-3xl bg-white/80 p-8 dark:bg-neutral-900 sm:min-w-[400px]">
+          {/* <X
             className={cn(
               "absolute right-4 top-4 cursor-pointer hover:scale-105 hover:text-red-600 active:scale-95",
             )}
             onClick={() => setModalOpen(!modalOpen)}
-          />
+          /> */}
+          <span
+            className={cn(
+              "absolute right-4 top-4 cursor-pointer hover:scale-105 hover:text-red-600 active:scale-95",
+            )}
+            onClick={() => setModalOpen(!modalOpen)}
+          >
+            Collapse
+          </span>
 
           <input
             type="text"
@@ -390,7 +397,7 @@ const ColorSwatches = ({
         type="button"
         onClick={goPrev}
         disabled={!canGoPrev}
-        className="text-neutral-400 hover:scale-110 hover:text-neutral-600 active:scale-95 disabled:opacity-30"
+        className="text-neutral-400 hover:scale-110 hover:text-neutral-600 active:scale-95 disabled:pointer-events-none disabled:opacity-30"
       >
         <ChevronLeft className="size-6" />
         <span className="sr-only">Previous colors</span>
@@ -417,7 +424,7 @@ const ColorSwatches = ({
         type="button"
         onClick={goNext}
         disabled={!canGoNext}
-        className="text-neutral-400 hover:scale-110 hover:text-neutral-600 active:scale-95 disabled:opacity-30"
+        className="text-neutral-400 hover:scale-110 hover:text-neutral-600 active:scale-95 disabled:pointer-events-none disabled:opacity-30"
       >
         <ChevronRight className="size-6" />
         <span className="sr-only">Next colors</span>

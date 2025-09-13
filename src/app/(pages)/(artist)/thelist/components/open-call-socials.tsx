@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { OpenCallData } from "@/types/openCall";
 
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
-import { LucideIcon, Settings2 } from "lucide-react";
-import { ComponentType, useEffect, useRef, useState } from "react";
+import { LoaderCircle, LucideIcon, Settings2 } from "lucide-react";
+import { ComponentType, useState } from "react";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { toast } from "react-toastify";
 
@@ -19,32 +19,8 @@ export interface PostSettings {
   budget: boolean;
 }
 
-export function useClickOutside(
-  ref: React.RefObject<HTMLElement | null>,
-  handler: () => void,
-  active = true,
-) {
-  useEffect(() => {
-    if (!active) return;
-
-    const listener = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target) return;
-      if (ref.current?.contains(target)) return;
-      if (target.closest("[data-radix-popper-content-wrapper]")) return;
-      if (target.closest("[data-radix-portal]")) return;
-      if (target.closest("[role=dialog]")) return;
-      handler();
-    };
-
-    document.addEventListener("mousedown", listener);
-    return () => document.removeEventListener("mousedown", listener);
-  }, [ref, handler, active]);
-}
-
 const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
-  const dashboardRef = useRef<HTMLDivElement | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const [postSettings, setPostSettings] = useState<PostSettings>({
     fontSize: 30,
     bgColor: "hsla(50, 100%, 72%, 1.0)",
@@ -59,6 +35,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
       onClick: () => {
         handleDownloadSingle();
       },
+      actionable: true,
     },
     {
       key: "settings",
@@ -69,7 +46,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     },
   ];
 
-  useClickOutside(dashboardRef, () => setSettingsOpen(false), settingsOpen);
+  // useClickOutside(dashboardRef, () => setSettingsOpen(false), settingsOpen);
 
   if (!data) return <p>No Data</p>;
   const { event } = data;
@@ -79,6 +56,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
   };
 
   const handleDownloadSingle = async () => {
+    setLoading(true);
     const { origin } = window.location;
 
     const fontSize = postSettings.fontSize.toString();
@@ -89,33 +67,39 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
 
     const pageUrl = `${origin}/render/post?slug=${slug}&year=${year}&fontSize=${fontSize}&bgColor=${bgColor}&budget=${budget}`;
 
-    await toast.promise(
-      (async () => {
-        const res = await fetch(
-          `/api/screenshot?url=${encodeURIComponent(pageUrl)}`,
-        );
-        if (!res.ok) throw new Error("Failed to fetch screenshot");
+    try {
+      await toast.promise(
+        (async () => {
+          const res = await fetch(
+            `/api/screenshot?url=${encodeURIComponent(pageUrl)}`,
+          );
+          if (!res.ok) throw new Error("Failed to fetch screenshot");
 
-        const blob = await res.blob();
-        const urlBlob = URL.createObjectURL(blob);
+          const blob = await res.blob();
+          const urlBlob = URL.createObjectURL(blob);
 
-        const link = document.createElement("a");
-        link.href = urlBlob;
-        link.download = `${event.name}.jpg`;
-        link.click();
+          const link = document.createElement("a");
+          link.href = urlBlob;
+          link.download = `${event.name}.jpg`;
+          link.click();
 
-        URL.revokeObjectURL(urlBlob);
-      })(),
-      {
-        pending: "Creating post...",
-        success: "Post created successfully!",
-        error: "Failed to create post.",
-      },
-      {
-        autoClose: 2000,
-        pauseOnHover: false,
-      },
-    );
+          URL.revokeObjectURL(urlBlob);
+        })(),
+        {
+          pending: "Creating post...",
+          success: "Post created successfully!",
+          error: "Failed to create post.",
+        },
+        {
+          autoClose: 2000,
+          pauseOnHover: false,
+        },
+      );
+    } catch (error) {
+      console.error("Failed to create post:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -127,17 +111,20 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
       <section className={cn("flex flex-col gap-3")}>
         <p>Social Media Post</p>
         <div className="group relative">
-          <PostMenu items={postMenuItems} />
+          <PostMenu items={postMenuItems} loading={loading} />
 
           <OpenCallPost data={data} postSettings={postSettings} />
           {settingsOpen && (
             <PostPropertiesDashboard
-              ref={dashboardRef}
               fontSize={postSettings.fontSize}
               bgColor={postSettings.bgColor}
               budget={postSettings.budget}
               onChange={handlePostSettingsChange}
-              className={cn("absolute -right-5 top-0 flex translate-x-full")}
+              className={
+                cn()
+                // "absolute top-0 flex w-full translate-x-full sm:-right-5 sm:w-auto",
+              }
+              open={settingsOpen}
               setOpen={setSettingsOpen}
             />
           )}
@@ -157,14 +144,16 @@ type MenuItem = {
   key: string;
   icon: LucideIcon | ComponentType<{ className?: string }>;
   onClick: () => void;
+  actionable?: boolean;
 };
 
 type PostMenuProps = {
   className?: string;
   items: MenuItem[];
+  loading?: boolean;
 };
 
-const PostMenu = ({ className, items }: PostMenuProps) => {
+const PostMenu = ({ className, items, loading }: PostMenuProps) => {
   return (
     <div
       className={cn(
@@ -174,13 +163,18 @@ const PostMenu = ({ className, items }: PostMenuProps) => {
     >
       {items.map((item) => {
         const Icon = item.icon;
+        const actionableItem = item.actionable;
         return (
           <button
             key={item.key}
             className="cursor-pointer rounded border-1.5 border-foreground/10 bg-card-secondary p-1 hover:scale-105 active:scale-95"
             onClick={item.onClick}
           >
-            <Icon className="size-6" />
+            {actionableItem && loading ? (
+              <LoaderCircle className="size-6 animate-spin" />
+            ) : (
+              <Icon className="size-6" />
+            )}
           </button>
         );
       })}

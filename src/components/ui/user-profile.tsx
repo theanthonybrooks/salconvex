@@ -8,7 +8,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
@@ -20,11 +24,17 @@ import { usePreloadedQuery } from "convex/react";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import {
+  Bell,
   HelpCircle,
+  Lock,
   LogOut,
   LucideLayoutDashboard,
+  PaintRoller,
   Settings,
-  Users,
+  Sparkles,
+  Squirrel,
+  User,
+  Users2,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -149,46 +159,103 @@ export function UserProfile({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {isAdmin && (
-            <Link
-              href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
-              className="underline-offset-2 hover:cursor-pointer hover:underline"
-            >
-              <DropdownMenuItem className="focus:bg-salYellow/50">
-                {totalPending > 0 ? (
-                  <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
-                    {totalPending}
-                  </div>
-                ) : (
-                  <Users className="mr-2 size-4" />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <LucideLayoutDashboard className="mr-2 size-4" />
+              Dashboard
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                {isAdmin && (
+                  <Link
+                    href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      {totalPending > 0 ? (
+                        <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
+                          {totalPending}
+                        </div>
+                      ) : (
+                        <Squirrel className="mr-2 size-4" />
+                      )}
+                      <span>Admin</span>
+                    </DropdownMenuItem>
+                  </Link>
                 )}
-                <span>Admin Dashboard</span>
-              </DropdownMenuItem>
-            </Link>
-          )}
 
-          {hasActiveSub && (
-            <Link
-              href="/dashboard/"
-              className="underline-offset-2 hover:cursor-pointer hover:underline"
-            >
-              <DropdownMenuItem className="focus:bg-salYellow/50">
-                <LucideLayoutDashboard className="mr-2 size-4" />
-                <span>{isAdmin ? "User Dashboard" : "Dashboard"}</span>
-              </DropdownMenuItem>
-            </Link>
-          )}
-          {isOrganizer && (
-            <Link
-              href="/dashboard/organizer/events"
-              className="underline-offset-2 hover:cursor-pointer hover:underline"
-            >
-              <DropdownMenuItem className="focus:bg-salYellow/50">
-                <LucideLayoutDashboard className="mr-2 size-4" />
-                <span>Org Dashboard</span>
-              </DropdownMenuItem>
-            </Link>
-          )}
+                {hasActiveSub && (
+                  <Link
+                    href="/dashboard/"
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      <PaintRoller className="mr-2 size-4" />
+                      <span>{isAdmin ? "User" : "Artist"}</span>
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                {isOrganizer && (
+                  <Link
+                    href="/dashboard/organizer/events"
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      <Users2 className="mr-2 size-4" />
+                      <span>Organizer</span>
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Settings className="mr-2 size-4" />
+              Settings
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <Link
+                  href="/dashboard/settings/account"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <User className="mr-2 size-4" />
+                    <span>Account</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link
+                  href="/dashboard/settings/notifications"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <Bell className="mr-2 size-4" />
+                    <span>Notifications</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link
+                  href="/dashboard/settings/appearance"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <Sparkles className="mr-2 size-4" />
+                    <span>Appearance</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link
+                  href="/dashboard/settings/security"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <Lock className="mr-2 size-4" />
+                    <span>Security</span>
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
           {hasActiveSub && (
             <Link
               href="/dashboard/account/billing"
@@ -212,15 +279,6 @@ export function UserProfile({
               </DropdownMenuItem>
             </Link>
           )}
-          <Link
-            href="/dashboard/account/settings"
-            className="underline-offset-2 hover:cursor-pointer hover:underline"
-          >
-            <DropdownMenuItem className="focus:bg-salYellow/50">
-              <Settings className="mr-2 size-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
-          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <Link

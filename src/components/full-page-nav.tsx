@@ -758,7 +758,11 @@ const FullPageNav = ({
                             const organizerMatch =
                               isOrganizer &&
                               itemUserType?.includes("organizer");
-
+                            const deviceType = item?.deviceType;
+                            const deviceTypeMatch = ["desktop", "all"].some(
+                              (type) =>
+                                deviceType?.includes(type as DeviceOptions),
+                            );
                             const isPublic = itemUserType?.includes("public");
                             const typeMatch = user?.accountType?.some((type) =>
                               itemUserType?.some(
@@ -784,7 +788,8 @@ const FullPageNav = ({
                                 (typeMatch && subMatch) ||
                                 adminMatch ||
                                 organizerMatch) &&
-                              !excludedMatch
+                              !excludedMatch &&
+                              deviceTypeMatch
                             );
                           });
 
