@@ -50,6 +50,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const { event, organizer, openCall, application } = data;
   const {
     // id: eventId,
+    isUserOrg,
     logo: eventLogo,
     category: eventCategory,
     type: eventType,
@@ -313,8 +314,11 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
             />
             <ApplyButton
               user={user}
+              isUserOrg={isUserOrg}
               userPref={userPref}
+              activeSub={hasActiveSubscription}
               id={event._id}
+              mainOrgId={event.mainOrgId}
               event={event}
               openCallId={openCallId}
               openCallState={openCallState ?? null}

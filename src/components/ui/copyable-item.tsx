@@ -3,6 +3,7 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Check, LucideIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { toast } from "react-toastify";
 
 interface CopyableItemProps {
   children: string | number;
@@ -28,6 +29,11 @@ export const CopyableItem = ({
     navigator.clipboard.writeText(copyContent ?? children.toString());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast.success("Copied to clipboard!", {
+      autoClose: 2000,
+      pauseOnHover: false,
+      hideProgressBar: true,
+    });
   };
   return (
     <TooltipSimple content="Click to copy">

@@ -117,6 +117,15 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       const timeZone = row.original.timeZone;
       const now = new Date();
       const deadlineDate = new Date(value);
+      const isValid = !isNaN(deadlineDate.getTime());
+
+      if (!isValid) {
+        return (
+          <span className="block text-center text-sm text-foreground/50">
+            {/* Invalid value: {value} */}-
+          </span>
+        );
+      }
       // Difference in milliseconds
       const diffMs = deadlineDate.getTime() - now.getTime();
 

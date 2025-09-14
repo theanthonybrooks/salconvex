@@ -103,7 +103,8 @@ export const BookmarkNotesInput = ({ notes, bookmark }: AppNotesInputProps) => {
       value={notes}
       onChange={handleChange}
       inputPreview
-      placeholder="(optional)"
+      // placeholder="(optional)"
+      formInputPreviewClassName="line-clamp-1 min-h-5 max-h-20"
     />
   );
 };

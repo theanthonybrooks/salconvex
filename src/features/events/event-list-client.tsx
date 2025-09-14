@@ -21,6 +21,7 @@ import {
   EventType,
 } from "@/types/event";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
+import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -35,12 +36,14 @@ import {
   useRef,
   useState,
 } from "react";
+import { api } from "~/convex/_generated/api";
 
 export const viewOptionValues = [
   { value: "openCall", label: "Open Calls" },
   { value: "organizer", label: "Organizers" },
   { value: "event", label: "Events Only" },
   { value: "archive", label: "Archive" },
+  { value: "orgView", label: "My Submissions" },
 ] as const;
 
 export type ViewOptions = (typeof viewOptionValues)[number]["value"];
@@ -66,17 +69,27 @@ const ClientEventList = () => {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
-  const { subStatus: userSubStatus, hasActiveSubscription } = subStatus;
+  const { subStatus: userSubStatus } = subStatus;
 
   const artistData = usePreloadedQuery(preloadedArtistData);
   // console.log(artistData);
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
-  const isAdmin = user?.role?.includes("admin");
+  const isOrganizer = accountType?.includes("organizer");
+  const orgEvents = useQuery(
+    api.organizer.organizations.getUserOrgEvents,
+    isOrganizer ? {} : "skip",
+  );
 
-  const publicView = (!hasActiveSubscription || !isArtist) && !isAdmin;
-  const publicEventOnly = publicView && view === "event";
+  const hasOrgEvents = !!(orgEvents && orgEvents?.length > 0);
+
+  const isAdmin = user?.role?.includes("admin");
+  const hasActiveSubscription =
+    (subStatus?.hasActiveSubscription || isAdmin) ?? false;
+  const publicView = !hasActiveSubscription || !isArtist;
+  const publicEventOnly =
+    (publicView && view === "event") || (hasOrgEvents && view === "orgView");
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
@@ -101,7 +114,7 @@ const ClientEventList = () => {
       sortBy:
         view === "event" || view === "archive"
           ? "eventStart"
-          : view === "organizer"
+          : view === "organizer" || view === "orgView"
             ? "organizer"
             : "openCall",
       sortDirection: "asc",
@@ -384,7 +397,9 @@ const ClientEventList = () => {
               <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
                 {(isMobile
                   ? viewOptionValues.slice(0, 3)
-                  : viewOptionValues
+                  : hasOrgEvents
+                    ? viewOptionValues
+                    : viewOptionValues.slice(0, 4)
                 ).map((opt) => (
                   <TabsTrigger
                     key={opt.value}
@@ -412,6 +427,49 @@ const ClientEventList = () => {
                     <span className="z-10"> {opt.label}</span>
                   </TabsTrigger>
                 ))}
+              </TabsList>
+            </Tabs>
+          )}
+
+          {!hasActiveSubscription && hasOrgEvents && (
+            <Tabs
+              defaultValue={view}
+              className="relative w-max max-w-[90vw]"
+              // value={view}
+              onValueChange={(val) => setView(val as ViewOptions)}
+            >
+              <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
+                {viewOptionValues
+                  .filter(
+                    (opt) => opt.value === "event" || opt.value === "orgView",
+                  )
+                  .map((opt) => (
+                    <TabsTrigger
+                      key={opt.value}
+                      value={opt.value}
+                      className={cn(
+                        "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium hover:font-bold",
+                        view === opt.value
+                          ? "font-bold text-black"
+                          : "text-foreground/80",
+                      )}
+                    >
+                      {view === opt.value && (
+                        <motion.div
+                          exit={{ opacity: 0 }}
+                          layoutId="tab-bg"
+                          className="absolute inset-0 z-0 flex items-center justify-center rounded-md border-2 bg-background shadow-sm"
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+
+                      <span className="z-10"> {opt.label}</span>
+                    </TabsTrigger>
+                  ))}
               </TabsList>
             </Tabs>
           )}
@@ -525,6 +583,7 @@ const ClientEventList = () => {
                               publicPreview={showPublic}
                               user={user}
                               userPref={userPref}
+                              activeSub={hasActiveSubscription}
                             />
                           </div>
                         );
@@ -563,6 +622,7 @@ const ClientEventList = () => {
                                   publicPreview={showPublic}
                                   user={user}
                                   userPref={userPref}
+                                  activeSub={hasActiveSubscription}
                                 />
                               </div>
                             );

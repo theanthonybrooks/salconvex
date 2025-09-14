@@ -2,7 +2,7 @@
 //TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -186,6 +186,8 @@ export const SelectSimple = ({
   options: {
     label: string;
     value: string;
+    disabled?: boolean;
+    premium?: boolean;
   }[];
   onChangeAction: (value: string) => void;
   value: string;
@@ -216,9 +218,22 @@ export const SelectSimple = ({
           <SelectItem
             key={option.value}
             value={option.value}
-            className={cn(itemClassName)}
+            disabled={option.disabled}
+            className={cn(
+              itemClassName,
+              option.disabled && "pointer-events-none rounded-sm opacity-50",
+            )}
           >
-            {option.label}
+            <span className="flex items-center gap-x-1">
+              {option.premium && (
+                <span className="flex items-center gap-0">
+                  (<DollarSign className="size-3" />)
+                </span>
+              )}
+              <p className={cn(option.disabled && "line-through")}>
+                {option.label}
+              </p>
+            </span>
           </SelectItem>
         ))}
       </SelectContent>

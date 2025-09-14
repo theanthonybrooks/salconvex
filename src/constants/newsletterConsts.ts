@@ -12,8 +12,8 @@ export const newsletterFrequencyValues = newsletterFrequencyOptions.map(
 
 //todo: add an organizer type and perhaps an artist type? Event type of upcoming events each month?
 export const newsletterTypeOptions = [
-  { value: "openCall", label: "Open Call" },
   { value: "general", label: "General" },
+  { value: "openCall", label: "Open Call" },
 ] as const;
 
 export type NewsletterType = (typeof newsletterTypeOptions)[number]["value"];

@@ -131,8 +131,11 @@ export default function SettingsPage() {
   const fontSize = userPrefs?.fontSize === "large" ? "text-base" : "text-sm";
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
+
   const subStatus = subData?.subStatus ?? "none";
   const userPlan = subData?.subPlan ?? 0;
+  const minBananaUser = activeSub && userPlan >= 2;
+  // const minFatCapUser = activeSub && userPlan >= 3;
   const signedUpForNewsletter = userPrefs?.notifications?.newsletter ?? false;
 
   const newsletterInfo = useQuery(
@@ -990,7 +993,11 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <MultiSelect
-                      options={[...newsletterTypeOptions]}
+                      options={newsletterTypeOptions.map((opt) =>
+                        opt.value === "openCall" && !minBananaUser
+                          ? { ...opt, disabled: true, premium: true }
+                          : opt,
+                      )}
                       onValueChange={(value) => {
                         handleUpdateNewsletterPrefs(
                           "type",
@@ -1029,7 +1036,11 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <SelectSimple
-                      options={[...newsletterFrequencyOptions]}
+                      options={newsletterFrequencyOptions.map((opt) =>
+                        opt.value === "weekly" && !minBananaUser
+                          ? { ...opt, disabled: true, premium: true }
+                          : opt,
+                      )}
                       value={newsletterInfo?.frequency ?? "monthly"}
                       onChangeAction={(value) =>
                         handleUpdateNewsletterPrefs(

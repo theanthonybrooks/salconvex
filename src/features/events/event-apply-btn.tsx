@@ -23,7 +23,6 @@ import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
 } from "@/utils/loading-page-html";
-import { useQuery } from "convex-helpers/react/cache";
 import { useMutation } from "convex/react";
 import {
   CheckCircleIcon,
@@ -46,6 +45,8 @@ interface ApplyButtonShortProps {
   publicView?: boolean;
   appFee: number;
   className?: string;
+  user: User | null;
+  activeSub: boolean;
 }
 
 export const ApplyButtonShort = ({
@@ -56,7 +57,11 @@ export const ApplyButtonShort = ({
   publicView,
   appFee,
   className,
+  user,
+  activeSub,
 }: ApplyButtonShortProps) => {
+  const isArtist = user?.accountType?.includes("artist");
+  const hasValidSub = activeSub && isArtist;
   const currentUrl = window.location.href;
   const router = useRouter();
   const href =
@@ -71,7 +76,7 @@ export const ApplyButtonShort = ({
   const buttonText =
     openCall === "coming-soon"
       ? "Coming Soon!"
-      : appStatus && !publicView
+      : appStatus && !publicView && hasValidSub
         ? "Applied"
         : "Read More";
 
@@ -113,14 +118,15 @@ export const ApplyButtonShort = ({
 };
 
 interface ApplyButtonProps {
-  id: string;
+  id: Id<"events">;
   event: EventData;
-  openCallId: string;
+  openCallId: Id<"openCalls"> | null;
   openCallState: OpenCallState | null;
-  mainOrgId?: Id<"organizations">;
+  mainOrgId: Id<"organizations">;
+  isUserOrg: boolean;
 
   slug: string;
-  appUrl?: string;
+  appUrl?: string | null;
   appLinkformat?: string;
   edition: number;
   finalButton?: boolean;
@@ -141,6 +147,7 @@ interface ApplyButtonProps {
   orgPreview?: boolean;
   userPref?: UserPref | null;
   user?: User | null;
+  activeSub: boolean;
   callType?: CallType;
   fontSize?: "text-sm" | "text-base";
 }
@@ -151,12 +158,14 @@ export const ApplyButton = ({
   openCallId,
   openCallState,
   mainOrgId,
+  isUserOrg,
 
   slug,
   appUrl,
   appLinkformat,
   user,
   userPref,
+  activeSub,
   //isExternalApply, //todo: think about this. Could just use appUrl if it exists to gather the same assumption and user outcome.
 
   manualApplied: appStatus,
@@ -180,15 +189,13 @@ export const ApplyButton = ({
   fontSize = "text-sm",
 }: ApplyButtonProps) => {
   const autoApply = userPref?.autoApply ?? true;
-  const subscription = useQuery(
-    api.subscriptions.getUserSubscriptionStatus,
-    finalButton ? {} : "skip",
-  );
+
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const isEmail = callType === "Email" || appLinkformat === "mailto:";
-  const noSub =
-    !subscription?.hasActiveSubscription &&
-    (publicPreview || publicView || finalButton);
+  const noSub = !activeSub && (publicPreview || publicView || finalButton);
+
+  const isArtist = user?.accountType?.includes("artist");
+  const hasValidSub = activeSub && isArtist;
 
   const isAdmin = user?.role?.includes("admin") || false;
   // console.log("noSub: ", noSub);
@@ -283,7 +290,7 @@ export const ApplyButton = ({
             : `/thelist/event/${slug}/${edition}`;
   const buttonText =
     openCall === "active"
-      ? appStatus !== null && !publicView
+      ? appStatus !== null && hasValidSub
         ? appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1).toLowerCase()
         : isPreview
           ? "Read More"
@@ -293,14 +300,14 @@ export const ApplyButton = ({
               ? "Send Email"
               : "Apply"
       : openCall === "ended"
-        ? appStatus !== null && !publicView
+        ? appStatus !== null && hasValidSub
           ? appStatus.slice(0, 1).toUpperCase() +
             appStatus.slice(1).toLowerCase()
           : "Read More"
         : orgPreview
           ? "Test Apply"
           : "Read More";
-  const hasApplied = appStatus !== null;
+  const hasApplied = appStatus !== null && hasValidSub;
 
   return (
     <div
@@ -322,6 +329,7 @@ export const ApplyButton = ({
           className={cn(
             "relative z-[1] w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
             appStatus !== null &&
+              hasValidSub &&
               !publicView &&
               "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
           )}
@@ -461,6 +469,7 @@ export const ApplyButton = ({
             "relative z-[1] h-14 w-full cursor-pointer rounded-r-none border-r sm:h-11 xl:min-w-[150px]",
             appStatus !== null &&
               !publicView &&
+              hasValidSub &&
               "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",
           )}
           onClick={onApply}
@@ -485,18 +494,19 @@ export const ApplyButton = ({
           side="top"
         >
           <Button
-            disabled={noSub && !isAdmin}
+            disabled={!hasValidSub && !isAdmin}
             variant="salWithShadowHiddenVert"
             size="lg"
             className={cn(
               "relative z-[2] h-14 w-fit rounded-none border-x px-4 sm:h-11 sm:px-3 [&_svg]:size-6",
               appStatus !== null &&
                 !publicView &&
+                hasValidSub &&
                 "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
             )}
             onClick={onBookmark}
           >
-            {isBookmarked ? (
+            {isBookmarked && hasValidSub ? (
               <FaBookmark className="size-7 text-red-500" />
             ) : (
               <FaRegBookmark className="size-7" />
@@ -504,7 +514,7 @@ export const ApplyButton = ({
           </Button>
         </TooltipSimple>
       )}
-      {!orgPreview && hasApplied && (
+      {!orgPreview && hasApplied && hasValidSub && (
         <Button
           variant="salWithoutShadow"
           size="lg"
@@ -518,8 +528,8 @@ export const ApplyButton = ({
 
       <EventContextMenu
         event={event}
-        user={user}
         eventId={id}
+        isUserOrg={isUserOrg}
         mainOrgId={mainOrgId}
         openCallId={openCallId}
         openCallState={openCallState}

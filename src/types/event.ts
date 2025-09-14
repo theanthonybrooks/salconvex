@@ -124,6 +124,7 @@ export interface EventData {
   adminNote?: string;
   organizerId: string[];
   mainOrgId: Id<"organizations">;
+  isUserOrg: boolean;
 
   name: string;
   slug: string;
@@ -241,6 +242,7 @@ export type MergedEventPreviewData = PublicEventPreviewData & {
   manualApplied: boolean;
   status: ApplicationStatus | null;
   artistNationality: string[];
+  isUserOrg: boolean;
 };
 
 export type CombinedEventPreviewCardData = EventData & {
@@ -253,6 +255,7 @@ export type CombinedEventPreviewCardData = EventData & {
   slug: string;
 
   // User-specific metadata (nullable when unauthenticated)
+  isUserOrg: boolean;
   artistNationality: string[];
   bookmarked: boolean;
   hidden: boolean;

@@ -866,6 +866,14 @@ export const getEventBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+      : null;
+    if (!user) return null;
     // console.log(args.slug);
     const event = await ctx.db
       .query("events")
@@ -884,6 +892,7 @@ export const getEventBySlug = query({
       //   .collect(),
       ctx.db.get(event.mainOrgId),
     ]);
+    const userIsOrganizer = user?._id === organizer?.ownerId;
     // console.log(organizer);
 
     // const openCall = openCalls.find(
@@ -893,6 +902,7 @@ export const getEventBySlug = query({
     return {
       event: {
         ...event,
+        isUserOrg: userIsOrganizer,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
         type: event.type?.slice(0, 2) ?? [],
@@ -948,8 +958,6 @@ export const getEventWithDetails = query({
       ctx.db.get(event.mainOrgId),
     ]);
 
-    console.log(eventState);
-
     if (organizer?.ownerId !== userId && !eventPublished && !eventArchived)
       throw new ConvexError("You don't have permission to view this event");
 
@@ -957,9 +965,12 @@ export const getEventWithDetails = query({
       (e) => e.basicInfo.dates.edition === args.edition,
     );
 
+    const userIsOrganizer = user?._id === organizer?.ownerId;
+
     return {
       event: {
         ...event,
+        isUserOrg: userIsOrganizer,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
         type: event.type?.slice(0, 2) ?? [],
@@ -1083,6 +1094,7 @@ export const getEventWithOCDetails = query({
     return {
       event: {
         ...event,
+        isUserOrg: userIsOrganizer,
         state: event.state as SubmissionFormState,
         category: event.category as EventCategory,
         type: event.type?.slice(0, 2) ?? [],

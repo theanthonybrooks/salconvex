@@ -39,6 +39,7 @@ import { ApproveBtn } from "@/components/ui/approve-btn";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { formatApplicationLink } from "@/lib/applicationFns";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -55,6 +56,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const { data, artist, className } = props;
   const { event, organizer, openCall, application } = data;
   const {
+    isUserOrg,
     logo: eventLogo,
     category: eventCategory,
     type: eventType,
@@ -91,13 +93,15 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const validOpenCallState = publicStateValues.includes(openCallState ?? "");
   const bothValid = validEventState && validOpenCallState;
 
-  const appUrl = requirements?.applicationLink;
+  // const appUrl = requirements?.applicationLink;
   const appLinkFormat = requirements?.applicationLinkFormat;
-  const mailLink = appLinkFormat === "mailto:";
-  const mailSubject = requirements?.applicationLinkSubject;
-  const outputAppLink = mailLink
-    ? `mailto:${appUrl}${mailSubject ? `?subject=${mailSubject}` : ""}`
-    : appUrl;
+  // const mailLink = appLinkFormat === "mailto:";
+  // const mailSubject = requirements?.applicationLinkSubject;
+  // const outputAppLink = mailLink
+  //   ? `mailto:${appUrl}${mailSubject ? `?subject=${mailSubject}` : ""}`
+  //   : appUrl;
+
+  const outputAppLink = formatApplicationLink(requirements);
 
   const [activeTab, setActiveTab] = useState("openCall");
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
@@ -115,7 +119,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   );
 
   const locationString = getFormattedLocationString(location);
-  const isOwner = user?._id === organizer?.ownerId;
 
   const onBookmark = async () => {
     if (!hasActiveSubscription) return;
@@ -167,7 +170,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
-        isOwner={isOwner}
+        isOwner={isUserOrg}
       />
 
       <Card
@@ -338,11 +341,13 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 {`$${basicInfo?.appFee}`}
               </p>
             )}
-            {bothValid && (!isOwner || isAdmin) && (
+            {bothValid && (!isUserOrg || isAdmin) && (
               <>
                 <ApplyButton
                   user={user}
+                  isUserOrg={isUserOrg}
                   userPref={userPref}
+                  activeSub={hasActiveSubscription}
                   id={event._id}
                   event={event}
                   openCallId={openCallId}
@@ -375,10 +380,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 </p>
               </>
             )}
-            {!bothValid && !isAdmin && !isOwner && (
+            {!bothValid && !isAdmin && !isUserOrg && (
               <ApplyButton
                 user={user}
+                isUserOrg={isUserOrg}
                 userPref={userPref}
+                activeSub={hasActiveSubscription}
                 id={event._id}
                 event={event}
                 openCallId={openCallId}
@@ -402,7 +409,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               />
             )}
 
-            {((isAdmin && !bothValid) || isOwner) && (
+            {((isAdmin && !bothValid) || isUserOrg) && (
               <>
                 <ApproveBtn
                   user={user}
@@ -417,7 +424,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   appStatus={appStatus}
                   appLink={outputAppLink}
                   isHidden={hidden}
-                  isOwner={isOwner}
+                  isUserOrg={isUserOrg}
                 />
               </>
             )}
@@ -427,7 +434,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
         <div className="flex min-h-20 w-full flex-col rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
-          {(isAdmin || isOwner) && (
+          {(isAdmin || isUserOrg) && (
             <DraftPendingBanner
               format="desktop"
               openCallState={openCallState}
@@ -570,9 +577,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             <div className="mt-6 flex w-full justify-end xl:hidden">
               <ApplyButton
                 user={user}
+                isUserOrg={isUserOrg}
                 userPref={userPref}
-                orgPreview={isOwner}
+                activeSub={hasActiveSubscription}
+                orgPreview={isUserOrg}
                 id={event._id}
+                mainOrgId={event.mainOrgId}
                 event={event}
                 openCallId={openCallId}
                 openCallState={openCallState ?? null}

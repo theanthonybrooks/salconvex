@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import {
   ChevronDown,
   ChevronUp,
+  DollarSign,
   WandSparkles,
   X,
   XCircle,
@@ -73,6 +74,8 @@ interface MultiSelectProps
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>;
     abbr?: string;
+    disabled?: boolean;
+    premium?: boolean;
   }[];
 
   /**
@@ -482,8 +485,8 @@ export const MultiSelect = React.forwardRef<
                     <span className="text-base sm:text-sm">(Select All)</span>
                   </CommandItem>
                 )}
-
                 {options.some((o) => o.group) ? (
+                  // note-to-self: For grouped results
                   Object.entries(
                     options.reduce<Record<string, typeof options>>(
                       (acc, curr) => {
@@ -504,11 +507,13 @@ export const MultiSelect = React.forwardRef<
                         const isSelected = selectedValues.includes(
                           option.value,
                         );
-                        const isDisabled = !!(
-                          !isSelected &&
-                          limit &&
-                          selectedValues.length >= limit
-                        );
+                        const isDisabled =
+                          option.disabled ||
+                          !!(
+                            !isSelected &&
+                            limit &&
+                            selectedValues.length >= limit
+                          );
                         return (
                           <CommandItem
                             ref={idx === 0 ? firstItemRef : null}
@@ -531,6 +536,11 @@ export const MultiSelect = React.forwardRef<
                             {option.icon && (
                               <option.icon className="mr-2 size-4 text-foreground/50" />
                             )}
+                            {option.premium && (
+                              <span className="flex items-center gap-0">
+                                (<DollarSign className="size-3" />)
+                              </span>
+                            )}
                             <span className="text-base sm:text-sm">
                               {abbreviated ? option?.abbr : option?.label}
                             </span>
@@ -540,14 +550,17 @@ export const MultiSelect = React.forwardRef<
                     </CommandGroup>
                   ))
                 ) : (
+                  //note-to-self: For non-grouped results
                   <CommandGroup className="scrollable mini justy max-h-64">
                     {options.map((option, idx) => {
                       const isSelected = selectedValues.includes(option.value);
-                      const isDisabled = !!(
-                        !isSelected &&
-                        limit &&
-                        selectedValues.length >= limit
-                      );
+                      const isDisabled =
+                        option.disabled ||
+                        !!(
+                          !isSelected &&
+                          limit &&
+                          selectedValues.length >= limit
+                        );
                       return (
                         <CommandItem
                           ref={idx === 0 ? firstItemRef : null}
@@ -567,6 +580,11 @@ export const MultiSelect = React.forwardRef<
                           >
                             <FaCheck className="size-3 translate-y-[1.1px]" />
                           </div>
+                          {option.premium && (
+                            <span className="flex items-center gap-0">
+                              (<DollarSign className="size-3" />)
+                            </span>
+                          )}
                           {option.icon && (
                             <option.icon className="mr-2 size-4 text-foreground/50" />
                           )}

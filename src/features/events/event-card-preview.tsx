@@ -55,6 +55,7 @@ export interface EventCardPreviewProps {
   userPref: UserPref | null;
   publicView?: boolean;
   publicPreview?: boolean;
+  activeSub: boolean;
 }
 
 const EventCardPreview = ({
@@ -63,11 +64,15 @@ const EventCardPreview = ({
   user,
   userPref,
   publicPreview,
+  activeSub,
 }: EventCardPreviewProps) => {
   const isAdmin = user?.role?.includes("admin");
+  const isArtist = user?.accountType?.includes("artist");
+  const hasValidSub = activeSub && isArtist;
   const userTZ = !!userPref?.timezone ? userPref.timezone : undefined;
   const router = useRouter();
   const {
+    isUserOrg,
     location,
     category: eventCategory,
 
@@ -96,6 +101,7 @@ const EventCardPreview = ({
     ? opencall?.compensation
     : undefined;
   const ocState = opencall?.state;
+  const ocAppLink = opencall?.requirements?.applicationLink;
 
   const basicInfo = event.hasActiveOpenCall ? opencall?.basicInfo : undefined;
   const eligibility = event.hasActiveOpenCall
@@ -225,7 +231,7 @@ const EventCardPreview = ({
         <div
           onClick={() => {
             router.push(
-              !publicView || publicPreview
+              !publicView || publicPreview || isUserOrg
                 ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
                 : "/pricing#plans",
             );
@@ -290,7 +296,7 @@ const EventCardPreview = ({
               <p className={"font-semibold"}>
                 {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
               </p>
-              {publicView && !publicPreview ? (
+              {publicView && !publicPreview && !isUserOrg ? (
                 <span className="pointer-events-none blur-[5px]">
                   This Year
                 </span>
@@ -309,7 +315,7 @@ const EventCardPreview = ({
           {isCurrentlyOpen && (
             <p className={cn("flex items-center gap-x-1", fontSize)}>
               <span className="font-semibold">Budget:</span>
-              {publicView && !publicPreview ? (
+              {publicView && !publicPreview && !isUserOrg ? (
                 <span className="pointer-events-none blur-[5px]">
                   Sign in to view
                 </span>
@@ -344,7 +350,7 @@ const EventCardPreview = ({
               )}
             >
               <span className="font-semibold">Eligible:</span>
-              {publicView && !publicPreview ? (
+              {publicView && !publicPreview && !isUserOrg ? (
                 <span className="pointer-events-none blur-[5px]">
                   $3 per month
                 </span>
@@ -390,15 +396,17 @@ const EventCardPreview = ({
             </span>
           </div>
           <ApplyButtonShort
+            user={user}
+            activeSub={activeSub}
             slug={slug}
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
-            publicView={publicPreview ? false : publicView}
+            publicView={publicPreview || isUserOrg ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
           />
           <div className="flex items-center justify-center gap-x-2">
-            {bookmarked ? (
+            {bookmarked && hasValidSub ? (
               <FaBookmark
                 className="size-8 cursor-pointer text-red-600"
                 onClick={onBookmark}
@@ -420,7 +428,7 @@ const EventCardPreview = ({
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
           <div className="flex flex-col items-center gap-y-3">
-            {bookmarked ? (
+            {bookmarked && hasValidSub ? (
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger>
@@ -441,7 +449,8 @@ const EventCardPreview = ({
                     <FaRegBookmark
                       className="size-7 cursor-pointer"
                       onClick={() => {
-                        if (!publicView && !publicPreview) onBookmark();
+                        if (!publicView && !publicPreview && hasValidSub)
+                          onBookmark();
                       }}
                     />
                   </TooltipTrigger>
@@ -508,7 +517,7 @@ const EventCardPreview = ({
               </TooltipProvider>
             )}
 
-            {hidden && (
+            {hidden && hasValidSub && (
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger>
@@ -526,16 +535,17 @@ const EventCardPreview = ({
           </div>
           <EventContextMenu
             event={event}
+            isUserOrg={isUserOrg}
             eventId={event._id}
             mainOrgId={mainOrgId}
-            openCallId={opencall ? opencall._id : ""}
+            openCallId={opencall ? opencall._id : null}
+            appLink={ocAppLink}
             isHidden={hidden}
             publicView={publicView}
             appStatus={appStatus}
             eventCategory={eventCategory}
             openCallStatus={openCallStatus}
             openCallState={ocState ?? null}
-            user={user}
             align="start"
             postStatus={posted}
             postOptions={true}
@@ -547,7 +557,7 @@ const EventCardPreview = ({
             <div
               onClick={() => {
                 router.push(
-                  !publicView || publicPreview
+                  !publicView || publicPreview || isUserOrg
                     ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
                     : "/pricing#plans",
                 );
@@ -643,7 +653,7 @@ const EventCardPreview = ({
                 <p className={"font-semibold"}>
                   {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
                 </p>
-                {publicView && !publicPreview ? (
+                {publicView && !publicPreview && !isUserOrg ? (
                   <p className="pointer-events-none blur-[5px]">This Year</p>
                 ) : basicInfo?.callType === "Email" ? (
                   <p>Submit qualifications via email</p>
@@ -671,7 +681,7 @@ const EventCardPreview = ({
               </span>
               <span className={cn("flex items-center gap-x-1")}>
                 <span className="font-semibold">Eligible:</span>
-                {publicView && !publicPreview ? (
+                {publicView && !publicPreview && !isUserOrg ? (
                   <span className="pointer-events-none blur-[5px]">
                     $3 per month
                   </span>
@@ -723,7 +733,7 @@ const EventCardPreview = ({
               </span>
               <div className="flex items-center gap-x-1">
                 <span className="font-semibold">Budget:</span>
-                {publicView && !publicPreview ? (
+                {publicView && !publicPreview && !isUserOrg ? (
                   <span className="pointer-events-none blur-[5px]">
                     Get paid for your work
                   </span>
@@ -807,11 +817,13 @@ const EventCardPreview = ({
           )}
 
           <ApplyButtonShort
+            user={user}
+            activeSub={activeSub}
             slug={slug}
             edition={event.dates.edition}
             appStatus={event.status}
             openCall={event.openCallStatus}
-            publicView={publicPreview ? false : publicView}
+            publicView={publicPreview || isUserOrg ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
             className="max-w-40 xl:hidden"
           />
@@ -819,14 +831,18 @@ const EventCardPreview = ({
           <ApplyButton
             user={user}
             id={event._id}
+            isUserOrg={isUserOrg}
+            activeSub={activeSub}
             event={event}
-            openCallId={opencall ? opencall._id : ""}
+            openCallId={opencall ? opencall._id : null}
             openCallState={ocState ?? null}
+            appUrl={ocAppLink}
             slug={slug}
             edition={event.dates.edition}
+            mainOrgId={event.mainOrgId}
             // status={status}
             openCall={event.openCallStatus}
-            publicView={publicPreview ? false : publicView}
+            publicView={publicPreview || isUserOrg ? false : publicView}
             publicPreview={publicPreview}
             manualApplied={appStatus}
             // setManualApplied={setManualApplied}

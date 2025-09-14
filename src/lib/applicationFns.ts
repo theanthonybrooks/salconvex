@@ -1,3 +1,5 @@
+import { OpenCallLinkFormat } from "@/types/openCall";
+
 type TimeRange = "day" | "week" | "month" | "year";
 
 type Application = {
@@ -22,4 +24,28 @@ export function countApplicationsByTimeRange(
     const time = app.applicationTime ?? app._creationTime;
     return time >= timeThreshold;
   }).length;
+}
+
+type appLinkParams = {
+  applicationLink?: string;
+  applicationLinkFormat?: OpenCallLinkFormat;
+  applicationLinkSubject?: string;
+};
+
+export function formatApplicationLink(
+  requirements?: appLinkParams,
+): string | null {
+  if (!requirements?.applicationLink) return null;
+
+  const { applicationLink, applicationLinkFormat, applicationLinkSubject } =
+    requirements;
+
+  if (applicationLinkFormat === "mailto:") {
+    const subject = applicationLinkSubject
+      ? `?subject=${encodeURIComponent(applicationLinkSubject)}`
+      : "";
+    return `mailto:${applicationLink}${subject}`;
+  }
+
+  return applicationLink;
 }

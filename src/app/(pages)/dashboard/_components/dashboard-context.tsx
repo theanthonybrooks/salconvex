@@ -1,6 +1,7 @@
 // app/(pages)/dashboard/_components/dashboard-context.tsx
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import React, { createContext, useContext, useState } from "react";
 
 type DashboardContextType = {
@@ -21,7 +22,11 @@ export const DashboardProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const searchParams = useSearchParams();
+  const collapsedParam = searchParams.get("sidebar");
+  const [isSidebarCollapsed, setSidebarCollapsed] = useState(
+    collapsedParam === "false",
+  );
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 

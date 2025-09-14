@@ -15,7 +15,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Table,
@@ -108,8 +108,14 @@ export function DataTable<TData, TValue>({
   const defaultFiltersFromUrl: ColumnFiltersState = useMemo(() => {
     const filters: ColumnFiltersState = [];
 
+    const validColumnIds = columns.map((c) => c.id).filter(Boolean);
+
+    // console.log(validColumnIds);
+
     searchParams.forEach((value, key) => {
       if (!value) return;
+      if (!validColumnIds.includes(key)) return;
+
       const values = value
         .split(",")
         .map((v) => v.trim())
@@ -120,7 +126,7 @@ export function DataTable<TData, TValue>({
     });
 
     return filters;
-  }, [searchParams]);
+  }, [searchParams, columns]);
 
   const { isAdmin } = adminActions ?? {};
 

@@ -19,16 +19,16 @@ interface ApproveBtnProps {
   user: User | null;
   orgId: Id<"organizations">;
   event: EventData;
-  eventId: string;
+  eventId: Id<"events">;
   eventState?: EventState;
   eventCategory: EventCategory;
-  openCallId?: string;
+  openCallId?: Id<"openCalls"> | null;
   openCallState?: OpenCallState;
   openCallStatus: OpenCallStatus;
-  appLink?: string;
+  appLink?: string | null;
   appStatus: ApplicationStatus | null;
   isHidden: boolean;
-  isOwner: boolean;
+  isUserOrg: boolean;
 }
 
 export const ApproveBtn = ({
@@ -44,7 +44,7 @@ export const ApproveBtn = ({
   appLink,
   eventCategory,
   isHidden,
-  isOwner,
+  isUserOrg,
 }: ApproveBtnProps) => {
   const router = useRouter();
   const eventDraft = eventState === "draft";
@@ -115,7 +115,7 @@ export const ApproveBtn = ({
                   : "Go to Convex"}
           </Button>
         )}
-        {isOwner && !isAdmin && (
+        {isUserOrg && !isAdmin && (
           <Button
             variant="salWithShadowHiddenLeft"
             onClick={() => {
@@ -142,11 +142,11 @@ export const ApproveBtn = ({
         )}
 
         <EventContextMenu
-          user={user}
+          isUserOrg={isUserOrg}
           mainOrgId={orgId}
           event={event}
           eventId={eventId}
-          openCallId={openCallId ?? ""}
+          openCallId={openCallId ?? null}
           appLink={appLink}
           appStatus={appStatus}
           eventState={eventState}

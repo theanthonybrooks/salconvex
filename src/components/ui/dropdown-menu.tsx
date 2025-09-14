@@ -46,7 +46,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "outline-hidden group relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm focus:bg-salYellow/50 data-[state=open]:bg-salYellow/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+      "outline-hidden group/trigger relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm focus:bg-salYellow/50 data-[state=open]:bg-salYellow/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       inset && "pl-8",
       className,
     )}
@@ -54,8 +54,8 @@ const DropdownMenuSubTrigger = React.forwardRef<
   >
     {children}
     {/* <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]:rotate-180" /> */}
-    <Plus className="fixed right-3 ml-auto !size-3 text-muted-foreground transition-all duration-200 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-0" />
-    <Minus className="fixed right-3 ml-auto !size-3 text-muted-foreground opacity-0 transition-all duration-200 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-100" />
+    <Plus className="fixed right-3 ml-auto size-3 transition-all duration-200 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:opacity-0" />
+    <Minus className="fixed right-3 ml-auto size-3 opacity-0 transition-all duration-200 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:opacity-100" />
   </DropdownMenuPrimitive.SubTrigger>
 ));
 DropdownMenuSubTrigger.displayName =
@@ -68,7 +68,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-[51] min-w-[8rem] overflow-hidden border-1.5 bg-popover p-1 text-popover-foreground shadow-lg data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1.5 data-[side=left]:rounded-l-md data-[side=right]:rounded-r-md data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      "z-[51] min-w-[8rem] overflow-hidden border-1.5 bg-popover p-1 text-popover-foreground shadow-lg data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1.5 data-[side=left]:rounded-l-md data-[side=right]:rounded-r-md data-[side=left]:rounded-br-md data-[side=right]:rounded-bl-md data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className,
     )}
     {...props}
@@ -86,14 +86,14 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border-1.5 bg-popover p-1 text-popover-foreground shadow-md",
+        "group/content z-50 min-w-[8rem] overflow-hidden rounded-md border-1.5 bg-popover p-1 text-popover-foreground shadow-md",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className,
       )}
       {...props}
     >
       {children}
-      <div className="absolute top-[1px]">
+      <div className="absolute group-data-[side=bottom]/content:top-[1px] group-data-[side=top]/content:bottom-[1px]">
         <CustomArrow />
       </div>
     </DropdownMenuPrimitive.Content>

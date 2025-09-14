@@ -58,6 +58,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const aboutRef = useRef<HTMLDivElement | null>(null);
   const { event, organizer } = data;
   const {
+    isUserOrg,
     logo: eventLogo,
     category: eventCategory,
     type: eventType,
@@ -85,7 +86,6 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const { toggleListAction } = useToggleListAction(event._id);
 
   const locationString = getFormattedLocationString(location);
-  const isOwner = user?._id === organizer?.ownerId;
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
 
   const onBookmark = async () => {
@@ -135,7 +135,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
-        isOwner={isOwner}
+        isOwner={isUserOrg}
       />
       <Card
         className={cn(
@@ -234,7 +234,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 organizer={organizer}
                 abbr={true}
               />
-              {(isAdmin || isOwner) && (
+              {(isAdmin || isUserOrg) && (
                 <>
                   <Separator
                     orientation="horizontal"
@@ -247,12 +247,12 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     eventState={eventState}
                     eventCategory={eventCategory}
                     eventId={event._id}
-                    openCallId={""}
+                    openCallId={null}
                     orgId={event.mainOrgId}
                     openCallStatus={null}
                     appStatus={null}
                     isHidden={hidden}
-                    isOwner={isOwner}
+                    isUserOrg={isUserOrg}
                   />
                 </>
               )}
@@ -263,7 +263,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
         <div className="flex min-h-20 w-full flex-col items-center gap-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
-          {(isAdmin || isOwner) && (
+          {(isAdmin || isUserOrg) && (
             <DraftPendingBanner
               format="desktop"
               eventState={eventState}

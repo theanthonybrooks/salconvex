@@ -121,19 +121,35 @@ export const getOrgContactInfo = query({
     eventId: v.id("events"),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) return null;
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
     const org = await ctx.db.get(args.orgId);
     if (!org) return null;
-    const orgOwner = org?.ownerId;
-    if (!orgOwner) return null;
-    const user = await ctx.db
+    const orgOwnerId = org?.ownerId;
+    if (!orgOwnerId) return null;
+    const orgOwner = await ctx.db
       .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", orgOwner))
+      .withIndex("by_userId", (q) => q.eq("userId", orgOwnerId))
       .unique();
-    if (!user) return null;
+    if (!orgOwner) return null;
+
+    const idMatch = userId === orgOwnerId;
+    const emailMatch =
+      typeof user.email === "string" && user.email === orgOwner.email;
+
+    console.log(userId, orgOwnerId, idMatch, emailMatch, "name: ", org.name);
     return {
-      orgOwnerEmail: user.email,
+      orgOwnerEmail: orgOwner.email,
+      emailMatch,
+      orgOwnerId,
+      idMatch,
       eventName: event.name,
     };
   },
@@ -632,6 +648,40 @@ export const getUserOrganizations = query({
   },
 });
 
+export const getUserOrgEvents = query({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) return null;
+
+    const orgs = await ctx.db
+      .query("organizations")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
+      .collect();
+    const completeOrgs = orgs.filter((org) => org.isComplete === true);
+
+    const orgIds = completeOrgs.map((org) => org._id);
+
+    const orgsWithEvents = [];
+    for (const orgId of orgIds) {
+      const event = await ctx.db
+        .query("events")
+        .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", orgId))
+        .first();
+      if (event) {
+        orgsWithEvents.push(orgId);
+      }
+    }
+
+    return orgsWithEvents;
+  },
+});
+
 //
 //
 // ------------------------- Check New Organization Validity -----------------------
@@ -777,6 +827,7 @@ export const getOrganizerBySlug = query({
 
     events = rawEvents.map((e) => ({
       ...e,
+      isUserOrg: userIsOrganizer,
       category: e.category as EventCategory,
       state: e.state as SubmissionFormState,
       type: Array.isArray(e.type) ? e.type.slice(0, 2) : [],

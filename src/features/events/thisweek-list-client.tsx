@@ -52,8 +52,9 @@ const ClientThisWeekList = (
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
   const isAdmin = user?.role?.includes("admin");
-  const publicView =
-    (!subStatus?.hasActiveSubscription || !isArtist) && !isAdmin;
+  const hasActiveSubscription =
+    (subStatus?.hasActiveSubscription || isAdmin) ?? false;
+  const publicView = !hasActiveSubscription || !isArtist;
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
@@ -293,6 +294,7 @@ const ClientThisWeekList = (
                             publicPreview={showPublic}
                             user={user}
                             userPref={userPref}
+                            activeSub={hasActiveSubscription}
                           />
                         </div>
                       );

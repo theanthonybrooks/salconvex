@@ -1,3 +1,5 @@
+//TODO: Add organizer billing portion. Should list out invoices. Perhaps could just embed Stripe's invoice page.
+
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -105,7 +105,7 @@ export const FilterBase = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
-  const eventOnly = view === "event";
+  const limitOpenCalls = view === "event" || view === "orgView";
   const hasActiveSubscription = subData?.hasActiveSubscription;
   const isArtist = userData?.user?.accountType?.includes("artist");
   const paidUser = isArtist && hasActiveSubscription;
@@ -330,7 +330,7 @@ export const FilterBase = ({
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
-                  {!eventOnly && (
+                  {!limitOpenCalls && (
                     <SelectItem value="openCall">Open Call</SelectItem>
                   )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
@@ -386,7 +386,7 @@ export const FilterBase = ({
             </section>
           </div>
 
-          {!eventOnly && (
+          {!limitOpenCalls && (
             <section className="flex flex-col gap-2">
               <Label
                 htmlFor="eventCategories"
@@ -435,7 +435,7 @@ export const FilterBase = ({
               />
             </section>
           )}
-          {eventOnly && (
+          {limitOpenCalls && (
             <section className="flex flex-col gap-2">
               <Label htmlFor="continents" className="flex items-center gap-2">
                 Continent:
@@ -459,7 +459,7 @@ export const FilterBase = ({
               />
             </section>
           )}
-          {!eventOnly && (
+          {!limitOpenCalls && (
             <div
               onClick={() => setShowFull((prev) => !prev)}
               className="flex w-full flex-col items-center justify-center gap-2"
@@ -683,7 +683,7 @@ export const FilterBase = ({
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
-                  {!eventOnly && (
+                  {!limitOpenCalls && (
                     <SelectItem value="openCall">Open Call</SelectItem>
                   )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
@@ -737,7 +737,7 @@ export const FilterBase = ({
                 </SelectContent>
               </Select>
             </section>
-            {!eventOnly && (
+            {!limitOpenCalls && (
               <section className="flex flex-col gap-2">
                 <Label
                   htmlFor="eventCategories"
@@ -786,7 +786,7 @@ export const FilterBase = ({
                 showArrow={false}
               />
             </section>
-            {eventOnly && (
+            {limitOpenCalls && (
               <section className="flex flex-col gap-2">
                 <Label htmlFor="continents" className="flex items-center gap-2">
                   Continent:
@@ -842,7 +842,7 @@ export const FilterBase = ({
             <section
               className={cn(
                 "ml-2 flex flex-col gap-2 self-end",
-                eventOnly && "self-center",
+                limitOpenCalls && "self-center",
               )}
             >
               <span
@@ -861,7 +861,7 @@ export const FilterBase = ({
                 Clear filters
               </span>
 
-              {!eventOnly && (
+              {!limitOpenCalls && (
                 <div onClick={() => setShowFull((prev) => !prev)}>
                   {showFull ? (
                     <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">

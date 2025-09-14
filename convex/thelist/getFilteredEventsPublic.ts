@@ -41,6 +41,7 @@ export const getFilteredEventsPublic = query({
         v.literal("openCall"),
         v.literal("organizer"),
         v.literal("archive"),
+        v.literal("orgView"),
       ),
     ),
   },
@@ -61,6 +62,13 @@ export const getFilteredEventsPublic = query({
           .withIndex("userId", (q) => q.eq("userId", user._id))
           .first()
       : null;
+    const userOrgs = user
+      ? await ctx.db
+          .query("organizations")
+          .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
+          .collect()
+      : [];
+    const userOrgIds = new Set(userOrgs.map((org) => org._id));
     const hasActiveSubscription =
       subscription?.status === "active" ||
       subscription?.status === "trialing" ||
@@ -127,6 +135,16 @@ export const getFilteredEventsPublic = query({
           q.eq("state", "published").eq("category", "event"),
         )
         .collect();
+    } else if (view === "orgView") {
+      const eventArrays = await Promise.all(
+        Array.from(userOrgIds).map((orgId) =>
+          ctx.db
+            .query("events")
+            .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", orgId))
+            .collect(),
+        ),
+      );
+      events = eventArrays.flat();
     } else {
       events = await ctx.db
         .query("events")
@@ -171,6 +189,8 @@ export const getFilteredEventsPublic = query({
 
     const enriched = await Promise.all(
       events.map(async (event) => {
+        const isUserOrg = event.mainOrgId && userOrgIds.has(event.mainOrgId);
+
         const openCall = await ctx.db
           .query("openCalls")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
@@ -245,9 +265,11 @@ export const getFilteredEventsPublic = query({
           ...event,
           orgName,
           _creationTime: event._creationTime,
+          isUserOrg,
           openCall: openCall ?? null,
           openCallStatus,
           hasActiveOpenCall,
+
           eventId: event._id,
           slug: event.slug,
           dates: event.dates,

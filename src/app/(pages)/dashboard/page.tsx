@@ -54,10 +54,12 @@ export default function Dashboard() {
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");
+  const isArtist = accountType?.includes("artist");
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
-  const isArtist =
-    (accountType?.includes("artist") && hasActiveSubscription) || isAdmin;
+  const hasValidSub = hasActiveSubscription && isArtist;
+  // const isArtist =
+  //   (accountType?.includes("artist") && hasActiveSubscription) || isAdmin;
   const isOrganizer = accountType?.includes("organizer") || isAdmin;
 
   const { data: latestFive, isPending: latestPending } = useQueryWithStatus(
@@ -90,7 +92,7 @@ export default function Dashboard() {
   );
   const { data: artistData } = useQueryWithStatus(
     api.artists.applications.getArtistApplications,
-    isArtist || isAdmin ? {} : "skip",
+    hasValidSub || isAdmin ? {} : "skip",
   );
   //  const artistData = useQuery(api.artists.applications.getArtistApplications);
   const totalUsers = totalUsersData ?? 0;
@@ -349,7 +351,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-        {isArtist && (
+        {hasValidSub && (
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Artist Dashboard:</h3>
             <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
@@ -525,7 +527,7 @@ export default function Dashboard() {
             </Button>
 
             {/* TODO: add this logic once I've gotten the application system up and there's a reason for users to upload a portfolio and related files */}
-            {isAdmin && isArtist && (
+            {isAdmin && hasValidSub && (
               <Button
                 asChild
                 variant="salWithShadowHiddenYlw"
@@ -578,7 +580,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {hasActiveSubscription && (
+        {hasValidSub && (
           <Card className="lg:col-span-2 min-[1400px]:col-span-3">
             <CardHeader>
               <CardTitle>Latest Updates</CardTitle>
