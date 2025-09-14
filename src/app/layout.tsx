@@ -111,9 +111,7 @@ export default async function RootLayout({
             GeistSans.className,
             "scrollable justy darkbar font-spaceGrotesk antialiased",
             // "white:font-sans",
-
             // "default:font-spaceGrotesk",
-
             // " scrollable invis darkbar antialiased",
             appleClass,
             tankerReg.variable,
