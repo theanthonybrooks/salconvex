@@ -380,7 +380,6 @@ export const getEventByOrgId = query({
       .unique();
     if (!user) return null;
 
-    const isAdmin = user.role.includes("admin");
     const org = await ctx.db.get(args.orgId);
     if (!org) return null;
 
@@ -617,6 +616,7 @@ export const getUserEvents = query({
 
       return {
         ...event,
+        isUserOrg: true,
         openCallState: openCall?.state ?? null,
         openCallId: openCall?._id ?? null,
         organizationName: orgNameMap.get(event.mainOrgId.toString()) ?? "",
