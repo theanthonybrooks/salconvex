@@ -91,6 +91,11 @@ export default async function RootLayout({
     {},
     { token },
   );
+  const preloadedOrganizerData = await preloadQuery(
+    api.organizer.organizations.getUserOrgEvents,
+    {},
+    { token },
+  );
 
   return (
     <ConvexAuthNextjsServerProvider>
@@ -122,6 +127,7 @@ export default async function RootLayout({
             <ConvexPreloadContextProvider
               preloadedUserData={preloadedUserData}
               preloadedSubStatus={preloadedSubStatus}
+              preloadedOrganizerData={preloadedOrganizerData}
             >
               <ConvexQueryCacheProvider>
                 <ThemedProvider>
