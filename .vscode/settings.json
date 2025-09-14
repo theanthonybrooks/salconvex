@@ -21,7 +21,8 @@
     "This Week",
     "Admin",
     "Cookies",
-    "Social"
+    "Social",
+    "Context"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

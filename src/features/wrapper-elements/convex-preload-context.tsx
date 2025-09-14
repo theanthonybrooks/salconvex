@@ -9,6 +9,9 @@ type ConvexPreloadContextType = {
   preloadedSubStatus: Preloaded<
     typeof api.subscriptions.getUserSubscriptionStatus
   >;
+  preloadedOrganizerData: Preloaded<
+    typeof api.organizer.organizations.getUserOrgEvents
+  >;
 };
 
 const ConvexPreloadContext = createContext<ConvexPreloadContextType | null>(
@@ -23,10 +26,11 @@ export function ConvexPreloadContextProvider({
   children,
   preloadedUserData,
   preloadedSubStatus,
+  preloadedOrganizerData,
 }: ConvexPreloadContextProviderProps) {
   return (
     <ConvexPreloadContext.Provider
-      value={{ preloadedUserData, preloadedSubStatus }}
+      value={{ preloadedUserData, preloadedSubStatus, preloadedOrganizerData }}
     >
       {children}
     </ConvexPreloadContext.Provider>

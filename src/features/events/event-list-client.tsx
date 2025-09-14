@@ -21,7 +21,6 @@ import {
   EventType,
 } from "@/types/event";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
-import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -36,7 +35,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { api } from "~/convex/_generated/api";
 
 export const viewOptionValues = [
   { value: "openCall", label: "Open Calls" },
@@ -66,9 +64,11 @@ const ClientEventList = () => {
 
   const { isMobile } = useDevice();
   const { preloadedArtistData } = useArtistPreload();
-  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const { preloadedUserData, preloadedSubStatus, preloadedOrganizerData } =
+    useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const orgData = usePreloadedQuery(preloadedOrganizerData);
   const { subStatus: userSubStatus } = subStatus;
 
   const artistData = usePreloadedQuery(preloadedArtistData);
@@ -76,13 +76,7 @@ const ClientEventList = () => {
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
-  const isOrganizer = accountType?.includes("organizer");
-  const orgEvents = useQuery(
-    api.organizer.organizations.getUserOrgEvents,
-    isOrganizer ? {} : "skip",
-  );
-
-  const hasOrgEvents = !!(orgEvents && orgEvents?.length > 0);
+  const { hasOrgEvents } = orgData ?? {};
 
   const isAdmin = user?.role?.includes("admin");
   const hasActiveSubscription =

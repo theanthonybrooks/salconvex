@@ -678,7 +678,8 @@ export const getUserOrgEvents = query({
       }
     }
 
-    return orgsWithEvents;
+    const hasOrgEvents = orgsWithEvents.length > 0;
+    return { orgsWithEvents, hasOrgEvents };
   },
 });
 
