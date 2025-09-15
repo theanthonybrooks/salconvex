@@ -210,7 +210,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
     title: "Organizer",
     items: [
       {
-        title: "My Events/Projects",
+        title: "My Submissions",
         path: "/dashboard/organizer/events",
         category: "dashboard",
         public: false,

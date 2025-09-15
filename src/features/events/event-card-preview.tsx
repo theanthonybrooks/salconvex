@@ -649,7 +649,7 @@ const EventCardPreview = ({
           <div className={cn("flex flex-col gap-y-6 pb-3 pt-8", fontSize)}>
             <span className="font-semibold">Open Call:</span>
             <div className="flex flex-col gap-y-2">
-              <span className={cn("flex items-center gap-x-1")}>
+              <span className={cn("flex items-start gap-x-1")}>
                 <p className={"font-semibold"}>
                   {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
                 </p>
