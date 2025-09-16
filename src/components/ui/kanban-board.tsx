@@ -1018,117 +1018,89 @@ export const DetailsDialog = ({
       <DialogTrigger asChild onClick={onClickAction}>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="bg-card">
+      <DialogContent className="h-[90dvh] w-full max-w-[max(60rem,60vw)] bg-card sm:max-h-[max(40rem,70vh)]">
         <DialogHeader>
           <div className="flex flex-col gap-4">
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription className="sr-only">
               {"View task/suggestion details"}
             </DialogDescription>
-            <div className="flex items-center gap-2">
-              {/* {priority === "high" ? (
-                <FlairBadge
-                  icon={<FcHighPriority className="size-5" />}
-                  className={cn("bg-red-100")}
-                >
-                  {priority}
-                </FlairBadge>
-              ) : priority === "medium" ? (
-                <FlairBadge
-                  icon={<FcMediumPriority className="size-5" />}
-                  className={cn("bg-yellow-100")}
-                >
-                  {priority}
-                </FlairBadge>
-              ) : (
-                <FlairBadge
-                  icon={<FcLowPriority className="size-5" />}
-                  className={cn("bg-green-100")}
-                >
-                  {priority}
-                </FlairBadge>
-              )}
-              {category === "general" ? (
-                <FlairBadge
-                  icon={<Construction className="size-5" />}
-                  className={cn("bg-stone-100")}
-                >
-                  {category}
-                </FlairBadge>
-              ) : category === "ui/ux" ? (
-                <FlairBadge
-                  icon={<Palette className="size-5" />}
-                  className={cn("bg-purple-100")}
-                >
-                  {category}
-                </FlairBadge>
-              ) : (
-                <FlairBadge
-                  icon={<FcLowPriority className="size-5" />}
-                  className={cn("bg-green-100")}
-                >
-                  {category}
-                </FlairBadge>
-              )} */}
-              <FlairBadge
-                icon={priorityConfig.icon}
-                className={priorityConfig.className}
-              >
-                {priority}
-              </FlairBadge>
-              <FlairBadge
-                icon={categoryConfig.icon}
-                className={categoryConfig.className}
-              >
-                {category}
-              </FlairBadge>
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-2">
-                  <LucideThumbsUp
-                    className={cn(
-                      "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",
-                      guestUser && "pointer-events-none",
-                      userVotedUp && "text-green-600",
-                    )}
-                    onClick={() => handleVote("up")}
-                  />{" "}
-                  {upVoteCount}
-                </span>
-                {/* {" | "} */}
-                <span className="flex items-center gap-2">
-                  {" "}
-                  <LucideThumbsDown
-                    className={cn(
-                      "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",
-                      userVotedDown && "text-red-600",
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex w-full flex-col items-center gap-2 gap-y-6 sm:flex-row sm:justify-between">
+                <div className="flex items-center gap-2">
+                  <FlairBadge
+                    icon={priorityConfig.icon}
+                    className={cn("px-4 text-base", priorityConfig.className)}
+                  >
+                    {priority}
+                  </FlairBadge>
+                  <FlairBadge
+                    icon={categoryConfig.icon}
+                    className={cn("px-4 text-base", categoryConfig.className)}
+                  >
+                    {category}
+                  </FlairBadge>
+                  <span className="flex items-center gap-2">
+                    <LucideThumbsUp
+                      className={cn(
+                        "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",
+                        guestUser && "pointer-events-none",
+                        userVotedUp && "text-green-600",
+                      )}
+                      onClick={() => handleVote("up")}
+                    />{" "}
+                    {upVoteCount}
+                  </span>
 
-                      guestUser && "pointer-events-none",
-                    )}
-                    onClick={() => handleVote("down")}
-                  />{" "}
-                  {downVoteCount}
-                </span>
-              </div>
-              {isAdmin && (
-                <div className="relative min-w-50 rounded-lg border-1.5 border-dashed border-foreground/30 p-2">
-                  <TooltipSimple content="Edit task">
-                    <Pencil
-                      className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4"
-                      onClick={onEditAction}
-                    />
-                  </TooltipSimple>
-                  <p className="absolute -top-3 left-0.5 bg-card text-xs text-foreground/50">
-                    Admin only
-                  </p>
+                  <span className="flex items-center gap-2">
+                    {" "}
+                    <LucideThumbsDown
+                      className={cn(
+                        "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",
+                        userVotedDown && "text-red-600",
+
+                        guestUser && "pointer-events-none",
+                      )}
+                      onClick={() => handleVote("down")}
+                    />{" "}
+                    {downVoteCount}
+                  </span>
                 </div>
-              )}
+                {isAdmin && (
+                  <TooltipSimple content="Edit task">
+                    <Button
+                      className={cn(
+                        "inline-flex w-full items-center gap-x-3 sm:w-auto",
+                      )}
+                      onClick={onEditAction}
+                      size="sm"
+                    >
+                      Edit
+                      <Pencil className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
+                    </Button>
+                  </TooltipSimple>
+                )}
+              </div>
             </div>
+            {/* {isAdmin && (
+              <div className="relative min-w-50 rounded-lg border-1.5 border-dashed border-foreground/30 p-2">
+                <TooltipSimple content="Edit task">
+                  <Pencil
+                    className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4"
+                    onClick={onEditAction}
+                  />
+                </TooltipSimple>
+                <p className="absolute -top-2.5 left-3 bg-card p-0.5 text-xs text-foreground/50">
+                  Admin only
+                </p>
+              </div>
+            )} */}
           </div>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
-          <RichTextDisplay html={description} className="scrollable mini" />
-        </div>
+        {/* <div className="mt-5 flex max-h-[70dvh] flex-col gap-4 pb-6 sm:max-h-[60vh]"> */}
+        <RichTextDisplay html={description} className="scrollable mini" />
+        {/* </div> */}
       </DialogContent>
     </Dialog>
   );
