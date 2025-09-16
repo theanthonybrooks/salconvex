@@ -161,7 +161,7 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
   useEffect(() => {
     const handler = debounce((value: string) => {
       setDebouncedSearch(value);
-    }, 500);
+    }, 200);
 
     handler(searchTerm.trim());
 
@@ -169,7 +169,7 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
       handler.cancel();
     };
   }, [searchTerm]);
-
+  //TODO: use useQueryWithStatus instead to enable a loading/pending state. Or maybe just make a handler that's run via a button. Something. The form currently feels like it's just laggy.
   const searchResults = useQuery(
     api.kanban.cards.searchCards,
     debouncedSearch !== ""

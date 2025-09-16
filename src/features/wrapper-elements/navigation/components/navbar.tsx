@@ -146,19 +146,19 @@ export default function NavBar(
             <motion.div
               id="logo-background-front"
               initial={{
-                translateX: "-50%",
-                translateY: 14,
+                // translateX: "-50%",
+                // translateY: 14,
                 backgroundColor: "rgba(255, 255, 255, 1)",
               }}
               animate={{
-                translateX: "-50%",
-                translateY: 14,
+                // translateX: "-50%",
+                // translateY: 14,
                 backgroundColor: isScrolled
                   ? "rgba(255, 255, 255, 0)"
                   : "rgba(255, 255, 255, 1)",
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute bottom-0 left-1/2 z-10 rounded-full"
+              className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-[14px] rounded-full"
             >
               <Link href="/" prefetch={true}>
                 <motion.img
@@ -209,7 +209,7 @@ export default function NavBar(
               {/* Desktop Logo & Navigation */}
               <motion.div
                 id="logo-text-container"
-                className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
+                className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full p-[5px] ring-2 ring-foreground lg:flex"
                 initial={{
                   width: 60,
                   backgroundColor: "rgba(255, 255, 255, 1)",
@@ -229,8 +229,8 @@ export default function NavBar(
                   <Image
                     src="/logotransparency.png"
                     alt="The Street Art List"
-                    width={48}
-                    height={48}
+                    width={50}
+                    height={50}
                     priority={true}
                     className="shrink-0"
                   />
