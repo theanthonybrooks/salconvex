@@ -22,12 +22,13 @@ export const platformDomains: Record<PlatformType, string[]> = {
 const allowedCharacters = /^[a-zA-Z0-9._]+$/;
 
 export function formatHandleInput(
-  value: string,
+  value: string | undefined,
   platform: PlatformType,
 ): string {
   if (!value) return "";
 
   let cleanValue = value.trim().replace(/^\/+/, "");
+  cleanValue = cleanValue.split(/[?#]/)[0];
   if (!cleanValue) return "";
 
   if (
@@ -47,6 +48,7 @@ export function formatHandleInput(
       ) {
         return "";
       }
+
       const pathParts = url.pathname.split("/").filter(Boolean);
       if (pathParts.length !== 1 || !pathParts[0]) return "";
       cleanValue = pathParts[0];
@@ -107,8 +109,6 @@ export function formatFacebookInput(input: string): string {
   }
 
   return formatHandle(trimmed);
-
-
 }
 
 function isValidChar(char: string, platform: PlatformType): boolean {

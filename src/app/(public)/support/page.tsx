@@ -277,7 +277,7 @@ const SupportPage = () => {
 
                     <FormControl>
                       <SelectSimple
-                        options={supportCategoryOptions}
+                        options={[...supportCategoryOptions]}
                         value={field.value}
                         onChangeAction={field.onChange}
                         placeholder="Select a category"

@@ -119,10 +119,10 @@ export const AccountSubscribeForm = ({
         showCloseButton={false}
         onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(
-          "max-h-full w-full max-w-full bg-card md:h-auto md:max-w-lg",
+          "scrollable max-h-dvh w-full max-w-full bg-card md:h-auto md:max-w-[max(60rem,60vw)]",
           className,
           !isArtist &&
-            "h-[100dvh] md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
+            "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
         )}
       >
         <DialogTitle className={cn(!isArtist && "sr-only")}>
@@ -164,7 +164,7 @@ export const AccountSubscribeForm = ({
 
         <DialogDescription className={cn(!isArtist && "sr-only")}>
           {isArtist
-            ? "Add information needed to apply for open calls"
+            ? "Add information to your artist profile"
             : `Add an ${planKey === "1" ? "event" : "open call"} for your project or
             event`}
         </DialogDescription>

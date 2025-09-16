@@ -21,6 +21,10 @@ export interface ArtistResidency {
     symbol: string;
     format?: string;
   };
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export interface Artist {
@@ -35,6 +39,17 @@ export interface Artist {
     artistStatement?: string;
     images?: string[];
   };
+  contact: {
+    website?: string;
+    instagram?: string;
+    facebook?: string;
+    threads?: string;
+    vk?: string;
+    phone?: string;
+    youTube?: string;
+    linkedIn?: string;
+  };
+  canFeature?: boolean;
 }
 
 export interface ArtistFull extends Artist {

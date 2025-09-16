@@ -1,20 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 
+import { Checkbox } from "@/components/ui/checkbox";
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
+import { Separator } from "@/components/ui/separator";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
+import { autoHttps, formatHandleInput } from "@/lib/linkFns";
 import { sortedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { ArtistResidency } from "@/types/artist";
+import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
 import { User } from "@/types/user";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { FunctionReturnType } from "convex/server";
 import { formatDate, isBefore } from "date-fns";
 import { LoaderCircle } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { IoMdArrowRoundForward } from "react-icons/io";
 import { toast } from "react-toastify";
@@ -30,21 +44,9 @@ interface ArtistProfileFormProps {
     typeof api.subscriptions.getUserSubscriptionStatus
   >;
   onClick: () => void;
-  children?: React.ReactNode;
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: (value: boolean) => void;
 }
-
-type ArtistResValues = Omit<ArtistResidency, "full"> & {
-  full: string;
-};
-
-type ArtistFormValues = {
-  artistName: string;
-  logo: Blob | string | undefined;
-  artistResidency: ArtistResValues;
-  artistNationality: string[]; // cca2 codes for now
-};
 
 export const ArtistProfileForm = ({
   className,
@@ -54,6 +56,7 @@ export const ArtistProfileForm = ({
   hasUnsavedChanges,
   setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
+  const artistData = useQuery(api.artists.artistActions.getArtist, {});
   const [pending, setPending] = useState(false);
 
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
@@ -66,18 +69,43 @@ export const ArtistProfileForm = ({
   const trialEndsAt = subData?.trialEndsAt;
   const trialEnded = trialEndsAt && isBefore(new Date(trialEndsAt), new Date());
   const hasCurrentSub = activeSub || trialingSub;
-
-  // console.log(activeSub);
-  // console.log(hadTrial);
-  // console.log(trialEnded, trialingSub);
-  // const activeTrial = trialingSub && !trialEnded;
   const subAmount = subData?.subAmount
     ? (subData.subAmount / 100).toFixed(0)
     : 0;
   const subInterval = subData?.subInterval !== "none" && subData?.subInterval;
 
+  const form = useForm<UpdateArtistSchemaValues>({
+    resolver: zodResolver(UpdateArtistSchema),
+    defaultValues: {
+      artistName: artistData?.artistName ?? user?.name ?? "",
+      artistNationality: artistData?.artistNationality ?? [],
+      artistResidency: {
+        full: artistData?.artistResidency?.full ?? "",
+        city: artistData?.artistResidency?.city ?? "",
+        state: artistData?.artistResidency?.state ?? "",
+        stateAbbr: artistData?.artistResidency?.stateAbbr ?? "",
+        country: artistData?.artistResidency?.country ?? "",
+        countryAbbr: artistData?.artistResidency?.countryAbbr ?? "",
+        location: artistData?.artistResidency?.location ?? [],
+        timezone: artistData?.artistResidency?.timezone ?? "",
+        timezoneOffset: artistData?.artistResidency?.timezoneOffset ?? 0,
+      },
+      artistContact: {
+        website: artistData?.contact?.website,
+        instagram: artistData?.contact?.instagram,
+        facebook: artistData?.contact?.facebook,
+        threads: artistData?.contact?.threads,
+        vk: artistData?.contact?.vk,
+        phone: artistData?.contact?.phone,
+        youTube: artistData?.contact?.youTube,
+        linkedIn: artistData?.contact?.linkedIn,
+      },
+      canFeature: artistData?.canFeature ?? false,
+    },
+    mode: "onChange",
+  });
+
   const {
-    register,
     control,
     // setValue,
     // watch,
@@ -89,26 +117,7 @@ export const ArtistProfileForm = ({
       isValid,
     },
     reset,
-  } = useForm<ArtistFormValues>({
-    defaultValues: {
-      artistName: userName,
-      artistNationality: [],
-      artistResidency: {
-        full: "",
-        city: "",
-        state: "",
-        stateAbbr: "",
-        country: "",
-        countryAbbr: "",
-        location: [],
-        timezone: "",
-        timezoneOffset: 0,
-      },
-
-      logo: undefined,
-    },
-    mode: "onChange",
-  });
+  } = form;
 
   // const newUser = isValid && !hasCurrentSub;
   // const existingUser = isValid && hasCurrentSub;
@@ -117,7 +126,7 @@ export const ArtistProfileForm = ({
   // NOTE: Generate the upload url to use Convex's storage
   const handleManageSubscription = useManageSubscription(subscription ?? {});
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
-  const artistInfo = useQuery(api.artists.artistActions.getArtist, {});
+
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const updateArtist = useMutation(
     api.artists.artistActions.updateOrCreateArtist,
@@ -131,27 +140,38 @@ export const ArtistProfileForm = ({
   }, [hasUnsavedChanges, isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
-    if (!artistInfo) return;
+    if (!artistData) return;
 
     reset({
-      artistName: artistInfo.artistName ?? userName,
-      logo: user?.image ?? undefined,
-      artistNationality: artistInfo.artistNationality ?? [],
+      logo: user?.image,
+      artistName: artistData.artistName ?? user?.name ?? "",
+      artistNationality: artistData.artistNationality ?? [],
       artistResidency: {
-        full: artistInfo.artistResidency?.full ?? "",
-        city: artistInfo.artistResidency?.city ?? "",
-        state: artistInfo.artistResidency?.state ?? "",
-        stateAbbr: artistInfo.artistResidency?.stateAbbr ?? "",
-        country: artistInfo.artistResidency?.country ?? "",
-        countryAbbr: artistInfo.artistResidency?.countryAbbr ?? "",
-        location: artistInfo.artistResidency?.location ?? [],
-        timezone: artistInfo.artistResidency?.timezone ?? "",
-        timezoneOffset: artistInfo.artistResidency?.timezoneOffset ?? 0,
+        full: artistData.artistResidency?.full ?? "",
+        city: artistData.artistResidency?.city ?? "",
+        state: artistData.artistResidency?.state ?? "",
+        stateAbbr: artistData.artistResidency?.stateAbbr ?? "",
+        country: artistData.artistResidency?.country ?? "",
+        countryAbbr: artistData.artistResidency?.countryAbbr ?? "",
+        location: artistData.artistResidency?.location ?? [],
+        timezone: artistData.artistResidency?.timezone ?? "",
+        timezoneOffset: artistData.artistResidency?.timezoneOffset ?? 0,
       },
+      artistContact: {
+        website: artistData.contact?.website,
+        instagram: artistData.contact?.instagram,
+        facebook: artistData.contact?.facebook,
+        threads: artistData.contact?.threads,
+        vk: artistData.contact?.vk,
+        phone: artistData.contact?.phone,
+        youTube: artistData.contact?.youTube,
+        linkedIn: artistData.contact?.linkedIn,
+      },
+      canFeature: artistData.canFeature ?? false,
     });
-  }, [artistInfo, reset, userName, user]);
+  }, [artistData, reset, userName, user]);
 
-  const onSubmit = async (data: ArtistFormValues) => {
+  const onSubmit = async (data: UpdateArtistSchemaValues) => {
     setPending(true);
     let timezone: string | undefined;
     let timezoneOffset: number | undefined;
@@ -208,17 +228,26 @@ export const ArtistProfileForm = ({
             full: data.artistResidency?.full,
             locale: data.artistResidency?.locale,
             region: data.artistResidency?.region,
-
             city: data.artistResidency?.city,
             state: data.artistResidency?.state,
             stateAbbr: data.artistResidency?.stateAbbr,
             country: data.artistResidency?.country ?? "",
             countryAbbr: data.artistResidency?.countryAbbr ?? "",
+            continent: data.artistResidency?.continent ?? "",
             location: data.artistResidency?.location ?? [],
             timezone: timezone ?? "",
             timezoneOffset,
-            // ...data.artistResidency,
           },
+          contact: {
+            website: data.artistContact?.website,
+            instagram: data.artistContact?.instagram,
+            facebook: data.artistContact?.facebook,
+            threads: data.artistContact?.threads,
+            vk: data.artistContact?.vk,
+            phone: data.artistContact?.phone,
+            youTube: data.artistContact?.youTube,
+          },
+          canFeature: data.canFeature,
         });
         if (hasCurrentSub) {
           toast.success("Successfully updated profile!");
@@ -250,159 +279,263 @@ export const ArtistProfileForm = ({
   // console.log(watch("location"));
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className={cn("flex flex-col gap-6", className)}
-    >
-      <div className="flex items-end gap-4">
-        <div className="mt-4 flex flex-grow flex-col gap-2 lg:px-4">
-          <Label htmlFor="artistName">Artist Name </Label>
-          <input
-            tabIndex={1}
-            id="artistName"
-            {...register("artistName")}
-            placeholder="(if different from your profile name)"
-            className="w-full rounded border border-foreground/30 p-3 text-base placeholder-shown:bg-salYellow/50 focus:outline-none focus:ring-1 focus:ring-foreground"
-          />
-        </div>
-
-        <Controller
-          name="logo"
-          control={control}
-          render={({ field }) => (
-            <LogoUploader
-              id="logo"
-              onChangeAction={(file) => field.onChange(file)}
-              onRemoveAction={() => field.onChange(undefined)}
-              initialImage={user?.image}
-              imageOnly
-              className="gap-0 pr-8"
-              // initialImage={field.value ? URL.createObjectURL(field.value) : undefined}
-            />
-          )}
-        />
-      </div>
-      <div className="relative mt-3 flex flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pt-8 text-foreground/75 lg:pt-4">
-        <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
-          Eligibility Details:
-        </span>
-
-        <div className="flex flex-col gap-2">
-          <Label>Nationality (max 3)*</Label>
-          <Controller
-            name="artistNationality"
-            control={control}
-            rules={{
-              required: "Nationality is required",
-              validate: (value) =>
-                value.length > 0 || "Please select at least one nationality",
-            }}
-            render={({ field, fieldState }) => (
-              <>
-                <SearchMappedMultiSelect<Country>
-                  values={field.value}
-                  onChange={field.onChange}
-                  data={sortedGroupedCountries}
-                  selectLimit={3}
-                  placeholder="Select up to 3 nationalities"
-                  getItemLabel={(country) => country.name.common}
-                  getItemValue={(country) => country.name.common}
-                  searchFields={[
-                    "name.common",
-                    "name.official",
-                    "cca3",
-                    "altSpellings",
-                  ]}
-                  tabIndex={2}
-                  className="h-12 bg-card text-base hover:bg-card"
-                />
-                {fieldState.error && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {fieldState.error.message}
-                  </p>
-                )}
-              </>
-            )}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="artistResidency">Residence/Location (optional)</Label>
-          <Controller
-            name="artistResidency"
-            control={control}
-            render={({ field }) => (
-              <MapboxInputFull
-                id="artistResidency"
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                reset={false}
-                tabIndex={2}
-                placeholder="Place of residence (city, state, country, etc).."
-                className="mb-3 w-full lg:mb-0"
-                inputClassName="rounded-lg border-foreground "
-                isArtist={true}
-              />
-            )}
-          />
-        </div>
-      </div>
-      <div className="mt-4 flex items-center justify-between">
-        {activeSub ? (
-          <span className="flex-col gap-1 text-foreground/70">
-            <p className="text-sm">Your Plan:</p>{" "}
-            <p>
-              ${subAmount}/{subInterval}
-            </p>
-          </span>
-        ) : trialingSub ? (
-          <span className="flex-col gap-1 text-foreground/70">
-            <p className="text-sm">
-              {trialEnded ? "Trial Ended:" : "Trial Ends:"}
-            </p>
-            <p className={cn("text-sm", trialEnded && "italic text-red-600")}>
-              {trialEndsAt ? formatDate(new Date(trialEndsAt), "PPP") : "N/A"}
-            </p>
-          </span>
-        ) : (
-          <div />
+    <Form {...form}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={cn(
+          "grid-cols-[1fr_auto_1fr] grid-rows-[1fr_auto] gap-x-8 md:grid",
+          className,
         )}
-
-        <DialogFooter className="flex justify-end gap-4 lg:gap-2">
-          <DialogClose asChild>
-            <Button type="button" size="lg" variant="salWithShadowHiddenYlw">
-              Cancel
-            </Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button
-              type="submit"
-              size="lg"
-              variant="salWithShadowHidden"
-              disabled={!isValid || pending}
-            >
-              {!hadTrial ? (
-                "Start Trial"
-              ) : !activeSub && (!trialingSub || trialEnded) ? (
-                <span className="flex items-center gap-x-1">
-                  Continue to Stripe
-                  <IoMdArrowRoundForward className="size-4" />
-                </span>
-              ) : !hasUnsavedChanges && activeSub ? (
-                "View Membership"
-              ) : pending ? (
-                <span>
-                  Saving...
-                  <LoaderCircle className="size-4 animate-spin" />
-                </span>
-              ) : (
-                "Save Changes"
+      >
+        <div className="col-span-1 flex flex-col gap-3 pb-6">
+          <div className="flex items-end gap-4">
+            <FormField
+              control={control}
+              name="artistName"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel className="font-bold">
+                    Artist Name<sup>*</sup>{" "}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      tabIndex={1}
+                      id="artistName"
+                      {...field}
+                      placeholder="(if different from your profile name)"
+                      className="w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground"
+                    />
+                  </FormControl>
+                </FormItem>
               )}
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </div>
-    </form>
+            />
+
+            <FormField
+              control={control}
+              name="logo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only font-bold">
+                    Artist Logo
+                  </FormLabel>
+                  <FormControl>
+                    <LogoUploader
+                      id="logo"
+                      onChangeAction={(file) => field.onChange(file)}
+                      onRemoveAction={() => field.onChange(undefined)}
+                      initialImage={user?.image}
+                      imageOnly
+                      className="gap-0 pr-8"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={control}
+            name="artistContact.instagram"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">Instagram </FormLabel>
+                <FormControl>
+                  <DebouncedControllerInput
+                    tabIndex={1}
+                    id="artistContact.instagram"
+                    field={field}
+                    placeholder="@username"
+                    transform={(val) => formatHandleInput(val, "instagram")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="artistContact.website"
+            render={({ field }) => (
+              <FormItem className="hidden md:block">
+                <FormLabel className="font-bold">Website </FormLabel>
+                <FormControl>
+                  <DebouncedControllerInput
+                    tabIndex={2}
+                    id="artistContact.website"
+                    field={field}
+                    placeholder="yoursite.com"
+                    transform={autoHttps}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <Separator
+          orientation="vertical"
+          thickness={2}
+          className="mx-5 hidden bg-foreground/10 md:block"
+        />
+
+        <div className={cn("flex flex-col gap-4")}>
+          <div className="relative mt-3 flex h-max flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pb-6 pt-8 text-foreground/75 lg:pt-4">
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
+              Eligibility Details:
+            </span>
+
+            <div className="flex flex-col gap-2">
+              <Label>Nationality (max 3)*</Label>
+              <Controller
+                name="artistNationality"
+                control={control}
+                rules={{
+                  required: "Nationality is required",
+                  validate: (value) =>
+                    value.length > 0 ||
+                    "Please select at least one nationality",
+                }}
+                render={({ field, fieldState }) => (
+                  <>
+                    <SearchMappedMultiSelect<Country>
+                      values={field.value}
+                      onChange={field.onChange}
+                      data={sortedGroupedCountries}
+                      selectLimit={3}
+                      placeholder="Select up to 3 nationalities"
+                      getItemLabel={(country) => country.name.common}
+                      getItemValue={(country) => country.name.common}
+                      searchFields={[
+                        "name.common",
+                        "name.official",
+                        "cca3",
+                        "altSpellings",
+                      ]}
+                      tabIndex={2}
+                      className="h-12 bg-card text-base hover:bg-card"
+                    />
+                    {fieldState.error && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="artistResidency">
+                Residence/Location (optional)
+              </Label>
+              <Controller
+                name="artistResidency"
+                control={control}
+                render={({ field }) => (
+                  <MapboxInputFull
+                    id="artistResidency"
+                    value={field.value ?? null}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    reset={false}
+                    tabIndex={2}
+                    placeholder="Place of residence (city, state, country, etc).."
+                    className="mb-3 w-full lg:mb-0"
+                    inputClassName="rounded-lg border-foreground "
+                    isArtist={true}
+                  />
+                )}
+              />
+            </div>
+          </div>
+          <FormField
+            control={control}
+            name="canFeature"
+            render={({ field }) => (
+              <FormItem className="my-3 flex items-center gap-2 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    id="canFeature"
+                    checked={field.value || false}
+                    onCheckedChange={field.onChange}
+                    className="text-base"
+                  />
+                </FormControl>
+                <FormLabel className="font-bold leading-6 sm:leading-normal">
+                  Would you like to be considered for our artist feature?
+                  <sup>*</sup>
+                </FormLabel>
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className={cn("col-span-full flex w-full flex-col")}>
+          <Separator
+            thickness={2}
+            className="mb-3 hidden bg-foreground/10 md:block"
+          />
+          <div className="col-span-full mt-3 flex w-full items-center justify-end gap-6">
+            {activeSub ? (
+              <span className="hidden flex-col gap-1 text-foreground/70 md:flex">
+                <p className="text-sm">Your Plan:</p>{" "}
+                <p>
+                  ${subAmount}/{subInterval}
+                </p>
+              </span>
+            ) : trialingSub ? (
+              <span className="hidden flex-col gap-1 text-foreground/70 md:flex">
+                <p className="text-sm">
+                  {trialEnded ? "Trial Ended:" : "Trial Ends:"}
+                </p>
+                <p
+                  className={cn("text-sm", trialEnded && "italic text-red-600")}
+                >
+                  {trialEndsAt
+                    ? formatDate(new Date(trialEndsAt), "PPP")
+                    : "N/A"}
+                </p>
+              </span>
+            ) : null}
+
+            <DialogFooter className="flex flex-row justify-end gap-4 lg:gap-2">
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="salWithShadowHiddenYlw"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  type="submit"
+                  size="lg"
+                  variant="salWithShadowHidden"
+                  disabled={!isValid || pending}
+                >
+                  {!hadTrial ? (
+                    "Start Trial"
+                  ) : !activeSub && (!trialingSub || trialEnded) ? (
+                    <span className="flex items-center gap-x-1">
+                      Continue to Stripe
+                      <IoMdArrowRoundForward className="size-4" />
+                    </span>
+                  ) : !hasUnsavedChanges && activeSub ? (
+                    "View Membership"
+                  ) : pending ? (
+                    <span>
+                      Saving...
+                      <LoaderCircle className="size-4 animate-spin" />
+                    </span>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </div>
+        </div>
+      </form>
+    </Form>
   );
 };

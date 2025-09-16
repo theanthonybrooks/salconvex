@@ -25,7 +25,17 @@ export const searchCards = query({
   args: {
     purpose: v.optional(v.string()),
     searchTerm: v.optional(v.string()),
-    category: v.optional(v.string()),
+    category: v.optional(
+      v.union(
+        v.literal("general"),
+        v.literal("account"),
+        v.literal("artist"),
+        v.literal("organization"),
+        v.literal("event"),
+        v.literal("openCall"),
+        v.literal("other"),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     //todo: add category filter dropdown to search bar
@@ -67,8 +77,22 @@ export const addCard = mutation({
       v.literal("notPlanned"),
     ),
     order: v.optional(v.string()),
-    priority: v.optional(v.string()),
-    category: v.optional(v.string()),
+
+    priority: v.optional(
+      v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+    ),
+    category: v.optional(
+      v.union(
+        v.literal("general"),
+        v.literal("ui/ux"),
+        v.literal("account"),
+        v.literal("artist"),
+        v.literal("organization"),
+        v.literal("event"),
+        v.literal("openCall"),
+        v.literal("other"),
+      ),
+    ),
     isPublic: v.boolean(),
     purpose: v.string(),
     voters: v.optional(
@@ -253,7 +277,9 @@ export const editCard = mutation({
     id: v.id("todoKanban"),
     title: v.string(),
     description: v.optional(v.string()),
-    priority: v.optional(v.string()),
+    priority: v.optional(
+      v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+    ),
     column: v.optional(
       v.union(
         v.literal("proposed"),
@@ -264,7 +290,17 @@ export const editCard = mutation({
         v.literal("notPlanned"),
       ),
     ),
-    category: v.string(),
+    category: v.union(
+      v.literal("general"),
+      v.literal("ui/ux"),
+
+      v.literal("account"),
+      v.literal("artist"),
+      v.literal("organization"),
+      v.literal("event"),
+      v.literal("openCall"),
+      v.literal("other"),
+    ),
     voters: v.array(
       v.object({
         userId: v.id("users"),

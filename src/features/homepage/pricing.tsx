@@ -455,8 +455,7 @@ const PricingCard = ({
                 isArtist ? (
                   `$${
                     isYearly
-                      ? (((prices.year?.usd?.amount ?? 0) / 12).toFixed(2) ??
-                        "N/A")
+                      ? ((prices.year?.usd?.amount ?? 0).toFixed(0) ?? "N/A")
                       : (prices.month?.usd?.amount?.toFixed(0) ?? "N/A")
                   }`
                 ) : (
@@ -484,12 +483,13 @@ const PricingCard = ({
             </span>
 
             <span className={cn("text-muted-foreground")}>
-              {isArtist && "/month"}
+              {isArtist && (isYearly ? "/year" : "/month")}
             </span>
           </div>
           {isArtist && isYearly && (
             <p className={cn("mt-1 text-muted-foreground")}>
-              ( ${prices.year?.usd?.amount?.toFixed(0) ?? "N/A"} billed yearly )
+              ( ${((prices.year?.usd?.amount ?? 0) / 12).toFixed(2) ?? "N/A"}{" "}
+              per month )
             </p>
           )}
           {(!user || isEligibleForFree) && !isFree && isOrganizer && (

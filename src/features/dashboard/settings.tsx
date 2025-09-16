@@ -66,6 +66,7 @@ import {
   Clock,
   Cookie,
   Globe,
+  Info,
   LoaderCircle,
   Mail,
   Mailbox,
@@ -95,7 +96,6 @@ import {
   NewsletterType,
   newsletterTypeOptions,
 } from "@/constants/newsletterConsts";
-import { ArtistProfileForm } from "@/features/artists/components/artist-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
@@ -705,7 +705,32 @@ export default function SettingsPage() {
                 isArtist && activeSub && "grid gap-6 md:grid-cols-2",
               )}
             >
-              {isArtist && activeSub && <ArtistProfileForm user={user} />}
+              {isArtist && activeSub && (
+                <Card className={cn(isArtist && activeSub && "self-start")}>
+                  <CardHeader>
+                    <CardTitle>Artist Profile</CardTitle>
+                    <CardDescription>
+                      Manage your artist profile
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <span className={cn("inline-flex items-center gap-x-1")}>
+                      <Info className="size-4" /> Note: Artist profile has been
+                      moved to the{" "}
+                      <Link
+                        href="/dashboard/artist"
+                        variant="bold"
+                        className={cn(
+                          "!text-base underline-offset-2 hover:underline-offset-4 active:underline-offset-1",
+                        )}
+                      >
+                        My Profile
+                      </Link>
+                      page.
+                    </span>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Preferences */}
               <Card className={cn(isArtist && activeSub && "self-start")}>

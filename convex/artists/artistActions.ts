@@ -33,16 +33,22 @@ export const updateOrCreateArtist = mutation({
           format: v.optional(v.string()),
         }),
       ),
-      coordinates: v.optional(
-        v.object({
-          latitude: v.number(),
-          longitude: v.number(),
-        }),
-      ),
     }),
+    contact: v.optional(
+      v.object({
+        website: v.optional(v.string()),
+        instagram: v.optional(v.string()),
+        facebook: v.optional(v.string()),
+        threads: v.optional(v.string()),
+        vk: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        youTube: v.optional(v.string()),
+        linkedIn: v.optional(v.string()),
+      }),
+    ),
+    canFeature: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    console.log(args.artistResidency);
     const userId = await getAuthUserId(ctx);
     let fileUrl = null;
     if (!userId) throw new ConvexError("Not authenticated");
@@ -85,21 +91,9 @@ export const updateOrCreateArtist = mutation({
         artistId: user._id,
         artistName: args.artistName,
         artistNationality: args.artistNationality ?? [],
-        artistResidency: {
-          full: args.artistResidency?.full,
-          locale: args.artistResidency?.locale,
-          city: args.artistResidency?.city,
-          region: args.artistResidency?.region,
-          state: args.artistResidency?.state,
-          stateAbbr: args.artistResidency?.stateAbbr,
-          country: args.artistResidency?.country,
-          countryAbbr: args.artistResidency?.countryAbbr,
-          continent: args.artistResidency?.continent,
-          location: args.artistResidency?.location,
-          timezone: args.artistResidency?.timezone,
-          timezoneOffset: args.artistResidency?.timezoneOffset,
-          currency: args.artistResidency?.currency,
-        },
+        ...(args.artistResidency && { artistResidency: args.artistResidency }),
+        ...(args.contact && { contact: args.contact }),
+        canFeature: args.canFeature ?? false,
         updatedAt: Date.now(),
         lastUpdatedBy: userId,
         completedProfile: false,
@@ -110,14 +104,16 @@ export const updateOrCreateArtist = mutation({
 
     // Create a patch object with only the fields that are defined
     const patch: Partial<Doc<"artists">> = {
+      ...(args.artistName && { artistName: args.artistName }),
+      ...(args.artistNationality && {
+        artistNationality: args.artistNationality,
+      }),
+      ...(args.artistResidency && { artistResidency: args.artistResidency }),
+      ...(args.contact && { contact: args.contact }),
+      ...(args.canFeature && { canFeature: args.canFeature }),
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
     };
-
-    if ("artistName" in args) patch.artistName = args.artistName;
-    if ("artistNationality" in args)
-      patch.artistNationality = args.artistNationality;
-    if ("artistResidency" in args) patch.artistResidency = args.artistResidency;
 
     if (artistSlug && artist?.artistSlug !== artistSlug)
       patch.artistSlug = artistSlug;

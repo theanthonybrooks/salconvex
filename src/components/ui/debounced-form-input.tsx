@@ -2,12 +2,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
-import {
-  ControllerRenderProps,
-  FieldValues,
-  Path,
-  useFormContext,
-} from "react-hook-form";
+import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 
 interface DebouncedControllerInputProps<
   TFieldValues extends FieldValues,
@@ -28,7 +23,7 @@ export function DebouncedControllerInput<
   transform,
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
-  const { setValue } = useFormContext();
+  // const { setValue } = useFormContext();
   const [localValue, setLocalValue] = useState(field.value ?? "");
 
   const latestTransform = useRef(transform);
@@ -41,10 +36,11 @@ export function DebouncedControllerInput<
       const transformed = latestTransform.current
         ? latestTransform.current(val)
         : val;
-      setValue(field.name, transformed as TFieldValues[TName], {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+      // setValue(field.name, transformed as TFieldValues[TName], {
+      //   shouldValidate: true,
+      //   shouldDirty: true,
+      // });
+      field.onChange(transformed);
       setLocalValue(transformed);
     }, debounceMs),
   ).current;
@@ -59,10 +55,12 @@ export function DebouncedControllerInput<
     };
   }, [debouncedOnChange]);
 
+  console.log(field);
+
   return (
     <Input
+      {...field}
       {...inputProps}
-      name={field.name}
       className={cn(
         "bg-card text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
         typeof inputProps.className === "string"
@@ -80,21 +78,22 @@ export function DebouncedControllerInput<
         const pasted = e.clipboardData.getData("text");
         const transformed = transform ? transform(pasted) : pasted;
         setLocalValue(transformed);
-        // field.onChange(transformed);
-        setValue(field.name, transformed as TFieldValues[TName], {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
+        field.onChange(transformed);
+        // setValue(field.name, transformed as TFieldValues[TName], {
+        //   shouldValidate: true,
+        //   shouldDirty: true,
+        // });
+
         requestAnimationFrame(() => {
           field.onBlur();
         });
       }}
-      onBlur={(e) => {
-        field.onBlur();
-        if (typeof inputProps.onBlur === "function") {
-          inputProps.onBlur(e);
-        }
-      }}
+      // onBlur={(e) => {
+      //   field.onBlur();
+      //   if (typeof inputProps.onBlur === "function") {
+      //     inputProps.onBlur(e);
+      //   }
+      // }}
     />
   );
 }

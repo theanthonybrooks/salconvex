@@ -144,6 +144,19 @@ const artistSchema = {
     ),
   }),
 
+  contact: v.optional(
+    v.object({
+      website: v.optional(v.string()),
+      instagram: v.optional(v.string()),
+      facebook: v.optional(v.string()),
+      threads: v.optional(v.string()),
+      linkedIn: v.optional(v.string()),
+      vk: v.optional(v.string()),
+      phone: v.optional(v.string()),
+      youTube: v.optional(v.string()),
+    }),
+  ),
+
   documents: v.optional(
     v.object({
       cv: v.optional(v.string()),
@@ -152,7 +165,7 @@ const artistSchema = {
       images: v.optional(v.array(v.string())),
     }),
   ),
-
+  canFeature: v.optional(v.boolean()),
   updatedAt: v.optional(v.number()),
   lastUpdatedBy: v.optional(v.string()),
   completedProfile: v.boolean(),
@@ -227,6 +240,7 @@ const organizationSchema = {
       phone: v.optional(v.string()),
       phoneExt: v.optional(v.string()),
       linkAggregate: v.optional(v.string()),
+      linkedIn: v.optional(v.string()),
       youTube: v.optional(v.string()),
       other: v.optional(v.string()),
     }),
@@ -325,6 +339,7 @@ const eventSchema = {
       phone: v.optional(v.string()),
       phoneExt: v.optional(v.string()),
       linkAggregate: v.optional(v.string()),
+      linkedIn: v.optional(v.string()),
       youTube: v.optional(v.string()),
       other: v.optional(v.string()),
     }),
@@ -785,14 +800,25 @@ export default defineSchema({
       }),
     ),
 
-    category: v.string(),
+    category: v.union(
+      v.literal("general"),
+      v.literal("ui/ux"),
+      v.literal("account"),
+      v.literal("artist"),
+      v.literal("organization"),
+      v.literal("event"),
+      v.literal("openCall"),
+      v.literal("other"),
+    ),
     order: v.number(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
     completedAt: v.optional(v.number()),
     public: v.boolean(),
     lastUpdatedBy: v.id("users"),
-    priority: v.optional(v.string()),
+    priority: v.optional(
+      v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+    ),
     purpose: v.optional(v.string()),
     userSuggestion: v.optional(v.string()),
     userId: v.optional(v.id("users")),

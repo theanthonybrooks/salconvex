@@ -38,6 +38,7 @@ import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-
 import { ExternalLinksInput } from "@/features/events/open-calls/components/external-links-input";
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
+import { OpenCallStep1 } from "@/features/organizers/schemas/event-add-schema";
 import { autoHttps } from "@/lib/linkFns";
 import "filepond/dist/filepond.min.css";
 import { DateTime } from "luxon";
@@ -76,6 +77,14 @@ const SubmissionFormOC1 = ({
     // getValues,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+
+  const {
+    formState: { errors: currentErrors },
+  } = useFormContext<OpenCallStep1>();
+
+  console.log(currentErrors);
+
+  console.log(errors?.openCall?.requirements?.applicationLink, errors);
   const appLinkFormat =
     watch("openCall.requirements.applicationLinkFormat") ?? "https://";
 
@@ -779,13 +788,15 @@ const SubmissionFormOC1 = ({
                                 "w-full rounded border-foreground",
                                 errors?.openCall?.requirements
                                   ?.applicationLink && "invalid-field",
+                                currentErrors?.openCall?.requirements
+                                  ?.applicationLink && "invalid-field",
                               )}
                               debounceMs={50}
                               tabIndex={12}
                               onBlur={() => {
                                 field.onBlur?.();
                                 handleCheckSchema?.();
-                                field.onChange(field.value || "");
+                                // field.onChange(field.value || "");
                                 // console.log("Blur me", field + type)
                               }}
                             />

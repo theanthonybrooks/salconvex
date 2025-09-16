@@ -723,9 +723,10 @@ export const EventOCForm = ({
         //   )?.message ?? issues[0]?.message;
         const userRelevantIssues = issues.filter(
           (i) =>
-            i.message && !["Required", "Invalid input"].includes(i.message),
+            i.message &&
+            !["Required", "Invalid input", "invalid_union"].includes(i.message),
+          // i.message && !["Required"].includes(i.message),
         );
-
         const firstMessage = userRelevantIssues[0]?.message || "";
 
         setErrorMsg(firstMessage || "");

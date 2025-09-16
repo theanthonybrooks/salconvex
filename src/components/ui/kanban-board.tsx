@@ -4,14 +4,7 @@
 import { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import {
-  Construction,
-  Eye,
-  LucideThumbsDown,
-  LucideThumbsUp,
-  Palette,
-  X,
-} from "lucide-react";
+import { Eye, LucideThumbsDown, LucideThumbsUp, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
@@ -37,14 +30,15 @@ import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import {
+  CATEGORY_CONFIG,
+  Priority,
+  PRIORITY_CONFIG,
+} from "@/constants/kanbanConsts";
+import { SupportCategory } from "@/constants/supportConsts";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { User } from "@/types/user";
 import { debounce } from "lodash";
-import {
-  FcHighPriority,
-  FcLowPriority,
-  FcMediumPriority,
-} from "react-icons/fc";
 import { ColumnType, Voter } from "~/convex/kanban/cards";
 
 interface Card {
@@ -52,9 +46,9 @@ interface Card {
   description: string;
   id: string;
   column: ColumnType;
-  priority?: string;
+  priority?: Priority;
   voters: Voter[];
-  category: string;
+  category: SupportCategory;
   isPublic: boolean;
   purpose: string;
 }
@@ -79,8 +73,8 @@ interface AddCardArgs {
   column: ColumnType;
   order?: "start" | "end";
   voters?: Voter[];
-  priority?: string;
-  category: string;
+  priority?: Priority;
+  category: SupportCategory;
   isPublic: boolean;
   purpose: string;
 }
@@ -110,9 +104,9 @@ interface CardProps {
   description: string;
   id: string;
   column: ColumnType;
-  priority?: string;
+  priority?: Priority;
   voters: Voter[];
-  category: string;
+  category: SupportCategory;
   isPublic: boolean;
   purpose: string;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
@@ -192,8 +186,8 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
       column: ColumnType;
       order: number;
       voters: Voter[];
-      category: string;
-      priority?: string;
+      category: SupportCategory;
+      priority?: Priority;
       public: boolean;
       purpose: string;
       completedAt?: number;
@@ -476,7 +470,9 @@ const Card = ({
   isPublic,
   purpose,
 }: CardProps) => {
-  const [newPriority, setNewPriority] = useState(priority || "medium");
+  const [newPriority, setNewPriority] = useState<Priority>(
+    priority || "medium",
+  );
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -493,7 +489,7 @@ const Card = ({
     voters,
     priority: (["low", "medium", "high"].includes(priority ?? "")
       ? priority
-      : "medium") as "low" | "medium" | "high",
+      : "medium") as Priority,
     column,
     isPublic,
   };
@@ -506,7 +502,7 @@ const Card = ({
 
   const handleTogglePriority = async () => {
     setNewPriority((prevPriority) => {
-      let updatedPriority;
+      let updatedPriority: Priority;
       if (prevPriority === "high") {
         updatedPriority = "low";
       } else if (prevPriority === "low") {
@@ -578,7 +574,7 @@ const Card = ({
                 column,
                 priority: (["low", "medium", "high"].includes(priority ?? "")
                   ? priority
-                  : "medium") as "low" | "medium" | "high",
+                  : "medium") as Priority,
                 voters,
                 category: category ?? "general",
                 isPublic: isPublic ?? true,
@@ -690,9 +686,9 @@ type BaseTaskValues = {
   title: string;
   description: string;
   column: ColumnType;
-  priority: "low" | "medium" | "high";
+  priority: Priority;
   voters: Voter[];
-  category: string;
+  category: SupportCategory;
   isPublic: boolean;
 };
 
@@ -747,14 +743,14 @@ export const TaskDialog = ({
   const [column, setColumn] = useState<ColumnType>(
     initialValues?.column || "todo",
   );
-  const [priority, setPriority] = useState<"low" | "medium" | "high">(
+  const [priority, setPriority] = useState<Priority>(
     initialValues?.priority || "medium",
   );
   const isSubmittingRef = useRef(false);
   const [order, setOrder] = useState<"start" | "end">(
     mode === "add" && initialValues?.order ? initialValues.order : "start",
   );
-  const [category, setCategory] = useState(
+  const [category, setCategory] = useState<SupportCategory>(
     initialValues?.category || "general",
   );
 
@@ -976,7 +972,8 @@ export const DetailsDialog = ({
 }: DetailsDialogProps) => {
   const title = initialValues?.title || "";
   const description = initialValues?.description || "";
-  const category = initialValues?.category || "";
+  const category = initialValues?.category || "general";
+  const priority = initialValues?.priority || "medium";
   const upVotes = initialValues?.voters?.filter((v) => v.direction === "up");
   const downVotes = initialValues?.voters?.filter(
     (v) => v.direction === "down",
@@ -986,9 +983,8 @@ export const DetailsDialog = ({
 
   const guestUser = user === null;
 
-  const [priority] = useState<"low" | "medium" | "high">(
-    initialValues?.priority || "medium",
-  );
+  const priorityConfig = PRIORITY_CONFIG[priority];
+  const categoryConfig = CATEGORY_CONFIG[category];
 
   const voteCard = useMutation(api.kanban.cards.voteCard);
 
@@ -1030,7 +1026,7 @@ export const DetailsDialog = ({
               {"View task/suggestion details"}
             </DialogDescription>
             <div className="flex items-center gap-2">
-              {priority === "high" ? (
+              {/* {priority === "high" ? (
                 <FlairBadge
                   icon={<FcHighPriority className="size-5" />}
                   className={cn("bg-red-100")}
@@ -1073,10 +1069,21 @@ export const DetailsDialog = ({
                 >
                   {category}
                 </FlairBadge>
-              )}
+              )} */}
+              <FlairBadge
+                icon={priorityConfig.icon}
+                className={priorityConfig.className}
+              >
+                {priority}
+              </FlairBadge>
+              <FlairBadge
+                icon={categoryConfig.icon}
+                className={categoryConfig.className}
+              >
+                {category}
+              </FlairBadge>
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-2">
-                  {" "}
                   <LucideThumbsUp
                     className={cn(
                       "size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4",

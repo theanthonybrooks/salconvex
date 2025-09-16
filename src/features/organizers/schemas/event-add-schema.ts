@@ -1,5 +1,13 @@
 import { cleanHtml } from "@/lib/richTextFns";
-import { toMutableEnum } from "@/lib/zodFns";
+import {
+  domainRegex,
+  isValidFacebook,
+  isValidInstagram,
+  isValidPhone,
+  isValidThreads,
+  isValidVK,
+  toMutableEnum,
+} from "@/lib/zodFns";
 import {
   eventCategoryValues,
   eventFormatValues,
@@ -75,14 +83,14 @@ export const strictUrl = z
 //     value,
 //   );
 
-const isValidUrl = (value: string) => {
-  try {
-    const url = new URL(value);
-    return ["http:", "https:"].includes(url.protocol);
-  } catch {
-    return false;
-  }
-};
+// const isValidUrl = (value: string) => {
+//   try {
+//     const url = new URL(value);
+//     return ["http:", "https:"].includes(url.protocol);
+//   } catch {
+//     return false;
+//   }
+// };
 
 // const isValidUrlWithMailto = (value: string) => {
 //   try {
@@ -93,42 +101,15 @@ const isValidUrl = (value: string) => {
 //   }
 // };
 
-const isValidInstagram = (value: string) => {
-  // Remove leading @ for validation
-  const username = value.startsWith("@") ? value.slice(1) : value;
-
-  // Must be 1–30 chars, only a-z, 0-9, _, ., no consecutive or trailing periods
-  const regex = /^(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]{2,30}$/;
-
-  return regex.test(username);
-};
-
-// const isValidFacebook = (value: string) => /^@?[a-zA-Z0-9.]{5,}$/i.test(value); // Basic heuristic
-// const isValidFacebook = (value: string) => {
-//   // Accept either a valid handle or a full URL
-//   const handleRegex = /^@?[a-zA-Z0-9.]{5,}$/;
-//   const urlRegex = /^https:\/\/www\.facebook\.com\/[a-zA-Z0-9./_-]+$/i;
-
-//   return handleRegex.test(value) || urlRegex.test(value);
-// };
-const isValidFacebook = (value: string) => {
-  const handleRegex = /^@?[a-zA-Z0-9.]{5,}$/;
-  const urlRegex = /^https:\/\/www\.facebook\.com\/.+$/i;
-
-  return handleRegex.test(value) || urlRegex.test(value);
-};
-
-const isValidEmail = (value: string) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-const isValidPhone = (value: string) => /^\+?[0-9\s\-().]{7,}$/i.test(value);
-
-const isValidThreads = isValidInstagram;
-const isValidVK = (value: string) => /^@?[a-z][a-z0-9._-]{4,31}$/i.test(value);
-
 const linksSchemaLoose = z.object({
   sameAsOrganizer: z.boolean().optional(),
-  website: z.string().optional(),
+  website: z
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+      error: "Must be a valid URL (https://example.com)",
+    })
+    .optional(),
   email: z.email().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
@@ -137,19 +118,25 @@ const linksSchemaLoose = z.object({
   phone: z.string().optional(),
   phoneExt: z.string().optional(),
   linkAggregate: z.string().optional(),
-  other: z.string().optional(),
+  other: z
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+      error: "Must be a valid URL (https://example.com)",
+    })
+    .optional(),
 });
 
 const linksSchemaStrict = z.object({
   sameAsOrganizer: z.boolean().optional(),
 
   website: z
-    .string()
-    .optional()
-    .refine((val) => !val || isValidUrl(val), {
-      message: "Must be a valid URL (https://...)",
-    }),
-
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+      error: "Must be a valid URL (https://example.com)",
+    })
+    .optional(),
   email: z.email("Must be a valid email address").optional(),
 
   instagram: z
@@ -191,18 +178,20 @@ const linksSchemaStrict = z.object({
   phoneExt: z.string().optional(),
 
   linkAggregate: z
-    .string()
-    .optional()
-    .refine((val) => !val || isValidUrl(val), {
-      message: "Must be a valid URL (ie Linktr.ee, Carrd.co, Lnk.Bio, etc)",
-    }),
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+      error: "Must be a valid URL (https://example.com)",
+    })
+    .optional(),
 
   other: z
-    .string()
-    .optional()
-    .refine((val) => !val || isValidUrl(val), {
-      message: "Must be a valid URL",
-    }),
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+      error: "Must be a valid URL (https://example.com)",
+    })
+    .optional(),
 });
 
 const contactSchema = z.object({
@@ -552,15 +541,14 @@ export const openCallBaseSchema = z.object({
     links: z.array(
       z.object({
         title: z.string().min(1, "Link title is required"), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
-        href: z
-          .string()
-          .min(8, "URL is too short")
-          .refine((val) => !val || isValidUrl(val), {
-            message: "Must be a valid URL (https://...)",
-          }),
+        href: z.url({
+          protocol: /^https?$/,
+          hostname: z.regexes.domain,
+          error: "Must be a valid URL (https://example.com)",
+        }),
       }),
     ),
-    applicationLink: z.string().min(8, "URL is too short"),
+    applicationLink: z.string().min(1, "Application link is required"),
     applicationLinkFormat: z.union([
       z.literal("https://"),
       z.literal("mailto:"),
@@ -832,21 +820,76 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
         path: ["openCall", "basicInfo", "dates"],
       });
     }
-    if (appLinkFormat === "mailto:") {
-      if (!appLink || !isValidEmail(appLink)) {
+    // if (appLinkFormat === "mailto:") {
+    //   if (!appLink || !isValidEmail(appLink)) {
+    //     ctx.addIssue({
+    //       code: "custom",
+    //       message: "Must be a valid email address",
+    //       path: ["openCall", "requirements", "applicationLink"],
+    //     });
+    //   }
+    // }
+
+    // if (appLinkFormat === "https://") {
+    //   if (!appLink || !isValidUrl(appLink)) {
+    //     ctx.addIssue({
+    //       code: "custom",
+    //       message: "Must be a valid website URL (https://...)",
+    //       path: ["openCall", "requirements", "applicationLink"],
+    //     });
+    //   }
+    // }
+
+    if (appLinkFormat === "https://") {
+      // const parsed = z
+      //   .url({
+      //     protocol: /^https?$/,
+      //     hostname: domainRegex,
+      //   })
+      //   .safeParse(appLink);
+      const parsed = z
+        .string()
+        .refine(
+          (val) => {
+            try {
+              const url = new URL(val);
+
+              // protocol must be http/https
+              if (!["http:", "https:"].includes(url.protocol)) return false;
+
+              // reject credentials in the authority section
+              if (url.username || url.password) return false;
+
+              // enforce strict domain pattern
+              if (!domainRegex.test(url.hostname)) return false;
+
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          {
+            message: "Must be a valid website URL (https://example.com)",
+          },
+        )
+        .safeParse(appLink);
+
+      if (!parsed.success) {
         ctx.addIssue({
           code: "custom",
-          message: "Must be a valid email address",
+          message: "Link must be a valid website URL (https://example.com)",
           path: ["openCall", "requirements", "applicationLink"],
         });
       }
     }
 
-    if (appLinkFormat === "https://") {
-      if (!appLink || !isValidUrl(appLink)) {
+    if (appLinkFormat === "mailto:") {
+      const parsed = z.email().safeParse(appLink);
+
+      if (!parsed.success) {
         ctx.addIssue({
           code: "custom",
-          message: "Must be a valid website URL (https://...)",
+          message: "Link must be a valid email address",
           path: ["openCall", "requirements", "applicationLink"],
         });
       }
@@ -860,6 +903,8 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
     }
   });
 };
+
+export type OpenCallStep1 = z.infer<ReturnType<typeof getOpenCallStep1Schema>>;
 
 export const getEventWithOCSchema = (isAdmin: boolean = false) => {
   void isAdmin; // use me later :)

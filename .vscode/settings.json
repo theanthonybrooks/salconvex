@@ -23,7 +23,8 @@
     "Cookies",
     "Social",
     "Context",
-    "Kanban"
+    "Kanban",
+    "Artist"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -1,18 +1,42 @@
+import { SupportCategory } from "@/constants/supportConsts";
+import {
+  Calendar,
+  Construction,
+  CreditCard,
+  Megaphone,
+  PaintRoller,
+  Palette,
+  Users2,
+} from "lucide-react";
+import {
+  FcHighPriority,
+  FcLowPriority,
+  FcMediumPriority,
+} from "react-icons/fc";
+
+export const priorityOptions = [
+  { label: "High", value: "high" },
+  { label: "Medium", value: "medium" },
+  { label: "Low", value: "low" },
+] as const;
+
+export type Priority = typeof priorityOptions[number]["value"];
+
 interface Task {
-  id: number
-  title: string
-  description?: string
+  id: number;
+  title: string;
+  description?: string;
 }
 
 interface Category {
-  title: string
-  tasks: Task[]
+  title: string;
+  tasks: Task[];
 }
 
 export interface Column {
-  categories: Category[]
-  mainTitle?: string
-  description?: string
+  categories: Category[];
+  mainTitle?: string;
+  description?: string;
 }
 
 export const roadmapData: Column = {
@@ -135,4 +159,60 @@ export const roadmapData: Column = {
       ],
     },
   ],
-}
+};
+
+export const PRIORITY_CONFIG: Record<
+  "high" | "medium" | "low",
+  { icon: React.ReactNode; className: string }
+> = {
+  high: {
+    icon: <FcHighPriority className="size-5" />,
+    className: "bg-red-100",
+  },
+  medium: {
+    icon: <FcMediumPriority className="size-5" />,
+    className: "bg-yellow-100",
+  },
+  low: {
+    icon: <FcLowPriority className="size-5" />,
+    className: "bg-green-100",
+  },
+};
+
+export const CATEGORY_CONFIG: Record<
+  SupportCategory,
+  { icon: React.ReactNode; className: string }
+> = {
+  general: {
+    icon: <Construction className="size-5" />,
+    className: "bg-stone-100",
+  },
+  "ui/ux": {
+    icon: <Palette className="size-5" />,
+    className: "bg-purple-100",
+  },
+  account: {
+    icon: <CreditCard className="size-5" />,
+    className: "bg-blue-100",
+  },
+  artist: {
+    icon: <PaintRoller className="size-5" />,
+    className: "bg-amber-100",
+  },
+  organization: {
+    icon: <Users2 className="size-5" />,
+    className: "bg-emerald-100",
+  },
+  event: {
+    icon: <Calendar className="size-5" />,
+    className: "bg-rose-100",
+  },
+  openCall: {
+    icon: <Megaphone className="size-5" />,
+    className: "bg-pink-100",
+  },
+  other: {
+    icon: <FcLowPriority className="size-5" />,
+    className: "bg-green-100",
+  },
+};

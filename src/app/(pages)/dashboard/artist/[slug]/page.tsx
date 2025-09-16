@@ -41,7 +41,8 @@ export default async function ArtistPage({
       return <ArtistDashboardTableWrapper page="hidden" />;
 
     default:
-      //   redirect("/dashboard/admin");
-      return <ArtistDashboardTableWrapper page="applications" />;
+      // return <ArtistDashboardTableWrapper page="applications" />;
+      // return <ArtistMainPage />;
+      redirect("/dashboard/artist");
   }
 }
