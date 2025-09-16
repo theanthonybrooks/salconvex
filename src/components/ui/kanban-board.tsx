@@ -29,6 +29,7 @@ import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
@@ -1032,9 +1033,9 @@ export const DetailsDialog = ({
       <DialogTrigger asChild onClick={onClickAction}>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="h-[90dvh] w-full max-w-[max(60rem,60vw)] bg-card sm:max-h-[max(40rem,70vh)]">
+      <DialogContent className="flex h-[90dvh] w-full max-w-[max(60rem,60vw)] flex-col bg-card sm:max-h-[max(40rem,70vh)]">
         <DialogHeader>
-          <div className="flex flex-col gap-4">
+          <div className="flex h-fit flex-col gap-4">
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription className="sr-only">
               {"View task/suggestion details"}
@@ -1098,6 +1099,7 @@ export const DetailsDialog = ({
             </div>
           </div>
         </DialogHeader>
+        <Separator thickness={1.5} className="mb-4 mt-2" />
 
         {/* <div className="mt-5 flex max-h-[70dvh] flex-col gap-4 pb-6 sm:max-h-[60vh]"> */}
         <RichTextDisplay html={description} className="scrollable mini" />
