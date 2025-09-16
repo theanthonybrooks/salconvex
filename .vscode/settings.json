@@ -22,7 +22,8 @@
     "Admin",
     "Cookies",
     "Social",
-    "Context"
+    "Context",
+    "Kanban"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -161,7 +161,7 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
   useEffect(() => {
     const handler = debounce((value: string) => {
       setDebouncedSearch(value);
-    }, 100);
+    }, 500);
 
     handler(searchTerm.trim());
 
@@ -175,7 +175,7 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
     debouncedSearch !== ""
       ? {
           purpose,
-          searchTerm,
+          searchTerm: debouncedSearch,
         }
       : "skip",
   );
