@@ -325,7 +325,7 @@ export const ArtistProfileForm = ({
                       onRemoveAction={() => field.onChange(undefined)}
                       initialImage={user?.image}
                       imageOnly
-                      className="gap-0 pr-8"
+                      className="gap-0 pr-8 sm:pr-0"
                     />
                   </FormControl>
                 </FormItem>
@@ -378,7 +378,7 @@ export const ArtistProfileForm = ({
         />
 
         <div className={cn("flex flex-col gap-4")}>
-          <div className="relative mt-3 flex h-max flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pb-6 pt-8 text-foreground/75 lg:pt-4">
+          <div className="relative mt-3 flex h-max flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pb-6 pt-8 text-foreground/75">
             <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
               Eligibility Details:
             </span>
