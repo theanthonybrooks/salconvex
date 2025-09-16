@@ -62,7 +62,7 @@ const StyledWrapper = styled.div`
     background-image: linear-gradient(to bottom, #d5d5d5, #e8e8e8);
     box-shadow: 0 1px 1px rgb(255 255 255 / 0.6);
     /* resize for demo */
-    font-size: 1.5em;
+    font-size: 1.25em;
   }
 
   .toggle-checkbox {

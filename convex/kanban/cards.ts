@@ -3,13 +3,16 @@ import { v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "../_generated/server";
 
-export type ColumnType =
-  | "proposed"
-  | "backlog"
-  | "todo"
-  | "doing"
-  | "done"
-  | "notPlanned";
+export const ColumnTypeOptions = [
+  { label: "Proposed", value: "proposed" },
+  { label: "Backlog", value: "backlog" },
+  { label: "Todo", value: "todo" },
+  { label: "Doing", value: "doing" },
+  { label: "Done", value: "done" },
+  { label: "Not Planned", value: "notPlanned" },
+] as const;
+
+export type ColumnType = (typeof ColumnTypeOptions)[number]["value"];
 
 export type VoteType = {
   upVote: number;

@@ -28,18 +28,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { SelectSimple } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   CATEGORY_CONFIG,
   Priority,
   PRIORITY_CONFIG,
+  priorityOptions,
 } from "@/constants/kanbanConsts";
-import { SupportCategory } from "@/constants/supportConsts";
+import {
+  SupportCategory,
+  supportCategoryOptions,
+} from "@/constants/supportConsts";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { User } from "@/types/user";
-import { debounce } from "lodash";
-import { ColumnType, Voter } from "~/convex/kanban/cards";
+import { capitalize, debounce } from "lodash";
+import { ColumnType, ColumnTypeOptions, Voter } from "~/convex/kanban/cards";
 
 interface Card {
   title: string;
@@ -589,6 +594,7 @@ const Card = ({
               }}
             />
             <DetailsDialog
+              isOpen={isPreviewing}
               user={user}
               isAdmin={isAdmin ?? false}
               onClickAction={() => setIsPreviewing(true)}
@@ -598,6 +604,7 @@ const Card = ({
               }}
               onEditAction={() => {
                 if (!isAdmin) return;
+                setIsPreviewing(false);
                 setIsEditing(true);
               }}
               trigger={
@@ -719,6 +726,7 @@ type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
 type DetailsDialogProps = {
   id: Id<"todoKanban">;
   trigger: React.ReactNode;
+  isOpen: boolean;
   initialValues: BaseTaskValues;
   onClickAction?: () => void;
   onCloseAction?: () => void;
@@ -819,7 +827,7 @@ export const TaskDialog = ({
       <DialogTrigger asChild onClick={onClick}>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="bg-card">
+      <DialogContent className="w-full max-w-[max(50rem,100vw)] bg-card sm:max-w-[max(40rem,50vw)]">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
           <DialogDescription>
@@ -872,38 +880,44 @@ export const TaskDialog = ({
             className="scrollable mini max-h-[60dvh] min-h-72 w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           /> */}
 
-          <div className="flex items-center gap-3">
-            <div className="flex flex-1 flex-col gap-3">
-              <Label htmlFor="column">Column</Label>
-              <select
-                name="column"
-                value={column}
-                onChange={(e) => setColumn(e.target.value as ColumnType)}
-                className="rounded border bg-background p-2 text-foreground"
-              >
-                <option value="proposed">Proposed</option>
-                <option value="backlog">Considering</option>
-                <option value="todo">To Do</option>
-                <option value="doing">In Progress</option>
-                <option value="done">Complete</option>
-                <option value="notPlanned">Not Planned</option>
-              </select>
-            </div>
+          <div className="flex flex-col items-center gap-3 md:flex-row">
+            <div className="flex w-full items-center gap-3 sm:w-auto">
+              <div className="flex w-full flex-col gap-3 sm:w-auto">
+                <Label htmlFor="column">Column</Label>
 
-            <div className="flex flex-1 flex-col gap-3">
-              <Label htmlFor="priority">Priority</Label>
-              <select
-                name="priority"
-                value={priority}
-                onChange={(e) =>
-                  setPriority(e.target.value as "low" | "medium" | "high")
+                <SelectSimple
+                  options={[...ColumnTypeOptions]}
+                  value={column}
+                  onChangeAction={(value) => setColumn(value as ColumnType)}
+                  placeholder="Select column"
+                  className="w-full min-w-30 max-w-sm sm:max-w-40"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="priority">Priority</Label>
+
+                <SelectSimple
+                  options={[...priorityOptions]}
+                  value={priority}
+                  onChangeAction={(value) => setPriority(value as Priority)}
+                  placeholder="Select priority"
+                  className="w-full min-w-30 max-w-sm sm:max-w-30"
+                />
+              </div>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:w-auto">
+              <Label htmlFor="priority">Category</Label>
+
+              <SelectSimple
+                options={[...supportCategoryOptions]}
+                value={category}
+                onChangeAction={(value) =>
+                  setCategory(value as SupportCategory)
                 }
-                className="rounded border bg-card p-2 text-foreground"
-              >
-                <option value="high">🟢 High</option>
-                <option value="medium">🟡Medium</option>
-                <option value="low">🔴 Low</option>
-              </select>
+                placeholder="Select category"
+                className="w-full min-w-40 max-w-sm sm:max-w-50"
+              />
             </div>
 
             {!isEdit && (
@@ -965,7 +979,7 @@ export const DetailsDialog = ({
   isAdmin,
   trigger,
   initialValues,
-
+  isOpen,
   onClickAction,
   onCloseAction,
   onEditAction,
@@ -1014,7 +1028,7 @@ export const DetailsDialog = ({
   );
 
   return (
-    <Dialog onOpenChange={(open) => !open && onCloseDialog()}>
+    <Dialog onOpenChange={(open) => !open && onCloseDialog()} open={isOpen}>
       <DialogTrigger asChild onClick={onClickAction}>
         {trigger}
       </DialogTrigger>
@@ -1032,13 +1046,13 @@ export const DetailsDialog = ({
                     icon={priorityConfig.icon}
                     className={cn("px-4 text-base", priorityConfig.className)}
                   >
-                    {priority}
+                    {capitalize(priority)}
                   </FlairBadge>
                   <FlairBadge
                     icon={categoryConfig.icon}
                     className={cn("px-4 text-base", categoryConfig.className)}
                   >
-                    {category}
+                    {capitalize(category)}
                   </FlairBadge>
                   <span className="flex items-center gap-2">
                     <LucideThumbsUp
@@ -1082,19 +1096,6 @@ export const DetailsDialog = ({
                 )}
               </div>
             </div>
-            {/* {isAdmin && (
-              <div className="relative min-w-50 rounded-lg border-1.5 border-dashed border-foreground/30 p-2">
-                <TooltipSimple content="Edit task">
-                  <Pencil
-                    className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4"
-                    onClick={onEditAction}
-                  />
-                </TooltipSimple>
-                <p className="absolute -top-2.5 left-3 bg-card p-0.5 text-xs text-foreground/50">
-                  Admin only
-                </p>
-              </div>
-            )} */}
           </div>
         </DialogHeader>
 

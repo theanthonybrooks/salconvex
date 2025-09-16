@@ -738,7 +738,7 @@ export const RichTextEditor = ({
 
       <div
         className={cn(
-          "absolute bottom-4 right-4 flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-1 sm:w-auto",
+          "absolute bottom-4 right-6 flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-1 sm:w-auto",
           // bgClassName,
         )}
       >

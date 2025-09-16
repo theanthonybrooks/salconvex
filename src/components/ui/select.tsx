@@ -2,10 +2,17 @@
 //TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  LucideIcon,
+} from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { IconType } from "react-icons";
 
 const Select = SelectPrimitive.Root;
 
@@ -171,6 +178,26 @@ export {
   SelectValue,
 };
 
+interface SelectSimpleProps {
+  options: {
+    label: string;
+    value: string;
+    icon?: IconType | LucideIcon;
+    disabled?: boolean;
+    premium?: boolean;
+  }[];
+  onChangeAction: (value: string) => void;
+  value: string;
+  id?: string;
+  placeholder: string;
+  className?: string;
+  contentClassName?: string;
+  itemClassName?: string;
+  tabIndex?: number;
+  invalid?: boolean;
+  disabled?: boolean;
+}
+
 export const SelectSimple = ({
   options,
   onChangeAction,
@@ -182,26 +209,12 @@ export const SelectSimple = ({
   tabIndex,
   invalid,
   disabled,
-}: {
-  options: {
-    label: string;
-    value: string;
-    disabled?: boolean;
-    premium?: boolean;
-  }[];
-  onChangeAction: (value: string) => void;
-  value: string;
-  placeholder: string;
-  className?: string;
-  contentClassName?: string;
-  itemClassName?: string;
-  tabIndex?: number;
-  invalid?: boolean;
-  disabled?: boolean;
-}) => {
+  id,
+}: SelectSimpleProps) => {
   return (
     <Select value={value} onValueChange={onChangeAction}>
       <SelectTrigger
+        id={id}
         disabled={disabled}
         className={cn(
           className,
@@ -214,28 +227,31 @@ export const SelectSimple = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className={cn(contentClassName)}>
-        {options.map((option) => (
-          <SelectItem
-            key={option.value}
-            value={option.value}
-            disabled={option.disabled}
-            className={cn(
-              itemClassName,
-              option.disabled && "pointer-events-none rounded-sm opacity-50",
-            )}
-          >
-            <span className="flex items-center gap-x-1">
-              {option.premium && (
-                <span className="flex items-center gap-0">
-                  (<DollarSign className="size-3" />)
-                </span>
+        {options.map((option) => {
+          return (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+              className={cn(
+                itemClassName,
+                option.disabled && "pointer-events-none rounded-sm opacity-50",
               )}
-              <p className={cn(option.disabled && "line-through")}>
-                {option.label}
-              </p>
-            </span>
-          </SelectItem>
-        ))}
+            >
+              <span className="flex items-center gap-x-1">
+                {option.premium && (
+                  <span className="flex items-center gap-0">
+                    (<DollarSign className="size-3" />)
+                  </span>
+                )}
+                {option.icon && <option.icon className="size-4" />}
+                <p className={cn(option.disabled && "line-through")}>
+                  {option.label}
+                </p>
+              </span>
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );

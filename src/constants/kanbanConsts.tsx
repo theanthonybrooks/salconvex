@@ -1,6 +1,7 @@
 import { SupportCategory } from "@/constants/supportConsts";
 import {
   Calendar,
+  Circle,
   Construction,
   CreditCard,
   Megaphone,
@@ -15,12 +16,12 @@ import {
 } from "react-icons/fc";
 
 export const priorityOptions = [
-  { label: "High", value: "high" },
-  { label: "Medium", value: "medium" },
-  { label: "Low", value: "low" },
+  { label: "High", value: "high", icon: FcHighPriority },
+  { label: "Medium", value: "medium", icon: FcMediumPriority },
+  { label: "Low", value: "low", icon: FcLowPriority },
 ] as const;
 
-export type Priority = typeof priorityOptions[number]["value"];
+export type Priority = (typeof priorityOptions)[number]["value"];
 
 interface Task {
   id: number;
@@ -212,7 +213,7 @@ export const CATEGORY_CONFIG: Record<
     className: "bg-pink-100",
   },
   other: {
-    icon: <FcLowPriority className="size-5" />,
+    icon: <Circle className="size-5" />,
     className: "bg-green-100",
   },
 };
