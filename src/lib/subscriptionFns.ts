@@ -1,6 +1,7 @@
 import { intervalToLetter, userPlans } from "@/constants/subscriptions";
 
 export function formatSubscriptionLabel(planName: string, interval: string) {
+  if (!userPlans[planName]) return "";
   const planNumber = userPlans[planName] ?? 0;
   const intervalLetter = intervalToLetter[interval] ?? "";
   const intervalLabel =
