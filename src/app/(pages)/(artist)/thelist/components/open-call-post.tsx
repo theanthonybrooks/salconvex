@@ -59,7 +59,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
     >
       <section
         className={cn(
-          "flex items-center justify-between px-8 pt-6 font-semibold uppercase",
+          "flex items-center justify-between px-9 pt-6 font-semibold uppercase",
         )}
       >
         <p>{locationString}</p>
@@ -71,14 +71,14 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
           type="event"
         />
       </section>
-      <section className="w-full px-10">
+      <section className="w-full">
         <h1 className={cn("-mt-5 flex gap-4 font-acumin", styles.title)}>
           OPEN <span className={cn(styles.light)}>CALL</span>
         </h1>
       </section>
       <section
         className={cn(
-          "mx-5 mb-10 flex flex-1 flex-col divide-y-2.5 overflow-hidden rounded-b-sm rounded-t-3xl border-2.5",
+          "mx-8 mb-10 flex flex-1 flex-col divide-y-2.5 overflow-hidden rounded-b-sm rounded-t-3xl border-2.5",
         )}
       >
         <div className={cn("flex items-center divide-x-2.5")}>
@@ -152,8 +152,9 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
             )}
           >
             <p className={cn("font-bold")}>Be kind to organizers:</p>
-            <p>Only apply if you&apos;re able to go</p>
-            <p>& have read the requirements</p>
+            <p className="text-balance text-center">
+              Only apply if you&apos;re able to go & have read the requirements
+            </p>
           </div>
         </div>
         <div
