@@ -258,7 +258,7 @@ export function UserProfile({
           </DropdownMenuSub>
           {hasActiveSub && (
             <Link
-              href="/dashboard/account/billing"
+              href="/dashboard/billing"
               className="underline-offset-2 hover:cursor-pointer hover:underline"
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">

@@ -31,7 +31,7 @@ export const CanceledBanner = ({
                 Your membership is past due. Please{" "}
                 <Link
                   className="underline underline-offset-2"
-                  href="/dashboard/account/billing"
+                  href="/dashboard/billing"
                   fontSize={fontSize}
                 >
                   check your payment method

@@ -746,7 +746,7 @@ const PublicHeader = ({
           className="text-lg font-bold lg:text-xl"
           onClick={() => {
             if (subStatus === "past_due") {
-              router.push("/dashboard/account/billing");
+              router.push("/dashboard/billing");
             } else {
               router.push("/pricing");
             }

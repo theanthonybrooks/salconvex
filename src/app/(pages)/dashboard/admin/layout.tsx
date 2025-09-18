@@ -31,7 +31,7 @@ export default async function DashboardLayout({
 
   if (!isAdmin) {
     if (!subStatus || subStatus === "canceled") {
-      redirect("/dashboard/account/settings");
+      redirect("/dashboard/settings");
     }
 
     redirect("/dashboard");

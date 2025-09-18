@@ -31,7 +31,7 @@ export default async function AdminPage({
 
   if (!user?.role.includes("admin")) {
     if (!subStatus || subStatus === "canceled") {
-      redirect("/dashboard/account/settings");
+      redirect("/dashboard/settings");
     }
 
     redirect("/dashboard");

@@ -509,7 +509,7 @@ export default function Dashboard() {
                 variant="salWithShadowHiddenYlw"
                 className="w-full justify-start gap-2"
               >
-                <Link variant="standard" href="/dashboard/account/billing">
+                <Link variant="standard" href="/dashboard/billing">
                   <PiPiggyBank className="size-5" />
                   Manage Billing
                 </Link>
@@ -520,7 +520,7 @@ export default function Dashboard() {
               variant="salWithShadowHiddenYlw"
               className="w-full justify-start gap-2"
             >
-              <Link variant="standard" href="/dashboard/account/settings">
+              <Link variant="standard" href="/dashboard/settings">
                 <FaGear className="size-5" />
                 Account Settings
               </Link>

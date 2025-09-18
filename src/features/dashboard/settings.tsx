@@ -1472,7 +1472,7 @@ export default function SettingsPage() {
                         Permanently delete your account — any active memberships
                         need to be{" "}
                         <Link
-                          href="/dashboard/account/billing"
+                          href="/dashboard/billing"
                           variant="subtleUnderline"
                         >
                           canceled
