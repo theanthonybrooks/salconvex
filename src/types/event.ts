@@ -115,9 +115,17 @@ export const eventFormatValues = [
 ] as const;
 export type EventFormat = (typeof eventFormatValues)[number];
 
-export const PostStatusValues = ["posted", "toPost"] as const;
+export const PostStatusOptionValues = [
+  { value: "posted", label: "Posted" },
+  { value: "toPost", label: "To Post" },
+  { value: "all", label: "All" },
+] as const;
+export const PostStatusValues = PostStatusOptionValues.map(
+  (o) => o.value,
+) as readonly [...(typeof PostStatusOptionValues)[number]["value"][]];
 
-export type PostStatus = (typeof PostStatusValues)[number];
+export type PostStatusOptions = (typeof PostStatusValues)[number];
+export type PostStatus = Exclude<PostStatusOptions, "all">;
 
 export interface EventData {
   _id: Id<"events">;
@@ -192,6 +200,7 @@ export interface EventData {
   posted?: PostStatus;
   postedAt?: number;
   postedBy?: string;
+  approvedAt?: number;
 }
 
 export interface EventCardDetailProps {

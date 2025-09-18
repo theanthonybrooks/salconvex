@@ -292,6 +292,27 @@ export const compareEnrichedEvents = (
 
     return directionMultiplier * aP.locState.localeCompare(bP.locState);
   }
+  if (sortBy === "recent") {
+    const getApprovedAt = (item: EnrichedEventsCardData) => {
+      const ocApproved = item.tabs.opencall?.approvedAt
+        ? new Date(item.tabs.opencall.approvedAt).getTime()
+        : null;
+      const evApproved = item.approvedAt
+        ? new Date(item.approvedAt).getTime()
+        : null;
+
+      if (ocApproved) return ocApproved;
+      if (evApproved) return evApproved;
+      return 0;
+    };
+
+    const aApproved = getApprovedAt(a);
+    const bApproved = getApprovedAt(b);
+
+    return sortDirection === "desc"
+      ? aApproved - bApproved
+      : bApproved - aApproved;
+  }
 
   return 0;
 };

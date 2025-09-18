@@ -37,7 +37,8 @@ export const EventFilters = ({
     (filters.continent && filters.continent.length > 0) ||
     (filters.eligibility && filters.eligibility.length > 0) ||
     (filters.callType && filters.callType.length > 0) ||
-    !!(filters.callFormat && filters.callFormat !== "");
+    !!(filters.callFormat && filters.callFormat !== "") ||
+    (filters.postStatus && filters.postStatus !== "all");
 
   //TODO: Add filters for: applied, open calls, budget range?, eligibility, ... ?
   return (

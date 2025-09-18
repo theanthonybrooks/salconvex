@@ -160,6 +160,7 @@ export interface OpenCall {
   paid?: boolean;
   paidAt?: number;
   publicPreview?: boolean;
+  approvedAt?: number;
 }
 
 // export interface OpenCallApplication {

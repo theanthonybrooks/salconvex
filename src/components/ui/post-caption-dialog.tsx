@@ -78,23 +78,28 @@ export const PostCaptionDialog = ({
         content += `\n\nBudget: ${formatBudgetCurrency(budget.min, budget.max, budget.currency)} ${budget.allInclusive ? " (All-inclusive)" : ""}\n`;
         // if (budget.allInclusive) content += `All-inclusive budget\n`;
       }
-      content += `\nProvided:\n`;
-      let i = 1;
-      for (const [title, amount] of Object.entries(
-        openCall.compensation.categories,
-      )) {
-        if (typeof amount === "number") {
-          content += `${i}. ${
-            openCallCategoryFields.find((field) => field.value === title)
-              ?.label ?? title
-          }: ${formatCurrency(amount, budget.currency)}\n`;
-          i++;
-        } else if (amount) {
-          content += `${i}. ${
-            openCallCategoryFields.find((field) => field.value === title)
-              ?.label ?? title
-          }\n`;
-          i++;
+      const hasAnyCategoryValue = Object.values(
+        openCall.compensation.categories ?? {},
+      ).some((v) => (typeof v === "number" ? v > 0 : Boolean(v)));
+      if (hasAnyCategoryValue) {
+        content += `\nProvided:\n`;
+        let i = 1;
+        for (const [title, amount] of Object.entries(
+          openCall.compensation.categories,
+        )) {
+          if (typeof amount === "number") {
+            content += `${i}. ${
+              openCallCategoryFields.find((field) => field.value === title)
+                ?.label ?? title
+            }: ${formatCurrency(amount, budget.currency)}\n`;
+            i++;
+          } else if (amount) {
+            content += `${i}. ${
+              openCallCategoryFields.find((field) => field.value === title)
+                ?.label ?? title
+            }\n`;
+            i++;
+          }
         }
       }
     }
@@ -123,7 +128,7 @@ export const PostCaptionDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className={cn(
-          "w-full bg-card sm:max-h-[80dvh] sm:max-w-[90dvw]",
+          "w-full bg-card sm:max-h-[80dvh] sm:max-w-[min(64rem,90dvw)]",
           className,
         )}
         overlayClassName="hidden"

@@ -644,7 +644,9 @@ export const get5latestPublishedEvents = query({
 
     const publishedEvents = await ctx.db
       .query("events")
-      .withIndex("by_state_approvedAt", (q) => q.eq("state", "published"))
+      .withIndex("by_state_approvedAt", (q) =>
+        q.eq("state", "published").gt("approvedAt", undefined),
+      )
       // .withIndex("by_state_hasOpenCall_approvedAt", (q) =>
       //   q.eq("state", "published").eq("hasOpenCall", "Fixed"),
       // )

@@ -1,7 +1,13 @@
-import { EventCategory, EventType } from "@/types/event";
+import { EventCategory, EventType, PostStatusOptions } from "@/types/event";
 import { Id } from "~/convex/_generated/dataModel";
 
-type SortBy = "openCall" | "name" | "eventStart" | "country" | "organizer";
+type SortBy =
+  | "openCall"
+  | "name"
+  | "eventStart"
+  | "country"
+  | "organizer"
+  | "recent";
 type SortDirection = "asc" | "desc";
 export type Continents =
   | "North America"
@@ -21,6 +27,7 @@ export interface Filters {
   callType?: string[];
   callFormat?: string;
   limit: number;
+  postStatus?: PostStatusOptions;
 }
 
 export interface SortOptions {

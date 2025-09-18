@@ -244,5 +244,23 @@ export function getGroupKeyFromEvent(
     return { raw: orgName };
   }
 
+  if (sortBy === "recent") {
+    const approvedAt =
+      event.tabs.opencall?.approvedAt ?? event.approvedAt ?? null;
+
+    if (approvedAt) {
+      const dt = DateTime.fromMillis(approvedAt, { zone: timeZone });
+      const day = dt.day;
+      const month = getFourCharMonthFromLuxon(dt);
+      const suffix = getOrdinalSuffix(day);
+      const year = dt.toFormat("yyyy");
+
+      return {
+        raw: `${month} ${day}${suffix} (${year})`,
+        parts: { month, day, suffix, year },
+      };
+    }
+  }
+
   return { raw: "Ungrouped" };
 }

@@ -17,9 +17,13 @@ export const getFilteredEventsPublic = query({
       limit: v.optional(v.number()),
       showHidden: v.optional(v.boolean()),
       bookmarkedOnly: v.optional(v.boolean()),
+      postStatus: v.optional(
+        v.union(v.literal("posted"), v.literal("toPost"), v.literal("all")),
+      ),
     }),
     sortOptions: v.object({
       sortBy: v.union(
+        v.literal("recent"),
         v.literal("eventStart"),
         v.literal("openCall"),
         v.literal("name"),
@@ -118,12 +122,16 @@ export const getFilteredEventsPublic = query({
     if (thisWeekPg || nextWeekPg || view === "archive" || view === "openCall") {
       const publishedEvents = await ctx.db
         .query("events")
-        .withIndex("by_state", (q) => q.eq("state", "published"))
+        .withIndex("by_state_approvedAt", (q) =>
+          q.eq("state", "published").gt("approvedAt", undefined),
+        )
         .collect();
 
       const archivedEvents = await ctx.db
         .query("events")
-        .withIndex("by_state", (q) => q.eq("state", "archived"))
+        .withIndex("by_state_approvedAt", (q) =>
+          q.eq("state", "archived").gt("approvedAt", undefined),
+        )
         .collect();
 
       events = [...publishedEvents, ...archivedEvents];
@@ -183,6 +191,10 @@ export const getFilteredEventsPublic = query({
           e.location?.continent &&
           filters.continent!.includes(e.location.continent),
       );
+    }
+
+    if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
+      events = events.filter((e) => e.posted === filters.postStatus);
     }
     let totalResults = 0;
     let totalOpenCalls = 0;

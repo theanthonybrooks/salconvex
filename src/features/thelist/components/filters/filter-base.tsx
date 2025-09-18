@@ -9,6 +9,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSimple,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -25,6 +26,9 @@ import {
   eventCategoryOptions,
   EventType,
   eventTypeOptions,
+  PostStatus,
+  PostStatusOptions,
+  PostStatusOptionValues,
 } from "@/types/event";
 import {
   CallFormat,
@@ -108,6 +112,7 @@ export const FilterBase = ({
   const limitOpenCalls = view === "event" || view === "orgView";
   const hasActiveSubscription = subData?.hasActiveSubscription;
   const isArtist = userData?.user?.accountType?.includes("artist");
+  const isAdmin = userData?.user?.role?.includes("admin");
   const paidUser = isArtist && hasActiveSubscription;
   const notEvent =
     filters.eventCategories?.length !== 0 &&
@@ -331,7 +336,10 @@ export const FilterBase = ({
                 </SelectTrigger>
                 <SelectContent className="z-top">
                   {!limitOpenCalls && (
-                    <SelectItem value="openCall">Open Call</SelectItem>
+                    <>
+                      <SelectItem value="recent">Most Recent</SelectItem>
+                      <SelectItem value="openCall">Open Call</SelectItem>
+                    </>
                   )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
@@ -585,6 +593,22 @@ export const FilterBase = ({
               </section>
             </>
           )}
+          {isAdmin && (
+            <section className="flex flex-col gap-2">
+              <Label htmlFor="limit" className="flex items-center gap-2">
+                Post Status:
+              </Label>
+              <SelectSimple
+                options={[...PostStatusOptionValues]}
+                placeholder="Posted"
+                value={filters.postStatus ?? ""}
+                onChangeAction={(value) => {
+                  onChange({ postStatus: value as PostStatus });
+                }}
+                className="w-full border bg-transparent hover:bg-white/30 sm:h-12"
+              />
+            </section>
+          )}
 
           <div className="mt-2 flex w-full justify-between">
             {paidUser && (
@@ -614,6 +638,7 @@ export const FilterBase = ({
                 </label>
               </section>
             )}
+
             {hasActiveFilters && (
               <Button
                 variant="salWithoutShadow"
@@ -684,7 +709,10 @@ export const FilterBase = ({
                 </SelectTrigger>
                 <SelectContent className="z-top">
                   {!limitOpenCalls && (
-                    <SelectItem value="openCall">Open Call</SelectItem>
+                    <>
+                      <SelectItem value="recent">Most Recent</SelectItem>
+                      <SelectItem value="openCall">Open Call</SelectItem>
+                    </>
                   )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
@@ -988,6 +1016,25 @@ export const FilterBase = ({
                     </SelectContent>
                   </Select>
                 </section>
+                {isAdmin && (
+                  <section className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="postStatus"
+                      className="flex items-center gap-2"
+                    >
+                      Post Status:
+                    </Label>
+                    <SelectSimple
+                      options={[...PostStatusOptionValues]}
+                      placeholder="Posted"
+                      value={filters.postStatus ?? "all"}
+                      onChangeAction={(value) => {
+                        onChange({ postStatus: value as PostStatusOptions });
+                      }}
+                      className="w-full max-w-40 border bg-transparent hover:bg-white/30 sm:h-12"
+                    />
+                  </section>
+                )}
                 <section className="flex flex-col gap-3 self-end">
                   <label className="flex cursor-pointer items-center gap-2">
                     <Checkbox
