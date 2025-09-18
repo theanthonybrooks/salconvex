@@ -81,7 +81,7 @@ const EventDates = ({
                   {formatEventDates(
                     start || "",
                     end || "",
-                    isOngoing,
+                    dates?.eventFormat ?? null,
                     format,
                     preview,
                   )}
@@ -107,7 +107,7 @@ const EventDates = ({
                   {formatEventDates(
                     start || "",
                     end || "",
-                    false,
+                    dates?.eventFormat ?? null,
                     format,
                     preview,
                   )}

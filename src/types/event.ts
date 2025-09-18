@@ -167,6 +167,7 @@ export interface EventData {
       longitude: number;
     };
   };
+  blurb?: string;
   about?: string;
   links?: {
     sameAsOrganizer?: boolean;

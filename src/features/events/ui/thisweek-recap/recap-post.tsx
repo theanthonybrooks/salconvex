@@ -1,7 +1,7 @@
 import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
-import { formatCurrency } from "@/lib/eventFns";
+import { formatBudgetCurrency } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { PublicEventPreviewData } from "@/types/event";
@@ -121,7 +121,7 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
                 <b>Paid:</b> {hasBudget ? "Yes" : "No Info"}
                 {hasBudget &&
                   "; " +
-                    formatCurrency(
+                    formatBudgetCurrency(
                       compensation?.budget?.min,
                       compensation?.budget?.max,
                       compensation?.budget?.currency,

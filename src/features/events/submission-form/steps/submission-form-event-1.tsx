@@ -1,5 +1,6 @@
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
 import { FormDatePicker } from "@/components/ui/form-date-pickers";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -462,16 +463,49 @@ const SubmissionFormEventStep1 = ({
                         {getEventCategoryLabelAbbr(category)} About
                       </Label>
                       <Controller
+                        name="event.blurb"
+                        control={control}
+                        render={({ field }) => (
+                          // <div className={cn("relative")}>
+                          //   <Textarea
+                          //     value={field.value ?? ""}
+                          //     onChange={field.onChange}
+                          //     placeholder="Short blurb about your project/event... (max 200 characters) "
+                          //     maxLength={200}
+                          //     className={cn(
+                          //       "scrollable justy mini h-25 w-full resize-none rounded-lg border border-foreground bg-card p-3 text-base focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
+                          //     )}
+                          //   />
+                          //   <p className="absolute bottom-2 right-2 text-xs text-gray-400">
+                          //     {field.value?.length}/200
+                          //   </p>
+                          // </div>
+                          <DebouncedFormTextarea
+                            field={field}
+                            maxLength={200}
+                            className="max-h-30 min-h-12"
+                            placeholder="Short blurb about your project/event... Limit 200 characters "
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <div className="col-start-2 mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                      <Label htmlFor="event.name" className="sr-only">
+                        {getEventCategoryLabelAbbr(category)} About
+                      </Label>
+                      <Controller
                         name="event.about"
                         control={control}
                         render={({ field }) => (
                           <RichTextEditor
                             value={field.value ?? ""}
                             onChange={field.onChange}
-                            placeholder="Short blurb about your project/event... "
-                            charLimit={2500}
+                            placeholder="Full details about your project/event... "
+                            charLimit={5000}
                             noList={true}
                             formInputPreview
+                            inputPreviewContainerClassName="rounded-lg"
                           />
                         )}
                       />
@@ -624,6 +658,7 @@ const SubmissionFormEventStep1 = ({
                         charLimit={2500}
                         noList={false}
                         formInputPreview
+                        inputPreviewContainerClassName="rounded-lg"
                       />
                     )}
                   />

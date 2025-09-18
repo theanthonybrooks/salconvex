@@ -1,28 +1,7 @@
+import { ColumnType } from "@/constants/kanbanConsts";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "../_generated/server";
-
-export const ColumnTypeOptions = [
-  { label: "Proposed", value: "proposed" },
-  { label: "Backlog", value: "backlog" },
-  { label: "Todo", value: "todo" },
-  { label: "Doing", value: "doing" },
-  { label: "Done", value: "done" },
-  { label: "Not Planned", value: "notPlanned" },
-] as const;
-
-export type ColumnType = (typeof ColumnTypeOptions)[number]["value"];
-
-export type VoteType = {
-  upVote: number;
-  downVote: number;
-};
-
-export type Voter = {
-  userId: Id<"users">;
-  direction: "up" | "down";
-};
 
 export const searchCards = query({
   args: {

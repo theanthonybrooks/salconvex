@@ -9,6 +9,7 @@ import {
   paidEvents,
 } from "@/types/event";
 import { CallType } from "@/types/openCall";
+import currencies from "currency-codes";
 
 export const isFreeEvent = (eventTypes: EventType[] | string[]): boolean => {
   const hasFree = eventTypes.some((type) => freeEvents.includes(type));
@@ -71,9 +72,9 @@ export const getEventCategoryLabelAbbr = (category: EventCategory): string => {
   );
 };
 
-import currencies from "currency-codes";
 
-export const formatCurrency = (
+
+export const formatBudgetCurrency = (
   min: number,
   max: number | undefined,
   currency: string,
@@ -115,41 +116,7 @@ export const formatCurrency = (
   return formatter.format(min);
 };
 
-export const formatCompCurrency = (value: number, currency: string) => {
-  if (value === 0) return "Not Provided";
-  const currencyInfo = currencies.code(currency);
-  if (!currencyInfo) throw new Error(`Invalid currency code: ${currency}`);
 
-  const locale = new Intl.NumberFormat(undefined, {
-    currency,
-  }).resolvedOptions().locale;
-
-  const formatter = new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  });
-
-  // Extract the currency symbol from formatted output
-  // const currencySymbol = formatter.format(0).replace(/\d/g, "").trim();
-
-  // // Handle different cases
-  // if (max) {
-  //   if (!preview) {
-  //     return `${currencySymbol}${min.toLocaleString(
-  //       locale,
-  //     )} - ${max.toLocaleString(locale)}`;
-  //   } else if (min === 0) {
-  //     return `Up to ${currencySymbol}${max.toLocaleString(locale)}+`;
-  //   } else {
-  //     return total ? formatter.format(max) : `${formatter.format(max)}+`;
-  //   }
-  // }
-
-  // If no max value, return only min formatted
-  return formatter.format(value);
-};
 
 export const formatRate = (
   rate: number,

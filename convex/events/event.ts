@@ -847,7 +847,7 @@ export const getEventsForCalendar = query({
           // end: event.dates.eventDates[0].end,
           extendedProps: {
             logo: event.logo,
-            description: event.about,
+            description: event.blurb ?? event.about,
             slug: event.slug,
             hasOpenCall,
             edition: event.dates.edition,
@@ -1177,6 +1177,7 @@ export const createOrUpdateEvent = mutation({
       timezone: v.optional(v.string()),
       timezoneOffset: v.optional(v.number()),
     }),
+    blurb: v.optional(v.string()),
     about: v.optional(v.string()),
     links: v.optional(
       v.object({
@@ -1326,6 +1327,7 @@ export const createOrUpdateEvent = mutation({
         location: {
           ...args.location,
         },
+        blurb: args.blurb,
         about: args.about,
         links: sanitizedLinks,
         otherInfo: args.otherInfo,
@@ -1364,6 +1366,7 @@ export const createOrUpdateEvent = mutation({
       location: {
         ...args.location,
       },
+      blurb: args.blurb,
       about: args.about,
       timeLine: args.timeLine,
       links: sanitizedLinks,
@@ -1509,6 +1512,7 @@ export const duplicateEvent = mutation({
       location: {
         ...event.location,
       },
+      blurb: event.blurb,
       about: event.about,
       links: event.links,
       otherInfo: event.otherInfo,

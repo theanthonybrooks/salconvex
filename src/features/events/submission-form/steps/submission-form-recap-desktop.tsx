@@ -20,7 +20,7 @@ import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OrganizerCardLogoName } from "@/features/organizers/components/organizer-logo-name-card";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
 import {
-  formatCurrency,
+  formatBudgetCurrency,
   formatRate,
   getCallTypeLabel,
   getEventCategoryLabel,
@@ -371,7 +371,7 @@ export const SubmissionFormRecapDesktop = ({
                     <td>
                       <div className="flex items-center gap-2">
                         {hasBudget &&
-                          formatCurrency(
+                          formatBudgetCurrency(
                             ocData?.compensation?.budget?.min,
                             ocData?.compensation?.budget?.max,
                             ocData?.compensation?.budget?.currency,

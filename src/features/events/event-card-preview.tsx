@@ -20,7 +20,7 @@ import { OpenCallProvidedPreview } from "@/features/events/open-calls/components
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
 import {
-  formatCurrency,
+  formatBudgetCurrency,
   formatRate,
   getEventCategoryLabel,
   getEventCategoryLabelAbbr,
@@ -320,7 +320,7 @@ const EventCardPreview = ({
                   Sign in to view
                 </span>
               ) : budget.min > 0 || (budget.max && budget.max > 0) ? (
-                formatCurrency(
+                formatBudgetCurrency(
                   budget.min,
                   budget.max,
                   budget.currency,
@@ -610,16 +610,19 @@ const EventCardPreview = ({
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </span>
             )}
-            {event.about && (
+            {(event.about || event.blurb) && (
               <div className={cn("flex flex-col gap-y-1 text-sm", fontSize)}>
                 <span className="font-semibold">About:</span>
-
-                <RichTextDisplay
-                  html={event.about}
-                  className="line-clamp-3 max-h-20 text-sm"
-                  maxChars={100}
-                  fontSize={fontSize}
-                />
+                {event.blurb ? (
+                  <p>{event.blurb}</p>
+                ) : (
+                  <RichTextDisplay
+                    html={event.about ?? ""}
+                    className="line-clamp-3 max-h-20 text-sm"
+                    maxChars={100}
+                    fontSize={fontSize}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -743,7 +746,7 @@ const EventCardPreview = ({
                       <>
                         <span className="hidden items-center gap-x-1 xl:flex">
                           {hasBudget &&
-                            formatCurrency(
+                            formatBudgetCurrency(
                               budget.min,
                               budget.max,
                               budget.currency,
@@ -762,7 +765,7 @@ const EventCardPreview = ({
                         </span>
                         <span className="xl:hidden">
                           {hasBudget &&
-                            formatCurrency(
+                            formatBudgetCurrency(
                               budget.min,
                               budget.max,
                               budget.currency,

@@ -919,6 +919,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 timezone: timezone,
                 timezoneOffset: timezoneOffset,
               },
+              blurb: eventData.blurb,
               about: eventData.about,
               links: eventData.links,
               otherInfo: eventData.otherInfo || undefined,
@@ -968,6 +969,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               location: {
                 ...eventData.location,
               },
+              blurb: eventData.blurb,
               about: eventData.about,
               links: eventData.links,
               otherInfo: eventData.otherInfo || undefined,
@@ -1375,6 +1377,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               location: {
                 ...eventData.location,
               },
+              blurb: eventData.blurb,
               about: eventData.about,
               links: eventLinks,
               otherInfo: eventData.otherInfo || undefined,

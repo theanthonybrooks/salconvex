@@ -153,7 +153,9 @@ export const ColorPicker = ({
 
   return (
     <>
-      <label className="mb-1 block text-sm font-medium">{label}</label>
+      {!modalOpen && (
+        <label className="mb-1 block text-sm font-medium">{label}</label>
+      )}
       {modalOpen === false ? (
         <div className={cn("flex items-center gap-2")}>
           <SelectSimple
@@ -253,7 +255,7 @@ export const ColorPicker = ({
           {/* 2-axis slider */}
           <div
             ref={sliderRef}
-            className="relative h-48 cursor-crosshair overflow-hidden rounded-md"
+            className="relative h-[20dvh] max-h-25 cursor-crosshair overflow-hidden rounded-md"
             onMouseDown={(e) => {
               handleSliderMove(e.nativeEvent);
               const handleMouseMove = (e: MouseEvent) => handleSliderMove(e);

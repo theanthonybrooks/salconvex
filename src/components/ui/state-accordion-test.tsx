@@ -130,19 +130,13 @@ const AccordionContent = React.forwardRef<
     <AccordionPrimitive.Content
       ref={ref}
       className={cn(
-        "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+        "overflow-hidden pb-4 text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+        triggerProps?.hasPreview && "pt-2",
         className,
       )}
       {...props}
     >
-      <div className={cn("pb-4 pt-0", triggerProps?.hasPreview && "pt-2")}>
-        {/* {triggerProps?.hasPreview && (
-          <div className='text-muted-foreground text-sm mb-2'>
-            Preview enabled: {triggerProps.title}
-          </div>
-        )} */}
-        {children}
-      </div>
+      {children}
     </AccordionPrimitive.Content>
   );
 });

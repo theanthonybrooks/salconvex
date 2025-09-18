@@ -9,16 +9,15 @@ export const seasonalTerms = ["spring", "summer", "fall", "winter"];
 export const formatEventDates = (
   start: string,
   end: string,
-  ongoing: boolean,
+  eventFormat: EventFormat | null,
   mode: "desktop" | "mobile" = "desktop",
   preview?: boolean,
-  eventFormat?: EventFormat,
 ) => {
   const isMobile = mode === "mobile";
-  if (ongoing) return "Ongoing";
-  if (eventFormat === "noEvent") {
-    return "No Event Dates";
-  }
+  if (eventFormat === "ongoing") return "Ongoing";
+  // if (eventFormat === "noEvent") {
+  //   return "No Event Dates";
+  // }
 
   const isSeasonalStart = seasonalTerms.some((term) =>
     start.toLowerCase().includes(term),

@@ -1000,6 +1000,7 @@ export const EventOCForm = ({
                 timezone: timezone,
                 timezoneOffset: timezoneOffset,
               },
+              blurb: eventData.blurb,
               about: eventData.about,
               timeLine: eventData.timeLine,
               links: eventData.links,
@@ -1048,6 +1049,7 @@ export const EventOCForm = ({
               location: {
                 ...eventData.location,
               },
+              blurb: eventData.blurb,
               about: eventData.about,
               links: eventData.links,
               otherInfo: eventData.otherInfo || undefined,
@@ -1472,6 +1474,7 @@ export const EventOCForm = ({
               location: {
                 ...eventData.location,
               },
+              blurb: eventData.blurb,
               about: eventData.about,
               links: eventLinks,
               otherInfo: eventData.otherInfo || undefined,

@@ -135,7 +135,7 @@ const SubmissionFormEventStep2 = ({
         >
           {canNameEvent && (
             <>
-              <div className="input-section h-full">
+              {/* <div className="input-section h-full">
                 <p className="min-w-max font-bold lg:text-xl">
                   Step{" "}
                   {categoryEvent && !eventOnly && !isOngoing
@@ -165,6 +165,7 @@ const SubmissionFormEventStep2 = ({
                       placeholder="Add any other info about your project/event. Don't add open call details here."
                       charLimit={5000}
                       formInputPreview
+                      inputPreviewContainerClassName="rounded-lg"
                     />
                   )}
                 />
@@ -172,12 +173,12 @@ const SubmissionFormEventStep2 = ({
                   (Formatting is for preview and won&apos;t exactly match the
                   public version)
                 </span>
-              </div>
-              <Separator
+              </div> */}
+              {/* <Separator
                 thickness={2}
                 className="col-span-full mx-auto my-2 block"
                 orientation="horizontal"
-              />
+              /> */}
               <p className="col-span-full mx-auto mb-2 font-medium">
                 {eventOnly
                   ? "Open Call: Is this an invite-only event?"
@@ -187,10 +188,10 @@ const SubmissionFormEventStep2 = ({
                 <p className="min-w-max font-bold lg:text-xl">
                   Step{" "}
                   {categoryEvent && !eventOnly && !isOngoing
-                    ? 12
+                    ? 11
                     : (!categoryEvent && isOngoing) || noEvent || prodOnly
-                      ? 10
-                      : 11}
+                      ? 9
+                      : 10}
                   :
                 </p>
                 <p className="lg:text-xs">
@@ -309,6 +310,7 @@ const SubmissionFormEventStep2 = ({
                           charLimit={2000}
                           placeholder="Notes to self (or other admins)"
                           formInputPreview
+                          inputPreviewContainerClassName="rounded-lg"
                         />
                       )}
                     />

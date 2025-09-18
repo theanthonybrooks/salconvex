@@ -273,8 +273,8 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                                           event.dates.eventDates[
                                             event.dates.eventDates.length - 1
                                           ].end,
-                                          event.dates.eventFormat === "ongoing",
-                                          "desktop",
+
+                                          event.dates.eventFormat ?? null,
                                         )
                                       : event.dates.prodDates
                                         ? formatEventDates(
@@ -282,8 +282,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                                             event.dates.prodDates[
                                               event.dates.prodDates.length - 1
                                             ].end,
-                                            false,
-                                            "desktop",
+                                            event.dates.eventFormat ?? null,
                                           )
                                         : event.dates.edition}
                                   </span>

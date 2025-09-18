@@ -24,7 +24,7 @@ import {
 } from "@/features/organizers/components/organizer-main-contact";
 import { formatOpenCallDeadline } from "@/lib/dateFns";
 import {
-  formatCurrency,
+  formatBudgetCurrency,
   formatRate,
   getCallTypeLabel,
   getEventCategoryLabel,
@@ -403,7 +403,7 @@ export const SubmissionFormRecapMobile = ({
                   <span className="pr-4 align-top font-medium">Budget</span>
                   <span>
                     {hasBudget &&
-                      formatCurrency(
+                      formatBudgetCurrency(
                         ocData?.compensation?.budget?.min,
                         ocData?.compensation?.budget?.max,
                         ocData?.compensation?.budget?.currency,

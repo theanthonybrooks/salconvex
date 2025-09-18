@@ -1,6 +1,6 @@
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { siteUrl } from "@/constants/siteInfo";
-import { formatCompCurrency } from "@/lib/eventFns";
+import { formatCurrency } from "@/lib/currencyFns";
 import { cn } from "@/lib/utils";
 import { OpenCall, openCallCategoryFields } from "@/types/openCall";
 import { X } from "lucide-react";
@@ -33,7 +33,7 @@ const getDisplayValue = (
   currency?: string,
 ) => {
   if (typeof val === "number" && val)
-    return formatCompCurrency(val, currency ?? "USD");
+    return formatCurrency(val, currency ?? "USD");
   if (typeof val === "boolean" && val) return "Provided";
   return (
     <span

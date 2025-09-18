@@ -207,7 +207,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                                           event.dates.eventDates[
                                             event.dates.eventDates.length - 1
                                           ].end,
-                                          event.dates.eventFormat === "ongoing",
+                                          event.dates.eventFormat ?? null,
                                           "mobile",
                                         )
                                       : event.dates.prodDates
@@ -216,7 +216,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                                             event.dates.prodDates[
                                               event.dates.prodDates.length - 1
                                             ].end,
-                                            false,
+                                            event.dates.eventFormat ?? null,
                                             "mobile",
                                           )
                                         : event.dates.edition}

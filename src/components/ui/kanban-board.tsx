@@ -34,9 +34,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   CATEGORY_CONFIG,
+  ColumnType,
+  ColumnTypeOptions,
   Priority,
   PRIORITY_CONFIG,
   priorityOptions,
+  Voter,
 } from "@/constants/kanbanConsts";
 import {
   SupportCategory,
@@ -45,7 +48,6 @@ import {
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { User } from "@/types/user";
 import { capitalize, debounce } from "lodash";
-import { ColumnType, ColumnTypeOptions, Voter } from "~/convex/kanban/cards";
 
 interface Card {
   title: string;

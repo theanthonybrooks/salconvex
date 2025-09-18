@@ -5,6 +5,11 @@ import { UserPref } from "@/types/user";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export const callFormatValues = ["RFP", "RFQ", "RFA"] as const;
+export const callFormatMap: Record<string, string> = {
+  RFP: "Request for Proposals",
+  RFQ: "Request for Qualifications",
+  RFA: "Request for Artworks",
+};
 
 export type CallFormat = (typeof callFormatValues)[number];
 

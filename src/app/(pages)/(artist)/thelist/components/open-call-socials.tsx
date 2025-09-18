@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { OpenCallData } from "@/types/openCall";
 
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
-import { LoaderCircle, LucideIcon, Settings2 } from "lucide-react";
+import { PostCaptionDialog } from "@/components/ui/post-caption-dialog";
+import { LetterText, LoaderCircle, LucideIcon, Settings2 } from "lucide-react";
 import { ComponentType, useState } from "react";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { toast } from "react-toastify";
@@ -27,8 +28,16 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     budget: false,
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [textDialogOpen, setTextDialogOpen] = useState(false);
 
   const postMenuItems: MenuItem[] = [
+    {
+      key: "caption",
+      icon: LetterText,
+      onClick: () => {
+        setTextDialogOpen(true);
+      },
+    },
     {
       key: "photos",
       icon: BiPhotoAlbum,
@@ -113,27 +122,30 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
         <div className="group relative">
           <PostMenu items={postMenuItems} loading={loading} />
 
-          <OpenCallPost data={data} postSettings={postSettings} />
-          {settingsOpen && (
-            <PostPropertiesDashboard
-              fontSize={postSettings.fontSize}
-              bgColor={postSettings.bgColor}
-              budget={postSettings.budget}
-              onChange={handlePostSettingsChange}
-              className={
-                cn()
-                // "absolute top-0 flex w-full translate-x-full sm:-right-5 sm:w-auto",
-              }
-              open={settingsOpen}
-              setOpen={setSettingsOpen}
-            />
-          )}
+          <div className={cn("origin-top-left scale-[0.72] sm:scale-100")}>
+            <OpenCallPost data={data} postSettings={postSettings} />
+          </div>
+
+          <PostPropertiesDashboard
+            fontSize={postSettings.fontSize}
+            bgColor={postSettings.bgColor}
+            budget={postSettings.budget}
+            onChange={handlePostSettingsChange}
+            open={settingsOpen}
+            setOpen={setSettingsOpen}
+          />
+
+          <PostCaptionDialog
+            data={data}
+            open={textDialogOpen}
+            setOpen={setTextDialogOpen}
+          />
         </div>
       </section>
-      <section className={cn("flex flex-col gap-3")}>
+      {/* <section className={cn("flex flex-col gap-3")}>
         <p>Social Media Story</p>
         <div className="h-[889px] w-[500px] rounded-sm border-3"></div>
-      </section>
+      </section> */}
     </div>
   );
 };
@@ -167,7 +179,7 @@ const PostMenu = ({ className, items, loading }: PostMenuProps) => {
         return (
           <button
             key={item.key}
-            className="cursor-pointer rounded border-1.5 border-foreground/10 bg-card-secondary p-1 hover:scale-105 active:scale-95"
+            className="cursor-pointer rounded bg-card-secondary p-1 ring-1.5 ring-foreground/10 hover:scale-105 hover:ring-2 hover:ring-foreground/25 active:scale-95"
             onClick={item.onClick}
           >
             {actionableItem && loading ? (

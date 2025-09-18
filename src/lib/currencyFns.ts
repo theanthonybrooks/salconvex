@@ -1,5 +1,5 @@
 import { currencies } from "@/app/data/currencies";
-
+import currencyCodes from "currency-codes";
 export function formatAmount(amount: number): string {
   return amount % 1 === 0
     ? amount.toLocaleString("en-US", {
@@ -45,3 +45,24 @@ export function getCurrencySymbol(code: string): string | undefined {
   }
   return undefined;
 }
+
+
+export const formatCurrency = (value: number, currency: string) => {
+  if (value === 0) return "Not Provided";
+  const currencyInfo = currencyCodes.code(currency);
+  if (!currencyInfo) throw new Error(`Invalid currency code: ${currency}`);
+
+  const locale = new Intl.NumberFormat(undefined, {
+    currency,
+  }).resolvedOptions().locale;
+
+  const formatter = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+
+  // If no max value, return only min formatted
+  return formatter.format(value);
+};

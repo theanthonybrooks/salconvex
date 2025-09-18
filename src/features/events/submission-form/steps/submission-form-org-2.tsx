@@ -138,6 +138,7 @@ const SubmissionFormOrgStep2 = ({
                     purpose="organizerAbout"
                     formInputPreview
                     formInputPreviewClassName="min-h-12 max-h-50 "
+                    inputPreviewContainerClassName="rounded-lg"
                   />
                 )}
               />

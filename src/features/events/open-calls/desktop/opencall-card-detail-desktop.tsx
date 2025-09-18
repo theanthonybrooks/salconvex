@@ -38,6 +38,7 @@ import { api } from "~/convex/_generated/api";
 import { ApproveBtn } from "@/components/ui/approve-btn";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
+import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { formatApplicationLink } from "@/lib/applicationFns";
 
@@ -92,6 +93,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const validEventState = publicStateValues.includes(eventState ?? "");
   const validOpenCallState = publicStateValues.includes(openCallState ?? "");
   const bothValid = validEventState && validOpenCallState;
+  const oneValid = validEventState || validOpenCallState;
 
   // const appUrl = requirements?.applicationLink;
   const appLinkFormat = requirements?.applicationLinkFormat;
@@ -144,7 +146,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     setActiveTab("event");
     setTimeout(() => {
       const element = aboutRef.current;
-      console.log(element);
       if (element) {
         const offset = element.getBoundingClientRect().top + window.scrollY;
 
@@ -279,7 +280,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             )}
 
             {/* //todo: ensure that this is required in the submission form */}
-            {event.about && (
+            {(event.about || event.blurb) && (
               <Accordion type="multiple" defaultValue={["about"]}>
                 <AccordionItem value="about">
                   <AccordionTrigger
@@ -287,21 +288,22 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     className="pb-2"
                     fontSize={fontSize}
                   />
-                  <AccordionContent>
-                    <RichTextDisplay
-                      html={event.about}
-                      // className="line-clamp-5"
-                      fontSize={fontSize}
-                      maxChars={200}
-                    />
-                    {event.about?.length > 200 && (
-                      <button
-                        className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={scrollToAbout}
-                      >
-                        Read more
-                      </button>
+                  <AccordionContent className="pb-3">
+                    {event.blurb ? (
+                      <p className={cn(fontSize)}>{event.blurb}</p>
+                    ) : (
+                      <RichTextDisplay
+                        html={event.about ?? ""}
+                        fontSize={fontSize}
+                        maxChars={200}
+                      />
                     )}
+                    <button
+                      className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                      onClick={scrollToAbout}
+                    >
+                      Read more
+                    </button>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -411,6 +413,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
             {((isAdmin && !bothValid) || isUserOrg) && (
               <>
+                {oneValid && <Separator thickness={2} className="my-2" />}
                 <ApproveBtn
                   user={user}
                   event={event}

@@ -206,22 +206,30 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
               </p>
             )}
-
-            {/* //todo: ensure that this is required in the submission form */}
-            {event.about && (
+            {(event.about || event.blurb) && (
               <Accordion type="multiple" defaultValue={["about"]}>
                 <AccordionItem value="about">
-                  <AccordionTrigger title="About:" className="pb-2" />
-                  <AccordionContent className="text-sm">
-                    <RichTextDisplay html={event.about} maxChars={200} />
-                    {event.about?.length > 200 && (
-                      <button
-                        className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={scrollToAbout}
-                      >
-                        Read more
-                      </button>
+                  <AccordionTrigger
+                    title="About:"
+                    className="pb-2"
+                    fontSize={fontSize}
+                  />
+                  <AccordionContent className="pb-3">
+                    {event.blurb ? (
+                      <p className={cn(fontSize)}>{event.blurb}</p>
+                    ) : (
+                      <RichTextDisplay
+                        html={event.about ?? ""}
+                        fontSize={fontSize}
+                        maxChars={200}
+                      />
                     )}
+                    <button
+                      className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                      onClick={scrollToAbout}
+                    >
+                      Read more
+                    </button>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

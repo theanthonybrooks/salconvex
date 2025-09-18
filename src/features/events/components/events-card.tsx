@@ -53,9 +53,9 @@ export const EventCard = ({
     <>
       {isMobile ? (
         <Card className="w-full max-w-[95vw] rounded-xl border-foreground/20 bg-white/60 p-5">
-          <Accordion type="multiple" defaultValue={["item-1"]}>
+          <Accordion type="multiple" defaultValue={["location"]}>
             {location.coordinates && (
-              <AccordionItem value="item-1">
+              <AccordionItem value="location">
                 <AccordionTrigger title="Location:" fontSize={fontSize} />
 
                 <AccordionContent>
@@ -79,9 +79,17 @@ export const EventCard = ({
                 </AccordionContent>
               </AccordionItem>
             )}
+            {/* {event.blurb && !event.about && (
+              <AccordionItem value="about">
+                <AccordionTrigger title="About:" fontSize={fontSize} />
+                <AccordionContent>
+                  <p className={cn("mb-4 pb-3", fontSize)}>{event.blurb}</p>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
             {event.about && (
-              <AccordionItem value="item-2">
+              <AccordionItem value="about">
                 <AccordionTrigger title="About:" fontSize={fontSize} />
 
                 <AccordionContent>
@@ -90,9 +98,24 @@ export const EventCard = ({
                   </div>
                 </AccordionContent>
               </AccordionItem>
+            )} */}
+            {(event.about || event.blurb) && (
+              <AccordionItem value="about">
+                <AccordionTrigger title="About:" fontSize={fontSize} />
+
+                <AccordionContent ref={aboutRef}>
+                  {event.about ? (
+                    <div className="flex flex-col space-y-3 pb-3">
+                      <RichTextDisplay html={event.about} fontSize={fontSize} />
+                    </div>
+                  ) : (
+                    <p className={cn("pb-3", fontSize)}>{event.blurb}</p>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
             )}
             {event.links && (
-              <AccordionItem value="item-3">
+              <AccordionItem value="links">
                 <AccordionTrigger title="Links:" fontSize={fontSize} />
 
                 <AccordionContent>
@@ -106,7 +129,7 @@ export const EventCard = ({
             )}
 
             {event.otherInfo && (
-              <AccordionItem value="item-4">
+              <AccordionItem value="other">
                 <AccordionTrigger title="Other info:" fontSize={fontSize} />
                 <AccordionContent>
                   <RichTextDisplay html={event.otherInfo} />
@@ -212,14 +235,18 @@ export const EventCard = ({
             </AccordionItem>
           )}
 
-          {event.about && (
+          {(event.about || event.blurb) && (
             <AccordionItem value="about">
               <AccordionTrigger title="About:" fontSize={fontSize} />
 
               <AccordionContent ref={aboutRef}>
-                <div className="mb-4 flex flex-col space-y-3 pb-3">
-                  <RichTextDisplay html={event.about} fontSize={fontSize} />
-                </div>
+                {event.about ? (
+                  <div className="mb-4 flex flex-col space-y-3 pb-3">
+                    <RichTextDisplay html={event.about} fontSize={fontSize} />
+                  </div>
+                ) : (
+                  <p className={cn("mb-4 pb-3", fontSize)}>{event.blurb}</p>
+                )}
               </AccordionContent>
             </AccordionItem>
           )}

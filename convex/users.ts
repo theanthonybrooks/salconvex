@@ -98,8 +98,7 @@ export const usersWithSubscriptions = query({
           subscription?.status === "active" ||
           subscription?.status === "trialing";
 
-        const planName =
-          subscription?.metadata?.plan?.toLowerCase() ?? "unknown";
+        const planName = subscription?.metadata?.plan?.toLowerCase();
         const cancelAt = subscription?.cancelAt;
         const canceledAt = subscription?.canceledAt;
         const customerId = subscription?.customerId;
@@ -155,9 +154,10 @@ export const usersWithSubscriptions = query({
           }
         }
 
-        const label = subscription
-          ? formatSubscriptionLabel(planName, interval)
-          : null;
+        const label =
+          subscription && planName
+            ? formatSubscriptionLabel(planName, interval)
+            : null;
 
         const organizations = await ctx.db
           .query("organizations")

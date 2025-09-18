@@ -24,7 +24,7 @@ import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCall
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { generateICSFile } from "@/lib/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
-import { formatCurrency, formatRate } from "@/lib/eventFns";
+import { formatBudgetCurrency, formatRate } from "@/lib/eventFns";
 import { getMimeTypeFromHref } from "@/lib/fileFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { RichTextDisplay } from "@/lib/richTextFns";
@@ -191,7 +191,7 @@ const OpenCallCard = ({
                         deadlineTimezone,
                         callType,
                       )}
-                      {icsLink && callType === "Fixed" && (
+                      {/* {icsLink && callType === "Fixed" && (
                         <Link
                           href={icsLink}
                           download={`${event.name.replace(/\s+/g, "_")}.ics`}
@@ -203,7 +203,7 @@ const OpenCallCard = ({
                           Add to Calendar
                           <CalendarClockIcon className="size-5 text-foreground/70 md:size-4" />
                         </Link>
-                      )}
+                      )} */}
                     </span>
                   </span>
                   <span>
@@ -266,7 +266,7 @@ const OpenCallCard = ({
                 >
                   <div className="flex justify-start gap-2">
                     {hasBudget &&
-                      formatCurrency(
+                      formatBudgetCurrency(
                         budgetMin,
                         budgetMax,
                         currency,
@@ -305,7 +305,7 @@ const OpenCallCard = ({
                     </span>
                     <br />
                     {hasBudget &&
-                      formatCurrency(
+                      formatBudgetCurrency(
                         budgetMin,
                         budgetMax,
                         currency,
@@ -600,7 +600,7 @@ const OpenCallCard = ({
                           <span className="font-semibold underline underline-offset-2">
                             {hasBudgetRange ? "Budget Range" : "Budget"}:
                           </span>
-                          {formatCurrency(
+                          {formatBudgetCurrency(
                             budgetMin,
                             budgetMax,
                             currency,

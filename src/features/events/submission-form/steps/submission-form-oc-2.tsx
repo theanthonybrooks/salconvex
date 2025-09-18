@@ -755,6 +755,7 @@ const SubmissionFormOC2 = ({
                     charLimit={2000}
                     readOnly={pastEvent}
                     formInputPreview
+                    inputPreviewContainerClassName="rounded-lg"
                   />
                 )}
               />

@@ -414,6 +414,7 @@ const SubmissionFormOC1 = ({
                     }
                     charLimit={1200}
                     inputPreviewContainerClassName={cn(
+                      "rounded-lg",
                       (errors?.openCall?.eligibility?.details ||
                         !hasRequiredEligDetails) &&
                         "invalid-field",
@@ -655,6 +656,7 @@ const SubmissionFormOC1 = ({
                       title={eventName}
                       subtitle="Application Requirements"
                       inputPreviewContainerClassName={cn(
+                        "rounded-lg",
                         errors?.openCall?.requirements?.requirements &&
                           "invalid-field",
                       )}
@@ -698,6 +700,7 @@ const SubmissionFormOC1 = ({
                       title={eventName}
                       subtitle="Other Info"
                       inputPreviewContainerClassName={cn(
+                        "rounded-lg",
                         errors?.openCall?.requirements?.otherInfo &&
                           "invalid-field",
                       )}

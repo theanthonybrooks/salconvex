@@ -141,7 +141,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             !subscription && "italic text-muted-foreground",
           )}
         >
-          <p className="capitalize"> {subscription || "none"}</p>
+          <p className="text-center capitalize"> {subscription || "none"}</p>
         </div>
       );
     },

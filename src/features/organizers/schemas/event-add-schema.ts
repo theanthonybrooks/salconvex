@@ -269,6 +269,7 @@ export const eventBase = z.object({
   links: linksSchemaLoose,
   otherInfo: z.string().optional(),
   timeLine: z.string().optional(),
+  blurb: z.string().optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
   adminNote: z.string().optional(),

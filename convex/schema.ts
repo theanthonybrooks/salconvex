@@ -326,6 +326,7 @@ const eventSchema = {
     timezone: v.optional(v.string()),
     timezoneOffset: v.optional(v.number()),
   }),
+  blurb: v.optional(v.string()),
   about: v.optional(v.string()),
   links: v.optional(
     v.object({

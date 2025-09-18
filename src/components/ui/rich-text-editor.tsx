@@ -838,7 +838,7 @@ export const RichTextEditor = ({
                 {requiredChars && (
                   <p> {`Minimum (${requiredChars} characters)`}</p>
                 )}
-                {!inputPreview && <p>{`Limit (${charLimit} characters)`}</p>}
+                {!inputPreview && <p>{`Limit ${charLimit} characters`}</p>}
               </span>
             )}
           </div>

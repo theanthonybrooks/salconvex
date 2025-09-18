@@ -3,7 +3,7 @@ import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabelServer } from "@/features/events/open-calls/components/eligibilty-label-server";
 import { formatOpenCallDeadlineForPost } from "@/lib/dateFns";
 import {
-  formatCurrency,
+  formatBudgetCurrency,
   formatRate,
   getEventCategoryLabelAbbr,
 } from "@/lib/eventFns";
@@ -72,19 +72,19 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
         />
       </section>
       <section className="w-full px-10">
-        <h1 className={cn("font-acumin -mt-5 flex gap-4", styles.title)}>
+        <h1 className={cn("-mt-5 flex gap-4 font-acumin", styles.title)}>
           OPEN <span className={cn(styles.light)}>CALL</span>
         </h1>
       </section>
       <section
         className={cn(
-          "divide-y-2.5 border-2.5 mx-5 mb-10 flex flex-1 flex-col overflow-hidden rounded-b-sm rounded-t-3xl",
+          "mx-5 mb-10 flex flex-1 flex-col divide-y-2.5 overflow-hidden rounded-b-sm rounded-t-3xl border-2.5",
         )}
       >
-        <div className={cn("divide-x-2.5 flex items-center")}>
+        <div className={cn("flex items-center divide-x-2.5")}>
           <span
             className={cn(
-              "font-acumin min-w-0 flex-1 break-words px-8 text-center font-bold uppercase",
+              "min-w-0 flex-1 break-words px-8 text-center font-acumin font-bold uppercase",
             )}
             style={{ fontSize: postSettings.fontSize }}
           >
@@ -106,7 +106,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
         </div>
         <div className={cn("flex w-full flex-col gap-1 bg-card px-6 py-4")}>
           <p className="font-acumin text-sm uppercase">Application Deadline:</p>
-          <p className="font-acumin w-full text-center text-6xl font-[725] uppercase">
+          <p className="w-full text-center font-acumin text-6xl font-[725] uppercase">
             {formatOpenCallDeadlineForPost(
               basicInfo.dates?.ocEnd || "",
               basicInfo.dates?.timezone,
@@ -114,8 +114,8 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
             )}
           </p>
         </div>
-        <div className={cn("divide-x-2.5 flex h-full items-stretch")}>
-          <div className="font-acumin flex flex-col items-center justify-center px-4 py-2 uppercase">
+        <div className={cn("flex h-full items-stretch divide-x-2.5")}>
+          <div className="flex flex-col items-center justify-center px-4 py-2 font-acumin uppercase">
             <p className={cn("text-sm")}>Call Type:</p>
             <span className={cn("flex flex-col items-center leading-[0.8]")}>
               <p className="text-6xl font-black">
@@ -131,7 +131,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
               <p className={cn("font-bold")}>Project Budget:</p>
               <span className="items-center gap-x-1">
                 {hasBudget &&
-                  formatCurrency(
+                  formatBudgetCurrency(
                     budget.min,
                     budget.max,
                     budget.currency,
@@ -157,7 +157,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
           </div>
         </div>
         <div
-          className={cn("divide-x-2.5 flex h-max items-center bg-foreground")}
+          className={cn("flex h-max items-center divide-x-2.5 bg-foreground")}
         >
           <div
             className={cn(

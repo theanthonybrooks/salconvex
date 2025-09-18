@@ -83,6 +83,7 @@ interface EventContextMenuProps {
   orgPreview?: boolean;
   postStatus?: PostStatus;
   postOptions?: boolean;
+  type?: "event" | "admin";
 }
 
 const EventContextMenu = ({
@@ -110,6 +111,7 @@ const EventContextMenu = ({
   orgPreview,
   postStatus,
   postOptions = false,
+  type = "event",
 }: EventContextMenuProps) => {
   const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -189,6 +191,7 @@ const EventContextMenu = ({
                 appStatus !== null &&
                   !nonAdminPublicView &&
                   hasValidSub &&
+                  type === "event" &&
                   "border-foreground/50 bg-background text-foreground/50 hover:shadow-slga",
               )}
             >
@@ -206,68 +209,65 @@ const EventContextMenu = ({
         <DropdownMenuLabel>More options</DropdownMenuLabel>
         {/* <p className="py-2 pl-4 font-bold">More options</p> */}
         <DropdownMenuSeparator />
-        {isUserOrg && (
+        {isUserOrg && !isAdmin && (
           <DropdownMenuGroup>
             <DropdownMenuLabel>Organizer</DropdownMenuLabel>
-            {!isAdmin && (
-              <>
-                <DropdownMenuItem
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/organizer/update-event?_id=${eventId}&sidebar=false`,
-                    )
-                  }
+
+            <DropdownMenuItem
+              onClick={() =>
+                router.push(
+                  `/dashboard/organizer/update-event?_id=${eventId}&sidebar=false`,
+                )
+              }
+            >
+              <Pencil className="size-4" />{" "}
+              {openCallState === "pending"
+                ? "Finish Submission"
+                : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
+            </DropdownMenuItem>
+            {appLink && (
+              <DropdownMenuItem>
+                <Link
+                  href={appLink}
+                  target={appLink.includes("mailto:") ? "_self" : "_blank"}
+                  className="flex items-center gap-x-2"
                 >
-                  <Pencil className="size-4" />{" "}
-                  {openCallState === "pending"
-                    ? "Finish Submission"
-                    : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
-                </DropdownMenuItem>
-                {appLink && (
-                  <DropdownMenuItem>
-                    <Link
-                      href={appLink}
-                      target={appLink.includes("mailto:") ? "_self" : "_blank"}
-                      className="flex items-center gap-x-2"
-                    >
-                      <ArrowRightCircle className="size-4" />
-                      Preview Link
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="flex items-center gap-x-2">
-                    <Ellipsis className="size-4" /> More
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent className={cn("p-2")}>
-                      {eventId && (
-                        <DropdownMenuItem>
-                          <CopyableItem
-                            copyContent={eventId}
-                            className="gap-x-2"
-                            defaultIcon={<FaRegCopy className="size-4" />}
-                          >
-                            Copy Event ID
-                          </CopyableItem>
-                        </DropdownMenuItem>
-                      )}
-                      {openCallId && (
-                        <DropdownMenuItem>
-                          <CopyableItem
-                            copyContent={openCallId}
-                            className="gap-x-2"
-                            defaultIcon={<FaRegCopy className="size-4" />}
-                          >
-                            Copy Open Call ID
-                          </CopyableItem>
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </>
+                  <ArrowRightCircle className="size-4" />
+                  Preview Link
+                </Link>
+              </DropdownMenuItem>
             )}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                <Ellipsis className="size-4" /> More
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent className={cn("p-2")}>
+                  {eventId && (
+                    <DropdownMenuItem>
+                      <CopyableItem
+                        copyContent={eventId}
+                        className="gap-x-2"
+                        defaultIcon={<FaRegCopy className="size-4" />}
+                      >
+                        Copy Event ID
+                      </CopyableItem>
+                    </DropdownMenuItem>
+                  )}
+                  {openCallId && (
+                    <DropdownMenuItem>
+                      <CopyableItem
+                        copyContent={openCallId}
+                        className="gap-x-2"
+                        defaultIcon={<FaRegCopy className="size-4" />}
+                      >
+                        Copy Open Call ID
+                      </CopyableItem>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
           </DropdownMenuGroup>
         )}
         {hasValidSub && (!isUserOrg || (isAdmin && !reviewMode)) && (

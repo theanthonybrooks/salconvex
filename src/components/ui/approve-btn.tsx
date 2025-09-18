@@ -157,6 +157,7 @@ export const ApproveBtn = ({
           buttonTrigger={true}
           align="end"
           reviewMode={true}
+          type="admin"
         />
       </div>
     </div>
