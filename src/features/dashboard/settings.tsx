@@ -714,20 +714,6 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* <span className={cn()}>
-                      <Info className="mr-1 inline-block size-4 align-text-top" />
-                      Note: Artist profile has moved to the{" "}
-                      <Link
-                        href="/dashboard/artist"
-                        variant="bold"
-                        className={cn(
-                          "!text-base underline-offset-2 hover:underline-offset-4 active:underline-offset-1",
-                        )}
-                      >
-                        My Profile
-                      </Link>{" "}
-                      page.
-                    </span> */}
                     <span className="inline-flex items-baseline text-sm sm:text-base">
                       <Info className="mr-1 size-4 shrink-0 translate-y-0.5" />
                       <span>
