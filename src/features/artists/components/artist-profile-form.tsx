@@ -307,7 +307,6 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
             <FormItem className="my-4 flex items-center gap-2 space-y-0">
               <FormControl>
                 <Checkbox
-                  id="canFeature"
                   checked={field.value || false}
                   onCheckedChange={field.onChange}
                   className="text-base"
