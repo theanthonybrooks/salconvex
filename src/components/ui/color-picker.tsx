@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
+  Clipboard,
   LoaderCircle,
   Minus,
   Plus,
@@ -28,6 +30,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ColorMode, colorModes } from "@/constants/colorConsts";
+import Color from "color";
 import { BiColor } from "react-icons/bi";
 
 type Color = { value: string; gradient?: boolean };
@@ -60,6 +64,7 @@ export const ColorPicker = ({
   const addSwatch = useMutation(api.functions.palettes.addColor);
   const deleteSwatch = useMutation(api.functions.palettes.deleteColor);
   const deletePalette = useMutation(api.functions.palettes.deletePalette);
+  const [colorMode, setColorMode] = useState<ColorMode>("hsl");
   const [modalOpen, setModalOpen] = useState(false);
   const [newPaletteName, setNewPaletteName] = useState("");
   const [addPaletteDialogOpen, setAddPaletteDialogOpen] = useState(false);
@@ -70,6 +75,7 @@ export const ColorPicker = ({
   const [palette, setPalette] = useState(defaultPalette);
   const [hue, setHue] = useState(0);
   const [opacity, setOpacity] = useState(100);
+  const [copied, setCopied] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const palettes = useQuery(api.functions.palettes.getPalettes);
 
@@ -98,12 +104,57 @@ export const ColorPicker = ({
       const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
 
       const newHue = Math.round(x * 360);
-      const newOpacity = Math.round((1 - y) * 100);
+      const newOpacity = Math.round((1 - y) * 100) / 100;
+
+      const base = Color.hsl(newHue, 100, 50).alpha(newOpacity);
+
+      let outputColorValue: string;
+
+      switch (colorMode) {
+        case "hsl":
+          outputColorValue = base.hsl().string();
+          break;
+        case "rgb":
+          outputColorValue = base.rgb().string();
+          break;
+        case "hex":
+          outputColorValue = base.hex();
+          break;
+        default:
+          outputColorValue = base.hsl().string();
+      }
 
       setHue(newHue);
-      setOpacity(newOpacity);
-      setSelectedColorAction(`hsla(${newHue}, 100%, 50%, ${newOpacity / 100})`);
+      setOpacity(newOpacity * 100);
+      setSelectedColorAction(outputColorValue);
       vibrate();
+    }
+  };
+
+  const handleModeChange = (newMode: ColorMode) => {
+    setColorMode(newMode);
+
+    try {
+      const c = Color(selectedColor);
+
+      let converted: string;
+      switch (newMode) {
+        case "hsl":
+          converted = c.hsl().string();
+          break;
+        case "rgb":
+          converted = c.rgb().string();
+          break;
+        case "hex":
+          converted = c.hex();
+          break;
+        default:
+          converted = selectedColor;
+      }
+
+      setSelectedColorAction(converted);
+    } catch {
+      setSelectedColorAction(selectedColor);
     }
   };
 
@@ -151,6 +202,13 @@ export const ColorPicker = ({
     setDeletePaletteDialogOpen(false);
   };
 
+  const handleColorCopy = async () => {
+    if (!selectedColor) return;
+    setCopied(true);
+    await navigator.clipboard.writeText(selectedColor);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <>
       {!modalOpen && (
@@ -196,15 +254,36 @@ export const ColorPicker = ({
             Collapse
           </span>
 
-          <input
-            type="text"
-            value={selectedColor}
-            onChange={(e) => setSelectedColorAction(e.target.value)}
-            className={cn(
-              "w-full rounded-md border border-neutral-300 bg-transparent p-1 text-center text-sm text-neutral-700 dark:border-neutral-600 dark:text-neutral-300",
-            )}
-            placeholder="Enter CSS color"
-          />
+          <div className="flex items-center gap-1">
+            <SelectSimple
+              options={[...colorModes]}
+              value={colorMode}
+              onChangeAction={(val) => handleModeChange(val as ColorMode)}
+              placeholder="Color Mode"
+              className="!h-8 w-25"
+            />
+            <input
+              type="text"
+              value={selectedColor}
+              onChange={(e) => setSelectedColorAction(e.target.value)}
+              className={cn(
+                "h-8 w-full rounded-md border border-neutral-300 bg-transparent p-1 text-center text-sm text-neutral-700 dark:border-neutral-600 dark:text-neutral-300",
+              )}
+              placeholder="Enter CSS color"
+            />
+            <Button
+              variant="default"
+              size="sm"
+              className="h-8 flex-1 border-neutral-300"
+              onClick={handleColorCopy}
+            >
+              {copied ? (
+                <Check className="size-4" />
+              ) : (
+                <Clipboard className="size-4" />
+              )}
+            </Button>
+          </div>
           <div className={cn("flex items-center gap-1")}>
             <Button
               variant="salWithShadowHiddenBg"

@@ -21,10 +21,11 @@ export interface PostSettings {
 }
 
 const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
+  const defaultColor = "hsla(50, 100%, 72%, 1.0)";
   const [loading, setLoading] = useState(false);
   const [postSettings, setPostSettings] = useState<PostSettings>({
     fontSize: 30,
-    bgColor: "hsla(50, 100%, 72%, 1.0)",
+    bgColor: defaultColor,
     budget: false,
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
