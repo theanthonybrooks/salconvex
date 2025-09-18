@@ -11,14 +11,13 @@ import {
 import { formatCurrency } from "@/lib/currencyFns";
 import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns";
 import { formatBudgetCurrency } from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
+import { getDemonym, getFormattedLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import {
   callFormatMap,
   openCallCategoryFields,
   OpenCallData,
 } from "@/types/openCall";
-import { lowerCase } from "lodash";
 import { Check, Clipboard } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
@@ -45,7 +44,7 @@ export const PostCaptionDialog = ({
     const { event, openCall, organizer } = data;
     if (!openCall || !organizer || !event) return;
     const hasEvent = event.dates.eventFormat !== "noEvent";
-
+    console.log(organizer.links.instagram);
     const eventStart = hasEvent
       ? event.dates.eventDates[0].start
       : event.dates.prodDates?.[0]?.start || "";
@@ -58,7 +57,13 @@ export const PostCaptionDialog = ({
     content += `\nDeadline: ${formatOpenCallDeadline(openCall.basicInfo.dates.ocEnd || "", openCall.basicInfo.dates.timezone, openCall.basicInfo.callType)}`;
     content += `\nCall Format: ${callFormatMap[openCall.basicInfo.callFormat]}`;
     content += `\nOpen to: ${openCall.eligibility.type === "International" ? "International (all)" : openCall.eligibility.type}`;
-    content += `${openCall.eligibility.details && "*"}`;
+    if (
+      openCall.eligibility.whom.length === 1 &&
+      openCall.eligibility.type === "National"
+    ) {
+      content += ` -  ${getDemonym(openCall.eligibility.whom[0])} Artists`;
+    }
+    content += `${openCall.eligibility.details ? "*" : ""}`;
 
     content += `\n\nProject Info:`;
     content += `\n—————————\n`;
@@ -106,7 +111,7 @@ export const PostCaptionDialog = ({
     content += `\n🔗 The links and full details for all open calls are on thestreetartlist.com (link in bio). Memberships start at $3/month`;
     content += `\n\nPlease contact the organizers directly with any open call-related questions you may have 💛`;
 
-    content += `\n\n#streetartcall #opencall #muralopencall #thelist #thestreetartlist #streetartfest #muralproject #publicartopencall #publicart #publicartist #callforentry #opencall #rfq #eoi #mural #murals #streetart #muralfestival #muralfest #streetartfestival #streetartist #streetartopencall #streetartopportunity #streetartcalls #artistopportunity #${lowerCase(event.name.replace(/\s+/g, ""))} ${organizer.links.instagram ? "#" + lowerCase(organizer.links.instagram.replace(/@/g, "")) : ""}`;
+    content += `\n\n#streetartcall #opencall #muralopencall #thelist #thestreetartlist #streetartfest #muralproject #publicartopencall #publicart #publicartist #callforentry #opencall #rfq #eoi #mural #murals #streetart #muralfestival #muralfest #streetartfestival #streetartist #streetartopencall #streetartopportunity #streetartcalls #artistopportunity #${event.name.replace(/[^a-z0-9_]/gi, "").toLowerCase()} ${organizer.links.instagram ? "#" + organizer.links.instagram.replace(/[^a-z0-9_]/gi, "").toLowerCase() : ""}`;
 
     setCaptionText(content);
 

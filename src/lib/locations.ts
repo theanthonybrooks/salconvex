@@ -280,6 +280,9 @@ rawCountries.forEach((country) => {
 });
 
 export function getDemonym(countryName: string): string {
+  if (countryName.toLowerCase() === "united states") {
+    return "US";
+  }
   const country = rawCountries.find(
     (c) =>
       c.name.common.toLowerCase() === countryName.toLowerCase() ||
