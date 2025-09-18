@@ -18,7 +18,7 @@ const buttonVariants = cva(
         destructive: `bg-destructive text-destructive-foreground hover:bg-destructive/90 `,
         outline: `border-1.5 border-foreground bg-background hover:bg-white/30 `,
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80 `,
-        ghost: `hover:scale-110 active:scale-95 border border-transparent `,
+        ghost: `hover:scale-105 active:scale-95 border border-transparent `,
         ghost2: `hover:bg-none hover:text-accent-foreground hover:scale-105 active:scale-95 `,
         link: `link-btn text-primary underline-offset-2 hover:underline  `,
         expandIcon: `group relative text-primary-foreground bg-primary hover:bg-primary/90 `,

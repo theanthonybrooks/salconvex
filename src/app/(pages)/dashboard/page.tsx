@@ -629,7 +629,7 @@ export default function Dashboard() {
             <CardFooter>
               <Button
                 variant="ghost"
-                className="w-full"
+                className="mx-auto w-max"
                 onClick={() => router.push("/thelist")}
               >
                 View All Updates
