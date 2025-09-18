@@ -68,7 +68,7 @@ export const PostCaptionDialog = ({
     content += `\n\nProject Info:`;
     content += `\n—————————\n`;
     if (organizer.links?.instagram) {
-      content += `Organizer:${organizer.links.instagram}`;
+      content += `Organizer: ${organizer.links.instagram}`;
     } else {
       content += `Organizer: ${organizer.name}`;
     }
