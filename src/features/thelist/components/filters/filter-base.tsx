@@ -109,11 +109,11 @@ export const FilterBase = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
-  const limitOpenCalls = view === "event" || view === "orgView";
   const hasActiveSubscription = subData?.hasActiveSubscription;
   const isArtist = userData?.user?.accountType?.includes("artist");
   const isAdmin = userData?.user?.role?.includes("admin");
   const paidUser = isArtist && hasActiveSubscription;
+  const limitOpenCalls = view === "event" || view === "orgView";
   const notEvent =
     filters.eventCategories?.length !== 0 &&
     !filters.eventCategories?.includes("event");
@@ -335,9 +335,11 @@ export const FilterBase = ({
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
+                  {paidUser && (
+                    <SelectItem value="recent">Most Recent</SelectItem>
+                  )}
                   {!limitOpenCalls && (
                     <>
-                      <SelectItem value="recent">Most Recent</SelectItem>
                       <SelectItem value="openCall">Open Call</SelectItem>
                     </>
                   )}
@@ -467,7 +469,7 @@ export const FilterBase = ({
               />
             </section>
           )}
-          {!limitOpenCalls && (
+          {(!limitOpenCalls || paidUser) && (
             <div
               onClick={() => setShowFull((prev) => !prev)}
               className="flex w-full flex-col items-center justify-center gap-2"
@@ -708,9 +710,11 @@ export const FilterBase = ({
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="z-top">
+                  {paidUser && (
+                    <SelectItem value="recent">Most Recent</SelectItem>
+                  )}
                   {!limitOpenCalls && (
                     <>
-                      <SelectItem value="recent">Most Recent</SelectItem>
                       <SelectItem value="openCall">Open Call</SelectItem>
                     </>
                   )}
@@ -889,7 +893,7 @@ export const FilterBase = ({
                 Clear filters
               </span>
 
-              {!limitOpenCalls && (
+              {(!limitOpenCalls || paidUser) && (
                 <div onClick={() => setShowFull((prev) => !prev)}>
                   {showFull ? (
                     <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">

@@ -81,6 +81,7 @@ const ClientEventList = () => {
   const isAdmin = user?.role?.includes("admin");
   const hasActiveSubscription =
     (subStatus?.hasActiveSubscription || isAdmin) ?? false;
+  const hasValidSub = hasActiveSubscription && isArtist;
   const publicView = !hasActiveSubscription || !isArtist;
   const publicEventOnly =
     (publicView && view === "event") || (hasOrgEvents && view === "orgView");
@@ -103,18 +104,30 @@ const ClientEventList = () => {
     [],
   );
 
-  const defaultSort: SortOptions = useMemo(
-    () => ({
-      sortBy:
-        view === "event" || view === "archive"
-          ? "eventStart"
-          : view === "organizer" || view === "orgView"
-            ? "organizer"
-            : "openCall",
-      sortDirection: "asc",
-    }),
-    [view],
-  );
+  // const defaultSort: SortOptions = useMemo(
+  //   () => ({
+  //     sortBy:
+  //       view === "event" || view === "archive"
+  //         ? "eventStart"
+  //         : view === "organizer" || view === "orgView"
+  //           ? "organizer"
+  //           : "openCall",
+  //     sortDirection: "asc",
+  //   }),
+  //   [view],
+  // );
+
+  const getDefaultSortForView = (view: ViewOptions): SortOptions => {
+    if (view === "event" || view === "archive") {
+      return { sortBy: "eventStart", sortDirection: "asc" };
+    }
+    if (view === "organizer" || view === "orgView") {
+      return { sortBy: "organizer", sortDirection: "asc" };
+    }
+    return { sortBy: "openCall", sortDirection: "asc" };
+  };
+
+  const defaultSort = useMemo(() => getDefaultSortForView(view), [view]);
 
   const currentFilters: Filters = {
     showHidden: searchParams.get("h") === "true",
@@ -188,14 +201,17 @@ const ClientEventList = () => {
     sessionStorage.setItem("salView", view);
   }, [view]);
 
-  useEffect(() => {
-    handleResetFilters();
-    if (view === "event") {
-      setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
-    } else if (view === "openCall") {
-      setSortOptions({ sortBy: "openCall", sortDirection: "asc" });
-    }
-  }, [view, handleResetFilters]);
+  // useEffect(() => {
+  //   if (hasValidSub) return
+  //   if (initialTitleRef.current !== null && !hasValidSub) {
+  //     // handleResetFilters();
+  //     if (view === "event") {
+  //       setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
+  //     } else if (view === "openCall") {
+  //       setSortOptions({ sortBy: "openCall", sortDirection: "asc" });
+  //     }
+  //   }
+  // }, [view, handleResetFilters, hasValidSub]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -292,7 +308,7 @@ const ClientEventList = () => {
         view,
       );
 
-      const mainKey = title.raw || "Ungrouped";
+      const mainKey = title.raw || "";
       const subKey = title.subHeading ?? null;
 
       if (!groups[mainKey]) {
@@ -324,6 +340,11 @@ const ClientEventList = () => {
   const handleSortChange = (partial: Partial<SortOptions>) => {
     setSortOptions((prev) => ({ ...prev, ...partial }));
     setPage(1);
+  };
+
+  const handleViewChange = (newView: ViewOptions) => {
+    setView(newView);
+    setSortOptions(getDefaultSortForView(newView));
   };
 
   const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
@@ -386,7 +407,8 @@ const ClientEventList = () => {
               defaultValue={view}
               className="relative w-max max-w-[90vw]"
               // value={view}
-              onValueChange={(val) => setView(val as ViewOptions)}
+              // onValueChange={(val) => setView(val as ViewOptions)}
+              onValueChange={(val) => handleViewChange(val as ViewOptions)}
             >
               <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
                 {(isMobile
