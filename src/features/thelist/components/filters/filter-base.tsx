@@ -874,7 +874,7 @@ export const FilterBase = ({
             <section
               className={cn(
                 "ml-2 flex flex-col gap-2 self-end",
-                limitOpenCalls && "self-center",
+                limitOpenCalls && !paidUser && "self-center",
               )}
             >
               <span

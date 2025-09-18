@@ -714,9 +714,9 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <span className={cn("inline-flex items-center gap-x-1")}>
-                      <Info className="size-4" /> Note: Artist profile has been
-                      moved to the{" "}
+                    {/* <span className={cn()}>
+                      <Info className="mr-1 inline-block size-4 align-text-top" />
+                      Note: Artist profile has moved to the{" "}
                       <Link
                         href="/dashboard/artist"
                         variant="bold"
@@ -725,8 +725,22 @@ export default function SettingsPage() {
                         )}
                       >
                         My Profile
-                      </Link>
+                      </Link>{" "}
                       page.
+                    </span> */}
+                    <span className="inline-flex items-baseline text-sm sm:text-base">
+                      <Info className="mr-1 size-4 shrink-0 translate-y-0.5" />
+                      <span>
+                        Note: Artist profile has moved to the{" "}
+                        <Link
+                          href="/dashboard/artist"
+                          variant="bold"
+                          className="text-sm underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                        >
+                          My Profile
+                        </Link>{" "}
+                        page.
+                      </span>
                     </span>
                   </CardContent>
                 </Card>
@@ -877,7 +891,7 @@ export default function SettingsPage() {
                       <div className="space-y-0.5">
                         <Label className={fontSize}>Auto-Apply</Label>
 
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           Automatically mark open calls as &quot;Applied&quot;
                           after clicking Apply
                         </p>
