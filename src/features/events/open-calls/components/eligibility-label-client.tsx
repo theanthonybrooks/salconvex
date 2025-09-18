@@ -124,12 +124,16 @@ export const EligibilityLabel = ({
       }
     }
   } else if (whom.length === 1) {
+    if (type === "National") {
+      parts.push(`${getDemonym(whom[0])} Artists`);
+    } else {
+      parts.push(whom[0]);
+    }
     // if (mobilePreview && type !== "National") {
     //   parts.push(type);
     // } else {
     //   parts.push(whom[0]);
     // }
-    parts.push(whom[0]);
   } else if (multipleWhom) {
     if (preview) {
       if (whom.length > 2) {
