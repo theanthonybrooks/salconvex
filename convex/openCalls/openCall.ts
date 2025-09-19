@@ -241,6 +241,7 @@ export const createOrUpdateOpenCall = mutation({
         v.literal("National"),
         v.literal("Regional/Local"),
         v.literal("Other"),
+        v.literal("Unknown"),
       ),
       whom: v.array(v.string()),
       details: v.optional(v.string()),

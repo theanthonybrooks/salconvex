@@ -56,6 +56,7 @@ export const EligibilityLabel = ({
   publicView,
   socialPost,
 }: EligibilityLabelProps) => {
+  const unknownType = type === "Unknown";
   const internationalType = type === "International";
   const nationalType = type === "National";
   const multipleWhom = whom.length > 1;
@@ -65,6 +66,10 @@ export const EligibilityLabel = ({
   const [fullListIsOpen, setFullListIsOpen] = useState(false);
 
   if (!type || !whom) return null;
+
+  if (unknownType) {
+    return "Not Specified";
+  }
   const parts: string[] = [];
   const groupLabel = getGroupEligibilityLabel(whom);
 

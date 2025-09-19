@@ -20,6 +20,7 @@ import { enhancedGroupedCountries } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import {
   CallFormat,
+  eligibilityOptionValues,
   EligibilityType,
   openCallFileType,
 } from "@/types/openCall";
@@ -82,9 +83,9 @@ const SubmissionFormOC1 = ({
     formState: { errors: currentErrors },
   } = useFormContext<OpenCallStep1>();
 
-  console.log(currentErrors);
+  // console.log(currentErrors);
 
-  console.log(errors?.openCall?.requirements?.applicationLink, errors);
+  // console.log(errors?.openCall?.requirements?.applicationLink, errors);
   const appLinkFormat =
     watch("openCall.requirements.applicationLinkFormat") ?? "https://";
 
@@ -319,7 +320,21 @@ const SubmissionFormOC1 = ({
                         <SelectValue placeholder="Eligiblity type (select one)" />
                       </SelectTrigger>
                       <SelectContent className="min-w-auto">
-                        <SelectItem fit value="International">
+                        {eligibilityOptionValues
+                          .filter(
+                            (option) => isAdmin || option.value !== "Unknown",
+                          )
+                          .map((option) => (
+                            <SelectItem
+                              fit
+                              key={option.value}
+                              value={option.value}
+                            >
+                              {option.full}
+                            </SelectItem>
+                          ))}
+
+                        {/* <SelectItem fit value="International">
                           International Artists (All)
                         </SelectItem>
                         <SelectItem fit value="National">
@@ -331,6 +346,11 @@ const SubmissionFormOC1 = ({
                         <SelectItem fit value="Other">
                           Other (specify below - Required)
                         </SelectItem>
+                        {isAdmin && (
+                          <SelectItem fit value="Unknown">
+                            Unknown
+                          </SelectItem>
+                        )} */}
                       </SelectContent>
                     </Select>
                   );

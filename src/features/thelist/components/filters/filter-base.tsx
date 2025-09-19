@@ -35,7 +35,7 @@ import {
   callFormat_option_values,
   CallType,
   callType_option_values,
-  eligibility_option_values,
+  eligibilityOptionValues,
   EligibilityType,
 } from "@/types/openCall";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
@@ -518,7 +518,11 @@ export const FilterBase = ({
                     Eligibility:
                   </Label>
                   <MultiSelect
-                    options={eligibility_option_values}
+                    options={[
+                      ...eligibilityOptionValues.filter(
+                        (option) => isAdmin || option.value !== "Unknown",
+                      ),
+                    ]}
                     value={filters.eligibility ?? []}
                     onValueChange={(value) =>
                       onChange({ eligibility: value as EligibilityType[] })
@@ -947,7 +951,11 @@ export const FilterBase = ({
                     Eligibility:
                   </Label>
                   <MultiSelect
-                    options={eligibility_option_values}
+                    options={[
+                      ...eligibilityOptionValues.filter(
+                        (option) => isAdmin || option.value !== "Unknown",
+                      ),
+                    ]}
                     value={filters.eligibility ?? []}
                     onValueChange={(value) =>
                       onChange({ eligibility: value as EligibilityType[] })

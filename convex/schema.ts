@@ -419,6 +419,7 @@ const openCallSchema = {
       v.literal("National"),
       v.literal("Regional/Local"),
       v.literal("Other"),
+      v.literal("Unknown"),
     ),
     //todo: later, add some method/additional fields that will enter in codes for country, region, etc. Maybe start small. Could be tables in the db, so they're easy to query and filter from convex. Then, use that to show user calls that they are or aren't eligible for. Could be put in as a systemic check to ensure that organizers aren't getting ineligible applicants.
     whom: v.array(v.string()),

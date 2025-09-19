@@ -8,10 +8,12 @@ export const EligibilityLabelServer = ({
 }: EligibilityLabelBaseProps) => {
   const internationalType = type === "International";
   const nationalType = type === "National";
+  const unknownType = type === "Unknown";
 
   if (!type || !whom) return null;
-
-  if (internationalType) {
+  if (unknownType) {
+    return "Not Specified";
+  } else if (internationalType) {
     return (
       <p>
         International (All)

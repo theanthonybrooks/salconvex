@@ -55,21 +55,23 @@ export const callType_option_values = [
   { label: "Invite Only", value: "Invite" },
 ];
 
-export const eligibilityTypeValues = [
-  "International",
-  "National",
-  "Regional/Local",
-  "Other",
+export const eligibilityOptionValues = [
+  {
+    full: "International Artists (All)",
+    label: "International",
+    value: "International",
+  },
+  { full: "National Artists", label: "National", value: "National" },
+  {
+    full: "Regional/Local Artists",
+    label: "Regional/Local",
+    value: "Regional/Local",
+  },
+  { full: "Other (specify below - Required)", label: "Other", value: "Other" },
+  { full: "Unknown", label: "Unknown", value: "Unknown" },
 ] as const;
 
-export const eligibility_option_values = [
-  { label: "International", value: "International" },
-  { label: "National", value: "National" },
-  { label: "Regional/Local", value: "Regional/Local" },
-  { label: "Other", value: "Other" },
-];
-
-export type EligibilityType = (typeof eligibilityTypeValues)[number];
+export type EligibilityType = (typeof eligibilityOptionValues)[number]["value"];
 
 export const openCallCategoryFields = [
   { label: "Artist Stipend", value: "artistStipend" },

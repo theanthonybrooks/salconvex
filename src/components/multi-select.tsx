@@ -66,6 +66,7 @@ interface MultiSelectProps
    */
   options: {
     /** The text to display for the option. */
+    full?: string;
     label: string;
     /** The unique value associated with the option. */
     value: string;

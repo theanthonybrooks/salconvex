@@ -1089,7 +1089,6 @@ export const EventOCForm = ({
             }[] = [];
 
             if (!openCallData) return;
-            console.log(openCallData.tempFiles);
 
             if (openCallData.tempFiles) {
               if (openCallData.tempFiles?.length > 0) {

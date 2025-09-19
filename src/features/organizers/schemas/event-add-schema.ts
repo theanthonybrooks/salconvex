@@ -529,6 +529,7 @@ export const openCallBaseSchema = z.object({
       z.literal("National"),
       z.literal("Regional/Local"),
       z.literal("Other"),
+      z.literal("Unknown"),
     ]),
     whom: z.optional(z.array(z.string())),
     details: z.optional(z.string()),
