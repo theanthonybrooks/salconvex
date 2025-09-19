@@ -395,11 +395,11 @@ export const ColorPicker = ({
             }}
           >
             <div
-              className="absolute inset-0 rounded-lg border-1.5"
+              className="absolute inset-0 rounded-lg"
               style={{
                 background: html`
                   linear-gradient(to bottom, #00000043 0%, transparent 50%),
-                  linear-gradient(to top, #ffffffca 0%, transparent 50%),
+                  linear-gradient(to top, #ffffffe6 0%, transparent 50%),
                   linear-gradient( to right, hsl(0, 100%, 50%), hsl(60, 100%,
                   50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%,
                   50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%) )
