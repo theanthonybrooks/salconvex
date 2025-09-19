@@ -81,7 +81,7 @@ const ClientEventList = () => {
   const isAdmin = user?.role?.includes("admin");
   const hasActiveSubscription =
     (subStatus?.hasActiveSubscription || isAdmin) ?? false;
-  const hasValidSub = hasActiveSubscription && isArtist;
+  // const hasValidSub = hasActiveSubscription && isArtist;
   const publicView = !hasActiveSubscription || !isArtist;
   const publicEventOnly =
     (publicView && view === "event") || (hasOrgEvents && view === "orgView");

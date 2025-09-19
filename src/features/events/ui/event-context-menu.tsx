@@ -156,7 +156,7 @@ const EventContextMenu = ({
 
   const { data: orgOwnerEmailData } = useQueryWithStatus(
     api.organizer.organizations.getOrgContactInfo,
-    mainOrgId && isAdmin
+    reviewMode && mainOrgId && isAdmin
       ? { orgId: mainOrgId, eventId: eventId as Id<"events"> }
       : "skip",
   );
@@ -515,10 +515,10 @@ const EventContextMenu = ({
               </DropdownMenuPortal>
             </DropdownMenuSub>
 
-            {reviewMode && mainOrgId && orgOwnerEmailData && (
+            {reviewMode && mainOrgId && orgOwnerEmailData && orgOwnerEmail && (
               <DropdownMenuItem>
                 <Link
-                  href={`mailto:${orgOwnerEmail ?? ""}?subject=${capitalize(eventName ?? "")} submission`}
+                  href={`mailto:${orgOwnerEmail}?subject=${capitalize(eventName ?? "")} submission`}
                   className="flex items-center gap-x-2 px-4 py-2 text-sm hover:bg-salPinkLtHover"
                 >
                   <Mail className="size-4" />

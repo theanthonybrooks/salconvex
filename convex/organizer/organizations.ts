@@ -128,6 +128,7 @@ export const getOrgContactInfo = query({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
     if (!user) return null;
+    const userIsAdmin = user.role.includes("admin");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
     const org = await ctx.db.get(args.orgId);
@@ -144,9 +145,9 @@ export const getOrgContactInfo = query({
     const emailMatch =
       typeof user.email === "string" && user.email === orgOwner.email;
 
-    console.log(userId, orgOwnerId, idMatch, emailMatch, "name: ", org.name);
+    const contactEmail = userIsAdmin ? org.links?.email : orgOwner.email;
     return {
-      orgOwnerEmail: orgOwner.email,
+      orgOwnerEmail: contactEmail,
       emailMatch,
       orgOwnerId,
       idMatch,
