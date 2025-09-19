@@ -92,7 +92,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
           </span>
           <div
             className={cn(
-              "flex size-[150px] shrink-0 items-center justify-center bg-foreground p-3",
+              "flex size-[150px] shrink-0 items-center justify-center bg-foreground p-5",
             )}
           >
             <Image

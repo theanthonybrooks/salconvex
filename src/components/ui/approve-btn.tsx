@@ -140,25 +140,26 @@ export const ApproveBtn = ({
                       : `Update ${getEventCategoryLabelAbbr(eventCategory)}`}
           </Button>
         )}
-
-        <EventContextMenu
-          isUserOrg={isUserOrg}
-          mainOrgId={orgId}
-          event={event}
-          eventId={eventId}
-          openCallId={openCallId ?? null}
-          appLink={appLink}
-          appStatus={appStatus}
-          eventState={eventState}
-          openCallState={openCallState ?? null}
-          openCallStatus={openCallStatus}
-          isHidden={isHidden}
-          eventCategory={eventCategory}
-          buttonTrigger={true}
-          align="end"
-          reviewMode={true}
-          type="admin"
-        />
+        {((openCallId && !bothPublished) || !eventPublished) && (
+          <EventContextMenu
+            isUserOrg={isUserOrg}
+            mainOrgId={orgId}
+            event={event}
+            eventId={eventId}
+            openCallId={openCallId ?? null}
+            appLink={appLink}
+            appStatus={appStatus}
+            eventState={eventState}
+            openCallState={openCallState ?? null}
+            openCallStatus={openCallStatus}
+            isHidden={isHidden}
+            eventCategory={eventCategory}
+            buttonTrigger={true}
+            align="end"
+            reviewMode={true}
+            type="admin"
+          />
+        )}
       </div>
     </div>
   );

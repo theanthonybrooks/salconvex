@@ -5,8 +5,15 @@ import { cn } from "@/lib/utils";
 import { OpenCallData } from "@/types/openCall";
 
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
+import { Link } from "@/components/ui/custom-link";
 import { PostCaptionDialog } from "@/components/ui/post-caption-dialog";
-import { LetterText, LoaderCircle, LucideIcon, Settings2 } from "lucide-react";
+import {
+  ArrowLeft,
+  LetterText,
+  LoaderCircle,
+  LucideIcon,
+  Settings2,
+} from "lucide-react";
 import { ComponentType, useState } from "react";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { toast } from "react-toastify";
@@ -113,40 +120,49 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
   };
 
   return (
-    <div
-      className={cn(
-        "relative my-10 flex w-full flex-col justify-items-center lg:grid lg:grid-cols-2",
-      )}
-    >
-      <section className={cn("flex flex-col gap-3")}>
-        <p>Social Media Post</p>
-        <div className="group relative">
-          <PostMenu items={postMenuItems} loading={loading} />
+    <div className="mx-auto w-full px-10">
+      <Link
+        className={cn("flex w-max items-center gap-2 self-start")}
+        href={`/thelist/event/${event.slug}/${event.dates.edition}/call`}
+      >
+        <ArrowLeft className="size-5" />
+        <p>Back to Open Call</p>
+      </Link>
+      <div
+        className={cn(
+          "relative my-10 flex w-full flex-col justify-items-center lg:grid lg:grid-cols-2",
+        )}
+      >
+        <section className={cn("flex flex-col gap-3")}>
+          <p>Social Media Post</p>
+          <div className="group relative">
+            <PostMenu items={postMenuItems} loading={loading} />
 
-          <div className={cn("origin-top-left scale-[0.72] sm:scale-100")}>
-            <OpenCallPost data={data} postSettings={postSettings} />
+            <div className={cn("origin-top-left scale-[0.72] sm:scale-100")}>
+              <OpenCallPost data={data} postSettings={postSettings} />
+            </div>
+
+            <PostPropertiesDashboard
+              fontSize={postSettings.fontSize}
+              bgColor={postSettings.bgColor}
+              budget={postSettings.budget}
+              onChange={handlePostSettingsChange}
+              open={settingsOpen}
+              setOpen={setSettingsOpen}
+            />
+
+            <PostCaptionDialog
+              data={data}
+              open={textDialogOpen}
+              setOpen={setTextDialogOpen}
+            />
           </div>
-
-          <PostPropertiesDashboard
-            fontSize={postSettings.fontSize}
-            bgColor={postSettings.bgColor}
-            budget={postSettings.budget}
-            onChange={handlePostSettingsChange}
-            open={settingsOpen}
-            setOpen={setSettingsOpen}
-          />
-
-          <PostCaptionDialog
-            data={data}
-            open={textDialogOpen}
-            setOpen={setTextDialogOpen}
-          />
-        </div>
-      </section>
-      {/* <section className={cn("flex flex-col gap-3")}>
-        <p>Social Media Story</p>
-        <div className="h-[889px] w-[500px] rounded-sm border-3"></div>
-      </section> */}
+        </section>
+        {/* <section className={cn("flex flex-col gap-3")}>
+          <p>Social Media Story</p>
+          <div className="h-[889px] w-[500px] rounded-sm border-3"></div>
+        </section> */}
+      </div>
     </div>
   );
 };
