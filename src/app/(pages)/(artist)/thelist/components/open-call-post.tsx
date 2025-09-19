@@ -51,6 +51,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
   const hasBudget = !!(budgetMin > 0 || hasBudgetRange);
   const hasRate = !!budgetRate && budgetRate > 0;
   const locationString = getFormattedLocationString(location);
+
   return (
     <div
       id="post-root"
@@ -84,7 +85,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
         <div className={cn("flex items-center divide-x-2.5")}>
           <span
             className={cn(
-              "min-w-0 flex-1 break-words px-8 text-center font-acumin font-bold uppercase",
+              "min-w-0 flex-1 break-words px-8 text-center font-acumin font-bold uppercase leading-[1.3]",
             )}
             style={{ fontSize: postSettings.fontSize }}
           >

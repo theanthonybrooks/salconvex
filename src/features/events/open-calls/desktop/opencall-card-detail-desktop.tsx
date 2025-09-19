@@ -413,7 +413,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
             {((isAdmin && !bothValid) || isUserOrg) && (
               <>
-                {oneValid && <Separator thickness={2} className="my-2" />}
+                {isAdmin && oneValid && (
+                  <Separator thickness={2} className="my-2" />
+                )}
                 <ApproveBtn
                   user={user}
                   event={event}

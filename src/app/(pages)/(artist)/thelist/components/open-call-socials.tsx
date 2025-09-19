@@ -14,7 +14,7 @@ import {
   LucideIcon,
   Settings2,
 } from "lucide-react";
-import { ComponentType, useState } from "react";
+import { ComponentType, useEffect, useState } from "react";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { toast } from "react-toastify";
 
@@ -64,7 +64,19 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
   ];
 
   // useClickOutside(dashboardRef, () => setSettingsOpen(false), settingsOpen);
-
+  useEffect(() => {
+    if (!data) return;
+    const eventName = data.event.name.trim();
+    if (eventName.length >= 50) {
+      setPostSettings((prev) => ({ ...prev, fontSize: 20 }));
+    } else if (eventName.length > 30 && eventName.length < 50) {
+      setPostSettings((prev) => ({ ...prev, fontSize: 24 }));
+    } else if (eventName.length <= 18 && eventName.length > 10) {
+      setPostSettings((prev) => ({ ...prev, fontSize: 32 }));
+    } else if (eventName.length <= 10) {
+      setPostSettings((prev) => ({ ...prev, fontSize: 36 }));
+    }
+  }, [data]);
   if (!data) return <p>No Data</p>;
   const { event } = data;
 

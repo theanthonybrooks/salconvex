@@ -244,11 +244,13 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
               />
               {(isAdmin || isUserOrg) && (
                 <>
-                  <Separator
-                    orientation="horizontal"
-                    thickness={2}
-                    className="col-span-full mx-auto mb-2 mt-3"
-                  />
+                  {isAdmin && (
+                    <Separator
+                      orientation="horizontal"
+                      thickness={2}
+                      className="col-span-full mx-auto mb-2 mt-3"
+                    />
+                  )}
                   <ApproveBtn
                     user={user}
                     event={event}

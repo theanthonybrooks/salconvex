@@ -226,7 +226,7 @@ export const SelectSimple = ({
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className={cn(contentClassName)}>
+      <SelectContent className={cn(contentClassName, "z-top max-h-64")}>
         {options.map((option) => {
           return (
             <SelectItem

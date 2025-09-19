@@ -60,6 +60,8 @@ export const ApproveBtn = ({
   //   eventSubmitted || openCallSubmitted || bothSubmitted;
   const eventPublished = eventState === "published";
   const bothPublished = eventPublished && openCallState === "published";
+  const showContextMenu =
+    (isAdmin && openCallId && !bothPublished) || !eventPublished || !isAdmin;
 
   const handleCopy = (id: string) => {
     if (!id) return;
@@ -74,7 +76,11 @@ export const ApproveBtn = ({
       <div className="flex w-full items-center justify-center">
         {isAdmin && (
           <Button
-            variant="salWithShadowHiddenLeft"
+            variant={
+              !showContextMenu
+                ? "salWithShadowHiddenLeft"
+                : "salWithShadowHidden"
+            }
             onClick={() => {
               if (bothSubmitted) {
                 approveOC({
@@ -104,7 +110,10 @@ export const ApproveBtn = ({
                 );
               }
             }}
-            className={cn("w-full rounded-r-none border-r")}
+            className={cn(
+              "w-full",
+              showContextMenu && "rounded-r-none border-r",
+            )}
           >
             {bothSubmitted
               ? "Approve Both"
@@ -117,7 +126,11 @@ export const ApproveBtn = ({
         )}
         {isUserOrg && !isAdmin && (
           <Button
-            variant="salWithShadowHiddenLeft"
+            variant={
+              showContextMenu
+                ? "salWithShadowHiddenLeft"
+                : "salWithShadowHidden"
+            }
             onClick={() => {
               if (!openCallId && bothPublished && appLink) {
                 window.location.href = appLink;
@@ -125,7 +138,10 @@ export const ApproveBtn = ({
                 router.push(`/dashboard/organizer/update-event?_id=${eventId}`);
               }
             }}
-            className={cn("w-full rounded-r-none border-r")}
+            className={cn(
+              "w-full",
+              showContextMenu && "rounded-r-none border-r",
+            )}
           >
             {bothDraft || openCallDraft
               ? "Finish Open Call"
@@ -140,7 +156,7 @@ export const ApproveBtn = ({
                       : `Update ${getEventCategoryLabelAbbr(eventCategory)}`}
           </Button>
         )}
-        {((openCallId && !bothPublished) || !eventPublished) && (
+        {showContextMenu && (
           <EventContextMenu
             isUserOrg={isUserOrg}
             mainOrgId={orgId}
