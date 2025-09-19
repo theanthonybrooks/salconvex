@@ -94,9 +94,26 @@ export const usersWithSubscriptions = query({
           .withIndex("userId", (q) => q.eq("userId", user._id))
           .first();
 
+        const artistProfile = await ctx.db
+          .query("artists")
+          .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
+          .first();
+
         const activeSub =
           subscription?.status === "active" ||
           subscription?.status === "trialing";
+
+        const artistIG = artistProfile?.contact?.instagram;
+        const artistWebsite = artistProfile?.contact?.website;
+        const artistCanFeature = artistProfile?.canFeature;
+        const artistNationalities: string[] = Array.from(
+          new Set([
+            ...(artistProfile?.artistNationality ?? []),
+            ...(artistProfile?.artistResidency?.country
+              ? [artistProfile.artistResidency.country]
+              : []),
+          ]),
+        );
 
         const planName = subscription?.metadata?.plan?.toLowerCase();
         const cancelAt = subscription?.cancelAt;
@@ -174,8 +191,13 @@ export const usersWithSubscriptions = query({
 
         return {
           _id: user._id,
+          artistId: artistProfile?._id,
           customerId,
           name,
+          location: artistNationalities ?? [],
+          instagram: artistIG,
+          website: artistWebsite,
+          canFeature: artistCanFeature ?? false,
           email: user.email,
           subscription: label ?? "4. none",
           subStatus: currentStatus ?? "-",

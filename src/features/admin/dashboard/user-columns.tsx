@@ -1,3 +1,4 @@
+//TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
 "use client";
 
 import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
@@ -27,6 +28,10 @@ import { Id } from "~/convex/_generated/dataModel";
 export const userColumnLabels: Record<string, string> = {
   name: "Name",
   email: "Email",
+  location: "Location",
+  instagram: "Instagram",
+  website: "Website",
+  canFeature: "Can Feature",
   subscription: "Subscription",
   subStatus: "Sub Status",
   cancelComment: "Cancel Comment",
@@ -42,9 +47,14 @@ export const userColumnLabels: Record<string, string> = {
 
 interface UserColumnsProps {
   _id: Id<"users">;
+  artistId?: Id<"artists">;
   customerId?: string;
   name: string;
   email: string;
+  location: string[];
+  instagram?: string;
+  website?: string;
+  canFeature: boolean;
   subscription: string;
   subStatus: string;
   cancelComment?: string;
@@ -90,14 +100,14 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const user = row.original;
+      const { _id: userId, name } = row.original;
       return (
         <ConvexDashboardLink
           className="font-medium"
           table="userSubscriptions"
-          id={user._id}
+          id={userId}
         >
-          <p className="truncate">{row.getValue("name")}</p>
+          <p className="truncate">{name}</p>
         </ConvexDashboardLink>
       );
     },
@@ -123,7 +133,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Subscription" />
     ),
     cell: ({ row }) => {
-      const subscription = row.getValue("subscription") as string | undefined;
+      const { subscription } = row.original;
       const fatcapSubs = ["3a. monthly-fatcap", "3b. yearly-fatcap"];
       const originalSubs = ["1a. monthly-original", "1b. yearly-original"];
       const bananaSubs = ["2a. monthly-banana", "2b. yearly-banana"];
@@ -158,9 +168,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const subStatus = row.getValue("subStatus") as string | undefined;
-      const cancelType = row.getValue("cancelReason") as string | undefined;
-      const systemCancel = cancelType === "payment_failed";
+      const { subStatus, cancelReason } = row.original;
+      const systemCancel = cancelReason === "payment_failed";
 
       return (
         <div
@@ -177,7 +186,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         >
           <p className="flex items-center justify-center gap-1 text-center capitalize">
             {subStatus || "none"}
-            {cancelType ? (
+            {cancelReason ? (
               systemCancel ? (
                 <BsRobot className="size-3" />
               ) : (
@@ -202,7 +211,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Cancel Reason" />
     ),
     cell: ({ row }) => {
-      const cancelReason = row.getValue("cancelReason") as string | undefined;
+      const { cancelReason } = row.original;
       return (
         <TooltipSimple content={cancelReason}>
           <div
@@ -225,7 +234,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Cancel Comment" />
     ),
     cell: ({ row }) => {
-      const cancelComment = row.getValue("cancelComment") as string | undefined;
+      const { cancelComment } = row.original;
       return (
         <TooltipSimple content={cancelComment}>
           <div
@@ -248,15 +257,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Canceled At" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("canceledAt") as number | undefined;
+      const { canceledAt } = row.original;
       return (
         <div
           className={cn(
             "truncate text-sm text-muted-foreground",
-            !value && "text-center",
+            !canceledAt && "text-center",
           )}
         >
-          {value ? new Date(value).toLocaleString() : "-"}
+          {canceledAt ? new Date(canceledAt).toLocaleString() : "-"}
         </div>
       );
     },
@@ -269,15 +278,107 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Last Active" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("lastActive") as number | undefined;
+      const { lastActive } = row.original;
       return (
         <div
           className={cn(
             "truncate text-sm text-muted-foreground",
-            !value && "text-center",
+            !lastActive && "text-center",
           )}
         >
-          {value ? new Date(value).toLocaleString() : "-"}
+          {lastActive ? new Date(lastActive).toLocaleString() : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "location",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Location" />
+    ),
+    cell: ({ row }) => {
+      const { location } = row.original;
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {location?.length > 0 ? (
+            <TooltipSimple content={location.join(", ")}>
+              <p>{location?.length > 0 ? location.join(", ") : "-"}</p>
+            </TooltipSimple>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "instagram",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Instagram" />
+    ),
+    cell: ({ row }) => {
+      const { instagram } = row.original;
+      const username = instagram?.startsWith("@")
+        ? instagram?.slice(1)
+        : instagram;
+
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {instagram ? (
+            <Link
+              href={`https://www.instagram.com/${username}`}
+              target="_blank"
+            >
+              {instagram}
+            </Link>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "website",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Website" />
+    ),
+    cell: ({ row }) => {
+      const { website } = row.original;
+      const displayLink = website?.startsWith("http")
+        ? website.slice(website.indexOf("//") + 2)
+        : website;
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {website ? (
+            <Link href={website} target="_blank">
+              {displayLink}
+            </Link>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "canFeature",
+    minSize: 40,
+    maxSize: 60,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Can Feature" />
+    ),
+    cell: ({ row }) => {
+      const { canFeature, artistId } = row.original;
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {artistId ? (canFeature ? "Yes" : "No") : "-"}
         </div>
       );
     },
@@ -403,6 +504,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     enableResizing: false,
     cell: ({ row }) => {
       const user = row.original;
+      const { artistId } = user;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -456,6 +558,17 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                     User ID
                   </CopyableItem>
                 </DropdownMenuItem>
+                {artistId && (
+                  <DropdownMenuItem>
+                    <CopyableItem
+                      defaultIcon={<LucideClipboardCopy className="size-4" />}
+                      copyContent={artistId}
+                      className="gap-x-2"
+                    >
+                      Artist ID
+                    </CopyableItem>
+                  </DropdownMenuItem>
+                )}
                 {user.customerId && (
                   <DropdownMenuItem>
                     <CopyableItem

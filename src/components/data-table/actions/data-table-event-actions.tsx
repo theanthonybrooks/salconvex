@@ -9,6 +9,7 @@ import { Id } from "~/convex/_generated/dataModel";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import {
   Eye,
+  Image as ImageIcon,
   LucideFolderCheck,
   LucideFolderClock,
   LucideFolderInput,
@@ -32,9 +33,12 @@ interface SubmittedActionProps extends EventActionProps {
   state: SubmissionFormState;
 }
 
-interface ToEventActionProps {
+interface BaseEventActionProps {
   slug: string;
   edition: number;
+}
+
+interface ToEventActionProps extends BaseEventActionProps {
   hasOpenCall: boolean;
   category: EventCategory;
 }
@@ -54,6 +58,20 @@ export const GoToEvent = ({
     >
       <Eye className="size-4" />
       View {getEventCategoryLabelAbbr(category)}
+    </DropdownMenuItem>
+  );
+};
+
+export const GoToSocialPost = ({ slug, edition }: BaseEventActionProps) => {
+  return (
+    <DropdownMenuItem
+      onClick={() => {
+        window.location.href = `/thelist/event/${slug}/${edition}/call/social`;
+      }}
+      className="flex items-center gap-x-1"
+    >
+      <ImageIcon className="size-4" />
+      View Socials
     </DropdownMenuItem>
   );
 };

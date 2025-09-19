@@ -1,3 +1,5 @@
+//TODO: Break the dropdown menu into sub-menus.
+
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -13,6 +15,7 @@ import {
   DeleteEvent,
   DuplicateEvent,
   GoToEvent,
+  GoToSocialPost,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
 import { DataTableEventEdition } from "@/components/data-table/actions/data-table-event-edition";
@@ -370,6 +373,9 @@ export const columns: ColumnDef<Event>[] = [
                   hasOpenCall={hasOC}
                   category={eventCategory}
                 />
+                {isAdmin && hasOC && (
+                  <GoToSocialPost slug={slug} edition={edition} />
+                )}
                 <DuplicateEvent eventId={event._id} />
                 {((state === "draft" && !eventApproved) || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
