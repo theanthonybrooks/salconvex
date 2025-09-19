@@ -32,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ColorMode, colorModes } from "@/constants/colorConsts";
 import Color from "color";
+import { html } from "common-tags";
 import { BiColor } from "react-icons/bi";
 
 type Color = { value: string; gradient?: boolean };
@@ -60,6 +61,8 @@ export const ColorPicker = ({
   defaultColor = "hsla(50, 100%, 72%, 1.0)",
   defaultPalette = "tailwind-light",
 }: ColorPickerProps) => {
+  const minL = 30;
+  const maxL = 95;
   const addPalette = useMutation(api.functions.palettes.addPalette);
   const addSwatch = useMutation(api.functions.palettes.addColor);
   const deleteSwatch = useMutation(api.functions.palettes.deleteColor);
@@ -75,6 +78,7 @@ export const ColorPicker = ({
   const [palette, setPalette] = useState(defaultPalette);
   const [hue, setHue] = useState(0);
   const [opacity, setOpacity] = useState(100);
+  const [lightness, setLightness] = useState(50);
   const [copied, setCopied] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const palettes = useQuery(api.functions.palettes.getPalettes);
@@ -90,6 +94,13 @@ export const ColorPicker = ({
 
   const handleColorSelect = (color: Color) => {
     setSelectedColorAction(color.value);
+    const c = Color(color.value);
+    const h = c.hue() || 0;
+    const a = Math.round(c.alpha() * 100);
+
+    setHue(h);
+    setOpacity(a);
+    setLightness(c.lightness());
     vibrate();
   };
 
@@ -105,8 +116,10 @@ export const ColorPicker = ({
 
       const newHue = Math.round(x * 360);
       const newOpacity = Math.round((1 - y) * 100) / 100;
+      const newLightness = Math.round(minL + y * (maxL - minL));
 
-      const base = Color.hsl(newHue, 100, 50).alpha(newOpacity);
+      // const base = Color.hsl(newHue, 100, 50).alpha(newOpacity);
+      const base = Color.hsl(newHue, 100, newLightness);
 
       let outputColorValue: string;
 
@@ -126,6 +139,7 @@ export const ColorPicker = ({
 
       setHue(newHue);
       setOpacity(newOpacity * 100);
+      setLightness(newLightness);
       setSelectedColorAction(outputColorValue);
       vibrate();
     }
@@ -158,6 +172,9 @@ export const ColorPicker = ({
     }
   };
 
+  const isGradient = (val: string) =>
+    val.startsWith("linear-gradient") || val.startsWith("radial-gradient");
+
   if (!palettes)
     return (
       <div>
@@ -165,9 +182,6 @@ export const ColorPicker = ({
         <LoaderCircle className="size-5 animate-spin" />
       </div>
     );
-
-  const isGradient = (val: string) =>
-    val.startsWith("linear-gradient") || val.startsWith("radial-gradient");
 
   const handleAddPalette = async () => {
     if (!newPaletteName) return;
@@ -355,7 +369,7 @@ export const ColorPicker = ({
               document.addEventListener("touchmove", handleTouchMove);
               document.addEventListener("touchend", handleTouchEnd);
             }}
-            aria-valuetext={`Hue: ${hue}, Opacity: ${opacity}%`}
+            aria-valuetext={`Hue: ${hue}, Opacity: ${opacity}%, lightness: ${lightness}%`}
             aria-valuemin={0}
             aria-valuemax={360}
             onKeyDown={(e) => {
@@ -368,10 +382,12 @@ export const ColorPicker = ({
                   setHue((h) => Math.min(360, h + step));
                   break;
                 case "ArrowUp":
-                  setOpacity((o) => Math.min(100, o + step));
+                  // setOpacity((o) => Math.min(100, o + step));
+                  setLightness((l) => Math.min(100, l + step));
                   break;
                 case "ArrowDown":
-                  setOpacity((o) => Math.max(0, o - step));
+                  // setOpacity((o) => Math.max(0, o - step));
+                  setLightness((l) => Math.max(0, l - step));
                   break;
                 default:
                   break;
@@ -379,20 +395,16 @@ export const ColorPicker = ({
             }}
           >
             <div
-              className="absolute inset-0 border-4 border-white/50 dark:border-black/50"
+              className="absolute inset-0 rounded-lg border-1.5"
               style={{
-                backgroundImage: `
-        linear-gradient(
-          90deg,
-          hsl(0, 100%, 50%),
-          hsl(60, 100%, 50%),
-          hsl(120, 100%, 50%),
-          hsl(180, 100%, 50%),
-          hsl(240, 100%, 50%),
-          hsl(300, 100%, 50%),
-          hsl(360, 100%, 50%)
-        )`,
-                maskImage: "linear-gradient(to bottom, white, transparent)",
+                background: html`
+                  linear-gradient(to bottom, #00000043 0%, transparent 50%),
+                  linear-gradient(to top, #ffffffca 0%, transparent 50%),
+                  linear-gradient( to right, hsl(0, 100%, 50%), hsl(60, 100%,
+                  50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%,
+                  50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%) )
+                `,
+                backgroundBlendMode: "multiply, screen, normal",
               }}
             />
 
@@ -400,7 +412,8 @@ export const ColorPicker = ({
               className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 transform rounded-full border-2 border-white shadow-lg dark:border-black"
               style={{
                 left: `${(hue / 360) * 100}%`,
-                top: `${100 - opacity}%`,
+                // top: `${100 - opacity}%`,
+                top: `${((lightness - minL) / (maxL - minL)) * 100}%`,
               }}
             />
           </div>
