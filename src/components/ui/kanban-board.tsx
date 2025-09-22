@@ -584,7 +584,8 @@ const Card = ({
                   ? priority
                   : "medium") as Priority,
                 voters,
-                category: category ?? "general",
+                category:
+                  (category ?? purpose === "design") ? "ui/ux" : "general",
                 isPublic: isPublic ?? true,
               }}
               onSubmit={(data) => {
@@ -680,7 +681,7 @@ const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
         description: "",
         isPublic: true,
         voters: [],
-        category: "general",
+        category: purpose === "design" ? "ui/ux" : "general",
       }}
       onSubmit={(data) => {
         addCard({
