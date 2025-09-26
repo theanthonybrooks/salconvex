@@ -24,7 +24,8 @@
     "Social",
     "Context",
     "Kanban",
-    "Artist"
+    "Artist",
+    "Calendar"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

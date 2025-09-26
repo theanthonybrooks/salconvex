@@ -6,15 +6,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { LazyCalendar } from "@/features/calendar/lazy-calendar";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { cn } from "@/lib/utils";
 import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 
 import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
-import { ExternalLink, Plus } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -70,8 +70,13 @@ const Calendar = () => {
         Event & Open Call Calendar
       </h1>
 
-      <div className="w-full max-w-[90dvw] grid-cols-[15%_minmax(0,1fr)] gap-x-10 xl:grid">
-        <div className="col-span-1 hidden h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3 lg:block xl:mt-[85px]">
+      <div
+        className={cn(
+          "w-full max-w-[90dvw] gap-x-10 xl:grid",
+          //  "grid-cols-[15%_minmax(0,1fr)]"
+        )}
+      >
+        {/* <div className="col-span-1 hidden h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3 lg:block xl:mt-[85px]">
           <p className="px-3 pb-2 text-xl font-bold">Filters</p>
           <Separator className="mb-4" thickness={2} />
           <div className="flex flex-col gap-y-2 px-4 opacity-30">
@@ -92,7 +97,7 @@ const Calendar = () => {
           <p className="my-2 text-center text-lg font-bold text-foreground">
             Filters coming soon!
           </p>
-        </div>
+        </div> */}
         <LazyCalendar
           events={events}
           onEventClick={handleEventClick}
