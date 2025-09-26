@@ -131,6 +131,7 @@ export default function SettingsPage() {
   const fontSize = userPrefs?.fontSize === "large" ? "text-base" : "text-sm";
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
+  const canDelete = !subData?.subscription || subData?.subStatus === "canceled";
 
   const subStatus = subData?.subStatus ?? "none";
   const userPlan = subData?.subPlan ?? 0;
@@ -1484,7 +1485,7 @@ export default function SettingsPage() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
-                          disabled={activeSub}
+                          disabled={canDelete}
                           type="button"
                           variant="destructive"
                           className="w-full min-w-[150px] font-bold sm:w-auto"
