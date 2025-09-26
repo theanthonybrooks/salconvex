@@ -1485,7 +1485,7 @@ export default function SettingsPage() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
-                          disabled={canDelete}
+                          disabled={!canDelete}
                           type="button"
                           variant="destructive"
                           className="w-full min-w-[150px] font-bold sm:w-auto"
