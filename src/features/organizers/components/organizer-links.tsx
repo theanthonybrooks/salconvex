@@ -7,6 +7,7 @@ import {
   FaFacebookF,
   FaInstagram,
   FaLink,
+  FaLinkedin,
   FaRegEnvelope,
   FaThreads,
   FaVk,
@@ -24,6 +25,7 @@ const linkDisplayOrder: (keyof Organizer["links"])[] = [
   "facebook",
   "threads",
   "vk",
+  "linkedIn",
   "youTube",
 ];
 
@@ -37,6 +39,7 @@ const displayNames: Record<keyof Organizer["links"], string> = {
   facebook: "Facebook",
   threads: "Threads",
   vk: "VK",
+  linkedIn: "LinkedIn",
   youTube: "YouTube",
   address: "Address",
   other: "Other",
@@ -52,6 +55,7 @@ const organizerLinkIcons: Record<keyof Organizer["links"], React.ReactNode> = {
   facebook: <FaFacebookF className={iconSize} />,
   threads: <FaThreads className={iconSize} />,
   vk: <FaVk className={iconSize} />,
+  linkedIn: <FaLinkedin className={iconSize} />,
   youTube: <FaYoutube className={iconSize} />,
   address: null,
   other: null,
