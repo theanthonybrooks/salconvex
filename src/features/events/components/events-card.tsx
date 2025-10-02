@@ -164,14 +164,18 @@ export const EventCard = ({
                   <span className="flex items-center gap-2">
                     <p>{event.location.full}</p>
 
-                    {"-"}
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
-                      className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
-                    >
-                      Get directions
-                      <FaMapLocationDot className="size-5 md:size-4" />
-                    </a>
+                    {eventCategory === "event" && (
+                      <>
+                        {"-"}
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+                          className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
+                        >
+                          Get directions
+                          <FaMapLocationDot className="size-5 md:size-4" />
+                        </a>
+                      </>
+                    )}
                   </span>
                 </section>
                 {/* <a
