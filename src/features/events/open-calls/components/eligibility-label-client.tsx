@@ -59,6 +59,7 @@ export const EligibilityLabel = ({
   const unknownType = type === "Unknown";
   const internationalType = type === "International";
   const nationalType = type === "National";
+  const regionalType = type === "Regional/Local";
   const multipleWhom = whom.length > 1;
   const mobilePreview = format === "mobile" && preview;
   const isMobile = format === "mobile";
@@ -108,6 +109,8 @@ export const EligibilityLabel = ({
       if (!mobilePreview) {
         parts.push(`${type}:`);
       }
+    } else if (regionalType) {
+      parts.push(`${type}:`);
     } else {
       parts.push(type);
     }
@@ -129,7 +132,7 @@ export const EligibilityLabel = ({
       }
     }
   } else if (whom.length === 1) {
-    if (type === "National") {
+    if (nationalType || regionalType) {
       parts.push(`${getDemonym(whom[0])} Artists`);
     } else {
       parts.push(whom[0]);
