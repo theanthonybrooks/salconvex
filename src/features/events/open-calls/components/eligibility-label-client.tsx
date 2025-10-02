@@ -138,7 +138,7 @@ export const EligibilityLabel = ({
   } else if (whom.length === 1) {
     if (nationalType || (regionalType && !mobilePreview)) {
       parts.push(`${getDemonym(whom[0])} Artists`);
-      if (hasDetails) {
+      if (hasDetails && eligible !== false) {
         parts.push("*");
       }
     } else {
