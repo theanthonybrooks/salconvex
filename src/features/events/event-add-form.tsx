@@ -984,9 +984,7 @@ export const EventOCForm = ({
               formType,
               _id: eventData._id || "",
               name: eventData.name,
-              slug:
-                existingEvent?.slug ??
-                slugify(eventData.name, { lower: true, strict: true }),
+              slug: slugify(eventData.name, { lower: true, strict: true }),
               logoStorageId,
               logo: eventLogo,
               type: eventData.type || [],
@@ -1040,9 +1038,7 @@ export const EventOCForm = ({
             const { event } = await createOrUpdateEvent({
               _id: eventData._id || "",
               name: eventData.name,
-              slug:
-                existingEvent?.slug ??
-                slugify(eventData.name, { lower: true, strict: true }),
+              slug: slugify(eventData.name, { lower: true, strict: true }),
 
               logo: eventData.logo as string | "1.jpg",
               type: eventData.type || [],
@@ -1391,9 +1387,10 @@ export const EventOCForm = ({
             const result = await updateOrg({
               orgId: orgData._id as Id<"organizations">,
               name: orgData.name?.trim(),
-              slug:
-                existingOrg?.slug ??
-                slugify(orgData.name?.trim(), { lower: true, strict: true }),
+              slug: slugify(orgData.name?.trim(), {
+                lower: true,
+                strict: true,
+              }),
               logo: orgData.logo as string,
               location: {
                 ...orgData.location,
@@ -1465,9 +1462,7 @@ export const EventOCForm = ({
               formType,
               _id: eventData._id || "",
               name: eventData.name,
-              slug:
-                existingEvent?.slug ??
-                slugify(eventData.name, { lower: true, strict: true }),
+              slug: slugify(eventData.name, { lower: true, strict: true }),
               logo: eventData.logo as string,
               type: eventData.type || [],
               category: !eventOnly ? eventData.category : "event",
