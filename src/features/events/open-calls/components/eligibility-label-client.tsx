@@ -110,7 +110,11 @@ export const EligibilityLabel = ({
         parts.push(`${type}:`);
       }
     } else if (regionalType) {
-      parts.push(`${type}:`);
+      if (!mobilePreview) {
+        parts.push(`${type}${whom.length > 0 ? ":" : ""}`);
+      } else {
+        parts.push(type);
+      }
     } else {
       parts.push(type);
     }
@@ -132,7 +136,7 @@ export const EligibilityLabel = ({
       }
     }
   } else if (whom.length === 1) {
-    if (nationalType || regionalType) {
+    if (nationalType || (regionalType && !mobilePreview)) {
       parts.push(`${getDemonym(whom[0])} Artists`);
     } else {
       parts.push(whom[0]);
