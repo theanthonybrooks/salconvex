@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { EligibilityType } from "@/types/openCall";
 import { CheckIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 export interface EligibilityLabelBaseProps {
   type: EligibilityType | null;
@@ -71,7 +71,7 @@ export const EligibilityLabel = ({
   if (unknownType) {
     return "Not Specified";
   }
-  const parts: string[] = [];
+  const parts: ReactNode[] = [];
   const groupLabel = getGroupEligibilityLabel(whom);
 
   if (socialPost) {
@@ -136,6 +136,9 @@ export const EligibilityLabel = ({
       parts.push(`${getDemonym(whom[0])} Artists`);
     } else {
       parts.push(whom[0]);
+    }
+    if (hasDetails) {
+      parts.push(<sup>*</sup>);
     }
     // if (mobilePreview && type !== "National") {
     //   parts.push(type);
