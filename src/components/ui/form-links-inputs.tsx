@@ -21,6 +21,7 @@ import {
   FaGlobe,
   FaInstagram,
   FaLink,
+  FaLinkedin,
   FaPhone,
   FaPlus,
   FaThreads,
@@ -528,6 +529,31 @@ export const FormLinksInput = ({
                   );
                 })}
               </>
+            )}
+            {isOrg && (
+              <div className="flex items-center gap-x-4">
+                <FaLinkedin className={cn("size-5 shrink-0")} />
+                <Controller
+                  name="organization.links.linkedIn"
+                  control={control}
+                  render={({ field }) => (
+                    <DebouncedControllerInput
+                      disabled={eventSameAsOrg && isEvent}
+                      field={field}
+                      placeholder="linkedIn"
+                      className={cn(
+                        "flex-1",
+                        errors?.[type]?.links?.linkAggregate && "invalid-field",
+                      )}
+                      transform={autoHttps}
+                      onBlur={() => {
+                        field.onBlur?.();
+                        handleCheckSchema?.();
+                      }}
+                    />
+                  )}
+                />
+              </div>
             )}
             {isOrg && (
               <div className="flex items-center gap-x-4">

@@ -495,6 +495,7 @@ export const updateOrganization = mutation({
         threads: v.optional(v.string()),
         email: v.optional(v.string()),
         vk: v.optional(v.string()),
+        linkedIn: v.optional(v.string()),
         youTube: v.optional(v.string()),
         phone: v.optional(v.string()),
         phoneExt: v.optional(v.string()),

@@ -62,6 +62,7 @@ export type Organizer = {
     phoneExt?: string;
     address?: string;
     linkAggregate?: string;
+    linkedIn?: string;
     youTube?: string;
     other?: string;
   };

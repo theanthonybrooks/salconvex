@@ -118,6 +118,7 @@ const linksSchemaLoose = z.object({
   phone: z.string().optional(),
   phoneExt: z.string().optional(),
   linkAggregate: z.string().optional(),
+  linkedIn: z.string().optional(),
   other: z
     .url({
       protocol: /^https?$/,
@@ -178,6 +179,13 @@ const linksSchemaStrict = z.object({
   phoneExt: z.string().optional(),
 
   linkAggregate: z
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+      error: "Must be a valid URL (https://example.com)",
+    })
+    .optional(),
+  linkedIn: z
     .url({
       protocol: /^https?$/,
       hostname: z.regexes.domain,

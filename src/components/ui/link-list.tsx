@@ -7,6 +7,7 @@ import {
   FaFacebookF,
   FaInstagram,
   FaLink,
+  FaLinkedin,
   FaPlus,
   FaRegEnvelope,
   FaThreads,
@@ -432,6 +433,26 @@ export const LinkList = ({
                     )}
                   >
                     {submitRecap ? organizer.links.youTube : "YouTube"}{" "}
+                  </span>
+                </div>
+              </a>
+            )}
+            {organizer.links.linkedIn && (
+              <a href={organizer.links.linkedIn} target="_blank">
+                <div className="flex items-center gap-x-2">
+                  <FaLinkedin className="size-4 shrink-0" />
+                  <span
+                    className={cn(
+                      "underline-offset-2 hover:underline",
+                      submitRecap && "truncate",
+                    )}
+                  >
+                    {submitRecap
+                      ? organizer.links.linkedIn.replace(
+                          "https://linkedin.com/in/",
+                          "",
+                        )
+                      : "LinkedIn"}
                   </span>
                 </div>
               </a>

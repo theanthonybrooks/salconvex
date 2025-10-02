@@ -3,6 +3,7 @@ export type PlatformType =
   | "instagram"
   | "threads"
   | "vk"
+  | "linkedin"
   | "youTube"
   | "email"
   | "website"
@@ -13,6 +14,7 @@ export const platformDomains: Record<PlatformType, string[]> = {
   threads: ["threads.com"],
   facebook: ["facebook.com"],
   vk: ["vk.com"],
+  linkedin: ["linkedin.com"],
   youTube: ["youtube.com"],
   email: [],
   website: [],
