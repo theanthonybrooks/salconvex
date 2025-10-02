@@ -704,9 +704,15 @@ export const EventOCForm = ({
       if (!hasUserEditedForm) return true;
 
       const result = schema.safeParse(currentValues);
+      if (isAdmin) {
+        console.log("safeParse result: ", result);
+      }
 
       if (!result.success) {
         const issues = result.error.issues;
+        if (isAdmin) {
+          console.log("issues: ", issues);
+        }
 
         issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
