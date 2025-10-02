@@ -270,7 +270,7 @@ export const EligibilityLabel = ({
 
       {preview && (
         <>
-          {(internationalType || eligible) && !publicView && (
+          {(internationalType || eligible) && !publicView && !hasDetails && (
             <CheckIcon className="size-4 shrink-0 text-emerald-800" />
           )}
           {nationalType && eligible === false && !publicView && (
