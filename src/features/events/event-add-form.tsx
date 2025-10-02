@@ -443,6 +443,13 @@ export const EventOCForm = ({
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid =
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep1;
+  if (isAdmin) {
+    console.log("isValid", isValid);
+    console.log("validOrgWZod", validOrgWZod);
+    console.log("isStepValidZod", isStepValidZod);
+    console.log("eventChoiceMade", eventChoiceMade);
+    console.log("validStep1", validStep1);
+  }
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
 
