@@ -25,7 +25,8 @@
     "Context",
     "Kanban",
     "Artist",
-    "Calendar"
+    "Calendar",
+    "Event"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }
