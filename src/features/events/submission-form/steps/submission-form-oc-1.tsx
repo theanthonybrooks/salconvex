@@ -359,7 +359,8 @@ const SubmissionFormOC1 = ({
             </div>
           </>
         )}
-        {ocEligiblityType === "National" && (
+        {(ocEligiblityType === "National" ||
+          ocEligiblityType === "Regional/Local") && (
           <>
             <div className="input-section self-start">
               <p className="lg:text-xs">Eligible Nationalities</p>
