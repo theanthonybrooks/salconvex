@@ -134,7 +134,16 @@ export const getFilteredEventsPublic = query({
         )
         .collect();
 
-      events = [...publishedEvents, ...archivedEvents];
+      if (view === "openCall") {
+        console.log("hihi");
+        events = [...publishedEvents];
+      } else {
+        events = [...publishedEvents, ...archivedEvents];
+      }
+
+      console.log("view: ", view, "events: ", events?.length);
+
+      // events = [...publishedEvents, ...archivedEvents];
     } else if (view === "event") {
       //TODO: later, add the ability to view published or archived events (when archive is made and functional)
       events = await ctx.db
@@ -207,10 +216,12 @@ export const getFilteredEventsPublic = query({
           .query("openCalls")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
           .filter((q) =>
-            q.or(
-              q.eq(q.field("state"), "published"),
-              q.eq(q.field("state"), "archived"),
-            ),
+            view === "openCall"
+              ? q.eq(q.field("state"), "published")
+              : q.or(
+                  q.eq(q.field("state"), "published"),
+                  q.eq(q.field("state"), "archived"),
+                ),
           )
           .first();
 

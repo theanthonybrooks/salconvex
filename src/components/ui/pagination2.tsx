@@ -22,7 +22,6 @@ interface BasicPaginationProps {
   totalArchived?: number;
   bottomPag?: boolean;
   className?: string;
-  
 
   onPageChange: (page: number) => void;
   viewType: ViewOptions;
@@ -72,9 +71,11 @@ export const BasicPagination = ({
         >
           {!bottomPag && totalPages !== 0 && (
             <div className="mb-5 flex w-full items-center justify-around gap-4 sm:mb-0 sm:w-auto sm:gap-2">
-              <p className={cn("mx-auto text-nowrap text-center")}>
-                Results: {totalResults}
-              </p>
+              {viewType !== "openCall" && (
+                <p className={cn("mx-auto text-nowrap text-center")}>
+                  Results: {totalResults}
+                </p>
+              )}
               {showOCTotal && totalOpenCalls && (
                 <p className={cn("mx-auto text-nowrap text-center")}>
                   Active Calls: {totalOpenCalls}
