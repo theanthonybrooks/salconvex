@@ -840,12 +840,13 @@ const SubmissionFormOC1 = ({
                             className={cn("w-full rounded border-foreground")}
                             debounceMs={50}
                             tabIndex={12}
-                            onBlur={() => {
-                              field.onBlur?.();
-                              handleCheckSchema?.();
-                              field.onChange(field.value);
-                              // console.log("Blur me", field + type)
-                            }}
+                            // onBlur={() => {
+                            //   field.onBlur?.();
+                            //   handleCheckSchema?.();
+                            //   field.onChange(field.value);
+                            //   // console.log("Blur me", field + type)
+                            // }}
+                            onSchemaCheck={handleCheckSchema}
                           />
                         )}
                       />

@@ -12,6 +12,7 @@ interface DebouncedControllerInputProps<
   debounceMs?: number;
   transform?: (value: string) => string;
   [key: string]: unknown;
+  onSchemaCheck?: () => void;
 }
 
 export function DebouncedControllerInput<
@@ -21,6 +22,7 @@ export function DebouncedControllerInput<
   field,
   debounceMs = 500,
   transform,
+  onSchemaCheck,
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
   // const { setValue } = useFormContext();
@@ -79,6 +81,7 @@ export function DebouncedControllerInput<
         const transformed = transform ? transform(pasted) : pasted;
         setLocalValue(transformed);
         field.onChange(transformed);
+        onSchemaCheck?.();
         // setValue(field.name, transformed as TFieldValues[TName], {
         //   shouldValidate: true,
         //   shouldDirty: true,
@@ -88,12 +91,10 @@ export function DebouncedControllerInput<
           field.onBlur();
         });
       }}
-      // onBlur={(e) => {
-      //   field.onBlur();
-      //   if (typeof inputProps.onBlur === "function") {
-      //     inputProps.onBlur(e);
-      //   }
-      // }}
+      onBlur={() => {
+        field.onBlur();
+        onSchemaCheck?.();
+      }}
     />
   );
 }
