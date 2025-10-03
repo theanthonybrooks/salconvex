@@ -21,3 +21,8 @@ export const supportCategoryOptions = [
 ] as const;
 
 export type SupportCategory = (typeof supportCategoryOptions)[number]["value"];
+
+export function getSupportCategoryLabel(value: SupportCategory): string {
+  const option = supportCategoryOptions.find((opt) => opt.value === value);
+  return option ? option.label : value;
+}

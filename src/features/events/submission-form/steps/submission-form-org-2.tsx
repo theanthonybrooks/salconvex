@@ -18,9 +18,11 @@ const SubmissionFormOrgStep2 = ({
 }: SubmissionFormOrgStep2Props) => {
   const {
     control,
-    // watch,
+    watch,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+
+  const organizerTitle = watch("organization.contact.organizer");
   // const currentValues = getValues();
 
   return (
@@ -115,6 +117,30 @@ const SubmissionFormOrgStep2 = ({
                   />
                 )}
               />
+              {typeof organizerTitle === "string" &&
+                organizerTitle.trim().length > 0 && (
+                  <Controller
+                    name="organization.contact.organizerTitle"
+                    control={control}
+                    render={({ field }) => (
+                      <DebouncedControllerInput
+                        field={field}
+                        placeholder="Title of primary contact"
+                        className={cn(
+                          "w-full rounded border-foreground",
+                          errors?.organization?.contact?.organizerTitle &&
+                            "invalid-field",
+                        )}
+                        tabIndex={3}
+                        onBlur={() => {
+                          field.onBlur?.();
+                          handleCheckSchema?.();
+                          // console.log("Blur me", field + type)
+                        }}
+                      />
+                    )}
+                  />
+                )}
             </div>
             <div className="input-section h-full">
               <p className="min-w-max font-bold lg:text-xl">Step 3:</p>

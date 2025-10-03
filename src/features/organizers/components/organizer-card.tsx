@@ -48,7 +48,14 @@ export const OrganizerCard = ({
               {organizer.contact?.organizer && (
                 <span className={cn(fontSize)}>
                   <p className="font-semibold">Organizer:</p>
-                  <p className="line-clamp-4">{organizer.contact.organizer}</p>
+                  <span className="flex items-center gap-1">
+                    {organizer.contact.organizer}
+                    {organizer.contact.organizerTitle ? (
+                      <span className="text-sm">
+                        - {organizer.contact.organizerTitle}
+                      </span>
+                    ) : null}
+                  </span>
                 </span>
               )}
 
@@ -86,9 +93,14 @@ export const OrganizerCard = ({
                 {organizer.contact?.organizer && (
                   <span>
                     <p className="font-semibold">Organizer:</p>
-                    <p className="line-clamp-4">
+                    <span className="flex items-center gap-1">
                       {organizer.contact.organizer}
-                    </p>
+                      {organizer.contact.organizerTitle ? (
+                        <span className="text-sm">
+                          - {organizer.contact.organizerTitle}
+                        </span>
+                      ) : null}
+                    </span>
                   </span>
                 )}
                 <OrganizerMainContact

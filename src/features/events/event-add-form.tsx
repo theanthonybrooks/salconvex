@@ -1404,6 +1404,7 @@ export const EventOCForm = ({
               },
               contact: {
                 organizer: orgData.contact?.organizer,
+                organizerTitle: orgData.contact?.organizerTitle,
                 primaryContact: orgData.contact?.primaryContact || "",
               },
               about: orgData.about,

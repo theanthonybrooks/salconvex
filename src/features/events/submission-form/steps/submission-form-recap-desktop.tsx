@@ -30,6 +30,7 @@ import { getCallFormatLabel } from "@/lib/openCallFns";
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { cn } from "@/lib/utils";
 import { EligibilityType } from "@/types/openCall";
+import { capitalize } from "lodash";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Id } from "~/convex/_generated/dataModel";
@@ -118,13 +119,21 @@ export const SubmissionFormRecapDesktop = ({
                     Primary Contact
                   </th>
                   <td>
-                    {/* <OrganizerMainContact
-                      organizer={orgData as OrgContactProps}
-                      linkOnly
-                    /> */}
                     <p className="capitalize">
-                      {orgData?.contact?.primaryContact}
+                      <span className="font-medium">Preferred Method:</span>{" "}
+                      {capitalize(orgData?.contact?.primaryContact)}
                     </p>{" "}
+                    {orgData?.contact?.organizer && (
+                      <span className="flex items-center gap-1">
+                        <span className="font-medium">Contact:</span>{" "}
+                        {orgData?.contact?.organizer}
+                        {orgData?.contact?.organizerTitle && (
+                          <span className="text-sm">
+                            - {orgData?.contact?.organizerTitle}
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </td>
                 </tr>
 

@@ -484,6 +484,7 @@ export const updateOrganization = mutation({
     contact: v.optional(
       v.object({
         organizer: v.optional(v.string()),
+        organizerTitle: v.optional(v.string()),
         primaryContact: v.string(),
       }),
     ),
@@ -547,6 +548,7 @@ export const updateOrganization = mutation({
       about: args.about,
       contact: {
         organizer: args.contact?.organizer,
+        organizerTitle: args.contact?.organizerTitle,
         primaryContact: args.contact?.primaryContact || "",
       },
       links: sanitizedLinks,

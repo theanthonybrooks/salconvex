@@ -309,11 +309,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                 <SelectItem fit value="seasonRange">
                   Season Range
                 </SelectItem>
-                {isEvent && (
-                  <SelectItem fit value="ongoing">
-                    Ongoing
-                  </SelectItem>
-                )}
+
+                <SelectItem fit value="ongoing">
+                  Ongoing
+                </SelectItem>
               </SelectContent>
             </Select>
           );

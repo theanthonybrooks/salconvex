@@ -49,6 +49,7 @@ export type Organizer = {
   about?: string;
   contact: {
     organizer?: string;
+    organizerTitle?: string;
     primaryContact: PrimaryContact;
   };
   links: {

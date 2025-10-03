@@ -42,6 +42,7 @@ import {
   Voter,
 } from "@/constants/kanbanConsts";
 import {
+  getSupportCategoryLabel,
   SupportCategory,
   supportCategoryOptions,
 } from "@/constants/supportConsts";
@@ -1056,7 +1057,7 @@ export const DetailsDialog = ({
                     icon={categoryConfig.icon}
                     className={cn("px-4 text-base", categoryConfig.className)}
                   >
-                    {capitalize(category)}
+                    {getSupportCategoryLabel(category)}
                   </FlairBadge>
                   <span className="flex items-center gap-2">
                     <LucideThumbsUp

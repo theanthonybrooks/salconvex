@@ -30,7 +30,7 @@ export const DraftPendingBanner = ({
         <>
           {(hasDraft || hasPendingState) && (
             <div className="col-span-full mb-4 w-full text-center">
-              {hasDraft && (
+              {hasDraft && !hasPendingState && (
                 <p className="rounded-lg border-2 bg-stone-100 p-4 text-2xl font-bold uppercase text-foreground/60">
                   Draft - Preview Only
                 </p>

@@ -204,7 +204,8 @@ const linksSchemaStrict = z.object({
 
 const contactSchema = z.object({
   organizer: z.optional(z.string()),
-  primaryContact: z.string(),
+  organizerTitle: z.optional(z.string()),
+  primaryContact: z.string().min(3, "Primary Contact is required"),
 });
 
 const organizationSchema = z.object({
@@ -469,10 +470,7 @@ export const step1Schema = z
 
 export const orgDetailsSchema = z.object({
   organization: organizationSchema.extend({
-    contact: z.object({
-      organizer: z.optional(z.string()),
-      primaryContact: z.string().min(3, "Primary Contact is required"),
-    }),
+    contact: contactSchema,
     links: linksSchemaStrict,
     about: z.optional(z.string()),
   }),

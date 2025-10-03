@@ -226,6 +226,7 @@ const organizationSchema = {
   contact: v.optional(
     v.object({
       organizer: v.optional(v.string()),
+      organizerTitle: v.optional(v.string()),
       primaryContact: v.string(),
     }),
   ),
