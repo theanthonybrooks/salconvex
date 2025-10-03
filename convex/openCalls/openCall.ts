@@ -27,12 +27,6 @@ export const getTotalNumberOfOpenCalls = query({
           pending++;
           break;
         case "published":
-          // console.log(
-          //   "openCall.eventId",
-          //   openCall._id,
-          //   "active number: ",
-          //   active,
-          // );
           active++;
           break;
         case "archived":
@@ -49,6 +43,20 @@ export const getTotalNumberOfOpenCalls = query({
           break;
       }
     }
+    console.log(
+      "totalOpenCalls: ",
+      openCalls.length,
+      "activeOpenCalls: ",
+      active,
+      "archivedOpenCalls: ",
+      archived,
+      "draftOpenCalls: ",
+      draft,
+      "pendingOpenCalls: ",
+      pending,
+      "editingOpenCalls: ",
+      editing,
+    );
 
     return {
       totalOpenCalls: openCalls.length,

@@ -1,3 +1,5 @@
+//todo: currently, the active open call count doesn't include coming-soon calls. But the counter on the main page does. How to handle this?
+
 import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
 import { OpenCallStatus } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -135,13 +137,10 @@ export const getFilteredEventsPublic = query({
         .collect();
 
       if (view === "openCall") {
-        console.log("hihi");
         events = [...publishedEvents];
       } else {
         events = [...publishedEvents, ...archivedEvents];
       }
-
-      console.log("view: ", view, "events: ", events?.length);
 
       // events = [...publishedEvents, ...archivedEvents];
     } else if (view === "event") {
@@ -206,7 +205,7 @@ export const getFilteredEventsPublic = query({
       events = events.filter((e) => e.posted === filters.postStatus);
     }
     let totalResults = 0;
-    let totalOpenCalls = 0;
+    // let totalOpenCalls = 0;
 
     const enriched = await Promise.all(
       events.map(async (event) => {
@@ -256,9 +255,9 @@ export const getFilteredEventsPublic = query({
           } else if (openCall && openCall.state === "archived") {
             openCallStatus = "ended";
           }
-          if (hasActiveOpenCall) {
-            totalOpenCalls++;
-          }
+          // if (hasActiveOpenCall) {
+          //   totalOpenCalls++;
+          // }
         } else if (thisWeekPg || nextWeekPg) {
           // if (!openCall || openCall.state !== "published") return null;
 
@@ -278,7 +277,7 @@ export const getFilteredEventsPublic = query({
 
               if (openCallStatus === "active" || openCallStatus === "ended") {
                 hasActiveOpenCall = true;
-                totalOpenCalls++;
+                // totalOpenCalls++;
               }
             }
           }

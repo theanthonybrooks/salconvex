@@ -586,7 +586,7 @@ const Card = ({
                   : "medium") as Priority,
                 voters,
                 category:
-                  (category ?? purpose === "design") ? "ui/ux" : "general",
+                  category ?? (purpose === "design" ? "ui/ux" : "general"),
                 isPublic: isPublic ?? true,
               }}
               onSubmit={(data) => {
@@ -866,24 +866,6 @@ export const TaskDialog = ({
             inputPreview={false}
             inputPreviewContainerClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
           />
-          {/* <input autoFocus className="sr-only" /> */}
-
-          {/* <textarea
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onKeyDown={(e) => {
-              const isMac = navigator.userAgent.includes("Mac");
-              const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
-              if (ctrlOrCmd && e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit(e);
-                onClose?.();
-              }
-            }}
-            placeholder="Task title..."
-            className="scrollable mini max-h-[60dvh] min-h-72 w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
-          /> */}
 
           <div className="flex flex-col items-center gap-3 md:flex-row">
             <div className="flex w-full items-center gap-3 sm:w-auto">
