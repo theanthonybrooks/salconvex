@@ -67,18 +67,18 @@ const handleFields: {
     primaryOption: true,
   },
   {
-    key: "vk",
-    icon: <FaVk className={cn("size-5 shrink-0")} />,
-    platform: "vk",
-    placeholder: "@eventname",
-    primaryOption: true,
-  },
-  {
     key: "youTube",
     icon: <FaYoutube className={cn("size-5 shrink-0")} />,
     platform: "youTube",
     placeholder: "youtube.com/...",
     primaryOption: false,
+  },
+  {
+    key: "vk",
+    icon: <FaVk className={cn("size-5 shrink-0")} />,
+    platform: "vk",
+    placeholder: "@eventname",
+    primaryOption: true,
   },
 ];
 

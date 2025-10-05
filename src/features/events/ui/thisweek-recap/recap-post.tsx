@@ -103,16 +103,16 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
                       "italic text-red-600",
                   )}
                 >
-                  {
-                    <EligibilityLabel
-                      type={eligibility?.type ?? null}
-                      whom={eligibility?.whom || []}
-                      format="desktop"
-                      preview={true}
-                      publicView={true}
-                    />
-                  }
+                  <EligibilityLabel
+                    type={eligibility?.type ?? null}
+                    whom={eligibility?.whom || []}
+                    format="desktop"
+                    preview={true}
+                    publicView={true}
+                  />
+                  {eligibility?.details && "*"}
                 </span>
+                \
               </span>
             </li>
             <li>

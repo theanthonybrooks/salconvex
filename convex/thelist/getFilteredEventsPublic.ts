@@ -1,7 +1,7 @@
 //todo: currently, the active open call count doesn't include coming-soon calls. But the counter on the main page does. How to handle this?
 
 import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
-import { OpenCallStatus } from "@/types/openCall";
+import { OpenCallStatus, validOCVals } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { addDays, addWeeks, endOfWeek, startOfWeek } from "date-fns";
@@ -121,6 +121,7 @@ export const getFilteredEventsPublic = query({
 
     const hiddenIds = listActions.filter((a) => a.hidden).map((a) => a.eventId);
     let events = [];
+
     if (thisWeekPg || nextWeekPg || view === "archive" || view === "openCall") {
       const publishedEvents = await ctx.db
         .query("events")
@@ -136,7 +137,7 @@ export const getFilteredEventsPublic = query({
         )
         .collect();
 
-      if (view === "openCall") {
+      if (view === "openCall" && !(thisWeekPg || nextWeekPg)) {
         events = [...publishedEvents];
       } else {
         events = [...publishedEvents, ...archivedEvents];
@@ -210,23 +211,27 @@ export const getFilteredEventsPublic = query({
     const enriched = await Promise.all(
       events.map(async (event) => {
         const isUserOrg = event.mainOrgId && userOrgIds.has(event.mainOrgId);
+        const eventHasOpenCall = validOCVals.includes(event.hasOpenCall);
 
-        const openCall = await ctx.db
-          .query("openCalls")
-          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .filter((q) =>
-            view === "openCall"
-              ? q.eq(q.field("state"), "published")
-              : q.or(
-                  q.eq(q.field("state"), "published"),
-                  q.eq(q.field("state"), "archived"),
-                ),
-          )
-          .first();
+        const openCall = eventHasOpenCall
+          ? await ctx.db
+              .query("openCalls")
+              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+              .filter((q) =>
+                view === "openCall" && !(thisWeekPg || nextWeekPg)
+                  ? q.eq(q.field("state"), "published")
+                  : q.or(
+                      q.eq(q.field("state"), "published"),
+                      q.eq(q.field("state"), "archived"),
+                    ),
+              )
+              .first()
+          : null;
 
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;
         let orgName: string | null = null;
+        //TODO: Split this out into a separate fn. it's currently querying the entire organizatoin just for the org name.
 
         if (event.mainOrgId) {
           const org = await ctx.db.get(event.mainOrgId);
@@ -308,7 +313,11 @@ export const getFilteredEventsPublic = query({
 
     const filtered =
       thisWeekPg || nextWeekPg
-        ? enriched.filter((e) => e.openCall && e.hasActiveOpenCall)
+        ? enriched.filter(
+            (e) =>
+              e.openCall &&
+              (e.hasActiveOpenCall || e.openCallStatus === "ended"),
+          )
         : enriched.filter((e) => {
             const oc = e.openCall;
             // if (!oc) return false;
