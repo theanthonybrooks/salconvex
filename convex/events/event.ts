@@ -15,6 +15,8 @@ import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
+import { eventsAggregate } from "~/convex/aggregates/eventAggregates";
+
 export const globalSearch = query({
   args: {
     searchTerm: v.string(),
@@ -33,7 +35,7 @@ export const globalSearch = query({
 
     const today = new Date().toISOString();
     const now = Date.parse(today);
-
+    //TODO: How to make this more efficient?
     const allOpenCalls = activeSub
       ? await ctx.db.query("openCalls").collect()
       : [];
@@ -329,42 +331,151 @@ export const updateEventLastEditedAt = mutation({
   },
 });
 
+// export const getTotalNumberOfEvents = query({
+//   handler: async (ctx) => {
+//     const events = await ctx.db.query("events").collect();
+
+//     let active = 0,
+//       archived = 0,
+//       draft = 0,
+//       pending = 0;
+
+//     for (const event of events) {
+//       switch (event.state) {
+//         case "published":
+//           active++;
+//           break;
+//         case "archived":
+//           archived++;
+//           break;
+//         case "draft":
+//           draft++;
+//           break;
+//         case "submitted":
+//           pending++;
+//           break;
+//       }
+//     }
+//     console.log(
+//       "active: ",
+//       active,
+//       "archived: ",
+//       archived,
+//       "draft: ",
+//       draft,
+//       "pending: ",
+//       pending,
+//       "total: ",
+//       events.length,
+//     );
+
+//     console.log(eventsAggregate);
+
+//     return {
+//       totalEvents: events.length,
+//       activeEvents: active,
+//       archivedEvents: archived,
+//       draftEvents: draft,
+//       pendingEvents: pending,
+//     };
+//   },
+// });
+
 export const getTotalNumberOfEvents = query({
   handler: async (ctx) => {
-    const events = await ctx.db.query("events").collect();
+    // const active = await eventsAggregate.count(ctx, {
+    //   bounds: { prefix: "published" },
+    // });
+    // const archived = await eventsAggregate.count(ctx, {
+    //   bounds: { prefix: "archived" },
+    // });
+    // const draft = await eventsAggregate.count(ctx, {
+    //   bounds: { prefix: "draft" },
+    // });
+    // const submitted = await eventsAggregate.count(ctx, {
+    //   bounds: { prefix: "submitted" },
+    // });
+    // const pending = await eventsAggregate.count(ctx, {
+    //   bounds: { prefix: "submitted" },
+    // });
 
-    let active = 0,
-      archived = 0,
-      draft = 0,
-      pending = 0;
+    // const publishedBounds = {
+    //   prefix: ["published"] ,
+    // };
+    // const archivedBounds = {
+    //   prefix: ["archived"] ,
+    // };
+    // const draftBounds = {
+    //   prefix: ["draft"] ,
+    // };
+    // const submittedBounds = {
+    //   prefix: ["submitted"] ,
+    // };
+    // const pendingBounds = {
+    //   prefix: ["published"] ,
+    // };
+    const publishedBounds = {
+      lower: { key: "published", inclusive: true },
+      upper: { key: "published", inclusive: true },
+    };
+    const archivedBounds = {
+      lower: { key: "archived", inclusive: true },
+      upper: { key: "archived", inclusive: true },
+    };
+    const draftBounds = {
+      lower: { key: "draft", inclusive: true },
+      upper: { key: "draft", inclusive: true },
+    };
+    const submittedBounds = {
+      lower: { key: "submitted", inclusive: true },
+      upper: { key: "submitted", inclusive: true },
+    };
+    const pendingBounds = {
+      lower: { key: "pending", inclusive: true },
+      upper: { key: "pending", inclusive: true },
+    };
 
-    for (const event of events) {
-      switch (event.state) {
-        case "published":
-          active++;
-          break;
-        case "archived":
-          archived++;
-          break;
-        case "draft":
-          draft++;
-          break;
-        case "submitted":
-          pending++;
-          break;
-      }
-    }
+    const [active, archived, draft, submitted, pending] =
+      await eventsAggregate.countBatch(ctx, [
+        // { bounds: { prefix: ["published"] } },
+        // { bounds: { prefix: ["archived"] } },
+        // { bounds: { prefix: ["draft"] } },
+        // { bounds: { prefix: ["submitted"] } },
+        // { bounds: { prefix: ["pending"] } },
+        { bounds: publishedBounds },
+        { bounds: archivedBounds },
+        { bounds: draftBounds },
+        { bounds: submittedBounds },
+        { bounds: pendingBounds },
+      ]);
+
+    const totalEvents = await eventsAggregate.count(ctx);
+    console.log(
+      "active: ",
+      active,
+      "archived: ",
+      archived,
+      "draft: ",
+      draft,
+      "submitted: ",
+      submitted,
+      "pending: ",
+      pending,
+      "total: ",
+
+      totalEvents,
+    );
 
     return {
-      totalEvents: events.length,
+      totalEvents,
       activeEvents: active,
       archivedEvents: archived,
       draftEvents: draft,
+      submittedEvents: submitted,
       pendingEvents: pending,
     };
   },
 });
-
 export const getEventByOrgId = query({
   args: {
     orgId: v.id("organizations"),
@@ -419,6 +530,7 @@ export const getEventByOrgId = query({
 //   },
 // });
 
+//TODO: Make this more efficient
 export const getSubmittedEvents = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
@@ -503,6 +615,7 @@ export const getSubmittedEventCount = query({
   },
 });
 
+//TODO: Make this more efficient
 export const getAllEvents = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
@@ -811,16 +924,16 @@ export const checkEventNameExists = query({
   },
 });
 
-export const getPublishedEvents = query({
-  handler: async (ctx) => {
-    const events = await ctx.db
-      .query("events")
-      .withIndex("by_state", (q) => q.eq("state", "published"))
-      .collect();
+// export const getPublishedEvents = query({
+//   handler: async (ctx) => {
+//     const events = await ctx.db
+//       .query("events")
+//       .withIndex("by_state", (q) => q.eq("state", "published"))
+//       .collect();
 
-    return events;
-  },
-});
+//     return events;
+//   },
+// });
 
 export const getEventsForCalendar = query({
   handler: async (ctx) => {
@@ -886,20 +999,8 @@ export const getEventBySlug = query({
 
     if (!event) throw new ConvexError("No event found");
 
-    const [organizer] = await Promise.all([
-      // const [openCalls, organizer] = await Promise.all([
-      // ctx.db
-      //   .query("openCalls")
-      //   .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-      //   .collect(),
-      ctx.db.get(event.mainOrgId),
-    ]);
+    const [organizer] = await Promise.all([ctx.db.get(event.mainOrgId)]);
     const userIsOrganizer = user?._id === organizer?.ownerId;
-    // console.log(organizer);
-
-    // const openCall = openCalls.find(
-    //   (e) => e.basicInfo.dates.edition === args.edition,
-    // );
 
     return {
       event: {
@@ -1384,6 +1485,7 @@ export const createOrUpdateEvent = mutation({
       lastEditedAt: Date.now(),
     });
     const newEvent = await ctx.db.get(eventId);
+    await eventsAggregate.insert(ctx, newEvent!);
     return { event: newEvent };
   },
 });
@@ -1407,13 +1509,15 @@ export const approveEvent = mutation({
     if (!event) return null;
 
     const eventState = event.state === "submitted" ? "published" : "published";
-
+    const oldDoc = event;
     await ctx.db.patch(event._id, {
       state: eventState,
       lastEditedAt: Date.now(),
       approvedBy: userId,
       approvedAt: Date.now(),
     });
+    const newDoc = await ctx.db.get(event._id);
+    await eventsAggregate.replace(ctx, oldDoc!, newDoc!);
 
     return { event };
   },
@@ -1438,12 +1542,15 @@ export const reactivateEvent = mutation({
 
     const eventState =
       event.state === "archived" && isAdmin ? "published" : "submitted";
+    const oldDoc = event;
 
     await ctx.db.patch(event._id, {
       state: eventState,
       lastEditedAt: Date.now(),
       approvedBy: undefined,
     });
+    const newDoc = await ctx.db.get(event._id);
+    await eventsAggregate.replace(ctx, oldDoc!, newDoc!);
 
     return { event };
   },
@@ -1461,10 +1568,13 @@ export const archiveEvent = mutation({
 
     const eventState = event.state === "submitted" ? "archived" : "archived";
 
+    const oldDoc = event;
     await ctx.db.patch(event._id, {
       state: eventState,
       lastEditedAt: Date.now(),
     });
+    const newDoc = await ctx.db.get(event._id);
+    await eventsAggregate.replace(ctx, oldDoc!, newDoc!);
 
     return { event };
   },
@@ -1499,7 +1609,7 @@ export const duplicateEvent = mutation({
     eventName = name;
     eventSlug = slug;
 
-    const newEvent = await ctx.db.insert("events", {
+    const newEventId = await ctx.db.insert("events", {
       formType: event.formType,
       name: eventName,
       slug: eventSlug,
@@ -1528,8 +1638,10 @@ export const duplicateEvent = mutation({
       state: "draft",
       lastEditedAt: Date.now(),
     });
+    const newEvent = await ctx.db.get(newEventId);
+    await eventsAggregate.insert(ctx, newEvent!);
 
-    return { event: newEvent };
+    return { event: newEventId };
   },
 });
 
@@ -1571,6 +1683,7 @@ export const deleteEvent = mutation({
     }
 
     await ctx.db.delete(event._id);
+    await eventsAggregate.delete(ctx, event!);
 
     return { event };
   },
@@ -1626,6 +1739,7 @@ export const deleteMultipleEvents = mutation({
       }
 
       await ctx.db.delete(event._id);
+      await eventsAggregate.delete(ctx, event);
       deletedEventIds.push(event._id);
     }
 

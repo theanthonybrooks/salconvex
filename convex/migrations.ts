@@ -1,6 +1,10 @@
 import { Migrations } from "@convex-dev/migrations";
+import {
+  eventsAggregate,
+  openCallsAggregate,
+} from "~/convex/aggregates/eventAggregates.js";
 import { components, internal } from "./_generated/api.js";
-import { DataModel, Id } from "./_generated/dataModel.js";
+import { DataModel } from "./_generated/dataModel.js";
 
 //NOTE: (TO RUN THIS MIGRATION)
 // FOR PRODUCTION:
@@ -12,110 +16,130 @@ import { DataModel, Id } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
-export const addDefaultNewsletterTypeandFrequency = migrations.define({
-  table: "newsletter",
-  migrateOne: async (ctx, user) => {
-    //gather all newsletter subscriptions
-    //everyone gets a monthly frequency and general newsletter type
-    await ctx.db.patch(user._id, {
-      type: ["general"],
-      frequency: "monthly",
-    });
+export const backfillEventsAggregate = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, event) => {
+    await eventsAggregate.insertIfDoesNotExist(ctx, event);
+  },
+});
+export const backfillOCAggregate = migrations.define({
+  table: "openCalls",
+  migrateOne: async (ctx, doc) => {
+    await openCallsAggregate.insertIfDoesNotExist(ctx, doc);
   },
 });
 
-export const findUsersWithActiveNewsletterAndUpdateUserPref = migrations.define(
-  {
-    table: "users",
-    migrateOne: async (ctx, user) => {
-      const userId = user._id;
-      const subscriptionByUserId = await ctx.db
-        .query("newsletter")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
-        .first();
-
-      const subscriptionByEmail = await ctx.db
-        .query("newsletter")
-        .withIndex("by_email", (q) => q.eq("email", user.email))
-        .first();
-
-      const userPrefs = await ctx.db
-        .query("userPreferences")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
-        .unique();
-
-      if (!userPrefs) return;
-
-      if (subscriptionByUserId?.newsletter) {
-        await ctx.db.patch(userPrefs._id, {
-          notifications: {
-            newsletter: true,
-          },
-          lastUpdated: Date.now(),
-        });
-      } else if (subscriptionByEmail?.newsletter) {
-        await ctx.db.patch(userPrefs._id, {
-          notifications: {
-            newsletter: true,
-          },
-          lastUpdated: Date.now(),
-        });
-      }
-    },
-  },
+export const runBackfillEA = migrations.runner(
+  internal.migrations.backfillEventsAggregate,
+);
+export const runBackfillOCA = migrations.runner(
+  internal.migrations.backfillOCAggregate,
 );
 
-export const runFUWA = migrations.runner(
-  internal.migrations.findUsersWithActiveNewsletterAndUpdateUserPref,
-);
+// export const addDefaultNewsletterTypeandFrequency = migrations.define({
+//   table: "newsletter",
+//   migrateOne: async (ctx, user) => {
+//     //gather all newsletter subscriptions
+//     //everyone gets a monthly frequency and general newsletter type
+//     await ctx.db.patch(user._id, {
+//       type: ["general"],
+//       frequency: "monthly",
+//     });
+//   },
+// });
 
-export const runANPBU = migrations.runner(
-  internal.migrations.addDefaultNewsletterTypeandFrequency,
-);
-export const addVotersArrayToKanban = migrations.define({
-  table: "todoKanban",
-  migrateOne: async (ctx, todo) => {
-    await ctx.db.patch(todo._id, { voters: [] });
-  },
-});
+// export const findUsersWithActiveNewsletterAndUpdateUserPref = migrations.define(
+//   {
+//     table: "users",
+//     migrateOne: async (ctx, user) => {
+//       const userId = user._id;
+//       const subscriptionByUserId = await ctx.db
+//         .query("newsletter")
+//         .withIndex("by_userId", (q) => q.eq("userId", userId))
+//         .first();
 
-export const addUserIdToKanban = migrations.define({
-  table: "todoKanban",
-  migrateOne: async (ctx, todo) => {
-    await ctx.db.patch(todo._id, {
-      lastUpdatedBy: "mh74phva5yrxhg9ga6x1g1csk97cp2vc" as Id<"users">,
-    });
-  },
-});
-export const runAUIDTK = migrations.runner(
-  internal.migrations.addUserIdToKanban,
-);
+//       const subscriptionByEmail = await ctx.db
+//         .query("newsletter")
+//         .withIndex("by_email", (q) => q.eq("email", user.email))
+//         .first();
 
-export const backfillUserPlan = migrations.define({
-  table: "users",
-  migrateOne: async (ctx, user) => {
-    if (typeof user.plan === "number") return;
+//       const userPrefs = await ctx.db
+//         .query("userPreferences")
+//         .withIndex("by_userId", (q) => q.eq("userId", userId))
+//         .unique();
 
-    const planStr: string | undefined = user?.subscription;
-    if (!planStr) return;
+//       if (!userPrefs) return;
 
-    const mapping: Record<string, number> = {
-      "monthly-original": 1,
-      "monthly-banana": 2,
-      "monthly-fatcap": 3,
-      "yearly-original": 1,
-      "yearly-banana": 2,
-      "yearly-fatcap": 3,
-    };
+//       if (subscriptionByUserId?.newsletter) {
+//         await ctx.db.patch(userPrefs._id, {
+//           notifications: {
+//             newsletter: true,
+//           },
+//           lastUpdated: Date.now(),
+//         });
+//       } else if (subscriptionByEmail?.newsletter) {
+//         await ctx.db.patch(userPrefs._id, {
+//           notifications: {
+//             newsletter: true,
+//           },
+//           lastUpdated: Date.now(),
+//         });
+//       }
+//     },
+//   },
+// );
 
-    const numeric = mapping[planStr];
-    if (numeric === undefined) return;
+// export const runFUWA = migrations.runner(
+//   internal.migrations.findUsersWithActiveNewsletterAndUpdateUserPref,
+// );
 
-    await ctx.db.patch(user._id, { plan: numeric });
-  },
-});
+// export const runANPBU = migrations.runner(
+//   internal.migrations.addDefaultNewsletterTypeandFrequency,
+// );
+// export const addVotersArrayToKanban = migrations.define({
+//   table: "todoKanban",
+//   migrateOne: async (ctx, todo) => {
+//     await ctx.db.patch(todo._id, { voters: [] });
+//   },
+// });
 
-export const runBUP = migrations.runner(internal.migrations.backfillUserPlan);
+// export const addUserIdToKanban = migrations.define({
+//   table: "todoKanban",
+//   migrateOne: async (ctx, todo) => {
+//     await ctx.db.patch(todo._id, {
+//       lastUpdatedBy: "mh74phva5yrxhg9ga6x1g1csk97cp2vc" as Id<"users">,
+//     });
+//   },
+// });
+// export const runAUIDTK = migrations.runner(
+//   internal.migrations.addUserIdToKanban,
+// );
+
+// export const backfillUserPlan = migrations.define({
+//   table: "users",
+//   migrateOne: async (ctx, user) => {
+//     if (typeof user.plan === "number") return;
+
+//     const planStr: string | undefined = user?.subscription;
+//     if (!planStr) return;
+
+//     const mapping: Record<string, number> = {
+//       "monthly-original": 1,
+//       "monthly-banana": 2,
+//       "monthly-fatcap": 3,
+//       "yearly-original": 1,
+//       "yearly-banana": 2,
+//       "yearly-fatcap": 3,
+//     };
+
+//     const numeric = mapping[planStr];
+//     if (numeric === undefined) return;
+
+//     await ctx.db.patch(user._id, { plan: numeric });
+//   },
+// });
+
+// export const runBUP = migrations.runner(internal.migrations.backfillUserPlan);
 
 // export const copyUpdatedAtToCompletedAt = migrations.define({
 //   table: "todoKanban",

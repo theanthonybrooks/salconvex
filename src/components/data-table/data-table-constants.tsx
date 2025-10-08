@@ -123,11 +123,13 @@ export const eventStates = [
     label: "Draft",
     icon: Pencil,
   },
+  { value: "editing", label: "Editing", icon: Pencil },
   {
     value: "submitted",
     label: "Submitted",
     icon: Clock,
   },
+  { value: "pending", label: "Pending", icon: DollarSign },
   {
     value: "published",
     label: "Published",
