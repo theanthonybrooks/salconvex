@@ -410,7 +410,7 @@ const ClientEventList = () => {
               // onValueChange={(val) => setView(val as ViewOptions)}
               onValueChange={(val) => handleViewChange(val as ViewOptions)}
             >
-              <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
+              <TabsList className="relative flex h-12 w-full justify-around bg-white/70">
                 {(isMobile
                   ? viewOptionValues.slice(0, 3)
                   : hasOrgEvents
@@ -454,7 +454,7 @@ const ClientEventList = () => {
               // value={view}
               onValueChange={(val) => setView(val as ViewOptions)}
             >
-              <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
+              <TabsList className="relative flex h-12 w-full justify-around bg-white/70">
                 {viewOptionValues
                   .filter(
                     (opt) => opt.value === "event" || opt.value === "orgView",

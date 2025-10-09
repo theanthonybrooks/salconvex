@@ -136,7 +136,7 @@ export const PricingSwitch = ({ onSwitchAction }: SwitchProps) => {
           setActiveTab(val);
         }}
       >
-        <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/70">
+        <TabsList className="relative flex h-12 w-full justify-around bg-white/70">
           {pricingIntervals.map((opt) => (
             <TabsTrigger
               key={opt.val}

@@ -566,7 +566,7 @@ export default function SettingsPage() {
         onValueChange={handleTabChange}
         className="space-y-6"
       >
-        <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border bg-white/80 md:w-auto md:justify-start">
+        <TabsList className="scrollable invis h-12 w-full max-w-full justify-around bg-white/80 md:w-auto md:justify-start">
           <TabsTrigger value="account" className="h-9 px-4" border>
             Account
           </TabsTrigger>

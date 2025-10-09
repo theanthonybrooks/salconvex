@@ -368,7 +368,7 @@ const FullPageNav = ({
                   />
                 </Link>
               </motion.section>
-              <ThemeToggle user={user ?? null} userPref={userPref} />
+              {user && <ThemeToggle user={user} userPref={userPref} />}{" "}
             </>
           )}
         </AnimatePresence>
