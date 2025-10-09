@@ -535,7 +535,8 @@ const ClientEventList = () => {
         <>
           {hasResults ? (
             groupedEvents.map((group, index) => {
-              const isEndedGroup = !!group.title.isPast;
+              const isEndedGroup = !!group.title.isEnded;
+              console.log("isEndedGroup", isEndedGroup, group.title.label);
               const isFirstEnded =
                 isEndedGroup &&
                 !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);

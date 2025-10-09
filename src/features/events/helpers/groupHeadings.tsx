@@ -28,7 +28,7 @@ export function getGroupKeyFromEvent(
     suffix: string;
     year?: string;
   };
-  isPast?: boolean;
+  isEnded?: boolean;
 } {
   const basicInfo = event.tabs.opencall?.basicInfo;
   // const isPublished = event.tabs.opencall?.state === "published";
@@ -85,10 +85,10 @@ export function getGroupKeyFromEvent(
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },
-        isPast,
+        isEnded: isPast,
       };
     } else {
-      return { raw: `${ocEnd}`, isPast };
+      return { raw: `${ocEnd}`, isEnded: isPast };
     }
   }
 
@@ -119,10 +119,10 @@ export function getGroupKeyFromEvent(
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },
-        isPast,
+        isEnded: isPastStart,
       };
     } else {
-      return { raw: `${eventStart}`, isPast };
+      return { raw: `${eventStart}`, isEnded: isPastStart };
     }
   } else if (sortBy === "eventStart" && !eventStart) {
     const ongoing = event.dates.eventFormat === "ongoing";
