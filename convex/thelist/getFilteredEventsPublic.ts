@@ -222,6 +222,9 @@ export const getFilteredEventsPublic = query({
           q.eq("state", "published").eq("category", "event"),
         )
         .collect();
+      const eventNameList = events.map((event) => event.name);
+      console.log("num of events: ", events.length);
+      console.log("events", eventNameList);
     } else if (view === "orgView") {
       const eventArrays = await Promise.all(
         Array.from(userOrgIds).map((orgId) =>
@@ -279,6 +282,7 @@ export const getFilteredEventsPublic = query({
           filters.continent!.includes(e.location.continent),
       );
     }
+    console.log("events after filters", events.length);
 
     let totalResults = 0;
     const publishedOpenCalls = await ctx.db
@@ -324,9 +328,8 @@ export const getFilteredEventsPublic = query({
       events.map(async (event) => {
         const isUserOrg = event.mainOrgId && userOrgIds.has(event.mainOrgId);
         const eventHasOpenCall = validOCVals.includes(event.hasOpenCall);
-        const openCall = eventHasOpenCall
-          ? openCallsByEventId.get(event._id)
-          : null;
+        let openCall = null;
+        openCall = eventHasOpenCall ? openCallsByEventId.get(event._id) : null;
 
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;
@@ -385,6 +388,11 @@ export const getFilteredEventsPublic = query({
               }
             }
           }
+        }
+        if (!hasActiveSubscription && !isAdmin && view === "event") {
+          hasActiveOpenCall = false;
+          openCall = null;
+          openCallStatus = null;
         }
 
         return {
@@ -456,7 +464,7 @@ export const getFilteredEventsPublic = query({
 
     let viewFiltered = sorted;
     if (view === "event") {
-      viewFiltered = sorted.filter((e) => !e.openCall);
+      // viewFiltered = sorted.filter((e) => !e.openCall);
     } else if (view === "openCall") {
       viewFiltered = sorted.filter((e) => e.openCall);
     }

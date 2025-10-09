@@ -56,12 +56,14 @@ export function getGroupKeyFromEvent(
     eventStart && isValidIsoDate(eventStart)
       ? DateTime.fromISO(eventStart, { zone: timeZone }).plus({ hours: 12 })
       : null;
+  const thisYear = DateTime.now().year;
 
   const isPast = ocEndDT ? ocEndDT < DateTime.now() : false;
   const isPastStart = eventStartDT ? eventStartDT < DateTime.now() : false;
   // const isPast = !!ocEndDate && ocEndDate < new Date();
   // const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
   const isYear = eventStart.trim().length === 4;
+  const isAfterThisYear = eventStartDT ? eventStartDT.year > thisYear : false;
   const isSeason = seasonalTerms.includes(eventStart.trim());
 
   if (
@@ -78,7 +80,7 @@ export function getGroupKeyFromEvent(
       const day = dt.day;
       const month = getFourCharMonthFromLuxon(dt);
       const suffix = getOrdinalSuffix(day);
-      const year = isPast ? dt.toFormat("yyyy") : undefined;
+      const year = isPast || isAfterThisYear ? dt.toFormat("yyyy") : undefined;
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },
@@ -109,7 +111,8 @@ export function getGroupKeyFromEvent(
       const month = getFourCharMonthFromLuxon(dt);
 
       const suffix = getOrdinalSuffix(day);
-      const year = isPastStart ? dt.toFormat("yyyy") : undefined;
+      const year =
+        isPastStart || isAfterThisYear ? dt.toFormat("yyyy") : undefined;
 
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
