@@ -54,7 +54,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           variant="outline"
           size="sm"
           className={cn(
-            "hidden h-10 items-center gap-1 border-dashed md:flex",
+            "hidden h-12 items-center gap-1 border-dashed sm:h-10 md:flex",
             className,
             forDashboard && "flex",
             isMobile && "w-full",

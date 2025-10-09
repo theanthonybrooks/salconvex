@@ -107,17 +107,17 @@ export function DataTableToolbar<TData>({
         forDashboard && "mx-auto",
       )}
     >
-      <div className="mx-auto flex w-full flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
+      <div className="mx-auto flex w-full max-w-[80vw] flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
         <Input
           placeholder="Search..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="mx-auto h-12 w-full max-w-[74dvw] sm:h-10 sm:w-[150px] lg:w-[200px]"
+          className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {eventAndOC && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
             {table.getColumn("state") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -170,7 +170,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {orgEventsTable && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
             {table.getColumn("category") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -210,7 +210,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {usersTable && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:flex-col [@media(max-width:768px)]:px-5">
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
             {table.getColumn("subscription") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -256,7 +256,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {appsTable && (
-          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:px-5">
+          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-full">
             {table.getColumn("applicationStatus") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -269,7 +269,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {bookmarksTable && (
-          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-[85vw] [@media(max-width:768px)]:px-5">
+          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-full">
             {table.getColumn("eventIntent") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}

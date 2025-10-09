@@ -82,13 +82,13 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
   return (
     <div
       className={cn(
-        "flex w-full flex-col items-center gap-2 sm:flex-row",
+        "mx-auto flex w-full max-w-[80vw] flex-col items-center gap-2 sm:flex-row",
         usersMode && "justify-between",
       )}
     >
       {usersMode && (
         <>
-          <div className="flex flex-col items-center gap-2 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row">
             {/* <span className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground">Total Users:</p>
               <p className="text-sm font-bold">{userCount ?? 0}</p>
@@ -116,7 +116,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
               </p>
             </span>
           </div>
-          <div className="flex w-full items-center gap-2 px-10 sm:w-auto sm:px-0">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <Select
               value={currency}
               onValueChange={(value) => setCurrency(value as "usd" | "eur")}
