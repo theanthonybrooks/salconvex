@@ -492,6 +492,25 @@ export const updateUserNotifications = mutation({
   },
 });
 
+export const getUserThemePrefsByEmail = query({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email))
+      .first();
+    if (!user) return null;
+    const userPrefs = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .first();
+    if (!userPrefs) return null;
+    return userPrefs.theme;
+  },
+});
+
 // export const updateUserPrefs = mutation({
 //   args: {
 //     autoApply: v.optional(v.boolean()),

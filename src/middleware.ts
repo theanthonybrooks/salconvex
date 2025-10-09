@@ -33,7 +33,7 @@ export default convexAuthNextjsMiddleware(
       }
 
       if (path.startsWith("/auth/sign-in")) {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL("/?initial=true", request.url));
       }
 
       // fallback for any other /auth/* page

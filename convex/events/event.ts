@@ -450,21 +450,21 @@ export const getTotalNumberOfEvents = query({
       ]);
 
     const totalEvents = await eventsAggregate.count(ctx);
-    console.log(
-      "active: ",
-      active,
-      "archived: ",
-      archived,
-      "draft: ",
-      draft,
-      "submitted: ",
-      submitted,
-      "pending: ",
-      pending,
-      "total: ",
+    // console.log(
+    //   "active: ",
+    //   active,
+    //   "archived: ",
+    //   archived,
+    //   "draft: ",
+    //   draft,
+    //   "submitted: ",
+    //   submitted,
+    //   "pending: ",
+    //   pending,
+    //   "total: ",
 
-      totalEvents,
-    );
+    //   totalEvents,
+    // );
 
     return {
       totalEvents,
@@ -873,7 +873,7 @@ export const checkEventNameExists = query({
     edition: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    console.log(args);
+    // console.log(args);
     const eventSlug = slugify(args.name.trim(), { lower: true, strict: true });
     const existingEvents = await ctx.db
       .query("events")
@@ -882,7 +882,7 @@ export const checkEventNameExists = query({
 
     for (const event of existingEvents) {
       const sameEvent = args.eventId && args.eventId === event._id;
-      console.log(args.eventId, event._id);
+      // console.log(args.eventId, event._id);
       const sameOrg =
         args.organizationId && args.organizationId === event.mainOrgId;
       const sameEdition = args.edition && args.edition === event.dates.edition;
@@ -891,14 +891,14 @@ export const checkEventNameExists = query({
 
       if (eventCreatedAt && now - eventCreatedAt < 1000) continue;
 
-      console.log(
-        "sameEvent: ",
-        sameEvent,
-        "sameOrg: ",
-        sameOrg,
-        "sameEdition: ",
-        sameEdition,
-      );
+      // console.log(
+      //   "sameEvent: ",
+      //   sameEvent,
+      //   "sameOrg: ",
+      //   sameOrg,
+      //   "sameEdition: ",
+      //   sameEdition,
+      // );
 
       if (sameEvent === true || (sameEdition === false && sameOrg === true))
         continue;

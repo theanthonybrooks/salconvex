@@ -1,13 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { PendingThemeContext } from "@/providers/themed-provider";
 import { User, UserPref } from "@/types/user";
-import { useMutation } from "convex/react";
 import { motion as m, Variants } from "framer-motion";
 import { useTheme } from "next-themes";
-import { useContext } from "react";
-import { api } from "~/convex/_generated/api";
 
 interface ThemeToggleProps {
   className?: string;
@@ -18,29 +14,13 @@ interface ThemeToggleProps {
 export default function ThemeToggle({
   className,
   user,
-  userPref,
+  // userPref,
 }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme();
-  const { setPendingTheme } = useContext(PendingThemeContext);
-
-  const updateUserPref = useMutation(api.users.updateUserPrefs);
   const isAdmin = user?.role?.includes("admin");
 
-  // const debouncedUpdate = useRef(
-  //   debounce((themeValue: string) => {
-  //     return updateUserPref({ theme: themeValue });
-  //   }, 400),
-  // ).current;
-
   const handleClick = async (nextTheme: string) => {
-    setPendingTheme(nextTheme);
     setTheme(nextTheme);
-    try {
-      await updateUserPref({ theme: nextTheme });
-    } catch (error) {
-      console.error("Error updating user theme:", error);
-      setTheme(userPref?.theme || "default");
-    }
   };
 
   const raysVariants = {

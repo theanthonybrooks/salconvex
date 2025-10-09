@@ -17,7 +17,6 @@ export default function AuthScreen() {
   // Create booleans based on the URL.
   const isRegister = pathname.endsWith("/register");
   const isForgotPassword = pathname.endsWith("/forgot-password");
-  // const isSignIn = !isRegister && !isForgotPassword // default
 
   const switchFlow = (target: "signIn" | "register" | "forgotPassword") => {
     let targetPath = "/auth/sign-in"; // default

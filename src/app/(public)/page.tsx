@@ -26,6 +26,7 @@ import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -38,10 +39,13 @@ export default function Home() {
   const searchParams = useSearchParams();
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
-  const { preloadedSubStatus } = useConvexPreload();
-  // const userData = usePreloadedQuery(preloadedUserData);
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const { theme, setTheme } = useTheme();
+  const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
+  const userPref = userData?.userPref;
+
   // const user = userData?.user ?? null;
   // const isAdmin = user?.role?.includes("admin");
 
@@ -86,6 +90,19 @@ export default function Home() {
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const initial = searchParams.get("initial");
+    if (initial) {
+      if (userPref?.theme && theme !== userPref?.theme) {
+        setTheme(userPref?.theme);
+      }
+      const url = new URL(window.location.href);
+      url.searchParams.delete("initial");
+      window.history.replaceState({}, "", url.toString());
+      return;
+    }
+  });
 
   useEffect(() => {
     sessionStorage.removeItem("previousSalPage");

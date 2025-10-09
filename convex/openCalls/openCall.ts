@@ -83,20 +83,20 @@ export const getTotalNumberOfOpenCalls = query({
     //       break;
     //   }
     // }
-    console.log(
-      "totalOpenCalls: ",
-      totalOpenCalls,
-      "activeOpenCalls: ",
-      active,
-      "archivedOpenCalls: ",
-      archived,
-      "draftOpenCalls: ",
-      draft,
-      "pendingOpenCalls: ",
-      pending,
-      "editingOpenCalls: ",
-      editing,
-    );
+    // console.log(
+    //   "totalOpenCalls: ",
+    //   totalOpenCalls,
+    //   "activeOpenCalls: ",
+    //   active,
+    //   "archivedOpenCalls: ",
+    //   archived,
+    //   "draftOpenCalls: ",
+    //   draft,
+    //   "pendingOpenCalls: ",
+    //   pending,
+    //   "editingOpenCalls: ",
+    //   editing,
+    // );
 
     return {
       totalOpenCalls,
@@ -450,13 +450,17 @@ export const createOrUpdateOpenCall = mutation({
     // console.log("lookup", lookup);
 
     if (lookup) {
+      const prevOc = await ctx.db.get(lookup.openCallId);
       await ctx.db.patch(lookup.openCallId, openCallData);
+      const newOC = await ctx.db.get(lookup.openCallId);
       await ctx.db.patch(lookup._id, {
         edition: args.basicInfo.dates.edition,
         state: openCallState,
         lastEdited: Date.now(),
         ...(args.openCallId && { openCallId: args.openCallId }),
       });
+      // console.log("prev lookup: ", prevOc?._id, "new lookup: ", newOC?._id);
+      await openCallsAggregate.replace(ctx, prevOc!, newOC!);
       // console.log("lookup updated", lookup, openCallData);
       return openCallData;
     }
@@ -476,6 +480,7 @@ export const createOrUpdateOpenCall = mutation({
           state: openCallState,
         });
         const newOC = await ctx.db.get(args.openCallId);
+        // console.log("prev: ", existing?._id, "new: ", newOC?._id);
         await openCallsAggregate.replace(ctx, existing, newOC!);
         // console.log("existing updated", existing, openCallData);
         return openCallData;
@@ -497,7 +502,7 @@ export const createOrUpdateOpenCall = mutation({
       state: openCallState,
     });
 
-    console.log(openCallData);
+    // console.log(openCallData);
     return openCallData;
   },
 });
@@ -778,6 +783,7 @@ export const changeOCStatus = mutation({
       });
     }
     const newEvent = await ctx.db.get(eventId);
+    // console.log("prev event: ", prevEvent?._id, "new event: ", newEvent?._id);
     await eventsAggregate.replace(ctx, prevEvent!, newEvent!);
     await ctx.db.patch(oc._id, {
       state: ocState,
@@ -786,6 +792,7 @@ export const changeOCStatus = mutation({
       approvedAt: Date.now(),
     });
     const newOC = await ctx.db.get(oc._id);
+    console.log("prev oc: ", oc._id, "new oc: ", newOC?._id);
     await openCallsAggregate.replace(ctx, oc, newOC!);
 
     return { oc };

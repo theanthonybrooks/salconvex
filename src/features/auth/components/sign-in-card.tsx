@@ -27,6 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Heart, LoaderCircle } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -66,6 +67,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const email = watch("email");
 
+  const { setTheme } = useTheme();
   const [pending, setPending] = useState(false);
   const [isLoading, setIsLoading] = useState("");
   const [error, setError] = useState<React.ReactNode | undefined>("");
@@ -112,6 +114,13 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
       }
       if (!isNewUser) {
         await updateUserLastActive({ email });
+        await convex
+          .query(api.users.getUserThemePrefsByEmail, { email })
+          .then((result) => {
+            if (result) {
+              setTheme(result);
+            }
+          });
       }
     } catch (error) {
       // console.log(error);
