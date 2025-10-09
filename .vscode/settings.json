@@ -26,7 +26,8 @@
     "Kanban",
     "Artist",
     "Calendar",
-    "Event"
+    "Event",
+    "Zeren"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

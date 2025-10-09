@@ -264,7 +264,7 @@ const OpenCallCard = ({
                     fontSize,
                   )}
                 >
-                  <div className="flex justify-start gap-2">
+                  <div className="my-4 flex justify-start gap-2 text-3xl">
                     {hasBudget &&
                       formatBudgetCurrency(
                         budgetMin,
@@ -325,7 +325,7 @@ const OpenCallCard = ({
 
                     {noBudgetInfo && <p>No Info</p>}
                   </div>
-                  <p className="mx-auto font-semibold underline underline-offset-2">
+                  <p className="font-semibold underline underline-offset-2">
                     Compensation Includes:
                   </p>
 

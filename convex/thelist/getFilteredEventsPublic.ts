@@ -3,26 +3,99 @@
 import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
 import { OpenCallStatus, validOCVals } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { Infer, v } from "convex/values";
 import { addDays, addWeeks, endOfWeek, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
+import type { Id } from "~/convex/_generated/dataModel";
+import type { QueryCtx } from "~/convex/_generated/server";
+
+type EventState = "published" | "archived";
+export const filtersSchema = v.object({
+  eventCategories: v.optional(v.array(v.string())),
+  eventTypes: v.optional(v.array(v.string())),
+  continent: v.optional(v.array(v.string())),
+  eligibility: v.optional(v.array(v.string())),
+  callType: v.optional(v.array(v.string())),
+  callFormat: v.optional(v.string()),
+  limit: v.optional(v.number()),
+  showHidden: v.optional(v.boolean()),
+  bookmarkedOnly: v.optional(v.boolean()),
+  postStatus: v.optional(
+    v.union(v.literal("posted"), v.literal("toPost"), v.literal("all")),
+  ),
+});
+
+export type Filters = Infer<typeof filtersSchema>;
+
+export async function buildEventQuery(
+  ctx: QueryCtx,
+  options: {
+    state: EventState;
+    filters: Filters;
+    bookmarkedIds: Id<"events">[];
+    hiddenIds: Id<"events">[];
+    isAdmin: boolean;
+    onlyWithOpenCall?: boolean;
+  },
+) {
+  const {
+    state,
+    filters,
+    bookmarkedIds,
+    hiddenIds,
+    isAdmin,
+    onlyWithOpenCall,
+  } = options;
+
+  let queryBuilder = ctx.db
+    .query("events")
+    .withIndex("by_state_approvedAt", (q) =>
+      q.eq("state", state).gt("approvedAt", undefined),
+    );
+
+  if (filters.bookmarkedOnly && bookmarkedIds.length > 0) {
+    queryBuilder = queryBuilder.filter((q) =>
+      q.or(...bookmarkedIds.map((id) => q.eq(q.field("_id"), id))),
+    );
+  }
+
+  if (!filters.showHidden && hiddenIds.length > 0) {
+    queryBuilder = queryBuilder.filter((q) =>
+      q.not(q.or(...hiddenIds.map((id) => q.eq(q.field("_id"), id)))),
+    );
+  }
+
+  if (filters.eventCategories && filters.eventCategories.length > 0) {
+    queryBuilder = queryBuilder.filter((q) =>
+      q.or(
+        ...filters.eventCategories!.map((cat) =>
+          q.eq(q.field("category"), cat),
+        ),
+      ),
+    );
+  }
+
+  if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
+    queryBuilder = queryBuilder.filter((q) =>
+      q.eq(q.field("posted"), filters.postStatus),
+    );
+  }
+
+  if (onlyWithOpenCall) {
+    queryBuilder = queryBuilder.filter((q) =>
+      q.or(...validOCVals.map((val) => q.eq(q.field("hasOpenCall"), val))),
+    );
+  }
+
+  // Convex doesn’t support filtering on array membership,
+  // so eventTypes and continent should be filtered post-query.
+  return queryBuilder.collect();
+}
+
 export const getFilteredEventsPublic = query({
   args: {
-    filters: v.object({
-      eventCategories: v.optional(v.array(v.string())),
-      eventTypes: v.optional(v.array(v.string())),
-      continent: v.optional(v.array(v.string())),
-      eligibility: v.optional(v.array(v.string())),
-      callType: v.optional(v.array(v.string())),
-      callFormat: v.optional(v.string()),
-      limit: v.optional(v.number()),
-      showHidden: v.optional(v.boolean()),
-      bookmarkedOnly: v.optional(v.boolean()),
-      postStatus: v.optional(
-        v.union(v.literal("posted"), v.literal("toPost"), v.literal("all")),
-      ),
-    }),
+    filters: filtersSchema,
     sortOptions: v.object({
       sortBy: v.union(
         v.literal("recent"),
@@ -57,6 +130,16 @@ export const getFilteredEventsPublic = query({
     const theListPg = source === "thelist";
 
     const view = viewType ?? "openCall";
+    console.log(
+      "view: ",
+      view,
+      "sort by: ",
+      sortOptions.sortBy,
+      "source: ",
+      source,
+      "filters: ",
+      filters,
+    );
 
     let refDate = new Date();
     const userId = await getAuthUserId(ctx);
@@ -83,28 +166,13 @@ export const getFilteredEventsPublic = query({
     if (thisWeekPg && refDate.getDay() === 0) {
       refDate = addDays(refDate, 1);
     }
-    // const now = new Date();
 
     const targetWeekOffset = source === "nextweek" ? 1 : 0;
-    // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 14);
-    // const startDay = subHours(startOfWeek(new Date(), { weekStartsOn: 1 }), 0);
     //TODO: Decide if it should start on Sunday or Monday.
     const startDay = startOfWeek(refDate, { weekStartsOn: 0 });
-    // const startDay = addHours(startOfWeek(refDate, { weekStartsOn: 1 }), 4);
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
-
     const endDay = endOfWeek(refDate, { weekStartsOn: 1 });
-
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
-    // console.log(
-    //   startDay,
-    //   // startDayMin,
-    //   endDay,
-    //   "shiftedWeek: ",
-    //   shiftedWeekStart,
-    //   shiftedWeekEnd,
-    // );
-
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
 
@@ -123,29 +191,31 @@ export const getFilteredEventsPublic = query({
     let events = [];
 
     if (thisWeekPg || nextWeekPg || view === "archive" || view === "openCall") {
-      const publishedEvents = await ctx.db
-        .query("events")
-        .withIndex("by_state_approvedAt", (q) =>
-          q.eq("state", "published").gt("approvedAt", undefined),
-        )
-        .collect();
+      const shouldFilterByOpenCall =
+        thisWeekPg || nextWeekPg || view === "openCall";
+      const publishedEvents = await buildEventQuery(ctx, {
+        state: "published",
+        filters,
+        bookmarkedIds,
+        hiddenIds,
+        isAdmin: !!isAdmin,
+        onlyWithOpenCall: shouldFilterByOpenCall,
+      });
 
-      const archivedEvents = await ctx.db
-        .query("events")
-        .withIndex("by_state_approvedAt", (q) =>
-          q.eq("state", "archived").gt("approvedAt", undefined),
-        )
-        .collect();
+      const archivedEvents =
+        view === "openCall" && !(thisWeekPg || nextWeekPg)
+          ? []
+          : await buildEventQuery(ctx, {
+              state: "archived",
+              filters,
+              bookmarkedIds,
+              hiddenIds,
+              isAdmin: !!isAdmin,
+              onlyWithOpenCall: shouldFilterByOpenCall,
+            });
 
-      if (view === "openCall" && !(thisWeekPg || nextWeekPg)) {
-        events = [...publishedEvents];
-      } else {
-        events = [...publishedEvents, ...archivedEvents];
-      }
-
-      // events = [...publishedEvents, ...archivedEvents];
+      events = [...publishedEvents, ...archivedEvents];
     } else if (view === "event") {
-      //TODO: later, add the ability to view published or archived events (when archive is made and functional)
       events = await ctx.db
         .query("events")
         .withIndex("by_state_category", (q) =>
@@ -163,27 +233,35 @@ export const getFilteredEventsPublic = query({
       );
       events = eventArrays.flat();
     } else {
-      events = await ctx.db
-        .query("events")
-        .withIndex("by_state", (q) => q.eq("state", "published"))
-        .collect();
+      events = await buildEventQuery(ctx, {
+        state: "published",
+        filters,
+        bookmarkedIds,
+        hiddenIds,
+        isAdmin: !!isAdmin,
+      });
     }
 
     // User/Artist filters
+    if (view !== "archive" && view !== "openCall") {
+      if (filters.bookmarkedOnly) {
+        events = events.filter((e) => bookmarkedIds.includes(e._id));
+      }
 
-    if (filters.bookmarkedOnly) {
-      events = events.filter((e) => bookmarkedIds.includes(e._id));
-    }
+      if (!filters.showHidden) {
+        events = events.filter((e) => !hiddenIds.includes(e._id));
+      }
 
-    if (!filters.showHidden) {
-      events = events.filter((e) => !hiddenIds.includes(e._id));
-    }
+      // Public filters
+      if (filters.eventCategories?.length) {
+        events = events.filter((e) =>
+          filters.eventCategories!.includes(e.category),
+        );
+      }
 
-    // Public filters
-    if (filters.eventCategories?.length) {
-      events = events.filter((e) =>
-        filters.eventCategories!.includes(e.category),
-      );
+      if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
+        events = events.filter((e) => e.posted === filters.postStatus);
+      }
     }
 
     if (filters.eventTypes?.length) {
@@ -202,30 +280,52 @@ export const getFilteredEventsPublic = query({
       );
     }
 
-    if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
-      events = events.filter((e) => e.posted === filters.postStatus);
-    }
     let totalResults = 0;
-    // let totalOpenCalls = 0;
+    const publishedOpenCalls = await ctx.db
+      .query("openCalls")
+      // .withIndex("by_state", (q) => q.eq("state", "published"))
+      .withIndex("by_state_ocEnd", (q) =>
+        thisWeekPg || nextWeekPg
+          ? q
+              .eq("state", "published")
+              .gt("basicInfo.dates.ocEnd", weekStartISO)
+              .lt("basicInfo.dates.ocEnd", weekEndISO)
+          : q.eq("state", "published").gt("basicInfo.dates.ocEnd", null),
+      )
+      .collect();
+    const archivedOpenCalls =
+      view === "openCall" && !(thisWeekPg || nextWeekPg)
+        ? []
+        : await ctx.db
+            .query("openCalls")
+            // .withIndex("by_state", (q) => q.eq("state", "archived"))
+            .withIndex("by_state_ocEnd", (q) =>
+              thisWeekPg || nextWeekPg
+                ? q
+                    .eq("state", "archived")
+                    .gt("basicInfo.dates.ocEnd", weekStartISO)
+                    .lt("basicInfo.dates.ocEnd", weekEndISO)
+                : q.eq("state", "archived").gt("basicInfo.dates.ocEnd", null),
+            )
+            .collect();
+    const allOpenCalls = [...publishedOpenCalls, ...archivedOpenCalls];
+
+    const openCallsByEventId = new Map(
+      allOpenCalls.map((oc) => [oc.eventId, oc]),
+    );
+
+    const orgIds = [...new Set(events.map((e) => e.mainOrgId).filter(Boolean))];
+    const allOrgs = await Promise.all(orgIds.map((id) => ctx.db.get(id)));
+    const orgNameMap = new Map(
+      allOrgs.filter(Boolean).map((org) => [org?._id, org?.name]),
+    );
 
     const enriched = await Promise.all(
       events.map(async (event) => {
         const isUserOrg = event.mainOrgId && userOrgIds.has(event.mainOrgId);
         const eventHasOpenCall = validOCVals.includes(event.hasOpenCall);
-
         const openCall = eventHasOpenCall
-          ? await ctx.db
-              .query("openCalls")
-              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-              .filter((q) =>
-                view === "openCall" && !(thisWeekPg || nextWeekPg)
-                  ? q.eq(q.field("state"), "published")
-                  : q.or(
-                      q.eq(q.field("state"), "published"),
-                      q.eq(q.field("state"), "archived"),
-                    ),
-              )
-              .first()
+          ? openCallsByEventId.get(event._id)
           : null;
 
         let openCallStatus: OpenCallStatus | null = null;
@@ -234,8 +334,7 @@ export const getFilteredEventsPublic = query({
         //TODO: Split this out into a separate fn. it's currently querying the entire organizatoin just for the org name.
 
         if (event.mainOrgId) {
-          const org = await ctx.db.get(event.mainOrgId);
-          orgName = org?.name ?? null;
+          orgName = orgNameMap.get(event.mainOrgId) ?? null;
         }
 
         const now = Date.now();

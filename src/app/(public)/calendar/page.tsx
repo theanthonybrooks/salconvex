@@ -8,13 +8,12 @@ import {
 } from "@/components/ui/dialog";
 import { LazyCalendar } from "@/features/calendar/lazy-calendar";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { RichTextDisplay } from "@/lib/richTextFns";
+import { getFormattedLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 
 import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
-import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -118,51 +117,56 @@ const Calendar = () => {
               </DialogTitle>
             </DialogHeader>
             <div className="mt-2 space-y-2">
-              {visibleEvents.map((event) => (
-                <div
-                  className="flex cursor-pointer flex-row items-center gap-4 rounded-md border-1.5 border-foreground/30 bg-white/50 p-3 hover:bg-white/70 hover:shadow-sm"
-                  key={event.id || event.title + event.startStr}
-                >
-                  <Image
-                    src={event.extendedProps.logo ?? "/1.jpg"}
-                    // src="/1.jpg"
-                    alt={event.title}
-                    width={50}
-                    height={50}
-                    className="rounded-full"
-                  />
+              {visibleEvents.map((event) => {
+                const locationString = getFormattedLocationString(
+                  event.extendedProps.location,
+                );
+                return (
                   <div
+                    className="flex cursor-pointer flex-row items-center gap-4 rounded-md border-1.5 border-foreground/30 bg-white/50 p-3 hover:bg-white/70 hover:shadow-sm"
                     key={event.id || event.title + event.startStr}
-                    className="event-card-link w-full"
-                    onClick={() => {
-                      // setShowModal(false);
-
-                      if (event.extendedProps.hasOpenCall && activeArtist) {
-                        router.push(
-                          `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/`,
-                        );
-                      } else {
-                        router.push(
-                          `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}`,
-                        );
-                      }
-                    }}
                   >
-                    <span className="flex items-center justify-between">
+                    <Image
+                      src={event.extendedProps.logo ?? "/1.jpg"}
+                      // src="/1.jpg"
+                      alt={event.title}
+                      width={50}
+                      height={50}
+                      className="rounded-full"
+                    />
+                    <div
+                      key={event.id || event.title + event.startStr}
+                      className="event-card-link w-full"
+                      onClick={() => {
+                        // setShowModal(false);
+
+                        if (event.extendedProps.hasOpenCall && activeArtist) {
+                          router.push(
+                            `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/`,
+                          );
+                        } else {
+                          router.push(
+                            `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}`,
+                          );
+                        }
+                      }}
+                    >
+                      {/* <span className="flex items-center justify-between"> */}
                       <p className="text-base font-semibold capitalize">
                         {event.title}
                       </p>
-                      <ExternalLink size={16} />
-                    </span>
-
-                    <RichTextDisplay
+                      {/* <ExternalLink size={16} /> */}
+                      {/* </span> */}
+                      <span>{locationString}</span>
+                      {/* <RichTextDisplay
                       html={event.extendedProps.description ?? "No description"}
                       className="line-clamp-2 text-sm text-foreground"
                       maxChars={150}
-                    />
+                    /> */}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>

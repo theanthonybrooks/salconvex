@@ -753,6 +753,7 @@ export default defineSchema({
     .index("by_budget", ["compensation.budget.min"])
     .index("by_endDate", ["basicInfo.dates.ocEnd"])
     .index("by_state", ["state"])
+    .index("by_state_ocEnd", ["state", "basicInfo.dates.ocEnd"])
     .index("by_eligibility", ["eligibility.type"]),
 
   openCallOrganizers: defineTable(openCallOrganizerSchema)

@@ -134,7 +134,7 @@ export const EventCard = ({
               <AccordionItem value="other">
                 <AccordionTrigger title="Other info:" fontSize={fontSize} />
                 <AccordionContent>
-                  <RichTextDisplay html={event.otherInfo} />
+                  <RichTextDisplay html={event.otherInfo} fontSize={fontSize} />
                 </AccordionContent>
               </AccordionItem>
             )}

@@ -966,6 +966,7 @@ export const getEventsForCalendar = query({
             slug: event.slug,
             hasOpenCall,
             edition: event.dates.edition,
+            location: event.location,
           },
         };
       }),
