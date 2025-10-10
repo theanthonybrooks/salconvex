@@ -57,7 +57,7 @@ export const compareEnrichedEvents = (
             priority = 0;
           } else if (validStartDate >= now && isAfterThisYear) {
             console.log("2: startDate - ", startDate);
-            priority = 2;
+            priority = 1;
           } else {
             console.log("3: startDate - ", startDate);
             priority = 3;
