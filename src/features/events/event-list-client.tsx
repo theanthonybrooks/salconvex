@@ -255,7 +255,7 @@ const ClientEventList = () => {
   }, [filters, sortOptions, page, defaultSort]);
 
   useEffect(() => {
-    window.scroll({ top: 0 });
+    window.scroll({ top: 240 });
   }, [page]);
 
   const totalPages = Math.ceil(total / filters.limit);
@@ -347,6 +347,7 @@ const ClientEventList = () => {
   const handleViewChange = (newView: ViewOptions) => {
     setView(newView);
     setSortOptions(getDefaultSortForView(newView));
+    setPage(1);
   };
 
   const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
@@ -454,7 +455,9 @@ const ClientEventList = () => {
               defaultValue={view}
               className="relative w-max max-w-[90vw]"
               // value={view}
-              onValueChange={(val) => setView(val as ViewOptions)}
+              onValueChange={(val) => {
+                setView(val as ViewOptions);
+              }}
             >
               <TabsList className="relative flex h-12 w-full justify-around bg-white/70">
                 {viewOptionValues
