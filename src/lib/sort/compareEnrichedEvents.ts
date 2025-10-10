@@ -42,21 +42,42 @@ export const compareEnrichedEvents = (
       const isOngoing = item.dates.eventFormat === "ongoing";
       const eventStartDate = parseEventDate(startDate) ?? FAR_FUTURE;
       const isPast = eventStartDate < now;
+      const thisYear = new Date().getFullYear();
+      const isThisYear = eventStartDate.getFullYear() === thisYear;
+      const isAfterThisYear = eventStartDate.getFullYear() > thisYear;
+      // console.log(
+      //   startDate + " " + isValid + " " + validStartDate + " " + isPast,
+      // );
 
       let priority: number;
       if (startDate) {
         if (validStartDate) {
-          if (validStartDate >= now) {
+          if (validStartDate >= now && isThisYear) {
+            console.log("0: startDate - ", startDate);
             priority = 0;
+          } else if (validStartDate >= now && isAfterThisYear) {
+            console.log("2: startDate - ", startDate);
+            priority = 2;
           } else {
+            console.log("3: startDate - ", startDate);
             priority = 3;
           }
-        } else if (!isValid) priority = 1;
-        else if (isOngoing) priority = 2;
-        else if (isPast) priority = 3;
-        else priority = 4;
+        } else if (!isValid) {
+          console.log("2: startDate not valid - ", startDate);
+          priority = 2;
+        } else if (isOngoing) {
+          console.log("2: ongoing- ", startDate);
+          priority = 2;
+        } else if (isPast) {
+          console.log("3: past- ", startDate);
+          priority = 3;
+        } else {
+          console.log("4: else- ", startDate);
+          priority = 4;
+        }
       } else {
         priority = 5;
+        console.log("5: else - ", startDate);
       }
 
       return {

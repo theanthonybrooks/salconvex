@@ -308,7 +308,9 @@ const ClientEventList = () => {
         view,
       );
 
-      const mainKey = title.raw || "";
+      // const mainKey = title.raw || "";
+      const mainKey = `${title.raw || ""}__${title.isEnded ? "ended" : "active"}`;
+
       const subKey = title.subHeading ?? null;
 
       if (!groups[mainKey]) {
@@ -518,8 +520,11 @@ const ClientEventList = () => {
 
             <div />
           </div>
-          {skeletonGroups.map((group) => (
-            <div key={group.id} className="flex flex-col items-center gap-6">
+          {skeletonGroups.map((group, index) => (
+            <div
+              key={group.id + index}
+              className="flex flex-col items-center gap-6"
+            >
               <Skeleton className="mx-auto mt-3 h-10 w-64 rounded-xl bg-black/20" />
 
               {group.results.map((_, idx) => (
@@ -536,13 +541,13 @@ const ClientEventList = () => {
           {hasResults ? (
             groupedEvents.map((group, index) => {
               const isEndedGroup = !!group.title.isEnded;
-              console.log("isEndedGroup", isEndedGroup, group.title.label);
+
               const isFirstEnded =
                 isEndedGroup &&
-                !groupedEvents.slice(0, index).some((g) => g.title.parts?.year);
+                !groupedEvents.slice(0, index).some((g) => g.title.isEnded);
 
               return (
-                <div key={group.title.raw} className="mb-6">
+                <div key={group.title.raw + index} className="mb-6">
                   {isFirstEnded && sortOptions.sortBy === "openCall" && (
                     <h2 className="mb-4 mt-10 text-center text-xl font-semibold">
                       Ended Calls

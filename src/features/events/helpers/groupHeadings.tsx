@@ -43,6 +43,8 @@ export function getGroupKeyFromEvent(
   const ocStatus = event.openCallStatus;
   // const eventFormat = event.dates.eventFormat;
   const eventStart = event.dates?.eventDates[0]?.start;
+  const eventEnd =
+    event.dates?.eventDates[event.dates.eventDates.length - 1]?.end;
   const eventOCStatus = event.hasOpenCall;
   const eventStartDate =
     eventStart && isValidIsoDate(eventStart) ? new Date(eventStart) : null;
@@ -57,10 +59,18 @@ export function getGroupKeyFromEvent(
     eventStart && isValidIsoDate(eventStart)
       ? DateTime.fromISO(eventStart, { zone: timeZone }).plus({ hours: 12 })
       : null;
+  const eventEndDT =
+    eventEnd && isValidIsoDate(eventEnd)
+      ? DateTime.fromISO(eventEnd, { zone: timeZone }).plus({
+          hours: 23,
+          minutes: 59,
+        })
+      : null;
   const thisYear = DateTime.now().year;
 
   const isPast = ocEndDT ? ocEndDT < DateTime.now() : false;
   const isPastStart = eventStartDT ? eventStartDT < DateTime.now() : false;
+  const isPastEnd = eventEndDT ? eventEndDT < DateTime.now() : false;
   // const isPast = !!ocEndDate && ocEndDate < new Date();
   // const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
   const isYear = eventStart.trim().length === 4;
@@ -119,10 +129,10 @@ export function getGroupKeyFromEvent(
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },
-        isEnded: isPastStart,
+        isEnded: isPastEnd,
       };
     } else {
-      return { raw: `${eventStart}`, isEnded: isPastStart };
+      return { raw: `${eventStart}`, isEnded: isPastEnd };
     }
   } else if (sortBy === "eventStart" && !eventStart) {
     const ongoing = event.dates.eventFormat === "ongoing";

@@ -223,8 +223,8 @@ export const getFilteredEventsPublic = query({
         )
         .collect();
       const eventNameList = events.map((event) => event.name);
-      console.log("num of events: ", events.length);
-      console.log("events", eventNameList);
+      // console.log("num of events: ", events.length);
+      // console.log("events", eventNameList);
     } else if (view === "orgView") {
       const eventArrays = await Promise.all(
         Array.from(userOrgIds).map((orgId) =>
@@ -282,7 +282,7 @@ export const getFilteredEventsPublic = query({
           filters.continent!.includes(e.location.continent),
       );
     }
-    console.log("events after filters", events.length);
+    // console.log("events after filters", events.length);
 
     let totalResults = 0;
     const publishedOpenCalls = await ctx.db
