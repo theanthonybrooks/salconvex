@@ -69,13 +69,14 @@ const ClientEventList = () => {
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const orgData = usePreloadedQuery(preloadedOrganizerData);
-  const { subStatus: userSubStatus } = subStatus;
+  const { subStatus: userSubStatus, subscription } = subStatus;
 
   const artistData = usePreloadedQuery(preloadedArtistData);
   // console.log(artistData);
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
+  // const isOrganizer = accountType?.includes("organizer");
   const { hasOrgEvents } = orgData ?? {};
 
   const isAdmin = user?.role?.includes("admin");
@@ -103,19 +104,6 @@ const ClientEventList = () => {
     }),
     [],
   );
-
-  // const defaultSort: SortOptions = useMemo(
-  //   () => ({
-  //     sortBy:
-  //       view === "event" || view === "archive"
-  //         ? "eventStart"
-  //         : view === "organizer" || view === "orgView"
-  //           ? "organizer"
-  //           : "openCall",
-  //     sortDirection: "asc",
-  //   }),
-  //   [view],
-  // );
 
   const getDefaultSortForView = (view: ViewOptions): SortOptions => {
     if (view === "event" || view === "archive") {
@@ -165,6 +153,14 @@ const ClientEventList = () => {
     { page },
     "thelist",
     view,
+    // {
+    //   bookmarked: artistData?.bookmarked ?? [],
+    //   hidden: artistData?.hidden ?? [],
+    // },
+    {
+      subscription: subscription ?? undefined,
+      userOrgs: orgData?.orgIds ?? [],
+    },
   );
   void useFilteredEventsQuery(
     filters,
@@ -174,6 +170,14 @@ const ClientEventList = () => {
     },
     "thelist",
     view,
+    // {
+    //   bookmarked: artistData?.bookmarked ?? [],
+    //   hidden: artistData?.hidden ?? [],
+    // },
+    {
+      subscription: subscription ?? undefined,
+      userOrgs: orgData?.orgIds ?? [],
+    },
   );
   void useFilteredEventsQuery(
     filters,
@@ -183,6 +187,14 @@ const ClientEventList = () => {
     },
     "thelist",
     view,
+    // {
+    //   bookmarked: artistData?.bookmarked ?? [],
+    //   hidden: artistData?.hidden ?? [],
+    // },
+    {
+      subscription: subscription ?? undefined,
+      userOrgs: orgData?.orgIds ?? [],
+    },
   );
 
   const total = queryResult?.total ?? 0;

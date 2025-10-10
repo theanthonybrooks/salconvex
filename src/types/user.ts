@@ -50,3 +50,8 @@ export type UserData = {
   user: Doc<"users">;
   userPref: Doc<"userPreferences">;
 } | null;
+
+export type UserAccountData = {
+  subscription?: Doc<"userSubscriptions">;
+  userOrgs: Id<"organizations">[];
+};

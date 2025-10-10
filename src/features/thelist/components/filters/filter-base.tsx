@@ -114,6 +114,7 @@ export const FilterBase = ({
   const isAdmin = userData?.user?.role?.includes("admin");
   const paidUser = isArtist && hasActiveSubscription;
   const limitOpenCalls = view === "event" || view === "orgView";
+  const orgView = view === "orgView";
   const notEvent =
     filters.eventCategories?.length !== 0 &&
     !filters.eventCategories?.includes("event");
@@ -617,7 +618,7 @@ export const FilterBase = ({
           )}
 
           <div className="mt-2 flex w-full justify-between">
-            {paidUser && (
+            {paidUser && !orgView && (
               <section className="flex flex-col gap-4">
                 <label className="flex cursor-pointer items-center gap-2">
                   <Checkbox
@@ -878,7 +879,7 @@ export const FilterBase = ({
             <section
               className={cn(
                 "ml-2 flex flex-col gap-2 self-end",
-                limitOpenCalls && !paidUser && "self-center",
+                ((limitOpenCalls && !paidUser) || orgView) && "self-center",
               )}
             >
               <span
@@ -897,7 +898,7 @@ export const FilterBase = ({
                 Clear filters
               </span>
 
-              {(!limitOpenCalls || paidUser) && (
+              {(!limitOpenCalls || paidUser) && !orgView && (
                 <div onClick={() => setShowFull((prev) => !prev)}>
                   {showFull ? (
                     <span className="flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline active:scale-95">
@@ -914,35 +915,37 @@ export const FilterBase = ({
               )}
             </section>
           </div>
-          {showFull && (
+          {showFull && !orgView && (
             <div className="flex flex-col gap-3">
               <p className="font-bold">More Filters:</p>
               <div className="flex items-center gap-3"></div>
               <div className="flex items-center gap-3">
-                <section className="flex flex-col gap-2">
-                  <Label
-                    htmlFor="continents"
-                    className="flex items-center gap-2"
-                  >
-                    Continent:
-                  </Label>
-                  <MultiSelect
-                    options={select_continents}
-                    value={filters.continent ?? []}
-                    onValueChange={(value) =>
-                      onChange({ continent: value as Continents[] })
-                    }
-                    placeholder="--Continent--"
-                    variant="basic"
-                    selectAll={false}
-                    hasSearch={false}
-                    textClassName="text-center"
-                    className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
-                    badgeClassName="h-9"
-                    shortResults
-                    showArrow={false}
-                  />
-                </section>
+                {!limitOpenCalls && (
+                  <section className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="continents"
+                      className="flex items-center gap-2"
+                    >
+                      Continent:
+                    </Label>
+                    <MultiSelect
+                      options={select_continents}
+                      value={filters.continent ?? []}
+                      onValueChange={(value) =>
+                        onChange({ continent: value as Continents[] })
+                      }
+                      placeholder="--Continent--"
+                      variant="basic"
+                      selectAll={false}
+                      hasSearch={false}
+                      textClassName="text-center"
+                      className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+                      badgeClassName="h-9"
+                      shortResults
+                      showArrow={false}
+                    />
+                  </section>
+                )}
                 <section className="flex flex-col gap-2">
                   <Label
                     htmlFor="eligibility"
@@ -1047,6 +1050,7 @@ export const FilterBase = ({
                     />
                   </section>
                 )}
+
                 <section className="flex flex-col gap-3 self-end">
                   <label className="flex cursor-pointer items-center gap-2">
                     <Checkbox

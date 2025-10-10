@@ -81,7 +81,7 @@ export const BasicPagination = ({
                   Active Calls: {totalOpenCalls}
                 </p>
               )}
-              {viewType === "archive" && totalActive && (
+              {viewType === "archive" && typeof totalActive === "number" && (
                 <p className={cn("mx-auto text-nowrap text-center")}>
                   Total Active: {totalActive}
                 </p>

@@ -1,5 +1,6 @@
 import { ViewOptions } from "@/features/events/event-list-client";
 import { Filters, Pagination, SortOptions } from "@/types/thelist";
+import { UserAccountData } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "~/convex/_generated/api";
 
@@ -17,6 +18,8 @@ export const useFilteredEventsQuery = (
   pagination: Pagination,
   source: Source,
   viewType?: ViewOptions,
+  // artistData?: ArtistListActions,
+  userAccountData?: UserAccountData,
 ) => {
   return useQuery(api.thelist.getFilteredEventsPublic.getFilteredEventsPublic, {
     filters,
@@ -24,5 +27,7 @@ export const useFilteredEventsQuery = (
     page: pagination.page,
     source,
     viewType,
+    // artistData,
+    userAccountData,
   });
 };

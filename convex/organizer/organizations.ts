@@ -14,8 +14,6 @@ import {
   QueryCtx,
 } from "~/convex/_generated/server";
 
-
-
 export async function updateOrgOwner(
   ctx: MutationCtx,
   orgId: Id<"organizations">,
@@ -685,7 +683,7 @@ export const getUserOrgEvents = query({
     }
 
     const hasOrgEvents = orgsWithEvents.length > 0;
-    return { orgsWithEvents, hasOrgEvents };
+    return { orgsWithEvents, hasOrgEvents, orgIds };
   },
 });
 

@@ -212,6 +212,18 @@ export const artistApplicationActions = mutation({
   },
 });
 
+export const getArtistListActions = query({
+  args: {},
+  handler: async (ctx, {}) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    return await ctx.db
+      .query("listActions")
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+      .collect();
+  },
+});
+
 export const artistListActions = mutation({
   args: {
     eventId: v.id("events"),
@@ -270,3 +282,8 @@ export type ArtistEventMetadata = {
     }
   >;
 };
+
+export type ArtistListActions = Pick<
+  ArtistEventMetadata,
+  "bookmarked" | "hidden"
+>;
