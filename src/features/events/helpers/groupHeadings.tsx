@@ -75,6 +75,7 @@ export function getGroupKeyFromEvent(
   // const isPastStart = eventStart ? new Date(eventStart) < new Date() : false;
   const isYear = eventStart.trim().length === 4;
   const isAfterThisYear = eventStartDT ? eventStartDT.year > thisYear : false;
+  const ocEndsAfterThisYear = ocEndDT ? ocEndDT.year > thisYear : false;
   const isSeason = seasonalTerms.includes(eventStart.trim());
 
   if (
@@ -91,7 +92,8 @@ export function getGroupKeyFromEvent(
       const day = dt.day;
       const month = getFourCharMonthFromLuxon(dt);
       const suffix = getOrdinalSuffix(day);
-      const year = isPast || isAfterThisYear ? dt.toFormat("yyyy") : undefined;
+      const year =
+        isPast || ocEndsAfterThisYear ? dt.toFormat("yyyy") : undefined;
       return {
         raw: `${month} ${day}${suffix}${year ? ` (${year})` : ""}`,
         parts: { month, day, suffix, year },

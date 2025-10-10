@@ -53,31 +53,31 @@ export const compareEnrichedEvents = (
       if (startDate) {
         if (validStartDate) {
           if (validStartDate >= now && isThisYear) {
-            console.log("0: startDate - ", startDate);
+            // console.log("0: startDate - ", startDate);
             priority = 0;
           } else if (validStartDate >= now && isAfterThisYear) {
-            console.log("2: startDate - ", startDate);
+            // console.log("2: startDate - ", startDate);
             priority = 1;
           } else {
-            console.log("3: startDate - ", startDate);
+            // console.log("3: startDate - ", startDate);
             priority = 3;
           }
         } else if (!isValid) {
-          console.log("2: startDate not valid - ", startDate);
+          // console.log("2: startDate not valid - ", startDate);
           priority = 2;
         } else if (isOngoing) {
-          console.log("2: ongoing- ", startDate);
+          // console.log("2: ongoing- ", startDate);
           priority = 2;
         } else if (isPast) {
-          console.log("3: past- ", startDate);
+          // console.log("3: past- ", startDate);
           priority = 3;
         } else {
-          console.log("4: else- ", startDate);
+          // console.log("4: else- ", startDate);
           priority = 4;
         }
       } else {
         priority = 5;
-        console.log("5: else - ", startDate);
+        // console.log("5: else - ", startDate);
       }
 
       return {
