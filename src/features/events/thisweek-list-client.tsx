@@ -48,12 +48,13 @@ const ClientThisWeekList = (
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const artistData = usePreloadedQuery(preloadedArtistData);
   // console.log(artistData);
+  const { hasActiveSubscription, subscription } = subStatus;
+
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
   const isArtist = accountType?.includes("artist");
   const isAdmin = user?.role?.includes("admin");
-  const hasActiveSubscription =
-    (subStatus?.hasActiveSubscription || isAdmin) ?? false;
+
   const publicView = !hasActiveSubscription || !isArtist;
   const userPref = userData?.userPref ?? null;
   const userTimeZone = userPref?.timezone || browserTimeZone;
@@ -79,6 +80,11 @@ const ClientThisWeekList = (
     sortOptions,
     { page: 1 },
     source,
+    "openCall",
+    {
+      subscription: subscription ?? undefined,
+      userOrgs: [],
+    },
   );
 
   const total = queryResult?.total ?? 0;

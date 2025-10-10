@@ -39,14 +39,16 @@ export const getUserSubscriptionStatus = query({
     if (!user) {
       return { hasActiveSubscription: false };
     }
-
+    const isAdmin = user.role.includes("admin");
     const subscription = await ctx.db
       .query("userSubscriptions")
       .withIndex("userId", (q) => q.eq("userId", user._id))
       .first();
 
     const hasActiveSubscription =
-      subscription?.status === "active" || subscription?.status === "trialing";
+      subscription?.status === "active" ||
+      subscription?.status === "trialing" ||
+      isAdmin;
 
     const subStatus = subscription?.status || "none";
     const hadTrial = subscription?.hadTrial || false;
