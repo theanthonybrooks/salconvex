@@ -81,6 +81,7 @@ export function DebouncedControllerInput<
         const transformed = transform ? transform(pasted) : pasted;
         setLocalValue(transformed);
         field.onChange(transformed);
+        // debouncedOnChange(transformed);
         onSchemaCheck?.();
         // setValue(field.name, transformed as TFieldValues[TName], {
         //   shouldValidate: true,

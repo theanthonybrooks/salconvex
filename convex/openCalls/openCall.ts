@@ -727,6 +727,11 @@ export const deleteOC = mutation({
       throw new ConvexError("Active open calls cannot be deleted");
     const organization = await ctx.db.get(openCall.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
+    const ocLookup = await ctx.db
+      .query("eventOpenCalls")
+      .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
+      .first();
+    if (ocLookup) await ctx.db.delete(ocLookup._id);
 
     await ctx.db.delete(openCall._id);
     await openCallsAggregate.delete(ctx, openCall!);

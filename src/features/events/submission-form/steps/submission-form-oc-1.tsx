@@ -120,7 +120,9 @@ const SubmissionFormOC1 = ({
   const showAppFeeInput = hasAppFee?.trim() === "true";
   const hasRequiredEligDetails =
     eligDetails.trim().length > 25 || isInternational || isNational || isAdmin;
-  const hasAppRequiredDetails = appDetails?.trim().length > 50 || isAdmin;
+  const hasAppRequiredDetails =
+    appDetails?.trim().length > 50 ||
+    (isAdmin && appDetails?.trim().length > 1);
   const appLink = openCall?.requirements?.applicationLink ?? "";
 
   const hasAppLink = appLink?.trim().length > 10;

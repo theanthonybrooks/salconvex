@@ -272,11 +272,22 @@ export const EventOCForm = ({
   const currentSchema = steps[activeStep]?.schema;
 
   const isStepValidZod = useMemo(() => {
+    console.log(
+      "watchedValues",
+      watchedValues.openCall?.requirements?.applicationLink,
+    );
     if (!currentSchema) return true;
+    console.log("watched snapshot:", JSON.stringify(watchedValues, null, 2));
     const result = currentSchema.safeParse(watchedValues);
-    // console.log(result);
+    console.log("zod result", result);
+    if (!result.success) {
+      console.log("ZOD ERROR DETAILS:");
+      console.log(JSON.stringify(result.error.format(), null, 2));
+    }
+
     return result.success;
   }, [watchedValues, currentSchema]);
+
   // #endregion
   //
   //
@@ -710,7 +721,10 @@ export const EventOCForm = ({
       if (!schema) return true;
       if (!hasUserEditedForm) return true;
 
+      console.log("current snapshot:", JSON.stringify(currentValues, null, 2));
       const result = schema.safeParse(currentValues);
+      console.log("handle result", result);
+
       if (isAdmin) {
         console.log("safeParse result: ", result);
       }
@@ -1248,7 +1262,7 @@ export const EventOCForm = ({
                 requirements: openCallData.requirements.requirements,
                 more: undefined,
                 destination: "reqsDestination",
-                links: openCallData.requirements.links,
+                links: openCallData.requirements.links ?? [],
                 applicationLink: openCallData.requirements.applicationLink,
                 applicationLinkFormat:
                   openCallData.requirements.applicationLinkFormat,
@@ -1344,7 +1358,7 @@ export const EventOCForm = ({
                 requirements: openCallData.requirements.requirements,
                 more: undefined,
                 destination: undefined,
-                links: openCallData.requirements.links,
+                links: openCallData.requirements.links ?? [],
                 applicationLink: openCallData.requirements.applicationLink,
                 applicationLinkFormat:
                   openCallData.requirements.applicationLinkFormat,
@@ -1548,7 +1562,7 @@ export const EventOCForm = ({
                   more: undefined,
                   destination: undefined,
 
-                  links: openCallData.requirements.links,
+                  links: openCallData.requirements.links ?? [],
                   applicationLink: openCallData.requirements.applicationLink,
                   applicationLinkFormat:
                     openCallData.requirements.applicationLinkFormat,

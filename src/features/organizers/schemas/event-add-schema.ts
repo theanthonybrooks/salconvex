@@ -546,16 +546,18 @@ export const openCallBaseSchema = z.object({
     //   more: z.string(),
     //   destination: z.string(),
     otherInfo: z.optional(z.string()),
-    links: z.array(
-      z.object({
-        title: z.string().min(1, "Link title is required"), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
-        href: z.url({
-          protocol: /^https?$/,
-          hostname: z.regexes.domain,
-          error: "Must be a valid URL (https://example.com)",
+    links: z
+      .array(
+        z.object({
+          title: z.string().min(1, "Link title is required"), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
+          href: z.url({
+            protocol: /^https?$/,
+            hostname: z.regexes.domain,
+            error: "Must be a valid URL (https://example.com)",
+          }),
         }),
-      }),
-    ),
+      )
+      .optional(),
     applicationLink: z.string().min(1, "Application link is required"),
     applicationLinkFormat: z.union([
       z.literal("https://"),
