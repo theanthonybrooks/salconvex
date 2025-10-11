@@ -15,7 +15,6 @@ import {
   DeleteEvent,
   DuplicateEvent,
   GoToEvent,
-  GoToSocialPost,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
 import { DataTableEventEdition } from "@/components/data-table/actions/data-table-event-edition";
@@ -36,16 +35,27 @@ import { CopyableItem } from "@/components/ui/copyable-item";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SocialDropdownMenus } from "@/features/events/components/social-dropdown-menus";
 import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
-import { EventCategory, EventType, SubmissionFormState } from "@/types/event";
+import {
+  EventCategory,
+  EventType,
+  PostStatus,
+  SubmissionFormState,
+} from "@/types/event";
 import { OpenCallState } from "@/types/openCall";
-import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+import { Globe, LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const columnLabels: Record<string, string> = {
@@ -74,6 +84,7 @@ export type Event = {
   openCallState?: string | null;
   openCallId?: Id<"openCalls"> | null;
   approvedAt?: number;
+  posted?: PostStatus;
 };
 
 export const columns: ColumnDef<Event>[] = [
@@ -336,6 +347,7 @@ export const columns: ColumnDef<Event>[] = [
       const edition = event.dates.edition;
       const slug = event.slug;
       const eventApproved = typeof event.approvedAt === "number";
+      const postStatus = event.posted;
 
       // const openCallState = event.openCallState;
 
@@ -357,82 +369,147 @@ export const columns: ColumnDef<Event>[] = [
                 className="scrollable mini darkbar max-h-56"
               >
                 {isAdmin && (
-                  <DataTableAdminOrgActions
-                    eventId={event._id}
-                    userRole="admin"
-                  />
+                  <>
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>Admin</DropdownMenuLabel>
+                      <DataTableAdminOrgActions
+                        eventId={event._id}
+                        userRole="admin"
+                      />
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                  </>
                 )}
-                <DropdownMenuLabel>
-                  {isAdmin ? "Event" : "Actions"}
-                </DropdownMenuLabel>{" "}
-                <DropdownMenuSeparator />
-                {/* NOTE: this is the 'View Event' link */}
-                <GoToEvent
-                  slug={slug}
-                  edition={edition}
-                  hasOpenCall={hasOC}
-                  category={eventCategory}
-                />
-                {isAdmin && hasOC && (
-                  <GoToSocialPost slug={slug} edition={edition} />
-                )}
-                <DuplicateEvent eventId={event._id} />
-                {((state === "draft" && !eventApproved) || isAdmin) && (
-                  <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
-                )}
-                {state === "submitted" && isAdmin && (
-                  <ApproveEvent eventId={event._id} />
-                )}
-                {state === "published" && <ArchiveEvent eventId={event._id} />}
-                {(state === "archived" ||
-                  (state === "published" && isAdmin)) && (
-                  <ReactivateEvent eventId={event._id} state={state} />
-                )}
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                      Event
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent className={cn("p-2")}>
+                        {/* NOTE: this is the 'View Event' link */}
+                        <GoToEvent
+                          slug={slug}
+                          edition={edition}
+                          hasOpenCall={false}
+                          category={eventCategory}
+                        />
+                        {isAdmin && hasOC && (
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                              <Globe className="size-4" /> Socials
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent className={cn("p-2")}>
+                                <SocialDropdownMenus
+                                  socialsEvent={event}
+                                  openCallState={!!ocState}
+                                  postStatus={postStatus}
+                                />
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                        )}
+                        <DuplicateEvent eventId={event._id} />
+                        {((state === "draft" && !eventApproved) || isAdmin) && (
+                          <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
+                        )}
+                        {state === "submitted" && isAdmin && (
+                          <ApproveEvent eventId={event._id} />
+                        )}
+                        {state === "published" && (
+                          <ArchiveEvent eventId={event._id} />
+                        )}
+                        {(state === "archived" ||
+                          (state === "published" && isAdmin)) && (
+                          <ReactivateEvent eventId={event._id} state={state} />
+                        )}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
                 {hasOC && (
                   <>
-                    <DropdownMenuLabel className="mt-2 border-t-1.5 border-foreground/20">
-                      Open Call
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DuplicateOC openCallId={openCallId} />
-                    {(ocState === "draft" || isAdmin) && (
-                      <DeleteOC openCallId={openCallId} isAdmin={isAdmin} />
-                    )}
-                    {ocState === "submitted" && isAdmin && (
-                      <ApproveOC openCallId={openCallId} />
-                    )}
+                    <DropdownMenuGroup>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                          Open Call
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent className={cn("p-2")}>
+                            <GoToEvent
+                              slug={slug}
+                              edition={edition}
+                              hasOpenCall={true}
+                              category={eventCategory}
+                            />
 
-                    {(ocState === "archived" || ocState === "published") &&
-                      isAdmin && (
-                        <ReactivateOC openCallId={openCallId} state={ocState} />
-                      )}
-                    {ocState === "submitted" &&
-                      state === "submitted" &&
-                      isAdmin && <ApproveBoth openCallId={openCallId} />}
+                            <DuplicateOC openCallId={openCallId} />
+                            {(ocState === "draft" || isAdmin) && (
+                              <DeleteOC
+                                openCallId={openCallId}
+                                isAdmin={isAdmin}
+                              />
+                            )}
+                            {ocState === "submitted" && isAdmin && (
+                              <ApproveOC openCallId={openCallId} />
+                            )}
+
+                            {(ocState === "archived" ||
+                              ocState === "published") &&
+                              isAdmin && (
+                                <ReactivateOC
+                                  openCallId={openCallId}
+                                  state={ocState}
+                                />
+                              )}
+                            {ocState === "submitted" &&
+                              state === "submitted" &&
+                              isAdmin && (
+                                <ApproveBoth openCallId={openCallId} />
+                              )}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                    </DropdownMenuGroup>
+
+                    <DropdownMenuSeparator />
                   </>
                 )}
                 {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <CopyableItem
-                        defaultIcon={<LucideClipboardCopy className="size-4" />}
-                        copyContent={event._id}
-                      >
-                        Event ID
-                      </CopyableItem>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <CopyableItem
-                        defaultIcon={<LucideClipboardCopy className="size-4" />}
-                        copyContent={openCallId as string}
-                      >
-                        Open Call ID
-                      </CopyableItem>
-                    </DropdownMenuItem>
+                  <DropdownMenuGroup>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                        Convex
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className={cn("p-2")}>
+                          <DropdownMenuItem>
+                            <CopyableItem
+                              defaultIcon={
+                                <LucideClipboardCopy className="size-4" />
+                              }
+                              copyContent={event._id}
+                            >
+                              Event ID
+                            </CopyableItem>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <CopyableItem
+                              defaultIcon={
+                                <LucideClipboardCopy className="size-4" />
+                              }
+                              copyContent={openCallId as string}
+                            >
+                              Open Call ID
+                            </CopyableItem>
+                          </DropdownMenuItem>
 
-                    <DataTableOrgInfo orgId={event.mainOrgId} />
-                  </>
+                          <DataTableOrgInfo orgId={event.mainOrgId} />
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  </DropdownMenuGroup>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

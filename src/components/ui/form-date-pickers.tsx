@@ -74,7 +74,8 @@ export const FormDatePicker = <T extends EventOCFormValues>({
 
   const data = watch(watchPath) as z.infer<typeof eventBase.shape.dates>;
   const eventData = watch("event");
-  // const eventDates = eventData?.dates?.eventDates;
+  // const edition = eventData?.dates?.edition;
+
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
   const isEvent = type === "event";
@@ -588,6 +589,10 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                   name={`${nameBase}.${formatKey}.0.start` as Path<T>}
                   control={control}
                   render={({ field }) => {
+                    const endDate = fromSeason(
+                      formatDatesArray?.[0]?.end ?? "",
+                    );
+
                     return (
                       <CustomDatePicker
                         isAdmin={isAdmin}
@@ -602,10 +607,8 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                         }}
                         className="w-full rounded border p-2 text-center"
                         inputClassName="h-12"
-                        maxDate={
-                          fromSeason(formatDatesArray?.[0]?.end ?? "") ??
-                          new Date()
-                        }
+                        minDate={isAdmin ? undefined : new Date()}
+                        maxDate={endDate ?? undefined}
                       />
                     );
                   }}

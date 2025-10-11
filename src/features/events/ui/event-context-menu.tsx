@@ -26,7 +26,6 @@ import {
   Globe,
   Mail,
   Pencil,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -44,6 +43,7 @@ import { CopyableItem } from "@/components/ui/copyable-item";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
+import { SocialDropdownMenus } from "@/features/events/components/social-dropdown-menus";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import {
@@ -55,7 +55,6 @@ import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
-import { MdPhoto } from "react-icons/md";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -128,9 +127,7 @@ const EventContextMenu = ({
   const hasValidSub = hasActiveSubscription && isArtist;
 
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
-  const updateEventPostStatus = useMutation(
-    api.events.event.updateEventPostStatus,
-  );
+
   const approveEvent = useMutation(api.events.event.approveEvent);
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -164,18 +161,6 @@ const EventContextMenu = ({
   const { orgOwnerEmail, eventName } = orgOwnerEmailData ?? {};
 
   const nonAdminPublicView = publicView && !isAdmin && !orgPreview;
-
-  const handlePostEvent = async (postStatus: PostStatus | null) => {
-    if (!user) return;
-    try {
-      await updateEventPostStatus({
-        eventId: eventId as Id<"events">,
-        posted: postStatus,
-      });
-    } catch (error) {
-      console.error("Error updating event post status:", error);
-    }
-  };
 
   return (
     <DropdownMenu>
@@ -411,49 +396,11 @@ const EventContextMenu = ({
                   <DropdownMenuSubContent
                     className={cn("p-2", nonAdminPublicView && "hidden")}
                   >
-                    <>
-                      {!postStatus ? (
-                        <DropdownMenuItem
-                          className="flex items-center gap-x-2 text-sm"
-                          onClick={() => {
-                            handlePostEvent("toPost");
-                            if (!openCallState) return;
-                            window.open(
-                              `/thelist/event/${slug}/${dates.edition}/call/social`,
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                          }}
-                        >
-                          <MdPhoto className="size-4" />
-                          Make Post
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem
-                          className="flex items-center gap-x-2 text-sm"
-                          onClick={() => handlePostEvent(null)}
-                        >
-                          <X className="size-4" />
-                          Cancel Post
-                        </DropdownMenuItem>
-                      )}
-
-                      {postStatus && (
-                        <DropdownMenuItem
-                          className="flex items-center gap-x-2 text-sm"
-                          onClick={() => {
-                            window.open(
-                              `/thelist/event/${slug}/${dates.edition}/call/social`,
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                          }}
-                        >
-                          <MdPhoto className="size-4" />
-                          View Socials
-                        </DropdownMenuItem>
-                      )}
-                    </>
+                    <SocialDropdownMenus
+                      socialsEvent={event}
+                      openCallState={openCallState === "published"}
+                      postStatus={postStatus}
+                    />
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>

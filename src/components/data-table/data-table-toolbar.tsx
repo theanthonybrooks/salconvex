@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { LucideDiamondPlus, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -150,22 +150,6 @@ export function DataTableToolbar<TData>({
                 title="Category"
                 options={eventCategories}
               />
-            )}
-
-            {isAdmin && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "hidden h-10 items-center gap-1 border-dashed bg-card md:flex",
-                  )}
-                  onClick={() => router.push("/dashboard/admin/event")}
-                >
-                  <LucideDiamondPlus className="size-4" />
-                  Add New
-                </Button>
-              </>
             )}
           </div>
         )}

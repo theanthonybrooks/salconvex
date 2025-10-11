@@ -57,7 +57,7 @@ export const GoToEvent = ({
       className="flex items-center gap-x-1"
     >
       <Eye className="size-4" />
-      View {getEventCategoryLabelAbbr(category)}
+      View {hasOpenCall ? "Open Call" : getEventCategoryLabelAbbr(category)}
     </DropdownMenuItem>
   );
 };

@@ -115,11 +115,15 @@ const SubmissionFormOC1 = ({
   const ocEligibilityWhom = openCall?.eligibility?.whom;
   const isNational = ocEligiblityType === "National";
   const isInternational = ocEligiblityType === "International";
+  const isUnknown = ocEligiblityType === "Unknown";
   const eligDetails = openCall?.eligibility?.details ?? "";
   const appDetails = openCall?.requirements?.requirements ?? "";
   const showAppFeeInput = hasAppFee?.trim() === "true";
   const hasRequiredEligDetails =
-    eligDetails.trim().length > 25 || isInternational || isNational || isAdmin;
+    eligDetails.trim().length > 25 ||
+    isInternational ||
+    (isUnknown && isAdmin) ||
+    (isNational && ocEligibilityWhom && ocEligibilityWhom.length > 0);
   const hasAppRequiredDetails =
     appDetails?.trim().length > 50 ||
     (isAdmin && appDetails?.trim().length > 1);
@@ -395,7 +399,10 @@ const SubmissionFormOC1 = ({
                       "altSpellings",
                     ]}
                     tabIndex={3}
-                    className="h-12 min-h-12 border border-foreground bg-card text-base hover:bg-card"
+                    className={cn(
+                      "h-12 min-h-12 border border-foreground bg-card text-base hover:bg-card",
+                      !hasRequiredEligDetails && isNational && "invalid-field",
+                    )}
                   />
                 )}
               />
@@ -403,7 +410,7 @@ const SubmissionFormOC1 = ({
           </>
         )}
 
-        {ocEligiblityType && (
+        {ocEligiblityType && !isUnknown && (
           <>
             <div className="input-section self-start">
               <p className="lg:text-xs">More Info</p>
@@ -439,7 +446,7 @@ const SubmissionFormOC1 = ({
                     inputPreviewContainerClassName={cn(
                       "rounded-lg",
                       (errors?.openCall?.eligibility?.details ||
-                        !hasRequiredEligDetails) &&
+                        (!hasRequiredEligDetails && !isNational)) &&
                         "invalid-field",
                     )}
                     formInputPreview
@@ -627,7 +634,7 @@ const SubmissionFormOC1 = ({
                     control={control}
                     render={({ field }) => (
                       <OcCustomDatePicker
-                        disabled={pastEvent}
+                        disabled={pastEvent || !ocStart}
                         value={field.value}
                         onChange={field.onChange}
                         pickerType="end"
@@ -727,6 +734,7 @@ const SubmissionFormOC1 = ({
                         errors?.openCall?.requirements?.otherInfo &&
                           "invalid-field",
                       )}
+                      formInputPreviewClassName="line-clamp-5"
                       formInputPreview
                       tabIndex={11}
                     />

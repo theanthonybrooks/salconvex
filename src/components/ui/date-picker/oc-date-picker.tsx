@@ -1,4 +1,3 @@
-
 //TODO: Replace with react-day-picker. Link: https://daypicker.dev/guides/timepicker
 import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
 import { getTimezoneFormat, toDate } from "@/lib/dateFns";
@@ -264,7 +263,11 @@ export const OcCustomDatePicker = ({
           showTimeZone={showTimeZone}
         />
       }
-      className={cn(className, "rounded")}
+      className={cn(
+        className,
+        "rounded",
+        disabled && "pointer-events-none border-foreground/20 opacity-50",
+      )}
       tabIndex={tabIndex}
       renderCustomHeader={(props) => (
         <DatePickerHeader {...props} pickerType={pickerType} />
