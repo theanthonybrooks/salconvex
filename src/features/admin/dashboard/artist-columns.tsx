@@ -18,9 +18,9 @@ import {
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/lib/utils";
-import { ArtistDoc } from "@/types/artist";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+import { Id } from "~/convex/_generated/dataModel";
 
 export const artistColumnLabels: Record<string, string> = {
   name: "Name",
@@ -34,108 +34,51 @@ export const artistColumnLabels: Record<string, string> = {
   createdAt: "Created",
 };
 
-export const artistColumns: ColumnDef<ArtistDoc>[] = [
-  // {
-  //   id: "select",
-  //   size: 35,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+export interface ArtistColumnProps {
+  artistId: Id<"artists">;
+  name: string;
+  nationality: string[];
+  instagram: string;
+  website: string;
+  canFeature: boolean;
+  feature: boolean | "none";
+  notes: string;
+  createdAt: number;
+}
+
+export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   {
     accessorKey: "name",
+    id: "name",
     minSize: 120,
     maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const { _id: artistId, artistName } = row.original;
+      const { artistId, name } = row.original;
       return (
         <ConvexDashboardLink
           className="font-medium"
           table="artists"
           id={artistId}
         >
-          <p className="truncate">{artistName}</p>
+          <p className="truncate">{name}</p>
         </ConvexDashboardLink>
       );
     },
   },
-  // {
-  //   accessorKey: "nationality",
-  //   minSize: 150,
-  //   maxSize: 400,
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Email" />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <CopyableItem className="text-sm text-muted-foreground" truncate>
-  //       {row.getValue("email")}
-  //     </CopyableItem>
-  //   ),
-  // },
-  // {
-  //   accessorKey: "subscription",
-  //   minSize: 120,
-  //   maxSize: 200,
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Subscription" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const { subscription } = row.original;
-  //     const fatcapSubs = ["3a. monthly-fatcap", "3b. yearly-fatcap"];
-  //     const originalSubs = ["1a. monthly-original", "1b. yearly-original"];
-  //     const bananaSubs = ["2a. monthly-banana", "2b. yearly-banana"];
-  //     return (
-  //       <div
-  //         className={cn(
-  //           "rounded px-2 py-1 text-xs font-medium",
-  //           fatcapSubs.includes(subscription ?? "") &&
-  //             "border border-green-500 bg-green-100 text-green-800",
-  //           originalSubs.includes(subscription ?? "") &&
-  //             "border border-gray-500 bg-gray-100 text-gray-800",
-  //           bananaSubs.includes(subscription ?? "") &&
-  //             "border border-orange-500 bg-orange-100 text-orange-800",
-
-  //           !subscription && "italic text-muted-foreground",
-  //         )}
-  //       >
-  //         <p className="text-center capitalize"> {subscription || "none"}</p>
-  //       </div>
-  //     );
-  //   },
-  //   filterFn: (row, columnId, filterValue) => {
-  //     if (!Array.isArray(filterValue)) return true;
-  //     return filterValue.includes(row.getValue(columnId));
-  //   },
-  // },
 
   {
     accessorKey: "nationality",
+    id: "nationality",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nationality" />
     ),
     cell: ({ row }) => {
-      const { artistNationality: nationality } = row.original;
+      const { nationality } = row.original;
       return (
         <div className="truncate text-center text-sm text-muted-foreground">
           {nationality?.length > 0 ? (
@@ -152,14 +95,14 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
 
   {
     accessorKey: "instagram",
+    id: "instagram",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Instagram" />
     ),
     cell: ({ row }) => {
-      const { contact } = row.original;
-      const instagram = contact?.instagram;
+      const { instagram, feature } = row.original;
       const username = instagram?.startsWith("@")
         ? instagram?.slice(1)
         : instagram;
@@ -170,6 +113,7 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
             <Link
               href={`https://www.instagram.com/${username}`}
               target="_blank"
+              className={cn(feature === false && "line-through")}
             >
               {instagram}
             </Link>
@@ -181,28 +125,32 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
-      const instagram = row.original.contact?.instagram;
+      const instagram = row.original?.instagram;
       const hasValue = !!instagram && instagram.trim() !== "";
       return filterValue.includes(String(hasValue));
     },
   },
   {
     accessorKey: "website",
+    id: "website",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Website" />
     ),
     cell: ({ row }) => {
-      const { contact } = row.original;
-      const website = contact?.website;
+      const { website, feature } = row.original;
       const displayLink = website?.startsWith("http")
         ? website.slice(website.indexOf("//") + 2)
         : website;
       return (
         <div className="truncate text-center text-sm text-muted-foreground">
           {website ? (
-            <Link href={website} target="_blank">
+            <Link
+              href={website}
+              target="_blank"
+              className={cn(feature === false && "line-through")}
+            >
               {displayLink}
             </Link>
           ) : (
@@ -214,6 +162,7 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
   },
   {
     accessorKey: "canFeature",
+    id: "canFeature",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -230,12 +179,12 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
       const value = row.getValue(columnId);
-      console.log(value);
       return filterValue.includes(String(value));
     },
   },
   {
     accessorKey: "feature",
+    id: "feature",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -245,21 +194,23 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
       const { feature } = row.original;
       return (
         <ArtistFeatureSelect
-          artistId={row.original._id}
-          feature={!!feature}
-          key={row.original._id}
+          artistId={row.original.artistId}
+          feature={feature}
+          key={row.original.artistId}
         />
       );
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
       const value = row.getValue(columnId);
+      console.log(value, filterValue);
       return filterValue.includes(String(value));
     },
   },
 
   {
     accessorKey: "notes",
+    id: "notes",
     minSize: 120,
     maxSize: 180,
     header: ({ column }) => (
@@ -272,13 +223,14 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
   },
   {
     accessorKey: "createdAt",
+    id: "createdAt",
     minSize: 120,
     maxSize: 180,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
     cell: ({ row }) => {
-      const { _creationTime: value } = row.original;
+      const { createdAt: value } = row.original;
       return (
         <span className="text-sm">
           {value ? new Date(value).toLocaleString() : "-"}
@@ -294,8 +246,7 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
     minSize: 40,
     enableResizing: false,
     cell: ({ row }) => {
-      const user = row.original;
-      const { artistId } = user;
+      const { artistId } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -333,7 +284,7 @@ export const artistColumns: ColumnDef<ArtistDoc>[] = [
                 <DropdownMenuItem>
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
-                    copyContent={user._id}
+                    copyContent={artistId}
                     className="gap-x-2"
                   >
                     User ID

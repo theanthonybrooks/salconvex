@@ -38,7 +38,15 @@ export const createSupportTicket = mutation({
     <br />
     <br />
     <p style='display:flex;align-items:center;gap:1;'><strong>Name:</strong> ${args.name}</p>
-    <p style='display:flex;align-items:center;gap:1;'><strong>Email:</strong> ${args.email}</p>
+   <p style='display:flex;align-items:center;gap:1;'><strong>Email:</strong>
+      <a
+        href="mailto:${args.email}?subject=Support%20Request for Ticket%20#${ticketNumber}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+       ${args.email}
+      </a>
+   </p>
    <p style='display:flex;align-items:center;gap:1;'><strong>User ID:</strong>
       <a
         href="${process.env.CONVEX_DASHBOARD_URL}data?table=users&id=${userId}"
@@ -62,12 +70,13 @@ export const createSupportTicket = mutation({
       voters: [],
       createdAt: Date.now(),
       lastUpdatedBy: userId ?? "guest",
+      ticketNumber: support,
     });
 
     return { support, ticketNumber };
   },
 });
-
+//TODO: Update this to include the ticketNumber (or I guess that's the support ticket number)
 export const updateSupportTicket = mutation({
   args: {
     supportId: v.id("support"),

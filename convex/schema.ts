@@ -829,6 +829,7 @@ export default defineSchema({
     purpose: v.optional(v.string()),
     userSuggestion: v.optional(v.string()),
     userId: v.optional(v.id("users")),
+    ticketNumber: v.optional(v.id("support")),
   })
     .searchIndex("search_by_title", {
       searchField: "title",

@@ -5,13 +5,15 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
-import { artistColumns } from "@/features/admin/dashboard/artist-columns";
+import {
+  ArtistColumnProps,
+  artistColumns,
+} from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
-import { ArtistDoc } from "@/types/artist";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "~/convex/_generated/api";
@@ -229,7 +231,7 @@ export function AdminDashboardTableWrapper({
           <div className="hidden max-h-full w-full px-10 py-10 lg:block">
             <DataTable
               columns={artistColumns}
-              data={(artistsData ?? []) as ArtistDoc[]}
+              data={(artistsData ?? []) as ArtistColumnProps[]}
               defaultFilters={[
                 {
                   id: `canFeature`,
@@ -239,6 +241,7 @@ export function AdminDashboardTableWrapper({
                   id: `instagram`,
                   value: ["true"],
                 },
+                { id: `feature`, value: ["true", "none"] },
               ]}
               toolbarData={{
                 userCount: artistsData?.length ?? 0,
@@ -253,7 +256,7 @@ export function AdminDashboardTableWrapper({
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
               columns={artistColumns}
-              data={(artistsData ?? []) as ArtistDoc[]}
+              data={(artistsData ?? []) as ArtistColumnProps[]}
               defaultFilters={[
                 {
                   id: `canFeature`,
@@ -263,6 +266,7 @@ export function AdminDashboardTableWrapper({
                   id: `instagram`,
                   value: ["true"],
                 },
+                { id: `feature`, value: ["true", "none"] },
               ]}
               defaultSort={{ id: `createdAt`, desc: false }}
               onRowSelect={(row) => {

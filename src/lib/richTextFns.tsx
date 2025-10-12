@@ -117,6 +117,8 @@ export const RichTextDisplay = ({
               <a
                 className={cn("mr-1 font-semibold", commonClasses)}
                 href={domNode.attribs?.href}
+                target={domNode.attribs?.target}
+                rel={domNode.attribs?.rel}
                 title={cleanedText}
               >
                 {displayText}
@@ -128,6 +130,8 @@ export const RichTextDisplay = ({
           <Link
             className={cn("font-semibold", commonClasses)}
             href={domNode.attribs?.href}
+            target={domNode.attribs?.target}
+            rel={domNode.attribs?.rel}
           >
             {children}
           </Link>

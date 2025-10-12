@@ -32,7 +32,17 @@ export const getActiveArtists = query({
           )
           .first();
         if (!artist) return null;
-        return artist;
+        return {
+          artistId: artist._id,
+          name: artist.artistName,
+          nationality: artist.artistNationality,
+          instagram: artist.contact?.instagram,
+          website: artist.contact?.website,
+          canFeature: artist.canFeature,
+          feature: artist.feature ?? "none",
+          notes: artist.notes,
+          createdAt: artist._creationTime,
+        };
       }),
     );
 

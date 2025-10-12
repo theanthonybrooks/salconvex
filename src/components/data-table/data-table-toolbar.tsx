@@ -22,6 +22,7 @@ import { AlertDialogSimple } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
 import { eventTypeOptions } from "@/types/event";
+import { TableTypes } from "@/types/tanstack-table";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -101,6 +102,12 @@ export function DataTableToolbar<TData>({
     }
   }, [initialSearchTerm, table]);
 
+  const getColumnLabel = (table?: TableTypes) => {
+    // note-to-self: use this to adjust the default column for searching. For now, it's just the name column.
+    if (table === "artists") return "name";
+    return "name";
+  };
+
   return (
     <div
       className={cn(
@@ -111,9 +118,15 @@ export function DataTableToolbar<TData>({
       <div className="mx-auto flex w-full max-w-[80vw] flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
         <Input
           placeholder="Search..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={
+            (table
+              .getColumn(getColumnLabel(tableType))
+              ?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table
+              .getColumn(getColumnLabel(tableType))
+              ?.setFilterValue(event.target.value)
           }
           className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
@@ -165,6 +178,7 @@ export function DataTableToolbar<TData>({
                 options={[
                   { value: true, label: "Feature" },
                   { value: false, label: "Don't Feature" },
+                  { value: "none", label: "Unchecked" },
                 ]}
               />
             )}

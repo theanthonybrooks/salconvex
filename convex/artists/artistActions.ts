@@ -141,7 +141,7 @@ export const getArtist = query({
 export const updateArtistFeature = mutation({
   args: {
     artistId: v.id("artists"),
-    feature: v.optional(v.boolean()),
+    feature: v.optional(v.union(v.boolean(), v.null())),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -153,7 +153,7 @@ export const updateArtistFeature = mutation({
     if (!artist) throw new ConvexError("Artist not found");
 
     await ctx.db.patch(artist._id, {
-      feature: args.feature,
+      feature: args.feature ?? undefined,
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
     });
