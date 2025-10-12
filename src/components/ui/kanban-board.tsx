@@ -167,7 +167,6 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [purpose, setPurpose] = useState<string>(initialPurpose ?? "todo");
-
   useEffect(() => {
     const handler = debounce((value: string) => {
       setDebouncedSearch(value);
@@ -269,7 +268,11 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
   }
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
-      <div className={cn("flex items-center justify-between pr-4")}>
+      <div
+        className={cn(
+          "mb-6 flex flex-col-reverse items-center justify-between gap-3 md:mb-0 md:flex-row lg:pr-4",
+        )}
+      >
         <div className="flex items-center gap-3">
           <Input
             value={searchTerm}
@@ -277,22 +280,17 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
             placeholder="Search"
             className="w-full max-w-md"
           />
-          {debouncedSearch !== "" && (
-            // <p
-            //   className="text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95"
-            //   onClick={() => setSearchTerm("")}
-            // >
-            //   Clear Search
-            // </p>
-            <Button
-              variant="salWithShadowHidden"
-              onClick={() => setSearchTerm("")}
-            >
-              Reset
-            </Button>
-          )}
+
+          <Button
+            variant="salWithShadowHidden"
+            onClick={() => setSearchTerm("")}
+            className={"h-11 disabled:border-foreground/40"}
+            disabled={debouncedSearch === ""}
+          >
+            Reset
+          </Button>
         </div>
-        <div className="relative inset-y-0 z-10 mt-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:mt-0 lg:p-0">
+        <div className="relative inset-y-0 z-10 my-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:my-0 lg:p-0">
           {/* Thumb indicator */}
           <div
             className={cn(
