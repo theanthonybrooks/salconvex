@@ -23,7 +23,6 @@ export default async function AdminLayout({
   }
 
   return (
-    //<ClientAuthWrapper>
     <>
       <NavbarWrapper type="thelist" />
       <main className="flex w-full flex-1 flex-col items-center px-4 pt-32">
@@ -31,6 +30,5 @@ export default async function AdminLayout({
       </main>
       <Footer />
     </>
-    // </ClientAuthWrapper>
   );
 }
