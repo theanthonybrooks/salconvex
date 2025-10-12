@@ -37,9 +37,9 @@ export const generalFaqs: AccordionSection = {
   // title: "FAQ",
   sectionTitle: "General Questions",
 
-  // icon: <HelpCircle className='h-4 w-4' />,
-  iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
+  // icon: <HelpCircle className='size-4' />,
+  iconClosed: <Plus className={cn("mr-1 size-4", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("mr-1 size-4", iconOpenClass)} />,
 
   items: [
     {
@@ -174,9 +174,9 @@ export const openCallFaqs: AccordionSection = {
   // title: "FAQ",
   sectionTitle: "Open Calls",
 
-  // icon: <HelpCircle className='h-4 w-4' />,
-  iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
+  // icon: <HelpCircle className='size-4' />,
+  iconClosed: <Plus className={cn("mr-1 size-4", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("mr-1 size-4", iconOpenClass)} />,
 
   items: [
     {
@@ -190,7 +190,8 @@ export const openCallFaqs: AccordionSection = {
       text: (
         <p>
           Term used to describe whether the project budget is provided with no
-          other additional support (ie no design fee, no equipment, etc). If not
+          other additional support (ie no design fee, no equipment, etc — the
+          budget is meant to cover everything related to the project) . If not
           &quot;All-inclusive&quot;, then the project budget is provided with
           additional support beyond the artist stipend.
         </p>
@@ -252,9 +253,9 @@ export const pricingFaqs: AccordionSection = {
   title: "FAQ",
   description:
     "What do you get with a membership? How does it work for artists vs organizers? ",
-  // icon: <HelpCircle className='h-4 w-4' />,
-  iconClosed: <Plus className={cn("mr-1 h-4 w-4", iconClosedClass)} />,
-  iconOpen: <Minus className={cn("mr-1 h-4 w-4", iconOpenClass)} />,
+  // icon: <HelpCircle className='size-4' />,
+  iconClosed: <Plus className={cn("mr-1 size-4", iconClosedClass)} />,
+  iconOpen: <Minus className={cn("mr-1 size-4", iconOpenClass)} />,
 
   items: [
     {

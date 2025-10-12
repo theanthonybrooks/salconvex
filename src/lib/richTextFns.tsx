@@ -41,6 +41,8 @@ export const RichTextDisplay = ({
       "checked",
       "data-type",
       "data-checked",
+      "target",
+      "rel",
     ],
   });
 

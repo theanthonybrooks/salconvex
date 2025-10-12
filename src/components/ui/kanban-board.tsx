@@ -4,7 +4,7 @@
 import { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { Circle, Eye, LucideThumbsDown, LucideThumbsUp, X } from "lucide-react";
+import { Eye, LucideThumbsDown, LucideThumbsUp, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
@@ -33,12 +33,22 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
+  AddCardProps,
+  CardBase,
+  CardProps,
   CATEGORY_CONFIG,
+  ColumnProps,
   ColumnType,
   ColumnTypeOptions,
+  DetailsDialogProps,
+  DropIndicatorProps,
+  getColumnColor,
+  KanbanBoardProps,
   Priority,
   PRIORITY_CONFIG,
   priorityOptions,
+  purposeOptions,
+  TaskDialogProps,
   Voter,
 } from "@/constants/kanbanConsts";
 import {
@@ -47,113 +57,7 @@ import {
   supportCategoryOptions,
 } from "@/constants/supportConsts";
 import { RichTextDisplay } from "@/lib/richTextFns";
-import { User } from "@/types/user";
 import { capitalize, debounce } from "lodash";
-import { MdOutlineDesignServices } from "react-icons/md";
-
-interface Card {
-  title: string;
-  description: string;
-  id: string;
-  column: ColumnType;
-  priority?: Priority;
-  voters: Voter[];
-  category: SupportCategory;
-  isPublic: boolean;
-  purpose: string;
-}
-
-interface MoveCardArgs {
-  id: Id<"todoKanban">;
-  column: ColumnType;
-  beforeId?: Id<"todoKanban"> | undefined;
-  purpose: string;
-}
-
-interface AddCardProps {
-  column: ColumnType;
-  userRole: string[];
-  purpose: string;
-  addCard: (args: AddCardArgs) => void;
-}
-
-interface AddCardArgs {
-  title: string;
-  description: string;
-  column: ColumnType;
-  order?: "start" | "end";
-  voters?: Voter[];
-  priority?: Priority;
-  category: SupportCategory;
-  isPublic: boolean;
-  purpose: string;
-}
-
-interface DeleteCardArgs {
-  id: Id<"todoKanban">;
-}
-
-// type ConvexCard = Omit<Card, "id"> & { _id: string }
-
-interface ColumnProps {
-  title: string;
-  headingColor: string;
-  column: ColumnType;
-  cards: Card[];
-  userRole: string[];
-  purpose: string;
-  activeColumn: string | null;
-  setActiveColumn: (col: string | null) => void;
-  moveCard: (args: MoveCardArgs) => void;
-  addCard: (args: AddCardArgs) => void;
-  deleteCard: (args: DeleteCardArgs) => void;
-}
-
-interface CardProps {
-  title: string;
-  description: string;
-  id: string;
-  column: ColumnType;
-  priority?: Priority;
-  voters: Voter[];
-  category: SupportCategory;
-  isPublic: boolean;
-  purpose: string;
-  handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
-  handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: Card) => void;
-  deleteCard: (args: DeleteCardArgs) => void;
-}
-
-interface DropIndicatorProps {
-  beforeId: string | undefined;
-  column: ColumnType;
-}
-
-// interface BurnBarrelProps {
-//   userRole: string
-// }
-
-interface KanbanBoardProps {
-  userRole: string[];
-  purpose: string;
-}
-
-const getColumnColor = (column: ColumnType) => {
-  const colors: Record<ColumnType, string> = {
-    proposed: "bg-purple-300",
-    backlog: "bg-neutral-200",
-    todo: "bg-yellow-200",
-    doing: "bg-blue-200",
-    done: "bg-emerald-200",
-    notPlanned: "bg-red-200",
-  };
-  return colors[column] || "bg-neutral-500";
-};
-
-const purposeOptions = [
-  { value: "todo", label: "All", Icon: Circle },
-  { value: "design", label: "UI/UX", Icon: MdOutlineDesignServices },
-];
 
 export const KanbanBoard = ({
   userRole = ["user"],
@@ -354,7 +258,10 @@ const Column = ({
 }: ColumnProps) => {
   const [active, setActive] = useState(false);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
+  const handleDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    card: CardBase,
+  ) => {
     if (!userRole.includes("admin")) return;
     e.dataTransfer.setData("cardId", card.id);
     // setActive(true);
@@ -727,51 +634,6 @@ const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
   );
 };
 
-type BaseTaskValues = {
-  title: string;
-  description: string;
-  column: ColumnType;
-  priority: Priority;
-  voters: Voter[];
-  category: SupportCategory;
-  isPublic: boolean;
-};
-
-type BaseTaskDialogSharedProps = {
-  trigger: React.ReactNode;
-  onClick?: () => void;
-  onClose?: () => void;
-};
-
-type AddTaskDialogProps = {
-  purpose: string;
-  mode: "add";
-  initialValues?: BaseTaskValues & { order: "start" | "end" };
-  onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
-  isOpen?: boolean;
-} & BaseTaskDialogSharedProps;
-
-type EditTaskDialogProps = {
-  purpose: string;
-  mode: "edit";
-  isOpen: boolean;
-  initialValues?: BaseTaskValues;
-  onSubmit: (values: BaseTaskValues) => void;
-} & BaseTaskDialogSharedProps;
-
-type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
-
-type DetailsDialogProps = {
-  id: Id<"todoKanban">;
-  trigger: React.ReactNode;
-  isOpen: boolean;
-  initialValues: BaseTaskValues;
-  onClickAction?: () => void;
-  onCloseAction?: () => void;
-  onEditAction?: () => void;
-  isAdmin: boolean;
-  user: User | null;
-};
 export const TaskDialog = ({
   mode,
   trigger,

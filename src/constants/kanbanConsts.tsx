@@ -1,4 +1,5 @@
 import { SupportCategory } from "@/constants/supportConsts";
+import { User } from "@/types/user";
 import {
   Calendar,
   Circle,
@@ -14,6 +15,7 @@ import {
   FcLowPriority,
   FcMediumPriority,
 } from "react-icons/fc";
+import { MdOutlineDesignServices } from "react-icons/md";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const ColumnTypeOptions = [
@@ -238,4 +240,145 @@ export const CATEGORY_CONFIG: Record<
     icon: <Circle className="size-5" />,
     className: "bg-green-100",
   },
+};
+
+export interface CardBase {
+  title: string;
+  description: string;
+  id: string;
+  column: ColumnType;
+  priority?: Priority;
+  voters: Voter[];
+  category: SupportCategory;
+  isPublic: boolean;
+  purpose: string;
+}
+
+export interface MoveCardArgs {
+  id: Id<"todoKanban">;
+  column: ColumnType;
+  beforeId?: Id<"todoKanban"> | undefined;
+  purpose: string;
+}
+
+export interface AddCardProps {
+  column: ColumnType;
+  userRole: string[];
+  purpose: string;
+  addCard: (args: AddCardArgs) => void;
+}
+
+export interface AddCardArgs {
+  title: string;
+  description: string;
+  column: ColumnType;
+  order?: "start" | "end";
+  voters?: Voter[];
+  priority?: Priority;
+  category: SupportCategory;
+  isPublic: boolean;
+  purpose: string;
+}
+
+export interface DeleteCardArgs {
+  id: Id<"todoKanban">;
+}
+
+// type ConvexCard = Omit<Card, "id"> & { _id: string }
+
+export interface ColumnProps {
+  title: string;
+  headingColor: string;
+  column: ColumnType;
+  cards: CardBase[];
+  userRole: string[];
+  purpose: string;
+  activeColumn: string | null;
+  setActiveColumn: (col: string | null) => void;
+  moveCard: (args: MoveCardArgs) => void;
+  addCard: (args: AddCardArgs) => void;
+  deleteCard: (args: DeleteCardArgs) => void;
+}
+
+export interface CardProps extends CardBase {
+  handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardBase) => void;
+  handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: CardBase) => void;
+  deleteCard: (args: DeleteCardArgs) => void;
+}
+
+export interface DropIndicatorProps {
+  beforeId: string | undefined;
+  column: ColumnType;
+}
+
+// interface BurnBarrelProps {
+//   userRole: string
+// }
+
+export interface KanbanBoardProps {
+  userRole: string[];
+  purpose: string;
+}
+
+export const getColumnColor = (column: ColumnType) => {
+  const colors: Record<ColumnType, string> = {
+    proposed: "bg-orange-200",
+    backlog: "bg-neutral-200",
+    todo: "bg-yellow-200",
+    doing: "bg-blue-200",
+    done: "bg-emerald-200",
+    notPlanned: "bg-red-200",
+  };
+  return colors[column] || "bg-neutral-500";
+};
+
+export const purposeOptions = [
+  { value: "todo", label: "All", Icon: Circle },
+  { value: "design", label: "UI/UX", Icon: MdOutlineDesignServices },
+];
+
+export type BaseTaskValues = {
+  title: string;
+  description: string;
+  column: ColumnType;
+  priority: Priority;
+  voters: Voter[];
+  category: SupportCategory;
+  isPublic: boolean;
+};
+
+export type BaseTaskDialogSharedProps = {
+  trigger: React.ReactNode;
+  onClick?: () => void;
+  onClose?: () => void;
+};
+
+export type AddTaskDialogProps = {
+  purpose: string;
+  mode: "add";
+  initialValues?: BaseTaskValues & { order: "start" | "end" };
+  onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
+  isOpen?: boolean;
+} & BaseTaskDialogSharedProps;
+
+export type EditTaskDialogProps = {
+  purpose: string;
+  mode: "edit";
+  isOpen: boolean;
+  initialValues?: BaseTaskValues;
+  onSubmit: (values: BaseTaskValues) => void;
+} & BaseTaskDialogSharedProps;
+
+export type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
+
+export type DetailsDialogProps = {
+  id: Id<"todoKanban">;
+  trigger: React.ReactNode;
+  isOpen: boolean;
+  initialValues: BaseTaskValues;
+  onClickAction?: () => void;
+  onCloseAction?: () => void;
+  onEditAction?: () => void;
+  isAdmin: boolean;
+  user: User | null;
 };

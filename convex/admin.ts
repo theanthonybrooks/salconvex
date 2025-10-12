@@ -33,9 +33,26 @@ export const createSupportTicket = mutation({
 
     const supportPurpose = args.category === "ui/ux" ? "design" : "general";
 
+    const description = `
+    ${args.message}
+    <br />
+    <br />
+    <p style='display:flex;align-items:center;gap:1;'><strong>Name:</strong> ${args.name}</p>
+    <p style='display:flex;align-items:center;gap:1;'><strong>Email:</strong> ${args.email}</p>
+   <p style='display:flex;align-items:center;gap:1;'><strong>User ID:</strong>
+      <a
+        href="${process.env.CONVEX_DASHBOARD_URL}data?table=users&id=${userId}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+       ${userId}
+      </a>
+   </p>
+    `;
+
     await ctx.db.insert("todoKanban", {
       title: "Support Ticket #" + ticketNumber,
-      description: args.message,
+      description,
       column: "proposed",
       order: 0,
       priority: "high",
