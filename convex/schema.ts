@@ -822,7 +822,7 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
     completedAt: v.optional(v.number()),
     public: v.boolean(),
-    lastUpdatedBy: v.id("users"),
+    lastUpdatedBy: v.union(v.id("users"), v.literal("guest")),
     priority: v.optional(
       v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
     ),

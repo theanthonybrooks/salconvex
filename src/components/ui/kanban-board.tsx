@@ -455,7 +455,7 @@ const Column = ({
           <h3 className={cn("z-10 rounded-lg p-4 font-medium", headingColor)}>
             {title}
           </h3>
-          {!userRole.includes("admin") && (
+          {userRole.includes("admin") && (
             <AddCard
               purpose={purpose}
               column={column}
@@ -937,13 +937,14 @@ export const TaskDialog = ({
                 }
                 placeholder="Select category"
                 className="w-full min-w-40 max-w-sm sm:max-w-50"
+                contentClassName="sm:max-h-80"
               />
             </div>
 
             {!isEdit && (
               <div className="flex flex-1 flex-col gap-3">
                 <Label htmlFor="order">Order</Label>
-                <select
+                {/* <select
                   name="order"
                   value={order}
                   onChange={(e) => setOrder(e.target.value as "start" | "end")}
@@ -951,7 +952,17 @@ export const TaskDialog = ({
                 >
                   <option value="start">Start</option>
                   <option value="end">End</option>
-                </select>
+                </select> */}
+                <SelectSimple
+                  options={[
+                    { value: "start", label: "Start" },
+                    { value: "end", label: "End" },
+                  ]}
+                  value={order}
+                  onChangeAction={(value) => setOrder(value as "start" | "end")}
+                  placeholder="Order"
+                  className="w-full max-w-md"
+                />
               </div>
             )}
           </div>

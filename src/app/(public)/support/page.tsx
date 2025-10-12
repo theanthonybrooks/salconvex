@@ -286,6 +286,7 @@ const SupportPage = () => {
                         invalid={
                           (fieldHasError("category") || !categoryValid) ?? false
                         }
+                        contentClassName="sm:max-h-80"
                       />
                     </FormControl>
                     <FormMessage />

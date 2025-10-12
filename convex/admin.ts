@@ -1,3 +1,5 @@
+import { SupportCategory } from "@/constants/supportConsts";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { ShardedCounter } from "@convex-dev/sharded-counter";
 import { ConvexError, v } from "convex/values";
 import { components } from "~/convex/_generated/api";
@@ -14,6 +16,7 @@ export const createSupportTicket = mutation({
     message: v.string(),
   },
   async handler(ctx, args) {
+    const userId = await getAuthUserId(ctx);
     await counter.inc(ctx, "supportTickets");
     const ticketNumber = await counter.count(ctx, "supportTickets");
 
@@ -26,6 +29,22 @@ export const createSupportTicket = mutation({
       message: args.message,
       status: "open",
       createdAt: Date.now(),
+    });
+
+    const supportPurpose = args.category === "ui/ux" ? "design" : "general";
+
+    await ctx.db.insert("todoKanban", {
+      title: "Support Ticket #" + ticketNumber,
+      description: args.message,
+      column: "proposed",
+      order: 0,
+      priority: "high",
+      category: args.category as SupportCategory,
+      public: true,
+      purpose: supportPurpose,
+      voters: [],
+      createdAt: Date.now(),
+      lastUpdatedBy: userId ?? "guest",
     });
 
     return { support, ticketNumber };
@@ -61,13 +80,15 @@ export const getSupportTicketStatus = query({
   handler: async (ctx, args) => {
     const support = await ctx.db
       .query("support")
-      .withIndex("by_ticketNumber", (q) => q.eq("ticketNumber", args.ticketNumber))
+      .withIndex("by_ticketNumber", (q) =>
+        q.eq("ticketNumber", args.ticketNumber),
+      )
       .first();
 
-      if (!support) {
-        throw new ConvexError("No support ticket found");
-      }
+    if (!support) {
+      throw new ConvexError("No support ticket found");
+    }
 
     return support;
   },
-})
+});
