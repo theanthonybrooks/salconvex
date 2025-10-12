@@ -16,6 +16,7 @@ import type * as aggregates_eventAggregates from "../aggregates/eventAggregates.
 import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as artists_artistProfile from "../artists/artistProfile.js";
+import type * as artists_artistQueries from "../artists/artistQueries.js";
 import type * as artists_getArtistEventMetadata from "../artists/getArtistEventMetadata.js";
 import type * as artists_listActions from "../artists/listActions.js";
 import type * as auth from "../auth.js";
@@ -65,6 +66,7 @@ declare const fullApi: ApiFromModules<{
   "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
   "artists/artistProfile": typeof artists_artistProfile;
+  "artists/artistQueries": typeof artists_artistQueries;
   "artists/getArtistEventMetadata": typeof artists_getArtistEventMetadata;
   "artists/listActions": typeof artists_listActions;
   auth: typeof auth;

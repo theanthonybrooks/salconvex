@@ -25,7 +25,7 @@ export const searchCards = query({
       .query("todoKanban")
       .withSearchIndex("search_by_desc", (q) => {
         let filter = q.search("description", args.searchTerm ?? "");
-        if (args.purpose) {
+        if (args.purpose && args.purpose !== "todo") {
           filter = filter.eq("purpose", args.purpose);
         }
         return filter;
@@ -39,10 +39,13 @@ export const getCards = query({
     purpose: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("todoKanban")
-      .withIndex("by_purpose", (q) => q.eq("purpose", args.purpose))
-      .collect();
+    const allCards = args.purpose === "todo";
+    return allCards
+      ? await ctx.db.query("todoKanban").collect()
+      : await ctx.db
+          .query("todoKanban")
+          .withIndex("by_purpose", (q) => q.eq("purpose", args.purpose))
+          .collect();
   },
 });
 
@@ -97,7 +100,7 @@ export const addCard = mutation({
       priority,
       isPublic,
     } = args;
-
+    const cardPurpose = category === "ui/ux" ? "design" : args.purpose;
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("User not authenticated");
     if (column === "done") {
@@ -112,7 +115,7 @@ export const addCard = mutation({
         category: category ?? "general",
         priority,
         public: isPublic,
-        purpose: args.purpose,
+        purpose: cardPurpose,
         completedAt: Date.now(),
       });
     }
@@ -142,7 +145,7 @@ export const addCard = mutation({
         category: category ?? "general",
         priority,
         public: isPublic,
-        purpose: args.purpose,
+        purpose: cardPurpose,
         userId,
       });
     }
@@ -167,7 +170,7 @@ export const addCard = mutation({
 
       category: category ?? "general",
       public: isPublic,
-      purpose: args.purpose,
+      purpose: cardPurpose,
     });
   },
 });

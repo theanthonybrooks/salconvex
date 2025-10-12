@@ -132,7 +132,7 @@ const EventContextMenu = ({
   const { toggleListAction } = useToggleListAction(eventId as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
   const hasApplied = appStatus !== null;
-  const { slug, dates } = event;
+  // const { slug, dates } = event;
 
   const onHide = async () => {
     toggleListAction({ hidden: !isHidden });

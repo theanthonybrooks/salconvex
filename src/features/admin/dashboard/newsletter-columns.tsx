@@ -3,7 +3,6 @@
 import { DeleteNewsletterSubscription } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { Link } from "@/components/ui/custom-link";
 import {
@@ -55,29 +54,29 @@ interface NewsletterColumnsProps {
 }
 
 export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
-  {
-    id: "select",
-    size: 30,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "select",
+  //   size: 30,
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: "name",
     minSize: 120,
@@ -215,7 +214,6 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
-      // const dumbFuck = row.table.fuckoff
       // console.log(table.options)
 
       return (

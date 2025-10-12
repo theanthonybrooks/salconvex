@@ -23,13 +23,15 @@ export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
   const tablePageSize = table.getState().pagination.pageSize;
+  const formType = table.options.meta?.pageType === "form";
   const minimalView = table.options.meta?.minimalView;
   // const tableType = table.options.meta?.tableType;
   // const forEvents = tableType === "events";
   // console.log(table.nextPage());
+
   // console.log(table.previousPage());
 
-  if (table.options.data.length <= 10) return;
+  if (table.options.data.length <= 10 && formType) return;
   return (
     <div className="flex flex-col items-center justify-between gap-y-2 px-2 sm:flex-row">
       {!minimalView && (

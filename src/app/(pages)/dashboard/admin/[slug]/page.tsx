@@ -24,6 +24,7 @@ export default async function AdminPage({
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
   const user = userData?.user;
   const subStatus = subscription?.status;
+  const isDesigner = user?.role?.includes("designer");
 
   if (!user) {
     redirect("/auth/sign-in");
@@ -41,14 +42,21 @@ export default async function AdminPage({
     case "analytics":
       return <AnalyticsPage />;
     case "todos":
-      return <KanbanBoard userRole={user.role?.[0]} purpose="todo" />;
-    case "design":
-      return <KanbanBoard userRole={user.role?.[0]} purpose="design" />;
+      return (
+        <KanbanBoard
+          userRole={user.role ?? []}
+          purpose={isDesigner ? "design" : "todo"}
+        />
+      );
+    // case "design":
+    //   return <KanbanBoard userRole={user.role?.[0]} purpose="design" />;
     case "submissions":
       return <AdminDashboardTableWrapper page="events" />;
 
     case "users":
       return <AdminDashboardTableWrapper page="users" />;
+    case "artists":
+      return <AdminDashboardTableWrapper page="artists" />;
     case "event":
       return <AdminEventForm user={user} />;
     case "applications":

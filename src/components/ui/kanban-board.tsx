@@ -4,7 +4,7 @@
 import { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { Eye, LucideThumbsDown, LucideThumbsUp, X } from "lucide-react";
+import { Circle, Eye, LucideThumbsDown, LucideThumbsUp, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
@@ -49,6 +49,7 @@ import {
 import { RichTextDisplay } from "@/lib/richTextFns";
 import { User } from "@/types/user";
 import { capitalize, debounce } from "lodash";
+import { MdOutlineDesignServices } from "react-icons/md";
 
 interface Card {
   title: string;
@@ -71,7 +72,7 @@ interface MoveCardArgs {
 
 interface AddCardProps {
   column: ColumnType;
-  userRole: string;
+  userRole: string[];
   purpose: string;
   addCard: (args: AddCardArgs) => void;
 }
@@ -99,7 +100,7 @@ interface ColumnProps {
   headingColor: string;
   column: ColumnType;
   cards: Card[];
-  userRole: string;
+  userRole: string[];
   purpose: string;
   activeColumn: string | null;
   setActiveColumn: (col: string | null) => void;
@@ -133,7 +134,7 @@ interface DropIndicatorProps {
 // }
 
 interface KanbanBoardProps {
-  userRole: string;
+  userRole: string[];
   purpose: string;
 }
 
@@ -149,17 +150,23 @@ const getColumnColor = (column: ColumnType) => {
   return colors[column] || "bg-neutral-500";
 };
 
+const purposeOptions = [
+  { value: "todo", label: "All", Icon: Circle },
+  { value: "design", label: "UI/UX", Icon: MdOutlineDesignServices },
+];
+
 export const KanbanBoard = ({
-  userRole = "user",
+  userRole = ["user"],
   purpose = "todo",
 }: KanbanBoardProps) => {
   return <Board userRole={userRole} purpose={purpose} />;
 };
 
-const Board = ({ userRole, purpose }: KanbanBoardProps) => {
+const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [purpose, setPurpose] = useState<string>(initialPurpose ?? "todo");
 
   useEffect(() => {
     const handler = debounce((value: string) => {
@@ -245,10 +252,8 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
   };
 
   const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"];
-  const hasProposed =
-    cards.some((card) => card.column === "proposed") || purpose === "design";
-  const hasNotPlanned =
-    cards.some((card) => card.column === "notPlanned") || purpose === "design";
+  const hasProposed = cards.some((card) => card.column === "proposed");
+  const hasNotPlanned = cards.some((card) => card.column === "notPlanned");
 
   // const orderedColumns: ColumnType[] = hasProposed
   //   ? ["proposed", ...baseColumns]
@@ -264,27 +269,57 @@ const Board = ({ userRole, purpose }: KanbanBoardProps) => {
   }
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
-      <div className="flex items-center gap-3">
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search"
-          className="w-full max-w-md"
-        />
-        {debouncedSearch !== "" && (
-          // <p
-          //   className="text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95"
-          //   onClick={() => setSearchTerm("")}
-          // >
-          //   Clear Search
-          // </p>
-          <Button
-            variant="salWithShadowHidden"
-            onClick={() => setSearchTerm("")}
-          >
-            Reset
-          </Button>
-        )}
+      <div className={cn("flex items-center justify-between pr-4")}>
+        <div className="flex items-center gap-3">
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search"
+            className="w-full max-w-md"
+          />
+          {debouncedSearch !== "" && (
+            // <p
+            //   className="text-red-600 hover:scale-105 hover:cursor-pointer active:scale-95"
+            //   onClick={() => setSearchTerm("")}
+            // >
+            //   Clear Search
+            // </p>
+            <Button
+              variant="salWithShadowHidden"
+              onClick={() => setSearchTerm("")}
+            >
+              Reset
+            </Button>
+          )}
+        </div>
+        <div className="relative inset-y-0 z-10 mt-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:mt-0 lg:p-0">
+          {/* Thumb indicator */}
+          <div
+            className={cn(
+              "absolute left-0 top-0 z-1 h-full w-1/2 bg-background transition-all duration-200 ease-out",
+              purpose === "todo" && "translate-x-0",
+              purpose === "design" && "translate-x-full bg-orange-200",
+            )}
+          />
+
+          {/* Icon buttons */}
+          {purposeOptions?.map(({ value, Icon, label }) => (
+            <button
+              key={value}
+              onClick={() => setPurpose(value)}
+              className={cn(
+                "relative z-10 flex w-1/2 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
+                purpose === value && "text-foreground",
+              )}
+              type="button"
+            >
+              <span className="flex items-center gap-1">
+                <Icon className="size-6 shrink-0 lg:size-4" />
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
       <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
         {orderedColumns.map((column) => (
@@ -322,13 +357,13 @@ const Column = ({
   const [active, setActive] = useState(false);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
-    if (userRole !== "admin") return;
+    if (!userRole.includes("admin")) return;
     e.dataTransfer.setData("cardId", card.id);
     // setActive(true);
   };
 
   const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return;
+    if (!userRole.includes("admin")) return;
 
     const cardId = e.dataTransfer.getData("cardId");
     if (!cardId) return;
@@ -356,7 +391,7 @@ const Column = ({
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    if (userRole !== "admin") return;
+    if (!userRole.includes("admin")) return;
     e.preventDefault();
     highlightIndicator(e);
     setActive(true);
@@ -422,7 +457,7 @@ const Column = ({
           <h3 className={cn("z-10 rounded-lg p-4 font-medium", headingColor)}>
             {title}
           </h3>
-          {userRole === "admin" && (
+          {!userRole.includes("admin") && (
             <AddCard
               purpose={purpose}
               column={column}
@@ -660,7 +695,7 @@ const DropIndicator = ({ beforeId, column }: DropIndicatorProps) => {
 };
 
 const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
-  if (userRole !== "admin") return null;
+  if (!userRole.includes("admin")) return null;
 
   return (
     <TaskDialog

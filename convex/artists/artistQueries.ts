@@ -1,0 +1,41 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { mergedStream, stream } from "convex-helpers/server/stream";
+import { Id } from "~/convex/_generated/dataModel";
+import { query } from "~/convex/_generated/server";
+import schema from "~/convex/schema";
+
+export const getActiveArtists = query({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db.get(userId);
+    if (!user?.role?.includes("admin")) return null;
+    const activeSubs = [];
+    activeSubs.push(
+      stream(ctx.db, schema)
+        .query("userSubscriptions")
+        .withIndex("by_status", (q) => q.eq("status", "active")),
+    );
+    activeSubs.push(
+      stream(ctx.db, schema)
+        .query("userSubscriptions")
+        .withIndex("by_status", (q) => q.eq("status", "trialing")),
+    );
+    const mergedSubs = mergedStream(activeSubs, ["status"]);
+    const subs = await mergedSubs.collect();
+    const artists = await Promise.all(
+      subs.map(async (sub) => {
+        const artist = await ctx.db
+          .query("artists")
+          .withIndex("by_artistId", (q) =>
+            q.eq("artistId", sub.userId as Id<"users">),
+          )
+          .first();
+        if (!artist) return null;
+        return artist;
+      }),
+    );
+
+    return artists;
+  },
+});

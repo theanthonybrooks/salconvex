@@ -1,0 +1,360 @@
+//TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
+"use client";
+
+import { ArtistFeatureSelect } from "@/components/data-table/actions/data-table-admin-artist-actions";
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { Button } from "@/components/ui/button";
+import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
+import { CopyableItem } from "@/components/ui/copyable-item";
+import { Link } from "@/components/ui/custom-link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { TooltipSimple } from "@/components/ui/tooltip";
+import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
+import { cn } from "@/lib/utils";
+import { ArtistDoc } from "@/types/artist";
+import { ColumnDef } from "@tanstack/react-table";
+import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+
+export const artistColumnLabels: Record<string, string> = {
+  name: "Name",
+  nationality: "Nationality",
+  documents: "Documents",
+  instagram: "Instagram",
+  website: "Website",
+  canFeature: "Can Feature",
+  feature: "Feature",
+  notes: "Notes",
+  createdAt: "Created",
+};
+
+export const artistColumns: ColumnDef<ArtistDoc>[] = [
+  // {
+  //   id: "select",
+  //   size: 35,
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
+  {
+    accessorKey: "name",
+    minSize: 120,
+    maxSize: 400,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+    cell: ({ row }) => {
+      const { _id: artistId, artistName } = row.original;
+      return (
+        <ConvexDashboardLink
+          className="font-medium"
+          table="artists"
+          id={artistId}
+        >
+          <p className="truncate">{artistName}</p>
+        </ConvexDashboardLink>
+      );
+    },
+  },
+  // {
+  //   accessorKey: "nationality",
+  //   minSize: 150,
+  //   maxSize: 400,
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Email" />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <CopyableItem className="text-sm text-muted-foreground" truncate>
+  //       {row.getValue("email")}
+  //     </CopyableItem>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "subscription",
+  //   minSize: 120,
+  //   maxSize: 200,
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Subscription" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const { subscription } = row.original;
+  //     const fatcapSubs = ["3a. monthly-fatcap", "3b. yearly-fatcap"];
+  //     const originalSubs = ["1a. monthly-original", "1b. yearly-original"];
+  //     const bananaSubs = ["2a. monthly-banana", "2b. yearly-banana"];
+  //     return (
+  //       <div
+  //         className={cn(
+  //           "rounded px-2 py-1 text-xs font-medium",
+  //           fatcapSubs.includes(subscription ?? "") &&
+  //             "border border-green-500 bg-green-100 text-green-800",
+  //           originalSubs.includes(subscription ?? "") &&
+  //             "border border-gray-500 bg-gray-100 text-gray-800",
+  //           bananaSubs.includes(subscription ?? "") &&
+  //             "border border-orange-500 bg-orange-100 text-orange-800",
+
+  //           !subscription && "italic text-muted-foreground",
+  //         )}
+  //       >
+  //         <p className="text-center capitalize"> {subscription || "none"}</p>
+  //       </div>
+  //     );
+  //   },
+  //   filterFn: (row, columnId, filterValue) => {
+  //     if (!Array.isArray(filterValue)) return true;
+  //     return filterValue.includes(row.getValue(columnId));
+  //   },
+  // },
+
+  {
+    accessorKey: "nationality",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nationality" />
+    ),
+    cell: ({ row }) => {
+      const { artistNationality: nationality } = row.original;
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {nationality?.length > 0 ? (
+            <TooltipSimple content={nationality.join(", ")}>
+              <p>{nationality?.length > 0 ? nationality.join(", ") : "-"}</p>
+            </TooltipSimple>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "instagram",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Instagram" />
+    ),
+    cell: ({ row }) => {
+      const { contact } = row.original;
+      const instagram = contact?.instagram;
+      const username = instagram?.startsWith("@")
+        ? instagram?.slice(1)
+        : instagram;
+
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {instagram ? (
+            <Link
+              href={`https://www.instagram.com/${username}`}
+              target="_blank"
+            >
+              {instagram}
+            </Link>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const instagram = row.original.contact?.instagram;
+      const hasValue = !!instagram && instagram.trim() !== "";
+      return filterValue.includes(String(hasValue));
+    },
+  },
+  {
+    accessorKey: "website",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Website" />
+    ),
+    cell: ({ row }) => {
+      const { contact } = row.original;
+      const website = contact?.website;
+      const displayLink = website?.startsWith("http")
+        ? website.slice(website.indexOf("//") + 2)
+        : website;
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {website ? (
+            <Link href={website} target="_blank">
+              {displayLink}
+            </Link>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "canFeature",
+    minSize: 80,
+    maxSize: 80,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Can Feature" />
+    ),
+    cell: ({ row }) => {
+      const { canFeature } = row.original;
+      return (
+        <div className="truncate text-center text-sm text-muted-foreground">
+          {typeof canFeature === "boolean" ? (canFeature ? "Yes" : "No") : "-"}
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      console.log(value);
+      return filterValue.includes(String(value));
+    },
+  },
+  {
+    accessorKey: "feature",
+    minSize: 80,
+    maxSize: 80,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Feature" />
+    ),
+    cell: ({ row }) => {
+      const { feature } = row.original;
+      return (
+        <ArtistFeatureSelect
+          artistId={row.original._id}
+          feature={!!feature}
+          key={row.original._id}
+        />
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(String(value));
+    },
+  },
+
+  {
+    accessorKey: "notes",
+    minSize: 120,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Notes" />
+    ),
+    cell: ({ row }) => {
+      const { notes } = row.original;
+      return <span className="text-sm">{notes ?? "-"}</span>;
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    minSize: 120,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created" />
+    ),
+    cell: ({ row }) => {
+      const { _creationTime: value } = row.original;
+      return (
+        <span className="text-sm">
+          {value ? new Date(value).toLocaleString() : "-"}
+        </span>
+      );
+    },
+  },
+
+  {
+    id: "actions",
+
+    maxSize: 40,
+    minSize: 40,
+    enableResizing: false,
+    cell: ({ row }) => {
+      const user = row.original;
+      const { artistId } = user;
+
+      // const openCallState = event.openCallState;
+      // const openCallId = event.openCallId;
+
+      // console.log(table.options)
+
+      return (
+        <div className={cn("flex justify-center")}>
+          <ConfirmingDropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+                >
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="scrollable mini darkbar max-h-56"
+              >
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
+                <DropdownMenuSeparator />
+                {/* <DropdownMenuItem>
+                  <Link
+                    href={`mailto:${user.email}`}
+                    target="_blank"
+                    className="flex items-center gap-x-2"
+                  >
+                    <FaEnvelope className="size-4" /> Contact
+                  </Link>
+                </DropdownMenuItem> */}
+                <DropdownMenuItem>
+                  <CopyableItem
+                    defaultIcon={<LucideClipboardCopy className="size-4" />}
+                    copyContent={user._id}
+                    className="gap-x-2"
+                  >
+                    User ID
+                  </CopyableItem>
+                </DropdownMenuItem>
+                {artistId && (
+                  <DropdownMenuItem>
+                    <CopyableItem
+                      defaultIcon={<LucideClipboardCopy className="size-4" />}
+                      copyContent={artistId}
+                      className="gap-x-2"
+                    >
+                      Artist ID
+                    </CopyableItem>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </ConfirmingDropdown>
+        </div>
+      );
+    },
+  },
+];

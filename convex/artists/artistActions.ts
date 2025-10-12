@@ -138,6 +138,29 @@ export const getArtist = query({
   },
 });
 
+export const updateArtistFeature = mutation({
+  args: {
+    artistId: v.id("artists"),
+    feature: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    console.log(args.artistId, args.feature);
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const artist = await ctx.db
+      .query("artists")
+      .withIndex("by_id", (q) => q.eq("_id", args.artistId))
+      .unique();
+    if (!artist) throw new ConvexError("Artist not found");
+
+    await ctx.db.patch(artist._id, {
+      feature: args.feature,
+      updatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
+  },
+});
+
 export const getArtistFull = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);

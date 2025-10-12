@@ -180,7 +180,7 @@ export {
 
 interface SelectSimpleProps {
   options: {
-    label: string;
+    label: React.ReactNode;
     value: string;
     icon?: IconType | LucideIcon;
     disabled?: boolean;

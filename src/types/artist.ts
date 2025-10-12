@@ -1,5 +1,5 @@
 import { ApplicationStatus } from "@/types/applications";
-import { Id } from "~/convex/_generated/dataModel";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export interface ArtistResidency {
   full?: string;
@@ -27,32 +27,34 @@ export interface ArtistResidency {
   };
 }
 
-export interface Artist {
-  // _id: Id<"artists">;
-  artistId: Id<"users">;
-  artistName: string;
-  artistNationality?: string[];
-  artistResidency?: ArtistResidency;
-  documents: {
-    cv?: string;
-    resume?: string;
-    artistStatement?: string;
-    images?: string[];
-  };
-  contact: {
-    website?: string;
-    instagram?: string;
-    facebook?: string;
-    threads?: string;
-    vk?: string;
-    phone?: string;
-    youTube?: string;
-    linkedIn?: string;
-  };
-  canFeature?: boolean;
-}
+export type ArtistDoc = Doc<"artists">;
 
-export interface ArtistFull extends Artist {
+// export interface Artist {
+//   // _id: Id<"artists">;
+//   artistId: Id<"users">;
+//   artistName: string;
+//   artistNationality?: string[];
+//   artistResidency?: ArtistResidency;
+//   documents: {
+//     cv?: string;
+//     resume?: string;
+//     artistStatement?: string;
+//     images?: string[];
+//   };
+//   contact: {
+//     website?: string;
+//     instagram?: string;
+//     facebook?: string;
+//     threads?: string;
+//     vk?: string;
+//     phone?: string;
+//     youTube?: string;
+//     linkedIn?: string;
+//   };
+//   canFeature?: boolean;
+// }
+
+export interface ArtistFull extends ArtistDoc {
   applications: Applications[];
   listActions: ListActions[];
 }

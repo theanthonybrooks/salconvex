@@ -18,10 +18,10 @@ import { Id } from "~/convex/_generated/dataModel";
 
 export const ColumnTypeOptions = [
   { label: "Proposed", value: "proposed" },
-  { label: "Backlog", value: "backlog" },
+  { label: "Considering", value: "backlog" },
   { label: "Todo", value: "todo" },
-  { label: "Doing", value: "doing" },
-  { label: "Done", value: "done" },
+  { label: "In Progress", value: "doing" },
+  { label: "Completed", value: "done" },
   { label: "Not Planned", value: "notPlanned" },
 ] as const;
 

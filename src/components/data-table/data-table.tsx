@@ -307,6 +307,15 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => {
                 let bgStatusClass = "";
 
+                if (tableType === "artists") {
+                  const { feature } = row.original as {
+                    feature: boolean | null;
+                  };
+                  if (feature === true) {
+                    bgStatusClass = "bg-green-100";
+                  }
+                }
+
                 if (tableType === "bookmarks") {
                   const { eventIntent } = row.original as {
                     eventIntent: string | null;

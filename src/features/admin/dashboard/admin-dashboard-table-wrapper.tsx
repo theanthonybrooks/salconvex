@@ -5,11 +5,13 @@ import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
+import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { columns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
+import { ArtistDoc } from "@/types/artist";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "~/convex/_generated/api";
@@ -38,17 +40,28 @@ export function AdminDashboardTableWrapper({
   const adminActions = {
     isAdmin,
   };
-
-  const usersData = useQuery(api.users.usersWithSubscriptions);
-  const newsletterData = useQuery(
-    api.newsletter.subscriber.getNewsletterSubscribers,
-  );
   const submissionsPage = page === "events";
   const appsPage = page === "applications";
   const usersPage = page === "users";
+  const artistsPage = page === "artists";
   const newsletterPage = page === "newsletter";
+
+  const usersData = useQuery(
+    api.users.usersWithSubscriptions,
+    usersPage ? {} : "skip",
+  );
+  const newsletterData = useQuery(
+    api.newsletter.subscriber.getNewsletterSubscribers,
+    newsletterPage ? {} : "skip",
+  );
   const applicationData = useQuery(
     api.artists.applications.getArtistApplications2,
+    appsPage ? {} : "skip",
+  );
+
+  const artistsData = useQuery(
+    api.artists.artistQueries.getActiveArtists,
+    artistsPage ? {} : "skip",
   );
 
   return (
@@ -204,6 +217,57 @@ export function AdminDashboardTableWrapper({
               }}
               adminActions={adminActions}
               tableType="users"
+              pageType="dashboard"
+              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn("lg:hidden")}
+            />
+          </div>
+        </>
+      )}
+      {artistsPage && (
+        <>
+          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+            <DataTable
+              columns={artistColumns}
+              data={(artistsData ?? []) as ArtistDoc[]}
+              defaultVisibility={{
+                category: true,
+                dates_edition: true,
+                type: false,
+                role: false,
+              }}
+              toolbarData={{
+                userCount: artistsData?.length ?? 0,
+              }}
+              adminActions={adminActions}
+              tableType="artists"
+              pageType="dashboard"
+              defaultSort={{ id: `createdAt`, desc: true }}
+              pageSize={50}
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
+            <DataTable
+              columns={artistColumns}
+              data={(artistsData ?? []) as ArtistDoc[]}
+              defaultVisibility={{
+                type: false,
+                category: false,
+                role: false,
+                lastEditedAt: false,
+                dates_edition: false,
+              }}
+              toolbarData={{
+                userCount: artistsData?.length ?? 0,
+              }}
+              defaultSort={{ id: `createdAt`, desc: true }}
+              onRowSelect={(row) => {
+                console.log(row);
+                // setExistingEvent(row.getValue("event"));
+                // setExistingOpenCall(row.getValue("openCall"));
+              }}
+              adminActions={adminActions}
+              tableType="artists"
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}

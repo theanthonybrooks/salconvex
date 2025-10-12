@@ -508,7 +508,6 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
-      // const dumbFuck = row.table.fuckoff
       // console.log(table.options)
 
       return (

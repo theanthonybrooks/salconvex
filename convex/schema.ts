@@ -166,6 +166,8 @@ const artistSchema = {
     }),
   ),
   canFeature: v.optional(v.boolean()),
+  feature: v.optional(v.boolean()),
+  notes: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
   lastUpdatedBy: v.optional(v.string()),
   completedProfile: v.boolean(),
@@ -910,6 +912,7 @@ export default defineSchema({
     lastEditedAt: v.optional(v.number()),
     paidStatus: v.optional(v.boolean()),
   })
+    .index("by_status", ["status"])
     .index("userId", ["userId"])
     .index("stripeId", ["stripeId"])
     .index("customerId", ["customerId"]),

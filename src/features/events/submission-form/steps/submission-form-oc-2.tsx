@@ -317,7 +317,7 @@ const SubmissionFormOC2 = ({
 
           <div
             className={cn(
-              "flex min-w-50 flex-1 items-center justify-between rounded border border-foreground bg-card px-3",
+              "flex min-w-50 flex-1 items-center justify-between gap-x-2 rounded border border-foreground bg-card px-3",
               !showBudgetInputs &&
                 "border-foreground/30 opacity-50 [@media(max-width:640px)]:hidden",
               pastEvent && "border-foreground/50 opacity-50",
@@ -350,7 +350,7 @@ const SubmissionFormOC2 = ({
               <div className="flex w-full select-none items-center justify-center gap-1 text-2xs text-foreground/50">
                 <p>Minimum - Maximum</p>
               </div>
-              <div className="flex w-full items-center gap-1">
+              <div className="flex w-full gap-1">
                 <Controller
                   name="openCall.compensation.budget.min"
                   control={control}
@@ -361,7 +361,12 @@ const SubmissionFormOC2 = ({
                       min={0}
                       disabled={!showBudgetInputs || pastEvent}
                       placeholder="Minimum"
-                      className="h-fit border-none !bg-card px-0 pb-2 pt-0 text-end focus:border-none focus:outline-none sm:text-base"
+                      className={cn(
+                        "h-fit border-none !bg-card px-0 py-0 focus:border-none focus:outline-none sm:text-base",
+                        !budgetMin && hasBudget && "invalid-field",
+                        "text-center",
+                        // "text-end"
+                      )}
                     />
                   )}
                 />
@@ -375,7 +380,7 @@ const SubmissionFormOC2 = ({
                     <DebouncedControllerNumInput
                       // min={budgetMin}
                       // type="number"
-                      disabled={!showBudgetInputs || pastEvent}
+                      disabled={!showBudgetInputs || pastEvent || !budgetMin}
                       formatNumber={true}
                       field={{
                         ...field,
@@ -387,7 +392,14 @@ const SubmissionFormOC2 = ({
                       // min={budgetMin}
                       debounceMs={1500}
                       placeholder="Maximum "
-                      className="arrowless h-fit border-none !bg-card px-0 pb-2 pt-0 text-left focus:border-none focus:outline-none sm:text-base"
+                      className={cn(
+                        "arrowless h-fit border-none !bg-card px-0 py-0 focus:border-none focus:outline-none sm:text-base",
+                        "text-center",
+                        !budgetMin &&
+                          hasBudget &&
+                          "!bg-foreground/15 text-foreground/50 opacity-50",
+                        // "text-start"
+                      )}
                     />
                   )}
                 />

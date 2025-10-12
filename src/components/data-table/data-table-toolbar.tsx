@@ -53,6 +53,7 @@ export function DataTableToolbar<TData>({
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
   const appsTable = tableType === "applications";
+  const artistsTable = tableType === "artists";
   const bookmarksTable = tableType === "bookmarks";
   const usersTable = tableType === "users";
   // const organizersTable = tableType === "organizations";
@@ -149,6 +150,46 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("category")}
                 title="Category"
                 options={eventCategories}
+              />
+            )}
+          </div>
+        )}
+        {artistsTable && (
+          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
+            {table.getColumn("feature") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("feature")}
+                title="Feature"
+                options={[
+                  { value: true, label: "Feature" },
+                  { value: false, label: "Don't Feature" },
+                ]}
+              />
+            )}
+            {table.getColumn("canFeature") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("canFeature")}
+                title="Can Feature"
+                options={[
+                  { value: true, label: "Can Feature" },
+                  { value: false, label: "Can't Feature" },
+                ]}
+              />
+            )}
+            {table.getColumn("instagram") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("instagram")}
+                title="Instagram"
+                options={[
+                  { value: true, label: "Has Instagram" },
+                  { value: false, label: "No Instagram" },
+                ]}
               />
             )}
           </div>
