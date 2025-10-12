@@ -12,6 +12,7 @@ import { api } from "~/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { Pencil } from "lucide-react";
 
+import { MultiSelect } from "@/components/multi-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -42,7 +43,6 @@ import {
   ColumnTypeOptions,
   DetailsDialogProps,
   DropIndicatorProps,
-  getColumnColor,
   KanbanBoardProps,
   Priority,
   PRIORITY_CONFIG,
@@ -66,9 +66,23 @@ export const KanbanBoard = ({
   return <Board userRole={userRole} purpose={purpose} />;
 };
 
+export const getColumnColor = (column: ColumnType) => {
+  const colors: Record<ColumnType, string> = {
+    proposed: "bg-orange-200",
+    backlog: "bg-neutral-200/80",
+    todo: "bg-salYellow/70",
+    doing: "bg-blue-200",
+    done: "bg-emerald-200",
+    notPlanned: "bg-red-200",
+  };
+  return colors[column] || "bg-neutral-500";
+};
+
 const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState<SupportCategory[]>([]);
+
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [purpose, setPurpose] = useState<string>(initialPurpose ?? "todo");
   useEffect(() => {
@@ -89,6 +103,7 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
       ? {
           purpose,
           searchTerm: debouncedSearch,
+          category,
         }
       : "skip",
   );
@@ -96,7 +111,7 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
   const rawResults =
     useQuery(
       api.kanban.cards.getCards,
-      debouncedSearch === "" ? { purpose } : "skip",
+      debouncedSearch === "" ? { purpose, category } : "skip",
     ) ||
     ([] as {
       _id: Id<"todoKanban">;
@@ -193,6 +208,26 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
           >
             Reset
           </Button>
+          {purpose === "todo" && (
+            <MultiSelect
+              options={[...supportCategoryOptions]}
+              onValueChange={(value) => {
+                setCategory(value as SupportCategory[]);
+              }}
+              value={category}
+              placeholder="Select category"
+              variant="basic"
+              maxCount={1}
+              condensed
+              height={11}
+              hasSearch={false}
+              selectAll={false}
+              className={cn(
+                "w-full min-w-80 max-w-lg border-1.5 border-foreground/20 sm:h-11",
+              )}
+              listClassName="max-h-80"
+            />
+          )}
         </div>
         <div className="relative inset-y-0 z-10 my-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:my-0 lg:p-0">
           {/* Thumb indicator */}
@@ -495,9 +530,10 @@ const Card = ({
             purpose,
           })
         }
-        className={`relative grid cursor-grab grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground active:cursor-grabbing ${getColumnColor(
-          column,
-        )}`}
+        className={cn(
+          "relative grid cursor-grab grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground active:cursor-grabbing",
+          getColumnColor(column),
+        )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={
           !isEditing && !isPreviewing ? () => setIsHovered(false) : () => {}

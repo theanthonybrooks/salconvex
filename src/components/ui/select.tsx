@@ -32,9 +32,9 @@ const SelectTrigger = React.forwardRef<
     )}
     {...props}
   >
-    {children}
+    <div className="flex w-full justify-center">{children}</div>
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50 group-data-[state=open]:rotate-180" />
+      <ChevronDown className="size-4 opacity-50 group-data-[state=open]:rotate-180" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -217,10 +217,10 @@ export const SelectSimple = ({
         id={id}
         disabled={disabled}
         className={cn(
-          className,
           "*:data-[slot=select-value]:pr-4",
 
           invalid && "invalid-field",
+          className,
         )}
         tabIndex={tabIndex}
       >

@@ -5,7 +5,7 @@ import { ConvexError, v } from "convex/values";
 import { components } from "~/convex/_generated/api";
 import { mutation, query } from "~/convex/_generated/server";
 
-const counter = new ShardedCounter(components.shardedCounter);
+export const counter = new ShardedCounter(components.shardedCounter);
 
 export const createSupportTicket = mutation({
   args: {

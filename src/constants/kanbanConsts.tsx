@@ -320,18 +320,6 @@ export interface KanbanBoardProps {
   purpose: string;
 }
 
-export const getColumnColor = (column: ColumnType) => {
-  const colors: Record<ColumnType, string> = {
-    proposed: "bg-orange-200",
-    backlog: "bg-neutral-200",
-    todo: "bg-yellow-200",
-    doing: "bg-blue-200",
-    done: "bg-emerald-200",
-    notPlanned: "bg-red-200",
-  };
-  return colors[column] || "bg-neutral-500";
-};
-
 export const purposeOptions = [
   { value: "todo", label: "All", Icon: Circle },
   { value: "design", label: "UI/UX", Icon: MdOutlineDesignServices },

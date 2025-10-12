@@ -136,8 +136,11 @@ interface MultiSelectProps
   className?: string;
   badgeClassName?: string;
   textClassName?: string;
+  listClassName?: string;
+  groupClassName?: string;
   height?: number;
   shortResults?: boolean;
+  condensed?: boolean;
   value?: string[];
   id?: string;
   limit?: number;
@@ -174,11 +177,14 @@ export const MultiSelect = React.forwardRef<
       showArrow,
       // modalPopover = false,
       shortResults = false,
+      condensed = false,
       tabIndex,
       // asChild = false,
       className,
       badgeClassName,
       textClassName,
+      listClassName,
+      groupClassName,
       disabled,
       abbreviated = false,
       showIcon = true,
@@ -301,7 +307,7 @@ export const MultiSelect = React.forwardRef<
             disabled={disabled}
             // style={{ height: `${height * 4}px` }}
             className={cn(
-              "flex h-11 w-full min-w-40 items-center justify-between truncate rounded-md border bg-stone-100 p-1 text-foreground hover:bg-stone-100 focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
+              "flex h-11 w-full min-w-40 items-center justify-between truncate rounded-md border bg-card p-1 text-foreground hover:bg-card focus:ring-1 focus:ring-black disabled:pointer-events-none disabled:border-foreground/30 disabled:opacity-50 disabled:hover:bg-transparent sm:h-9 [&_svg]:pointer-events-auto",
               multiSelectVariants({ variant }),
               variant === "basic" ? "border-foreground" : "",
               className,
@@ -359,18 +365,24 @@ export const MultiSelect = React.forwardRef<
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {condensed ? (
+                        <> {`+ ${selectedValues.length - maxCount}`}</>
+                      ) : (
+                        <>
+                          {`+ ${selectedValues.length - maxCount} more`}
 
-                      <XCircle
-                        className={cn(
-                          "ml-2 size-4 cursor-pointer",
-                          disabledClass,
-                        )}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearExtraOptions();
-                        }}
-                      />
+                          <XCircle
+                            className={cn(
+                              "ml-2 size-4 cursor-pointer",
+                              disabledClass,
+                            )}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              clearExtraOptions();
+                            }}
+                          />
+                        </>
+                      )}
                     </Badge>
                   )}
                   {shortResults && (
@@ -464,9 +476,9 @@ export const MultiSelect = React.forwardRef<
                 ref={commandInputRef}
               />
             )}
-            <CommandList>
+            <CommandList className={listClassName}>
               <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup className="scrollable invis">
+              <CommandGroup className={cn("scrollable invis", groupClassName)}>
                 {selectAll && (
                   <CommandItem
                     key="all"
@@ -502,7 +514,10 @@ export const MultiSelect = React.forwardRef<
                     <CommandGroup
                       key={group}
                       heading={group === "Ungrouped" ? undefined : group}
-                      className="scrollable mini justy max-h-64"
+                      className={cn(
+                        "scrollable mini justy max-h-64",
+                        groupClassName,
+                      )}
                     >
                       {groupOptions.map((option, idx) => {
                         const isSelected = selectedValues.includes(

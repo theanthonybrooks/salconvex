@@ -50,6 +50,19 @@ export const eventFormatValidator = v.union(
   v.literal("ongoing"),
 );
 
+export const supportCategoryValidator = v.union(
+  v.literal("general"),
+  v.literal("ui/ux"),
+  v.literal("account"),
+  v.literal("artist"),
+  v.literal("organization"),
+  v.literal("event"),
+  v.literal("openCall"),
+  v.literal("other"),
+);
+
+export const supportCategoryArrayValidator = v.array(supportCategoryValidator);
+
 const openCallFilesSchema = v.object({
   storageId: v.id("_storage"),
   uploadedBy: v.id("users"),
@@ -556,11 +569,13 @@ const supportSchema = {
   message: v.string(),
   status: v.union(
     v.literal("open"),
+    v.literal("pending"),
     v.literal("resolved"),
     v.literal("closed"),
   ),
   createdAt: v.number(),
   updatedAt: v.optional(v.number()),
+  updatedBy: v.optional(v.id("users")),
 };
 
 const paletteSchema = v.object({
@@ -807,16 +822,7 @@ export default defineSchema({
       }),
     ),
 
-    category: v.union(
-      v.literal("general"),
-      v.literal("ui/ux"),
-      v.literal("account"),
-      v.literal("artist"),
-      v.literal("organization"),
-      v.literal("event"),
-      v.literal("openCall"),
-      v.literal("other"),
-    ),
+    category: supportCategoryValidator,
     order: v.number(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
@@ -841,7 +847,9 @@ export default defineSchema({
     })
 
     .index("by_column_completedAt", ["column", "completedAt"])
+    .index("by_column_ticketNumber", ["column", "ticketNumber"])
     .index("by_purpose", ["purpose"])
+    .index("by_category", ["category"])
     .index("by_column_order", ["column", "order"]),
 
   userPlans: defineTable({

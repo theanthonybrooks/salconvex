@@ -1,23 +1,16 @@
 import { ColumnType } from "@/constants/kanbanConsts";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { OrderedQuery, Query, QueryInitializer } from "convex/server";
 import { v } from "convex/values";
+import { DataModel } from "~/convex/_generated/dataModel";
+import { supportCategoryValidator } from "~/convex/schema";
 import { mutation, query } from "../_generated/server";
 
 export const searchCards = query({
   args: {
     purpose: v.optional(v.string()),
     searchTerm: v.optional(v.string()),
-    category: v.optional(
-      v.union(
-        v.literal("general"),
-        v.literal("account"),
-        v.literal("artist"),
-        v.literal("organization"),
-        v.literal("event"),
-        v.literal("openCall"),
-        v.literal("other"),
-      ),
-    ),
+    category: v.array(supportCategoryValidator),
   },
   handler: async (ctx, args) => {
     //todo: add category filter dropdown to search bar
@@ -37,15 +30,54 @@ export const searchCards = query({
 export const getCards = query({
   args: {
     purpose: v.optional(v.string()),
+    category: v.array(supportCategoryValidator),
   },
   handler: async (ctx, args) => {
-    const allCards = args.purpose === "todo";
-    return allCards
-      ? await ctx.db.query("todoKanban").collect()
-      : await ctx.db
-          .query("todoKanban")
-          .withIndex("by_purpose", (q) => q.eq("purpose", args.purpose))
-          .collect();
+    const tableQuery: QueryInitializer<DataModel["todoKanban"]> =
+      ctx.db.query("todoKanban");
+    let indexedQuery: Query<DataModel["todoKanban"]> = tableQuery;
+
+    if (args.category.length > 0 && args.purpose === "todo") {
+      const results = await Promise.all(
+        args.category.map((category) =>
+          tableQuery
+            .withIndex("by_category", (q) => q.eq("category", category))
+            .collect(),
+        ),
+      );
+      return results.flat();
+    }
+    // if (args.category !== undefined) {
+    //   indexedQuery = tableQuery.withIndex("by_category", (q) =>
+    //     q.eq("category", args.category!),
+    //   );
+    // }
+
+    if (args.purpose !== "todo") {
+      indexedQuery = tableQuery.withIndex("by_purpose", (q) =>
+        q.eq("purpose", args.purpose!),
+      );
+    } else {
+      if (args.category.length === 0) {
+        let orderedQuery: OrderedQuery<DataModel["todoKanban"]> = indexedQuery;
+        orderedQuery = orderedQuery.filter((q) =>
+          q.neq(q.field("column"), "notPlanned"),
+        );
+        const results = await orderedQuery.collect();
+
+        return results;
+      }
+      //   console.log("ordered query", orderedQuery);
+      //   return await orderedQuery.collect();
+      // }
+    }
+
+    // let orderedQuery: OrderedQuery<DataModel["todoKanban"]> = indexedQuery;
+    // if (args.searchTerm) {
+    //   orderedQuery = tableQuery.withSearchIndex("search_by_desc", q => q.search("description", args.searchTerm!));
+    // }
+
+    return await indexedQuery.collect();
   },
 });
 
@@ -197,6 +229,25 @@ export const moveCard = mutation({
     const card = await ctx.db.get(id);
     if (!card) throw new Error("Card not found");
 
+    const kanbanCard = await ctx.db.get(args.id);
+    const supportTicket = kanbanCard?.ticketNumber;
+    if (supportTicket) {
+      const status =
+        args.column === "todo"
+          ? "pending"
+          : args.column === "notPlanned"
+            ? "closed"
+            : args.column === "done"
+              ? "resolved"
+              : "open";
+
+      await ctx.db.patch(supportTicket, {
+        status,
+        updatedAt: Date.now(),
+        updatedBy: userId,
+      });
+    }
+
     // console.log(`Moving card ${id} to column ${column}, before ${beforeId}`)
 
     let cardsInColumn = await ctx.db
@@ -305,6 +356,24 @@ export const editCard = mutation({
         await ctx.db.patch(args.id, { completedAt: Date.now() });
       }
     }
+    const kanbanCard = await ctx.db.get(args.id);
+    const supportTicket = kanbanCard?.ticketNumber;
+    if (supportTicket) {
+      const status =
+        args.column === "todo"
+          ? "pending"
+          : args.column === "notPlanned"
+            ? "closed"
+            : args.column === "done"
+              ? "resolved"
+              : "open";
+
+      await ctx.db.patch(supportTicket, {
+        status,
+        updatedAt: Date.now(),
+        updatedBy: userId,
+      });
+    }
 
     return await ctx.db.patch(args.id, {
       title: args.title,
@@ -333,6 +402,19 @@ export const deleteCard = mutation({
       .unique();
     if (!user) throw new Error("User not found");
     if (user.role.includes("admin")) {
+      const kanbanCard = await ctx.db.get(args.id);
+      const supportTicket = kanbanCard?.ticketNumber;
+
+      if (supportTicket) {
+        //note: not deleting for now. I think that the tickets should remain as a record, even if they're stupid or deleted from tasks. Should this also notify the user that created the ticket?
+        // await ctx.db.delete(supportTicket);
+        // await counter.dec(ctx, "supportTickets");
+        await ctx.db.patch(supportTicket, {
+          status: "closed",
+          updatedAt: Date.now(),
+          updatedBy: userId,
+        });
+      }
       return await ctx.db.delete(args.id);
     }
   },

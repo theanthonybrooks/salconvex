@@ -206,6 +206,7 @@ export default {
         "80": "320px",
         "90": "360px",
         "100": "400px",
+        lg: "32rem",
         "3xl": "1536px",
         "90dvw": "90dvw",
         "80dvw": "80dvw",
