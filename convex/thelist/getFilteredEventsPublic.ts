@@ -54,7 +54,7 @@ export async function buildEventQuery(
     isAdmin: boolean;
     onlyWithOpenCall?: boolean;
     hideArchived?: boolean;
-    viewType?: ViewTypeOptions;
+    view?: ViewTypeOptions;
   },
 ) {
   const {
@@ -66,15 +66,11 @@ export async function buildEventQuery(
     isAdmin,
     onlyWithOpenCall,
     hideArchived,
-    viewType,
+    view,
   } = options;
 
   const streams = [];
-  if (
-    viewType === "openCall" ||
-    viewType === "archive" ||
-    viewType === "organizer"
-  ) {
+  if (view === "openCall" || view === "archive" || view === "organizer") {
     if (!hideArchived) {
       streams.push(
         stream(ctx.db, schema)
@@ -91,7 +87,7 @@ export async function buildEventQuery(
           q.eq("state", "published").gt("approvedAt", undefined),
         ),
     );
-  } else if (viewType === "event") {
+  } else if (view === "event") {
     streams.push(
       stream(ctx.db, schema)
         .query(table)
@@ -102,7 +98,7 @@ export async function buildEventQuery(
   }
 
   let mergeOrder: string[];
-  if (viewType === "event") {
+  if (view === "event") {
     mergeOrder = ["state", "category", "_creationTime"];
   } else {
     mergeOrder = ["state", "approvedAt", "_creationTime"];
@@ -307,7 +303,7 @@ export const getFilteredEventsPublic = query({
         isAdmin: !!isAdmin,
         onlyWithOpenCall: shouldFilterByOpenCall,
         hideArchived: view === "openCall" && !(thisWeekPg || nextWeekPg),
-        viewType,
+        view,
       });
     }
 

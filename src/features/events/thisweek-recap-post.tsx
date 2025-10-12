@@ -11,12 +11,10 @@ import { useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { waitForImagesToLoad } from "@/lib/thisWeekFns";
 import { cn } from "@/lib/utils";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
 import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
@@ -40,9 +38,6 @@ interface ThisweekRecapPostProps {
 
 const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const router = useRouter();
-  const { preloadedSubStatus } = useConvexPreload();
-  const subStatus = usePreloadedQuery(preloadedSubStatus);
-  const { subscription } = subStatus;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
   const [copiedText, setCopiedText] = useState(false);
@@ -75,11 +70,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     sortOptions,
     { page: 1 },
     source,
-    "openCall",
-    {
-      subscription: subscription ?? undefined,
-      userOrgs: [],
-    },
   );
 
   const now = useMemo(() => new Date(), []);
