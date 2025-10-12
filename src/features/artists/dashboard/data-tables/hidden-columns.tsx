@@ -53,6 +53,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   // },
   {
     accessorKey: "name",
+    id: "name",
     minSize: 200,
     maxSize: 400,
     header: ({ column }) => (
@@ -77,6 +78,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    id: "edition",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -90,6 +92,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "category",
+    id: "category",
     minSize: 100,
     maxSize: 150,
     header: ({ column }) => (
@@ -111,6 +114,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "type",
+    id: "type",
     minSize: 150,
     maxSize: 200,
     header: ({ column }) => (
@@ -132,6 +136,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "hiddenStatus",
+    id: "hiddenStatus",
     minSize: 160,
     maxSize: 160,
     header: ({ column }) => (

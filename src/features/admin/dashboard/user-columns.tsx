@@ -94,6 +94,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "name",
+    id: "name",
     minSize: 120,
     maxSize: 400,
     header: ({ column }) => (
@@ -114,6 +115,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "email",
+    id: "email",
     minSize: 150,
     maxSize: 400,
     header: ({ column }) => (
@@ -127,6 +129,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "subscription",
+    id: "subscription",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -162,6 +165,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "subStatus",
+    id: "subStatus",
     minSize: 100,
     maxSize: 120,
     header: ({ column }) => (
@@ -205,6 +209,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
   {
     accessorKey: "cancelReason",
+    id: "cancelReason",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -228,6 +233,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "cancelComment",
+    id: "cancelComment",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -251,6 +257,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "canceledAt",
+    id: "canceledAt",
     minSize: 120,
     maxSize: 180,
     header: ({ column }) => (
@@ -272,6 +279,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "lastActive",
+    id: "lastActive",
     minSize: 120,
     maxSize: 180,
     header: ({ column }) => (
@@ -293,6 +301,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "location",
+    id: "location",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -315,6 +324,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "instagram",
+    id: "instagram",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -344,6 +354,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "website",
+    id: "website",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -369,6 +380,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "canFeature",
+    id: "canFeature",
     minSize: 40,
     maxSize: 60,
     header: ({ column }) => (
@@ -386,6 +398,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
   {
     accessorKey: "accountType",
+    id: "accountType",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
@@ -420,6 +433,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "organizationNames",
+    id: "organizationNames",
     minSize: 120,
     maxSize: 400,
     header: ({ column }) => (
@@ -444,6 +458,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
   {
     accessorKey: "role",
+    id: "role",
     minSize: 100,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" />
@@ -464,6 +479,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "createdAt",
+    id: "createdAt",
     minSize: 120,
     maxSize: 180,
     header: ({ column }) => (
@@ -480,6 +496,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "source",
+    id: "source",
     minSize: 120,
     maxSize: 150,
     header: ({ column }) => (

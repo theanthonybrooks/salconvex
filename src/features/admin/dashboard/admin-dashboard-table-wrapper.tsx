@@ -230,12 +230,16 @@ export function AdminDashboardTableWrapper({
             <DataTable
               columns={artistColumns}
               data={(artistsData ?? []) as ArtistDoc[]}
-              defaultVisibility={{
-                category: true,
-                dates_edition: true,
-                type: false,
-                role: false,
-              }}
+              defaultFilters={[
+                {
+                  id: `canFeature`,
+                  value: ["true"],
+                },
+                {
+                  id: `instagram`,
+                  value: ["true"],
+                },
+              ]}
               toolbarData={{
                 userCount: artistsData?.length ?? 0,
               }}
@@ -250,16 +254,16 @@ export function AdminDashboardTableWrapper({
             <DataTable
               columns={artistColumns}
               data={(artistsData ?? []) as ArtistDoc[]}
-              defaultVisibility={{
-                type: false,
-                category: false,
-                role: false,
-                lastEditedAt: false,
-                dates_edition: false,
-              }}
-              toolbarData={{
-                userCount: artistsData?.length ?? 0,
-              }}
+              defaultFilters={[
+                {
+                  id: `canFeature`,
+                  value: ["true"],
+                },
+                {
+                  id: `instagram`,
+                  value: ["true"],
+                },
+              ]}
               defaultSort={{ id: `createdAt`, desc: true }}
               onRowSelect={(row) => {
                 console.log(row);

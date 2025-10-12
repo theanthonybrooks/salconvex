@@ -144,7 +144,6 @@ export const updateArtistFeature = mutation({
     feature: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    console.log(args.artistId, args.feature);
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
     const artist = await ctx.db

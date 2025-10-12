@@ -76,6 +76,7 @@ interface DataTableProps<TData, TValue> {
   initialSearchTerm?: string;
   minimalView?: boolean;
   defaultSort?: ColumnSort;
+  defaultFilters?: ColumnFiltersState;
   pageSize?: number;
   isMobile?: boolean;
 }
@@ -97,6 +98,7 @@ export function DataTable<TData, TValue>({
   initialSearchTerm,
   minimalView,
   defaultSort,
+  defaultFilters,
   pageSize = 10,
   isMobile,
 }: DataTableProps<TData, TValue>) {
@@ -120,6 +122,7 @@ export function DataTable<TData, TValue>({
         .split(",")
         .map((v) => v.trim())
         .filter(Boolean);
+
       if (values.length > 0) {
         filters.push({ id: key, value: values });
       }
@@ -134,9 +137,22 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     defaultVisibility ?? {},
   );
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    defaultFiltersFromUrl,
-  );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() => {
+    // merge filters from URL and from props, with URL taking precedence
+    if (defaultFilters?.length) {
+      const merged = [
+        ...defaultFiltersFromUrl,
+        ...defaultFilters.filter(
+          (def) => !defaultFiltersFromUrl.some((f) => f.id === def.id),
+        ),
+      ];
+      return merged;
+    }
+    return defaultFiltersFromUrl;
+  });
+
+  console.log(columnFilters);
+
   const initialSort = useMemo<SortingState>(() => {
     return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
   }, [defaultSort]);

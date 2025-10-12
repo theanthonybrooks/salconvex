@@ -116,6 +116,7 @@ export const columns: ColumnDef<Event>[] = [
 
   {
     accessorKey: "name",
+    id: "name",
     // size: "100%",
     minSize: 120,
     // maxSize: 400,
@@ -182,6 +183,7 @@ export const columns: ColumnDef<Event>[] = [
 
   {
     accessorKey: "state",
+    id: "state",
     minSize: 130,
     maxSize: 130,
     header: ({ column }) => (
@@ -209,7 +211,7 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     accessorKey: "openCallState",
-
+    id: "openCallState",
     minSize: 130,
     maxSize: 130,
     header: ({ column }) => (
@@ -252,7 +254,7 @@ export const columns: ColumnDef<Event>[] = [
 
   {
     accessorKey: "lastEditedAt",
-
+    id: "lastEditedAt",
     minSize: 180,
     maxSize: 180,
     header: ({ column }) => (
@@ -273,7 +275,7 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     accessorKey: "category",
-
+    id: "category",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -295,6 +297,7 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     accessorKey: "type",
+    id: "type",
     minSize: 120,
     maxSize: 240,
     header: ({ column }) => (

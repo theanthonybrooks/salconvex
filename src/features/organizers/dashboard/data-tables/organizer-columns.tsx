@@ -103,6 +103,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
   {
     accessorKey: "orgName",
+    id: "orgName",
     // size: "100%",
     minSize: 120,
     maxSize: 300,
@@ -124,6 +125,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
   {
     accessorKey: "name",
+    id: "name",
     // size: "100%",
     minSize: 120,
     maxSize: 300,
@@ -183,6 +185,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
   {
     accessorKey: "state",
+    id: "state",
     size: 130,
     minSize: 130,
     maxSize: 130,
@@ -211,6 +214,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
   {
     accessorKey: "openCallState",
+    id: "openCallState",
     size: 130,
     minSize: 130,
     maxSize: 130,
@@ -240,6 +244,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
   {
     accessorKey: "lastEditedAt",
+    id: "lastEditedAt",
     size: 180,
     minSize: 180,
     maxSize: 180,
@@ -261,6 +266,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
   {
     accessorKey: "category",
+    id: "category",
     size: 80,
     minSize: 80,
     maxSize: 80,
@@ -283,6 +289,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
   {
     accessorKey: "type",
+    id: "type",
     accessorFn: (row) => row.type,
     filterFn: (row, columnId, filterValues: string[]) => {
       const cellValues = row.getValue<string[]>(columnId) ?? [];

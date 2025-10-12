@@ -66,6 +66,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   // },
   {
     accessorKey: "name",
+    id: "name",
     minSize: 120,
     maxSize: 400,
     header: ({ column }) => (
@@ -90,6 +91,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "dates_edition",
+    id: "dates_edition",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -103,6 +105,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "eventStart",
+    id: "eventStart",
     minSize: 120,
     maxSize: 120,
     header: ({ column }) => (
@@ -116,6 +119,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "eventEnd",
+    id: "eventEnd",
     minSize: 120,
     maxSize: 120,
     header: ({ column }) => (
@@ -129,6 +133,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "productionStart",
+    id: "productionStart",
     minSize: 150,
     maxSize: 150,
     header: ({ column }) => (
@@ -142,6 +147,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "productionEnd",
+    id: "productionEnd",
     minSize: 150,
     maxSize: 150,
     header: ({ column }) => (
@@ -155,6 +161,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "applicationTime",
+    id: "applicationTime",
     minSize: 150,
     maxSize: 180,
     header: ({ column }) => (
@@ -171,6 +178,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "applicationStatus",
+    id: "applicationStatus",
     minSize: 180,
     maxSize: 200,
     filterFn: (row, columnId, filterValue) => {
@@ -212,6 +220,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
 
   {
     accessorKey: "responseTime",
+    id: "responseTime",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Response Time" />
     ),
@@ -226,6 +235,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "notes",
+    id: "notes",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Notes" />
     ),

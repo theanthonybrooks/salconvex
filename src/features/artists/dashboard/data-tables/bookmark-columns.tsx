@@ -70,6 +70,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   // },
   {
     accessorKey: "name",
+    id: "name",
     minSize: 200,
     maxSize: 400,
     header: ({ column }) => (
@@ -94,6 +95,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    id: "edition",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
@@ -107,6 +109,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "deadline",
+    id: "deadline",
     minSize: 120,
     maxSize: 120,
     header: ({ column }) => (
@@ -148,6 +151,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "eventStart",
+    id: "eventStart",
     minSize: 120,
     maxSize: 120,
     header: ({ column }) => (
@@ -161,6 +165,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "eventEnd",
+    id: "eventEnd",
     minSize: 120,
     maxSize: 120,
     header: ({ column }) => (
@@ -174,6 +179,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "prodStart",
+    id: "prodStart",
     minSize: 150,
     maxSize: 150,
     header: ({ column }) => (
@@ -187,6 +193,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "prodEnd",
+    id: "prodEnd",
     minSize: 150,
     maxSize: 150,
     header: ({ column }) => (
@@ -200,6 +207,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "bookmarkStatus",
+    id: "bookmarkStatus",
     minSize: 180,
     maxSize: 200,
     header: ({ column }) => (
@@ -219,6 +227,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "eventIntent",
+    id: "eventIntent",
     minSize: 180,
     maxSize: 200,
     header: ({ column }) => (
@@ -242,6 +251,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "bookmarkNote",
+    id: "bookmarkNote",
     minSize: 120,
     maxSize: 400,
     header: ({ column }) => (
