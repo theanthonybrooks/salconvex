@@ -15,7 +15,10 @@ import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
 import { categoryValidator, typeValidator } from "~/convex/schema";
 
-import { eventsAggregate } from "~/convex/aggregates/eventAggregates";
+import {
+  eventsAggregate,
+  openCallsAggregate,
+} from "~/convex/aggregates/eventAggregates";
 
 export const globalSearch = query({
   args: {
@@ -1410,7 +1413,7 @@ export const createOrUpdateEvent = mutation({
           : existingFormType;
 
       // console.log(existingFormType, updatedFormType);
-
+      const oldEvent = event;
       await ctx.db.patch(event._id, {
         formType: updatedFormType,
         name: args.name.trim(),
@@ -1445,6 +1448,8 @@ export const createOrUpdateEvent = mutation({
       });
 
       const updatedEvent = await ctx.db.get(event._id);
+      if (updatedEvent)
+        await eventsAggregate.replace(ctx, oldEvent, updatedEvent);
       // console.log("updatedEvent", updatedEvent);
       return { event: updatedEvent };
     }
@@ -1486,7 +1491,7 @@ export const createOrUpdateEvent = mutation({
       lastEditedAt: Date.now(),
     });
     const newEvent = await ctx.db.get(eventId);
-    await eventsAggregate.insert(ctx, newEvent!);
+    if (newEvent) await eventsAggregate.insert(ctx, newEvent);
     return { event: newEvent };
   },
 });
@@ -1518,7 +1523,7 @@ export const approveEvent = mutation({
       approvedAt: Date.now(),
     });
     const newDoc = await ctx.db.get(event._id);
-    await eventsAggregate.replace(ctx, oldDoc!, newDoc!);
+    if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);
 
     return { event };
   },
@@ -1551,7 +1556,7 @@ export const reactivateEvent = mutation({
       approvedBy: undefined,
     });
     const newDoc = await ctx.db.get(event._id);
-    await eventsAggregate.replace(ctx, oldDoc!, newDoc!);
+    if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);
 
     return { event };
   },
@@ -1566,8 +1571,22 @@ export const archiveEvent = mutation({
     if (!userId) throw new Error("Not authenticated");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-
+    const openCalls = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect();
     const eventState = event.state === "submitted" ? "archived" : "archived";
+
+    for (const openCall of openCalls) {
+      const oldOpenCall = openCall;
+      await ctx.db.patch(openCall._id, {
+        state: eventState,
+        lastUpdatedAt: Date.now(),
+      });
+      const newOpenCall = await ctx.db.get(openCall._id);
+      if (newOpenCall)
+        await openCallsAggregate.replace(ctx, oldOpenCall, newOpenCall);
+    }
 
     const oldDoc = event;
     await ctx.db.patch(event._id, {
@@ -1575,7 +1594,7 @@ export const archiveEvent = mutation({
       lastEditedAt: Date.now(),
     });
     const newDoc = await ctx.db.get(event._id);
-    await eventsAggregate.replace(ctx, oldDoc!, newDoc!);
+    if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);
 
     return { event };
   },
@@ -1640,7 +1659,7 @@ export const duplicateEvent = mutation({
       lastEditedAt: Date.now(),
     });
     const newEvent = await ctx.db.get(newEventId);
-    await eventsAggregate.insert(ctx, newEvent!);
+    if (newEvent) await eventsAggregate.insert(ctx, newEvent);
 
     return { event: newEventId };
   },
@@ -1662,11 +1681,11 @@ export const deleteEvent = mutation({
     if (!user) {
       throw new ConvexError("User not found");
     }
-
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    if (event.state !== "draft" && !args.isAdmin)
+    if (event.state !== "draft" && !args.isAdmin) {
       throw new ConvexError("Active events cannot be deleted, only archived");
+    }
     const organization = await ctx.db.get(event.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
     const orgLogoStorageId = organization.logoStorageId;
@@ -1676,15 +1695,23 @@ export const deleteEvent = mutation({
       .collect();
 
     for (const openCall of openCalls) {
+      //TODO: Delete open call docs and any associated rows/files
+      const ocLookup = await ctx.db
+        .query("eventOpenCalls")
+        .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))
+        .first();
+      if (ocLookup) await ctx.db.delete(ocLookup._id);
       await ctx.db.delete(openCall._id);
+      await openCallsAggregate.delete(ctx, openCall);
     }
 
     if (event.logoStorageId && event.logoStorageId !== orgLogoStorageId) {
+      console.log("deleting logo storage id", event.logoStorageId);
       await ctx.storage.delete(event.logoStorageId);
     }
-
+    const oldEvent = event;
     await ctx.db.delete(event._id);
-    await eventsAggregate.delete(ctx, event!);
+    if (oldEvent) await eventsAggregate.delete(ctx, oldEvent);
 
     return { event };
   },

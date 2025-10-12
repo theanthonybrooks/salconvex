@@ -673,7 +673,7 @@ export const duplicateOC = mutation({
       lastEditedAt: Date.now(),
     });
     const newEventDoc = await ctx.db.get(newEvent);
-    await eventsAggregate.insert(ctx, newEventDoc!);
+    if (newEventDoc) await eventsAggregate.insert(ctx, newEventDoc);
 
     const newOpenCall = await ctx.db.insert("openCalls", {
       adminNoteOC: openCall.adminNoteOC,
@@ -707,7 +707,7 @@ export const duplicateOC = mutation({
       lastUpdatedBy: userId,
     });
     const newOCDoc = await ctx.db.get(newOpenCall);
-    await openCallsAggregate.insert(ctx, newOCDoc!);
+    if (newOCDoc) await openCallsAggregate.insert(ctx, newOCDoc);
 
     return { openCall: newOpenCall, event: newEvent };
   },

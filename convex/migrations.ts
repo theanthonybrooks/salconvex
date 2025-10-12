@@ -16,24 +16,45 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
-export const backfillEventsAggregate = migrations.define({
+export const clearEventsAggregate = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, event) => {
+    await eventsAggregate.clear(ctx);
+  },
+});
+
+export const backfillEventsAggregate1 = migrations.define({
   table: "events",
   migrateOne: async (ctx, event) => {
     await eventsAggregate.insertIfDoesNotExist(ctx, event);
   },
 });
-export const backfillOCAggregate = migrations.define({
+
+export const clearOCAggregate = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, event) => {
+    await openCallsAggregate.clear(ctx);
+  },
+});
+export const backfillOCAggregate1 = migrations.define({
   table: "openCalls",
   migrateOne: async (ctx, doc) => {
     await openCallsAggregate.insertIfDoesNotExist(ctx, doc);
   },
 });
 
+export const runBFA = migrations.runner([
+  internal.migrations.clearEventsAggregate,
+  internal.migrations.clearOCAggregate,
+  internal.migrations.backfillEventsAggregate1,
+  internal.migrations.backfillOCAggregate1,
+]);
+
 export const runBackfillEA = migrations.runner(
-  internal.migrations.backfillEventsAggregate,
+  internal.migrations.backfillEventsAggregate1,
 );
 export const runBackfillOCA = migrations.runner(
-  internal.migrations.backfillOCAggregate,
+  internal.migrations.backfillOCAggregate1,
 );
 
 // export const addDefaultNewsletterTypeandFrequency = migrations.define({

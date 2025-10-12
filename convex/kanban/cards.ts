@@ -13,16 +13,27 @@ export const searchCards = query({
     category: v.array(supportCategoryValidator),
   },
   handler: async (ctx, args) => {
-    //todo: add category filter dropdown to search bar
     let q = ctx.db
       .query("todoKanban")
       .withSearchIndex("search_by_desc", (q) => {
         let filter = q.search("description", args.searchTerm ?? "");
+
         if (args.purpose && args.purpose !== "todo") {
           filter = filter.eq("purpose", args.purpose);
         }
+
         return filter;
       });
+
+    // apply category filtering (if specified)
+    if (args.category && args.category.length > 0) {
+      const all = await q.collect();
+      const filtered = all.filter((item) =>
+        args.category.includes(item.category),
+      );
+      return filtered;
+    }
+
     return await q.collect();
   },
 });
@@ -47,11 +58,6 @@ export const getCards = query({
       );
       return results.flat();
     }
-    // if (args.category !== undefined) {
-    //   indexedQuery = tableQuery.withIndex("by_category", (q) =>
-    //     q.eq("category", args.category!),
-    //   );
-    // }
 
     if (args.purpose !== "todo") {
       indexedQuery = tableQuery.withIndex("by_purpose", (q) =>
