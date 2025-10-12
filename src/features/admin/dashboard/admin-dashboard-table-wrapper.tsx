@@ -246,7 +246,7 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="artists"
               pageType="dashboard"
-              defaultSort={{ id: `createdAt`, desc: true }}
+              defaultSort={{ id: `createdAt`, desc: false }}
               pageSize={50}
             />
           </div>
@@ -264,7 +264,7 @@ export function AdminDashboardTableWrapper({
                   value: ["true"],
                 },
               ]}
-              defaultSort={{ id: `createdAt`, desc: true }}
+              defaultSort={{ id: `createdAt`, desc: false }}
               onRowSelect={(row) => {
                 console.log(row);
                 // setExistingEvent(row.getValue("event"));
