@@ -194,7 +194,7 @@ const ClientEventList = () => {
       subscription: subscription ?? undefined,
       userOrgs: orgData?.orgIds ?? [],
     },
-    !hasActiveSubscription,
+    !hasActiveSubscription || view === "organizer" || view === "archive",
   );
 
   const total = queryResult?.total ?? 0;

@@ -826,7 +826,7 @@ export default defineSchema({
     // .index("by_eligibilityType", ["eligibilityType"])
 
     // // Filtering combinations
-    // .index("by_eventState_eventCategory", ["eventState", "eventCategory"])
+    .index("by_eventState_eventCategory", ["eventState", "eventCategory"])
     .index("by_eventState_hasOpenCall", ["eventState", "hasOpenCall"])
     .index("by_hasOpenCall_ocEnd", ["hasOpenCall", "ocEnd"])
     .index("by_ocState_ocEnd", ["ocState", "ocEnd"])

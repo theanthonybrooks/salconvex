@@ -153,7 +153,7 @@ export const getFilteredEventsPublic = query({
     let lookupResults = [];
 
     if (view === "openCall" && !thisWeekPg && !nextWeekPg) {
-      if (!hasActiveSubscription && !isAdmin) {
+      if (!hasActiveSubscription) {
         lookupResults = await ctx.db
           .query("eventLookup")
           .withIndex("by_ocState_ocEnd", (q) =>
@@ -162,7 +162,7 @@ export const getFilteredEventsPublic = query({
               .gte("ocEnd", weekStartISO)
               .lte("ocEnd", monthFromNowISO),
           )
-          .collect();
+          .take(10);
       } else {
         lookupResults = await ctx.db
           .query("eventLookup")
@@ -170,19 +170,33 @@ export const getFilteredEventsPublic = query({
           .collect();
       }
     } else if (thisWeekPg || nextWeekPg) {
-      lookupResults = await ctx.db
-        .query("eventLookup")
-        .withIndex("by_hasOpenCall_ocEnd", (q) =>
-          q
-            .eq("hasOpenCall", true)
-            .gte("ocEnd", weekStartISO)
-            .lte("ocEnd", weekEndISO),
-        )
-        .collect();
+      if (!hasActiveSubscription) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_hasOpenCall_ocEnd", (q) =>
+            q
+              .eq("hasOpenCall", true)
+              .gte("ocEnd", weekStartISO)
+              .lte("ocEnd", weekEndISO),
+          )
+          .take(10);
+      } else {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_hasOpenCall_ocEnd", (q) =>
+            q
+              .eq("hasOpenCall", true)
+              .gte("ocEnd", weekStartISO)
+              .lte("ocEnd", weekEndISO),
+          )
+          .collect();
+      }
     } else if (view === "event") {
       lookupResults = await ctx.db
         .query("eventLookup")
-        .withIndex("by_eventState", (q) => q.eq("eventState", "published"))
+        .withIndex("by_eventState_eventCategory", (q) =>
+          q.eq("eventState", "published").eq("eventCategory", "event"),
+        )
         .collect();
     } else if (view === "archive" || view === "organizer") {
       lookupResults = await ctx.db.query("eventLookup").collect();
@@ -264,7 +278,12 @@ export const getFilteredEventsPublic = query({
 
         let openCall = null;
         if (openCallId && eventHasOpenCall) {
-          openCall = await ctx.db.get(openCallId);
+          if (
+            hasActiveSubscription ||
+            (!hasActiveSubscription && view !== "event")
+          ) {
+            openCall = await ctx.db.get(openCallId);
+          }
         }
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;
