@@ -9,100 +9,33 @@ import {
 } from "@/components/ui/drawer";
 import { FlairBadge } from "@/components/ui/flair-badge";
 import { Input } from "@/components/ui/input";
+import { SelectSimple } from "@/components/ui/select";
+import { searchDialogVariants } from "@/constants/dialogConsts";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ViewOptions } from "@/features/events/event-list-client";
+  AllSearchResults,
+  EventResult,
+  FilterDrawerProps,
+  OrgResult,
+  searchTermOptions,
+  SearchType,
+  TheListFilterCommandItem,
+} from "@/constants/filterConsts";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getSearchLocationString } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { EventCategory, EventType } from "@/types/event";
-import { Filters, SortOptions } from "@/types/thelist";
 import { Command } from "cmdk";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
-import { AnimatePresence, motion, Variants } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { debounce } from "lodash";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
 import { IoSearch } from "react-icons/io5";
 import { api } from "~/convex/_generated/api";
-
-export interface TheListFilterCommandItem {
-  label?: string;
-  name?: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  path?: string;
-  href?: string;
-  group?: string;
-  meta?: string;
-  edition?: number;
-  category?: string;
-  ocStatus?: number;
-}
-
-export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  isMobile?: boolean;
-  title: string;
-  source: T[];
-  shortcut?: string;
-  placeholder?: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  userType?: string[];
-  userRole?: string[] | undefined;
-  filters: Filters;
-  sortOptions: SortOptions;
-  onChange: (newFilters: Partial<Filters>) => void;
-  onSortChange: (newSort: Partial<SortOptions>) => void;
-  searchType: SearchType;
-  setSearchType: React.Dispatch<React.SetStateAction<SearchType>>;
-  onResetFilters: () => void;
-  // user: User | null;
-  hasActiveFilters: boolean | undefined;
-  view: ViewOptions;
-}
-
-export type SearchType = "events" | "orgs" | "loc" | "all";
-
-type Location = {
-  full?: string;
-  city?: string;
-  stateAbbr?: string;
-  countryAbbr?: string;
-};
-
-type EventResult = {
-  name: string;
-  slug: string;
-  category: EventCategory;
-  type?: EventType[];
-  dates?: { edition?: number };
-  location?: Location;
-  ocStatus: number;
-};
-
-type OrgResult = {
-  name: string;
-  slug: string;
-  location?: Location;
-};
-
-type AllSearchResults = {
-  eventName: EventResult[];
-  orgName: OrgResult[];
-  eventLoc: EventResult[];
-  orgLoc: OrgResult[];
-};
 
 export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   open,
@@ -129,6 +62,10 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
+  const userPref = userData?.userPref ?? null;
+  const baseFontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  // const smFontSize = userPref?.fontSize === "large" ? "text-sm" : "text-xs";
+  const subFontColor = "text-stone-500";
 
   const hasActiveSubscription = subData?.hasActiveSubscription;
   const isArtist = userData?.user?.accountType?.includes("artist");
@@ -188,24 +125,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     return () => document.removeEventListener("keydown", down);
   }, [setOpen]);
 
-  const dialogVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-  };
-
   const handleValueChange = (newValue: string) => {
     setSearch(newValue);
     setValue(newValue);
@@ -216,12 +135,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   // };
 
   const groupedItems: Record<string, TheListFilterCommandItem[]> = {};
-  useEffect(() => {
-    // if searchResults?.results?.length === 0 {
-    //   return;
-    // }
-    // console.log(searchResults, value);
-  }, [searchResults, value]);
+  // useEffect(() => {
+  //   // if searchResults?.results?.length === 0 {
+  //   //   return;
+  //   // }
+  //   // console.log(searchResults, value);
+  // }, [searchResults, value]);
   // Location search
   if (
     searchResults?.label === "Location" &&
@@ -442,38 +361,31 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       </Drawer>
     </>
   ) : (
-    <Command.Dialog
-      open={open}
-      onOpenChange={setOpen}
-      shouldFilter={false}
-      label={title}
-      className="fixed inset-0 z-999 flex items-center justify-center text-foreground"
-      onClick={() => setOpen(false)}
-    >
-      {/* Background overlay */}
-      <AnimatePresence>
-        {open && (
+    <AnimatePresence>
+      {open && (
+        <Command.Dialog
+          open
+          shouldFilter={false}
+          label={title}
+          className="fixed inset-0 z-999 flex items-center justify-center text-foreground"
+          onClick={() => setOpen(false)}
+        >
           <motion.div
             key="overlay"
             className="z-100 fixed inset-0"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }} // adjust to your liking
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // subtler overlay color
+            transition={{ duration: 0.1 }}
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {/* Dialog box */}
-        {open && (
           <motion.div
             key="dialogBox"
-            variants={dialogVariants}
+            variants={searchDialogVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative flex max-h-[80dvh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-2xl"
+            className="relative flex max-h-[80dvh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-[min(70vw,70rem)]"
             onClick={(e) => e.stopPropagation()}
           >
             <DialogTitle className="sr-only">{title}</DialogTitle>
@@ -507,23 +419,14 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                   <X className="size-7 text-stone-600 hover:scale-105 hover:text-red-700 active:scale-95 sm:size-5" />
                 </button>
               )}
-              <Select
-                name="searchType"
+
+              <SelectSimple
+                options={[...searchTermOptions]}
                 value={searchType}
-                onValueChange={(value) =>
-                  setSearchType(value as "events" | "loc" | "orgs" | "all")
-                }
-              >
-                <SelectTrigger className="w-50 text-center">
-                  <SelectValue placeholder="Search Type" />
-                </SelectTrigger>
-                <SelectContent align="end" className="z-top">
-                  <SelectItem value="events">Event Name</SelectItem>
-                  <SelectItem value="orgs">Organizer Name</SelectItem>
-                  <SelectItem value="loc">Location</SelectItem>
-                  <SelectItem value="all">All</SelectItem>
-                </SelectContent>
-              </Select>
+                onChangeAction={(value) => setSearchType(value as SearchType)}
+                placeholder="Search Type"
+                className="w-50"
+              />
             </div>
             <div className="max-h-60dvh search scrollable mini p-3">
               <Command.List>
@@ -542,7 +445,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           </span>
                         </span>
 
-                        <p className="text-sm italic text-foreground/60">
+                        <p
+                          className={cn(
+                            "italic text-foreground/60",
+                            baseFontSize,
+                          )}
+                        >
                           If you&apos;re an organizer, you can submit your
                           event, project, or open call{" "}
                           <Link href="/submit" className="font-bold uppercase">
@@ -566,13 +474,19 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                       <Command.Group
                         key={groupKey}
                         heading={groupKey.toUpperCase()}
-                        className="mb-5 border-t-1.5 border-stone-200 pt-2 text-sm text-stone-400 first:border-t-0"
+                        className={cn(
+                          "mb-5 border-t-1.5 border-stone-200 pt-2 text-stone-400 first:border-t-0",
+                          baseFontSize,
+                        )}
                       >
                         {groupItems.map((item) => (
                           <Command.Item
                             key={`${groupKey}-${item.path}`}
                             value={`${groupKey}-${item.path}`}
-                            className="group flex cursor-pointer items-center rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
+                            className={cn(
+                              "group flex cursor-pointer items-center rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",
+                              baseFontSize,
+                            )}
                             onSelect={() => {
                               router.push(item.path || "/thelist");
                               setOpen(false);
@@ -591,27 +505,51 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                                   <span />
                                 )}
                                 {item.edition ? (
-                                  <span className="text-center text-xs text-stone-500">
+                                  <span
+                                    className={cn(
+                                      "text-center",
+                                      subFontColor,
+                                      baseFontSize,
+                                    )}
+                                  >
                                     {item.edition}
                                   </span>
                                 ) : (
                                   <span />
                                 )}
                                 {item.category ? (
-                                  <span className="flex items-center gap-2 text-center text-xs text-stone-500">
+                                  <span
+                                    className={cn(
+                                      "flex items-center gap-2 text-center",
+                                      subFontColor,
+                                      baseFontSize,
+                                    )}
+                                  >
                                     |<p>{item.category}</p>
                                   </span>
                                 ) : (
                                   <span />
                                 )}
-                                <span className="truncate text-right text-xs text-stone-500">
+                                <span
+                                  className={cn(
+                                    "truncate text-right",
+                                    subFontColor,
+                                    baseFontSize,
+                                  )}
+                                >
                                   {item.meta}
                                 </span>
                               </div>
                             ) : (
                               <div className="flex w-full justify-between gap-2">
                                 <span className="truncate">{item.name}</span>
-                                <span className="truncate text-xs text-stone-500">
+                                <span
+                                  className={cn(
+                                    "truncate text-right",
+                                    subFontColor,
+                                    baseFontSize,
+                                  )}
+                                >
                                   {item.meta}
                                 </span>
                               </div>
@@ -624,8 +562,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
               </Command.List>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </Command.Dialog>
+        </Command.Dialog>
+      )}
+    </AnimatePresence>
   );
 };

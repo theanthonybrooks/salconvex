@@ -230,7 +230,6 @@ export default function TheListNavBar(
                 // groupName={"Heading"}
 
                 placeholder="Search..."
-                user={user}
               />
               <Search
                 iconOnly
@@ -240,7 +239,6 @@ export default function TheListNavBar(
                 // groupName={"Heading"}
                 className="lg:hidden"
                 placeholder="Search..."
-                user={user}
               />
             </>
           )}

@@ -6,12 +6,9 @@ import {
   CommandMenuCustom,
 } from "@/features/Sidebar/CommandMenuCustom";
 import { cn } from "@/lib/utils";
-import { User } from "@/types/user";
-import { useQuery } from "convex-helpers/react/cache";
 import { useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import { TbWorldSearch } from "react-icons/tb";
-import { api } from "~/convex/_generated/api";
 
 interface SearchProps<T extends CommandItem> {
   title: string;
@@ -23,7 +20,6 @@ interface SearchProps<T extends CommandItem> {
   iconOnly?: boolean;
   isMobile?: boolean;
   invisible?: boolean;
-  user?: User | null;
   pageType?: "page" | "dashboard";
 }
 
@@ -31,8 +27,6 @@ export const Search = <T extends CommandItem>({
   title,
   source,
   shortcut = "/",
-  user,
-  // groupName,
   iconOnly = false,
   isMobile = false,
   invisible = false,
@@ -40,13 +34,8 @@ export const Search = <T extends CommandItem>({
   placeholder,
   pageType,
 }: SearchProps<T>) => {
-  const subscription = useQuery(api.subscriptions.getUserSubscriptionStatus);
-  const subStatus = subscription?.subStatus;
-
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("Search");
-  const userType = user?.accountType;
-  const userRole = user?.role;
   const dashboardPg = pageType === "dashboard";
 
   return (
@@ -121,9 +110,6 @@ export const Search = <T extends CommandItem>({
         placeholder={placeholder}
         setSearch={setValue}
         isMobile={isMobile}
-        userType={userType}
-        subStatus={subStatus}
-        userRole={userRole}
       />
     </>
   );

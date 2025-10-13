@@ -156,7 +156,6 @@ export default function DashboardSideBar({
         <Search
           title={"Search"}
           source={dashboardNavItems}
-          user={user}
           className={cn("mb-5", collapsedSidebar ? "mx-auto" : "mx-4")}
           placeholder="Search..."
           iconOnly={collapsedSidebar}

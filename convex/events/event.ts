@@ -39,7 +39,7 @@ export const globalSearch = query({
 
     const today = new Date().toISOString();
     const now = Date.parse(today);
-    //TODO: How to make this more efficient?
+    //TODO: How to make this more efficient? Use eventLookup table
     const allOpenCalls = activeSub
       ? await ctx.db.query("openCalls").collect()
       : [];
@@ -1710,6 +1710,7 @@ export const deleteMultipleEvents = mutation({
         .collect();
 
       for (const openCall of openCalls) {
+        //TODO: Delete open call docs and any associated rows/files
         await ctx.db.delete(openCall._id);
       }
 

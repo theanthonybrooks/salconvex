@@ -1,7 +1,7 @@
 import { DialogTitle } from "@/components/ui/dialog";
 import { DashIcon } from "@radix-ui/react-icons";
 import { Command } from "cmdk";
-import { AnimatePresence, motion, Variants } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CircleX, X } from "lucide-react";
 import Link from "next/link";
 import { IoSearch } from "react-icons/io5";
@@ -12,7 +12,10 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { searchDialogVariants } from "@/constants/dialogConsts";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/lib/utils";
+import { usePreloadedQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
@@ -37,10 +40,7 @@ interface CommandMenuProps<T extends CommandItem> {
   source: T[];
   shortcut?: string;
   placeholder?: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  userType?: string[];
-  subStatus?: string | undefined;
-  userRole?: string[] | undefined;
+  setSearch: Dispatch<React.SetStateAction<string>>;
 }
 
 export const CommandMenuCustom = <T extends CommandItem>({
@@ -50,13 +50,19 @@ export const CommandMenuCustom = <T extends CommandItem>({
   source,
   shortcut = "/",
   isMobile = false,
-  userType,
-  subStatus,
-  userRole,
+
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
 }: CommandMenuProps<T>) => {
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const userType = userData?.user?.accountType;
+  const userRole = userData?.user?.role;
+  const { subStatus } = subData ?? {};
+  const userPref = userData?.userPref ?? null;
+  const baseFontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   // console.log(subStatus);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -126,26 +132,6 @@ export const CommandMenuCustom = <T extends CommandItem>({
     group: item.sectionCat || item.group || "Other",
     desc: item.desc || "",
   }));
-
-  const dialogVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-  };
-
-  //TODO: FIGURE OUT WHY THE EXIT ANIMATION DOESN'T HAPPEN
 
   const searchTerm = value.toLowerCase();
 
@@ -272,116 +258,122 @@ export const CommandMenuCustom = <T extends CommandItem>({
       </DrawerContent>
     </Drawer>
   ) : (
-    <Command.Dialog
-      open={open}
-      onOpenChange={setOpen}
-      shouldFilter={false}
-      label={title}
-      className="fixed inset-0 z-999 flex items-center justify-center text-foreground"
-      onClick={() => setOpen(false)}
-    >
-      {/* Background overlay */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="overlay"
-            className="z-100 fixed inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }} // adjust to your liking
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // subtler overlay color
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {/* Dialog box */}
-        {open && (
-          <motion.div
-            key="dialogBox"
-            variants={dialogVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="relative flex max-h-[80vh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setOpen(false)}
-              className="absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110"
+    <AnimatePresence>
+      {open && (
+        <Command.Dialog
+          open
+          shouldFilter={false}
+          label={title}
+          className="fixed inset-0 z-999 flex items-center justify-center text-foreground"
+          onClick={() => setOpen(false)}
+        >
+          <>
+            <motion.div
+              key="overlay"
+              className="z-100 fixed inset-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+            />
+            <motion.div
+              key="dialogBox"
+              variants={searchDialogVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="relative flex max-h-[80vh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-2xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="h-7 w-7 text-stone-600 md:h-5 md:w-5" />
-            </button>
-            <DialogTitle className="sr-only">{title}</DialogTitle>
-            <div className="flex items-center gap-1 border-b border-stone-300">
-              <IoSearch className="z-20 p-1 text-3xl text-stone-400" />
-              <Command.Input
-                ref={inputRef}
-                value={value}
-                onValueChange={handleValueChange}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setOpen(false);
-                  }
-                  if (e.key === "Escape") {
-                    setValue("");
-                    setSearch("");
-                    setOpen(false);
-                  }
-                }}
-                placeholder={cn(placeholder, !isMobile && "  (Hint: Ctrl + /)")}
-                className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
-              />
-            </div>
-            <div className="max-h-60dvh search scrollable mini p-3">
-              <Command.List>
-                {Object.keys(groupedItems).length === 0 ? (
-                  <Command.Empty>
-                    No results found for{" "}
-                    <span className="italic text-violet-500">
-                      &quot;{value}&quot;
-                    </span>
-                  </Command.Empty>
-                ) : (
-                  Object.entries(groupedItems).map(([groupKey, groupItems]) => (
-                    <Command.Group
-                      key={groupKey}
-                      heading={groupKey.toUpperCase()}
-                      className="mb-5 border-t-1.5 border-stone-200 pt-2 text-sm text-stone-400 first:border-t-0"
-                    >
-                      {groupItems.map((item) => (
-                        <Command.Item
-                          key={item.path}
-                          className="group flex cursor-pointer items-start gap-2 rounded p-2 pl-5 text-sm text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40"
-                          onSelect={() => router.push(item.path)}
-                        >
-                          <div className={cn("flex items-center gap-2")}>
-                            {item.icon && <item.icon className="size-4" />}
-                            <Link
-                              href={item.path}
-                              prefetch={true}
-                              onClick={handleLinkClick}
-                              className="text-nowrap"
-                            >
-                              <span>{item.title}</span>
-                            </Link>
-                          </div>
-                          {item.desc && !isMobile && (
-                            <span className="inline-flex gap-2 text-stone-600 opacity-0 transition-opacity ease-in-out group-hover:opacity-100">
-                              <DashIcon className={cn("mt-1")} />
-                              <span>{item.desc}</span>
-                            </span>
+              <button
+                onClick={() => setOpen(false)}
+                className="absolute right-4 top-4 z-20 rounded p-1 hover:scale-125 active:scale-110"
+              >
+                <X className="h-7 w-7 text-stone-600 md:h-5 md:w-5" />
+              </button>
+              <DialogTitle className="sr-only">{title}</DialogTitle>
+              <div className="flex items-center gap-1 border-b border-stone-300">
+                <IoSearch className="z-20 p-1 text-3xl text-stone-400" />
+                <Command.Input
+                  ref={inputRef}
+                  value={value}
+                  onValueChange={handleValueChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setOpen(false);
+                    }
+                    if (e.key === "Escape") {
+                      setValue("");
+                      setSearch("");
+                      setOpen(false);
+                    }
+                  }}
+                  placeholder={cn(
+                    placeholder,
+                    !isMobile && "  (Hint: Ctrl + /)",
+                  )}
+                  className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
+                />
+              </div>
+              <div className="max-h-60dvh search scrollable mini p-3">
+                <Command.List>
+                  {Object.keys(groupedItems).length === 0 ? (
+                    <Command.Empty>
+                      No results found for{" "}
+                      <span className="italic text-violet-500">
+                        &quot;{value}&quot;
+                      </span>
+                    </Command.Empty>
+                  ) : (
+                    Object.entries(groupedItems).map(
+                      ([groupKey, groupItems]) => (
+                        <Command.Group
+                          key={groupKey}
+                          heading={groupKey.toUpperCase()}
+                          className={cn(
+                            "mb-5 border-t-1.5 border-stone-200 pt-2 text-stone-400 first:border-t-0",
+                            baseFontSize,
                           )}
-                        </Command.Item>
-                      ))}
-                    </Command.Group>
-                  ))
-                )}
-              </Command.List>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Command.Dialog>
+                        >
+                          {groupItems.map((item) => (
+                            <Command.Item
+                              key={item.path}
+                              className={cn(
+                                "group flex cursor-pointer items-start gap-2 rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",
+                                baseFontSize,
+                              )}
+                              onSelect={() => router.push(item.path)}
+                            >
+                              <div className={cn("flex items-center gap-2")}>
+                                {item.icon && <item.icon className="size-4" />}
+                                <Link
+                                  href={item.path}
+                                  prefetch={true}
+                                  onClick={handleLinkClick}
+                                  className="text-nowrap"
+                                >
+                                  <span>{item.title}</span>
+                                </Link>
+                              </div>
+                              {item.desc && !isMobile && (
+                                <span className="inline-flex gap-2 text-stone-600 opacity-0 transition-opacity ease-in-out group-hover:opacity-100">
+                                  <DashIcon className={cn("mt-1")} />
+                                  <span>{item.desc}</span>
+                                </span>
+                              )}
+                            </Command.Item>
+                          ))}
+                        </Command.Group>
+                      ),
+                    )
+                  )}
+                </Command.List>
+              </div>
+            </motion.div>
+          </>
+        </Command.Dialog>
+      )}
+    </AnimatePresence>
   );
 };

@@ -1,11 +1,8 @@
 "use client";
 
+import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 import { ViewOptions } from "@/features/events/event-list-client";
-import {
-  SearchType,
-  TheListFilterCommandItem,
-  TheListFilterDrawer,
-} from "@/features/thelist/components/filter-drawer";
+import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { cn } from "@/lib/utils";
 import { Filters, SortOptions } from "@/types/thelist";
