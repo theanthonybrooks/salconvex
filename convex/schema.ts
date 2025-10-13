@@ -409,6 +409,7 @@ const eventSchema = {
   postedBy: v.optional(v.id("users")),
   active: v.optional(v.boolean()),
   lastEditedAt: v.optional(v.number()),
+  lastEditedBy: v.optional(v.id("users")),
   approvedBy: v.optional(v.id("users")),
   approvedAt: v.optional(v.number()),
   formType: v.optional(v.number()),

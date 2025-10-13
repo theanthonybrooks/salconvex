@@ -149,6 +149,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const updateEventLastEditedAt = useMutation(
     api.events.event.updateEventLastEditedAt,
   );
+  const updateEventLookup = useMutation(
+    api.events.eventLookup.eventLookupUpdateHelper,
+  );
   const markOrganizationComplete = useMutation(
     api.organizer.organizations.markOrganizationComplete,
   );
@@ -927,6 +930,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               orgId: orgData._id as Id<"organizations">,
             });
 
+            if (event && publish) {
+              await updateEventLookup({
+                eventId: event._id,
+                openCallId: openCallId ?? undefined,
+              });
+            }
+
             eventResult = event;
 
             setExistingEvent(eventResult);
@@ -1514,6 +1524,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       updateOrg,
       updateEventLastEditedAt,
       createOrUpdateEvent,
+      updateEventLookup,
       existingEvent,
       currentValues,
       setExistingEvent,

@@ -8,6 +8,7 @@ import {
 } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
+import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
 import {
   eventsAggregate,
@@ -17,6 +18,10 @@ import { generateUniqueNameAndSlug } from "~/convex/events/event";
 
 export const getTotalNumberOfOpenCalls = query({
   handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isAdmin = user?.role?.includes("admin");
+
     const publishedBounds = {
       lower: { key: "published", inclusive: true },
       upper: { key: "published", inclusive: true },
@@ -41,71 +46,60 @@ export const getTotalNumberOfOpenCalls = query({
       lower: { key: "editing", inclusive: true },
       upper: { key: "editing", inclusive: true },
     };
-    const [active, archived, draft, submitted, pending, editing] =
-      await openCallsAggregate.countBatch(ctx, [
+    // const [active, archived, draft, submitted, pending, editing] =
+    //   await openCallsAggregate.countBatch(ctx, [
+    //     { bounds: publishedBounds },
+    //     { bounds: archivedBounds },
+    //     { bounds: draftBounds },
+    //     { bounds: submittedBounds },
+    //     { bounds: pendingBounds },
+    //     { bounds: editingBounds },
+    //   ]);
+
+    if (!isAdmin) {
+      // Only fetch total and active for non-admins, set others to zero
+      const [active] = await openCallsAggregate.countBatch(ctx, [
         { bounds: publishedBounds },
-        { bounds: archivedBounds },
-        { bounds: draftBounds },
-        { bounds: submittedBounds },
-        { bounds: pendingBounds },
-        { bounds: editingBounds },
       ]);
 
-    const totalOpenCalls = await openCallsAggregate.count(ctx);
+      return {
+        totalOpenCalls: 0,
+        activeOpenCalls: active,
+        archivedOpenCalls: 0,
+        draftOpenCalls: 0,
+        pendingOpenCalls: 0,
+        editingOpenCalls: 0,
+      };
+    } else {
+      // const [active, archived, draft, submitted, pending, editing] =
+      //   await openCallsAggregate.countBatch(ctx, [
+      //     { bounds: publishedBounds },
+      //     { bounds: archivedBounds },
+      //     { bounds: draftBounds },
+      //     { bounds: submittedBounds },
+      //     { bounds: pendingBounds },
+      //     { bounds: editingBounds },
+      //   ]);
+      const [active, archived, draft, pending, editing] =
+        await openCallsAggregate.countBatch(ctx, [
+          { bounds: publishedBounds },
+          { bounds: archivedBounds },
+          { bounds: draftBounds },
+          { bounds: pendingBounds },
+          { bounds: editingBounds },
+        ]);
 
-    // const openCalls = await ctx.db.query("openCalls").collect();
+      const totalOpenCalls = await openCallsAggregate.count(ctx);
 
-    // let active = 0,
-    //   archived = 0,
-    //   draft = 0,
-    //   editing = 0,
-    //   pending = 0;
-
-    // for (const openCall of openCalls) {
-    //   switch (openCall.state) {
-    //     case "submitted":
-    //       pending++;
-    //       break;
-    //     case "published":
-    //       active++;
-    //       break;
-    //     case "archived":
-    //       archived++;
-    //       break;
-    //     case "draft":
-    //       draft++;
-    //       break;
-    //     case "editing":
-    //       editing++;
-    //       break;
-    //     case "pending":
-    //       pending++;
-    //       break;
-    //   }
-    // }
-    // console.log(
-    //   "totalOpenCalls: ",
-    //   totalOpenCalls,
-    //   "activeOpenCalls: ",
-    //   active,
-    //   "archivedOpenCalls: ",
-    //   archived,
-    //   "draftOpenCalls: ",
-    //   draft,
-    //   "pendingOpenCalls: ",
-    //   pending,
-    //   "editingOpenCalls: ",
-    //   editing,
-    // );
-
-    return {
-      totalOpenCalls,
-      activeOpenCalls: active,
-      archivedOpenCalls: archived,
-      draftOpenCalls: draft,
-      pendingOpenCalls: pending,
-      editingOpenCalls: editing,
-    };
+      return {
+        totalOpenCalls,
+        activeOpenCalls: active,
+        archivedOpenCalls: archived,
+        draftOpenCalls: draft,
+        pendingOpenCalls: pending,
+        editingOpenCalls: editing,
+      };
+    }
   },
 });
 
@@ -458,6 +452,7 @@ export const createOrUpdateOpenCall = mutation({
       .query("eventOpenCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .unique();
+
     // console.log("ocId", args.openCallId);
     // console.log("lookup", lookup);
 
@@ -473,6 +468,15 @@ export const createOrUpdateOpenCall = mutation({
       });
       // console.log("prev lookup: ", prevOc?._id, "new lookup: ", newOC?._id);
       await openCallsAggregate.replace(ctx, prevOc!, newOC!);
+      if (newOC?.approvedAt) {
+        await ctx.runMutation(
+          internal.events.eventLookup.addUpdateEventLookup,
+          {
+            eventId: newOC.eventId,
+            openCallId: newOC._id,
+          },
+        );
+      }
       // console.log("lookup updated", lookup, openCallData);
       return openCallData;
     }
@@ -618,24 +622,7 @@ export const duplicateOC = mutation({
     let eventSlug = event.slug;
     // let edition = existingOcEdition;
     let edition = event.dates.edition;
-    // const existingEvents = await ctx.db
-    //   .query("events")
-    //   .withIndex("by_slug", (q) => q.eq("slug", event.slug))
-    //   .collect();
 
-    // const slugPrefix = event.slug + "-";
-    // const existingVariants = await ctx.db
-    //   .query("events")
-    //   .withIndex("by_slug", (q) =>
-    //     q.gte("slug", slugPrefix).lt("slug", slugPrefix + "\uffff"),
-    //   )
-    //   .collect();
-    // const allExisting = [...existingEvents, ...existingVariants];
-    // console.log(allExisting);
-
-    // if (existingOcEdition !== new Date().getFullYear()) {
-    //   edition = new Date().getFullYear();
-    // }
     if (event.dates.edition !== new Date().getFullYear()) {
       edition = new Date().getFullYear();
     }
@@ -744,6 +731,12 @@ export const deleteOC = mutation({
       .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
       .first();
     if (ocLookup) await ctx.db.delete(ocLookup._id);
+    if (openCall.approvedAt) {
+      await ctx.runMutation(internal.events.eventLookup.deleteEventLookup, {
+        eventId: openCall.eventId,
+        openCallOnly: true,
+      });
+    }
 
     await ctx.db.delete(openCall._id);
     await openCallsAggregate.delete(ctx, openCall!);
@@ -783,11 +776,15 @@ export const changeOCStatus = mutation({
     const oc = await ctx.db.get(args.openCallId);
     if (!oc) throw new ConvexError("Open call not found");
     const eventId = oc.eventId;
-    const ocState = args.newStatus || "submitted";
+    const prevState = oc.state;
+    const ocState =
+      isAdmin && args.newStatus === "submitted" && prevState !== "published"
+        ? "published"
+        : args.newStatus || "submitted";
     const approvedBy = isAdmin ? userId : undefined;
     const prevEvent = await ctx.db.get(eventId);
 
-    if (targetBoth) {
+    if (targetBoth || ocState === "published") {
       await ctx.db.patch(eventId, {
         state: ocState,
         lastEditedAt: Date.now(),
@@ -811,6 +808,12 @@ export const changeOCStatus = mutation({
     const newOC = await ctx.db.get(oc._id);
     console.log("prev oc: ", oc._id, "new oc: ", newOC?._id);
     await openCallsAggregate.replace(ctx, oc, newOC!);
+    if (newOC?.approvedAt) {
+      await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
+        eventId: eventId,
+        openCallId: newOC._id,
+      });
+    }
 
     return { oc };
   },

@@ -22,6 +22,7 @@ import type * as artists_listActions from "../artists/listActions.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as events_event from "../events/event.js";
+import type * as events_eventLookup from "../events/eventLookup.js";
 import type * as functions_customGoogle from "../functions/customGoogle.js";
 import type * as functions_customPassword from "../functions/customPassword.js";
 import type * as functions_palettes from "../functions/palettes.js";
@@ -73,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   crons: typeof crons;
   "events/event": typeof events_event;
+  "events/eventLookup": typeof events_eventLookup;
   "functions/customGoogle": typeof functions_customGoogle;
   "functions/customPassword": typeof functions_customPassword;
   "functions/palettes": typeof functions_palettes;

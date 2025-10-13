@@ -220,6 +220,9 @@ export const EventOCForm = ({
   const updateOpenCall = useMutation(
     api.openCalls.openCall.createOrUpdateOpenCall,
   );
+  const updateEventLookup = useMutation(
+    api.events.eventLookup.eventLookupUpdateHelper,
+  );
 
   const updateEventLastEditedAt = useMutation(
     api.events.event.updateEventLastEditedAt,
@@ -1577,6 +1580,12 @@ export const EventOCForm = ({
                 paid: formType === 3 && !alreadyPaid ? false : true,
               });
             }
+            if (event && publish) {
+              await updateEventLookup({
+                eventId: event._id,
+                openCallId: openCallId ?? undefined,
+              });
+            }
             eventResult = event;
             setExistingEvent(eventResult);
           } catch (error) {
@@ -1636,6 +1645,7 @@ export const EventOCForm = ({
       updateOrg,
       updateEventLastEditedAt,
       createOrUpdateEvent,
+      updateEventLookup,
       existingEvent,
       currentValues,
       setExistingEvent,

@@ -12,7 +12,7 @@ import {
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
-import { columns } from "@/features/events/components/events-data-table/columns";
+import { getColumns } from "@/features/events/components/events-data-table/columns";
 import { cn } from "@/lib/utils";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
@@ -72,7 +72,7 @@ export function AdminDashboardTableWrapper({
         <>
           <div className="hidden max-h-full w-full px-10 py-10 lg:block">
             <DataTable
-              columns={columns}
+              columns={getColumns(isAdmin)}
               data={eventsData}
               // columnVisibility={{
               //   category: true,
@@ -92,7 +92,7 @@ export function AdminDashboardTableWrapper({
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
-              columns={columns}
+              columns={getColumns(isAdmin)}
               data={eventsData}
               defaultVisibility={{
                 type: false,

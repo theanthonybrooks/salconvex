@@ -12,9 +12,103 @@ import { DataModel } from "./_generated/dataModel.js";
 // FOR DEVELOPMENT:
 //  npx convex run migrations:runUpdatePublic
 //  npx convex run migrations:
+// note-to-self: this will force it to run again
+// pnpm convex run migrations:runPEL2 '{cursor: null}'
+// pnpm convex run migrations:runPEL2 '{cursor: null}' --prod
 
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
+
+export const fixEventStartInEventLookup = migrations.define({
+  table: "eventLookup",
+  migrateOne: async (ctx, lookup) => {
+    // Fetch the related event document
+    const event = await ctx.db.get(lookup.eventId);
+    if (!event) return;
+
+    // Get the correct eventStart value
+    const correctEventStart = event.dates?.eventDates?.[0]?.start;
+
+    // Only update if the value is different or missing
+    if (lookup.eventStart !== correctEventStart) {
+      await ctx.db.patch(lookup._id, { eventStart: correctEventStart });
+    }
+  },
+});
+
+export const runFSD = migrations.runner(
+  internal.migrations.fixEventStartInEventLookup,
+);
+
+export const backfillEventLookup = migrations.define({
+  table: "events",
+  migrateOne: async (ctx, event) => {
+    if (!event.approvedAt) {
+      return;
+    }
+
+    // Check if this event already has a lookup entry
+    const existing = await ctx.db
+      .query("eventLookup")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .first();
+    if (existing) {
+      return; // Skip if already present
+    }
+
+    const org = await ctx.db.get(event.mainOrgId);
+    if (!org) {
+      return;
+    }
+
+    const hasOpenCall =
+      event.hasOpenCall === "Fixed" ||
+      event.hasOpenCall === "Rolling" ||
+      event.hasOpenCall === "Email";
+
+    const openCall = hasOpenCall
+      ? await ctx.db
+          .query("openCalls")
+          .withIndex("by_eventId_approvedAt", (q) =>
+            q.eq("eventId", event._id).gt("approvedAt", undefined),
+          )
+          .unique()
+      : null;
+
+    const eventLookupDoc = {
+      eventId: event._id,
+      openCallId: openCall?._id,
+      mainOrgId: event.mainOrgId,
+      orgName: org.name,
+      ownerId: org.ownerId,
+      eventName: event.name,
+      eventSlug: event.slug,
+      eventState: event.state,
+      eventCategory: event.category,
+      eventType: event.type,
+      country: event.location.country,
+      continent: event.location.continent ?? "",
+      eventStart: event.dates.eventStart,
+      hasOpenCall,
+      postStatus: event.posted,
+      ocState: openCall?.state,
+      callType: openCall?.basicInfo.callType ?? undefined,
+      callFormat: openCall?.basicInfo.callFormat ?? undefined,
+      eligibilityType: openCall?.eligibility.type ?? undefined,
+      ocStart: openCall?.basicInfo.dates.ocStart ?? undefined,
+      ocEnd: openCall?.basicInfo.dates.ocEnd ?? undefined,
+      eventApprovedAt: event.approvedAt,
+      ocApprovedAt: openCall?.approvedAt,
+      lastEditedAt: event.lastEditedAt ?? event.approvedAt,
+    };
+
+    await ctx.db.insert("eventLookup", eventLookupDoc);
+  },
+});
+
+export const runBFEL = migrations.runner(
+  internal.migrations.backfillEventLookup,
+);
 
 export const populateEventLookupTest = migrations.define({
   table: "events", // The table to walk through

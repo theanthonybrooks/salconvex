@@ -96,6 +96,8 @@ export const eventStates = [
 ] as const;
 export type SubmissionFormState = (typeof eventStates)[number];
 
+export const approvedStates = ["published", "archived"];
+
 export const prodFormatValues = [
   "sameAsEvent",
   "setDates",

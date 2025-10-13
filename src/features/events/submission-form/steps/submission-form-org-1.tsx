@@ -7,8 +7,8 @@ import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
 import { supportEmail } from "@/constants/siteInfo";
 import {
-  columns,
   Event as EventType,
+  getColumns,
 } from "@/features/events/components/events-data-table/columns";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
@@ -368,7 +368,7 @@ const SubmissionFormOrgStep = ({
               </div>
             )}
             <DataTable
-              columns={columns}
+              columns={getColumns(false)}
               data={eventsData}
               defaultVisibility={{
                 _id: false,
@@ -396,7 +396,7 @@ const SubmissionFormOrgStep = ({
               adminActions={{ isAdmin }}
             />
             <DataTable
-              columns={columns}
+              columns={getColumns(false)}
               data={eventsData}
               minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
@@ -417,7 +417,7 @@ const SubmissionFormOrgStep = ({
               }}
             />
             <DataTable
-              columns={columns}
+              columns={getColumns(false)}
               data={eventsData}
               minimalView={dashboardView && firstColVisible}
               initialSearchTerm={preloadFlag ? eventName : undefined}
