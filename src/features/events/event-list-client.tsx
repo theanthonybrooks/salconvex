@@ -176,7 +176,7 @@ const ClientEventList = () => {
       subscription: subscription ?? undefined,
       userOrgs: orgData?.orgIds ?? [],
     },
-    !hasActiveSubscription,
+    !hasActiveSubscription || view === "organizer" || view === "archive",
   );
   void useFilteredEventsQuery(
     filters,
@@ -194,7 +194,10 @@ const ClientEventList = () => {
       subscription: subscription ?? undefined,
       userOrgs: orgData?.orgIds ?? [],
     },
-    !hasActiveSubscription || view === "organizer" || view === "archive",
+    !hasActiveSubscription ||
+      view === "organizer" ||
+      view === "archive" ||
+      page === 1,
   );
 
   const total = queryResult?.total ?? 0;

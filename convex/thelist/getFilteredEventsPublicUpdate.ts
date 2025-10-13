@@ -198,7 +198,7 @@ export const getFilteredEventsPublic = query({
           q.eq("eventState", "published").eq("eventCategory", "event"),
         )
         .collect();
-    } else if (view === "archive" || view === "organizer") {
+    } else if (view === "archive") {
       lookupResults = await ctx.db.query("eventLookup").collect();
     } else if (view === "orgView" && userId) {
       lookupResults = await ctx.db
@@ -206,7 +206,24 @@ export const getFilteredEventsPublic = query({
         .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
         .collect();
     } else {
-      lookupResults = await ctx.db.query("eventLookup").collect();
+      //TODO: Make organizer cards and just show them here.
+      let results = [];
+      let doc = await ctx.db
+        .query("eventLookup")
+        .withIndex("by_orgName")
+        .order("asc")
+        .first();
+
+      while (doc !== null) {
+        results.push(doc);
+        const orgName = doc.orgName;
+        doc = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_orgName", (q) => q.gt("orgName", orgName))
+          .order("asc")
+          .first();
+      }
+      lookupResults = results;
     }
 
     if (
@@ -279,8 +296,9 @@ export const getFilteredEventsPublic = query({
         let openCall = null;
         if (openCallId && eventHasOpenCall) {
           if (
-            hasActiveSubscription ||
-            (!hasActiveSubscription && view !== "event")
+            (hasActiveSubscription ||
+              (!hasActiveSubscription && view !== "event")) &&
+            view !== "organizer"
           ) {
             openCall = await ctx.db.get(openCallId);
           }

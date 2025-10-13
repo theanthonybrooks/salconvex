@@ -811,6 +811,7 @@ export default defineSchema({
 
     // // Relationships
     .index("by_mainOrgId", ["mainOrgId"])
+    .index("by_orgName", ["orgName"])
     .index("by_ownerId", ["ownerId"])
     .index("by_eventId", ["eventId"])
     .index("by_openCallId", ["openCallId"])
