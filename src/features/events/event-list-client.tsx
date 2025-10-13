@@ -26,15 +26,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const viewOptionValues = [
   { value: "openCall", label: "Open Calls" },
@@ -400,7 +392,7 @@ const ClientEventList = () => {
       {publicView && (
         <PublicHeader
           subStatus={userSubStatus}
-          setViewAction={setView}
+          setViewAction={handleViewChange}
           view={view}
         />
       )}
@@ -741,7 +733,7 @@ export default ClientEventList;
 type publicHeaderProps = {
   view: ViewOptions;
   subStatus?: string;
-  setViewAction: Dispatch<SetStateAction<ViewOptions>>;
+  setViewAction: (view: ViewOptions) => void;
 };
 
 const PublicHeader = ({
@@ -756,11 +748,7 @@ const PublicHeader = ({
         <Button
           variant="salWithShadowHiddenBg"
           className="text-lg font-bold lg:text-xl"
-          onClick={() => {
-            setViewAction((prev: ViewOptions) =>
-              prev === "event" ? "openCall" : "event",
-            );
-          }}
+          onClick={() => setViewAction(view === "event" ? "openCall" : "event")}
         >
           {view === "event" ? "Go Back" : "View Events Only"}
         </Button>
