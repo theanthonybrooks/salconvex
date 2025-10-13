@@ -272,7 +272,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
               }}
               defaultValue={String(field.value ?? "")}
             >
-              <SelectTrigger className="h-12 w-full border bg-card text-center text-base placeholder:text-muted-foreground/70 sm:h-[50px]">
+              <SelectTrigger className="h-12 w-full border bg-card text-center text-base placeholder:text-muted-foreground/30 sm:h-[50px]">
                 <SelectValue
                   placeholder={
                     isEvent
@@ -285,11 +285,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                 />
               </SelectTrigger>
               <SelectContent className="min-w-auto">
-                {/* {isEvent && !categoryNotEvent && (
-                  <SelectItem fit value="noEvent">
-                    No Event
-                  </SelectItem>
-                )} */}
                 {isProduction && hasEventDates && (
                   <SelectItem fit value="sameAsEvent">
                     Same as{" "}
@@ -319,6 +314,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
           );
         }}
       />
+
       {formatError && formatValue && (
         <span className="mt-2 w-full text-center text-sm text-red-600">
           {formatError?.message ??
@@ -360,7 +356,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                         <motion.button
                           type="button"
                           onClick={() => remove(index)}
-                          className="absolute left-0 z-top -translate-y-1/2 text-red-500 hover:scale-110 hover:text-red-700 active:scale-95"
+                          className="absolute left-0 z-top -translate-y-1/2 text-red-500 hover:scale-105 hover:text-red-700 active:scale-95"
                           animate={hoveredIndex === index ? "hover" : "rest"}
                           variants={{
                             rest: { opacity: 0, x: -5, scale: 0.8 },

@@ -7,13 +7,7 @@ import { Label } from "@/components/ui/label";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { EventNameSearch } from "@/features/events/components/event-search";
 import { EventOCFormValues } from "@/features/events/event-add-form";
@@ -21,6 +15,7 @@ import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { cn } from "@/lib/utils";
 import {
   EventCategory,
+  eventCategoryOptions,
   eventTypeOptions,
   noEventCategories,
   prodOnlyCategories,
@@ -224,38 +219,15 @@ const SubmissionFormEventStep1 = ({
                 control={control}
                 render={({ field }) => {
                   return (
-                    <Select
-                      onValueChange={(value: EventCategory) => {
-                        field.onChange(value);
-                      }}
-                      value={field.value || ""}
-                    >
-                      <SelectTrigger
-                        className={cn(
-                          "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
-                          errors.event?.category && "invalid-field",
-                        )}
-                      >
-                        <SelectValue placeholder="(select one)" />
-                      </SelectTrigger>
-                      <SelectContent className="min-w-auto">
-                        <SelectItem fit value="event">
-                          Event
-                        </SelectItem>
-                        <SelectItem fit value="project">
-                          Project
-                        </SelectItem>
-                        <SelectItem fit value="residency">
-                          Residency
-                        </SelectItem>
-                        <SelectItem fit value="gfund">
-                          Grant/Fund
-                        </SelectItem>
-                        <SelectItem fit value="roster">
-                          Artist Roster
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <SelectSimple
+                      options={[...eventCategoryOptions]}
+                      value={field.value}
+                      onChangeAction={(value) =>
+                        field.onChange(value as EventCategory)
+                      }
+                      placeholder="(select one)"
+                      className="h-12 w-full border bg-card text-center text-base sm:h-[50px]"
+                    />
                   );
                 }}
               />

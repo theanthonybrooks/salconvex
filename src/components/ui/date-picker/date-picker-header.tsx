@@ -24,6 +24,7 @@ interface DatePickerHeaderProps {
   prevMonthButtonDisabled: boolean;
   nextMonthButtonDisabled: boolean;
   pickerType: string;
+  isAdmin?: boolean;
 }
 
 export const DatePickerHeader = ({
@@ -37,8 +38,12 @@ export const DatePickerHeader = ({
   prevMonthButtonDisabled,
   nextMonthButtonDisabled,
   pickerType,
+  isAdmin = false,
 }: DatePickerHeaderProps) => {
-  const years = Array.from({ length: 10 }, (_, i) => i + 2020);
+  const years = Array.from(
+    { length: 5 },
+    (_, i) => i + (isAdmin ? 2024 : new Date().getFullYear()),
+  );
   const months = Array.from({ length: 12 }, (_, i) =>
     format(new Date(2000, i), "MMMM"),
   );
@@ -61,7 +66,7 @@ export const DatePickerHeader = ({
           disabled={prevMonthButtonDisabled}
           className="hover:text-foreground, text-muted-foreground disabled:invisible"
         >
-          <FaChevronLeft className="size-4 hover:scale-110 active:scale-95" />
+          <FaChevronLeft className="size-4 hover:scale-105 active:scale-95" />
         </Button>
       )}
 
@@ -80,7 +85,7 @@ export const DatePickerHeader = ({
                 onChange={(val) => changeMonth(val)}
               >
                 <div className="relative w-[120px]">
-                  <ListboxButton className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-center text-lg font-bold hover:scale-110 active:scale-95">
+                  <ListboxButton className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-center text-lg font-bold hover:scale-105 active:scale-95">
                     {months[getMonth(date)]} <ChevronDown className="size-4" />
                   </ListboxButton>
                   <ListboxOptions className="scrollable mini darkbar absolute z-10 mt-1 max-h-40 w-full rounded-md border bg-white shadow-lg">
@@ -105,7 +110,7 @@ export const DatePickerHeader = ({
                 onChange={(val) => changeYear(val)}
               >
                 <div className="relative w-[100px]">
-                  <ListboxButton className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-center text-lg font-bold hover:scale-110 active:scale-95">
+                  <ListboxButton className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-center text-lg font-bold hover:scale-105 active:scale-95">
                     {getYear(date)} <ChevronDown className="size-4" />
                   </ListboxButton>
                   <ListboxOptions className="scrollable mini darkbar absolute z-10 mt-1 max-h-40 w-full rounded-md border bg-white shadow-lg">
@@ -138,7 +143,7 @@ export const DatePickerHeader = ({
             "text-muted-foreground hover:text-foreground disabled:invisible",
           )}
         >
-          <FaChevronRight className="size-4 hover:scale-110 active:scale-95" />
+          <FaChevronRight className="size-4 hover:scale-105 active:scale-95" />
         </Button>
       )}
     </div>

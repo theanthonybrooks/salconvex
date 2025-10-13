@@ -26,12 +26,12 @@ const allowedCharacters = /^[a-zA-Z0-9._]+$/;
 export function formatHandleInput(
   value: string | undefined,
   platform: PlatformType,
-): string {
-  if (!value) return "";
+): string | undefined {
+  if (!value) return undefined;
 
   let cleanValue = value.trim().replace(/^\/+/, "");
   cleanValue = cleanValue.split(/[?#]/)[0];
-  if (!cleanValue) return "";
+  if (!cleanValue) return undefined;
 
   if (
     (/\.\w{2,}/.test(cleanValue) || cleanValue.startsWith("http")) &&
@@ -48,7 +48,7 @@ export function formatHandleInput(
         allowedDomains.length > 0 &&
         !allowedDomains.some((domain) => url.hostname.endsWith(domain))
       ) {
-        return "";
+        return undefined;
       }
 
       const pathParts = url.pathname.split("/").filter(Boolean);
@@ -59,7 +59,7 @@ export function formatHandleInput(
       return "";
     }
   } else if (cleanValue.includes("/") || cleanValue.includes(" ")) {
-    return "";
+    return undefined;
   }
 
   cleanValue = cleanValue.startsWith("@") ? cleanValue : `@${cleanValue}`;
@@ -72,8 +72,8 @@ export function formatHandleInput(
   return `@${validUsername}`;
 }
 
-export function formatFacebookInput(input: string): string {
-  if (!input) return "";
+export function formatFacebookInput(input: string): string | undefined {
+  if (!input) return undefined;
 
   const trimmed = input.trim().replace(/^\/+/, "");
   const lower = trimmed.toLowerCase();
@@ -132,9 +132,9 @@ function isValidChar(char: string, platform: PlatformType): boolean {
 //   return raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
 // }
 
-export function autoHttps(url: string): string {
+export function autoHttps(url: string): string | undefined {
   const raw = url.trim();
-  if (!raw) return "";
+  if (!raw) return undefined;
 
   // Allow mailto: explicitly
   if (/^mailto:/i.test(raw)) {

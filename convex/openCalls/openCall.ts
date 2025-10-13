@@ -264,7 +264,7 @@ export const createNewOpenCall = mutation({
 
     const newId = await ctx.db.insert("openCalls", openCallData);
     const newOC = await ctx.db.get(newId);
-    await openCallsAggregate.insert(ctx, newOC!);
+    if (newOC) await openCallsAggregate.insert(ctx, newOC);
 
     await ctx.db.insert("eventOpenCalls", {
       eventId: args.eventId,
@@ -457,7 +457,7 @@ export const createOrUpdateOpenCall = mutation({
     // console.log("lookup", lookup);
 
     if (lookup) {
-      const prevOc = await ctx.db.get(lookup.openCallId);
+      const prevOC = await ctx.db.get(lookup.openCallId);
       await ctx.db.patch(lookup.openCallId, openCallData);
       const newOC = await ctx.db.get(lookup.openCallId);
       await ctx.db.patch(lookup._id, {
@@ -467,7 +467,9 @@ export const createOrUpdateOpenCall = mutation({
         ...(args.openCallId && { openCallId: args.openCallId }),
       });
       // console.log("prev lookup: ", prevOc?._id, "new lookup: ", newOC?._id);
-      await openCallsAggregate.replace(ctx, prevOc!, newOC!);
+      console.log("is it me");
+      if (prevOC && newOC)
+        await openCallsAggregate.replaceOrInsert(ctx, prevOC, newOC);
       if (newOC?.approvedAt) {
         await ctx.runMutation(
           internal.events.eventLookup.addUpdateEventLookup,
@@ -497,7 +499,10 @@ export const createOrUpdateOpenCall = mutation({
         });
         const newOC = await ctx.db.get(args.openCallId);
         // console.log("prev: ", existing?._id, "new: ", newOC?._id);
-        await openCallsAggregate.replace(ctx, existing, newOC!);
+
+        if (newOC)
+          await openCallsAggregate.replaceOrInsert(ctx, existing, newOC);
+
         // console.log("existing updated", existing, openCallData);
         return openCallData;
       } else {
@@ -509,7 +514,7 @@ export const createOrUpdateOpenCall = mutation({
     // Step 3: Create new openCall and lookup
     const newId = await ctx.db.insert("openCalls", openCallData);
     const newOC = await ctx.db.get(newId);
-    await openCallsAggregate.insert(ctx, newOC!);
+    if (newOC) await openCallsAggregate.insert(ctx, newOC);
 
     await ctx.db.insert("eventOpenCalls", {
       eventId: args.eventId,

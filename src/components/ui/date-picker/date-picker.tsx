@@ -134,9 +134,16 @@ export const CustomDatePicker = ({
       disabled={disabled}
       selected={parsedDate}
       onChange={onChange}
+      // onChangeRaw={(e) => {
+      //   if (e && e.target instanceof HTMLInputElement) {
+      //     console.log(e?.target?.value);
+      //   }
+      // }}
       dateFormat={dateFormat}
       openToDate={openToDate}
       showYearDropdown={pickerType === "dates"}
+      yearDropdownItemNumber={5}
+      showFourColumnMonthYearPicker
       showMonthDropdown={pickerType === "dates"}
       showYearPicker={pickerType === "year"}
       showMonthYearPicker={pickerType === "month"}
@@ -172,7 +179,11 @@ export const CustomDatePicker = ({
       className={className}
       tabIndex={tabIndex}
       renderCustomHeader={(props) => (
-        <DatePickerHeader {...props} pickerType={pickerType} />
+        <DatePickerHeader
+          {...props}
+          pickerType={pickerType}
+          isAdmin={isAdmin}
+        />
       )}
     />
   );

@@ -10,7 +10,7 @@ interface DebouncedControllerInputProps<
 > {
   field: ControllerRenderProps<TFieldValues, TName>;
   debounceMs?: number;
-  transform?: (value: string) => string;
+  transform?: (value: string) => string | undefined;
   [key: string]: unknown;
   onSchemaCheck?: () => void;
 }
@@ -26,7 +26,9 @@ export function DebouncedControllerInput<
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
   // const { setValue } = useFormContext();
-  const [localValue, setLocalValue] = useState(field.value ?? "");
+  const [localValue, setLocalValue] = useState<string | undefined>(
+    field.value ?? "",
+  );
 
   const latestTransform = useRef(transform);
   useEffect(() => {
@@ -42,8 +44,10 @@ export function DebouncedControllerInput<
       //   shouldValidate: true,
       //   shouldDirty: true,
       // });
-      field.onChange(transformed);
-      setLocalValue(transformed);
+      const normalized = transformed ?? undefined;
+
+      field.onChange(normalized);
+      setLocalValue(transformed ?? "");
     }, debounceMs),
   ).current;
 
@@ -69,7 +73,7 @@ export function DebouncedControllerInput<
           ? inputProps.className
           : undefined,
       )}
-      value={localValue}
+      value={localValue ?? ""}
       onChange={(e) => {
         const val = e.target.value;
         setLocalValue(val);

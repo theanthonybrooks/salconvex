@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { supportEmail } from "@/constants/siteInfo";
 import {
   Event as EventType,
@@ -15,7 +16,7 @@ import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/lib/utils";
 import { EnrichedEvent } from "@/types/event";
 import { AnimatePresence, motion } from "framer-motion";
-import { LucideChevronsLeftRight } from "lucide-react";
+import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -302,13 +303,24 @@ const SubmissionFormOrgStep = ({
           <Separator thickness={2} className="my-4 xl:hidden" />
           {existingOrg && (
             <div
-              className="hidden w-full flex-col items-center gap-3 hover:cursor-pointer xl:flex"
+              className="hidden w-full flex-col items-center gap-3 xl:flex"
               onClick={() => setFirstColVisible((prev) => !prev)}
             >
-              <LucideChevronsLeftRight className="size-6 shrink-0 text-foreground/50" />
               <Separator
                 thickness={2}
-                className="mx-auto hidden xl:block"
+                className="mx-auto hidden h-[45%] hover:cursor-pointer xl:block"
+                orientation="vertical"
+              />
+              <TooltipSimple content="Toggle full-width" side="right">
+                {firstColVisible ? (
+                  <LucideChevronLeft className="size-6 shrink-0 text-foreground/50 hover:scale-105 hover:cursor-pointer active:scale-95" />
+                ) : (
+                  <LucideChevronRight className="size-6 shrink-0 text-foreground/50 hover:scale-105 hover:cursor-pointer active:scale-95" />
+                )}
+              </TooltipSimple>
+              <Separator
+                thickness={2}
+                className="mx-auto hidden h-[40%] hover:cursor-pointer xl:block"
                 orientation="vertical"
               />
             </div>
@@ -428,9 +440,9 @@ const SubmissionFormOrgStep = ({
               defaultVisibility={{
                 _id: false,
                 submissionState: false,
-                category: false,
-                type: false,
-                // lastEditedAt: false,
+                category: !firstColVisible,
+                type: !firstColVisible,
+                lastEditedAt: !firstColVisible,
               }}
               className={cn(
                 "flex w-full max-w-[45vw] overflow-x-auto",

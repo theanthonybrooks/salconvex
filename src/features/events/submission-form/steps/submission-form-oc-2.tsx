@@ -342,7 +342,7 @@ const SubmissionFormOC2 = ({
                   getItemLabel={(c) => `${c.symbol} (${c.code}) - ${c.name}`}
                   getItemDisplay={(c) => `(${c.code}) ${c.symbol}`}
                   getItemValue={(c) => c.code}
-                  disabled={!showBudgetInputs || pastEvent}
+                  disabled={!showBudgetInputs || pastEvent || unknownBudget}
                 />
               )}
             />
@@ -359,11 +359,17 @@ const SubmissionFormOC2 = ({
                       field={field}
                       formatNumber={true}
                       min={0}
-                      disabled={!showBudgetInputs || pastEvent}
+                      disabled={!showBudgetInputs || pastEvent || unknownBudget}
                       placeholder="Minimum"
                       className={cn(
                         "h-fit border-none !bg-card px-0 py-0 focus:border-none focus:outline-none sm:text-base",
-                        !budgetMin && hasBudget && "invalid-field",
+                        !budgetMin &&
+                          hasBudget === "true" &&
+                          !unknownBudget &&
+                          "invalid-field",
+                        unknownBudget &&
+                          hasBudget === "true" &&
+                          "!bg-foreground/15 text-foreground/50 opacity-50",
                         "text-center",
                         // "text-end"
                       )}
@@ -380,7 +386,12 @@ const SubmissionFormOC2 = ({
                     <DebouncedControllerNumInput
                       // min={budgetMin}
                       // type="number"
-                      disabled={!showBudgetInputs || pastEvent || !budgetMin}
+                      disabled={
+                        !showBudgetInputs ||
+                        pastEvent ||
+                        !budgetMin ||
+                        unknownBudget
+                      }
                       formatNumber={true}
                       field={{
                         ...field,
@@ -395,8 +406,8 @@ const SubmissionFormOC2 = ({
                       className={cn(
                         "arrowless h-fit border-none !bg-card px-0 py-0 focus:border-none focus:outline-none sm:text-base",
                         "text-center",
-                        !budgetMin &&
-                          hasBudget &&
+                        ((!budgetMin && hasBudget) || unknownBudget) &&
+                          hasBudget === "true" &&
                           "!bg-foreground/15 text-foreground/50 opacity-50",
                         // "text-start"
                       )}

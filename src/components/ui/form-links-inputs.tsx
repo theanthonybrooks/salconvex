@@ -70,18 +70,18 @@ const handleFields: {
     primaryOption: true,
   },
   {
-    key: "youTube",
-    icon: <FaYoutube className={cn("size-5 shrink-0")} />,
-    platform: "youTube",
-    placeholder: { event: "youtube.com/...", org: "youtube.com/..." },
-    primaryOption: false,
-  },
-  {
     key: "vk",
     icon: <FaVk className={cn("size-5 shrink-0")} />,
     platform: "vk",
     placeholder: { event: "@eventname", org: "@organizer" },
     primaryOption: true,
+  },
+  {
+    key: "youTube",
+    icon: <FaYoutube className={cn("size-5 shrink-0")} />,
+    platform: "youTube",
+    placeholder: { event: "youtube.com/...", org: "youtube.com/..." },
+    primaryOption: false,
   },
 ];
 
@@ -331,6 +331,7 @@ export const FormLinksInput = ({
                             placeholder="+1 (555) 555-5555"
                             className={cn(
                               "flex h-10 w-full min-w-[10.5rem] flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm [&>input:disabled]:cursor-not-allowed [&>input:disabled]:bg-white [&>input:disabled]:opacity-50",
+                              // fontSize stuff, use "lg-text",
                               errors?.[type]?.links?.phone && "invalid-field",
                             )}
                             onChange={field.onChange}

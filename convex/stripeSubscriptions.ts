@@ -74,11 +74,11 @@ export const getUserHadTrial = query({
 
 export const getOrgHadFreeCall = query({
   handler: async (ctx) => {
-    const identity = await getAuthUserId(ctx);
-    if (!identity) return false;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return false;
     const orgs = await ctx.db
       .query("organizations")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", identity))
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
       .collect();
     return orgs.some((org) => org.hadFreeCall === true);
 

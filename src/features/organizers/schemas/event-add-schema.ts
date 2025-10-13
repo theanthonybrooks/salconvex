@@ -611,6 +611,7 @@ export const openCallCompensationSchema = z.object({
   }),
 });
 
+//TODO: Update the organization schema here to use the full thing since it's not at the
 export const openCallStep1Schema = z.object({
   organization: z.object({
     location: z.object({

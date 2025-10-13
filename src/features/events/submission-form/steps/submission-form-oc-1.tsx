@@ -88,9 +88,8 @@ const SubmissionFormOC1 = ({
   // console.log(currentErrors);
 
   // console.log(errors?.openCall?.requirements?.applicationLink, errors);
-  const appLinkFormat =
-    watch("openCall.requirements.applicationLinkFormat") ?? "https://";
-
+  const appLinkFormat = watch("openCall.requirements.applicationLinkFormat");
+  console.log(appLinkFormat);
   const pastEvent = pastEventCheck && !isAdmin;
   const freeCall = formType === 2;
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">(
@@ -198,6 +197,11 @@ const SubmissionFormOC1 = ({
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
+
+  useEffect(() => {
+    if (!appLinkFormat)
+      setValue("openCall.requirements.applicationLinkFormat", "https://");
+  }, [appLinkFormat, setValue]);
 
   useEffect(() => {
     if (hasAppFee === "false" && appFee === undefined) {
@@ -780,36 +784,13 @@ const SubmissionFormOC1 = ({
                         control={control}
                         render={({ field }) => {
                           return (
-                        <>
-                      {/*        // <Select
-                              //   disabled={pastEvent}
-                              //   onValueChange={(
-                              //     value: "mailto:" | "https://",
-                              //   ) => {
-                              //     field.onChange(value);
-                              //   }}
-                              //   value={field.value}
-                              // >
-                              //   <SelectTrigger
-                              //     tabIndex={11}
-                              //     className={cn(
-                              //       "w-24 rounded border bg-card text-center text-base sm:h-11",
-                              //       emailType && "hidden",
-                              //     )}
-                              //   >
-                              //     <SelectValue placeholder="(Type)" />
-                              //   </SelectTrigger>
-                              //   <SelectContent className="min-w-auto">
-                              //     <SelectItem fit value="mailto:">
-                              //       Email
-                              //     </SelectItem>
-                              //     <SelectItem fit value="https://">
-                              //       URL
-                              //     </SelectItem>
-                              //   </SelectContent>
-                              // </Select>*/}
-                              <SelectSimple options={[...openCallLinkFormatOptions]} value={field.value} onChangeAction={(value) => field.onChange(value)} placeholder="Link Format" className="w-24 rounded border bg-card text-center text-base sm:h-11" />
-                        </>
+                            <SelectSimple
+                              options={[...openCallLinkFormatOptions]}
+                              value={field.value}
+                              onChangeAction={(value) => field.onChange(value)}
+                              placeholder="Link Format"
+                              className="w-24 rounded border bg-card text-center text-base sm:h-11"
+                            />
                           );
                         }}
                       />

@@ -79,33 +79,33 @@ export const getSteps = (isAdmin: boolean = false) => [
   },
   {
     id: 2,
+    label: "Organizer Details",
+    mobileLabel: "Organizer Details",
+    schema: orgDetailsSchema,
+  },
+  {
+    id: 3,
     label: "Event, Project, Fund, etc",
     mobileLabel: "Event, Project, Fund, etc",
     schema: getEventOnlySchema(isAdmin),
   },
   {
-    id: 3,
+    id: 4,
     label: "Event/Project Details Pt.2",
     mobileLabel: "Event/Project Details",
     schema: getEventDetailsSchema(isAdmin),
   },
   {
-    id: 4,
+    id: 5,
     label: "Open Call",
     mobileLabel: "Open Call",
     schema: getOpenCallStep1Schema(isAdmin),
   },
   {
-    id: 5,
+    id: 6,
     label: "Budget & Compensation",
     mobileLabel: "Budget/Compensation",
     schema: openCallStep2Schema,
-  },
-  {
-    id: 6,
-    label: "Organizer Details",
-    mobileLabel: "Organizer Details",
-    schema: orgDetailsSchema,
   },
   {
     id: 7,
@@ -275,18 +275,8 @@ export const EventOCForm = ({
   const currentSchema = steps[activeStep]?.schema;
 
   const isStepValidZod = useMemo(() => {
-    console.log(
-      "watchedValues",
-      watchedValues.openCall?.requirements?.applicationLink,
-    );
     if (!currentSchema) return true;
-    console.log("watched snapshot:", JSON.stringify(watchedValues, null, 2));
     const result = currentSchema.safeParse(watchedValues);
-    console.log("zod result", result);
-    if (!result.success) {
-      console.log("ZOD ERROR DETAILS:");
-      console.log(JSON.stringify(result.error.format(), null, 2));
-    }
 
     return result.success;
   }, [watchedValues, currentSchema]);
@@ -315,7 +305,9 @@ export const EventOCForm = ({
   // #region ------------- Watch --------------
   const orgData = watch("organization");
   const eventData = watch("event");
+  const eventEdition = watch("event.dates.edition");
   const openCallData = watch("openCall");
+  const ocEdition = watch("openCall.basicInfo.dates.edition");
   const ocBudget = watch("openCall.compensation.budget");
   const tempFiles = watch("openCall.tempFiles");
 
@@ -427,43 +419,36 @@ export const EventOCForm = ({
   const hasUserEditedStep0 =
     JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
     activeStep === 0;
-  const hasUserEditedStep3 =
-    JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
-    activeStep === 3;
   const hasUserEditedStep4 =
     JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
     activeStep === 4;
-
   const hasUserEditedStep5 =
-    JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
+    JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
     activeStep === 5;
+
+  const hasUserEditedStep1 =
+    JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
+    activeStep === 1;
   const hasUserEditedEventSteps = JSON.stringify(
     dirtyFields?.event ?? {},
   ).includes("true");
   const hasUserEditedForm = !!(
     hasUserEditedEventSteps ||
     hasUserEditedStep0 ||
-    hasUserEditedStep3 ||
     hasUserEditedStep4 ||
-    hasUserEditedStep5
+    hasUserEditedStep5 ||
+    hasUserEditedStep1
   );
   const prevOrgRef = useRef(existingOrg);
   const prevEventRef = useRef(existingEvent);
-  const validStep1 =
-    activeStep > 0
+  const validStep2 =
+    activeStep > 1
       ? !!(eventName && eventName.trim().length >= 3 && !!eventDatesFormat)
       : true;
   const validOrgWZod = orgValidationSuccess && orgNameValid;
   const invalidOrgWZod = orgValidationError && orgNameValid;
   const isValid =
-    validOrgWZod && isStepValidZod && eventChoiceMade && validStep1;
-  if (isAdmin) {
-    console.log("isValid", isValid);
-    console.log("validOrgWZod", validOrgWZod);
-    console.log("isStepValidZod", isStepValidZod);
-    console.log("eventChoiceMade", eventChoiceMade);
-    console.log("validStep1", validStep1);
-  }
+    validOrgWZod && isStepValidZod && eventChoiceMade && validStep2;
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
 
@@ -590,7 +575,7 @@ export const EventOCForm = ({
       await handleSave();
     }
     handleFirstStep();
-    if (activeStep === 2) {
+    if (activeStep === 3) {
       if (!hasOpenCall) {
         unregister("openCall");
         setActiveStep((prev) => prev + 3);
@@ -604,6 +589,9 @@ export const EventOCForm = ({
           });
 
           setOpenCallId(openCallResult);
+        }
+        if (eventEdition !== ocEdition) {
+          setValue("openCall.basicInfo.dates.edition", eventEdition);
         }
 
         setActiveStep((prev) => prev + 1);
@@ -630,23 +618,22 @@ export const EventOCForm = ({
       topRef.current.scrollIntoView({ behavior: "auto" });
     }
   };
-
   const proceedBackStep = () => {
-    if (activeStep === 4 && !hasOpenCall) {
-      setActiveStep((prev) => prev - 3);
-    } else if (activeStep === 5) {
-      if (!orgData?.contact?.primaryContact) {
-        unregister("organization.contact");
-        unregister("organization.links");
-        // console.log(getValues("organization"));
-      }
+    console.log(activeStep);
+    if (activeStep === steps.length - 1) {
       if (!hasOpenCall) {
-        // console.log("heya");
         unregister("openCall");
         setActiveStep((prev) => prev - 3);
       } else {
         setActiveStep((prev) => prev - 1);
       }
+    } else if (activeStep === 1) {
+      if (!orgData?.contact?.primaryContact) {
+        unregister("organization.contact");
+        unregister("organization.links");
+        // console.log(getValues("organization"));
+      }
+      setActiveStep((prev) => prev - 1);
     } else {
       setActiveStep((prev) => prev - 1);
     }
@@ -724,9 +711,7 @@ export const EventOCForm = ({
       if (!schema) return true;
       if (!hasUserEditedForm) return true;
 
-      console.log("current snapshot:", JSON.stringify(currentValues, null, 2));
       const result = schema.safeParse(currentValues);
-      console.log("handle result", result);
 
       if (isAdmin) {
         console.log("safeParse result: ", result);
@@ -786,6 +771,7 @@ export const EventOCForm = ({
   const handleSave = useCallback(
     async (direct = false, publish = false) => {
       if (pending) return;
+
       setPending(true);
       const saveId = Symbol("save");
       latestSaveId.current = saveId;
@@ -826,11 +812,7 @@ export const EventOCForm = ({
           orgLogoStorageId = result.logoStorageId;
           timezone = result.timezone;
           timezoneOffset = result.timezoneOffset;
-          // console.log(orgLogoStorageId);
-          // const logo =
-          //   typeof orgData.logo === "string" ? orgData.logo : "1.jpg";
-          // // console.log(result);
-          // console.log(logo);
+
           try {
             const { org } = await createNewOrg({
               organizationName: orgData.name?.trim(),
@@ -861,20 +843,10 @@ export const EventOCForm = ({
               },
             });
             orgResult = org;
-            // orgLogoFullUrl = fileUrl ?? orgResult?.logo ?? "/1.jpg";
             orgLogoFullUrl =
               orgResult?.logo ??
               (orgData.logo === "string" ? orgData.logo : "/1.jpg");
 
-            // setPending(false);
-            // toast.success(
-            //   existingOrg
-            //     ? "Organization updated!"
-            //     : "Organization created! Going to step 2...",
-            //   {},
-            // );
-
-            // Updating existingOrg state with new values
             //TODO: Check if this is still needed as I'm already taking the resulting organization and updating the form's organization state.
             if (existingOrg) {
               setExistingOrg({
@@ -922,8 +894,6 @@ export const EventOCForm = ({
                 logo: eventFullUrl,
                 logoStorageId: existingEvent?.logoStorageId ?? orgLogoStorageId,
                 links: eventLinks,
-                // category: existingEvent.category,
-                // type: existingEvent.type ?? [],
                 location: locationFromEvent,
                 dates: {
                   ...existingEvent.dates,
@@ -957,9 +927,66 @@ export const EventOCForm = ({
             });
           }
         }
-        // await handleFormValues();
         //TODO: Check if any of these 'has user edited' things are even doing anything, since the handleNext/BackStep already has the check.
-        if (activeStep === 1 && hasUserEditedEventSteps) {
+        if (activeStep === 1) {
+          try {
+            const result = await updateOrg({
+              orgId: orgData._id as Id<"organizations">,
+              name: orgData.name?.trim(),
+              slug: slugify(orgData.name?.trim(), {
+                lower: true,
+                strict: true,
+              }),
+              logo: orgData.logo as string,
+              location: {
+                ...orgData.location,
+              },
+              contact: {
+                organizer: orgData.contact?.organizer,
+                organizerTitle: orgData.contact?.organizerTitle,
+                primaryContact: orgData.contact?.primaryContact || "",
+              },
+              about: orgData.about,
+              links: orgData.links,
+              isComplete: true,
+            });
+
+            if (!result) {
+              toast.error("Failed to update organization");
+              throw new Error("org_update_failed");
+            }
+            let lastEditedResult = null;
+            if (existingEvent?._id) {
+              lastEditedResult = await updateEventLastEditedAt({
+                eventId: existingEvent._id,
+              });
+            }
+            if (lastEditedResult) {
+              const lastEditedAt = lastEditedResult.lastEditedAt;
+              setLastSaved(lastEditedAt);
+              if (existingEvent) {
+                setExistingEvent({
+                  ...existingEvent,
+                  lastEditedAt,
+                });
+              }
+            }
+
+            reset({
+              ...currentValues,
+              organization: {
+                ...result.org,
+              },
+            });
+
+            // console.log("result", result);
+          } catch (error) {
+            console.error("Failed to update organization final step:", error);
+            toast.error("Failed to update organization");
+            throw new Error("org_final_step_failed");
+          }
+        }
+        if (activeStep === 2 && hasUserEditedEventSteps) {
           let result = {
             logoStorageId: eventData?.logoStorageId as
               | Id<"_storage">
@@ -985,15 +1012,11 @@ export const EventOCForm = ({
                 pauseOnHover: false,
                 hideProgressBar: true,
               });
-              // return;
               throw new Error("event_logo_upload_failed");
             }
             result = uploadResult;
-            // console.log(result);
           }
-          // console.log("doesnt need upload");
           const { logoStorageId, timezone, timezoneOffset } = result;
-          // console.log(logoStorageId, timezone, timezoneOffset);
           let eventResult = null;
           const eventLogo =
             typeof eventData.logo === "string" ? eventData.logo : "1.jpg";
@@ -1041,8 +1064,6 @@ export const EventOCForm = ({
             eventResult = event;
 
             setExistingEvent(eventResult);
-            // console.log(event);
-            // console.log(currentValues.event);
 
             reset(
               merge({}, currentValues, {
@@ -1055,7 +1076,7 @@ export const EventOCForm = ({
             throw new Error("event_creation_failed");
           }
         }
-        if (activeStep === 2 && hasUserEditedEventSteps) {
+        if (activeStep === 3 && hasUserEditedEventSteps) {
           let eventResult = null;
 
           try {
@@ -1103,8 +1124,7 @@ export const EventOCForm = ({
             throw new Error("event_update_failed");
           }
         }
-
-        if (activeStep === 3 && hasUserEditedStep3) {
+        if (activeStep === 4 && hasUserEditedStep4) {
           try {
             let openCallFiles = null;
             let saveResults: {
@@ -1145,20 +1165,7 @@ export const EventOCForm = ({
                 unregister("openCall.tempFiles");
               }
             }
-            // const documents = saveResults.map((saved, i) => {
-            //   const matched = openCallFiles?.find(
-            //     (original) => original.storageId === saved.storageId,
-            //   );
 
-            //   return {
-            //     id: saved.id,
-            //     title:
-            //       matched?.fileName ??
-            //       `${eventData.name}(${eventData.dates.edition}) - Document ${i + 1}`,
-            //     href: saved.url,
-            //   };
-            // });
-            // Build documents from fresh uploads
             const newDocs = saveResults.map((saved, i) => {
               const matched = openCallFiles?.find(
                 (original) => original.storageId === saved.storageId,
@@ -1173,7 +1180,6 @@ export const EventOCForm = ({
               };
             });
 
-            // Merge with currentDocs from query
             const mergedDocs = [
               ...(normalizedCurrentDocs ?? []),
               ...newDocs,
@@ -1307,7 +1313,7 @@ export const EventOCForm = ({
             throw new Error("open_call_create_update_failed");
           }
         }
-        if (activeStep === 4 && hasUserEditedStep4) {
+        if (activeStep === 5 && hasUserEditedStep5) {
           if (!openCallData) return;
 
           try {
@@ -1402,68 +1408,7 @@ export const EventOCForm = ({
             throw new Error("open_call_update_failed");
           }
         }
-        if (activeStep === steps.length - 2) {
-          // console.log("saving org details");
 
-          try {
-            // console.log("orgData presave", orgData);
-
-            const result = await updateOrg({
-              orgId: orgData._id as Id<"organizations">,
-              name: orgData.name?.trim(),
-              slug: slugify(orgData.name?.trim(), {
-                lower: true,
-                strict: true,
-              }),
-              logo: orgData.logo as string,
-              location: {
-                ...orgData.location,
-              },
-              contact: {
-                organizer: orgData.contact?.organizer,
-                organizerTitle: orgData.contact?.organizerTitle,
-                primaryContact: orgData.contact?.primaryContact || "",
-              },
-              about: orgData.about,
-              links: orgData.links,
-              isComplete: true,
-            });
-
-            if (!result) {
-              toast.error("Failed to update organization");
-              throw new Error("org_update_failed");
-            }
-            let lastEditedResult = null;
-            if (existingEvent?._id) {
-              lastEditedResult = await updateEventLastEditedAt({
-                eventId: existingEvent._id,
-              });
-            }
-            if (lastEditedResult) {
-              const lastEditedAt = lastEditedResult.lastEditedAt;
-              setLastSaved(lastEditedAt);
-              if (existingEvent) {
-                setExistingEvent({
-                  ...existingEvent,
-                  lastEditedAt,
-                });
-              }
-            }
-
-            reset({
-              ...currentValues,
-              organization: {
-                ...result.org,
-              },
-            });
-
-            // console.log("result", result);
-          } catch (error) {
-            console.error("Failed to update organization final step:", error);
-            toast.error("Failed to update organization");
-            throw new Error("org_final_step_failed");
-          }
-        }
         if (activeStep === steps.length - 1) {
           // console.log("saving final step");
           let eventResult = null;
@@ -1607,12 +1552,14 @@ export const EventOCForm = ({
         if (isAdmin && publish) {
           toast.success("Published!");
           setTimeout(() => {
+            window.location.href = `/thelist/event/${submissionUrl}`;
             setOpen(false);
           }, 1500);
         }
       }
     },
     [
+      submissionUrl,
       isAdmin,
       setOpen,
       steps.length,
@@ -1629,8 +1576,8 @@ export const EventOCForm = ({
       normalizedCurrentDocs,
       updateOpenCall,
       hasUserEditedStep0,
-      hasUserEditedStep3,
       hasUserEditedStep4,
+      hasUserEditedStep5,
       orgData,
       generateUploadUrl,
       getTimezone,
@@ -2073,9 +2020,11 @@ export const EventOCForm = ({
     }
   }, [shouldClose, saveAndClose]);
 
+  //TODO: Add this to admin/org form
+
   useEffect(() => {
     if (!hasOpenCall) {
-      setSkipped(new Set([3, 4]));
+      setSkipped(new Set([4, 5]));
     } else if (hasOpenCall) {
       setSkipped(new Set());
     }
@@ -2193,8 +2142,16 @@ export const EventOCForm = ({
                 furthestStep={furthestStep}
               />
             )}
-            {/* //------ 2nd: Event Basics  ------ */}
+
+            {/* //------ 6th Step: Organization Details  ------ */}
+
             {activeStep === 1 && (
+              <SubmissionFormOrgStep2
+                handleCheckSchema={() => handleCheckSchema(false)}
+              />
+            )}
+            {/* //------ 2nd: Event Basics  ------ */}
+            {activeStep === 2 && (
               <SubmissionFormEventStep1
                 user={user}
                 isAdmin={isAdmin}
@@ -2209,7 +2166,7 @@ export const EventOCForm = ({
 
             {/* //------ 3rd Step: Event Details  ------ */}
 
-            {activeStep === 2 && (
+            {activeStep === 3 && (
               <SubmissionFormEventStep2
                 user={user}
                 isAdmin={isAdmin}
@@ -2224,7 +2181,7 @@ export const EventOCForm = ({
             )}
             {/* //------ 4th Step: OC Start & Budget  ------ */}
 
-            {activeStep === 3 && (
+            {activeStep === 4 && (
               <SubmissionFormOC1
                 user={user}
                 isAdmin={isAdmin}
@@ -2238,7 +2195,7 @@ export const EventOCForm = ({
               />
             )}
             {/* //------ 5th Step: OC Reqs & Other Info  ------ */}
-            {activeStep === 4 && (
+            {activeStep === steps.length - 2 && (
               <SubmissionFormOC2
                 user={user}
                 isAdmin={isAdmin}
@@ -2252,13 +2209,6 @@ export const EventOCForm = ({
               />
             )}
 
-            {/* //------ 6th Step: Organization Details  ------ */}
-
-            {activeStep === steps.length - 2 && (
-              <SubmissionFormOrgStep2
-                handleCheckSchema={() => handleCheckSchema(false)}
-              />
-            )}
             {/* //------ Final Step: Recap  ------ */}
             {activeStep === steps.length - 1 && (
               <>

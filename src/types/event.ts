@@ -78,7 +78,7 @@ export const eventCategoryOptions = [
   { value: "project", label: "Mural Project", abbr: "Project" },
   { value: "residency", label: "Residency", abbr: "Residency" },
   { value: "gfund", label: "Grant/Funding", abbr: "Grant/Fund" },
-  { value: "roster", label: "Roster", abbr: "Roster" },
+  { value: "roster", label: "Artist Roster", abbr: "Roster" },
 ] as const;
 
 export const eventCategoryValues = eventCategoryOptions.map(
