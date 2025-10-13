@@ -112,7 +112,6 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
                   />
                   {eligibility?.details && "*"}
                 </span>
-                \
               </span>
             </li>
             <li>

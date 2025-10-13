@@ -48,7 +48,6 @@ export default function NavBar({
             // groupName={"Heading"}
             className="lg:hidden"
             placeholder="Search..."
-            user={user}
           />
 
           {!isMobile && (

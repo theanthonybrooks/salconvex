@@ -610,7 +610,7 @@ const SubmissionFormOC1 = ({
                     render={({ field }) => (
                       <OcCustomDatePicker
                         disabled={pastEvent}
-                        value={field.value}
+                        value={field.value ?? String(Date.now())}
                         onChange={field.onChange}
                         pickerType="start"
                         className="hansel min-h-12"
