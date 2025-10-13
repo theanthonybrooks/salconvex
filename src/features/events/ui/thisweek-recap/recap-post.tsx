@@ -101,6 +101,7 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
                   className={cn(
                     !eligibility?.type?.includes("International") &&
                       "italic text-red-600",
+                    "inline-flex",
                   )}
                 >
                   <EligibilityLabel

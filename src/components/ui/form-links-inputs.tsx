@@ -42,42 +42,45 @@ const handleFields: {
   key: string;
   icon: React.ReactNode;
   platform: PlatformType;
-  placeholder: string;
+  placeholder: { event: string; org: string };
   primaryOption: boolean;
 }[] = [
   {
     key: "instagram",
     icon: <FaInstagram className={cn("size-5 shrink-0")} />,
     platform: "instagram",
-    placeholder: "@eventname",
+    placeholder: {
+      event: "@eventname",
+      org: "@organizer",
+    },
     primaryOption: true,
   },
   {
     key: "facebook",
     icon: <FaFacebook className={cn("size-5 shrink-0")} />,
     platform: "facebook",
-    placeholder: "@eventname",
+    placeholder: { event: "@eventname", org: "@organizer" },
     primaryOption: true,
   },
   {
     key: "threads",
     icon: <FaThreads className={cn("size-5 shrink-0")} />,
     platform: "threads",
-    placeholder: "@eventname",
+    placeholder: { event: "@eventname", org: "@organizer" },
     primaryOption: true,
   },
   {
     key: "youTube",
     icon: <FaYoutube className={cn("size-5 shrink-0")} />,
     platform: "youTube",
-    placeholder: "youtube.com/...",
+    placeholder: { event: "youtube.com/...", org: "youtube.com/..." },
     primaryOption: false,
   },
   {
     key: "vk",
     icon: <FaVk className={cn("size-5 shrink-0")} />,
     platform: "vk",
-    placeholder: "@eventname",
+    placeholder: { event: "@eventname", org: "@organizer" },
     primaryOption: true,
   },
 ];
@@ -496,7 +499,7 @@ export const FormLinksInput = ({
                             name={name}
                             platform={platform}
                             icon={icon}
-                            placeholder={placeholder}
+                            placeholder={placeholder.org}
                             primaryOption={primaryOption}
                             isOrg={true}
                             primaryField={primaryField}
@@ -521,7 +524,7 @@ export const FormLinksInput = ({
                       name={name}
                       platform={platform}
                       icon={icon}
-                      placeholder={placeholder}
+                      placeholder={placeholder.event}
                       disabled={eventSameAsOrg && isEvent}
                       primaryField={primaryField}
                       handleCheckSchema={handleCheckSchema}
@@ -543,7 +546,7 @@ export const FormLinksInput = ({
                       placeholder="linkedIn"
                       className={cn(
                         "flex-1",
-                        errors?.[type]?.links?.linkAggregate && "invalid-field",
+                        errors?.[type]?.links?.linkedIn && "invalid-field",
                       )}
                       transform={autoHttps}
                       onBlur={() => {
@@ -591,7 +594,10 @@ export const FormLinksInput = ({
                     disabled={eventSameAsOrg && isEvent}
                     field={field}
                     placeholder="other links..."
-                    className="flex-1"
+                    className={cn(
+                      "flex-1",
+                      errors?.[type]?.links?.other && "invalid-field",
+                    )}
                     transform={autoHttps}
                     onBlur={() => {
                       field.onBlur?.();
