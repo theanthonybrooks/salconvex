@@ -151,15 +151,27 @@ export const archiveExpiredOpenCalls = internalMutation({
           state: "archived",
           lastUpdatedAt: Date.now(),
         });
+        const eventLookup = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_openCallId", (q) => q.eq("openCallId", oc._id))
+          .first();
+        if (eventLookup) {
+          await ctx.db.patch(eventLookup._id, {
+            ocState: "archived",
+            lastEditedAt: Date.now(),
+            ...(event.category !== "event" ? { eventState: "archived" } : {}),
+          });
+        }
+
         const newOC = await ctx.db.get(oc._id);
-        await openCallsAggregate.replace(ctx, oc, newOC!);
+        if (newOC) await openCallsAggregate.replace(ctx, oc, newOC);
         if (event.category !== "event") {
           await ctx.db.patch(event._id, {
             state: "archived",
             lastEditedAt: Date.now(),
           });
           const newEvent = await ctx.db.get(event._id);
-          await eventsAggregate.replace(ctx, event, newEvent!);
+          if (newEvent) await eventsAggregate.replace(ctx, event, newEvent);
         }
       }
     }

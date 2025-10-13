@@ -21,13 +21,16 @@ export const useFilteredEventsQuery = (
   // artistData?: ArtistListActions,
   userAccountData?: UserAccountData,
 ) => {
-  return useQuery(api.thelist.getFilteredEventsPublic.getFilteredEventsPublic, {
-    filters,
-    sortOptions,
-    page: pagination.page,
-    source,
-    viewType,
-    // artistData,
-    userAccountData,
-  });
+  return useQuery(
+    api.thelist.getFilteredEventsPublicUpdate.getFilteredEventsPublic,
+    {
+      filters,
+      sortOptions,
+      page: pagination.page,
+      source,
+      viewType,
+      // artistData,
+      userAccountData,
+    },
+  );
 };

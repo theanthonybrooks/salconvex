@@ -13,6 +13,24 @@ const stripeIntervalPricesValidator = v.object({
   usd: stripePriceValidator,
 });
 
+export const eventStateValidator = v.union(
+  v.literal("draft"),
+  v.literal("editing"),
+  v.literal("submitted"),
+  v.literal("published"),
+  v.literal("archived"),
+);
+
+export const ocStateValidator = v.union(
+  v.literal("draft"),
+  v.literal("editing"),
+  v.literal("pending"),
+  v.literal("submitted"),
+  v.literal("published"),
+  v.literal("archived"),
+  v.literal("initial"),
+);
+
 export const typeValidator = v.array(
   v.union(
     v.literal("gjm"),
@@ -50,6 +68,29 @@ export const eventFormatValidator = v.union(
   v.literal("ongoing"),
 );
 
+export const hasOpenCallValidator = v.union(
+  v.literal("Fixed"),
+  v.literal("Rolling"),
+  v.literal("Email"),
+  v.literal("Invite"),
+  v.literal("Unknown"),
+  v.literal("False"),
+);
+
+export const callFormatValidator = v.union(
+  v.literal("RFQ"),
+  v.literal("RFP"),
+  v.literal("RFA"),
+);
+
+export const eligibilityTypeValidator = v.union(
+  v.literal("International"),
+  v.literal("National"),
+  v.literal("Regional/Local"),
+  v.literal("Other"),
+  v.literal("Unknown"),
+);
+
 export const supportCategoryValidator = v.union(
   v.literal("general"),
   v.literal("ui/ux"),
@@ -59,6 +100,11 @@ export const supportCategoryValidator = v.union(
   v.literal("event"),
   v.literal("openCall"),
   v.literal("other"),
+);
+
+export const postStatusValidator = v.union(
+  v.literal("posted"),
+  v.literal("toPost"),
 );
 
 export const supportCategoryArrayValidator = v.array(supportCategoryValidator);
@@ -282,14 +328,7 @@ const eventSchema = {
   logoStorageId: v.optional(v.id("_storage")),
   type: typeValidator,
   category: categoryValidator,
-  hasOpenCall: v.union(
-    v.literal("Fixed"),
-    v.literal("Rolling"),
-    v.literal("Email"),
-    v.literal("Invite"),
-    v.literal("Unknown"),
-    v.literal("False"),
-  ),
+  hasOpenCall: hasOpenCallValidator,
 
   dates: v.object({
     edition: v.number(),
@@ -364,14 +403,8 @@ const eventSchema = {
   otherInfo: v.optional(v.string()),
   timeLine: v.optional(v.string()),
   // state: v.string(), //draft, submitted, published, archived
-  state: v.union(
-    v.literal("draft"),
-    v.literal("editing"),
-    v.literal("submitted"),
-    v.literal("published"),
-    v.literal("archived"),
-  ),
-  posted: v.optional(v.union(v.literal("toPost"), v.literal("posted"))),
+  state: eventStateValidator,
+  posted: v.optional(postStatusValidator),
   postedAt: v.optional(v.number()),
   postedBy: v.optional(v.id("users")),
   active: v.optional(v.boolean()),
@@ -392,19 +425,42 @@ const eventOpenCallSchema = {
   eventId: v.id("events"),
   openCallId: v.id("openCalls"),
   edition: v.number(),
-  state: v.optional(
-    v.union(
-      v.literal("draft"),
-      v.literal("editing"),
-      v.literal("pending"),
-      v.literal("submitted"),
-      v.literal("published"),
-      v.literal("archived"),
-      v.literal("initial"),
-    ),
-  ),
+  state: v.optional(ocStateValidator),
   lastEdited: v.optional(v.number()),
 };
+
+//TODO: Only push to this once the event is approved and published
+
+const eventLookupSchema = {
+  eventId: v.id("events"),
+  openCallId: v.optional(v.id("openCalls")),
+  mainOrgId: v.id("organizations"),
+  orgName: v.optional(v.string()),
+  ownerId: v.id("users"),
+  eventName: v.string(),
+  eventSlug: v.string(),
+  eventState: v.optional(eventStateValidator),
+  // eventState: v.optional(v.string()),
+  eventCategory: v.optional(categoryValidator),
+  // eventCategory: v.optional(v.string()),
+  eventType: v.optional(typeValidator),
+  // eventType: v.optional(v.string()),
+  country: v.string(),
+  continent: v.string(),
+  eventStart: v.optional(v.string()),
+  hasOpenCall: v.boolean(),
+  postStatus: v.optional(postStatusValidator),
+  ocState: v.optional(ocStateValidator),
+  callType: v.optional(hasOpenCallValidator),
+  callFormat: v.optional(callFormatValidator),
+  eligibilityType: v.optional(eligibilityTypeValidator),
+  ocStart: v.optional(v.string()),
+  ocEnd: v.optional(v.string()),
+  eventApprovedAt: v.optional(v.number()),
+  ocApprovedAt: v.optional(v.number()),
+  lastEditedAt: v.optional(v.number()),
+};
+
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
 const openCallSchema = {
   adminNoteOC: v.optional(v.string()),
@@ -413,7 +469,7 @@ const openCallSchema = {
   mainOrgId: v.id("organizations"),
   basicInfo: v.object({
     appFee: v.number(),
-    callFormat: v.union(v.literal("RFQ"), v.literal("RFP"), v.literal("RFA")),
+    callFormat: callFormatValidator,
     callType: v.union(
       v.literal("Fixed"),
       v.literal("Rolling"),
@@ -430,13 +486,7 @@ const openCallSchema = {
     }),
   }),
   eligibility: v.object({
-    type: v.union(
-      v.literal("International"),
-      v.literal("National"),
-      v.literal("Regional/Local"),
-      v.literal("Other"),
-      v.literal("Unknown"),
-    ),
+    type: eligibilityTypeValidator,
     //todo: later, add some method/additional fields that will enter in codes for country, region, etc. Maybe start small. Could be tables in the db, so they're easy to query and filter from convex. Then, use that to show user calls that they are or aren't eligible for. Could be put in as a systemic check to ensure that organizers aren't getting ineligible applicants.
     whom: v.array(v.string()),
     details: v.optional(v.string()),
@@ -751,6 +801,72 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_openCallId", ["openCallId"]),
 
+  eventLookup: defineTable(eventLookupSchema)
+    // Common filters
+    // .index("by_eventName", ["eventName"])
+    // .index("by_eventCategory", ["eventCategory"])
+    // .index("by_eventType", ["eventType"])
+    // .index("by_continent", ["continent"])
+    // .index("by_country", ["country"])
+
+    // // Relationships
+    .index("by_mainOrgId", ["mainOrgId"])
+    .index("by_ownerId", ["ownerId"])
+    .index("by_eventId", ["eventId"])
+    .index("by_openCallId", ["openCallId"])
+
+    // // Timing filters
+    // .index("by_eventStart", ["eventStart"])
+    // .index("by_lastEditedAt", ["lastEditedAt"])
+
+    // // Open Call filters
+    .index("by_ocState", ["ocState"])
+    .index("by_eventState", ["eventState"])
+    .index("by_hasOpenCall", ["hasOpenCall"])
+    // .index("by_eligibilityType", ["eligibilityType"])
+
+    // // Filtering combinations
+    // .index("by_eventState_eventCategory", ["eventState", "eventCategory"])
+    .index("by_eventState_hasOpenCall", ["eventState", "hasOpenCall"])
+    // .index("by_eventState_postStatus", ["eventState", "postStatus"])
+    // .index("by_eventState_callType", ["eventState", "callType"])
+    // .index("by_eventState_lastEdited", ["eventState", "lastEditedAt"])
+    // .index("oc_eSt_oSt_nam_cat_typ_evSta_cont_ctry_org_elT_cT_cF_pS", [
+    //   // "lastEditedAt",
+    //   "hasOpenCall",
+    //   "eventState",
+    //   "ocState",
+    //   "eventName",
+    //   "eventCategory",
+    //   // "eventType",
+    //   // "eventStart",
+    //   // "continent",
+    //   // "country",
+    //   "mainOrgId",
+    //   "eligibilityType",
+    //   "callType",
+    //   "callFormat",
+    //   "postStatus",
+    // ])
+    .index("oc_eSt_oSt_nam_cat_typ_evSta_cont_ctry_org_elT_cT_cF_pS", [
+      // "lastEditedAt",
+      "hasOpenCall",
+      "eventState",
+      "ocState",
+      "eventName",
+      "eventCategory",
+      "eventType",
+      "eventStart",
+      "continent",
+      // "country",
+      "mainOrgId",
+      "eligibilityType",
+      "callType",
+      "callFormat",
+      "postStatus",
+    ]),
+  // .index("by_eventState_ocState_category_type_continent_eligibilityType_callType_callFormat_postStatus", ["eventState", "ocState", "eventCategory", "eventType", "continent", "eligibilityType", "callType", "callFormat", "postStatus"])
+
   openCalls: defineTable(openCallSchema)
     .searchIndex("search_by_eventId", {
       searchField: "eventId",
@@ -765,6 +881,7 @@ export default defineSchema({
 
     .index("by_eventId", ["eventId"])
     .index("by_eventId_and_state", ["eventId", "state"])
+    .index("by_eventId_approvedAt", ["eventId", "approvedAt"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_budget", ["compensation.budget.min"])

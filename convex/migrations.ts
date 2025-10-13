@@ -16,27 +16,91 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
-export const clearEventsAggregate = migrations.define({
+export const populateEventLookupTest = migrations.define({
+  table: "events", // The table to walk through
+  migrateOne: async (ctx, event) => {
+    if (!event.approvedAt) {
+      return; // Only migrate events with approvedAt set
+    }
+
+    const org = await ctx.db.get(event.mainOrgId);
+    if (!org) {
+      return; // Skip if organization is not found
+    }
+
+    const hasOpenCall =
+      event.hasOpenCall === "Fixed" ||
+      event.hasOpenCall === "Rolling" ||
+      event.hasOpenCall === "Email";
+
+    // Find the related openCall, if any
+    const openCall = hasOpenCall
+      ? await ctx.db
+          .query("openCalls")
+          .withIndex("by_eventId_approvedAt", (q) =>
+            q.eq("eventId", event._id).gt("approvedAt", undefined),
+          )
+          .unique()
+      : null;
+
+    // Build the eventLookup document
+    const eventLookupDoc = {
+      eventId: event._id,
+      openCallId: openCall?._id,
+      mainOrgId: event.mainOrgId,
+      orgName: org.name,
+      ownerId: org.ownerId,
+      eventName: event.name,
+      eventSlug: event.slug,
+      eventState: event.state,
+      eventCategory: event.category,
+      eventType: event.type,
+      country: event.location.country,
+      continent: event.location.continent ?? "",
+      eventStart: event.dates.eventStart,
+      hasOpenCall,
+      postStatus: event.posted,
+      ocState: openCall?.state,
+      callType: openCall?.basicInfo.callType ?? undefined,
+      callFormat: openCall?.basicInfo.callFormat ?? undefined,
+      eligibilityType: openCall?.eligibility.type ?? undefined,
+      ocStart: openCall?.basicInfo.dates.ocStart ?? undefined,
+      ocEnd: openCall?.basicInfo.dates.ocEnd ?? undefined,
+      eventApprovedAt: event.approvedAt,
+      ocApprovedAt: openCall?.approvedAt,
+      lastEditedAt: event.lastEditedAt ?? event.approvedAt,
+    };
+
+    // Insert into eventLookup
+    await ctx.db.insert("eventLookup", eventLookupDoc);
+  },
+});
+
+export const runPEL2 = migrations.runner(
+  internal.migrations.populateEventLookupTest,
+);
+
+export const clearEventsAggregate2 = migrations.define({
   table: "events",
   migrateOne: async (ctx, event) => {
     await eventsAggregate.clear(ctx);
   },
 });
 
-export const backfillEventsAggregate1 = migrations.define({
+export const backfillEventsAggregate2 = migrations.define({
   table: "events",
   migrateOne: async (ctx, event) => {
     await eventsAggregate.insertIfDoesNotExist(ctx, event);
   },
 });
 
-export const clearOCAggregate = migrations.define({
+export const clearOCAggregate2 = migrations.define({
   table: "events",
   migrateOne: async (ctx, event) => {
     await openCallsAggregate.clear(ctx);
   },
 });
-export const backfillOCAggregate1 = migrations.define({
+export const backfillOCAggregate2 = migrations.define({
   table: "openCalls",
   migrateOne: async (ctx, doc) => {
     await openCallsAggregate.insertIfDoesNotExist(ctx, doc);
@@ -44,17 +108,17 @@ export const backfillOCAggregate1 = migrations.define({
 });
 
 export const runBFA = migrations.runner([
-  internal.migrations.clearEventsAggregate,
-  internal.migrations.clearOCAggregate,
-  internal.migrations.backfillEventsAggregate1,
-  internal.migrations.backfillOCAggregate1,
+  internal.migrations.clearEventsAggregate2,
+  internal.migrations.clearOCAggregate2,
+  internal.migrations.backfillEventsAggregate2,
+  internal.migrations.backfillOCAggregate2,
 ]);
 
 export const runBackfillEA = migrations.runner(
-  internal.migrations.backfillEventsAggregate1,
+  internal.migrations.backfillEventsAggregate2,
 );
 export const runBackfillOCA = migrations.runner(
-  internal.migrations.backfillOCAggregate1,
+  internal.migrations.backfillOCAggregate2,
 );
 
 // export const addDefaultNewsletterTypeandFrequency = migrations.define({

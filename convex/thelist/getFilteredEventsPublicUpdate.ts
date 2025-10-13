@@ -10,9 +10,7 @@ import { Infer, v } from "convex/values";
 import { addDays, addWeeks, endOfWeek, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
-import { mergedStream, stream } from "convex-helpers/server/stream";
 import type { Id } from "~/convex/_generated/dataModel";
-import type { QueryCtx } from "~/convex/_generated/server";
 import schema from "~/convex/schema";
 
 export const filtersSchema = v.object({
@@ -41,115 +39,6 @@ export const viewTypeSchema = v.union(
 export type ViewTypeOptions = Infer<typeof viewTypeSchema>;
 
 export type Filters = Infer<typeof filtersSchema>;
-
-export async function buildEventQuery(
-  ctx: QueryCtx,
-  options: {
-    table: "events";
-    // table: "events" | "openCalls";
-    // state?: SubmissionFormState;
-    filters: Filters;
-    bookmarkedIds: Id<"events">[];
-    hiddenIds: Id<"events">[];
-    isAdmin: boolean;
-    onlyWithOpenCall?: boolean;
-    hideArchived?: boolean;
-    view?: ViewTypeOptions;
-  },
-) {
-  const {
-    table,
-    // state,
-    filters,
-    bookmarkedIds,
-    hiddenIds,
-    isAdmin,
-    onlyWithOpenCall,
-    hideArchived,
-    view,
-  } = options;
-
-  const streams = [];
-  if (view === "openCall" || view === "archive" || view === "organizer") {
-    if (!hideArchived) {
-      streams.push(
-        stream(ctx.db, schema)
-          .query(table)
-          .withIndex("by_state_approvedAt", (q) =>
-            q.eq("state", "archived").gt("approvedAt", undefined),
-          ),
-      );
-    }
-    streams.push(
-      stream(ctx.db, schema)
-        .query(table)
-        .withIndex("by_state_approvedAt", (q) =>
-          q.eq("state", "published").gt("approvedAt", undefined),
-        ),
-    );
-  } else if (view === "event") {
-    streams.push(
-      stream(ctx.db, schema)
-        .query(table)
-        .withIndex("by_state_category", (q) =>
-          q.eq("state", "published").eq("category", "event"),
-        ),
-    );
-  }
-
-  let mergeOrder: string[];
-  if (view === "event") {
-    mergeOrder = ["state", "category", "_creationTime"];
-  } else {
-    mergeOrder = ["state", "approvedAt", "_creationTime"];
-  }
-  let merged = mergedStream(streams, mergeOrder);
-
-  if (filters.bookmarkedOnly && bookmarkedIds.length > 0) {
-    merged = merged.filterWith(async (event) =>
-      bookmarkedIds.includes(event._id),
-    );
-  }
-
-  if (!filters.showHidden && hiddenIds.length > 0) {
-    merged = merged.filterWith(async (event) => !hiddenIds.includes(event._id));
-  }
-
-  if (filters.eventCategories && filters.eventCategories?.length > 0) {
-    merged = merged.filterWith(async (event) =>
-      filters.eventCategories!.includes(event.category),
-    );
-  }
-
-  if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
-    merged = merged.filterWith(
-      async (event) => event.posted === filters.postStatus,
-    );
-  }
-
-  if (onlyWithOpenCall) {
-    merged = merged.filterWith(async (event) =>
-      validOCVals.includes(event.hasOpenCall),
-    );
-  }
-
-  if (filters.eventTypes?.length) {
-    merged = merged.filterWith(async (event) =>
-      Array.isArray(event.type)
-        ? event.type.some((t) => filters.eventTypes!.includes(t))
-        : filters.eventTypes!.includes(event.type),
-    );
-  }
-
-  if (filters.continent?.length) {
-    merged = merged.filterWith(async (event) =>
-      event.location?.continent
-        ? filters.continent!.includes(event.location.continent)
-        : false,
-    );
-  }
-  return merged.collect();
-}
 
 export const getFilteredEventsPublic = query({
   args: {
@@ -205,6 +94,7 @@ export const getFilteredEventsPublic = query({
     // const hiddenIds = artistData?.hidden ?? [];
     const subscription = userAccountData?.subscription ?? null;
     const userOrgIds = userAccountData?.userOrgs ?? [];
+    let totalOpenCalls = 0;
 
     const view = viewType ?? "openCall";
 
@@ -258,103 +148,115 @@ export const getFilteredEventsPublic = query({
 
     let events = [];
 
-    if (view === "orgView") {
-      const eventArrays = await Promise.all(
-        Array.from(userOrgIds).map((orgId) =>
-          ctx.db
-            .query("events")
-            .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", orgId))
-            .collect(),
-        ),
-      );
-      events = eventArrays.flat();
-      if (filters.eventCategories?.length) {
-        events = events.filter((e) =>
-          filters.eventCategories!.includes(e.category),
-        );
-      }
-      //note-to-self: maybe add this back later
-      // if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
-      //   events = events.filter((e) => e.posted === filters.postStatus);
-      // }
-      if (filters.eventTypes?.length) {
-        events = events.filter((e) =>
-          Array.isArray(e.type)
-            ? e.type.some((t) => filters.eventTypes!.includes(t))
-            : filters.eventTypes!.includes(e.type),
-        );
-      }
-      if (filters.continent?.length) {
-        events = events.filter(
-          (e) =>
-            e.location?.continent &&
-            filters.continent!.includes(e.location.continent),
-        );
-      }
-    } else {
-      const shouldFilterByOpenCall =
-        thisWeekPg || nextWeekPg || view === "openCall";
-      events = await buildEventQuery(ctx, {
-        table: "events",
-        // state: "published",
-        filters,
-        bookmarkedIds,
-        hiddenIds,
-        isAdmin: !!isAdmin,
-        onlyWithOpenCall: shouldFilterByOpenCall,
-        hideArchived: view === "openCall" && !(thisWeekPg || nextWeekPg),
-        view,
+    let lookupResults = [];
+
+    if (view === "openCall" && !thisWeekPg && !nextWeekPg) {
+      lookupResults = await ctx.db
+        .query("eventLookup")
+        .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
+        .collect();
+    } else if (thisWeekPg || nextWeekPg) {
+      lookupResults = await ctx.db
+        .query("eventLookup")
+        .withIndex("by_hasOpenCall", (q) => q.eq("hasOpenCall", true))
+        .collect();
+
+      // Sort by ocEnd ascending (soonest first)
+      lookupResults.sort((a, b) => {
+        const aEnd = a.ocEnd ? new Date(a.ocEnd).getTime() : Infinity;
+        const bEnd = b.ocEnd ? new Date(b.ocEnd).getTime() : Infinity;
+        return aEnd - bEnd;
       });
+
+      // Limit to the first 100 after sorting
+      lookupResults = lookupResults.slice(0, 100);
+    } else if (view === "event") {
+      lookupResults = await ctx.db
+        .query("eventLookup")
+        .withIndex("by_eventState", (q) => q.eq("eventState", "published"))
+        .collect();
+    } else if (view === "archive" || view === "organizer") {
+      lookupResults = await ctx.db.query("eventLookup").collect();
+    } else if (view === "orgView" && userId) {
+      lookupResults = await ctx.db
+        .query("eventLookup")
+        .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
+        .collect();
+    } else {
+      lookupResults = await ctx.db.query("eventLookup").collect();
     }
 
-    let totalResults = 0;
-    const publishedOpenCalls = await ctx.db
-      .query("openCalls")
-      // .withIndex("by_state", (q) => q.eq("state", "published"))
-      .withIndex("by_state_ocEnd", (q) =>
-        thisWeekPg || nextWeekPg
-          ? q
-              .eq("state", "published")
-              .gt("basicInfo.dates.ocEnd", weekStartISO)
-              .lt("basicInfo.dates.ocEnd", weekEndISO)
-          : q.eq("state", "published").gt("basicInfo.dates.ocEnd", null),
-      )
-      .collect();
-    const archivedOpenCalls =
-      view === "openCall" && !(thisWeekPg || nextWeekPg)
-        ? []
-        : await ctx.db
-            .query("openCalls")
-            // .withIndex("by_state", (q) => q.eq("state", "archived"))
-            .withIndex("by_state_ocEnd", (q) =>
-              thisWeekPg || nextWeekPg
-                ? q
-                    .eq("state", "archived")
-                    .gt("basicInfo.dates.ocEnd", weekStartISO)
-                    .lt("basicInfo.dates.ocEnd", weekEndISO)
-                : q.eq("state", "archived").gt("basicInfo.dates.ocEnd", null),
-            )
-            .collect();
-    const allOpenCalls = [...publishedOpenCalls, ...archivedOpenCalls];
+    if (
+      (thisWeekPg || nextWeekPg || view === "openCall") &&
+      !hasActiveSubscription &&
+      !isAdmin
+    ) {
+      totalOpenCalls = lookupResults.length;
+      lookupResults = lookupResults.slice(0, 20);
+    }
+    //TODO: Add back the other filters before the rest of this runs. Can also limit the queries here for the thisweek and public open call page?
 
-    const openCallsByEventId = new Map(
-      allOpenCalls.map((oc) => [oc.eventId, oc]),
-    );
+    // Now extract the eventIds from the lookup table
+    const eventIds = lookupResults
+      .map((r) => r.eventId)
+      .filter(Boolean) as Id<"events">[];
 
-    const orgIds = [...new Set(events.map((e) => e.mainOrgId).filter(Boolean))];
-    const allOrgs = await Promise.all(orgIds.map((id) => ctx.db.get(id)));
     const orgNameMap = new Map(
-      allOrgs.filter(Boolean).map((org) => [org?._id, org?.name]),
+      lookupResults.map((r) => [r.mainOrgId, r.orgName]),
     );
+
+    const openCallEventPairs: [Id<"events">, Id<"openCalls">][] = lookupResults
+      .filter((r) => r.eventId && r.openCallId)
+      .map((r) => [r.eventId as Id<"events">, r.openCallId as Id<"openCalls">]);
+
+    const openCallIdByEventId = new Map(openCallEventPairs);
+
+    // Fetch the corresponding events
+    const fetchedEvents = await Promise.all(
+      eventIds.map((id) => ctx.db.get(id)),
+    );
+    events = fetchedEvents.filter((e): e is NonNullable<typeof e> => !!e);
+    if (filters.showHidden && hiddenIds.length > 0) {
+      events = events.filter((e) => !hiddenIds.includes(e._id));
+    }
+    if (filters.bookmarkedOnly && bookmarkedIds.length > 0) {
+      events = events.filter((e) => bookmarkedIds.includes(e._id));
+    }
+    if (filters.eventCategories?.length) {
+      events = events.filter((e) =>
+        filters.eventCategories!.includes(e.category),
+      );
+    }
+    if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
+      events = events.filter((e) => e.posted === filters.postStatus);
+    }
+    if (filters.eventTypes?.length) {
+      events = events.filter((e) =>
+        Array.isArray(e.type)
+          ? e.type.some((t) => filters.eventTypes!.includes(t))
+          : filters.eventTypes!.includes(e.type),
+      );
+    }
+    if (filters.continent?.length) {
+      events = events.filter(
+        (e) =>
+          e.location?.continent &&
+          filters.continent!.includes(e.location.continent),
+      );
+    }
+    let totalResults = 0;
 
     const enriched = await Promise.all(
       events.map(async (event) => {
         const isUserOrg =
           event.mainOrgId && userOrgIds.includes(event.mainOrgId);
         const eventHasOpenCall = validOCVals.includes(event.hasOpenCall);
-        let openCall = null;
-        openCall = eventHasOpenCall ? openCallsByEventId.get(event._id) : null;
+        const openCallId = openCallIdByEventId.get(event._id);
 
+        let openCall = null;
+        if (openCallId && eventHasOpenCall) {
+          openCall = await ctx.db.get(openCallId);
+        }
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;
         let orgName: string | null = null;
@@ -481,10 +383,12 @@ export const getFilteredEventsPublic = query({
       ),
     );
 
-    const filteredTotalOpenCalls = filtered.reduce(
-      (acc, e) => acc + (e.hasActiveOpenCall ? 1 : 0),
-      0,
-    );
+    if (hasActiveSubscription) {
+      totalOpenCalls = filtered.reduce(
+        (acc, e) => acc + (e.hasActiveOpenCall ? 1 : 0),
+        0,
+      );
+    }
 
     let viewFiltered = sorted;
     if (view === "event") {
@@ -525,7 +429,7 @@ export const getFilteredEventsPublic = query({
     return {
       results: paginated,
       total: totalResults,
-      totalOpenCalls: filteredTotalOpenCalls,
+      totalOpenCalls,
       weekStartISO,
       weekEndISO,
       ...(view === "archive" ? { totalActive, totalArchived } : {}),
