@@ -79,9 +79,7 @@ const ClientEventList = () => {
   // const isOrganizer = accountType?.includes("organizer");
   const { hasOrgEvents } = orgData ?? {};
 
-  const isAdmin = user?.role?.includes("admin");
-  const hasActiveSubscription =
-    (subStatus?.hasActiveSubscription || isAdmin) ?? false;
+  const hasActiveSubscription = subStatus?.hasActiveSubscription;
   // const hasValidSub = hasActiveSubscription && isArtist;
   const publicView = !hasActiveSubscription || !isArtist;
   const publicEventOnly =
@@ -178,6 +176,7 @@ const ClientEventList = () => {
       subscription: subscription ?? undefined,
       userOrgs: orgData?.orgIds ?? [],
     },
+    !hasActiveSubscription,
   );
   void useFilteredEventsQuery(
     filters,
@@ -195,6 +194,7 @@ const ClientEventList = () => {
       subscription: subscription ?? undefined,
       userOrgs: orgData?.orgIds ?? [],
     },
+    !hasActiveSubscription,
   );
 
   const total = queryResult?.total ?? 0;

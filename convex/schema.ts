@@ -828,6 +828,8 @@ export default defineSchema({
     // // Filtering combinations
     // .index("by_eventState_eventCategory", ["eventState", "eventCategory"])
     .index("by_eventState_hasOpenCall", ["eventState", "hasOpenCall"])
+    .index("by_hasOpenCall_ocEnd", ["hasOpenCall", "ocEnd"])
+    .index("by_ocState_ocEnd", ["ocState", "ocEnd"])
     // .index("by_eventState_postStatus", ["eventState", "postStatus"])
     // .index("by_eventState_callType", ["eventState", "callType"])
     // .index("by_eventState_lastEdited", ["eventState", "lastEditedAt"])

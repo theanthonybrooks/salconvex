@@ -7,7 +7,7 @@ import { OpenCallStatus, validOCVals } from "@/types/openCall";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { doc } from "convex-helpers/validators";
 import { Infer, v } from "convex/values";
-import { addDays, addWeeks, endOfWeek, startOfWeek } from "date-fns";
+import { addDays, addMonths, addWeeks, endOfWeek, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 import type { Id } from "~/convex/_generated/dataModel";
@@ -130,8 +130,10 @@ export const getFilteredEventsPublic = query({
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
     const endDay = endOfWeek(refDate, { weekStartsOn: 1 });
     const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
+    const monthFromNow = addMonths(refDate, 1);
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
+    const monthFromNowISO = monthFromNow.toISOString();
 
     const listActions =
       user?._id && hasActiveSubscription
@@ -151,25 +153,32 @@ export const getFilteredEventsPublic = query({
     let lookupResults = [];
 
     if (view === "openCall" && !thisWeekPg && !nextWeekPg) {
-      lookupResults = await ctx.db
-        .query("eventLookup")
-        .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
-        .collect();
+      if (!hasActiveSubscription && !isAdmin) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_ocState_ocEnd", (q) =>
+            q
+              .eq("ocState", "published")
+              .gte("ocEnd", weekStartISO)
+              .lte("ocEnd", monthFromNowISO),
+          )
+          .collect();
+      } else {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
+          .collect();
+      }
     } else if (thisWeekPg || nextWeekPg) {
       lookupResults = await ctx.db
         .query("eventLookup")
-        .withIndex("by_hasOpenCall", (q) => q.eq("hasOpenCall", true))
+        .withIndex("by_hasOpenCall_ocEnd", (q) =>
+          q
+            .eq("hasOpenCall", true)
+            .gte("ocEnd", weekStartISO)
+            .lte("ocEnd", weekEndISO),
+        )
         .collect();
-
-      // Sort by ocEnd ascending (soonest first)
-      lookupResults.sort((a, b) => {
-        const aEnd = a.ocEnd ? new Date(a.ocEnd).getTime() : Infinity;
-        const bEnd = b.ocEnd ? new Date(b.ocEnd).getTime() : Infinity;
-        return aEnd - bEnd;
-      });
-
-      // Limit to the first 100 after sorting
-      lookupResults = lookupResults.slice(0, 100);
     } else if (view === "event") {
       lookupResults = await ctx.db
         .query("eventLookup")
@@ -192,7 +201,7 @@ export const getFilteredEventsPublic = query({
       !isAdmin
     ) {
       totalOpenCalls = lookupResults.length;
-      lookupResults = lookupResults.slice(0, 20);
+      // lookupResults = lookupResults.slice(0, 20);
     }
     //TODO: Add back the other filters before the rest of this runs. Can also limit the queries here for the thisweek and public open call page?
 

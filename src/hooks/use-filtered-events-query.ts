@@ -20,17 +20,20 @@ export const useFilteredEventsQuery = (
   viewType?: ViewOptions,
   // artistData?: ArtistListActions,
   userAccountData?: UserAccountData,
+  disabled?: boolean,
 ) => {
   return useQuery(
     api.thelist.getFilteredEventsPublicUpdate.getFilteredEventsPublic,
-    {
-      filters,
-      sortOptions,
-      page: pagination.page,
-      source,
-      viewType,
-      // artistData,
-      userAccountData,
-    },
+    !disabled
+      ? {
+          filters,
+          sortOptions,
+          page: pagination.page,
+          source,
+          viewType,
+          // artistData,
+          userAccountData,
+        }
+      : "skip",
   );
 };
