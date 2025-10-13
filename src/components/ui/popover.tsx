@@ -88,7 +88,7 @@ const CustomArrow = React.forwardRef<SVGSVGElement, CustomArrowProps>(
 CustomArrow.displayName = "CustomArrow";
 
 const PopoverContent = React.forwardRef<
-  React.ElementRef<typeof PopoverPrimitive.Content>,
+  React.ComponentRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
     showCloseButton?: boolean;
     shiftOffset?: number;

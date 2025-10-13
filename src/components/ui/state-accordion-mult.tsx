@@ -9,7 +9,7 @@ import * as React from "react";
 const AccordionMult = AccordionPrimitive.Root;
 
 const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
+  React.ComponentRef<typeof AccordionPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Item
@@ -26,7 +26,7 @@ interface AccordionTriggerProps
 }
 
 const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
+  React.ComponentRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
 >(({ className, title, ...props }, ref) => (
   <AccordionPrimitive.Header className="flex">
@@ -51,7 +51,7 @@ const AccordionTrigger = React.forwardRef<
 AccordionTrigger.displayName = "AccordionTrigger";
 
 const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content

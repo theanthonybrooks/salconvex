@@ -424,7 +424,6 @@ export default function NavBar(
                       source={dashboardNavItems}
                       className="lg:hidden"
                       placeholder="Search..."
-                      user={user}
                     />
                   )}
                 </div>
@@ -462,7 +461,7 @@ export default function NavBar(
 }
 
 export const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
+  React.ComponentRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & { href: string }
 >(({ className, title, children, href, ...props }, ref) => {
   return (

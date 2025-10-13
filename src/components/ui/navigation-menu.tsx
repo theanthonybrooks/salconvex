@@ -12,7 +12,7 @@ interface NavigationMenuProps
   vpClassName?: string;
 }
 const NavigationMenu = React.forwardRef<
-  React.ElementRef<typeof NavigationMenuPrimitive.Root>,
+  React.ComponentRef<typeof NavigationMenuPrimitive.Root>,
   NavigationMenuProps
 >(({ align, className, vpClassName, children, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
@@ -30,7 +30,7 @@ const NavigationMenu = React.forwardRef<
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
 const NavigationMenuList = React.forwardRef<
-  React.ElementRef<typeof NavigationMenuPrimitive.List>,
+  React.ComponentRef<typeof NavigationMenuPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.List>
 >(({ className, ...props }, ref) => (
   <NavigationMenuPrimitive.List
@@ -57,7 +57,7 @@ type NavigationMenuTriggerProps = React.ComponentPropsWithoutRef<
 };
 
 const NavigationMenuTrigger = React.forwardRef<
-  React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
+  React.ComponentRef<typeof NavigationMenuPrimitive.Trigger>,
   NavigationMenuTriggerProps
 >(({ isCurrent, className, children, ...props }, ref) => (
   <NavigationMenuPrimitive.Trigger
@@ -93,7 +93,7 @@ interface NavigationMenuContentProps
 }
 
 const NavigationMenuContent = React.forwardRef<
-  React.ElementRef<typeof NavigationMenuPrimitive.Content>,
+  React.ComponentRef<typeof NavigationMenuPrimitive.Content>,
   NavigationMenuContentProps
 >(({ align = "left", className, ...props }, ref) => (
   <NavigationMenuPrimitive.Content
@@ -119,7 +119,7 @@ interface NavigationMenuViewportProps
 }
 
 const NavigationMenuViewport = React.forwardRef<
-  React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
+  React.ComponentRef<typeof NavigationMenuPrimitive.Viewport>,
   NavigationMenuViewportProps
 >(({ align = "left", vpClassName, className, ...props }, ref) => (
   <div
@@ -143,7 +143,7 @@ NavigationMenuViewport.displayName =
   NavigationMenuPrimitive.Viewport.displayName;
 
 const NavigationMenuIndicator = React.forwardRef<
-  React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
+  React.ComponentRef<typeof NavigationMenuPrimitive.Indicator>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Indicator>
 >(({ className, ...props }, ref) => (
   <NavigationMenuPrimitive.Indicator

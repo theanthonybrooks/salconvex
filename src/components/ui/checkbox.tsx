@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { FaCheck } from "react-icons/fa";
 
 const Checkbox = React.forwardRef<
-  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
     size?: string;
     checkSize?: string;

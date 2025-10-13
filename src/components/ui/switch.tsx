@@ -6,7 +6,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const Switch = React.forwardRef<
-  // React.ElementRef<typeof SwitchPrimitives.Root>,
+  // React.ComponentRef<typeof SwitchPrimitives.Root>,
   React.ComponentRef<typeof SwitchPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
 >(({ className, ...props }, ref) => (
@@ -20,7 +20,7 @@ const Switch = React.forwardRef<
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        "ring-1.5 pointer-events-none block size-3 rounded-full shadow-lg ring-primary transition-transform data-[state=checked]:translate-x-[18px] data-[state=unchecked]:translate-x-1 data-[state=checked]:bg-background data-[state=unchecked]:bg-background",
+        "pointer-events-none block size-3 rounded-full shadow-lg ring-1.5 ring-primary transition-transform data-[state=checked]:translate-x-[18px] data-[state=unchecked]:translate-x-1 data-[state=checked]:bg-background data-[state=unchecked]:bg-background",
       )}
     />
   </SwitchPrimitives.Root>

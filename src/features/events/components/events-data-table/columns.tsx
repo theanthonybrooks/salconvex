@@ -382,7 +382,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         const hasOC = !!openCallId;
         const edition = event.dates.edition;
         const slug = event.slug;
-        const eventApproved = typeof event.approvedAt === "number";
+        // const eventApproved = typeof event.approvedAt === "number";
         const postStatus = event.posted;
 
         // const openCallState = event.openCallState;
