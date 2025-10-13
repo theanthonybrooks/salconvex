@@ -94,9 +94,13 @@ export const RateUnitValues = ["ft²", "m²", ""] as const;
 
 export type RateUnit = (typeof RateUnitValues)[number];
 
-export const openCallLinkFormatValues = ["https://", "mailto:"] as const;
+export const openCallLinkFormatOptions = [
+  { value: "https://", label: "https://" },
+  { value: "mailto:", label: "mailto:" },
+] as const;
 
-export type OpenCallLinkFormat = (typeof openCallLinkFormatValues)[number];
+export type OpenCallLinkFormat =
+  (typeof openCallLinkFormatOptions)[number]["value"];
 
 export type openCallFileType = {
   id?: Id<"openCallFiles">;

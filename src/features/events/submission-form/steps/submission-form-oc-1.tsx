@@ -10,6 +10,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSimple,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -23,6 +24,7 @@ import {
   eligibilityOptionValues,
   EligibilityType,
   openCallFileType,
+  openCallLinkFormatOptions,
 } from "@/types/openCall";
 import { User } from "@/types/user";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
@@ -210,6 +212,11 @@ const SubmissionFormOC1 = ({
       setValue("openCall.basicInfo.appFee", 0);
     }
   }, [freeCall, setValue]);
+
+  useEffect(() => {
+    if (!openCall?.basicInfo?.dates?.ocStart)
+      setValue("openCall.basicInfo.dates.ocStart", new Date().toISOString());
+  });
 
   // #endregion
   // console.log("Open Call", openCall);
@@ -610,7 +617,7 @@ const SubmissionFormOC1 = ({
                     render={({ field }) => (
                       <OcCustomDatePicker
                         disabled={pastEvent}
-                        value={field.value ?? String(Date.now())}
+                        value={field.value}
                         onChange={field.onChange}
                         pickerType="start"
                         className="hansel min-h-12"
@@ -773,33 +780,36 @@ const SubmissionFormOC1 = ({
                         control={control}
                         render={({ field }) => {
                           return (
-                            <Select
-                              disabled={pastEvent}
-                              onValueChange={(
-                                value: "mailto:" | "https://",
-                              ) => {
-                                field.onChange(value);
-                              }}
-                              value={field.value}
-                            >
-                              <SelectTrigger
-                                tabIndex={11}
-                                className={cn(
-                                  "w-24 rounded border bg-card text-center text-base sm:h-11",
-                                  emailType && "hidden",
-                                )}
-                              >
-                                <SelectValue placeholder="(Type)" />
-                              </SelectTrigger>
-                              <SelectContent className="min-w-auto">
-                                <SelectItem fit value="mailto:">
-                                  Email
-                                </SelectItem>
-                                <SelectItem fit value="https://">
-                                  URL
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
+                        <>
+                      {/*        // <Select
+                              //   disabled={pastEvent}
+                              //   onValueChange={(
+                              //     value: "mailto:" | "https://",
+                              //   ) => {
+                              //     field.onChange(value);
+                              //   }}
+                              //   value={field.value}
+                              // >
+                              //   <SelectTrigger
+                              //     tabIndex={11}
+                              //     className={cn(
+                              //       "w-24 rounded border bg-card text-center text-base sm:h-11",
+                              //       emailType && "hidden",
+                              //     )}
+                              //   >
+                              //     <SelectValue placeholder="(Type)" />
+                              //   </SelectTrigger>
+                              //   <SelectContent className="min-w-auto">
+                              //     <SelectItem fit value="mailto:">
+                              //       Email
+                              //     </SelectItem>
+                              //     <SelectItem fit value="https://">
+                              //       URL
+                              //     </SelectItem>
+                              //   </SelectContent>
+                              // </Select>*/}
+                              <SelectSimple options={[...openCallLinkFormatOptions]} value={field.value} onChangeAction={(value) => field.onChange(value)} placeholder="Link Format" className="w-24 rounded border bg-card text-center text-base sm:h-11" />
+                        </>
                           );
                         }}
                       />

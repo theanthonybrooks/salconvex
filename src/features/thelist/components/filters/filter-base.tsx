@@ -15,10 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { ViewOptions } from "@/features/events/event-list-client";
-import {
-  SearchType,
-  TheListFilterCommandItem,
-} from "@/features/thelist/components/filter-drawer";
+
 import { select_continents } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import {
@@ -56,6 +53,7 @@ import {
   LiaSortNumericDownSolid,
 } from "react-icons/lia";
 
+import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
 

@@ -19,6 +19,7 @@ interface SubmittedOCProps extends OCActionProps {
 
 interface DeleteOCActionProps extends OCActionProps {
   isAdmin: boolean | undefined;
+  dashboardView?: boolean;
 }
 
 export const DuplicateOC = ({ openCallId }: OCActionProps) => {
@@ -52,19 +53,28 @@ export const DuplicateOC = ({ openCallId }: OCActionProps) => {
   );
 };
 
-export const DeleteOC = ({ openCallId, isAdmin }: DeleteOCActionProps) => {
+export const DeleteOC = ({
+  openCallId,
+  isAdmin,
+  dashboardView = true,
+}: DeleteOCActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteOC = useMutation(api.openCalls.openCall.deleteOC);
   return (
     <DropdownMenuItem
-      onClick={() => {
-        confirm({
-          label: "Delete Open Call",
-          description: "Are you sure you want to delete this open call?",
-          onConfirm: () => {
-            deleteOC({ openCallId: openCallId as Id<"openCalls">, isAdmin });
-          },
-        });
+      onSelect={(e) => {
+        e.preventDefault();
+        if (dashboardView) {
+          confirm({
+            label: "Delete Open Call",
+            description: "Are you sure you want to delete this open call?",
+            onConfirm: () => {
+              deleteOC({ openCallId: openCallId as Id<"openCalls">, isAdmin });
+            },
+          });
+        } else {
+          deleteOC({ openCallId: openCallId as Id<"openCalls">, isAdmin });
+        }
       }}
       className="flex items-center gap-x-1"
     >

@@ -376,6 +376,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         const eventCategory = event.category as EventCategory;
         const state = event.state as SubmissionFormState;
         const isAdmin = table.options.meta?.isAdmin;
+        const isDashboard = table.options.meta?.pageType === "dashboard";
         const ocState = event.openCallState;
         const openCallId = event.openCallId;
         const hasOC = !!openCallId;
@@ -446,8 +447,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                             </DropdownMenuSub>
                           )}
                           <DuplicateEvent eventId={event._id} />
-                          {((state === "draft" && !eventApproved) ||
-                            isAdmin) && (
+                          {isAdmin && (
                             <DeleteEvent
                               eventId={event._id}
                               isAdmin={isAdmin}
@@ -487,10 +487,11 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                               />
 
                               <DuplicateOC openCallId={openCallId} />
-                              {(ocState === "draft" || isAdmin) && (
+                              {isAdmin && (
                                 <DeleteOC
                                   openCallId={openCallId}
                                   isAdmin={isAdmin}
+                                  dashboardView={isDashboard}
                                 />
                               )}
                               {ocState === "submitted" && isAdmin && (

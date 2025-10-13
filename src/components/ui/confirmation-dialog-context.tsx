@@ -36,6 +36,7 @@ export const ConfirmingDropdown = ({
             setPending(null);
           }}
           onCancel={() => setPending(null)}
+          forceMount
         />
       )}
     </ConfirmContext.Provider>

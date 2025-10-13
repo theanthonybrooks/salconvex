@@ -391,6 +391,7 @@ const SubmissionFormOrgStep = ({
                 dashboardView ? "max-w-full" : "max-w-[74dvw] sm:max-w-full",
               )}
               tableType="events"
+              pageType="form"
               defaultSort={{ id: "lastEditedAt", desc: true }}
               pageSize={5}
               adminActions={{ isAdmin }}
@@ -409,6 +410,7 @@ const SubmissionFormOrgStep = ({
                 newOrgEvent && "opacity-80",
               )}
               tableType="events"
+              pageType="form"
               defaultSort={{ id: "lastEditedAt", desc: true }}
               adminActions={{ isAdmin }}
               defaultVisibility={{
@@ -440,6 +442,7 @@ const SubmissionFormOrgStep = ({
                 newOrgEvent && "opacity-80",
               )}
               tableType="events"
+              pageType="form"
               defaultSort={{ id: "lastEditedAt", desc: true }}
               adminActions={{ isAdmin }}
             />

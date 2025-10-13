@@ -14,6 +14,7 @@ export const ConfirmDialog = ({
   description,
   onConfirm,
   onCancel,
+  forceMount,
   // children,
 }: {
   label: string;
@@ -21,10 +22,15 @@ export const ConfirmDialog = ({
   onConfirm: () => void;
   onCancel: () => void;
   children?: React.ReactNode;
+  forceMount?: true;
 }) => (
   <AlertDialog open onOpenChange={onCancel}>
     {/* {children && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>} */}
-    <AlertDialogContent overlayClassName="bg-foreground/20">
+
+    <AlertDialogContent
+      overlayClassName="bg-foreground/20 "
+      forceMount={forceMount}
+    >
       <AlertDialogHeader>
         <AlertDialogTitle>{label}</AlertDialogTitle>
         {description && (
