@@ -55,6 +55,7 @@ const OpenCallCard = ({
 
   const { eventDates } = dates;
   const {
+    selectionCriteria,
     compensation,
     basicInfo,
     eligibility,
@@ -377,26 +378,23 @@ const OpenCallCard = ({
                 )}
               </AccordionContent>
             </AccordionItem>
-
-            {/* {reqsDocs && reqsDocs.length > 0 && (
-              <AccordionItem value="Docs">
-                <AccordionTrigger title="Documents:" />
+            {selectionCriteria && (
+              <AccordionItem value="selCrit">
+                <AccordionTrigger
+                  title="Selection Criteria"
+                  fontSize={fontSize}
+                />
                 <AccordionContent>
-                  <ol className="list-outside list-decimal px-4 pl-6">
-                    {reqsDocs?.map((document, index) => (
-                      <li key={index} className="py-2">
-                        <div className="flex items-center gap-x-2">
-                          {document.title}
-                          <a href={document.href} download={document.title}>
-                            <Download className="size-5 hover:scale-110" />
-                          </a>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
+                  <div className="flex flex-col space-y-3 p-3">
+                    <RichTextDisplay
+                      html={selectionCriteria}
+                      fontSize={fontSize}
+                    />
+                  </div>
                 </AccordionContent>
               </AccordionItem>
-            )} */}
+            )}
+
             {reqsDocs && reqsDocs.length > 0 && (
               <>
                 {reqsDocs.some((doc) =>
@@ -715,6 +713,22 @@ const OpenCallCard = ({
               )}
             </AccordionContent>
           </AccordionItem>
+          {selectionCriteria && (
+            <AccordionItem value="selCrit">
+              <AccordionTrigger
+                title="Selection Criteria"
+                fontSize={fontSize}
+              />
+              <AccordionContent>
+                <div className="flex flex-col space-y-3 p-3">
+                  <RichTextDisplay
+                    html={selectionCriteria}
+                    fontSize={fontSize}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
           {reqsDocs && reqsDocs.length > 0 && (
             <>

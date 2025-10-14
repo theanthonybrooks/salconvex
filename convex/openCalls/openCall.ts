@@ -301,6 +301,7 @@ export const createOrUpdateOpenCall = mutation({
         // edition: v.number(), //note-to-self: this is used for the event's edition. Not sure if it's needed here. Could also just take from the event if it is necessary for some reason.
       }),
     }),
+    selectionCriteria: v.optional(v.string()),
     eligibility: v.object({
       type: v.union(
         v.literal("International"),
@@ -433,6 +434,7 @@ export const createOrUpdateOpenCall = mutation({
       organizerId: [args.orgId],
       mainOrgId: args.orgId,
       basicInfo: args.basicInfo,
+      selectionCriteria: args.selectionCriteria,
       eligibility: args.eligibility,
       compensation: args.compensation,
       requirements: {
@@ -691,6 +693,9 @@ export const duplicateOC = mutation({
           edition,
         },
       },
+      ...(openCall.selectionCriteria && {
+        selectionCriteria: openCall.selectionCriteria,
+      }),
       eligibility: {
         ...openCall.eligibility,
         type: openCall.eligibility.type,

@@ -365,6 +365,11 @@ export const SubmissionFormRecapDesktop = ({
                         format="desktop"
                       />
                     </td>
+                    <td>
+                      <p className="text-sm italic text-muted-foreground">
+                        {ocData?.selectionCriteria}
+                      </p>
+                    </td>
                   </tr>
 
                   {typeof ocData?.basicInfo?.appFee === "number" &&

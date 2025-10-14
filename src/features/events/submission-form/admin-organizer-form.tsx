@@ -1134,6 +1134,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   edition: eventData.dates.edition,
                 },
               },
+              selectionCriteria: openCallData.selectionCriteria,
               eligibility: {
                 type: openCallData.eligibility.type,
                 whom: openCallData.eligibility?.whom ?? [],
@@ -1258,6 +1259,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   edition: eventData.dates.edition,
                 },
               },
+              selectionCriteria: openCallData.selectionCriteria,
+
               eligibility: {
                 type: openCallData.eligibility.type,
                 whom: openCallData.eligibility?.whom ?? [],
@@ -1400,6 +1403,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     edition: eventData.dates.edition,
                   },
                 },
+                selectionCriteria: openCallData.selectionCriteria,
+
                 eligibility: {
                   type: openCallData.eligibility.type,
                   whom: openCallData.eligibility?.whom ?? [],

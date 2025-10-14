@@ -21,7 +21,7 @@ export const SalBackNavigation = ({
 }: SalBackNavigationProps) => {
   const router = useRouter();
   const desktopMode = format === "desktop";
-  const navText = "back to The List";
+  const navText = "back to results";
   const isOrganizer = user?.accountType?.includes("organizer") && isOwner;
   const onBackClick = useSalBackNavigation();
 
@@ -32,7 +32,7 @@ export const SalBackNavigation = ({
           <div
             onClick={onBackClick}
             className={cn(
-              "col-start-1 row-span-1 mx-auto flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline active:scale-95",
+              "col-start-1 row-span-1 flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline active:scale-95",
               className,
             )}
           >

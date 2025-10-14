@@ -173,7 +173,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
-        isOwner={isUserOrg}
+        isOwner={isUserOrg || isAdmin}
       />
 
       <Card
@@ -433,7 +433,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   appStatus={appStatus}
                   appLink={outputAppLink}
                   isHidden={hidden}
-                  isUserOrg={isUserOrg}
+                  isUserOrg={isUserOrg || isAdmin}
                 />
               </>
             )}

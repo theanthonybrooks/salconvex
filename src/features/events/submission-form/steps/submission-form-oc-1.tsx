@@ -475,33 +475,24 @@ const SubmissionFormOC1 = ({
                 Selection Criteria
               </Label>
               <Controller
-                name="openCall.eligibility.details"
+                name="openCall.selectionCriteria"
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
-                    tabIndex={4}
+                    tabIndex={5}
                     readOnly={pastEvent}
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    requiredChars={
-                      !isNational && !isInternational
-                        ? isAdmin
-                          ? undefined
-                          : 25
-                        : undefined
-                    }
                     onBlur={field.onBlur}
                     placeholder={
                       isMobile
-                        ? "Please be as specific as possible"
-                        : "Please be as specific as possible who can apply"
+                        ? "Enter your selection criteria (optional)"
+                        : "Please enter your selection criteria (optional)"
                     }
                     charLimit={1200}
                     inputPreviewContainerClassName={cn(
                       "rounded-lg",
-                      (errors?.openCall?.eligibility?.details ||
-                        (!hasRequiredEligDetails && !isNational)) &&
-                        "invalid-field",
+                      errors?.openCall?.selectionCriteria && "invalid-field",
                     )}
                     formInputPreview
                     formInputPreviewClassName="min-h-12"
@@ -535,7 +526,7 @@ const SubmissionFormOC1 = ({
                   className={cn(
                     "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                   )}
-                  tabIndex={5}
+                  tabIndex={6}
                 >
                   <SelectValue placeholder="Select One" />
                 </SelectTrigger>
@@ -572,7 +563,7 @@ const SubmissionFormOC1 = ({
                     <SearchMappedSelect<Currency>
                       tabIndex={
                         ocEligiblityType === "National" && showAppFeeInput
-                          ? 6
+                          ? 7
                           : -1
                       }
                       searchFields={["name", "symbol", "code"]}
@@ -612,7 +603,7 @@ const SubmissionFormOC1 = ({
                       formatNumber={true}
                       tabIndex={
                         ocEligiblityType === "National" && showAppFeeInput
-                          ? 7
+                          ? 8
                           : -1
                       }
                       // field={field}
@@ -672,7 +663,7 @@ const SubmissionFormOC1 = ({
                         orgTimezone={orgTimezone}
                         showTimeZone={false}
                         isAdmin={isAdmin}
-                        tabIndex={8}
+                        tabIndex={9}
                       />
                     )}
                   />
@@ -698,7 +689,7 @@ const SubmissionFormOC1 = ({
                         orgTimezone={orgTimezone}
                         placeholder="Deadline"
                         isAdmin={isAdmin}
-                        tabIndex={9}
+                        tabIndex={10}
                       />
                     )}
                   />
@@ -745,7 +736,7 @@ const SubmissionFormOC1 = ({
                           "invalid-field",
                       )}
                       formInputPreview
-                      tabIndex={10}
+                      tabIndex={11}
                     />
                   )}
                 />
@@ -790,7 +781,7 @@ const SubmissionFormOC1 = ({
                       )}
                       formInputPreviewClassName="line-clamp-5"
                       formInputPreview
-                      tabIndex={11}
+                      tabIndex={12}
                     />
                   )}
                 />

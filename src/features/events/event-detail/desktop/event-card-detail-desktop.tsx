@@ -135,7 +135,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         format="desktop"
         user={user}
         activeSub={hasActiveSubscription}
-        isOwner={isUserOrg}
+        isOwner={isUserOrg || isAdmin}
       />
       <Card
         className={cn(
@@ -262,7 +262,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                     openCallStatus={null}
                     appStatus={null}
                     isHidden={hidden}
-                    isUserOrg={isUserOrg}
+                    isUserOrg={isUserOrg || isAdmin}
                   />
                 </>
               )}

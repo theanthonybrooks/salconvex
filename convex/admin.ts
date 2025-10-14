@@ -65,7 +65,7 @@ export const createSupportTicket = mutation({
       order: 0,
       priority: "high",
       category: args.category as SupportCategory,
-      public: true,
+      public: false,
       purpose: supportPurpose,
       voters: [],
       createdAt: Date.now(),

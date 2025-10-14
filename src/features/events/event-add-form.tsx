@@ -1208,6 +1208,7 @@ export const EventOCForm = ({
                   edition: eventData.dates.edition,
                 },
               },
+              selectionCriteria: openCallData.selectionCriteria,
               eligibility: {
                 type: openCallData.eligibility.type,
                 whom: openCallData.eligibility?.whom ?? [],
@@ -1332,6 +1333,8 @@ export const EventOCForm = ({
                   edition: eventData.dates.edition,
                 },
               },
+              selectionCriteria: openCallData.selectionCriteria,
+
               eligibility: {
                 type: openCallData.eligibility.type,
                 whom: openCallData.eligibility?.whom ?? [],
@@ -1473,6 +1476,7 @@ export const EventOCForm = ({
                     edition: eventData.dates.edition,
                   },
                 },
+                selectionCriteria: openCallData.selectionCriteria,
                 eligibility: {
                   type: openCallData.eligibility.type,
                   whom: openCallData.eligibility?.whom ?? [],
