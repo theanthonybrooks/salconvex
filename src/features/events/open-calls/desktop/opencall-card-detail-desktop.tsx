@@ -52,6 +52,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
+  const activeArtist =
+    user?.accountType?.includes("artist") && hasActiveSubscription;
   const aboutRef = useRef<HTMLDivElement | null>(null);
 
   const { data, artist, className } = props;
@@ -123,14 +125,14 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const locationString = getFormattedLocationString(location);
 
   const onBookmark = async () => {
-    if (!hasActiveSubscription) return;
+    if (!activeArtist) return;
     toggleListAction({ bookmarked: !bookmarked });
 
     await updateUserLastActive({ email: user?.email ?? "" });
   };
 
   const onHide = async () => {
-    if (!hasActiveSubscription) return;
+    if (!activeArtist) return;
     toggleListAction({ hidden: !hidden });
     await updateUserLastActive({ email: user?.email ?? "" });
   };
@@ -370,16 +372,18 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   detailCard
                   finalButton
                 />
-                <p
-                  className={cn(
-                    "mt-2 flex w-full items-center justify-center gap-x-1 text-center text-sm italic text-muted-foreground hover:cursor-pointer",
-                    hidden && "text-red-600 underline underline-offset-2",
-                  )}
-                  onClick={onHide}
-                >
-                  {hidden ? "Marked" : "Mark"} as not interested
-                  {!hidden && "?"}
-                </p>
+                {activeArtist && (
+                  <p
+                    className={cn(
+                      "mt-2 flex w-full items-center justify-center gap-x-1 text-center text-sm italic text-muted-foreground hover:cursor-pointer",
+                      hidden && "text-red-600 underline underline-offset-2",
+                    )}
+                    onClick={onHide}
+                  >
+                    {hidden ? "Marked" : "Mark"} as not interested
+                    {!hidden && "?"}
+                  </p>
+                )}
               </>
             )}
             {!bothValid && !isAdmin && !isUserOrg && (
@@ -553,8 +557,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   <FaRegBookmark
                     className={cn(
                       "size-7 cursor-pointer",
-                      !hasActiveSubscription &&
-                        "cursor-default text-foreground/50",
+                      !activeArtist &&
+                        "invisible cursor-default text-foreground/50",
                     )}
                     onClick={onBookmark}
                   />

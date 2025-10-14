@@ -56,12 +56,17 @@ export const ApproveBtn = ({
   const approveEvent = useMutation(api.events.event.approveEvent);
   const approveOC = useMutation(api.openCalls.openCall.changeOCStatus);
   const isAdmin = user?.role?.includes("admin") || false;
+  const isArtist = user?.accountType?.includes("artist");
   // const somethingSubmitted =
   //   eventSubmitted || openCallSubmitted || bothSubmitted;
   const eventPublished = eventState === "published";
   const bothPublished = eventPublished && openCallState === "published";
   const showContextMenu =
-    (isAdmin && openCallId && !bothPublished) || !eventPublished || !isAdmin;
+    (isAdmin && !isArtist) ||
+    (isAdmin && openCallId && !bothPublished) ||
+    (isAdmin && !openCallId) ||
+    !eventPublished ||
+    !isAdmin;
 
   const handleCopy = (id: string) => {
     if (!id) return;
@@ -77,7 +82,7 @@ export const ApproveBtn = ({
         {isAdmin && (
           <Button
             variant={
-              !showContextMenu
+              showContextMenu
                 ? "salWithShadowHiddenLeft"
                 : "salWithShadowHidden"
             }
@@ -102,18 +107,20 @@ export const ApproveBtn = ({
                 return;
               }
               if (eventPublished) {
+                const dbPath = `/dashboard/admin/event?_id=${eventId}`;
                 handleCopy(eventId);
-                window.open(
-                  `${process.env.NEXT_PUBLIC_CONVEX_DASHBOARD_URL}data?table=events`,
-                  "_blank",
-                  "noopener, noreferrer",
-                );
+                if (isArtist) {
+                  window.open(
+                    `${process.env.NEXT_PUBLIC_CONVEX_DASHBOARD_URL}data?table=events`,
+                    "_blank",
+                    "noopener, noreferrer",
+                  );
+                } else {
+                  window.open(dbPath, "_blank", "noopener, noreferrer");
+                }
               }
             }}
-            className={cn(
-              "w-full",
-              showContextMenu && "rounded-r-none border-r",
-            )}
+            className={cn("w-full")}
           >
             {bothSubmitted
               ? "Approve Both"
@@ -121,7 +128,9 @@ export const ApproveBtn = ({
                 ? "Approve Event"
                 : openCallSubmitted
                   ? "Approve Open Call"
-                  : "Go to Convex"}
+                  : !isArtist
+                    ? "Edit Listing"
+                    : "Go to Convex"}
           </Button>
         )}
         {isUserOrg && !isAdmin && (
@@ -138,10 +147,7 @@ export const ApproveBtn = ({
                 router.push(`/dashboard/organizer/update-event?_id=${eventId}`);
               }
             }}
-            className={cn(
-              "w-full",
-              showContextMenu && "rounded-r-none border-r",
-            )}
+            className={cn("w-full")}
           >
             {bothDraft || openCallDraft
               ? "Finish Open Call"
@@ -174,6 +180,8 @@ export const ApproveBtn = ({
             align="end"
             reviewMode={true}
             type="admin"
+            postStatus={event.posted}
+            postOptions={isAdmin && !isArtist}
           />
         )}
       </div>

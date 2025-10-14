@@ -198,6 +198,7 @@ export const ApplyButton = ({
   const hasValidSub = activeSub && isArtist;
 
   const isAdmin = user?.role?.includes("admin") || false;
+  const nonArtistAdmin = isAdmin && !isArtist;
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
@@ -303,9 +304,11 @@ export const ApplyButton = ({
         ? appStatus !== null && hasValidSub
           ? appStatus.slice(0, 1).toUpperCase() +
             appStatus.slice(1).toLowerCase()
-          : "Read More"
-        : orgPreview
-          ? "Test Apply"
+          : orgPreview || nonArtistAdmin
+            ? "Test Link"
+            : "Read More"
+        : orgPreview || nonArtistAdmin
+          ? "Test Link"
           : "Read More";
   const hasApplied = appStatus !== null && hasValidSub;
 
@@ -327,7 +330,7 @@ export const ApplyButton = ({
           variant="salWithShadowHiddenLeft"
           size="lg"
           className={cn(
-            "relative z-[1] w-full cursor-pointer rounded-r-none border-r xl:min-w-[150px]",
+            "relative z-[1] w-full cursor-pointer xl:min-w-[150px]",
             appStatus !== null &&
               hasValidSub &&
               !publicView &&
@@ -355,10 +358,14 @@ export const ApplyButton = ({
                 (openCall !== "active" && !isAdmin && !orgPreview) ||
                 (noSub && !isAdmin && !orgPreview)
               }
-              variant="salWithShadowHiddenLeft"
+              variant={
+                nonArtistAdmin
+                  ? "salWithShadowHidden"
+                  : "salWithShadowHiddenLeft"
+              }
               size="lg"
               className={cn(
-                "relative z-[1] h-14 w-full cursor-pointer rounded-r-none border-r sm:h-11 xl:min-w-[150px]",
+                "relative z-[1] h-14 w-full cursor-pointer sm:h-11 xl:min-w-[150px]",
                 appStatus !== null &&
                   !publicView &&
                   "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",
@@ -488,7 +495,7 @@ export const ApplyButton = ({
         </Button>
       )}
 
-      {!orgPreview && !hasApplied && (
+      {!orgPreview && !hasApplied && !nonArtistAdmin && (
         <TooltipSimple
           content={isBookmarked ? "Remove Bookmark" : "Bookmark"}
           side="top"
@@ -514,7 +521,7 @@ export const ApplyButton = ({
           </Button>
         </TooltipSimple>
       )}
-      {!orgPreview && hasApplied && hasValidSub && (
+      {!orgPreview && hasApplied && hasValidSub && !nonArtistAdmin && (
         <Button
           variant="salWithoutShadow"
           size="lg"
@@ -526,29 +533,31 @@ export const ApplyButton = ({
         </Button>
       )}
 
-      <EventContextMenu
-        event={event}
-        eventId={id}
-        isUserOrg={isUserOrg}
-        mainOrgId={mainOrgId}
-        openCallId={openCallId}
-        openCallState={openCallState}
-        // onHide={onHide}
-        isHidden={isHidden}
-        // setIsHidden={setIsHidden}
-        publicView={publicView || noSub}
-        appLink={appUrl}
-        appStatus={appStatus}
-        eventCategory={eventCategory}
-        openCallStatus={openCall}
-        // setManualApplied={setManualApplied}
-        buttonTrigger={true}
-        align="end"
-        isBookmarked={isBookmarked}
-        orgPreview={orgPreview}
-        postStatus={event.posted}
-        postOptions={isAdmin}
-      />
+      {!nonArtistAdmin && (
+        <EventContextMenu
+          event={event}
+          eventId={id}
+          isUserOrg={isUserOrg}
+          mainOrgId={mainOrgId}
+          openCallId={openCallId}
+          openCallState={openCallState}
+          // onHide={onHide}
+          isHidden={isHidden}
+          // setIsHidden={setIsHidden}
+          publicView={publicView || noSub}
+          appLink={appUrl}
+          appStatus={appStatus}
+          eventCategory={eventCategory}
+          openCallStatus={openCall}
+          // setManualApplied={setManualApplied}
+          buttonTrigger={true}
+          align="end"
+          isBookmarked={isBookmarked}
+          orgPreview={orgPreview}
+          postStatus={event.posted}
+          postOptions={isAdmin}
+        />
+      )}
     </div>
   );
 };
