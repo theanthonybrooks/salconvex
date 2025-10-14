@@ -74,7 +74,8 @@ const ClientEventList = () => {
 
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
   // const hasValidSub = hasActiveSubscription && isArtist;
-  const publicView = !hasActiveSubscription || !isArtist || !isAdmin;
+  const publicView =
+    !hasActiveSubscription || (!isArtist && !isAdmin) || !isAdmin;
   const publicEventOnly =
     (publicView && view === "event") || (hasOrgEvents && view === "orgView");
   const userPref = userData?.userPref ?? null;

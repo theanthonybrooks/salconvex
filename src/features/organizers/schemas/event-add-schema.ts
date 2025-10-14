@@ -540,6 +540,7 @@ export const openCallBaseSchema = z.object({
     whom: z.optional(z.array(z.string())),
     details: z.optional(z.string()),
   }),
+  selectionCriteria: z.optional(z.string()),
 
   requirements: z.object({
     requirements: z.string(),

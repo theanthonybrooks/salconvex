@@ -466,6 +466,49 @@ const SubmissionFormOC1 = ({
                 )}
               />
             </div>
+            <div className="input-section self-start">
+              <p className="lg:text-xs">Selection Criteria</p>
+            </div>
+
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.type" className="sr-only">
+                Selection Criteria
+              </Label>
+              <Controller
+                name="openCall.eligibility.details"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    tabIndex={4}
+                    readOnly={pastEvent}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    requiredChars={
+                      !isNational && !isInternational
+                        ? isAdmin
+                          ? undefined
+                          : 25
+                        : undefined
+                    }
+                    onBlur={field.onBlur}
+                    placeholder={
+                      isMobile
+                        ? "Please be as specific as possible"
+                        : "Please be as specific as possible who can apply"
+                    }
+                    charLimit={1200}
+                    inputPreviewContainerClassName={cn(
+                      "rounded-lg",
+                      (errors?.openCall?.eligibility?.details ||
+                        (!hasRequiredEligDetails && !isNational)) &&
+                        "invalid-field",
+                    )}
+                    formInputPreview
+                    formInputPreviewClassName="min-h-12"
+                  />
+                )}
+              />
+            </div>
           </>
         )}
 

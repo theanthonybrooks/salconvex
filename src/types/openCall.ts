@@ -148,6 +148,7 @@ export interface OpenCall {
       [K in OpenCallCategoryKey]?: number | boolean;
     };
   };
+  selectionCriteria?: string;
   requirements: {
     requirements: string;
     more?: string;

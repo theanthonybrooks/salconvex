@@ -514,6 +514,7 @@ const openCallSchema = {
       equipment: v.optional(v.union(v.number(), v.boolean())),
     }),
   }),
+  selectionCriteria: v.optional(v.string()),
 
   requirements: v.object({
     requirements: v.string(),

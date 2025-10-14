@@ -159,7 +159,7 @@ export const ApproveBtn = ({
                     ? "Update Open Call"
                     : bothPublished
                       ? `Edit ${getEventCategoryLabelAbbr(eventCategory)}`
-                      : `Update ${getEventCategoryLabelAbbr(eventCategory)}`}
+                      : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
           </Button>
         )}
         {showContextMenu && (

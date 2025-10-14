@@ -61,7 +61,7 @@ export const ApplyButtonShort = ({
   activeSub,
 }: ApplyButtonShortProps) => {
   const isArtist = user?.accountType?.includes("artist");
-  const hasValidSub = activeSub && isArtist;
+  const hasValidSub = activeSub;
   const currentUrl = window.location.href;
   const router = useRouter();
   const href =
@@ -470,10 +470,12 @@ export const ApplyButton = ({
             (openCall !== "active" && !isAdmin && !orgPreview) ||
             (noSub && !isAdmin && !orgPreview)
           }
-          variant="salWithShadowHiddenLeft"
+          variant={
+            nonArtistAdmin ? "salWithShadowHidden" : "salWithShadowHiddenLeft"
+          }
           size="lg"
           className={cn(
-            "relative z-[1] h-14 w-full cursor-pointer rounded-r-none border-r sm:h-11 xl:min-w-[150px]",
+            "relative z-[1] h-14 w-full cursor-pointer sm:h-11 xl:min-w-[150px]",
             appStatus !== null &&
               !publicView &&
               hasValidSub &&
@@ -533,7 +535,7 @@ export const ApplyButton = ({
         </Button>
       )}
 
-      {!nonArtistAdmin && (
+      {!(nonArtistAdmin && finalButton) && (
         <EventContextMenu
           event={event}
           eventId={id}
