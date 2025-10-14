@@ -133,8 +133,8 @@ export const ApproveBtn = ({
             }
             onClick={() => {
               if (!openCallId && bothPublished && appLink) {
-                window.location.href = appLink;
-              } else {
+                //   window.location.href = appLink;
+                // } else {
                 router.push(`/dashboard/organizer/update-event?_id=${eventId}`);
               }
             }}
@@ -152,7 +152,7 @@ export const ApproveBtn = ({
                   : openCallSubmitted
                     ? "Update Open Call"
                     : bothPublished
-                      ? "Test Link"
+                      ? `Edit ${getEventCategoryLabelAbbr(eventCategory)}`
                       : `Update ${getEventCategoryLabelAbbr(eventCategory)}`}
           </Button>
         )}

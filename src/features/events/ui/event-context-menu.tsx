@@ -46,14 +46,10 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { SocialDropdownMenus } from "@/features/events/components/social-dropdown-menus";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import {
-  getEventCategoryLabel,
-  getEventCategoryLabelAbbr,
-} from "@/lib/eventFns";
+import { getEventCategoryLabel } from "@/lib/eventFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation, usePreloadedQuery } from "convex/react";
-import { useRouter } from "next/navigation";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -112,7 +108,7 @@ const EventContextMenu = ({
   postOptions = false,
   type = "event",
 }: EventContextMenuProps) => {
-  const router = useRouter();
+  // const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -198,7 +194,7 @@ const EventContextMenu = ({
           <DropdownMenuGroup>
             <DropdownMenuLabel>Organizer</DropdownMenuLabel>
 
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               onClick={() =>
                 router.push(
                   `/dashboard/organizer/update-event?_id=${eventId}&sidebar=false`,
@@ -209,7 +205,7 @@ const EventContextMenu = ({
               {openCallState === "pending"
                 ? "Finish Submission"
                 : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             {appLink && (
               <DropdownMenuItem>
                 <Link

@@ -41,6 +41,7 @@ interface BaseEventActionProps {
 interface ToEventActionProps extends BaseEventActionProps {
   hasOpenCall: boolean;
   category: EventCategory;
+  general?: boolean;
 }
 
 export const GoToEvent = ({
@@ -48,16 +49,23 @@ export const GoToEvent = ({
   edition,
   hasOpenCall,
   category,
+  general,
 }: ToEventActionProps) => {
   return (
     <DropdownMenuItem
       onClick={() => {
-        window.location.href = `/thelist/event/${slug}/${edition}${hasOpenCall ? "/call" : ""}`;
+        const linkPath = `/thelist/event/${slug}/${edition}${hasOpenCall ? "/call" : ""}`;
+        window.open(linkPath, "_blank");
       }}
       className="flex items-center gap-x-1"
     >
       <Eye className="size-4" />
-      View {hasOpenCall ? "Open Call" : getEventCategoryLabelAbbr(category)}
+      View{" "}
+      {general
+        ? "Listing"
+        : hasOpenCall
+          ? "Open Call"
+          : getEventCategoryLabelAbbr(category)}
     </DropdownMenuItem>
   );
 };
@@ -66,7 +74,8 @@ export const GoToSocialPost = ({ slug, edition }: BaseEventActionProps) => {
   return (
     <DropdownMenuItem
       onClick={() => {
-        window.location.href = `/thelist/event/${slug}/${edition}/call/social`;
+        const linkPath = `/thelist/event/${slug}/${edition}/call/social`;
+        window.open(linkPath, "_blank");
       }}
       className="flex items-center gap-x-1"
     >

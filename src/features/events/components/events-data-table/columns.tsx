@@ -18,7 +18,10 @@ import {
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
 import { DataTableEventEdition } from "@/components/data-table/actions/data-table-event-edition";
-import { DataTableEventName } from "@/components/data-table/actions/data-table-event-name";
+import {
+  DataTableEventName,
+  RenameEventDialog,
+} from "@/components/data-table/actions/data-table-event-name";
 import {
   ApproveBoth,
   ApproveOC,
@@ -412,6 +415,14 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                           eventId={event._id}
                           userRole="admin"
                         />
+
+                        <GoToEvent
+                          slug={slug}
+                          edition={edition}
+                          hasOpenCall={false}
+                          category={eventCategory}
+                          general={true}
+                        />
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                     </>
@@ -423,13 +434,14 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent className={cn("p-2")}>
-                          {/* NOTE: this is the 'View Event' link */}
+                          {/* note-to-self: this is the 'View Event' link */}
                           <GoToEvent
                             slug={slug}
                             edition={edition}
                             hasOpenCall={false}
                             category={eventCategory}
                           />
+                          <RenameEventDialog event={event} />
                           {isAdmin && hasOC && (
                             <DropdownMenuSub>
                               <DropdownMenuSubTrigger className="flex items-center gap-x-2">
@@ -479,6 +491,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                           </DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent className={cn("p-2")}>
+                              {/* note-to-self: this is the 'View OC' link */}
                               <GoToEvent
                                 slug={slug}
                                 edition={edition}
