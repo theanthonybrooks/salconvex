@@ -315,6 +315,15 @@ export const RichTextEditor = ({
   }, [editorOpen, editor, value]);
 
   useEffect(() => {
+    if (editorOpen && editor) {
+      // Wait for the modal to finish mounting visually
+      setTimeout(() => {
+        editor.commands.focus("end");
+      }, 50);
+    }
+  }, [editorOpen, editor]);
+
+  useEffect(() => {
     if (!editorOpen) return;
     if (tempContent !== value && editorOpen) {
       setHasUnsavedChanges(true);

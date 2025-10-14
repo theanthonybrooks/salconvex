@@ -67,13 +67,14 @@ const ClientEventList = () => {
   // console.log(artistData);
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
+  const isAdmin = user?.role?.includes("admin");
   const isArtist = accountType?.includes("artist");
   // const isOrganizer = accountType?.includes("organizer");
   const { hasOrgEvents } = orgData ?? {};
 
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
   // const hasValidSub = hasActiveSubscription && isArtist;
-  const publicView = !hasActiveSubscription || !isArtist;
+  const publicView = !hasActiveSubscription || !isArtist || !isAdmin;
   const publicEventOnly =
     (publicView && view === "event") || (hasOrgEvents && view === "orgView");
   const userPref = userData?.userPref ?? null;

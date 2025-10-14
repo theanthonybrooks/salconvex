@@ -390,7 +390,7 @@ export const LinkList = ({
                       submitRecap && "truncate",
                     )}
                   >
-                    @{organizer.links.threads.split(".net/").slice(-1)[0]}
+                    {organizer.links.threads}
                   </span>
                 </div>
               </a>

@@ -663,6 +663,9 @@ export const getUserOrgEvents = query({
       .unique();
     if (!user) return null;
 
+    const isOrganizer = user.accountType?.includes("organizer");
+    if (!isOrganizer) return null;
+
     const orgs = await ctx.db
       .query("organizations")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
