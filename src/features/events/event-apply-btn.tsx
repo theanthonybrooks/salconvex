@@ -61,7 +61,7 @@ export const ApplyButtonShort = ({
   activeSub,
 }: ApplyButtonShortProps) => {
   const isArtist = user?.accountType?.includes("artist");
-  const hasValidSub = activeSub;
+  const hasValidSub = activeSub && isArtist;
   const currentUrl = window.location.href;
   const router = useRouter();
   const href =
@@ -299,7 +299,9 @@ export const ApplyButton = ({
             ? "Test Apply"
             : isEmail
               ? "Send Email"
-              : "Apply"
+              : nonArtistAdmin
+                ? "Test Link"
+                : "Apply"
       : openCall === "ended"
         ? appStatus !== null && hasValidSub
           ? appStatus.slice(0, 1).toUpperCase() +

@@ -33,6 +33,16 @@ export const globalSearch = query({
     activeSub: v.optional(v.boolean()),
   },
   handler: async (ctx, { searchTerm, searchType, activeSub }) => {
+    const userId = await getAuthUserId(ctx);
+    const sub = userId
+      ? await ctx.db
+          .query("userSubscriptions")
+          .withIndex("userId", (q) => q.eq("userId", userId))
+          .first()
+      : null;
+    const hasActiveSubscription =
+      sub?.status === "active" || sub?.status === "trialing";
+
     const term = searchTerm.trim();
     if (!term) return { results: [], label: null };
     const searchTerms = term.toLowerCase().split(/\s+/);
@@ -48,6 +58,10 @@ export const globalSearch = query({
     const attachOpenCallStatusFlag = <T extends { _id: Id<"events"> }>(
       events: T[],
     ) => {
+      if (!hasActiveSubscription) {
+        return events.map((e) => ({ ...e, ocStatus: 0 }));
+      }
+
       const callMap = new Map<
         Id<"events">,
         { ocStart?: string; ocEnd?: string; callType?: string }[]
@@ -194,41 +208,6 @@ export const globalSearch = query({
       const filteredOrgName = orgName.filter((org) =>
         searchTerms.every((t) => org.name.toLowerCase().includes(t)),
       );
-
-      // const sortedOrgLoc = orgLoc.sort((a, b) => {
-      //   const isStateRequiredA = COUNTRIES_REQUIRING_STATE.includes(
-      //     a.location?.countryAbbr ?? "",
-      //   );
-      //   const isStateRequiredB = COUNTRIES_REQUIRING_STATE.includes(
-      //     b.location?.countryAbbr ?? "",
-      //   );
-
-      //   let aPrimary = "";
-      //   let bPrimary = "";
-      //   let aSecondary = "";
-      //   let bSecondary = "";
-
-      //   if (isStateRequiredA) {
-      //     aPrimary = a.location?.stateAbbr ?? "";
-      //     aSecondary = a.location?.city ?? "";
-      //   } else {
-      //     aPrimary = a.location?.city ?? "";
-      //     aSecondary = "";
-      //   }
-
-      //   if (isStateRequiredB) {
-      //     bPrimary = b.location?.stateAbbr ?? "";
-      //     bSecondary = b.location?.city ?? "";
-      //   } else {
-      //     bPrimary = b.location?.city ?? "";
-      //     bSecondary = "";
-      //   }
-
-      //   const primaryCompare = aPrimary.localeCompare(bPrimary);
-      //   if (primaryCompare !== 0) return primaryCompare;
-
-      //   return aSecondary.localeCompare(bSecondary);
-      // });
 
       const sortedOrgLoc = sortByLocation(
         orgLoc,
