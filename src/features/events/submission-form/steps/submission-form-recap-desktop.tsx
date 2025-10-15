@@ -471,7 +471,6 @@ export const SubmissionFormRecapDesktop = ({
                           eventId={eventData._id as Id<"events">}
                           isDraft={true}
                           isAdmin={isAdmin}
-                          isMobile={false}
                           recap={true}
                         />
                       </AccordionContent>

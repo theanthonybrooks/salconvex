@@ -1545,6 +1545,8 @@ export const duplicateEvent = mutation({
       hasOpenCall: "False",
       dates: {
         ...event.dates,
+        eventDates: [{ start: "", end: "" }],
+        prodDates: [],
         edition: eventEdition,
       },
       location: {

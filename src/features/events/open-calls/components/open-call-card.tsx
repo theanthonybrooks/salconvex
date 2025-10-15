@@ -406,8 +406,6 @@ const OpenCallCard = ({
                       <OpenCallFilesTable
                         files={(reqsDocs ?? []).filter(hasId)}
                         eventId={event._id}
-                        isDraft={false}
-                        isAdmin={false}
                         isPublic={true}
                         type="docs"
                         isMobile={true}

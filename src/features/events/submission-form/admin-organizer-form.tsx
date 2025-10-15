@@ -223,6 +223,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   //
   //
   // #region ------------- Refs --------------
+
   const prevErrorJson = useRef<string>("");
   const lastChangedRef = useRef<number | null>(null);
   const canCheckSchema = useRef(false);

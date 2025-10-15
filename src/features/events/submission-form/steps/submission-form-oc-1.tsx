@@ -104,6 +104,7 @@ const SubmissionFormOC1 = ({
 
   const pupstick = eventType?.includes("pup");
   const isDraft = openCall?.state === "draft";
+  const isApproved = !!openCall?.approvedAt;
   const orgTimezone =
     organizer?.location?.timezone ??
     Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -468,7 +469,7 @@ const SubmissionFormOC1 = ({
               />
             </div>
             <div className="input-section self-start">
-              <p className="lg:text-xs">Selection Criteria</p>
+              <p className="text-balance lg:text-xs">Selection Criteria</p>
             </div>
 
             <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
@@ -929,6 +930,7 @@ const SubmissionFormOC1 = ({
                           isMobile={isMobile}
                           files={openCall.documents.filter(hasId)}
                           eventId={eventId as Id<"events">}
+                          isApproved={isApproved}
                           isDraft={isDraft}
                           isAdmin={isAdmin}
                           disabled={pastEvent}

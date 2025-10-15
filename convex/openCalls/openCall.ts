@@ -578,6 +578,7 @@ export const duplicateOC = mutation({
       location: {
         ...event.location,
       },
+      blurb: event.blurb,
       about: event.about,
       links: event.links,
       otherInfo: event.otherInfo,
@@ -585,7 +586,6 @@ export const duplicateOC = mutation({
       active: event.active,
       mainOrgId: event.mainOrgId,
       organizerId: event.organizerId,
-      blurb: event.blurb,
 
       // mainOrgName: "",
 

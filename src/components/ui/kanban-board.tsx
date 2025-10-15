@@ -189,25 +189,27 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
     <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
       <div
         className={cn(
-          "mb-6 flex flex-col-reverse items-center justify-between gap-3 md:mb-0 md:flex-row lg:pr-4",
+          "mb-6 flex flex-col-reverse items-center justify-between gap-3 md:mb-0 lg:flex-row lg:pr-4",
         )}
       >
-        <div className="flex items-center gap-3">
-          <Input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search"
-            className="w-full max-w-md"
-          />
+        <div className="flex flex-col items-center gap-3 lg:flex-row">
+          <div className="flex items-center gap-3">
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search"
+              className="w-full min-w-60 max-w-md"
+            />
 
-          <Button
-            variant="salWithShadowHidden"
-            onClick={() => setSearchTerm("")}
-            className={"h-11 disabled:border-foreground/40"}
-            disabled={debouncedSearch === ""}
-          >
-            Reset
-          </Button>
+            <Button
+              variant="salWithShadowHidden"
+              onClick={() => setSearchTerm("")}
+              className={"h-11 disabled:border-foreground/40"}
+              disabled={debouncedSearch === ""}
+            >
+              Reset
+            </Button>
+          </div>
           {purpose === "todo" && (
             <MultiSelect
               options={[...supportCategoryOptions]}
@@ -223,7 +225,7 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
               hasSearch={false}
               selectAll={false}
               className={cn(
-                "w-full min-w-80 max-w-lg border-1.5 border-foreground/20 sm:h-11",
+                "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-80",
               )}
               listClassName="max-h-80"
             />
@@ -245,14 +247,14 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
               key={value}
               onClick={() => setPurpose(value)}
               className={cn(
-                "relative z-10 flex w-1/2 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
+                "relative z-10 flex h-11 w-1/2 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
                 purpose === value && "text-foreground",
               )}
               type="button"
             >
               <span className="flex items-center gap-1">
                 <Icon className="size-6 shrink-0 lg:size-4" />
-                {label}
+                <p className="lg:hidden xl:block">{label}</p>
               </span>
             </button>
           ))}
@@ -824,45 +826,49 @@ export const TaskDialog = ({
                 />
               </div>
             </div>
-            <div className="flex w-full flex-col gap-3 sm:w-auto">
-              <Label htmlFor="priority">Category</Label>
+            <div className="flex w-full gap-3">
+              <div className="flex w-full flex-col gap-3 sm:w-auto">
+                <Label htmlFor="priority">Category</Label>
 
-              <SelectSimple
-                options={[...supportCategoryOptions]}
-                value={category}
-                onChangeAction={(value) =>
-                  setCategory(value as SupportCategory)
-                }
-                placeholder="Select category"
-                className="w-full min-w-40 max-w-sm sm:max-w-50"
-                contentClassName="sm:max-h-80"
-              />
-            </div>
-
-            {!isEdit && (
-              <div className="flex flex-1 flex-col gap-3">
-                <Label htmlFor="order">Order</Label>
-                {/* <select
-                  name="order"
-                  value={order}
-                  onChange={(e) => setOrder(e.target.value as "start" | "end")}
-                  className="rounded border bg-card p-2 text-foreground"
-                >
-                  <option value="start">Start</option>
-                  <option value="end">End</option>
-                </select> */}
                 <SelectSimple
-                  options={[
-                    { value: "start", label: "Start" },
-                    { value: "end", label: "End" },
-                  ]}
-                  value={order}
-                  onChangeAction={(value) => setOrder(value as "start" | "end")}
-                  placeholder="Order"
-                  className="w-full max-w-md"
+                  options={[...supportCategoryOptions]}
+                  value={category}
+                  onChangeAction={(value) =>
+                    setCategory(value as SupportCategory)
+                  }
+                  placeholder="Select category"
+                  className="w-full min-w-40 max-w-sm sm:max-w-50"
+                  contentClassName="sm:max-h-80"
                 />
               </div>
-            )}
+
+              {!isEdit && (
+                <div className="flex flex-1 flex-col gap-3">
+                  <Label htmlFor="order">Order</Label>
+                  {/* <select
+                    name="order"
+                    value={order}
+                    onChange={(e) => setOrder(e.target.value as "start" | "end")}
+                    className="rounded border bg-card p-2 text-foreground"
+                  >
+                    <option value="start">Start</option>
+                    <option value="end">End</option>
+                  </select> */}
+                  <SelectSimple
+                    options={[
+                      { value: "start", label: "Start" },
+                      { value: "end", label: "End" },
+                    ]}
+                    value={order}
+                    onChangeAction={(value) =>
+                      setOrder(value as "start" | "end")
+                    }
+                    placeholder="Order"
+                    className="w-full max-w-md"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <DialogFooter className="flex w-full flex-row items-center justify-between sm:justify-between">

@@ -21,9 +21,10 @@ interface OpenCallFile {
 interface Props {
   files: OpenCallFile[];
   eventId: string;
-  isDraft: boolean;
-  isAdmin: boolean;
-  isMobile: boolean;
+  isDraft?: boolean;
+  isApproved?: boolean;
+  isAdmin?: boolean;
+  isMobile?: boolean;
   isPublic?: boolean;
   type?: "docs" | "images";
   className?: string;
@@ -40,9 +41,10 @@ export function hasId<T extends { id?: unknown }>(
 export function OpenCallFilesTable({
   files,
   eventId,
-  isDraft,
-  isAdmin,
-  isMobile,
+  // isDraft,
+  isApproved = false,
+  isAdmin = false,
+  isMobile = false,
   isPublic = false,
   type,
   className,
@@ -61,23 +63,30 @@ export function OpenCallFilesTable({
     : files;
 
   const startEditing = (id: string, currentTitle: string) => {
+    const baseName = currentTitle.replace(/\.[^/.]+$/, "");
     setEditingId(id);
-    setTempTitle(currentTitle);
+    setTempTitle(baseName);
   };
 
   const submitTitle = async (fileId: string) => {
-    if (
-      tempTitle.trim().length > 0 &&
-      tempTitle !== files.find((f) => f.id === fileId)?.title
-    ) {
+    const originalTitle = files.find((f) => f.id === fileId)?.title;
+    if (!originalTitle) return;
+
+    const extensionMatch = originalTitle.match(/\.[^/.]+$/);
+    const extension = extensionMatch ? extensionMatch[0] : "";
+    const newFullTitle = tempTitle.trim() + extension;
+
+    if (newFullTitle !== originalTitle) {
       await editFileName({
         fileId: fileId as Id<"openCallFiles">,
         eventId: eventId as Id<"events">,
-        newTitle: tempTitle,
+        newTitle: newFullTitle,
       });
     }
+
     setEditingId(null);
   };
+
   const mobileHidden = "hidden md:block";
   const mobileEditing = isMobile && editingId !== null;
   return (
@@ -104,7 +113,7 @@ export function OpenCallFilesTable({
                 {!isMobile && "Preview"}
               </th>
             )}
-            {!isDraft && !mobileEditing && !isPublic && (
+            {isApproved && !mobileEditing && !isPublic && (
               <th className={cn("w-12 px-2 py-1 text-center", mobileHidden)}>
                 Archive
               </th>
@@ -112,7 +121,7 @@ export function OpenCallFilesTable({
             {!mobileEditing &&
               !isPublic &&
               !disabled &&
-              (isDraft || isAdmin) && (
+              (!isApproved || isAdmin) && (
                 <th className={cn("w-10 px-2 py-1 text-center")}>
                   {!isMobile && "Delete"}
                 </th>
@@ -193,7 +202,7 @@ export function OpenCallFilesTable({
                       />
                     </td>
                   )}
-                  {!isDraft && !isMobile && !isPublic && (
+                  {isApproved && !isMobile && !isPublic && (
                     <td
                       className="px-2 py-2 text-center"
                       onClick={() => {
@@ -205,7 +214,7 @@ export function OpenCallFilesTable({
                       }}
                     >
                       <div className="cursor-pointer text-amber-800 opacity-70 transition hover:scale-110">
-                        {!doc?.archived && !isDraft && (
+                        {!doc?.archived && isApproved && (
                           <Book className={cn("mx-auto size-4")} />
                         )}
                         {doc?.archived && (
@@ -217,7 +226,7 @@ export function OpenCallFilesTable({
                   {!mobileEditing &&
                     !isPublic &&
                     !disabled &&
-                    (isDraft || isAdmin) && (
+                    (!isApproved || isAdmin) && (
                       <td className="px-2 py-2 text-center">
                         <X
                           className={cn(

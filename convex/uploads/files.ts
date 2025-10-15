@@ -137,7 +137,7 @@ export const deleteFile = mutation({
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .first();
 
-    const hasBeenPublished = openCall?.approvedBy !== undefined;
+    const hasBeenPublished = !!openCall?.approvedBy ;
 
     if (hasBeenPublished || archive) {
       if (isAdmin && !archive) {

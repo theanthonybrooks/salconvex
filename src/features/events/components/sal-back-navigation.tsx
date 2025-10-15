@@ -22,13 +22,20 @@ export const SalBackNavigation = ({
   const router = useRouter();
   const desktopMode = format === "desktop";
   const navText = "back to results";
-  const isOrganizer = user?.accountType?.includes("organizer") && isOwner;
+  const isAdmin = user?.role?.includes("admin");
+  const isOrganizer =
+    (user?.accountType?.includes("organizer") && isOwner) || isAdmin;
   const onBackClick = useSalBackNavigation();
 
   return (
     <>
       {desktopMode ? (
-        <div className="mx-auto flex w-fit items-center gap-2">
+        <div
+          className={cn(
+            "mx-auto flex w-full items-center gap-2",
+            isOrganizer && "w-fit",
+          )}
+        >
           <div
             onClick={onBackClick}
             className={cn(
