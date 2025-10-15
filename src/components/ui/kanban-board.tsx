@@ -247,13 +247,13 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
               key={value}
               onClick={() => setPurpose(value)}
               className={cn(
-                "relative z-10 flex h-11 w-1/2 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
+                "relative z-10 flex h-8 w-1/2 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground sm:h-11",
                 purpose === value && "text-foreground",
               )}
               type="button"
             >
               <span className="flex items-center gap-1">
-                <Icon className="size-6 shrink-0 lg:size-4" />
+                <Icon className="size-5 shrink-0 lg:size-4" />
                 <p className="lg:hidden xl:block">{label}</p>
               </span>
             </button>
