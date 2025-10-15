@@ -3,6 +3,7 @@
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
 
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import {
@@ -29,6 +30,8 @@ export function AdminDashboardTableWrapper({
   // );
   // const [existingOpenCall, setExistingOpenCall] =
   //   useState<Doc<"openCalls"> | null>(null);
+  const { isSidebarCollapsed } = useDashboard();
+
   const { preloadedEventData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -78,10 +81,11 @@ export function AdminDashboardTableWrapper({
               //   category: true,
               // }}
               defaultVisibility={{
-                category: true,
+                category: isSidebarCollapsed,
                 dates_edition: true,
                 submissionState: false,
                 type: false,
+                _id: false,
               }}
               adminActions={adminActions}
               tableType="events"
@@ -100,6 +104,7 @@ export function AdminDashboardTableWrapper({
                 lastEditedAt: false,
                 dates_edition: false,
                 submissionState: false,
+                _id: false,
               }}
               adminActions={adminActions}
               tableType="events"
@@ -178,6 +183,10 @@ export function AdminDashboardTableWrapper({
                 dates_edition: true,
                 type: false,
                 role: false,
+                instagram: isSidebarCollapsed,
+                website: isSidebarCollapsed,
+                accountType: isSidebarCollapsed,
+                organizationNames: isSidebarCollapsed,
               }}
               toolbarData={{
                 totalMonthly: usersData?.totalMonthly ?? 0,

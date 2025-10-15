@@ -107,6 +107,23 @@ export const postStatusValidator = v.union(
   v.literal("toPost"),
 );
 
+export const linksFields = {
+  website: v.optional(v.string()),
+  instagram: v.optional(v.string()),
+  facebook: v.optional(v.string()),
+  threads: v.optional(v.string()),
+  email: v.optional(v.string()),
+  vk: v.optional(v.string()),
+  phone: v.optional(v.string()),
+  phoneExt: v.optional(v.string()),
+  linkAggregate: v.optional(v.string()),
+  linkedIn: v.optional(v.string()),
+  youTube: v.optional(v.string()),
+  other: v.optional(v.string()),
+};
+
+export const linksValidator = v.object(linksFields);
+
 export const supportCategoryArrayValidator = v.array(supportCategoryValidator);
 
 const openCallFilesSchema = v.object({
@@ -291,22 +308,7 @@ const organizationSchema = {
       primaryContact: v.string(),
     }),
   ),
-  links: v.optional(
-    v.object({
-      website: v.optional(v.string()),
-      instagram: v.optional(v.string()),
-      facebook: v.optional(v.string()),
-      threads: v.optional(v.string()),
-      email: v.optional(v.string()),
-      vk: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      phoneExt: v.optional(v.string()),
-      linkAggregate: v.optional(v.string()),
-      linkedIn: v.optional(v.string()),
-      youTube: v.optional(v.string()),
-      other: v.optional(v.string()),
-    }),
-  ),
+  links: v.optional(linksValidator),
   hadFreeCall: v.boolean(),
   updatedAt: v.optional(v.number()),
 
@@ -317,7 +319,7 @@ const organizationSchema = {
 
 //TODO: Make another table that joins the events and open calls. Will act as a quick lookup for totals.
 
-const eventSchema = {
+export const eventSchema = {
   adminNote: v.optional(v.string()),
   //TODO: use a lookup table for these (I think?)
   organizerId: v.array(v.id("organizations")),
@@ -386,18 +388,7 @@ const eventSchema = {
   links: v.optional(
     v.object({
       sameAsOrganizer: v.boolean(),
-      website: v.optional(v.string()),
-      instagram: v.optional(v.string()),
-      facebook: v.optional(v.string()),
-      threads: v.optional(v.string()),
-      email: v.optional(v.string()),
-      vk: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      phoneExt: v.optional(v.string()),
-      linkAggregate: v.optional(v.string()),
-      linkedIn: v.optional(v.string()),
-      youTube: v.optional(v.string()),
-      other: v.optional(v.string()),
+      ...linksFields,
     }),
   ),
   otherInfo: v.optional(v.string()),
@@ -463,7 +454,7 @@ const eventLookupSchema = {
 };
 
 //NOTE: Make sure that once open calls end, they're READONLY and can't be edited. To ensure that any open calls are properly archived with all details.
-const openCallSchema = {
+export const openCallSchema = {
   adminNoteOC: v.optional(v.string()),
   eventId: v.id("events"),
   organizerId: v.array(v.id("organizations")),

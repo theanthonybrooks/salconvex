@@ -118,6 +118,7 @@ const linksSchemaLoose = z.object({
   phone: z.string().optional(),
   phoneExt: z.string().optional(),
   linkAggregate: z.string().optional(),
+  youTube: z.string().optional(),
   linkedIn: z.string().optional(),
   other: z
     .url({

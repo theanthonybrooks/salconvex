@@ -20,6 +20,10 @@ body,
     "clig" 0;
 }
 
+/* html {
+  overflow: hidden;
+} */
+
 body {
   height: 100dvh;
   display: flex;

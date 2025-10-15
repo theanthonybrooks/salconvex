@@ -45,7 +45,7 @@ const SubmissionFormOrgStep2 = ({
           )}
         >
           <div className="input-section self-start">
-            <p className="min-w-max font-bold lg:text-xl">Step 1:</p>
+            <p className="min-w-max font-bold lg:text-xl">Step 4:</p>
             <p className="lg:text-xs">Organizer Links</p>
           </div>
 
@@ -78,7 +78,7 @@ const SubmissionFormOrgStep2 = ({
             )}
           >
             <div className="input-section">
-              <p className="min-w-max font-bold lg:text-xl">Step 2</p>
+              <p className="min-w-max font-bold lg:text-xl">Step 5:</p>
               <p className="lg:text-xs">Primary Contact</p>
             </div>
             <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
@@ -143,7 +143,7 @@ const SubmissionFormOrgStep2 = ({
                 )}
             </div>
             <div className="input-section h-full">
-              <p className="min-w-max font-bold lg:text-xl">Step 3:</p>
+              <p className="min-w-max font-bold lg:text-xl">Step 6:</p>
               <p className="lg:text-xs">Organizer - About</p>
             </div>
 

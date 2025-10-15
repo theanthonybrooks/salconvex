@@ -1,5 +1,6 @@
 "use client";
 
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { DataTable } from "@/components/data-table/data-table";
 import { orgColumns } from "@/features/organizers/dashboard/data-tables/organizer-columns";
 import { cn } from "@/lib/utils";
@@ -7,6 +8,7 @@ import { useQuery } from "convex-helpers/react/cache";
 import { api } from "~/convex/_generated/api";
 
 export function OrganizerDashboardTableWrapper() {
+  const { isSidebarCollapsed } = useDashboard();
   const results = useQuery(api.events.event.getUserEvents);
 
   const orgEventsData = results ?? [];
@@ -21,6 +23,7 @@ export function OrganizerDashboardTableWrapper() {
             category: true,
             dates_edition: true,
             type: false,
+            lastEditedAt: isSidebarCollapsed,
           }}
           tableType="orgEvents"
           pageType="dashboard"

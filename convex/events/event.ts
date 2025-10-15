@@ -13,7 +13,13 @@ import { ConvexError, v } from "convex/values";
 import slugify from "slugify";
 import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
-import { categoryValidator, typeValidator } from "~/convex/schema";
+import {
+  eventFormatValidator,
+  eventSchema,
+  eventStateValidator,
+  linksFields,
+  prodFormatValidator,
+} from "~/convex/schema";
 
 import { internal } from "~/convex/_generated/api";
 import {
@@ -635,6 +641,7 @@ export const getUserEvents = query({
         ...event,
         isUserOrg: true,
         openCallState: openCall?.state ?? null,
+        openCallApproved: openCall?.approvedAt ? true : false,
         openCallId: openCall?._id ?? null,
         organizationName: orgNameMap.get(event.mainOrgId.toString()) ?? "",
         mainOrgId: event.mainOrgId,
@@ -1105,24 +1112,8 @@ export const getEventWithOCDetails = query({
 
 export const createOrUpdateEvent = mutation({
   args: {
-    formType: v.optional(v.number()),
-    orgId: v.id("organizations"),
-    _id: v.union(v.id("events"), v.string()),
-    logoStorageId: v.optional(v.id("_storage")),
-    name: v.string(),
-    slug: v.string(),
-    logo: v.string(),
-    type: typeValidator,
-    category: categoryValidator,
-    hasOpenCall: v.union(
-      v.literal("Fixed"),
-      v.literal("Rolling"),
-      v.literal("Email"),
-      v.literal("Invite"),
-      v.literal("Unknown"),
-      v.literal("False"),
-    ),
-
+    eventId: v.union(v.id("events"), v.string()),
+    ...eventSchema,
     dates: v.object({
       edition: v.number(),
       eventDates: v.optional(
@@ -1141,72 +1132,19 @@ export const createOrUpdateEvent = mutation({
           }),
         ),
       ),
-
-      eventFormat: v.optional(v.string()),
-      prodFormat: v.optional(v.string()),
+      eventFormat: v.optional(v.union(eventFormatValidator, v.literal(""))),
+      prodFormat: v.optional(v.union(prodFormatValidator, v.literal(""))),
       noProdStart: v.boolean(),
     }),
-    location: v.object({
-      sameAsOrganizer: v.boolean(),
-      full: v.optional(v.string()),
-      locale: v.optional(v.string()),
-      city: v.optional(v.string()),
-      state: v.optional(v.string()),
-      stateAbbr: v.optional(v.string()),
-      region: v.optional(v.string()),
-      country: v.string(),
-      countryAbbr: v.string(),
-      continent: v.optional(v.string()),
-      coordinates: v.optional(
-        v.object({
-          latitude: v.number(),
-          longitude: v.number(),
-        }),
-      ),
-      currency: v.optional(
-        v.object({
-          code: v.string(),
-          name: v.string(),
-          symbol: v.string(),
-        }),
-      ),
-      demonym: v.optional(v.string()),
-      timezone: v.optional(v.string()),
-      timezoneOffset: v.optional(v.number()),
-    }),
-    blurb: v.optional(v.string()),
-    about: v.optional(v.string()),
     links: v.optional(
       v.object({
         sameAsOrganizer: v.optional(v.boolean()),
-        website: v.optional(v.string()),
-        instagram: v.optional(v.string()),
-        facebook: v.optional(v.string()),
-        threads: v.optional(v.string()),
-        email: v.optional(v.string()),
-        vk: v.optional(v.string()),
-        linkedIn: v.optional(v.string()),
-        youTube: v.optional(v.string()),
-        phone: v.optional(v.string()),
-        phoneExt: v.optional(v.string()),
-        linkAggregate: v.optional(v.string()),
-        other: v.optional(v.string()),
+        ...linksFields,
       }),
     ),
-    otherInfo: v.optional(v.string()),
-    timeLine: v.optional(v.string()),
-    active: v.optional(v.boolean()),
-    state: v.optional(
-      v.union(
-        v.literal("draft"),
-        v.literal("submitted"),
-        v.literal("published"),
-        v.literal("archived"),
-      ),
-    ),
+    state: v.optional(eventStateValidator),
     finalStep: v.optional(v.boolean()),
     publish: v.optional(v.boolean()),
-    adminNote: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // console.log(args.logoStorageId, args.logo);
@@ -1235,7 +1173,7 @@ export const createOrUpdateEvent = mutation({
     }
     const isAdmin = user?.role.includes("admin");
     // console.log("isAdmin", isAdmin);
-    const organization = await ctx.db.get(args.orgId);
+    const organization = await ctx.db.get(args.mainOrgId);
     // console.log("organization", organization);
     // console.log(organization?.links);
     const linksLength = Object.keys(args.links ?? {}).length;
@@ -1261,7 +1199,9 @@ export const createOrUpdateEvent = mutation({
       return typeof id === "string" && id.trim() !== "";
     }
 
-    const event = isValidEventId(args._id) ? await ctx.db.get(args._id) : null;
+    const event = isValidEventId(args.eventId)
+      ? await ctx.db.get(args.eventId)
+      : null;
 
     const eventApproved = event?.approvedAt ? true : false;
 
@@ -1286,7 +1226,7 @@ export const createOrUpdateEvent = mutation({
       (args.finalStep ? "sameAsEvent" : undefined);
 
     if (event) {
-      const isOwner = event.mainOrgId === args.orgId || isAdmin;
+      const isOwner = event.mainOrgId === args.mainOrgId || isAdmin;
       // console.log("isOwner", isOwner);
       if (!isOwner)
         throw new ConvexError("You don't have permission to update this event");
@@ -1381,8 +1321,8 @@ export const createOrUpdateEvent = mutation({
       links: sanitizedLinks,
       otherInfo: args.otherInfo,
       active: args.active || true,
-      mainOrgId: args.orgId,
-      organizerId: [args.orgId],
+      mainOrgId: args.mainOrgId,
+      organizerId: args.organizerId,
       adminNote: args.adminNote,
       // mainOrgName: "",
 
@@ -1395,6 +1335,42 @@ export const createOrUpdateEvent = mutation({
   },
 });
 
+export const updateEventStatus = mutation({
+  args: {
+    eventId: v.id("events"),
+    status: eventSchema.state,
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) throw new Error("User not found");
+    const isAdmin = user.role.includes("admin");
+    if (!isAdmin)
+      throw new Error("You don't have permission to approve events");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+
+    const oldDoc = event;
+    await ctx.db.patch(event._id, {
+      state: args.status,
+      lastEditedAt: Date.now(),
+      lastEditedBy: userId,
+      approvedBy: userId,
+      approvedAt: Date.now(),
+    });
+    const newDoc = await ctx.db.get(event._id);
+    if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
+    await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
+      eventId: args.eventId,
+    });
+
+    return { event };
+  },
+});
 export const approveEvent = mutation({
   args: {
     eventId: v.id("events"),

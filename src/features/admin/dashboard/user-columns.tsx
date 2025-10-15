@@ -437,7 +437,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     minSize: 120,
     maxSize: 400,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Organization Names" />
+      <DataTableColumnHeader column={column} title="Org Names" />
     ),
     cell: ({ row }) => {
       const organizationNames = row.getValue("organizationNames") as string[];

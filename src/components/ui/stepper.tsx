@@ -3,20 +3,42 @@ import { cn } from "@/lib/utils";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
-import * as React from "react";
+import {
+  createContext,
+  Dispatch,
+  ElementType,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { FaCheckDouble } from "react-icons/fa6";
 
 import { z } from "zod";
+
+interface StepperContextValue {
+  scrollRef: React.RefObject<HTMLDivElement | null>;
+}
+
+export const StepperContext = createContext<StepperContextValue | null>(null);
+export const useStepper = () => {
+  const context = useContext(StepperContext);
+  if (!context) {
+    throw new Error("useStepper must be used within a StepperContext.Provider");
+  }
+  return context;
+};
 
 interface StepperProps {
   activeStep: number;
   onNextStep?: () => void;
   onBackStep?: () => void;
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  setActiveStep: Dispatch<SetStateAction<number>>;
 
-  // setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  // setActiveStep: Dispatch<SetStateAction<number>>;
   skipped?: Set<number>;
-  setSkipped?: React.Dispatch<React.SetStateAction<Set<number>>>;
+  setSkipped?: Dispatch<SetStateAction<Set<number>>>;
   steps:
     | {
         id: number;
@@ -27,11 +49,11 @@ interface StepperProps {
         schema?: z.ZodTypeAny;
       }[]
     | number;
-  children?: React.ReactNode;
+  children?: ReactNode;
   className?: string;
   finalLabel?: string;
   onFinalSubmit?: () => void;
-  cancelButton?: React.ReactNode;
+  cancelButton?: ReactNode;
   onSave?: () => void;
   onPublish?: () => void;
   isDirty?: boolean;
@@ -45,8 +67,8 @@ interface StepperProps {
   adminMode?: boolean;
   dashboardView?: boolean;
   formType?: number;
-  setFormType?: React.Dispatch<React.SetStateAction<number>>;
-  formTypeOptions?: { value: number; Icon: React.ElementType }[];
+  setFormType?: Dispatch<SetStateAction<number>>;
+  formTypeOptions?: { value: number; Icon: ElementType }[];
 }
 
 export default function HorizontalLinearStepper({
@@ -80,6 +102,13 @@ export default function HorizontalLinearStepper({
 }: StepperProps) {
   // console.log(errorMsg);
   // console.log(disabled);
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      scrollContainerRef.current?.scrollTo({ top: 0, behavior: "auto" });
+    });
+  }, [activeStep]);
+
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const stepArray =
     typeof steps === "number"
       ? Array.from({ length: steps }, (_, i) => ({
@@ -116,348 +145,358 @@ export default function HorizontalLinearStepper({
   const lastStep = stepArray.length - 1;
   const firstStep = activeStep === 0;
   return (
-    <div
-      className={cn(
-        "flex h-full w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[85dvh]",
-        dashboardView ? "max-h-[87dvh] xl:max-h-[87dvh]" : "max-h-[90dvh]",
-        className,
-      )}
-    >
-      <section
-        id="top-bar"
-        className="-mt-[20px] flex flex-col gap-4 lg:mt-auto lg:grid lg:grid-cols-[20%_60%_1fr]"
+    <StepperContext.Provider value={{ scrollRef: scrollContainerRef }}>
+      <div
+        className={cn(
+          "flex h-full w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[85dvh]",
+          dashboardView ? "max-h-[87dvh] xl:max-h-[87dvh]" : "max-h-[90dvh]",
+          className,
+        )}
       >
-        <p className="mx-auto flex items-center text-lg lg:text-sm">
-          <span className="hidden rounded-full text-center sm:block lg:min-w-40 lg:border-1.5 lg:bg-salYellow/30 lg:p-2 lg:px-4 lg:font-bold">
-            {stepArray[activeStep].label}
-          </span>
-          <span className="rounded-full text-center text-sm sm:hidden">
-            {stepArray[activeStep].mobileLabel}
-          </span>
-        </p>
+        <section
+          id="top-bar"
+          className="-mt-[20px] flex flex-col gap-4 lg:mt-auto lg:grid lg:grid-cols-[20%_60%_1fr]"
+        >
+          <p className="mx-auto flex items-center text-lg lg:text-sm">
+            <span className="hidden rounded-full text-center sm:block lg:min-w-40 lg:border-1.5 lg:bg-salYellow/30 lg:p-2 lg:px-4 lg:font-bold">
+              {stepArray[activeStep].label}
+            </span>
+            <span className="rounded-full text-center text-sm sm:hidden">
+              {stepArray[activeStep].mobileLabel}
+            </span>
+          </p>
 
-        {/* Custom Stepper Header with Animated Connectors */}
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-center px-4">
-          {stepArray.map((step, index) => {
-            if (skipped?.has(index)) {
-              return null;
-            }
-            const skippedBefore = [...(skipped ?? [])].filter(
-              (skippedIndex) => skippedIndex < index,
-            ).length;
-            const displayNumber = index + 1 - skippedBefore;
+          {/* Custom Stepper Header with Animated Connectors */}
+          <div className="mx-auto flex w-full max-w-3xl items-center justify-center px-4">
+            {stepArray.map((step, index) => {
+              if (skipped?.has(index)) {
+                return null;
+              }
+              const skippedBefore = [...(skipped ?? [])].filter(
+                (skippedIndex) => skippedIndex < index,
+              ).length;
+              const displayNumber = index + 1 - skippedBefore;
 
-            return (
-              <div
-                key={index}
-                className={cn(
-                  "flex w-full items-center",
-                  index === lastStep && "w-auto",
-                )}
-              >
+              return (
                 <div
+                  key={index}
                   className={cn(
-                    "z-10 flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold",
-                    {
-                      "border-salPinkDark bg-white text-salPinkDark":
-                        activeStep === index,
-                      "border-salPinkDark bg-salPinkDark text-white ring-4 ring-salPinkLtHover ring-offset-2":
-                        activeStep > index,
-
-                      "border-foreground/30 bg-white text-foreground/50":
-                        activeStep < index,
-                      "opacity-50": skipped?.has(index),
-                    },
-                    isAdmin && "cursor-pointer hover:scale-105 active:scale-95",
+                    "flex w-full items-center",
+                    index === lastStep && "w-auto",
                   )}
-                  onClick={() => {
-                    if (!isAdmin) return;
-                    setActiveStep(index);
-                  }}
                 >
-                  {activeStep > index && !skipped?.has(index) ? (
-                    <Check className="size-6" />
-                  ) : (
-                    displayNumber
+                  <div
+                    className={cn(
+                      "z-10 flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold",
+                      {
+                        "border-salPinkDark bg-white text-salPinkDark":
+                          activeStep === index,
+                        "border-salPinkDark bg-salPinkDark text-white ring-4 ring-salPinkLtHover ring-offset-2":
+                          activeStep > index,
+
+                        "border-foreground/30 bg-white text-foreground/50":
+                          activeStep < index,
+                        "opacity-50": skipped?.has(index),
+                      },
+                      isAdmin &&
+                        "cursor-pointer hover:scale-105 active:scale-95",
+                    )}
+                    onClick={() => {
+                      if (!isAdmin) return;
+                      setActiveStep(index);
+                    }}
+                  >
+                    {activeStep > index && !skipped?.has(index) ? (
+                      <Check className="size-6" />
+                    ) : (
+                      displayNumber
+                    )}
+                  </div>
+
+                  {/* Animated Line */}
+                  {index < stepArray.length - 1 && (
+                    <motion.div className="relative mx-2 h-1 flex-1 overflow-hidden rounded bg-gray-300">
+                      <motion.div
+                        className="absolute left-0 top-0 h-full bg-salPinkDark"
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: activeStep > index ? "100%" : "0%",
+                        }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    </motion.div>
                   )}
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Animated Line */}
-                {index < stepArray.length - 1 && (
-                  <motion.div className="relative mx-2 h-1 flex-1 overflow-hidden rounded bg-gray-300">
-                    <motion.div
-                      className="absolute left-0 top-0 h-full bg-salPinkDark"
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: activeStep > index ? "100%" : "0%",
-                      }}
-                      transition={{ duration: 0.5 }}
-                    />
-                  </motion.div>
-                )}
+          {adminMode &&
+            typeof formType === "number" &&
+            setFormType &&
+            ((isMobile && firstStep) || !isMobile) && (
+              <div className="relative inset-y-0 z-10 mx-auto mt-3 flex w-40 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:mt-0 lg:w-28 lg:p-0">
+                {/* Thumb indicator */}
+                <div
+                  className={cn(
+                    "absolute left-0 top-0 z-1 h-full w-1/3 bg-background transition-all duration-200 ease-out",
+                    formType === 1 && "translate-x-0",
+                    formType === 2 && "translate-x-full bg-orange-200",
+                    formType === 3 && "translate-x-[200%] bg-emerald-200",
+                  )}
+                />
+
+                {/* Icon buttons */}
+                {formTypeOptions?.map(({ value, Icon }) => (
+                  <button
+                    key={value}
+                    onClick={() => setFormType(value)}
+                    className={cn(
+                      "relative z-10 flex w-1/3 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
+                      formType === value && "text-foreground",
+                    )}
+                    type="button"
+                  >
+                    <Icon className="size-6 shrink-0 lg:size-4" />
+                  </button>
+                ))}
               </div>
-            );
-          })}
+            )}
+        </section>
+
+        {/* Scrollable Content */}
+        <div
+          className="scrollable justy mini darkbar my-4 h-full flex-1"
+          ref={scrollContainerRef}
+        >
+          {children}
         </div>
 
-        {adminMode &&
-          typeof formType === "number" &&
-          setFormType &&
-          ((isMobile && firstStep) || !isMobile) && (
-            <div className="relative inset-y-0 z-10 mx-auto mt-3 flex w-40 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:mt-0 lg:w-28 lg:p-0">
-              {/* Thumb indicator */}
-              <div
-                className={cn(
-                  "absolute left-0 top-0 z-1 h-full w-1/3 bg-background transition-all duration-200 ease-out",
-                  formType === 1 && "translate-x-0",
-                  formType === 2 && "translate-x-full bg-orange-200",
-                  formType === 3 && "translate-x-[200%] bg-emerald-200",
-                )}
-              />
-
-              {/* Icon buttons */}
-              {formTypeOptions?.map(({ value, Icon }) => (
-                <button
-                  key={value}
-                  onClick={() => setFormType(value)}
-                  className={cn(
-                    "relative z-10 flex w-1/3 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground",
-                    formType === value && "text-foreground",
-                  )}
-                  type="button"
-                >
-                  <Icon className="size-6 shrink-0 lg:size-4" />
-                </button>
-              ))}
+        {/* Buttons */}
+        {activeStep === stepArray.length ? (
+          <>
+            <Typography sx={{ mt: 2, mb: 1 }}>
+              All steps completed - you&apos;re finished
+            </Typography>
+            <div className="flex justify-end pt-2">
+              <Button onClick={handleReset}>Reset</Button>
             </div>
-          )}
-      </section>
+          </>
+        ) : (
+          <>
+            {errorMsg &&
+              errorMsg !== "Required" &&
+              errorMsg !== "Invalid input" && (
+                <p className="py-4 text-center text-sm italic text-red-600 lg:hidden">
+                  {errorMsg}
+                </p>
+              )}
+            <div
+              className={cn(
+                "flex items-center justify-end gap-x-4 lg:justify-between",
+              )}
+            >
+              <section className="hidden items-center gap-x-2 lg:flex">
+                <div>
+                  {activeStep >= 1 && activeStep !== stepArray.length - 1 && (
+                    <>
+                      {/* <Button
+                        variant="salWithShadowHidden"
+                        className={cn(
+                          "bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:hidden",
+                          isDirty &&
+                            onSave !== undefined &&
+                            activeStep >= 1 &&
+                            "opacity-100",
+                        )}
+                        //todo: fix the conditional styling that uses isDirty and onSave
+                        disabled={!isDirty || disabled}
+                        onClick={onSave}
+                      >
+                        Save
+                      </Button> */}
 
-      {/* Scrollable Content */}
-      <div className="scrollable justy mini darkbar my-4 h-full flex-1">
-        {children}
-      </div>
+                      <Button
+                        variant="salWithShadowHidden"
+                        className={cn(
+                          "hidden items-center gap-2 bg-salPinkLtHover opacity-0 hover:bg-salPinkLt disabled:opacity-40 lg:flex",
+                          isDirty && onSave !== undefined && "opacity-100",
+                        )}
+                        //todo: fix the conditional styling that uses isDirty and onSave
+                        disabled={!isDirty || disabled}
+                        onClick={onSave}
+                      >
+                        {pending
+                          ? "Saving"
+                          : !isDirty || disabled
+                            ? !lastSaved
+                              ? "Draft (Unsaved)"
+                              : isDirty
+                                ? "Unsaved Changes"
+                                : "Saved"
+                            : "Save Progress"}
+                        {pending && (
+                          <LoaderCircle className="size-4 animate-spin" />
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {/* {lastSaved && activeStep >= 1 && (
+                  <p className="hidden text-xs italic text-muted-foreground lg:block">
+                    Last saved: {lastSaved}
+                  </p>
+                )} */}
+              </section>
+              {onSave !== undefined &&
+                (!errorMsg ||
+                  errorMsg === "Required" ||
+                  errorMsg === "Invalid input") &&
+                !lastSaved &&
+                activeStep >= 1 && (
+                  <p className="hidden text-balance text-sm italic lg:block">
+                    You can save at any time and come back to it later.
+                  </p>
+                )}
 
-      {/* Buttons */}
-      {activeStep === stepArray.length ? (
-        <>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed - you&apos;re finished
-          </Typography>
-          <div className="flex justify-end pt-2">
-            <Button onClick={handleReset}>Reset</Button>
-          </div>
-        </>
-      ) : (
-        <>
-          {errorMsg &&
-            errorMsg !== "Required" &&
-            errorMsg !== "Invalid input" && (
-              <p className="py-4 text-center text-sm italic text-red-600 lg:hidden">
-                {errorMsg}
-              </p>
-            )}
-          <div
-            className={cn(
-              "flex items-center justify-end gap-x-4 lg:justify-between",
-            )}
-          >
-            <section className="hidden items-center gap-x-2 lg:flex">
-              <div>
-                {activeStep >= 1 && activeStep !== stepArray.length - 1 && (
-                  <>
-                    {/* <Button
-                      variant="salWithShadowHidden"
-                      className={cn(
-                        "bg-salPinkLtHover opacity-0 hover:bg-salPinkLt lg:hidden",
-                        isDirty &&
-                          onSave !== undefined &&
-                          activeStep >= 1 &&
-                          "opacity-100",
-                      )}
-                      //todo: fix the conditional styling that uses isDirty and onSave
-                      disabled={!isDirty || disabled}
-                      onClick={onSave}
-                    >
-                      Save
-                    </Button> */}
+              {errorMsg &&
+                errorMsg !== "Required" &&
+                errorMsg !== "Invalid input" && (
+                  <p className="hidden text-sm italic text-red-600 lg:block">
+                    {errorMsg}
+                  </p>
+                )}
 
+              <section
+                className={cn(
+                  "flex w-full min-w-24 items-center justify-end gap-2 sm:w-max",
+                  adminFinalStep &&
+                    "flex-col justify-center sm:w-auto sm:flex-row sm:justify-end",
+                  firstStep && isMobile && "",
+                )}
+              >
+                {lastSaved && activeStep >= 1 && (
+                  <p className="mr-2 hidden text-xs italic text-muted-foreground lg:block">
+                    Last saved: {lastSaved}
+                  </p>
+                )}
+                {isAdmin &&
+                  onCheckSchema &&
+                  activeStep !== stepArray.length - 1 &&
+                  isDirty && (
                     <Button
-                      variant="salWithShadowHidden"
-                      className={cn(
-                        "hidden items-center gap-2 bg-salPinkLtHover opacity-0 hover:bg-salPinkLt disabled:opacity-40 lg:flex",
-                        isDirty && onSave !== undefined && "opacity-100",
-                      )}
-                      //todo: fix the conditional styling that uses isDirty and onSave
-                      disabled={!isDirty || disabled}
-                      onClick={onSave}
+                      variant="salWithShadowHiddenYlw"
+                      onClick={onCheckSchema}
+                      className="hidden items-center gap-1 sm:flex"
                     >
-                      {pending
-                        ? "Saving"
-                        : !isDirty || disabled
-                          ? !lastSaved
-                            ? "Draft (Unsaved)"
-                            : isDirty
-                              ? "Unsaved Changes"
-                              : "Saved"
-                          : "Save Progress"}
+                      {pending ? "Pending..." : "Check Schema"}
                       {pending && (
                         <LoaderCircle className="size-4 animate-spin" />
                       )}
                     </Button>
-                  </>
-                )}
-              </div>
-              {/* {lastSaved && activeStep >= 1 && (
-                <p className="hidden text-xs italic text-muted-foreground lg:block">
-                  Last saved: {lastSaved}
-                </p>
-              )} */}
-            </section>
-            {onSave !== undefined &&
-              (!errorMsg ||
-                errorMsg === "Required" ||
-                errorMsg === "Invalid input") &&
-              !lastSaved &&
-              activeStep >= 1 && (
-                <p className="hidden text-balance text-sm italic lg:block">
-                  You can save at any time and come back to it later.
-                </p>
-              )}
+                  )}
 
-            {errorMsg &&
-              errorMsg !== "Required" &&
-              errorMsg !== "Invalid input" && (
-                <p className="hidden text-sm italic text-red-600 lg:block">
-                  {errorMsg}
-                </p>
-              )}
-
-            <section
-              className={cn(
-                "flex w-full min-w-24 items-center justify-end gap-2 sm:w-max",
-                adminFinalStep &&
-                  "flex-col justify-center sm:w-auto sm:flex-row sm:justify-end",
-                firstStep && isMobile && "",
-              )}
-            >
-              {lastSaved && activeStep >= 1 && (
-                <p className="mr-2 hidden text-xs italic text-muted-foreground lg:block">
-                  Last saved: {lastSaved}
-                </p>
-              )}
-              {isAdmin &&
-                onCheckSchema &&
-                activeStep !== stepArray.length - 1 &&
-                isDirty && (
+                {lastStep !== activeStep && cancelButton}
+                {activeStep !== 0 && (
                   <Button
                     variant="salWithShadowHiddenYlw"
-                    onClick={onCheckSchema}
-                    className="hidden items-center gap-1 sm:flex"
+                    disabled={activeStep === 0 || pending}
+                    // onClick={handleBack}
+                    onClick={onBackStep ?? handleBack}
+                    className={cn(adminFinalStep && "hidden sm:flex")}
                   >
-                    {pending ? "Pending..." : "Check Schema"}
+                    Back
+                  </Button>
+                )}
+
+                {stepArray[activeStep].optional && (
+                  <Button variant="salWithShadowHidden" onClick={handleSkip}>
+                    Skip
+                  </Button>
+                )}
+
+                <Button
+                  variant={
+                    disabled || pending
+                      ? "salWithoutShadow"
+                      : "salWithShadowHidden"
+                  }
+                  className={cn(
+                    "flex min-w-32 items-center gap-2",
+                    firstStep && isMobile && "flex-1",
+                    finalStep && "w-full sm:w-auto",
+                    finalStep &&
+                      !(disabled || pending) &&
+                      "translate-x-[3px] translate-y-[-3px] shadow-slg",
+                  )}
+                  disabled={disabled || pending}
+                  onClick={
+                    finalStep ? onFinalSubmit : (onNextStep ?? handleNext)
+                  }
+                >
+                  {finalStep ? (
+                    finalLabel ? (
+                      <div className="flex items-center gap-1">
+                        {finalLabel}
+                        {!pending && <CheckCircle2 className="size-5" />}
+                      </div>
+                    ) : (
+                      "Finish"
+                    )
+                  ) : firstStep ? (
+                    "Continue"
+                  ) : (
+                    "Next"
+                  )}
+                  {pending && <LoaderCircle className="size-4 animate-spin" />}
+                </Button>
+                {adminFinalStep && onPublish && (
+                  <Button
+                    variant="salWithShadowHiddenYlw"
+                    onClick={onPublish}
+                    className={cn(
+                      "flex items-center gap-1",
+                      adminFinalStep && "w-full sm:w-auto",
+                    )}
+                  >
+                    <div className="flex items-center gap-1">
+                      {pending ? "Publishing..." : "Publish"}{" "}
+                      {!pending && <FaCheckDouble className="size-5" />}
+                    </div>
+
                     {pending && (
                       <LoaderCircle className="size-4 animate-spin" />
                     )}
                   </Button>
                 )}
-
-              {lastStep !== activeStep && cancelButton}
-              {activeStep !== 0 && (
-                <Button
-                  variant="salWithShadowHiddenYlw"
-                  disabled={activeStep === 0 || pending}
-                  // onClick={handleBack}
-                  onClick={onBackStep ?? handleBack}
-                  className={cn(adminFinalStep && "hidden sm:flex")}
-                >
-                  Back
-                </Button>
-              )}
-
-              {stepArray[activeStep].optional && (
-                <Button variant="salWithShadowHidden" onClick={handleSkip}>
-                  Skip
-                </Button>
-              )}
-
-              <Button
-                variant={
-                  disabled || pending
-                    ? "salWithoutShadow"
-                    : "salWithShadowHidden"
-                }
-                className={cn(
-                  "flex min-w-32 items-center gap-2",
-                  firstStep && isMobile && "flex-1",
-                  finalStep && "w-full sm:w-auto",
-                  finalStep &&
-                    !(disabled || pending) &&
-                    "translate-x-[3px] translate-y-[-3px] shadow-slg",
+                {adminFinalStep && (
+                  <Button
+                    variant="salWithShadowHiddenYlw"
+                    disabled={pending}
+                    onClick={onBackStep ?? handleBack}
+                    className={cn(adminFinalStep && "w-full sm:hidden")}
+                  >
+                    Back
+                  </Button>
                 )}
-                disabled={disabled || pending}
-                onClick={finalStep ? onFinalSubmit : (onNextStep ?? handleNext)}
-              >
-                {finalStep ? (
-                  finalLabel ? (
-                    <div className="flex items-center gap-1">
-                      {finalLabel}
-                      {!pending && <CheckCircle2 className="size-5" />}
-                    </div>
-                  ) : (
-                    "Finish"
-                  )
-                ) : firstStep ? (
-                  "Continue"
-                ) : (
-                  "Next"
-                )}
-                {pending && <LoaderCircle className="size-4 animate-spin" />}
-              </Button>
-              {adminFinalStep && onPublish && (
-                <Button
-                  variant="salWithShadowHiddenYlw"
-                  onClick={onPublish}
-                  className={cn(
-                    "flex items-center gap-1",
-                    adminFinalStep && "w-full sm:w-auto",
-                  )}
-                >
-                  <div className="flex items-center gap-1">
-                    {pending ? "Publishing..." : "Publish"}{" "}
-                    {!pending && <FaCheckDouble className="size-5" />}
-                  </div>
+              </section>
+            </div>
 
-                  {pending && <LoaderCircle className="size-4 animate-spin" />}
-                </Button>
+            <div className="mt-4 hidden gap-2 text-center lg:hidden">
+              {lastSaved && (
+                <p className="text-xs italic text-muted-foreground">
+                  Last saved: {lastSaved}
+                </p>
               )}
-              {adminFinalStep && (
-                <Button
-                  variant="salWithShadowHiddenYlw"
-                  disabled={pending}
-                  onClick={onBackStep ?? handleBack}
-                  className={cn(adminFinalStep && "w-full sm:hidden")}
-                >
-                  Back
-                </Button>
+              {onSave !== undefined && !lastSaved && activeStep !== 0 && (
+                <p className="text-balance text-sm italic">
+                  (Form will autosave any new info after 1 minute)
+                </p>
               )}
-            </section>
-          </div>
-
-          <div className="mt-4 hidden gap-2 text-center lg:hidden">
-            {lastSaved && (
-              <p className="text-xs italic text-muted-foreground">
-                Last saved: {lastSaved}
-              </p>
-            )}
-            {onSave !== undefined && !lastSaved && activeStep !== 0 && (
-              <p className="text-balance text-sm italic">
-                (Form will autosave any new info after 1 minute)
-              </p>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+            </div>
+          </>
+        )}
+      </div>
+    </StepperContext.Provider>
   );
 }

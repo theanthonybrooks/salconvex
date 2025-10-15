@@ -151,8 +151,6 @@ export function DataTable<TData, TValue>({
     return defaultFiltersFromUrl;
   });
 
-  console.log(columnFilters);
-
   const initialSort = useMemo<SortingState>(() => {
     return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
   }, [defaultSort]);

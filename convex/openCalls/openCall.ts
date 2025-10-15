@@ -15,6 +15,7 @@ import {
   openCallsAggregate,
 } from "~/convex/aggregates/eventAggregates";
 import { generateUniqueNameAndSlug } from "~/convex/events/event";
+import { eventStateValidator, openCallSchema } from "~/convex/schema";
 
 export const getTotalNumberOfOpenCalls = query({
   handler: async (ctx) => {
@@ -279,103 +280,11 @@ export const createNewOpenCall = mutation({
 
 export const createOrUpdateOpenCall = mutation({
   args: {
-    orgId: v.id("organizations"),
-    eventId: v.id("events"),
+    // orgId: v.id("organizations"),
     openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
-    basicInfo: v.object({
-      appFee: v.number(),
-      callFormat: v.union(v.literal("RFQ"), v.literal("RFP"), v.literal("RFA")),
-      callType: v.union(
-        v.literal("Fixed"),
-        v.literal("Rolling"),
-        v.literal("Email"),
-        v.literal("Invite"),
-        v.literal("Unknown"),
-        v.literal("False"),
-      ),
-      dates: v.object({
-        ocStart: v.union(v.string(), v.null()),
-        ocEnd: v.union(v.string(), v.null()),
-        timezone: v.string(),
-        edition: v.number(),
-        // edition: v.number(), //note-to-self: this is used for the event's edition. Not sure if it's needed here. Could also just take from the event if it is necessary for some reason.
-      }),
-    }),
-    selectionCriteria: v.optional(v.string()),
-    eligibility: v.object({
-      type: v.union(
-        v.literal("International"),
-        v.literal("National"),
-        v.literal("Regional/Local"),
-        v.literal("Other"),
-        v.literal("Unknown"),
-      ),
-      whom: v.array(v.string()),
-      details: v.optional(v.string()),
-    }),
-    compensation: v.object({
-      budget: v.object({
-        hasBudget: v.boolean(),
-        min: v.number(),
-        max: v.optional(v.number()),
-        rate: v.number(),
-        unit: v.union(v.literal("ft²"), v.literal("m²"), v.literal("")),
-        currency: v.string(),
-        allInclusive: v.boolean(),
-        moreInfo: v.optional(v.string()),
-      }),
-
-      categories: v.object({
-        artistStipend: v.optional(v.union(v.number(), v.boolean())),
-        designFee: v.optional(v.union(v.number(), v.boolean())),
-        accommodation: v.optional(v.union(v.number(), v.boolean())),
-        food: v.optional(v.union(v.number(), v.boolean())),
-        travelCosts: v.optional(v.union(v.number(), v.boolean())),
-        materials: v.optional(v.union(v.number(), v.boolean())),
-        equipment: v.optional(v.union(v.number(), v.boolean())),
-      }),
-    }),
-    requirements: v.object({
-      requirements: v.string(),
-      more: v.optional(v.string()),
-      destination: v.optional(v.string()),
-      links: v.array(
-        v.object({
-          title: v.string(), //same here. I feel like it's valid to ask for what exactly the link is rather than relying on the title. Not sure, though.
-          href: v.string(),
-        }),
-      ),
-      applicationLink: v.string(),
-      applicationLinkFormat: v.union(
-        v.literal("https://"),
-        v.literal("mailto:"),
-      ),
-      applicationLinkSubject: v.optional(v.string()),
-      otherInfo: v.optional(v.string()),
-    }),
-    documents: v.optional(
-      v.array(
-        v.object({
-          id: v.id("openCallFiles"),
-          title: v.string(),
-          href: v.string(),
-          archived: v.optional(v.boolean()),
-        }),
-      ),
-    ),
-    state: v.optional(
-      v.union(
-        v.literal("draft"),
-        v.literal("editing"),
-        v.literal("pending"),
-        v.literal("submitted"),
-        v.literal("published"),
-        v.literal("archived"),
-      ),
-    ),
     finalStep: v.optional(v.boolean()),
     approved: v.optional(v.boolean()),
-    paid: v.optional(v.boolean()),
+    ...openCallSchema,
   },
 
   handler: async (ctx, args) => {
@@ -410,6 +319,7 @@ export const createOrUpdateOpenCall = mutation({
 
     const isAdmin = user?.role?.includes("admin");
 
+    //TODO: think about this logic and if it needs to be here or if it's better decided in the form per step (with the approved flag)
     const openCallState = isAdmin
       ? args.finalStep
         ? "published"
@@ -431,8 +341,8 @@ export const createOrUpdateOpenCall = mutation({
     const openCallData = {
       adminNoteOC: "",
       eventId: args.eventId,
-      organizerId: [args.orgId],
-      mainOrgId: args.orgId,
+      organizerId: args.organizerId,
+      mainOrgId: args.mainOrgId,
       basicInfo: args.basicInfo,
       selectionCriteria: args.selectionCriteria,
       eligibility: args.eligibility,
@@ -661,6 +571,8 @@ export const duplicateOC = mutation({
       hasOpenCall: event.hasOpenCall,
       dates: {
         ...event.dates,
+        eventDates: [{ start: "", end: "" }],
+        prodDates: [],
         edition,
       },
       location: {
@@ -673,6 +585,8 @@ export const duplicateOC = mutation({
       active: event.active,
       mainOrgId: event.mainOrgId,
       organizerId: event.organizerId,
+      blurb: event.blurb,
+
       // mainOrgName: "",
 
       state: "draft",
@@ -690,6 +604,7 @@ export const duplicateOC = mutation({
         ...openCall.basicInfo,
         dates: {
           ...openCall.basicInfo.dates,
+          ocEnd: "",
           edition,
         },
       },
@@ -730,6 +645,9 @@ export const deleteOC = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("User not found");
+    const isAdmin = user?.role?.includes("admin");
     const openCall = await ctx.db.get(args.openCallId);
     if (!openCall) return null;
     if (openCall.state !== "draft" && !args.isAdmin)
@@ -741,15 +659,17 @@ export const deleteOC = mutation({
       .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
       .first();
     if (ocLookup) await ctx.db.delete(ocLookup._id);
-    if (openCall.approvedAt) {
+    if (openCall.approvedAt && isAdmin) {
       await ctx.runMutation(internal.events.eventLookup.deleteEventLookup, {
         eventId: openCall.eventId,
         openCallOnly: true,
       });
     }
 
-    await ctx.db.delete(openCall._id);
-    await openCallsAggregate.delete(ctx, openCall!);
+    if ((openCall.approvedAt && isAdmin) || !openCall.approvedAt) {
+      await ctx.db.delete(openCall._id);
+      await openCallsAggregate.delete(ctx, openCall);
+    }
 
     return { openCall };
   },
@@ -758,13 +678,7 @@ export const deleteOC = mutation({
 export const changeOCStatus = mutation({
   args: {
     openCallId: v.id("openCalls"),
-    newStatus: v.union(
-      v.literal("published"),
-      v.literal("draft"),
-      v.literal("editing"),
-      v.literal("submitted"),
-      v.literal("archived"),
-    ),
+    newStatus: eventStateValidator,
     target: v.optional(
       v.union(v.literal("event"), v.literal("oc"), v.literal("both")),
     ),
@@ -787,16 +701,16 @@ export const changeOCStatus = mutation({
     if (!oc) throw new ConvexError("Open call not found");
     const eventId = oc.eventId;
     const prevState = oc.state;
-    const ocState =
+    const outputState =
       isAdmin && args.newStatus === "submitted" && prevState !== "published"
         ? "published"
         : args.newStatus || "submitted";
     const approvedBy = isAdmin ? userId : undefined;
     const prevEvent = await ctx.db.get(eventId);
 
-    if (targetBoth || ocState === "published") {
+    if (targetBoth || outputState === "published") {
       await ctx.db.patch(eventId, {
-        state: ocState,
+        state: outputState,
         lastEditedAt: Date.now(),
         approvedBy: approvedBy,
         approvedAt: Date.now(),
@@ -807,17 +721,16 @@ export const changeOCStatus = mutation({
       });
     }
     const newEvent = await ctx.db.get(eventId);
-    // console.log("prev event: ", prevEvent?._id, "new event: ", newEvent?._id);
-    await eventsAggregate.replace(ctx, prevEvent!, newEvent!);
+    if (newEvent && prevEvent)
+      await eventsAggregate.replaceOrInsert(ctx, prevEvent, newEvent);
     await ctx.db.patch(oc._id, {
-      state: ocState,
+      state: outputState,
       lastUpdatedAt: Date.now(),
       approvedBy: approvedBy,
       approvedAt: Date.now(),
     });
     const newOC = await ctx.db.get(oc._id);
-    console.log("prev oc: ", oc._id, "new oc: ", newOC?._id);
-    await openCallsAggregate.replace(ctx, oc, newOC!);
+    if (newOC) await openCallsAggregate.replaceOrInsert(ctx, oc, newOC);
     if (newOC?.approvedAt) {
       await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
         eventId: eventId,

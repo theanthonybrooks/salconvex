@@ -606,9 +606,9 @@ const Card = ({
           className={cn(
             "mt-1 size-2 rounded-full p-[5px] hover:cursor-pointer",
             newPriority === "high"
-              ? "bg-green-500"
+              ? "bg-red-500"
               : newPriority === "low"
-                ? "bg-red-500"
+                ? "bg-green-500"
                 : "bg-yellow-500",
           )}
         />

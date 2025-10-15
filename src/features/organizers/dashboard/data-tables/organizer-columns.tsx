@@ -340,6 +340,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       const slug = event.slug;
       const openCallId = event.openCallId;
       const hasOC = !!openCallId;
+      const ocApproved = !!event.approvedAt
       // console.log(openCallState);
 
       // const openCallState = event.openCallState;
@@ -373,7 +374,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                   eventId={event._id}
                   userRole={isAdmin ? "admin" : "user"}
                 />
-                {(state === "draft" || isAdmin) && (
+                {(state === "draft" && !ocApproved || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
                 {state === "published" && <ArchiveEvent eventId={event._id} />}

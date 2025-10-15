@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
+import { useStepper } from "@/components/ui/stepper";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { supportEmail } from "@/constants/siteInfo";
 import {
@@ -88,13 +89,16 @@ const SubmissionFormOrgStep = ({
   const orgName = orgData?.name ?? "";
   const bottomRef = useRef<HTMLParagraphElement | null>(null);
   const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
+  const { scrollRef } = useStepper();
+
   useEffect(() => {
-    if (scrollTrigger) {
-      if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({ behavior: "smooth" });
-      }
+    if (scrollTrigger && scrollRef.current) {
+      requestAnimationFrame(() => {
+        const el = scrollRef.current;
+        el?.scrollTo({ top: el?.scrollHeight, behavior: "smooth" });
+      });
     }
-  }, [scrollTrigger]);
+  }, [scrollTrigger, scrollRef]);
 
   const handleRowSelect = (
     event: EventType | null,

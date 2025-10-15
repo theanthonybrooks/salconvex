@@ -66,6 +66,7 @@ export const columnLabels: Record<string, string> = {
   dates_edition: "Edition",
   state: "State",
   openCallState: "Open Call",
+  approvedBy: "Approved By",
   lastEditedAt: "Last Edited",
   category: "Category",
   type: "Event Type",
@@ -90,6 +91,7 @@ export type Event = {
   posted?: PostStatus;
   eApprovedByUserName?: string | null;
   ocApprovedByUserName?: string | null;
+  openCallApproved?: boolean;
 };
 
 const approvedByColumn: ColumnDef<Event> = {
@@ -381,6 +383,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         const isAdmin = table.options.meta?.isAdmin;
         const isDashboard = table.options.meta?.pageType === "dashboard";
         const ocState = event.openCallState;
+        const ocApproved = event.openCallApproved;
         const openCallId = event.openCallId;
         const hasOC = !!openCallId;
         const edition = event.dates.edition;
@@ -500,7 +503,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                               />
 
                               <DuplicateOC openCallId={openCallId} />
-                              {isAdmin && (
+                              {(isAdmin || !ocApproved) && (
                                 <DeleteOC
                                   openCallId={openCallId}
                                   isAdmin={isAdmin}

@@ -57,7 +57,7 @@ import { getOcPricing } from "@/lib/pricingFns";
 import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
 import { EnrichedEvent, EventCategory } from "@/types/event";
-import { validOCVals } from "@/types/openCall";
+import { OpenCallState, validOCVals } from "@/types/openCall";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -79,7 +79,7 @@ export const getSteps = (isAdmin: boolean = false) => [
   },
   {
     id: 2,
-    label: "Organizer Details",
+    label: "Organization Pt.2",
     mobileLabel: "Organizer Details",
     schema: orgDetailsSchema,
   },
@@ -121,6 +121,8 @@ interface EventOCFormProps {
   user: User | undefined;
   onClick: () => void;
   shouldClose: boolean;
+  editedSections: ("event" | "openCall")[];
+  setEditedSections: Dispatch<SetStateAction<("event" | "openCall")[]>>;
   setShouldClose: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
   children?: ReactNode;
@@ -137,6 +139,8 @@ export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 export const EventOCForm = ({
   user,
   // onClick,
+  editedSections,
+  setEditedSections,
   shouldClose,
   setOpen,
   setShouldClose,
@@ -214,12 +218,14 @@ export const EventOCForm = ({
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+  const updateEventStatus = useMutation(api.events.event.updateEventStatus);
   const createNewOpenCall = useMutation(
     api.openCalls.openCall.createNewOpenCall,
   );
   const updateOpenCall = useMutation(
     api.openCalls.openCall.createOrUpdateOpenCall,
   );
+  const changeOCStatus = useMutation(api.openCalls.openCall.changeOCStatus);
   const updateEventLookup = useMutation(
     api.events.eventLookup.eventLookupUpdateHelper,
   );
@@ -258,8 +264,9 @@ export const EventOCForm = ({
   const [lastSaved, setLastSaved] = useState(
     existingEvent ? existingEvent.lastEditedAt : null,
   );
+
+  const [savedCount, setSavedCount] = useState(0);
   const [pending, setPending] = useState(false);
-  const [scrollTrigger, setScrollTrigger] = useState(false);
 
   const hasExistingOrg =
     typeof existingOrg === "object" && existingOrg !== null;
@@ -290,8 +297,6 @@ export const EventOCForm = ({
   // #region ------------- Refs --------------
   const prevErrorJson = useRef<string>("");
   const lastChangedRef = useRef<number | null>(null);
-  const topRef = useRef<HTMLDivElement | null>(null);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
   const canCheckSchema = useRef(false);
   const canClearEventData = useRef(true);
   const hasClosed = useRef(false);
@@ -316,7 +321,6 @@ export const EventOCForm = ({
   // #region ------------- Variables --------------
   const hasEventId = !!eventData?._id;
   const userAcceptedTerms = acceptedTerms;
-  const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
   const now = new Date();
@@ -490,6 +494,39 @@ export const EventOCForm = ({
   //   setActiveStep(0);
   // };
 
+  const handleDraftUpdate = useCallback(async () => {
+    try {
+      const bothEdited =
+        editedSections.includes("event") && editedSections.includes("openCall");
+
+      if (editedSections.includes("openCall") && openCallId) {
+        await changeOCStatus({
+          openCallId: openCallId as Id<"openCalls">,
+          newStatus: "draft",
+          target: bothEdited ? "both" : "oc",
+        });
+      } else if (editedSections.includes("event") && existingEvent?._id) {
+        await updateEventStatus({
+          eventId: existingEvent._id as Id<"events">,
+          status: "draft",
+        });
+      }
+
+      setSavedCount(0);
+      setEditedSections([]);
+    } catch (err) {
+      console.error("Failed to save:", err);
+    }
+  }, [
+    editedSections,
+    changeOCStatus,
+    updateEventStatus,
+    openCallId,
+    existingEvent,
+    setEditedSections,
+    setSavedCount,
+  ]);
+
   const submissionUrl = `${
     eventSlug || existingEvent?.slug
   }/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
@@ -599,9 +636,6 @@ export const EventOCForm = ({
     } else {
       setActiveStep((prev) => prev + 1);
     }
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: "auto" });
-    }
   };
 
   const handleBackStep = async () => {
@@ -614,12 +648,9 @@ export const EventOCForm = ({
       await handleSave();
     }
     proceedBackStep();
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: "auto" });
-    }
   };
+
   const proceedBackStep = () => {
-    console.log(activeStep);
     if (activeStep === steps.length - 1) {
       if (!hasOpenCall) {
         unregister("openCall");
@@ -628,6 +659,9 @@ export const EventOCForm = ({
         setActiveStep((prev) => prev - 1);
       }
     } else if (activeStep === 1) {
+      if (savedCount > 0 && activeStep > 0) {
+        handleDraftUpdate();
+      }
       if (!orgData?.contact?.primaryContact) {
         unregister("organization.contact");
         unregister("organization.links");
@@ -769,7 +803,7 @@ export const EventOCForm = ({
   );
 
   const handleSave = useCallback(
-    async (direct = false, publish = false) => {
+    async (direct = false, publish = false, exit = false) => {
       if (pending) return;
 
       setPending(true);
@@ -1029,7 +1063,7 @@ export const EventOCForm = ({
 
             const { event } = await createOrUpdateEvent({
               formType,
-              _id: eventData._id || "",
+              eventId: eventData._id || "",
               name: eventData.name,
               slug: slugify(eventData.name, { lower: true, strict: true }),
               logoStorageId,
@@ -1058,7 +1092,8 @@ export const EventOCForm = ({
               otherInfo: eventData.otherInfo || undefined,
               adminNote: eventData.adminNote || undefined,
               active: eventData.active,
-              orgId: orgData._id as Id<"organizations">,
+              mainOrgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
             });
 
             eventResult = event;
@@ -1081,7 +1116,7 @@ export const EventOCForm = ({
 
           try {
             const { event } = await createOrUpdateEvent({
-              _id: eventData._id || "",
+              eventId: eventData._id || "",
               name: eventData.name,
               slug: slugify(eventData.name, { lower: true, strict: true }),
 
@@ -1103,7 +1138,8 @@ export const EventOCForm = ({
               timeLine: eventData.timeLine,
               adminNote: eventData.adminNote || undefined,
               active: eventData.active,
-              orgId: orgData._id as Id<"organizations">,
+              mainOrgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
             });
 
             eventResult = event;
@@ -1194,7 +1230,8 @@ export const EventOCForm = ({
             );
 
             const ocResult = await updateOpenCall({
-              orgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
+              mainOrgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
               openCallId,
               basicInfo: {
@@ -1319,7 +1356,8 @@ export const EventOCForm = ({
 
           try {
             await updateOpenCall({
-              orgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
+              mainOrgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
               openCallId,
               basicInfo: {
@@ -1433,7 +1471,7 @@ export const EventOCForm = ({
 
             const { event } = await createOrUpdateEvent({
               formType,
-              _id: eventData._id || "",
+              eventId: eventData._id || "",
               name: eventData.name,
               slug: slugify(eventData.name, { lower: true, strict: true }),
               logo: eventData.logo as string,
@@ -1455,14 +1493,19 @@ export const EventOCForm = ({
               adminNote: eventData.adminNote || undefined,
 
               active: eventData.active,
-
+              ...(exit && {
+                state:
+                  eventData.state === "editing" ? "draft" : eventData.state,
+              }),
               finalStep,
               publish,
-              orgId: orgData._id as Id<"organizations">,
+              mainOrgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
             });
             if (hasOpenCall && openCallData) {
               await updateOpenCall({
-                orgId: orgData._id as Id<"organizations">,
+                organizerId: [orgData._id] as Id<"organizations">[],
+                mainOrgId: orgData._id as Id<"organizations">,
                 eventId: eventData._id as Id<"events">,
                 openCallId,
                 basicInfo: {
@@ -1523,7 +1566,14 @@ export const EventOCForm = ({
                   otherInfo: openCallData.requirements.otherInfo,
                 },
                 documents: normalizedCurrentDocs,
-                state: publish ? "published" : "submitted",
+                // state: publish ? "published" : "submitted",
+                state: publish
+                  ? "published"
+                  : exit
+                    ? openCallData.state === "editing"
+                      ? "draft"
+                      : (openCallData.state as OpenCallState)
+                    : "submitted",
                 finalStep,
                 approved: publish,
                 paid: formType === 3 && !alreadyPaid ? false : true,
@@ -1560,9 +1610,39 @@ export const EventOCForm = ({
             setOpen(false);
           }, 1500);
         }
+
+        if (activeStep > 1 && !exit && !finalStep) {
+          setSavedCount(savedCount + 1);
+
+          switch (activeStep) {
+            case 2:
+            case 3:
+              setEditedSections((prev) =>
+                prev.includes("event") ? prev : [...prev, "event"],
+              );
+              break;
+
+            case 4:
+            case 5:
+              setEditedSections((prev) =>
+                prev.includes("openCall") ? prev : [...prev, "openCall"],
+              );
+              break;
+
+            default:
+              break;
+          }
+        }
+
+        if (exit && savedCount > 0 && activeStep > 0) {
+          handleDraftUpdate();
+        }
       }
     },
     [
+      handleDraftUpdate,
+      savedCount,
+      setEditedSections,
       submissionUrl,
       isAdmin,
       setOpen,
@@ -1661,6 +1741,19 @@ export const EventOCForm = ({
   }, [formType, hasEventId]);
 
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (editedSections.length > 0) {
+        handleDraftUpdate();
+      }
+    };
+
+    window.addEventListener("unload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("unload", handleBeforeUnload);
+    };
+  }, [editedSections, handleDraftUpdate]);
+
+  useEffect(() => {
     if (formType === 1 || !initialFormType.current) return;
     if (projectBudgetLg && initialFormType.current < 3 && formType === 2) {
       setFormType(3);
@@ -1696,22 +1789,6 @@ export const EventOCForm = ({
       updateLastChanged();
     }
   }, [watchedValues, updateLastChanged, hasUserEditedForm]);
-
-  useEffect(() => {
-    if (scrollTrigger) {
-      if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({ behavior: "smooth" });
-        setScrollTrigger(false);
-      }
-    }
-  }, [scrollTrigger]);
-
-  useEffect(() => {
-    if (!firstTimeOnStep || bottomRef.current === null) return;
-    if (canNameEvent && activeStep === 1 && !existingEvent) {
-      setScrollTrigger(true);
-    }
-  }, [scrollTrigger, canNameEvent, activeStep, firstTimeOnStep, existingEvent]);
 
   // useEffect(() => {
   //   if (!schema || !hasUserEditedForm) return;
@@ -2010,7 +2087,8 @@ export const EventOCForm = ({
   }, [orgData, activeStep, setActiveStep]);
 
   const saveAndClose = useCallback(async () => {
-    await handleSave(true);
+    console.log("saving and closing");
+    await handleSave(true, false, true);
     setShouldClose(false);
     setOpen(false);
   }, [handleSave, setOpen, setShouldClose]);
@@ -2084,7 +2162,7 @@ export const EventOCForm = ({
                 : "Exit submission form?"
             }
             description={
-              activeStep > 0
+              activeStep > 0 && savedCount > 0
                 ? hasUnsavedChanges
                   ? "Sure? You can always start the submission process at a later time. Save your event to a draft in your dashboard."
                   : "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
@@ -2094,13 +2172,16 @@ export const EventOCForm = ({
             cancelTitle={hasUnsavedChanges ? "Cancel" : "Back"}
             primaryActionTitle="Save & Exit"
             onAction={() => {
+              //TODO: Update this to also/or change the open call. Whichever part was actually edited.
+              if (activeStep > 0 && editedSections.length > 0) {
+                saveAndClose();
+              }
               setOpen(false);
             }}
             onPrimaryAction={
               activeStep > 0 && hasUnsavedChanges
                 ? () => {
-                    handleSave();
-                    setOpen(false);
+                    saveAndClose();
                   }
                 : undefined
             }
@@ -2112,7 +2193,6 @@ export const EventOCForm = ({
           />
         }
       >
-        <div ref={topRef} />
         <FormProvider {...form}>
           <form
             onSubmit={handleSubmit(() => {
@@ -2237,8 +2317,6 @@ export const EventOCForm = ({
                 />
               </>
             )}
-
-            <div ref={bottomRef} />
           </form>
         </FormProvider>
       </HorizontalLinearStepper>

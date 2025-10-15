@@ -333,7 +333,7 @@ const EventContextMenu = ({
           </DropdownMenuGroup>
         )}
 
-        {hasActiveSubscription && !isArtist && !isUserOrg && (
+        {hasActiveSubscription && !isArtist && !isUserOrg && !isAdmin && (
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <Link href="/support">Error: Contact support </Link>

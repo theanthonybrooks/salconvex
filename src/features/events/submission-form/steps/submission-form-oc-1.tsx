@@ -89,7 +89,6 @@ const SubmissionFormOC1 = ({
 
   // console.log(errors?.openCall?.requirements?.applicationLink, errors);
   const appLinkFormat = watch("openCall.requirements.applicationLinkFormat");
-  console.log(appLinkFormat);
   const pastEvent = pastEventCheck && !isAdmin;
   const freeCall = formType === 2;
   const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">(
@@ -139,15 +138,17 @@ const SubmissionFormOC1 = ({
   const noEndRequired = callType && !fixedType;
   // const today = new Date();
   // const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
-  const todayDay = DateTime.now().setZone(orgTimezone).startOf("day");
+  // const todayDay = DateTime.now().setZone(orgTimezone).startOf("day");
+  const todayDay = DateTime.now().setZone(orgTimezone);
   const startDay = ocStart
-    ? DateTime.fromISO(ocStart, { setZone: true })
-        .setZone(orgTimezone)
-        .startOf("day")
+    ? DateTime.fromISO(ocStart, { setZone: true }).setZone(orgTimezone)
     : null;
   const minDT =
-    startDay && startDay >= todayDay ? startDay.plus({ days: 1 }) : todayDay;
+    startDay && (startDay >= todayDay || !isAdmin)
+      ? startDay.plus({ days: 1 })
+      : todayDay;
   const minDate = minDT.toISO();
+  // console.log(minDate);
   // const minDate =
   //   ocStart && DateTime.fromISO(ocStart) >= today
   //     ? DateTime.fromISO(ocStart).plus({ days: 1 }).toISO()

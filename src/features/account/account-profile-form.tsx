@@ -57,6 +57,9 @@ export const AccountSubscribeForm = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [shouldExit, setShouldExit] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [editedSections, setEditedSections] = useState<
+    ("event" | "openCall")[]
+  >([]);
   // const postType =
   //   planKey === "1" ? "eventOnly" : planKey === "2" ? "freeCall" : "paidCall";
 
@@ -68,7 +71,7 @@ export const AccountSubscribeForm = ({
       : activeSub
         ? "You can always update your artist profile later"
         : "You can always continue the subscription process later"
-    : activeStep > 0
+    : activeStep > 0 && editedSections.length > 0
       ? "Sure? You can always continue the submission process at a later time. We've saved your event to a draft in your dashboard."
       : "Sure? You can always start the submission process at a later time.";
 
@@ -85,11 +88,13 @@ export const AccountSubscribeForm = ({
     : "Exit submission form?";
 
   const handleClose = (withSave = false) => {
-    setActiveStep(0);
     if (withSave) {
+      console.log("with save");
       setShouldExit(true);
       setTimeout(() => {
+        setActiveStep(0);
         setShouldExit(false);
+        setEditedSections([]);
       }, 5000);
     } else {
       setOpen(false);
@@ -119,7 +124,8 @@ export const AccountSubscribeForm = ({
         showCloseButton={false}
         onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(
-          "scrollable max-h-dvh w-full max-w-full bg-card md:h-auto md:max-w-[max(60rem,60vw)]",
+          "max-h-dvh w-full max-w-full bg-card md:h-auto md:max-w-[max(60rem,60vw)]",
+          // "scrollable",
           className,
           !isArtist &&
             "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
@@ -154,7 +160,7 @@ export const AccountSubscribeForm = ({
             title={AlertTitle}
             description={alertDialogDescription}
             onAction={() => {
-              handleClose(false);
+              handleClose(editedSections.length > 0);
             }}
             actionTitle="Exit"
             className={cn("w-full")}
@@ -189,6 +195,8 @@ export const AccountSubscribeForm = ({
             shouldClose={shouldExit}
             setShouldClose={setShouldExit}
             setOpen={setOpen}
+            editedSections={editedSections}
+            setEditedSections={setEditedSections}
             isEligibleForFree={isEligibleForFree}
             planKey={planKey}
           />

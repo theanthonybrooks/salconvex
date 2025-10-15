@@ -73,6 +73,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
   const [formType, setFormType] = useState<number>(0);
+  const [editedSections, setEditedSections] = useState<
+    ("event" | "openCall")[]
+  >([]);
+  const [savedCount, setSavedCount] = useState(0);
 
   const eventOnly = formType === 1;
   const isAdmin = user?.role?.includes("admin") || false;
@@ -139,6 +143,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
+  const updateEventStatus = useMutation(api.events.event.updateEventStatus);
+  const changeOCStatus = useMutation(api.openCalls.openCall.changeOCStatus);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
   const createNewOpenCall = useMutation(
     api.openCalls.openCall.createNewOpenCall,
@@ -189,7 +195,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     existingEvent ? existingEvent.lastEditedAt : null,
   );
   const [pending, setPending] = useState(false);
-  const [scrollTrigger, setScrollTrigger] = useState(false);
   const isEligibleForFree = isAdmin ? true : orgHadFreeCall === false;
 
   const hasExistingOrg =
@@ -220,8 +225,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region ------------- Refs --------------
   const prevErrorJson = useRef<string>("");
   const lastChangedRef = useRef<number | null>(null);
-  const topRef = useRef<HTMLDivElement | null>(null);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
   const canCheckSchema = useRef(false);
   const canClearEventData = useRef(true);
   const isFirstRun = useRef(true);
@@ -247,7 +250,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventFormType = eventData?.formType;
   const hasEventId = !!eventData?._id;
   const userAcceptedTerms = acceptedTerms;
-  const firstTimeOnStep = furthestStep <= activeStep;
+  // const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
   const now = new Date();
@@ -432,6 +435,39 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     setActiveStep(0);
   };
 
+  const handleDraftUpdate = useCallback(async () => {
+    try {
+      const bothEdited =
+        editedSections.includes("event") && editedSections.includes("openCall");
+
+      if (editedSections.includes("openCall") && openCallId) {
+        await changeOCStatus({
+          openCallId: openCallId as Id<"openCalls">,
+          newStatus: "draft",
+          target: bothEdited ? "both" : "oc",
+        });
+      } else if (editedSections.includes("event") && existingEvent?._id) {
+        await updateEventStatus({
+          eventId: existingEvent._id as Id<"events">,
+          status: "draft",
+        });
+      }
+
+      setSavedCount(0);
+      setEditedSections([]);
+    } catch (err) {
+      console.error("Failed to save:", err);
+    }
+  }, [
+    editedSections,
+    changeOCStatus,
+    updateEventStatus,
+    openCallId,
+    existingEvent,
+    setEditedSections,
+    setSavedCount,
+  ]);
+
   const submissionUrl = `${
     eventSlug || existingEvent?.slug
   }/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
@@ -549,9 +585,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     } else {
       setActiveStep((prev) => prev + 1);
     }
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: "auto" });
-    }
   };
 
   const handleBackStep = async () => {
@@ -564,13 +597,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       await handleSave();
     }
     proceedBackStep();
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: "auto" });
-    }
   };
 
   const proceedBackStep = () => {
-    console.log(activeStep);
     if (activeStep === steps.length - 1) {
       if (!hasOpenCall) {
         unregister("openCall");
@@ -579,6 +608,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         setActiveStep((prev) => prev - 1);
       }
     } else if (activeStep === 1) {
+      if (savedCount > 0 && activeStep > 0) {
+        handleDraftUpdate();
+      }
       if (!orgData?.contact?.primaryContact) {
         unregister("organization.contact");
         unregister("organization.links");
@@ -954,7 +986,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
             const { event } = await createOrUpdateEvent({
               formType,
-              _id: eventData._id || "",
+              eventId: eventData._id || "",
               name: eventData.name,
               slug: slugify(eventData.name, { lower: true, strict: true }),
               logoStorageId,
@@ -984,7 +1016,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               timeLine: eventData.timeLine,
               adminNote: eventData.adminNote || undefined,
               active: eventData.active,
-              orgId: orgData._id as Id<"organizations">,
+              mainOrgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
             });
 
             eventResult = event;
@@ -1008,7 +1041,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           try {
             const { event } = await createOrUpdateEvent({
               formType,
-              _id: eventData._id || "",
+              eventId: eventData._id || "",
               name: eventData.name,
               slug: slugify(eventData.name, { lower: true, strict: true }),
 
@@ -1030,7 +1063,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               timeLine: eventData.timeLine,
               adminNote: eventData.adminNote || undefined,
               active: eventData.active,
-              orgId: orgData._id as Id<"organizations">,
+              mainOrgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
             });
 
             eventResult = event;
@@ -1120,7 +1154,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             );
 
             const ocResult = await updateOpenCall({
-              orgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
+              mainOrgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
               openCallId,
               basicInfo: {
@@ -1245,7 +1280,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
           try {
             await updateOpenCall({
-              orgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
+              mainOrgId: orgData._id as Id<"organizations">,
               eventId: eventData._id as Id<"events">,
               openCallId,
               basicInfo: {
@@ -1360,7 +1396,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
             const { event } = await createOrUpdateEvent({
               formType,
-              _id: eventData._id || "",
+              eventId: eventData._id || "",
               name: eventData.name,
               slug: slugify(eventData.name, { lower: true, strict: true }),
               logo: eventData.logo as string,
@@ -1385,11 +1421,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
               finalStep,
               publish,
-              orgId: orgData._id as Id<"organizations">,
+              mainOrgId: orgData._id as Id<"organizations">,
+              organizerId: [orgData._id] as Id<"organizations">[],
             });
             if (hasOpenCall && openCallData) {
               await updateOpenCall({
-                orgId: orgData._id as Id<"organizations">,
+                organizerId: [orgData._id] as Id<"organizations">[],
+                mainOrgId: orgData._id as Id<"organizations">,
                 eventId: eventData._id as Id<"events">,
                 openCallId,
                 basicInfo: {
@@ -1487,9 +1525,31 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             handleReset();
           }, 1500);
         }
+        if (activeStep > 1 && !finalStep) {
+          setSavedCount(savedCount + 1);
+          switch (activeStep) {
+            case 2:
+            case 3:
+              setEditedSections((prev) =>
+                prev.includes("event") ? prev : [...prev, "event"],
+              );
+              break;
+
+            case 4:
+            case 5:
+              setEditedSections((prev) =>
+                prev.includes("openCall") ? prev : [...prev, "openCall"],
+              );
+              break;
+
+            default:
+              break;
+          }
+        }
       }
     },
     [
+      savedCount,
       steps.length,
       submissionUrl,
       projectBudget,
@@ -1552,6 +1612,18 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // useEffect(() => {
   //   console.log(formType, hasUserEditedForm);
   // }, [formType, hasUserEditedForm]);
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (editedSections.length > 0) {
+        handleDraftUpdate();
+      }
+    };
+
+    window.addEventListener("unload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("unload", handleBeforeUnload);
+    };
+  }, [editedSections, handleDraftUpdate]);
 
   useEffect(() => {
     if (!initialFormType.current && hasEventId) {
@@ -1611,22 +1683,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       updateLastChanged();
     }
   }, [watchedValues, updateLastChanged, hasUserEditedForm]);
-
-  useEffect(() => {
-    if (scrollTrigger) {
-      if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({ behavior: "smooth" });
-        setScrollTrigger(false);
-      }
-    }
-  }, [scrollTrigger]);
-
-  useEffect(() => {
-    if (!firstTimeOnStep || bottomRef.current === null) return;
-    if (canNameEvent && activeStep === 1 && !existingEvent) {
-      setScrollTrigger(true);
-    }
-  }, [scrollTrigger, canNameEvent, activeStep, firstTimeOnStep, existingEvent]);
 
   useEffect(() => {
     if (!schema || !hasUserEditedForm) return;
@@ -1996,7 +2052,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           </Button>
         }
       >
-        <div ref={topRef} />
         <FormProvider {...form}>
           <form
             onSubmit={handleSubmit(() => {
@@ -2124,8 +2179,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 />
               </>
             )}
-
-            <div ref={bottomRef} />
           </form>
         </FormProvider>
       </HorizontalLinearStepper>

@@ -388,6 +388,14 @@ export const SubmissionFormRecapMobile = ({
                     />
                   </span>
                 </section>
+                {ocData?.selectionCriteria && (
+                  <section className="flex flex-col gap-3">
+                    <span className="pr-4 align-top font-medium">
+                      Selection Criteria
+                    </span>
+                    <span>{ocData.selectionCriteria}</span>
+                  </section>
+                )}
 
                 {typeof ocData?.basicInfo?.appFee === "number" &&
                   ocData?.basicInfo?.appFee > 0 && (
@@ -522,7 +530,7 @@ export const SubmissionFormRecapMobile = ({
             <AccordionItem value="Organizer">
               <AccordionTrigger title="Organizer Data:" />
               <AccordionContent>
-                <pre className="scrollable mini text-wrap text-sm text-foreground">
+                <pre className="scrollable mini max-w-[74dvw] text-wrap text-sm text-foreground">
                   {JSON.stringify(orgData, null, 2)}
                 </pre>
               </AccordionContent>
@@ -530,7 +538,7 @@ export const SubmissionFormRecapMobile = ({
             <AccordionItem value="Event">
               <AccordionTrigger title="Event Data:" />
               <AccordionContent>
-                <pre className="scrollable mini text-wrap text-sm text-foreground">
+                <pre className="scrollable mini max-w-[74dvw] text-wrap text-sm text-foreground">
                   {JSON.stringify(eventData, null, 2)}
                 </pre>
               </AccordionContent>
@@ -538,7 +546,7 @@ export const SubmissionFormRecapMobile = ({
             <AccordionItem value="OpenCall">
               <AccordionTrigger title="Open Call Data:" />
               <AccordionContent>
-                <pre className="scrollable mini text-wrap text-sm text-foreground">
+                <pre className="scrollable mini max-w-[74dvw] text-wrap text-sm text-foreground">
                   {JSON.stringify(ocData, null, 2)}
                 </pre>
               </AccordionContent>

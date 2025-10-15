@@ -76,6 +76,9 @@ export default async function RootLayout({
   const browserName = h.get("x-browser-name");
   const deviceVendor = h.get("x-device-vendor");
   const deviceModel = h.get("x-device-model");
+  const pathname = h.get("x-pathname");
+  const isDashboard = pathname?.startsWith("/dashboard");
+  console.log(pathname, isDashboard);
 
   const cookieStore = await cookies();
   const localCookiePrefs = cookieStore.get("cookie_preferences")?.value ?? null;
@@ -99,7 +102,11 @@ export default async function RootLayout({
 
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={cn(isDashboard && "overflow-hidden")}
+      >
         <head>
           <link
             rel="stylesheet"
