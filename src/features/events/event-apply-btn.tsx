@@ -209,6 +209,17 @@ export const ApplyButton = ({
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
 
     setPending(true);
+    const newTab = window.open("about:blank");
+
+    if (!newTab) {
+      toast.error(
+        "Application redirect blocked. Please enable popups for this site.",
+      );
+      console.error("Popup was blocked");
+      return;
+    }
+    newTab.document.write(getExternalRedirectHtml(finalAppUrl));
+    newTab.document.close();
 
     // if (isEmail) {
     //   console.log("isEmail: ", isEmail);
@@ -227,7 +238,6 @@ export const ApplyButton = ({
 
     // newTab.document.write(getExternalRedirectHtml(finalAppUrl));
     // newTab.document.close();
-    let newTab: Window | null = null;
 
     try {
       if (!appStatus && openCall === "active" && autoApply && !orgPreview) {
@@ -242,17 +252,6 @@ export const ApplyButton = ({
         window.location.href = appUrl;
         return;
       }
-
-      newTab = window.open("about:blank");
-      if (!newTab) {
-        toast.error(
-          "Application redirect blocked. Please enable popups for this site.",
-        );
-        console.error("Popup was blocked");
-        return;
-      }
-      newTab.document.write(getExternalRedirectHtml(finalAppUrl));
-      newTab.document.close();
 
       newTab.location.href = finalAppUrl;
     } catch (error) {
