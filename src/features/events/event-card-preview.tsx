@@ -3,12 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { LinkList } from "@/components/ui/link-list";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import {
@@ -429,40 +424,31 @@ const EventCardPreview = ({
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
           <div className="flex flex-col items-center gap-y-3">
             {bookmarked && hasValidSub ? (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <FaBookmark
-                      className="size-7 cursor-pointer text-red-600"
-                      onClick={onBookmark}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent align="start">
-                    <p>Remove Bookmark</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <TooltipSimple
+                content="Remove Bookmark"
+                delayDuration={0}
+                align="start"
+              >
+                <FaBookmark
+                  className="size-7 cursor-pointer text-red-600"
+                  onClick={onBookmark}
+                />
+              </TooltipSimple>
             ) : (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <FaRegBookmark
-                      className="size-7 cursor-pointer"
-                      onClick={() => {
-                        if (!publicView && !publicPreview && hasValidSub)
-                          onBookmark();
-                      }}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent align="start">
-                    {publicView || publicPreview ? (
-                      <p>Become a member to bookmark</p>
-                    ) : (
-                      <p>Bookmark {getEventCategoryLabel(eventCategory)}</p>
-                    )}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <TooltipSimple
+                align="start"
+                delayDuration={0}
+                content={
+                  publicView || publicPreview
+                    ? "Become a member to bookmark"
+                    : `Bookmark ${getEventCategoryLabel(eventCategory)}`
+                }
+              >
+                <FaRegBookmark
+                  className="size-7 cursor-pointer"
+                  onClick={onBookmark}
+                />
+              </TooltipSimple>
             )}
             {isAdmin &&
               (posted === "toPost" ? (
@@ -481,56 +467,41 @@ const EventCardPreview = ({
                 />
               ) : null)}
             {appStatus === null ? (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <CircleDollarSignIcon
-                      className={cn(
-                        "size-6 text-red-600",
-                        !basicInfo?.appFee && "hidden",
-                      )}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent align="start">
-                    <p>Has application fee</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <TooltipSimple
+                align="start"
+                delayDuration={0}
+                content="Has application fee"
+              >
+                <CircleDollarSignIcon
+                  className={cn(
+                    "size-6 text-red-600",
+                    !basicInfo?.appFee && "hidden",
+                  )}
+                />
+              </TooltipSimple>
             ) : (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <CheckCircleIcon
-                      className={cn(
-                        "size-6 text-emerald-600",
-                        publicView && "hidden",
-                      )}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent align="start">
-                    <p>
-                      Status:{" "}
-                      {appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1)}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <TooltipSimple
+                align="start"
+                delayDuration={0}
+                content={`Status: ${appStatus.slice(0, 1).toUpperCase() + appStatus.slice(1)}`}
+              >
+                <CheckCircleIcon
+                  className={cn(
+                    "size-6 text-emerald-600",
+                    publicView && "hidden",
+                  )}
+                />
+              </TooltipSimple>
             )}
 
             {hidden && hasValidSub && (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <EyeOff
-                      className="size-6 cursor-pointer"
-                      onClick={onHide}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent align="start">
-                    <p>Unhide event?</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <TooltipSimple
+                delayDuration={0}
+                content="Unhide event?"
+                align="start"
+              >
+                <EyeOff className="size-6 cursor-pointer" onClick={onHide} />
+              </TooltipSimple>
             )}
           </div>
           <EventContextMenu

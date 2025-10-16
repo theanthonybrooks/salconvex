@@ -17,7 +17,7 @@ const CustomArrow = React.forwardRef<
         "group-data-[side=bottom]:-translate-y-[1.5px]",
         "group-data-[side=left]:translate-x-[2px]",
         "group-data-[side=right]:-translate-x-[2px]",
-        "group-data-[align=start]:-translate-x-[6px]",
+        "group-data-[align=start]:translate-x-[3px]",
         "group-data-[align=end]:-translate-x-[2px]",
         "opacity-0 transition-opacity duration-200",
         "group-data-[state=closed]:opacity-0 group-data-[state=delayed-open]:opacity-100",
@@ -48,7 +48,14 @@ const TooltipContent = React.forwardRef<
   }
 >(
   (
-    { className, sideOffset = 4, children, withArrow = true, ...props },
+    {
+      className,
+      sideOffset = 4,
+
+      children,
+      withArrow = true,
+      ...props
+    },
     ref,
   ) => (
     <TooltipPrimitive.Portal>
@@ -59,6 +66,7 @@ const TooltipContent = React.forwardRef<
           "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
           "opacity-0 transition-opacity duration-200",
           "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
+
           className,
         )}
         {...props}
@@ -89,7 +97,7 @@ export const TooltipSimple = ({
   children,
   content,
   side = "top",
-  sideOffset = 4,
+  sideOffset = 8,
   align = "center",
   alignOffset = 0,
   delayDuration = 300,
@@ -105,6 +113,7 @@ export const TooltipSimple = ({
 
   return (
     <TooltipProvider delayDuration={disabled ? 0 : delayDuration}>
+      {/* <Tooltip open={true}> */}
       <Tooltip open={disabled ? false : undefined}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
 

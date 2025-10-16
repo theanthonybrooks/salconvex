@@ -160,7 +160,13 @@ const EventContextMenu = ({
 
   return (
     <DropdownMenu>
-      <TooltipSimple content="More options" side="top">
+      <TooltipSimple
+        content="More options"
+        side="top"
+        align="start"
+        sideOffset={3}
+        delayDuration={0}
+      >
         <DropdownMenuTrigger asChild>
           {buttonTrigger ? (
             <Button
