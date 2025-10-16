@@ -989,12 +989,17 @@ async function deleteRelatedDocuments(
   }
 
   // 1. Delete passwordResetLog entries.
-  await deleteInBatches("passwordResetLog", "userId", (q: any) =>
+  await deleteInBatches("passwordResetLog", "userId", (q) =>
     q.eq("userId", userId),
   );
 
   // 2. Delete user preferences
-  await deleteInBatches("userPreferences", "by_userId", (q: any) =>
+  await deleteInBatches("userPreferences", "by_userId", (q) =>
+    q.eq("userId", userId),
+  );
+
+  // 3. Delete newsletter subscriptions
+  await deleteInBatches("newsletter", "by_userId", (q) =>
     q.eq("userId", userId),
   );
 

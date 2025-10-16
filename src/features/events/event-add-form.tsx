@@ -612,6 +612,7 @@ export const EventOCForm = ({
       await handleSave();
     }
     handleFirstStep();
+
     if (activeStep === 3) {
       if (!hasOpenCall) {
         unregister("openCall");
@@ -634,6 +635,9 @@ export const EventOCForm = ({
         setActiveStep((prev) => prev + 1);
       }
     } else {
+      if (savedCount > 0 && activeStep === steps.length - 1) {
+        handleDraftUpdate();
+      }
       setActiveStep((prev) => prev + 1);
     }
   };
