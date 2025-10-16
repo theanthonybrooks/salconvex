@@ -113,6 +113,8 @@ export const RichTextEditor = ({
   tabIndex,
   withTaskList,
 }: Props) => {
+  const previewRef = useRef<HTMLDivElement>(null);
+
   const linkDialogRef = useRef<HTMLDivElement>(null);
   const [editorOpen, setEditorOpen] = useState(false);
 
@@ -406,6 +408,9 @@ export const RichTextEditor = ({
       setShowUnsavedDialog(true);
     } else {
       setEditorOpen(next);
+      if (!next) {
+        previewRef.current?.focus();
+      }
     }
   };
 
@@ -809,10 +814,12 @@ export const RichTextEditor = ({
             "relative cursor-pointer rounded border bg-card p-2",
             readOnly && "pointer-events-none border-foreground/50 opacity-50",
             "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
-
             inputPreviewContainerClassName,
           )}
-          tabIndex={tabIndex}
+          ref={previewRef}
+          tabIndex={tabIndex ?? 0}
+          role="button"
+          aria-label="Edit Text"
           onClick={() => setEditorOpen(true)}
           onMouseEnter={() => setHoverPreview(true)}
           onMouseLeave={() => setHoverPreview(false)}

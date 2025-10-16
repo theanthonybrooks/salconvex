@@ -1,4 +1,4 @@
-import type { FilePondFile } from "filepond"; // import type only
+import type { FilePondFile, FilePond as FilePondInstance } from "filepond"; // import type only
 import { FilePond, registerPlugin } from "react-filepond";
 
 import "filepond/dist/filepond.min.css";
@@ -46,6 +46,7 @@ export function FilePondInput({
   currentFileList,
 }: FilePondInputProps) {
   const currentFileListRef = useRef<string[] | undefined>(currentFileList);
+  const pondRef = useRef<FilePondInstance | null>(null);
 
   useEffect(() => {
     currentFileListRef.current = currentFileList;
@@ -107,6 +108,28 @@ export function FilePondInput({
     },
     [onChange],
   );
+
+  useEffect(() => {
+    // Cast just this access, not the ref itself
+    const el = (
+      pondRef.current as unknown as { root?: { element?: HTMLDivElement } }
+    )?.root?.element;
+    if (!el) return;
+
+    el.tabIndex = 0;
+    el.role = "button";
+    el.setAttribute("aria-label", "File upload area");
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        pondRef.current?.browse();
+      }
+    };
+
+    el.addEventListener("keydown", handleKeyDown);
+    return () => el.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <FilePond

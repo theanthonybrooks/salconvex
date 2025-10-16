@@ -38,7 +38,7 @@ export const OrgSearch = ({
   validationError: invalid,
   onReset,
   onLoadClick,
-  tabIndex,
+  tabIndex = 0,
 }: OrgSearchProps) => {
   const [inputValue, setInputValue] = useState(value || "");
   const [focused, setFocused] = useState(false);

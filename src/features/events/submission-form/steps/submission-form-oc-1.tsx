@@ -270,7 +270,6 @@ const SubmissionFormOC1 = ({
                     className={cn(
                       "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
                     )}
-                    tabIndex={1}
                   >
                     <SelectValue placeholder="Call Format (select one)" />
                   </SelectTrigger>
@@ -331,7 +330,6 @@ const SubmissionFormOC1 = ({
                       value={field.value || ""}
                     >
                       <SelectTrigger
-                        tabIndex={2}
                         className={cn(
                           "h-12 w-full border bg-card text-center text-base sm:h-[50px]",
                         )}
@@ -411,7 +409,6 @@ const SubmissionFormOC1 = ({
                       "cca3",
                       "altSpellings",
                     ]}
-                    tabIndex={3}
                     className={cn(
                       "h-12 min-h-12 border border-foreground bg-card text-base hover:bg-card",
                       !hasRequiredEligDetails && isNational && "invalid-field",
@@ -438,7 +435,6 @@ const SubmissionFormOC1 = ({
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
-                    tabIndex={4}
                     readOnly={pastEvent}
                     value={field.value ?? ""}
                     onChange={field.onChange}
@@ -481,7 +477,6 @@ const SubmissionFormOC1 = ({
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
-                    tabIndex={5}
                     readOnly={pastEvent}
                     value={field.value ?? ""}
                     onChange={field.onChange}
@@ -528,7 +523,6 @@ const SubmissionFormOC1 = ({
                   className={cn(
                     "h-12 w-full min-w-20 border bg-card text-center text-base sm:h-[50px] sm:w-fit",
                   )}
-                  tabIndex={6}
                 >
                   <SelectValue placeholder="Select One" />
                 </SelectTrigger>
@@ -563,11 +557,6 @@ const SubmissionFormOC1 = ({
                   control={control}
                   render={({ field }) => (
                     <SearchMappedSelect<Currency>
-                      tabIndex={
-                        ocEligiblityType === "National" && showAppFeeInput
-                          ? 7
-                          : -1
-                      }
                       searchFields={["name", "symbol", "code"]}
                       className="max-w-28 border-none bg-card py-2 sm:h-fit"
                       value={field.value?.code ?? "USD"}
@@ -603,11 +592,6 @@ const SubmissionFormOC1 = ({
                       }}
                       min={0}
                       formatNumber={true}
-                      tabIndex={
-                        ocEligiblityType === "National" && showAppFeeInput
-                          ? 8
-                          : -1
-                      }
                       // field={field}
                       placeholder={hasAppFee ? "Amount" : ""}
                       className="h-fit border-none bg-card py-2 text-center focus:border-none focus:outline-none sm:text-base"
@@ -665,7 +649,6 @@ const SubmissionFormOC1 = ({
                         orgTimezone={orgTimezone}
                         showTimeZone={false}
                         isAdmin={isAdmin}
-                        tabIndex={9}
                       />
                     )}
                   />
@@ -691,7 +674,6 @@ const SubmissionFormOC1 = ({
                         orgTimezone={orgTimezone}
                         placeholder="Deadline"
                         isAdmin={isAdmin}
-                        tabIndex={10}
                       />
                     )}
                   />
@@ -738,7 +720,6 @@ const SubmissionFormOC1 = ({
                           "invalid-field",
                       )}
                       formInputPreview
-                      tabIndex={11}
                     />
                   )}
                 />
@@ -783,7 +764,6 @@ const SubmissionFormOC1 = ({
                       )}
                       formInputPreviewClassName="line-clamp-5"
                       formInputPreview
-                      tabIndex={12}
                     />
                   )}
                 />
@@ -853,7 +833,6 @@ const SubmissionFormOC1 = ({
                                   ?.applicationLink && "invalid-field",
                               )}
                               debounceMs={50}
-                              tabIndex={12}
                               onBlur={() => {
                                 field.onBlur?.();
                                 handleCheckSchema?.();
@@ -876,7 +855,6 @@ const SubmissionFormOC1 = ({
                             placeholder="Email Subject (optional)"
                             className={cn("w-full rounded border-foreground")}
                             debounceMs={50}
-                            tabIndex={12}
                             // onBlur={() => {
                             //   field.onBlur?.();
                             //   handleCheckSchema?.();

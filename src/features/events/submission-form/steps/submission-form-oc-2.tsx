@@ -329,7 +329,7 @@ const SubmissionFormOC2 = ({
               render={({ field }) => (
                 <SearchMappedSelect<Currency>
                   searchFields={["name", "symbol", "code"]}
-                  className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
+                  className="w-40 border-none bg-card py-2 ring-foreground/50 focus-visible:ring-2 sm:h-fit sm:w-40"
                   value={field.value ?? orgCurrency?.code ?? "USD"}
                   onChange={(code) => {
                     const selected = Object.values(currencies[0])
@@ -432,7 +432,7 @@ const SubmissionFormOC2 = ({
                 render={({ field }) => {
                   return (
                     <Checkbox
-                      tabIndex={4}
+                      tabIndex={0}
                       id="noProdStart"
                       className="focus-visible:bg-salPink/50 focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-salPink focus-visible:ring-offset-1 focus-visible:data-[selected=true]:bg-salPink/50"
                       checked={field.value || false}
@@ -478,7 +478,7 @@ const SubmissionFormOC2 = ({
                     render={({ field }) => (
                       <SearchMappedSelect<Currency>
                         searchFields={["name", "symbol", "code"]}
-                        className="w-40 border-none bg-card py-2 sm:h-fit sm:w-40"
+                        className="w-40 border-none bg-card py-2 ring-foreground/50 focus-visible:ring-2 sm:h-fit sm:w-40"
                         value={field.value ?? orgCurrency?.code ?? "USD"}
                         onChange={(code) => {
                           const selected = Object.values(currencies[0])
@@ -673,7 +673,7 @@ const SubmissionFormOC2 = ({
                     shiftOffset={-10}
                     hasSearch={false}
                     selectAll={false}
-                    tabIndex={4}
+                    tabIndex={0}
                   />
                 )}
               />

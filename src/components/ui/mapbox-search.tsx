@@ -52,7 +52,7 @@ export const MapboxInputFull = ({
   placeholder = "Enter a location",
   className,
   inputClassName,
-  tabIndex,
+  tabIndex = 0,
   disabled,
   isEvent,
   isArtist,

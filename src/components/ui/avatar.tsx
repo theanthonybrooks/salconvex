@@ -5,6 +5,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
+import { User as UserIcon } from "lucide-react";
 
 const Avatar = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Root>,
@@ -67,6 +68,7 @@ export const AvatarSimple = ({
     <AvatarFallback className="text-foreground">
       {user?.firstName?.[0].toUpperCase()}
       {user?.lastName?.[0].toUpperCase()}
+      {!user && <UserIcon className="size-4" />}
     </AvatarFallback>
   </Avatar>
 );

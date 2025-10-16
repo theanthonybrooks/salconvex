@@ -2155,6 +2155,7 @@ export const EventOCForm = ({
         pending={pending}
         cancelButton={
           <DialogCloseBtn
+            tabIndex={4}
             className="w-full"
             title={
               hasUnsavedChanges

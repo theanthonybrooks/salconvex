@@ -210,7 +210,6 @@ const SubmissionFormOrgStep = ({
                   }
                   className="mb-3 h-12 lg:mb-0 lg:h-20"
                   inputClassName="rounded-lg py-2 text-base lg:text-xl"
-                  tabIndex={1}
                 />
               )}
             />
@@ -254,7 +253,6 @@ const SubmissionFormOrgStep = ({
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       reset={reset}
-                      tabIndex={2}
                       disabled={!orgNameValid}
                       placeholder="Organization Location (city, state, country, etc)..."
                       className="mb-3 w-full lg:mb-0"
@@ -297,7 +295,6 @@ const SubmissionFormOrgStep = ({
                       disabled={!orgNameValid}
                       initialImage={existingOrg?.logo}
                       size={72}
-                      tabIndex={3}
                     />
                   )}
                 />

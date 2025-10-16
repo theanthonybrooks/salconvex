@@ -399,6 +399,7 @@ export default function HorizontalLinearStepper({
                 {lastStep !== activeStep && cancelButton}
                 {activeStep !== 0 && (
                   <Button
+                    tabIndex={0}
                     variant="salWithShadowHiddenYlw"
                     disabled={activeStep === 0 || pending}
                     // onClick={handleBack}
@@ -416,6 +417,7 @@ export default function HorizontalLinearStepper({
                 )}
 
                 <Button
+                  tabIndex={0}
                   variant={
                     disabled || pending
                       ? "salWithoutShadow"

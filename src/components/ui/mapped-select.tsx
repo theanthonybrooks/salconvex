@@ -90,7 +90,7 @@ export function SearchMappedSelect<T>({
   searchFields,
   disabled = false,
   placeholder = "Select an option",
-  tabIndex,
+  tabIndex = 0,
 }: // width = "w-[280px]",
 SearchMappedSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);

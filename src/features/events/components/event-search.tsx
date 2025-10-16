@@ -23,7 +23,7 @@ export function EventNameSearch({
   onChange,
   placeholder = "Search or enter new",
   className,
-  tabIndex,
+  tabIndex = 0,
   isExisting,
   isAdmin,
 }: EventNameSearchProps) {

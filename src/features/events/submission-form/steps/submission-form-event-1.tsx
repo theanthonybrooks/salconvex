@@ -274,7 +274,6 @@ const SubmissionFormEventStep1 = ({
                     shiftOffset={-10}
                     hasSearch={false}
                     selectAll={false}
-                    tabIndex={4}
                     showIcon={false}
                   />
                 )}
@@ -372,7 +371,7 @@ const SubmissionFormEventStep1 = ({
                         onChange={field.onChange}
                         onBlur={field.onBlur}
                         reset={eventNameExists}
-                        tabIndex={2}
+                        tabIndex={0}
                         placeholder="Event Location (if different from organization)..."
                         className="mb-3 w-full lg:mb-0"
                         inputClassName={cn(
@@ -413,7 +412,7 @@ const SubmissionFormEventStep1 = ({
                             : undefined
                         }
                         size={72}
-                        tabIndex={3}
+                        tabIndex={0}
                         className={cn("pb-3")}
                       />
                     )}
@@ -471,6 +470,7 @@ const SubmissionFormEventStep1 = ({
                         control={control}
                         render={({ field }) => (
                           <RichTextEditor
+                            tabIndex={0}
                             value={field.value ?? ""}
                             onChange={field.onChange}
                             placeholder="Full details about your project/event... "

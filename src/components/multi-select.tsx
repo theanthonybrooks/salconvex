@@ -184,7 +184,7 @@ export const MultiSelect = React.forwardRef<
       // modalPopover = false,
       shortResults = false,
       condensed = false,
-      tabIndex,
+      tabIndex = 0,
       // asChild = false,
       className,
       badgeClassName,

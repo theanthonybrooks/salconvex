@@ -102,6 +102,11 @@ export const CustomDatePicker = ({
   isAdmin,
   disabled,
 }: CustomDatePickerProps) => {
+  console.log(value);
+  console.log(
+    minDate,
+    new Date(Number(minDate ?? new Date().getFullYear()), 0, 1),
+  );
   const parsedDate =
     pickerType === "season" ? fromSeason(value ?? "") : toDate(value);
 
@@ -151,10 +156,12 @@ export const CustomDatePicker = ({
       withPortal={true}
       minDate={
         isAdmin
-          ? new Date(2010, 0, 1)
+          ? (minToDate ?? new Date(2010, 0, 1))
           : pickerType === "season"
             ? new Date(new Date().getFullYear(), 0, 1)
-            : (minToDate ?? new Date())
+            : pickerType === "year"
+              ? new Date(Number(minToDate ?? new Date().getFullYear()), 0, 1)
+              : (minToDate ?? new Date())
       }
       maxDate={maxToDate ?? new Date(2099, 11, 31)}
       // placeholderText={

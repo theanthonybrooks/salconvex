@@ -96,7 +96,7 @@ const SubmissionFormOrgStep2 = ({
                   //   id="event.location"
                   //   value={field.value || ""}
                   //   onChange={field.onChange}
-                  //   tabIndex={2}
+                  //   tabIndex={0}
                   //   placeholder="Name of primary contact"
                   //   className="mb-3 w-full rounded-lg border-foreground disabled:opacity-50 lg:mb-0"
                   // />
@@ -108,7 +108,7 @@ const SubmissionFormOrgStep2 = ({
                       errors?.organization?.contact?.organizer &&
                         "invalid-field",
                     )}
-                    tabIndex={2}
+                    tabIndex={0}
                     onBlur={() => {
                       field.onBlur?.();
                       handleCheckSchema?.();
@@ -131,7 +131,7 @@ const SubmissionFormOrgStep2 = ({
                           errors?.organization?.contact?.organizerTitle &&
                             "invalid-field",
                         )}
-                        tabIndex={3}
+                        tabIndex={0}
                         onBlur={() => {
                           field.onBlur?.();
                           handleCheckSchema?.();
@@ -157,6 +157,7 @@ const SubmissionFormOrgStep2 = ({
                 control={control}
                 render={({ field }) => (
                   <RichTextEditor
+                    tabIndex={0}
                     value={field.value ?? ""}
                     onChange={field.onChange}
                     placeholder="Add any info about your organization... "

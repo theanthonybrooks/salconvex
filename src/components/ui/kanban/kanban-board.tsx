@@ -678,10 +678,10 @@ const Card = ({
           onClick={handleTogglePriority}
           className={cn(
             "mt-1 size-2 rounded-full p-[5px] hover:cursor-pointer",
-            newPriority === "high"
-              ? "bg-red-500"
-              : newPriority === "low" || column === "done"
-                ? "bg-green-500"
+            newPriority === "low" || column === "done"
+              ? "bg-green-500"
+              : newPriority === "high"
+                ? "bg-red-500"
                 : "bg-yellow-500",
           )}
         />
@@ -887,15 +887,18 @@ export const TaskDialog = ({
             Title
           </Label>
           <Textarea
+            tabIndex={1}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={60}
             className="scrollable mini w-full resize-none rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+            placeholder="Task title..."
           />
           <Label htmlFor="description" className="sr-only">
             Description
           </Label>
           <RichTextEditor
+            tabIndex={2}
             value={description}
             onChange={(e) => setDescription(e)}
             placeholder="Task description..."
@@ -913,6 +916,7 @@ export const TaskDialog = ({
                 <Label htmlFor="column">Column</Label>
 
                 <SelectSimple
+                  tabIndex={3}
                   options={[...ColumnTypeOptions]}
                   value={column}
                   onChangeAction={(value) => setColumn(value as ColumnType)}
@@ -925,6 +929,7 @@ export const TaskDialog = ({
                 <Label htmlFor="priority">Priority</Label>
 
                 <SelectSimple
+                  tabIndex={4}
                   options={[...priorityOptions]}
                   value={priority}
                   onChangeAction={(value) => setPriority(value as Priority)}
@@ -938,6 +943,7 @@ export const TaskDialog = ({
                 <Label htmlFor="priority">Category</Label>
 
                 <SelectSimple
+                  tabIndex={5}
                   options={[...supportCategoryOptions]}
                   value={category}
                   onChangeAction={(value) =>
@@ -962,6 +968,7 @@ export const TaskDialog = ({
                     <option value="end">End</option>
                   </select> */}
                   <SelectSimple
+                    tabIndex={6}
                     options={[
                       { value: "start", label: "Start" },
                       { value: "end", label: "End" },
@@ -998,12 +1005,22 @@ export const TaskDialog = ({
             </div>
             <div className="flex justify-end gap-2">
               <DialogClose asChild>
-                <Button type="button" variant="salWithShadowHiddenYlw">
+                <Button
+                  type="button"
+                  variant="salWithShadowHiddenYlw"
+                  tabIndex={8}
+                  className="focus:scale-95"
+                >
                   Cancel
                 </Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button type="submit" variant="salWithShadowHidden">
+                <Button
+                  type="submit"
+                  variant="salWithShadowHidden"
+                  tabIndex={7}
+                  className="focus:scale-95 focus:bg-salYellow/20"
+                >
                   {isEdit ? "Save Changes" : "Add Task"}
                 </Button>
               </DialogClose>

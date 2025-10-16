@@ -12,6 +12,7 @@ interface DebouncedTextareaProps<
   placeholder?: string;
   className?: string;
   delay?: number;
+  tabIndex?: number;
 }
 
 export function DebouncedFormTextarea<
@@ -23,6 +24,7 @@ export function DebouncedFormTextarea<
   placeholder,
   className,
   delay = 300,
+  tabIndex = 0,
 }: DebouncedTextareaProps<TFieldValues, TName>) {
   const [localValue, setLocalValue] = useState(field.value ?? "");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,6 +66,7 @@ export function DebouncedFormTextarea<
           setLocalValue(val);
           debouncedOnChange(val);
         }}
+        tabIndex={tabIndex}
         maxLength={maxLength}
         placeholder={placeholder}
         className={cn(

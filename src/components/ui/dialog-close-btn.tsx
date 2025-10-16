@@ -34,11 +34,12 @@ interface DialogCloseBtnProps {
   triggerClassName?: string;
   triggerVariant?: ButtonVariant;
   triggerSize?: ButtonSize;
-
+  tabIndex?: number;
   ariaLabel?: string;
 }
 
 export const DialogCloseBtn = ({
+  tabIndex = 0,
   title = "Discard unsaved changes?",
   description = "If you close now, your changes will be lost. Are you sure you want to leave?",
   className,
@@ -92,6 +93,7 @@ export const DialogCloseBtn = ({
         {type === "icon" ? (
           <Button
             ref={triggerRef}
+            tabIndex={tabIndex}
             variant="icon"
             className={cn(
               "absolute right-5 top-4 z-10 !w-max text-lg font-bold text-foreground hover:text-red-600 focus:text-red-600",

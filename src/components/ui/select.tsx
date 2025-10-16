@@ -206,7 +206,7 @@ export const SelectSimple = ({
   contentClassName,
   itemClassName,
   placeholder,
-  tabIndex,
+  tabIndex = 0,
   invalid,
   disabled,
   id,

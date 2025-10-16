@@ -8,6 +8,7 @@ import {
 import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { useMutation } from "convex/react";
+import { CheckIcon } from "lucide-react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -27,30 +28,33 @@ export const KanbanUserSelector = ({
   cardId,
   mode,
 }: UserSelectorProps) => {
-  const { image: currentUserImage, name: currentUserName } = currentUser || {};
+  const { image: currentUserImage, firstName: currentUserName } =
+    currentUser || {};
   const staffUsers = useQuery(api.admin.getStaffUsers, isAdmin ? {} : "skip");
   const staffUsersData = staffUsers ?? [];
   const updateAssignedUser = useMutation(api.kanban.cards.updateAssignedUser);
 
   return (
     <div className="flex items-center gap-3 pr-8 text-sm">
-      Assign{mode === "add" ? "to" : "ed to"}:
+      <div className="flex flex-col items-end gap-1">
+        Assign{mode === "add" || !currentUser ? " to" : "ed to"}:
+        <span className="font-semibold">{currentUserName}</span>
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-2 rounded-md border border-transparent px-2 py-1 transition-colors hover:border-foreground/20 hover:bg-muted/20">
+          <button className="/20 flex items-center gap-2 rounded-md border border-transparent px-2 py-1 transition-colors hover:border-foreground/20">
             <AvatarSimple
               src={currentUserImage}
               alt={currentUserName}
               user={currentUser}
-              className="size-8"
+              className="size-10"
             />
-            <span className="font-semibold">{currentUserName}</span>
           </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
           align="end"
-          className="max-h-80 w-56 overflow-y-auto rounded-md border bg-card p-1 shadow-lg"
+          className="max-h-80 w-56 overflow-y-auto"
         >
           {staffUsersData.length > 0 &&
             staffUsersData?.map((staff: User) => (
@@ -58,7 +62,11 @@ export const KanbanUserSelector = ({
                 key={staff.userId}
                 onClick={async () => {
                   if (setCurrentUser) {
-                    setCurrentUser(staff);
+                    if (staff.userId !== currentUser?.userId) {
+                      setCurrentUser(staff);
+                    } else {
+                      setCurrentUser(null);
+                    }
                   }
                   if (cardId) {
                     await updateAssignedUser({
@@ -68,7 +76,7 @@ export const KanbanUserSelector = ({
                     });
                   }
                 }}
-                className="flex cursor-pointer items-center gap-2 px-2 py-2 hover:bg-muted"
+                className="flex cursor-pointer items-center gap-2 px-2 py-2"
               >
                 <AvatarSimple
                   src={staff.image}
@@ -79,25 +87,11 @@ export const KanbanUserSelector = ({
                 <span className="truncate">
                   {staff.firstName} {staff.lastName}
                 </span>
+                {staff.userId === currentUser?.userId && (
+                  <CheckIcon className="size-4 text-emerald-600" />
+                )}
               </DropdownMenuItem>
             ))}
-          {staffUsersData.length > 0 && (
-            <DropdownMenuItem
-              className="w-full text-center text-muted-foreground"
-              onClick={async () => {
-                if (setCurrentUser) {
-                  setCurrentUser(null);
-                }
-                await updateAssignedUser({
-                  id: cardId,
-                  userId: undefined,
-                  isAdmin,
-                });
-              }}
-            >
-              Clear Filter
-            </DropdownMenuItem>
-          )}
 
           {(!staffUsersData || staffUsersData.length === 0) && (
             <DropdownMenuItem disabled className="text-muted-foreground">

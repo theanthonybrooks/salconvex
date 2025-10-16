@@ -31,7 +31,7 @@ export default function LogoUploader({
   onRemoveAction,
   initialImage,
   className,
-  tabIndex,
+  tabIndex = 0,
   disabled,
   size = 80,
   imageOnly = false,
@@ -134,6 +134,7 @@ export default function LogoUploader({
           style={{ height: size, width: size }}
           onClick={() => fileInputRef.current?.click()}
           tabIndex={tabIndex}
+          role="button"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -203,7 +204,8 @@ export default function LogoUploader({
                   }}
                   className="rounded-md border bg-card px-2 py-1 text-sm shadow-sm focus:border-emerald-400 focus:outline-none disabled:border-muted-foreground disabled:text-muted-foreground lg:w-64"
                   disabled={disabled}
-                  tabIndex={tabIndex ? tabIndex + 1 : -1}
+                  tabIndex={tabIndex}
+                  // tabIndex={tabIndex ? tabIndex + 1 : -1}
                 />
               </div>
             )}
