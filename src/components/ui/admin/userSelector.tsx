@@ -57,7 +57,11 @@ export const StaffUserSelector = ({
             <DropdownMenuItem
               key={staff.userId}
               onClick={() => {
-                setCurrentUser(staff);
+                if (staff.userId !== currentUser?.userId) {
+                  setCurrentUser(staff);
+                } else {
+                  setCurrentUser(null);
+                }
               }}
               className="flex cursor-pointer items-center gap-2 px-2 py-2 hover:bg-muted"
             >

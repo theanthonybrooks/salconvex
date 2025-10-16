@@ -430,7 +430,7 @@ const EventCardPreview = ({
                 align="start"
               >
                 <FaBookmark
-                  className="size-7 cursor-pointer text-red-600"
+                  className="size-7 cursor-pointer text-red-600 active:scale-95"
                   onClick={onBookmark}
                 />
               </TooltipSimple>
@@ -445,7 +445,7 @@ const EventCardPreview = ({
                 }
               >
                 <FaRegBookmark
-                  className="size-7 cursor-pointer"
+                  className="size-7 cursor-pointer active:scale-95"
                   onClick={onBookmark}
                 />
               </TooltipSimple>
@@ -500,7 +500,10 @@ const EventCardPreview = ({
                 content="Unhide event?"
                 align="start"
               >
-                <EyeOff className="size-6 cursor-pointer" onClick={onHide} />
+                <EyeOff
+                  className="size-6 cursor-pointer active:scale-95"
+                  onClick={onHide}
+                />
               </TooltipSimple>
             )}
           </div>

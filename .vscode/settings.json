@@ -27,7 +27,8 @@
     "Artist",
     "Calendar",
     "Event",
-    "Zeren"
+    "Zeren",
+    "Data Tables"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

@@ -173,7 +173,7 @@ const EventContextMenu = ({
               variant="salWithShadowHidden"
               size="lg"
               className={cn(
-                "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 sm:h-11 sm:px-3 [&_svg]:size-6",
+                "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 active:scale-95 sm:h-11 sm:px-3 [&_svg]:size-6",
 
                 appStatus !== null &&
                   !nonAdminPublicView &&

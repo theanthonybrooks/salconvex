@@ -41,7 +41,7 @@ export function DataTablePagination<TData>({
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
       )}
-      <div className="flex w-full items-center justify-around space-x-6 lg:space-x-8">
+      <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="hidden items-center space-x-2 sm:flex">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
@@ -62,6 +62,7 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
+
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
           {table.getPageCount()}
@@ -71,7 +72,8 @@ export function DataTablePagination<TData>({
             variant="outline"
             className={cn(
               "hidden size-8 max-h-8 p-0 lg:flex",
-              "disabled:border-foreground/50 disabled:opacity-30 sm:disabled:invisible",
+              "disabled:border-foreground/50 disabled:opacity-30",
+              // "sm:disabled:invisible",
             )}
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
@@ -82,8 +84,9 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "h-8 max-h-8 w-10 p-0 sm:w-auto sm:p-2",
-              "disabled:border-foreground/50 disabled:opacity-30 sm:disabled:invisible",
+              "h-8 max-h-8 w-10 p-0 px-4 sm:w-auto sm:p-2",
+              "disabled:border-foreground/50 disabled:opacity-30",
+              // "sm:disabled:invisible",
             )}
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
@@ -95,7 +98,7 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "h-8 max-h-8 w-10 p-0 sm:w-auto sm:p-2",
+              "h-8 max-h-8 w-10 p-0 px-4 sm:w-auto sm:p-2",
               "disabled:border-foreground/50 disabled:opacity-30",
             )}
             onClick={() => table.nextPage()}
