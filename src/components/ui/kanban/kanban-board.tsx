@@ -320,20 +320,22 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
             ))}
           </div>
 
-          <Button
-            onClick={() => setShowFilters((prev) => !prev)}
-            className={cn(showFilters && "text-foreground")}
-            variant="icon"
-          >
-            <span className="flex items-center gap-1">
-              {showFilters ? (
-                <Filter className="6 size-5 shrink-0" />
-              ) : (
-                <FilterX className="6 size-5 shrink-0" />
-              )}
-              <p className="hidden xl:block">Filters</p>
-            </span>
-          </Button>
+          {isMobile && (
+            <Button
+              onClick={() => setShowFilters((prev) => !prev)}
+              className={cn(showFilters && "text-foreground")}
+              variant="icon"
+            >
+              <span className="flex items-center gap-1">
+                {showFilters ? (
+                  <Filter className="6 size-5 shrink-0" />
+                ) : (
+                  <FilterX className="6 size-5 shrink-0" />
+                )}
+                <p className="hidden xl:block">Filters</p>
+              </span>
+            </Button>
+          )}
         </div>
       </div>
       <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">

@@ -734,15 +734,16 @@ export default function SettingsPage() {
               )}
 
               {/* Preferences */}
-              <Card className={cn(isArtist && activeSub && "self-start")}>
-                <CardHeader>
-                  <CardTitle>Preferences</CardTitle>
-                  <CardDescription>
-                    Manage your account preferences
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* <div className='flex items-center justify-between'>
+              {isArtist && activeSub && (
+                <Card className={cn(isArtist && activeSub && "self-start")}>
+                  <CardHeader>
+                    <CardTitle>Preferences</CardTitle>
+                    <CardDescription>
+                      Manage your account preferences
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* <div className='flex items-center justify-between'>
                    //TODO: Add language selection in the future 
                      <div className='space-y-0.5'>
                       <Label className={fontSize}>Language</Label>
@@ -763,82 +764,82 @@ export default function SettingsPage() {
                     </Select>
                   </div>
                   <Separator />*/}
-                  <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
-                    <div className="space-y-0.5">
-                      <Label className={fontSize}>Timezone</Label>
-                      <span
+                    <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                      <div className="space-y-0.5">
+                        <Label className={fontSize}>Timezone</Label>
+                        <span
+                          className={cn(
+                            "flex items-center gap-x-1",
+                            isArtist && activeSub && "flex-col items-start",
+                          )}
+                        >
+                          <p className="text-sm text-muted-foreground">
+                            Set your local timezone
+                          </p>
+                          <p className="hidden text-xs italic text-muted-foreground lg:block">
+                            (if you want it used to display deadlines)
+                          </p>
+                        </span>
+                      </div>
+
+                      <SearchMappedSelect<Timezone>
+                        searchFields={[
+                          "name",
+                          "region",
+                          "abbreviation",
+                          "gmtOffset",
+                          "gmtAbbreviation",
+                          "iana",
+                        ]}
+                        value={userPrefs?.timezone ?? ""}
+                        onChange={(value) =>
+                          handleUpdateUserPrefs({ timezone: value })
+                        }
                         className={cn(
-                          "flex items-center gap-x-1",
-                          isArtist && activeSub && "flex-col items-start",
+                          fontSize === "text-base" ? "sm:text-base" : fontSize,
+                          "max-w-[72vw] sm:w-[350px]",
                         )}
-                      >
-                        <p className="text-sm text-muted-foreground">
-                          Set your local timezone
-                        </p>
-                        <p className="hidden text-xs italic text-muted-foreground lg:block">
-                          (if you want it used to display deadlines)
-                        </p>
-                      </span>
+                        data={timezones[0]}
+                        getItemLabel={(timezone) =>
+                          `${formatGmtOffsetSimple(
+                            timezone.utcOffsets,
+                          )}  - ${timezone.name} (${timezone.abbreviation}${
+                            timezone.dstAbbreviation
+                              ? `/${timezone.dstAbbreviation}`
+                              : ""
+                          })`
+                        }
+                        // getItemDisplay={(timezone) =>
+                        //   `(${
+                        //     timezone.region !== "North America"
+                        //       ? timezone.gmtAbbreviation
+                        //       : timezone.abbreviation
+                        //   })  - ${timezone.name}`
+                        // }
+                        getItemDisplay={(timezone) => {
+                          // Build GMT offsets string from utcOffsets
+                          const gmtOffsetsDisplay = formatGmtOffsetSimple(
+                            timezone.utcOffsets,
+                          );
+
+                          const abbrevDisplay = timezone.dstAbbreviation
+                            ? `${timezone.abbreviation}/${timezone.dstAbbreviation}`
+                            : timezone.abbreviation;
+
+                          // Use GMT offsets for non–North America, abbreviations otherwise
+                          const regionLabel =
+                            timezone.region !== "North America"
+                              ? gmtOffsetsDisplay
+                              : abbrevDisplay;
+
+                          return `(${regionLabel}) - ${timezone.name}`;
+                        }}
+                        getItemValue={(timezone) => timezone.iana[0]}
+                      />
                     </div>
-
-                    <SearchMappedSelect<Timezone>
-                      searchFields={[
-                        "name",
-                        "region",
-                        "abbreviation",
-                        "gmtOffset",
-                        "gmtAbbreviation",
-                        "iana",
-                      ]}
-                      value={userPrefs?.timezone ?? ""}
-                      onChange={(value) =>
-                        handleUpdateUserPrefs({ timezone: value })
-                      }
-                      className={cn(
-                        fontSize === "text-base" ? "sm:text-base" : fontSize,
-                        "max-w-[72vw] sm:w-[350px]",
-                      )}
-                      data={timezones[0]}
-                      getItemLabel={(timezone) =>
-                        `${formatGmtOffsetSimple(
-                          timezone.utcOffsets,
-                        )}  - ${timezone.name} (${timezone.abbreviation}${
-                          timezone.dstAbbreviation
-                            ? `/${timezone.dstAbbreviation}`
-                            : ""
-                        })`
-                      }
-                      // getItemDisplay={(timezone) =>
-                      //   `(${
-                      //     timezone.region !== "North America"
-                      //       ? timezone.gmtAbbreviation
-                      //       : timezone.abbreviation
-                      //   })  - ${timezone.name}`
-                      // }
-                      getItemDisplay={(timezone) => {
-                        // Build GMT offsets string from utcOffsets
-                        const gmtOffsetsDisplay = formatGmtOffsetSimple(
-                          timezone.utcOffsets,
-                        );
-
-                        const abbrevDisplay = timezone.dstAbbreviation
-                          ? `${timezone.abbreviation}/${timezone.dstAbbreviation}`
-                          : timezone.abbreviation;
-
-                        // Use GMT offsets for non–North America, abbreviations otherwise
-                        const regionLabel =
-                          timezone.region !== "North America"
-                            ? gmtOffsetsDisplay
-                            : abbrevDisplay;
-
-                        return `(${regionLabel}) - ${timezone.name}`;
-                      }}
-                      getItemValue={(timezone) => timezone.iana[0]}
-                    />
-                  </div>
-                  <Separator />
-                  {/* //TODO: Add this back in when I implement the currency conversion logic */}
-                  {/*     <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <Separator />
+                    {/* //TODO: Add this back in when I implement the currency conversion logic */}
+                    {/*     <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="space-y-0.5">
                       <Label className={fontSize}>Currency</Label>
                       <p className="text-sm text-muted-foreground">
@@ -873,45 +874,48 @@ export default function SettingsPage() {
                       getItemValue={(currency) => currency.code}
                     />
                   </div>*/}
-                  {isArtist && (
-                    <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
-                      <div className="space-y-0.5">
-                        <Label className={fontSize}>Auto-Apply</Label>
+                    {isArtist && activeSub && (
+                      <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
+                        <div className="space-y-0.5">
+                          <Label className={fontSize}>Auto-Apply</Label>
 
-                        <p className="text-sm text-muted-foreground">
-                          Automatically mark open calls as &quot;Applied&quot;
-                          after clicking Apply
-                        </p>
-                      </div>
-                      <Select
-                        value={String(userPrefs?.autoApply)}
-                        onValueChange={(value) =>
-                          handleUpdateUserPrefs({ autoApply: value === "true" })
-                        }
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
-                            fontSize === "text-base"
-                              ? "sm:text-base"
-                              : fontSize,
-                          )}
+                          <p className="text-sm text-muted-foreground">
+                            Automatically mark open calls as &quot;Applied&quot;
+                            after clicking Apply
+                          </p>
+                        </div>
+                        <Select
+                          value={String(userPrefs?.autoApply)}
+                          onValueChange={(value) =>
+                            handleUpdateUserPrefs({
+                              autoApply: value === "true",
+                            })
+                          }
                         >
-                          <SelectValue placeholder="Select One" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="true" center>
-                            On (Default)
-                          </SelectItem>
-                          <SelectItem value="false" center>
-                            Off
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                          <SelectTrigger
+                            className={cn(
+                              "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                              fontSize === "text-base"
+                                ? "sm:text-base"
+                                : fontSize,
+                            )}
+                          >
+                            <SelectValue placeholder="Select One" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true" center>
+                              On (Default)
+                            </SelectItem>
+                            <SelectItem value="false" center>
+                              Off
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </TabsContent>

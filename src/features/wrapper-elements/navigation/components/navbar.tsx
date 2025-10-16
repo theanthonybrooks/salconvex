@@ -31,6 +31,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
+import { AccountTypeBase } from "~/convex/schema";
 
 interface NavBarProps {
   userId?: string;
@@ -79,11 +80,12 @@ export default function NavBar(
       (statusKey === "none" || statusKey === "canceled");
     const organizerLink = link.userType?.includes("organizer") && isOrganizer;
     const userTypeMatch = link.userType?.some((type) =>
-      userType.includes(type),
+      userType.includes(type as AccountTypeBase),
     );
     const userTypeExcluded =
-      link.excluded?.some((excluded) => userType.includes(excluded)) &&
-      !userTypeMatch;
+      link.excluded?.some((excluded) =>
+        userType.includes(excluded as AccountTypeBase),
+      ) && !userTypeMatch;
     const isMatch =
       (link.sub.includes(statusKey) ||
         link.sub.includes("all") ||

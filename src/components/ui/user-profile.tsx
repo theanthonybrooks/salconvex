@@ -150,56 +150,58 @@ export function UserProfile({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <LucideLayoutDashboard className="mr-2 size-4" />
-              Dashboard
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                {isAdmin && (
-                  <Link
-                    href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
-                  >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
-                      {totalPending > 0 ? (
-                        <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
-                          {totalPending}
-                        </div>
-                      ) : (
-                        <Squirrel className="mr-2 size-4" />
-                      )}
-                      <span>Admin</span>
-                    </DropdownMenuItem>
-                  </Link>
-                )}
+          {(hasActiveSub || isOrganizer) && (
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <LucideLayoutDashboard className="mr-2 size-4" />
+                Dashboard
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {isAdmin && (
+                    <Link
+                      href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        {totalPending > 0 ? (
+                          <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
+                            {totalPending}
+                          </div>
+                        ) : (
+                          <Squirrel className="mr-2 size-4" />
+                        )}
+                        <span>Admin</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
 
-                {hasActiveSub && (
-                  <Link
-                    href="/dashboard/"
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
-                  >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
-                      <PaintRoller className="mr-2 size-4" />
-                      <span>{isAdmin ? "User" : "Artist"}</span>
-                    </DropdownMenuItem>
-                  </Link>
-                )}
-                {isOrganizer && (
-                  <Link
-                    href="/dashboard/organizer/events"
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
-                  >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
-                      <Users2 className="mr-2 size-4" />
-                      <span>Organizer</span>
-                    </DropdownMenuItem>
-                  </Link>
-                )}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+                  {hasActiveSub && (
+                    <Link
+                      href="/dashboard/"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        <PaintRoller className="mr-2 size-4" />
+                        <span>{isAdmin ? "User" : "Artist"}</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+                  {isOrganizer && (
+                    <Link
+                      href="/dashboard/organizer/events"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        <Users2 className="mr-2 size-4" />
+                        <span>Organizer</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          )}
 
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>

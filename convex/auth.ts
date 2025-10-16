@@ -8,6 +8,7 @@ import {
   checkOrgStatus,
   updateOrgOwner,
 } from "~/convex/organizer/organizations";
+import { AccountType } from "~/convex/schema";
 import { CustomPassword } from "./functions/customPassword";
 import { ResendOTP } from "./otp/resendOtp";
 import { findUserByEmailPW } from "./users";
@@ -115,13 +116,15 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
       await ctx.db.insert("userRoles", {
         userId: newUserId,
-        role: profile.role ?? ["user"],
+        role: "user",
       });
 
-      await ctx.db.insert("userAccountTypes", {
-        userId: newUserId,
-        accountType: profile.accountType,
-      });
+      for (const type of profile.accountType as AccountType) {
+        await ctx.db.insert("userAccountTypes", {
+          userId: newUserId,
+          accountType: type,
+        });
+      }
 
       await ctx.db.insert("userPW", {
         userId: newUserId,
