@@ -136,7 +136,7 @@ export default function DashboardSideBar({
   return (
     <div
       className={cn(
-        "relative hidden h-screen max-h-[calc(100vh-80px)] w-64 border-r bg-background min-[1024px]:block",
+        "relative hidden h-screen max-h-[calc(100dvh-80px)] w-64 border-r bg-background min-[1024px]:block",
         collapsedSidebar && "w-fit",
       )}
     >

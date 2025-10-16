@@ -1500,7 +1500,7 @@ export default function SettingsPage() {
                       <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
                         <AlertDialogHeader>
                           <AlertDialogTitle className="text-foreground">
-                            Sign out all sessions?
+                            Delete Account
                           </AlertDialogTitle>
                         </AlertDialogHeader>
                         <AlertDialogDescription className="text-foreground">
