@@ -50,8 +50,8 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { api } from "~/convex/_generated/api";
 import { AccountType } from "~/convex/schema";
-import { api } from "../../../../convex/_generated/api";
 
 interface RegisterFormProps {
   // setState: (state: SignInFlow) => void
@@ -529,7 +529,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                       <FormLabel className="font-bold">Account Type</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          options={{ ...accountTypeOptions }}
+                          options={accountTypeOptions}
                           onValueChange={(value) => {
                             field.onChange(value);
                             setSelectedOption(value as AccountType);

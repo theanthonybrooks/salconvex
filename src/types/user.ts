@@ -20,6 +20,8 @@ export const accountTypeOptions = [
   { value: "organizer", label: "Organizer" },
 ];
 
+export type AccountType = (typeof accountTypeOptions)[number]["value"];
+
 export const userRoleOptions = [
   { value: "user", label: "User" },
   { value: "staff", label: "Staff" },
