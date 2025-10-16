@@ -514,7 +514,7 @@ export const getAllEvents = query({
     let events = await ctx.db
       .query("events")
       .withIndex("by_lastEditedAt")
-      .order("desc")
+      // .order("desc")
       .collect();
 
     if (!isAdmin) {

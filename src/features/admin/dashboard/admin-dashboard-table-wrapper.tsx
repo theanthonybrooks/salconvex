@@ -130,12 +130,6 @@ export function AdminDashboardTableWrapper({
                   // role: false,
                 }
               }
-              toolbarData={
-                {
-                  // totalPerMonth: usersData?.totalPerMonth ?? 0,
-                  // totalPerYear: usersData?.totalPerYear ?? 0,
-                }
-              }
               adminActions={adminActions}
               tableType="newsletter"
               pageType="dashboard"
@@ -154,12 +148,6 @@ export function AdminDashboardTableWrapper({
                   // role: false,
                   // lastEditedAt: false,
                   // dates_edition: false,
-                }
-              }
-              toolbarData={
-                {
-                  // totalPerMonth: usersData?.totalPerMonth ?? 0,
-                  // totalPerYear: usersData?.totalPerYear ?? 0,
                 }
               }
               defaultSort={{ id: `createdAt`, desc: true }}
@@ -262,7 +250,7 @@ export function AdminDashboardTableWrapper({
               pageType="dashboard"
               minimalView={true}
               collapsedSidebar={isSidebarCollapsed}
-              defaultSort={{ id: `createdAt`, desc: false }}
+              defaultSort={{ id: `createdAt`, desc: true }}
               pageSize={50}
             />
           </div>
@@ -281,12 +269,7 @@ export function AdminDashboardTableWrapper({
                 },
                 { id: `feature`, value: ["true", "none"] },
               ]}
-              defaultSort={{ id: `createdAt`, desc: false }}
-              onRowSelect={(row) => {
-                console.log(row);
-                // setExistingEvent(row.getValue("event"));
-                // setExistingOpenCall(row.getValue("openCall"));
-              }}
+              defaultSort={{ id: `createdAt`, desc: true }}
               adminActions={adminActions}
               tableType="artists"
               pageType="dashboard"

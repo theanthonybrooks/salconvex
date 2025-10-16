@@ -123,12 +123,6 @@ export const getBookmarkedEventsWithDetails = query({
 
     const isAdmin = user.role.includes("admin");
 
-    const artist = await ctx.db
-      .query("artists")
-      .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
-      .unique();
-    if (!artist) return null;
-
     const subscription = await ctx.db
       .query("userSubscriptions")
       .withIndex("userId", (q) => q.eq("userId", user._id))
@@ -141,20 +135,13 @@ export const getBookmarkedEventsWithDetails = query({
 
     const listActions = await ctx.db
       .query("listActions")
-      .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
+      .withIndex("by_artistId_bookmarked", (q) =>
+        q.eq("artistId", user._id).eq("bookmarked", true),
+      )
+
       .collect();
 
-    const bookmarkedMap = new Map(
-      listActions
-        .filter((a) => a.bookmarked)
-        .map((a) => [
-          a.eventId,
-          {
-            eventIntent: a.eventIntent,
-            bookmarkNote: a.bookmarkNote,
-          },
-        ]),
-    );
+    const bookmarkedMap = new Map(listActions.map((a) => [a.eventId, a]));
 
     const bookmarkedIds = Array.from(bookmarkedMap.keys());
     if (bookmarkedIds.length === 0) return [];
@@ -185,11 +172,17 @@ export const getBookmarkedEventsWithDetails = query({
         const deadlineDate = new Date(deadline);
         isPast = now > deadlineDate;
 
+        // const application = await ctx.db
+        //   .query("applications")
+        //   .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))
+        //   .filter((q) => q.eq(q.field("artistId"), user._id))
+        //   .unique();
         const application = await ctx.db
           .query("applications")
-          .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))
-          .filter((q) => q.eq(q.field("artistId"), user._id))
-          .unique();
+          .withIndex("by_openCallId_artistId", (q) =>
+            q.eq("openCallId", openCall._id).eq("artistId", user._id),
+          )
+          .first();
 
         if (application) {
           applicationStatus =
@@ -224,6 +217,15 @@ export const getBookmarkedEventsWithDetails = query({
         applicationStatus,
       });
     }
+
+    result.sort((a, b) => {
+      // Convert deadline strings to Date bjects for comparison
+      const dateA = new Date(a.deadline);
+      const dateB = new Date(b.deadline);
+      if (isNaN(dateA.getTime())) return 1;
+      if (isNaN(dateB.getTime())) return -1;
+      return dateA.getTime() - dateB.getTime();
+    });
     return result;
   },
 });
@@ -247,9 +249,10 @@ export const updateBookmark = mutation({
 
     const bookmark = await ctx.db
       .query("listActions")
-      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
-      .filter((q) => q.eq(q.field("artistId"), user._id))
-      .unique();
+      .withIndex("by_eventId_artistId", (q) =>
+        q.eq("eventId", args.eventId).eq("artistId", user._id),
+      )
+      .first();
     if (!bookmark) return null;
     await ctx.db.patch(bookmark._id, {
       ...(args.notes !== undefined && { bookmarkNote: args.notes }),

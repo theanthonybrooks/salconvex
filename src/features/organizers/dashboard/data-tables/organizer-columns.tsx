@@ -104,24 +104,20 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
     size: 30,
-    cell: ({ row, table }) => {
-      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
-      const pageSize =
-        table.getState().pagination?.pageSize ??
-        table.getRowModel().rows.length;
+    cell: ({ row }) => {
       return (
         <div className="text-center text-sm text-muted-foreground">
-          {pageIndex * pageSize + row.index + 1}
+          {row.index + 1}
         </div>
       );
     },
     enableSorting: true,
     sortingFn: (rowA, rowB, columnId) => {
       void columnId;
-      // Sort based on the index (numeric order)
       return rowA.index - rowB.index;
     },
     enableHiding: false,
+    enableMultiSort: true,
   },
 
   {
@@ -145,6 +141,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "name",
@@ -166,6 +163,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     id: "dates_edition",
@@ -187,6 +185,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
 
   //TODO: Make optional column
@@ -234,6 +233,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       if (!Array.isArray(filterValue)) return true;
       return filterValue.includes(row.getValue(columnId));
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "openCallState",
@@ -263,6 +263,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       if (!Array.isArray(filterValue)) return true;
       return filterValue.includes(row.getValue(columnId));
     },
+    enableMultiSort: true,
   },
 
   {
@@ -286,6 +287,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "category",
@@ -309,6 +311,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       if (!Array.isArray(filterValue)) return true;
       return filterValue.includes(row.getValue(columnId));
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "type",
@@ -345,6 +348,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     id: "actions",

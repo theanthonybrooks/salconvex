@@ -32,6 +32,7 @@ import {
 import { DataTableOrgInfo } from "@/components/data-table/actions/data-table-org-info";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";
 import {
@@ -116,35 +117,53 @@ const approvedByColumn: ColumnDef<Event> = {
   },
 };
 
+const numberColumn: ColumnDef<Event> = {
+  accessorKey: "rowNumber",
+  id: "rowNumber",
+  header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+  size: 40,
+  cell: ({ row }) => {
+    return (
+      <div className="text-center text-sm text-muted-foreground">
+        {row.index + 1}
+      </div>
+    );
+  },
+  enableSorting: false,
+  enableHiding: false,
+  enableResizing: false,
+  enableMultiSort: true,
+};
+
+const selectColumn: ColumnDef<Event> = {
+  id: "select",
+  size: 30,
+  minSize: 30,
+  maxSize: 30,
+  header: ({ table }) => (
+    <Checkbox
+      checked={
+        table.getIsAllPageRowsSelected() ||
+        (table.getIsSomePageRowsSelected() && "indeterminate")
+      }
+      onCheckedChange={() => table.toggleAllRowsSelected(false)}
+      aria-label="Deselect all"
+    />
+  ),
+  cell: ({ row }) => (
+    <Checkbox
+      checked={row.getIsSelected()}
+      onCheckedChange={(value) => row.toggleSelected(!!value)}
+      aria-label="Select row"
+    />
+  ),
+  enableSorting: false,
+  enableHiding: false,
+  enableResizing: false,
+};
+
 export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
   const baseColumns: ColumnDef<Event>[] = [
-    {
-      accessorKey: "rowNumber",
-      id: "rowNumber",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="#" />
-      ),
-      size: 30,
-      cell: ({ row, table }) => {
-        const pageIndex = table.getState().pagination?.pageIndex ?? 0;
-        const pageSize =
-          table.getState().pagination?.pageSize ??
-          table.getRowModel().rows.length;
-        return (
-          <div className="text-center text-sm text-muted-foreground">
-            {pageIndex * pageSize + row.index + 1}
-          </div>
-        );
-      },
-      enableSorting: true,
-      sortingFn: (rowA, rowB, columnId) => {
-        void columnId;
-        // Sort based on the index (numeric order)
-        return rowA.index - rowB.index;
-      },
-      enableHiding: false,
-    },
-
     {
       accessorKey: "name",
       id: "name",
@@ -196,6 +215,8 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
           <DataTableEventEdition event={event} dashboard={isDashboard} />
         );
       },
+      enableMultiSort: true,
+      sortUndefined: "last",
     },
 
     //TODO: Make optional column
@@ -225,13 +246,13 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       ),
 
       cell: ({ row, table }) => {
-        const event = row.original as Event;
-        const state = row.getValue("state") as SubmissionFormState;
+        const { state } = row.original;
         const isAdmin = table.options.meta?.isAdmin;
+
         return (
           <div className="flex justify-center">
             <DataTableAdminOrgStateActions
-              eventId={event._id}
+              eventId={row.original._id}
               state={state}
               userRole={isAdmin ? "admin" : "user"}
             />
@@ -242,7 +263,10 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         if (!Array.isArray(filterValue)) return true;
         return filterValue.includes(row.getValue(columnId));
       },
+      enableMultiSort: true,
+      sortUndefined: "last",
     },
+
     {
       accessorKey: "openCallState",
       id: "openCallState",
@@ -271,6 +295,8 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         if (!Array.isArray(filterValue)) return true;
         return filterValue.includes(row.getValue(columnId));
       },
+      enableMultiSort: true,
+      sortUndefined: "last",
     },
     {
       id: "submissionState",
@@ -287,6 +313,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
 
       enableHiding: false,
       enableSorting: false,
+      enableMultiSort: true,
     },
 
     {
@@ -309,6 +336,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
           </div>
         );
       },
+      enableMultiSort: true,
     },
     {
       accessorKey: "category",
@@ -331,6 +359,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         if (!Array.isArray(filterValue)) return true;
         return filterValue.includes(row.getValue(columnId));
       },
+      enableMultiSort: true,
     },
     {
       accessorKey: "type",
@@ -353,6 +382,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
           </div>
         );
       },
+      enableMultiSort: true,
     },
     {
       accessorKey: "_id",
@@ -369,6 +399,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
           </div>
         );
       },
+      enableMultiSort: true,
     },
     {
       id: "actions",
@@ -585,7 +616,9 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       0,
       approvedByColumn,
     );
+
+    return [numberColumn, ...baseColumns];
   }
 
-  return baseColumns;
+  return [selectColumn, ...baseColumns];
 };

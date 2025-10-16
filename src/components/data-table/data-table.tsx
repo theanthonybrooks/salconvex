@@ -48,13 +48,26 @@ export type ToolbarData = {
   userCount?: number;
 };
 
+// "events" | "orgEvents" | "organizations" | "openCalls" | "users" | "artists" | "newsletter" | "applications" | "bookmarks" | "hidden"
+
 export const selectableTableTypes = [
   "events",
   "orgEvents",
   "organizations",
-  "users",
+  // "users",
+  // "artists",
+  // "newsletter",
   // "applications",
   "openCalls",
+];
+
+export const numberedTableTypes = [
+  "users",
+  "artists",
+  "newsletter",
+  "applications",
+  "bookmarks",
+  "hidden",
 ];
 
 interface DataTableProps<TData, TValue> {
@@ -179,6 +192,7 @@ export function DataTable<TData, TValue>({
         pageIndex: 0,
         pageSize,
       },
+      sorting: initialSort,
     },
 
     state: {
@@ -200,7 +214,20 @@ export function DataTable<TData, TValue>({
 
       onRowSelect?.(selectedRow, newSelection);
     },
+    // isMultiSortEvent: () => true,
+    isMultiSortEvent: (e: unknown) => {
+      if (e instanceof MouseEvent || e instanceof KeyboardEvent) {
+        console.log("Multi-sort event:", {
+          type: e.type,
+          shift: e.shiftKey,
+          ctrl: e.ctrlKey,
+        });
+        return e.ctrlKey || e.shiftKey;
+      }
+      return false;
+    },
 
+    enableMultiSort: true,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -214,6 +241,7 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
   const tableRows = table.getRowModel?.().rows ?? [];
   const preloadedEvent =
     initialSearchTerm && tableRows.length > 0 ? tableRows[0]?.index : null;
@@ -272,7 +300,7 @@ export function DataTable<TData, TValue>({
   }, [table, pageSize]);
 
   return (
-    <div className={cn("w-full space-y-4", outerContainerClassName)}>
+    <div className={cn("w-full space-y-4 pb-3", outerContainerClassName)}>
       <AdminToolbar toolbarData={toolbarData} mode={tableType} />
       <DataTableToolbar
         table={table}
@@ -295,7 +323,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className={cn("group relative px-3 hover:bg-white/50")}
+                      className={cn("group relative")}
                       style={{ width: header.getSize() }}
                     >
                       {header.isPlaceholder
@@ -373,7 +401,11 @@ export function DataTable<TData, TValue>({
                     onClick={row.getToggleSelectedHandler()}
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
-                      "bg-white/50 hover:cursor-pointer hover:bg-salYellow/10 data-[state=selected]:bg-salPink/30",
+                      "bg-white/50 data-[state=selected]:bg-salPink/30",
+                      tableType &&
+                        selectableTableTypes.includes(tableType) &&
+                        "hover:cursor-pointer hover:bg-salYellow/10",
+
                       bgStatusClass,
                     )}
                   >
@@ -393,6 +425,7 @@ export function DataTable<TData, TValue>({
                             : undefined,
                           tableType &&
                             !selectableTableTypes.includes(tableType) &&
+                            !numberedTableTypes.includes(tableType) &&
                             cell.column.getIndex() >= 1 &&
                             "border-l border-border",
                         )}

@@ -22,12 +22,22 @@ export function DataTableColumnHeader<TData, TValue>({
   title,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>;
-  }
+  const baseClassName = "h-full px-3 ";
 
+  if (!column.getCanSort()) {
+    return <div className={cn(baseClassName, className)}>{title}</div>;
+  }
+  const descSortActive = column.getIsSorted() === "desc";
+  const ascSortActive = column.getIsSorted() === "asc";
+  const sortingActive = descSortActive || ascSortActive;
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div
+      className={cn(
+        baseClassName,
+        "flex items-center space-x-2 hover:bg-white/50",
+        className,
+      )}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="mx-auto w-full">
           <Button
@@ -36,9 +46,9 @@ export function DataTableColumnHeader<TData, TValue>({
             className="h-8 hover:cursor-pointer data-[state=open]:bg-white/50"
           >
             <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
+            {descSortActive ? (
               <ArrowDown className="size-4" />
-            ) : column.getIsSorted() === "asc" ? (
+            ) : ascSortActive ? (
               <ArrowUp className="size-4" />
             ) : (
               <ChevronsUpDown className="size-4" />
@@ -46,26 +56,45 @@ export function DataTableColumnHeader<TData, TValue>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem
-            onClick={() => column.toggleSorting(false)}
-            className="hover:cursor-pointer hover:bg-salPink/50 focus:bg-salPink/50"
-          >
-            <ArrowUp className="h-3.5 w-3.5 text-muted-foreground/70" />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => column.toggleSorting(true)}
-            className="hover:cursor-pointer hover:bg-salPink/50 focus:bg-salPink/50"
-          >
-            <ArrowDown className="h-3.5 w-3.5 text-muted-foreground/70" />
-            Desc
-          </DropdownMenuItem>
+          {!ascSortActive && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                const isMulti = e.ctrlKey || e.shiftKey;
+                column.toggleSorting(false, isMulti);
+              }}
+              className="hover:cursor-pointer hover:bg-salPink/50 focus:bg-salPink/50"
+            >
+              <ArrowUp className="size-3.5 text-muted-foreground/70" />
+              Asc
+            </DropdownMenuItem>
+          )}
+          {!descSortActive && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                const isMulti = e.ctrlKey || e.shiftKey;
+                column.toggleSorting(true, isMulti);
+              }}
+              className="hover:cursor-pointer hover:bg-salPink/50 focus:bg-salPink/50"
+            >
+              <ArrowDown className="size-3.5 text-muted-foreground/70" />
+              Desc
+            </DropdownMenuItem>
+          )}
+          {sortingActive && (
+            <DropdownMenuItem
+              onClick={() => column.clearSorting()}
+              className="hover:cursor-pointer hover:bg-salPink/50 focus:bg-salPink/50"
+            >
+              <ChevronsUpDown className="size-3.5 text-muted-foreground/70" />
+              Reset
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => column.toggleVisibility(false)}
             className="hover:cursor-pointer hover:bg-salPink/50 focus:bg-salPink/50"
           >
-            <EyeOff className="h-3.5 w-3.5 text-muted-foreground/70" />
+            <EyeOff className="size-3.5 text-muted-foreground/70" />
             Hide
           </DropdownMenuItem>
         </DropdownMenuContent>

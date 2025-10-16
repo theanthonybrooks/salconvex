@@ -74,27 +74,25 @@ interface UserColumnsProps {
 
 export const userColumns: ColumnDef<UserColumnsProps>[] = [
   {
+    accessorKey: "rowNumber",
     id: "rowNumber",
-    header: "#",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
     size: 40,
-    cell: ({ row, table }) => {
-      const { pageIndex = 0, pageSize = table.getRowModel().rows.length } =
-        table.getState().pagination ?? {};
-      const sortedRows = table.getRowModel().rows;
-      const descending = table.getState().sorting?.[0]?.desc ?? false;
-
-      const indexWithinPage = descending
-        ? sortedRows.length - row.index
-        : row.index + 1;
-
+    cell: ({ row }) => {
       return (
         <div className="text-center text-sm text-muted-foreground">
-          {pageIndex * pageSize + indexWithinPage}
+          {row.index + 1}
         </div>
       );
     },
-    enableSorting: false,
+    // enableSorting: false,
+    sortingFn: (rowA, rowB, columnId) => {
+      void columnId;
+      return rowA.index - rowB.index;
+    },
     enableHiding: false,
+    enableResizing: false,
+    enableMultiSort: true,
   },
 
   {
@@ -117,6 +115,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </ConvexDashboardLink>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "email",
@@ -131,6 +130,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         {row.getValue("email")}
       </CopyableItem>
     ),
+    enableMultiSort: true,
   },
   {
     accessorKey: "subscription",
@@ -167,6 +167,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       if (!Array.isArray(filterValue)) return true;
       return filterValue.includes(row.getValue(columnId));
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "subStatus",
@@ -210,6 +211,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       if (!Array.isArray(filterValue)) return true;
       return filterValue.includes(row.getValue(columnId));
     },
+    enableMultiSort: true,
   },
 
   {
@@ -303,6 +305,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "location",
@@ -356,6 +359,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "website",
@@ -399,6 +403,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
 
   {
@@ -488,6 +493,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </span>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "source",

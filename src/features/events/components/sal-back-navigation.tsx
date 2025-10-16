@@ -32,7 +32,8 @@ export const SalBackNavigation = ({
       {desktopMode ? (
         <div
           className={cn(
-            "mx-auto flex w-full items-center gap-2",
+            // "mx-auto",
+            "flex w-full items-center gap-2",
             isOrganizer && "w-fit",
           )}
         >

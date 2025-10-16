@@ -712,7 +712,10 @@ const OpenCallCard = ({
             </AccordionContent>
           </AccordionItem>
           {selectionCriteria && (
-            <AccordionItem value="selCrit">
+            <AccordionItem
+              value="selCrit"
+              className="rounded-lg border-2 bg-white/30 px-4"
+            >
               <AccordionTrigger
                 title="Selection Criteria"
                 fontSize={fontSize}

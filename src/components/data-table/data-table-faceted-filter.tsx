@@ -112,6 +112,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       <PopoverContent
         className="w-fit min-w-[--radix-popover-trigger-width] border-1.5 p-0"
         align={isMobile ? "center" : "start"}
+        showCloseButton={false}
       >
         <Command>
           <CommandInput placeholder={title} />

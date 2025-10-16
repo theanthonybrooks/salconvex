@@ -17,6 +17,7 @@ interface UserSelectorProps {
   isAdmin: boolean;
   cardId: Id<"todoKanban">;
   setCurrentUser?: React.Dispatch<React.SetStateAction<User | null>>;
+  mode: "add" | "edit" | "view";
 }
 
 export const KanbanUserSelector = ({
@@ -24,6 +25,7 @@ export const KanbanUserSelector = ({
   currentUser,
   isAdmin,
   cardId,
+  mode,
 }: UserSelectorProps) => {
   const { image: currentUserImage, name: currentUserName } = currentUser || {};
   const staffUsers = useQuery(api.admin.getStaffUsers, isAdmin ? {} : "skip");
@@ -32,7 +34,7 @@ export const KanbanUserSelector = ({
 
   return (
     <div className="flex items-center gap-3 pr-8 text-sm">
-      Assigned to:
+      Assign{mode === "add" ? "to" : "ed to"}:
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-2 rounded-md border border-transparent px-2 py-1 transition-colors hover:border-foreground/20 hover:bg-muted/20">

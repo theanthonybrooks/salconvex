@@ -872,6 +872,7 @@ export const TaskDialog = ({
               currentUser={assignedUser}
               isAdmin
               cardId={id as Id<"todoKanban">}
+              mode={mode}
             />
           </div>
           <DialogDescription>
@@ -1091,6 +1092,7 @@ export const DetailsDialog = ({
                     currentUser={assignedUser}
                     isAdmin
                     cardId={id}
+                    mode="view"
                   />
                 </div>
               )}

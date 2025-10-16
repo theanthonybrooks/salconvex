@@ -41,29 +41,27 @@ interface ApplicationColumnsProps {
 }
 
 export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
-  // {
-  //   id: "select",
-  //   size: 30,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+  {
+    accessorKey: "rowNumber",
+    id: "rowNumber",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+    size: 40,
+    cell: ({ row }) => {
+      // console.log(row.index, totalRows, descending);
+
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          {row.index + 1}
+        </div>
+      );
+    },
+    enableSorting: true,
+    sortingFn: (rowA, rowB, columnId) => {
+      void columnId;
+      return rowA.index - rowB.index;
+    },
+    enableHiding: false,
+  },
   {
     accessorKey: "name",
     id: "name",
@@ -198,25 +196,6 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       />
     ),
   },
-  // {
-  //   accessorKey: "manualApplied",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Manual Entry" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const value = row.getValue("manualApplied") as boolean;
-  //     return <span className="text-sm">{value ? "Yes" : "No"}</span>;
-  //   },
-  // },
-  // {
-  //   accessorKey: "response",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Response" />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <span className="capitalize">{row.getValue("response") || "-"}</span>
-  //   ),
-  // },
 
   {
     accessorKey: "responseTime",

@@ -46,22 +46,25 @@ interface BookmarkColumnsProps {
 
 export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   {
+    accessorKey: "rowNumber",
     id: "rowNumber",
-    header: "#",
-    size: 30,
-    cell: ({ row, table }) => {
-      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
-      const pageSize =
-        table.getState().pagination?.pageSize ??
-        table.getRowModel().rows.length;
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+    size: 40,
+    cell: ({ row }) => {
       return (
         <div className="text-center text-sm text-muted-foreground">
-          {pageIndex * pageSize + row.index + 1}
+          {row.index + 1}
         </div>
       );
     },
-    enableSorting: false,
+    enableSorting: true,
+    sortingFn: (rowA, rowB, columnId) => {
+      void columnId;
+      return rowA.index - rowB.index;
+    },
     enableHiding: false,
+    enableMultiSort: true,
+    enableResizing: false,
   },
 
   {
@@ -88,6 +91,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
         </div>
       );
     },
+    enableMultiSort: true,
   },
   {
     accessorKey: "edition",
@@ -226,6 +230,11 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
     id: "eventIntent",
     minSize: 180,
     maxSize: 200,
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(value);
+    },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Intent" />
     ),

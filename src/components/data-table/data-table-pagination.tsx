@@ -41,7 +41,7 @@ export function DataTablePagination<TData>({
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
       )}
-      <div className="flex items-center space-x-6 lg:space-x-8">
+      <div className="flex w-full items-center justify-around space-x-6 lg:space-x-8">
         <div className="hidden items-center space-x-2 sm:flex">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
@@ -71,7 +71,7 @@ export function DataTablePagination<TData>({
             variant="outline"
             className={cn(
               "hidden size-8 max-h-8 p-0 lg:flex",
-              "disabled:border-foreground/50 disabled:opacity-30",
+              "disabled:border-foreground/50 disabled:opacity-30 sm:disabled:invisible",
             )}
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
@@ -82,26 +82,28 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "size-8 max-h-8 p-0",
-              "disabled:border-foreground/50 disabled:opacity-30",
+              "h-8 max-h-8 w-10 p-0 sm:w-auto sm:p-2",
+              "disabled:border-foreground/50 disabled:opacity-30 sm:disabled:invisible",
             )}
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to previous page</span>
-            <ChevronLeft />
+            <ChevronLeft className="sm:hidden" />
+            <p className="hidden sm:block">Prev</p>
           </Button>
           <Button
             variant="outline"
             className={cn(
-              "size-8 max-h-8 p-0",
+              "h-8 max-h-8 w-10 p-0 sm:w-auto sm:p-2",
               "disabled:border-foreground/50 disabled:opacity-30",
             )}
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to next page</span>
-            <ChevronRight />
+            <ChevronRight className="sm:hidden" />
+            <p className="hidden sm:block">Next</p>
           </Button>
           <Button
             variant="outline"

@@ -29,28 +29,38 @@ interface hiddenColumnsProps {
 
 export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
+    accessorKey: "rowNumber",
     id: "rowNumber",
-    header: "#",
-    size: 30,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+    size: 40,
     cell: ({ row, table }) => {
-      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
-      const pageSize =
-        table.getState().pagination?.pageSize ??
-        table.getRowModel().rows.length;
+      const totalRows = table.getCoreRowModel().rows.length;
+      const descending = table.getState().sorting?.[0]?.desc ?? false;
+
+      // console.log(row.index, totalRows, descending);
+
+      const indexWithinPage = descending
+        ? totalRows - row.index
+        : row.index + 1;
+
       return (
         <div className="text-center text-sm text-muted-foreground">
-          {pageIndex * pageSize + row.index + 1}
+          {indexWithinPage}
         </div>
       );
     },
-    enableSorting: false,
+    enableSorting: true,
+    sortingFn: (rowA, rowB, columnId) => {
+      void columnId;
+      return rowA.index - rowB.index;
+    },
     enableHiding: false,
   },
 
   {
     accessorKey: "name",
     id: "name",
-    minSize: 200,
+    minSize: 150,
     maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Event Name" />
@@ -89,15 +99,15 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
     accessorKey: "category",
     id: "category",
-    minSize: 100,
-    maxSize: 150,
+    minSize: 80,
+    maxSize: 90,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex flex-col items-center gap-1">
-          <span className="min-w-20 max-w-[500px] truncate text-center font-medium capitalize">
+          <span className="min-w-20 max-w-50 truncate text-center font-medium capitalize">
             {getEventCategoryLabelAbbr(row.getValue("category"))}
           </span>
         </div>
@@ -111,7 +121,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
     accessorKey: "type",
     id: "type",
-    minSize: 150,
+    minSize: 160,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />
@@ -121,7 +131,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
 
       return (
         <div className="flex flex-col items-center gap-1">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+          <span className="min-w-20 max-w-sm truncate font-medium capitalize">
             {Array.isArray(types) && types.length > 0
               ? types.map((type) => getEventTypeLabel(type)).join(" | ")
               : "-"}
@@ -133,8 +143,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
     accessorKey: "hiddenStatus",
     id: "hiddenStatus",
-    minSize: 160,
-    maxSize: 160,
+    minSize: 120,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),

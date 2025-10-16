@@ -142,6 +142,7 @@ export const getFilteredEventsPublic = query({
             .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
             .collect()
         : [];
+
     const bookmarkedIds = listActions
       .filter((a) => a.bookmarked)
       .map((a) => a.eventId);
@@ -256,7 +257,7 @@ export const getFilteredEventsPublic = query({
       eventIds.map((id) => ctx.db.get(id)),
     );
     events = fetchedEvents.filter((e): e is NonNullable<typeof e> => !!e);
-    if (filters.showHidden && hiddenIds.length > 0) {
+    if (!filters.showHidden && hiddenIds.length > 0) {
       events = events.filter((e) => !hiddenIds.includes(e._id));
     }
     if (filters.bookmarkedOnly && bookmarkedIds.length > 0) {

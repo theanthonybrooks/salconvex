@@ -656,7 +656,7 @@ export const FilterBase = ({
           </div>
         </div>
       ) : (
-        <div className="hidden flex-col gap-5 px-5 sm:flex">
+        <div className="hidden flex-col gap-5 sm:flex">
           <div className="flex max-w-[90vw] flex-wrap items-center gap-3">
             <section className="flex flex-col gap-2">
               <Label htmlFor="list-search" className="flex items-center gap-2">
@@ -837,7 +837,7 @@ export const FilterBase = ({
                   selectAll={false}
                   hasSearch={false}
                   textClassName="text-center"
-                  className="w-50 border bg-transparent hover:bg-white/30 sm:h-12"
+                  className="w-44 border bg-transparent hover:bg-white/30 sm:h-12"
                   badgeClassName="h-9"
                   shortResults
                   showArrow={false}
@@ -884,7 +884,7 @@ export const FilterBase = ({
                 className={cn(
                   "flex cursor-pointer items-center gap-1 text-center text-sm text-foreground underline-offset-4 hover:underline",
                   !hasActiveFilters &&
-                    "pointer-events-none cursor-default opacity-40",
+                    "pointer-events-none cursor-default opacity-30",
                 )}
                 onClick={onResetFilters}
               >

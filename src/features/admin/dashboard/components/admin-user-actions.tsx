@@ -36,7 +36,8 @@ export const ChangeUserRole = ({ userId, role }: UserRoleProps) => {
       className="min-w-8"
       maxCount={1}
       showArrow={false}
-      compact={true}
+      compact
+      condensed
       selectAll={false}
       hasSearch={false}
       fallbackValue={["user"]}
@@ -64,7 +65,8 @@ export const ChangeUserAccountType = ({
       className="min-w-8"
       maxCount={1}
       showArrow={false}
-      compact={true}
+      compact
+      condensed
       selectAll={false}
       hasSearch={false}
       fallbackValue={["artist"]}

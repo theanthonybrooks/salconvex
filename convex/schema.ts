@@ -775,11 +775,18 @@ export default defineSchema({
   // List Actions Tables
   listActions: defineTable(listActionsSchema)
     .index("by_eventId", ["eventId"])
+    .index("by_eventId_artistId", ["eventId", "artistId"])
+    .index("by_eventId_artistId_bookmarked", ["eventId", "artistId", "bookmarked"])
+    .index("by_eventId_artistId_hidden", ["eventId", "artistId", "hidden"])
+    .index("by_artistId_bookmarked", ["artistId", "bookmarked"])
+    .index("by_artistId_hidden", ["artistId", "hidden"])
+
     .index("by_artistId", ["artistId"]),
 
   // Application Tables
   applications: defineTable(applicationsSchema)
     .index("by_openCallId", ["openCallId"])
+    .index("by_openCallId_artistId", ["openCallId", "artistId"])
     .index("by_artistId", ["artistId"]),
 
   // Organization Tables

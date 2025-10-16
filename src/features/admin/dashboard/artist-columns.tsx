@@ -48,21 +48,21 @@ export interface ArtistColumnProps {
 
 export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   {
+    accessorKey: "rowNumber",
     id: "rowNumber",
-    header: "#",
-    size: 30,
-    cell: ({ row, table }) => {
-      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
-      const pageSize =
-        table.getState().pagination?.pageSize ??
-        table.getRowModel().rows.length;
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+    size: 40,
+    cell: ({ row }) => {
       return (
         <div className="text-center text-sm text-muted-foreground">
-          {pageIndex * pageSize + row.index + 1}
+          {row.index + 1}
         </div>
       );
     },
-    enableSorting: false,
+    sortingFn: (rowA, rowB, columnId) => {
+      void columnId;
+      return rowA.index - rowB.index;
+    },
     enableHiding: false,
   },
   {

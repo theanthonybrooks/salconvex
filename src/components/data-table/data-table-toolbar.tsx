@@ -50,6 +50,11 @@ export function DataTableToolbar<TData>({
   );
   const [searchActive, setSearchActive] = useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
+  const initialSort = table.initialState.sorting;
+  const currentSort = table.getState().sorting;
+  const isDefaultSort =
+    JSON.stringify(initialSort) === JSON.stringify(currentSort);
+  const isSorted = currentSort.length > 0 && !isDefaultSort;
   const oneFilter = table.getState().columnFilters.length === 1;
   const onlySearch = oneFilter && searchActive;
   const isAdmin = table.options.meta?.isAdmin;
@@ -142,7 +147,7 @@ export function DataTableToolbar<TData>({
           className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {eventAndOC && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
+          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             {table.getColumn("state") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -180,7 +185,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {artistsTable && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
+          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             {table.getColumn("feature") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -224,7 +229,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {orgEventsTable && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
+          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             {table.getColumn("category") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -268,7 +273,7 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         {usersTable && (
-          <div className="flex items-center gap-3 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:flex-col">
+          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             {table.getColumn("subscription") && (
               <DataTableFacetedFilter
                 isMobile={isMobile}
@@ -345,20 +350,27 @@ export function DataTableToolbar<TData>({
           </div>
         )}
 
-        {isFiltered && (
+        {(isFiltered || isSorted) && (
           <TooltipSimple
-            content={onlySearch ? "Clear search" : "Reset filters"}
+            content={
+              onlySearch
+                ? "Clear search"
+                : isSorted
+                  ? "Reset options"
+                  : "Reset filters"
+            }
           >
             <Button
               variant="ghost"
               onClick={() => {
                 table.resetColumnFilters();
+                table.resetSorting();
                 handleClearParams();
               }}
               className="hidden h-8 px-2 sm:inline-flex sm:gap-1 lg:px-3"
             >
               {!minimalView && (onlySearch ? "Clear" : "Reset")}
-              {onlySearch ? (
+              {onlySearch || isSorted ? (
                 <X className="size-5" />
               ) : (
                 <TbFilterX className="size-5" />

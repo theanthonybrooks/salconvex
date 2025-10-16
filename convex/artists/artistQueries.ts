@@ -14,12 +14,14 @@ export const getActiveArtists = query({
     activeSubs.push(
       stream(ctx.db, schema)
         .query("userSubscriptions")
-        .withIndex("by_status", (q) => q.eq("status", "active")),
+        .withIndex("by_status", (q) => q.eq("status", "active"))
+        .order("desc"),
     );
     activeSubs.push(
       stream(ctx.db, schema)
         .query("userSubscriptions")
-        .withIndex("by_status", (q) => q.eq("status", "trialing")),
+        .withIndex("by_status", (q) => q.eq("status", "trialing"))
+        .order("desc"),
     );
     const mergedSubs = mergedStream(activeSubs, ["status"]);
     const subs = await mergedSubs.collect();
