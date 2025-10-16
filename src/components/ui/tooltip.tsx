@@ -13,7 +13,7 @@ const CustomArrow = React.forwardRef<
     <svg
       className={cn(
         "block",
-        "group-data-[side=top]:-translate-y-[2px]",
+        "group-data-[side=top]:-translate-y-[1.4px]",
         "group-data-[side=bottom]:-translate-y-[1.5px]",
         "group-data-[side=left]:translate-x-[2px]",
         "group-data-[side=right]:-translate-x-[2px]",
@@ -113,6 +113,7 @@ export const TooltipSimple = ({
 
   return (
     <TooltipProvider delayDuration={disabled ? 0 : delayDuration}>
+      {/* note-to-self:for testing */}
       {/* <Tooltip open={true}> */}
       <Tooltip open={disabled ? false : undefined}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>

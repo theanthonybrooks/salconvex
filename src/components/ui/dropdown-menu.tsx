@@ -24,7 +24,12 @@ const CustomArrow = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Arrow asChild ref={ref} {...props}>
     <svg
-      className={cn("block", className)}
+      className={cn(
+        "block",
+        "group-data-[side=top]/content:-translate-y-[1.4px]",
+        // "group-data-[side=bottom]/content:-translate-y-[1.4px]",
+        className,
+      )}
       width="15"
       height="10"
       viewBox="0 0 30 10"
@@ -68,7 +73,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-[51] min-w-[8rem] overflow-hidden border-1.5 bg-popover p-1 text-popover-foreground shadow-lg data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1.5 data-[side=left]:rounded-l-md data-[side=right]:rounded-r-md data-[side=left]:rounded-br-md data-[side=right]:rounded-bl-md data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      "group z-[51] min-w-[8rem] overflow-hidden border-1.5 bg-popover p-1 text-popover-foreground shadow-lg data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1.5 data-[side=left]:rounded-l-md data-[side=right]:rounded-r-md data-[side=left]:rounded-br-md data-[side=right]:rounded-bl-md data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className,
     )}
     {...props}
