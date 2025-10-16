@@ -6,6 +6,7 @@ import {
   Megaphone,
   PaintRoller,
   Palette,
+  Scroll,
   Users2,
 } from "lucide-react";
 
@@ -15,6 +16,7 @@ export const supportCategoryOptions = [
   { label: "Account/Billing", value: "account", icon: CreditCard },
   { label: "Artist", value: "artist", icon: PaintRoller },
   { label: "Organization", value: "organization", icon: Users2 },
+  { label: "The List", value: "theList", icon: Scroll },
   { label: "Event", value: "event", icon: Calendar },
   { label: "Open Call", value: "openCall", icon: Megaphone },
   { label: "Other", value: "other", icon: Circle },

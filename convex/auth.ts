@@ -113,6 +113,16 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         emailVerified: false,
       });
 
+      await ctx.db.insert("userRoles", {
+        userId: newUserId,
+        role: profile.role ?? ["user"],
+      });
+
+      await ctx.db.insert("userAccountTypes", {
+        userId: newUserId,
+        accountType: profile.accountType,
+      });
+
       await ctx.db.insert("userPW", {
         userId: newUserId,
         email: profile.email,

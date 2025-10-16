@@ -1,6 +1,7 @@
 import { Password } from "@convex-dev/auth/providers/Password";
 import { ConvexError } from "convex/values";
 import { Scrypt } from "lucia";
+import { AccountType } from "~/convex/schema";
 import { DataModel } from "../_generated/dataModel";
 import { ResendOTP } from "../otp/resendOtp";
 import { ResetOTP } from "../otp/resetOtp";
@@ -32,7 +33,7 @@ export const CustomPassword = () =>
         newPassword: params.newPassword as string,
         firstName: params.firstName as string,
         lastName: params.lastName as string,
-        accountType: params.accountType as string[],
+        accountType: params.accountType as AccountType,
         organizationName: params.organizationName as string,
         source: params.source as string,
         userId: params.userId as string,

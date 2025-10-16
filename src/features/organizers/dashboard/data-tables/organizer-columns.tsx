@@ -16,7 +16,6 @@ import {
 } from "@/components/data-table/actions/data-table-event-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";
 import {
@@ -75,29 +74,53 @@ export const orgColumnLabels: Record<string, string> = {
 // };
 
 export const orgColumns: ColumnDef<OrgEventData>[] = [
+  // {
+  //   id: "select",
+  //   size: 30,
+  //   minSize: 30,
+  //   maxSize: 30,
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={() => table.toggleAllRowsSelected(false)}
+  //       aria-label="Deselect all"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
-    id: "select",
+    accessorKey: "rowNumber",
+    id: "rowNumber",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
     size: 30,
-    minSize: 30,
-    maxSize: 30,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={() => table.toggleAllRowsSelected(false)}
-        aria-label="Deselect all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
+    cell: ({ row, table }) => {
+      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
+      const pageSize =
+        table.getState().pagination?.pageSize ??
+        table.getRowModel().rows.length;
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          {pageIndex * pageSize + row.index + 1}
+        </div>
+      );
+    },
+    enableSorting: true,
+    sortingFn: (rowA, rowB, columnId) => {
+      void columnId;
+      // Sort based on the index (numeric order)
+      return rowA.index - rowB.index;
+    },
     enableHiding: false,
   },
 
@@ -340,7 +363,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       const slug = event.slug;
       const openCallId = event.openCallId;
       const hasOC = !!openCallId;
-      const ocApproved = !!event.approvedAt
+      const ocApproved = !!event.approvedAt;
       // console.log(openCallState);
 
       // const openCallState = event.openCallState;
@@ -374,7 +397,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                   eventId={event._id}
                   userRole={isAdmin ? "admin" : "user"}
                 />
-                {(state === "draft" && !ocApproved || isAdmin) && (
+                {((state === "draft" && !ocApproved) || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}
                 {state === "published" && <ArchiveEvent eventId={event._id} />}

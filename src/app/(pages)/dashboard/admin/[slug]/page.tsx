@@ -1,4 +1,4 @@
-import { KanbanBoard } from "@/components/ui/kanban-board";
+import { KanbanBoard } from "@/components/ui/kanban/kanban-board";
 import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-table-wrapper";
 import AnalyticsPage from "@/features/dashboard/posthog-analytics";
 import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
@@ -42,12 +42,7 @@ export default async function AdminPage({
     case "analytics":
       return <AnalyticsPage />;
     case "todos":
-      return (
-        <KanbanBoard
-          userRole={user.role ?? []}
-          purpose={isDesigner ? "design" : "todo"}
-        />
-      );
+      return <KanbanBoard purpose={isDesigner ? "design" : "todo"} />;
     // case "design":
     //   return <KanbanBoard userRole={user.role?.[0]} purpose="design" />;
     case "submissions":

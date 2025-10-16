@@ -27,6 +27,7 @@ export function OrganizerDashboardTableWrapper() {
           }}
           tableType="orgEvents"
           pageType="dashboard"
+          minimalView={!isSidebarCollapsed}
           defaultSort={{ id: "lastEditedAt", desc: true }}
         />
       </div>
@@ -42,6 +43,7 @@ export function OrganizerDashboardTableWrapper() {
           }}
           tableType="orgEvents"
           pageType="dashboard"
+          minimalView={!isSidebarCollapsed}
           className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
           outerContainerClassName={cn("lg:hidden")}
           defaultSort={{ id: "lastEditedAt", desc: true }}

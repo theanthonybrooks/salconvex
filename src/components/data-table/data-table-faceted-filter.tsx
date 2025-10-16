@@ -1,5 +1,4 @@
 import { Column } from "@tanstack/react-table";
-import { PlusCircle } from "lucide-react";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -21,12 +20,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { FaCheck } from "react-icons/fa";
+import { TbFilterPlus } from "react-icons/tb";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   className?: string;
   column?: Column<TData, TValue>;
   forDashboard?: boolean;
   isMobile?: boolean;
+  minimalView?: boolean;
   title?: string;
   options: {
     label: string;
@@ -43,6 +44,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   className,
   forDashboard,
   isMobile,
+  minimalView,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   // const selectedValues = new Set(column?.getFilterValue() as string[]);
@@ -63,8 +65,10 @@ export function DataTableFacetedFilter<TData, TValue>({
             isMobile && "w-full",
           )}
         >
-          <PlusCircle className="size-4" />
           {title}
+          {selectedValues?.size === 0 && (
+            <TbFilterPlus className="size-4 text-foreground/60" />
+          )}
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
@@ -75,12 +79,15 @@ export function DataTableFacetedFilter<TData, TValue>({
                 {selectedValues.size}
               </Badge>
               <div className="hidden space-x-1 lg:flex">
-                {selectedValues.size > 1 ? (
+                {selectedValues.size > 1 || minimalView ? (
                   <Badge
                     variant="basic"
-                    className="rounded-sm px-1 font-normal"
+                    className={cn(
+                      "rounded-sm px-1 font-normal",
+                      minimalView && "px-2",
+                    )}
                   >
-                    {selectedValues.size} selected
+                    {selectedValues.size} {!minimalView && "selected"}
                   </Badge>
                 ) : (
                   options

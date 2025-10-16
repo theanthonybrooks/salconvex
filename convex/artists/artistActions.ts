@@ -85,6 +85,18 @@ export const updateOrCreateArtist = mutation({
         await ctx.db.patch(user._id, {
           accountType: [...user.accountType, "artist"],
         });
+        const hasArtistType = await ctx.db
+          .query("userAccountTypes")
+          .withIndex("by_userId_accountType", (q) =>
+            q.eq("userId", user._id).eq("accountType", "artist"),
+          )
+          .first();
+        if (!hasArtistType) {
+          await ctx.db.insert("userAccountTypes", {
+            userId: user._id,
+            accountType: "artist",
+          });
+        }
       }
       // If they don't exist, create a new "artist"
       const artistId = await ctx.db.insert("artists", {

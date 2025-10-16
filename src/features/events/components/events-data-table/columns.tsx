@@ -32,7 +32,6 @@ import {
 import { DataTableOrgInfo } from "@/components/data-table/actions/data-table-org-info";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";
 import {
@@ -120,28 +119,29 @@ const approvedByColumn: ColumnDef<Event> = {
 export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
   const baseColumns: ColumnDef<Event>[] = [
     {
-      id: "select",
+      accessorKey: "rowNumber",
+      id: "rowNumber",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="#" />
+      ),
       size: 30,
-      minSize: 30,
-      maxSize: 30,
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={() => table.toggleAllRowsSelected(false)}
-          aria-label="Deselect all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
+      cell: ({ row, table }) => {
+        const pageIndex = table.getState().pagination?.pageIndex ?? 0;
+        const pageSize =
+          table.getState().pagination?.pageSize ??
+          table.getRowModel().rows.length;
+        return (
+          <div className="text-center text-sm text-muted-foreground">
+            {pageIndex * pageSize + row.index + 1}
+          </div>
+        );
+      },
+      enableSorting: true,
+      sortingFn: (rowA, rowB, columnId) => {
+        void columnId;
+        // Sort based on the index (numeric order)
+        return rowA.index - rowB.index;
+      },
       enableHiding: false,
     },
 

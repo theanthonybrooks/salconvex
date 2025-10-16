@@ -37,6 +37,7 @@ import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
 import { onEmailChange } from "@/lib/privacy";
 import { RegisterSchema } from "@/schemas/auth";
+import { accountTypeOptions } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvex, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -49,6 +50,7 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { AccountType } from "~/convex/schema";
 import { api } from "../../../../convex/_generated/api";
 
 interface RegisterFormProps {
@@ -73,7 +75,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ReactNode | undefined>("");
   const [success, setSuccess] = useState<ReactNode | undefined>("");
-  const [selectedOption, setSelectedOption] = useState<string[]>(["artist"]);
+  const [selectedOption, setSelectedOption] = useState<AccountType>(["artist"]);
   const [submitData, setSubmitData] = useState<object>({});
   // const [step, setStep] = useState<StepType>("verifyOtp")
   const [step, setStep] = useState<StepType>("signUp");
@@ -317,11 +319,6 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
     }
   };
 
-  const options: { value: "artist" | "organizer"; label: string }[] = [
-    { value: "artist", label: "Artist" },
-    { value: "organizer", label: "Organizer" },
-  ];
-
   useEffect(() => {
     if (otp === "") {
       otpInputRef.current?.focus();
@@ -532,10 +529,10 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                       <FormLabel className="font-bold">Account Type</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          options={options}
+                          options={{ ...accountTypeOptions }}
                           onValueChange={(value) => {
                             field.onChange(value);
-                            setSelectedOption(value);
+                            setSelectedOption(value as AccountType);
                           }}
                           defaultValue={field.value}
                           placeholder="Select account type(s)"

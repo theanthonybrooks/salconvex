@@ -4,6 +4,7 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { User } from "@/types/user";
 
 const Avatar = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Root>,
@@ -12,7 +13,7 @@ const Avatar = React.forwardRef<
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+      "size-12.5 relative flex shrink-0 overflow-hidden rounded-full border-1.5 border-border active:scale-95",
       className,
     )}
     {...props}
@@ -40,12 +41,34 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      "flex h-full w-full items-center justify-center rounded-full border border-border bg-userIcon font-bold text-foreground",
       className,
     )}
     {...props}
   />
 ));
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
+
+interface AvatarSimpleProps {
+  src?: string;
+  alt?: string;
+  user?: User | null;
+  className?: string;
+}
+
+export const AvatarSimple = ({
+  src,
+  alt,
+  className,
+  user,
+}: AvatarSimpleProps) => (
+  <Avatar className={className}>
+    <AvatarImage src={src} alt={alt} />
+    <AvatarFallback className="text-foreground">
+      {user?.firstName?.[0].toUpperCase()}
+      {user?.lastName?.[0].toUpperCase()}
+    </AvatarFallback>
+  </Avatar>
+);
 
 export { Avatar, AvatarFallback, AvatarImage };

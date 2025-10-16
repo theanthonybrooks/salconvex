@@ -1,11 +1,10 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   accountTypeOptions,
@@ -19,12 +18,15 @@ import {
 } from "@/components/data-table/data-table-constants";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
 import { eventTypeOptions } from "@/types/event";
 import { TableTypes } from "@/types/tanstack-table";
 import { useMutation } from "convex/react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { TbFilterX } from "react-icons/tb";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -46,7 +48,10 @@ export function DataTableToolbar<TData>({
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,
   );
+  const [searchActive, setSearchActive] = useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
+  const oneFilter = table.getState().columnFilters.length === 1;
+  const onlySearch = oneFilter && searchActive;
   const isAdmin = table.options.meta?.isAdmin;
   const tableType = table.options.meta?.tableType;
   const pageType = table.options.meta?.pageType;
@@ -94,6 +99,7 @@ export function DataTableToolbar<TData>({
   const handleClearParams = () => {
     const path = window.location.pathname;
     router.replace(path, { scroll: false });
+    setSearchActive(false);
   };
 
   useEffect(() => {
@@ -123,11 +129,16 @@ export function DataTableToolbar<TData>({
               .getColumn(getColumnLabel(tableType))
               ?.getFilterValue() as string) ?? ""
           }
-          onChange={(event) =>
+          onChange={(event) => {
             table
               .getColumn(getColumnLabel(tableType))
-              ?.setFilterValue(event.target.value)
-          }
+              ?.setFilterValue(event.target.value);
+            if (event.target.value.length > 0) {
+              setSearchActive(true);
+            } else {
+              setSearchActive(false);
+            }
+          }}
           className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {eventAndOC && (
@@ -139,6 +150,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("state")}
                 title="State"
                 options={eventStates}
+                minimalView={minimalView}
               />
             )}
             {table.getColumn("openCallState") && !minimalView && (
@@ -175,6 +187,7 @@ export function DataTableToolbar<TData>({
                 forDashboard={forDashboard}
                 column={table.getColumn("feature")}
                 title="Feature"
+                minimalView={minimalView}
                 options={[
                   { value: true, label: "Feature" },
                   { value: false, label: "Don't Feature" },
@@ -188,6 +201,7 @@ export function DataTableToolbar<TData>({
                 forDashboard={forDashboard}
                 column={table.getColumn("canFeature")}
                 title="Can Feature"
+                minimalView={minimalView}
                 options={[
                   { value: true, label: "Can Feature" },
                   { value: false, label: "Can't Feature" },
@@ -199,7 +213,8 @@ export function DataTableToolbar<TData>({
                 isMobile={isMobile}
                 forDashboard={forDashboard}
                 column={table.getColumn("instagram")}
-                title="Instagram"
+                title="Insta"
+                minimalView={minimalView}
                 options={[
                   { value: true, label: "Has Instagram" },
                   { value: false, label: "No Instagram" },
@@ -216,6 +231,7 @@ export function DataTableToolbar<TData>({
                 forDashboard={forDashboard}
                 column={table.getColumn("category")}
                 title="Category"
+                minimalView={minimalView}
                 options={eventCategories}
               />
             )}
@@ -225,6 +241,7 @@ export function DataTableToolbar<TData>({
                 forDashboard={forDashboard}
                 column={table.getColumn("type")}
                 title="Event Type"
+                minimalView={minimalView}
                 options={[...eventTypeOptions]}
               />
             )}
@@ -235,6 +252,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("state")}
                 title="State"
                 options={eventStates}
+                minimalView={minimalView}
               />
             )}
             {table.getColumn("openCallState") && (
@@ -244,6 +262,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("openCallState")}
                 title="Open Call"
                 options={openCallStates}
+                minimalView={minimalView}
               />
             )}
           </div>
@@ -257,6 +276,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("subscription")}
                 title="Subscription"
                 options={subscriptionOptions}
+                minimalView={minimalView}
               />
             )}
             {table.getColumn("subStatus") && (
@@ -266,6 +286,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("subStatus")}
                 title="Status"
                 options={subscriptionStatusOptions}
+                minimalView={minimalView}
               />
             )}
             {table.getColumn("accountType") && (
@@ -275,6 +296,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("accountType")}
                 title="Account Type"
                 options={accountTypeOptions}
+                minimalView={minimalView}
               />
             )}
 
@@ -303,6 +325,7 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("applicationStatus")}
                 title="Status"
                 options={appStatusOptions}
+                minimalView={minimalView}
               />
             )}
           </div>
@@ -316,23 +339,32 @@ export function DataTableToolbar<TData>({
                 column={table.getColumn("eventIntent")}
                 title="Intent"
                 options={bookmarkIntents}
+                minimalView={minimalView}
               />
             )}
           </div>
         )}
 
         {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              table.resetColumnFilters();
-              handleClearParams();
-            }}
-            className="hidden h-8 px-2 sm:inline-flex sm:gap-1 lg:px-3"
+          <TooltipSimple
+            content={onlySearch ? "Clear search" : "Reset filters"}
           >
-            Reset
-            <X />
-          </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                table.resetColumnFilters();
+                handleClearParams();
+              }}
+              className="hidden h-8 px-2 sm:inline-flex sm:gap-1 lg:px-3"
+            >
+              {!minimalView && (onlySearch ? "Clear" : "Reset")}
+              {onlySearch ? (
+                <X className="size-5" />
+              ) : (
+                <TbFilterX className="size-5" />
+              )}
+            </Button>
+          </TooltipSimple>
         )}
       </div>
       <div className="flex items-center gap-3">

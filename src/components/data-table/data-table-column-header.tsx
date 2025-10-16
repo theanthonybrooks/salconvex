@@ -37,9 +37,9 @@ export function DataTableColumnHeader<TData, TValue>({
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (
-              <ArrowDown />
+              <ArrowDown className="size-4" />
             ) : column.getIsSorted() === "asc" ? (
-              <ArrowUp />
+              <ArrowUp className="size-4" />
             ) : (
               <ChevronsUpDown className="size-4" />
             )}

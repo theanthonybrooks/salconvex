@@ -5,9 +5,11 @@ import {
   Circle,
   Construction,
   CreditCard,
+  HelpCircle,
   Megaphone,
   PaintRoller,
   Palette,
+  Scroll,
   Users2,
 } from "lucide-react";
 import {
@@ -17,174 +19,6 @@ import {
 } from "react-icons/fc";
 import { MdOutlineDesignServices } from "react-icons/md";
 import { Id } from "~/convex/_generated/dataModel";
-
-export const ColumnTypeOptions = [
-  { label: "Proposed", value: "proposed" },
-  { label: "Considering", value: "backlog" },
-  { label: "Todo", value: "todo" },
-  { label: "In Progress", value: "doing" },
-  { label: "Completed", value: "done" },
-  { label: "Not Planned", value: "notPlanned" },
-] as const;
-
-export type ColumnType = (typeof ColumnTypeOptions)[number]["value"];
-
-export type VoteType = {
-  upVote: number;
-  downVote: number;
-};
-
-export type Voter = {
-  userId: Id<"users">;
-  direction: "up" | "down";
-};
-
-export const priorityOptions = [
-  { label: "High", value: "high", icon: FcHighPriority },
-  { label: "Medium", value: "medium", icon: FcMediumPriority },
-  { label: "Low", value: "low", icon: FcLowPriority },
-] as const;
-
-export type Priority = (typeof priorityOptions)[number]["value"];
-
-interface Task {
-  id: number;
-  title: string;
-  description?: string;
-}
-
-interface Category {
-  title: string;
-  tasks: Task[];
-}
-
-export interface Column {
-  categories: Category[];
-  mainTitle?: string;
-  description?: string;
-}
-
-export const roadmapData: Column = {
-  mainTitle: "Roadmap",
-  description: "A visual representation of the project's progress.",
-  categories: [
-    {
-      title: "Considering",
-      tasks: [
-        {
-          id: 1,
-          title: "Design Landing Page",
-          description: "Create the initial design for the landing page.",
-        },
-        {
-          id: 2,
-          title: "Setup Analytics",
-          description: "Integrate Google Analytics into the website.",
-        },
-        {
-          id: 3,
-          title: "Design Landing Page",
-          description: "Create the initial design for the landing page.",
-        },
-      ],
-    },
-    {
-      title: "Planned",
-      tasks: [
-        {
-          id: 4,
-          title: "Design Landing Page",
-          description: "Create the initial design for the landing page.",
-        },
-        {
-          id: 5,
-          title: "Setup Analytics",
-          description: "Integrate Google Analytics into the website.",
-        },
-        {
-          id: 6,
-          title: "Design Landing Page",
-          description: "Create the initial design for the landing page.",
-        },
-        {
-          id: 7,
-          title: "Setup Analytics",
-          description: "Integrate Google Analytics into the website.",
-        },
-        {
-          id: 8,
-          title: "Design Landing Page",
-          description: "Create the initial design for the landing page.",
-        },
-        {
-          id: 9,
-          title: "Setup Analytics",
-          description: "Integrate Google Analytics into the website.",
-        },
-      ],
-    },
-    {
-      title: "Working On",
-      tasks: [
-        {
-          id: 10,
-          title: "Develop Authentication",
-          description: "Implement user login and registration flows.",
-        },
-        {
-          id: 11,
-          title: "Optimize Performance",
-          description: "Improve load times and optimize performance.",
-        },
-      ],
-    },
-    {
-      title: "Implemented",
-      tasks: [
-        {
-          id: 12,
-          title: "Homepage Design",
-          description: "Complete homepage design and deploy.",
-        },
-        {
-          id: 13,
-          title: "User Login",
-          description: "Secure user login implemented.",
-        },
-        {
-          id: 14,
-          title: "Homepage Design",
-          description: "Complete homepage design and deploy.",
-        },
-        {
-          id: 15,
-          title: "User Login",
-          description: "Secure user login implemented.",
-        },
-        {
-          id: 16,
-          title: "Homepage Design",
-          description: "Complete homepage design and deploy.",
-        },
-        {
-          id: 17,
-          title: "User Login",
-          description: "Secure user login implemented.",
-        },
-        {
-          id: 18,
-          title: "Homepage Design",
-          description: "Complete homepage design and deploy.",
-        },
-        {
-          id: 19,
-          title: "User Login",
-          description: "Secure user login implemented.",
-        },
-      ],
-    },
-  ],
-};
 
 export const PRIORITY_CONFIG: Record<
   "high" | "medium" | "low",
@@ -228,6 +62,10 @@ export const CATEGORY_CONFIG: Record<
     icon: <Users2 className="size-5" />,
     className: "bg-emerald-100",
   },
+  theList: {
+    icon: <Scroll className="size-5" />,
+    className: "bg-emerald-100",
+  },
   event: {
     icon: <Calendar className="size-5" />,
     className: "bg-rose-100",
@@ -242,29 +80,84 @@ export const CATEGORY_CONFIG: Record<
   },
 };
 
+export const ColumnTypeOptions = [
+  { label: "Proposed", value: "proposed" },
+  { label: "Considering", value: "backlog" },
+  { label: "To Do", value: "todo" },
+  { label: "In Progress", value: "doing" },
+  { label: "Completed", value: "done" },
+  { label: "Not Planned", value: "notPlanned" },
+] as const;
+
+export type ColumnType = (typeof ColumnTypeOptions)[number]["value"];
+
+export const KanbanPurposeOptions = [
+  { label: "All", value: "todo", Icon: Circle },
+  { label: "UI/UX", value: "design", Icon: MdOutlineDesignServices },
+  { label: "Support", value: "support", Icon: HelpCircle },
+] as const;
+
+export type KanbanPurpose = (typeof KanbanPurposeOptions)[number]["value"];
+
+export type VoteType = {
+  upVote: number;
+  downVote: number;
+};
+
+export type Voter = {
+  userId: Id<"users">;
+  direction: "up" | "down";
+};
+
+export const priorityOptions = [
+  { label: "High", value: "high", icon: FcHighPriority },
+  { label: "Medium", value: "medium", icon: FcMediumPriority },
+  { label: "Low", value: "low", icon: FcLowPriority },
+] as const;
+
+export type Priority = (typeof priorityOptions)[number]["value"];
+
+interface Task {
+  id: number;
+  title: string;
+  description?: string;
+}
+
+interface Category {
+  title: string;
+  tasks: Task[];
+}
+
+export interface Column {
+  categories: Category[];
+  mainTitle?: string;
+  description?: string;
+}
+
 export interface CardBase {
   title: string;
   description: string;
-  id: string;
+  id: Id<"todoKanban">;
   column: ColumnType;
   priority?: Priority;
   voters: Voter[];
   category: SupportCategory;
   isPublic: boolean;
-  purpose: string;
+  purpose: KanbanPurpose;
+  assignedId?: Id<"users">;
 }
 
 export interface MoveCardArgs {
   id: Id<"todoKanban">;
   column: ColumnType;
-  beforeId?: Id<"todoKanban"> | undefined;
-  purpose: string;
+  beforeId?: Id<"todoKanban">;
+  purpose: KanbanPurpose;
 }
 
 export interface AddCardProps {
   column: ColumnType;
   userRole: string[];
-  purpose: string;
+  purpose: KanbanPurpose;
   addCard: (args: AddCardArgs) => void;
 }
 
@@ -277,7 +170,7 @@ export interface AddCardArgs {
   priority?: Priority;
   category: SupportCategory;
   isPublic: boolean;
-  purpose: string;
+  purpose: KanbanPurpose;
 }
 
 export interface DeleteCardArgs {
@@ -292,7 +185,7 @@ export interface ColumnProps {
   column: ColumnType;
   cards: CardBase[];
   userRole: string[];
-  purpose: string;
+  purpose: KanbanPurpose;
   activeColumn: string | null;
   setActiveColumn: (col: string | null) => void;
   moveCard: (args: MoveCardArgs) => void;
@@ -316,14 +209,8 @@ export interface DropIndicatorProps {
 // }
 
 export interface KanbanBoardProps {
-  userRole: string[];
-  purpose: string;
+  purpose: KanbanPurpose;
 }
-
-export const purposeOptions = [
-  { value: "todo", label: "All", Icon: Circle },
-  { value: "design", label: "UI/UX", Icon: MdOutlineDesignServices },
-];
 
 export type BaseTaskValues = {
   title: string;
@@ -333,6 +220,7 @@ export type BaseTaskValues = {
   voters: Voter[];
   category: SupportCategory;
   isPublic: boolean;
+  assignedId?: Id<"users">;
 };
 
 export type BaseTaskDialogSharedProps = {
@@ -342,7 +230,7 @@ export type BaseTaskDialogSharedProps = {
 };
 
 export type AddTaskDialogProps = {
-  purpose: string;
+  purpose: KanbanPurpose;
   mode: "add";
   initialValues?: BaseTaskValues & { order: "start" | "end" };
   onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
@@ -350,14 +238,16 @@ export type AddTaskDialogProps = {
 } & BaseTaskDialogSharedProps;
 
 export type EditTaskDialogProps = {
-  purpose: string;
+  purpose: KanbanPurpose;
   mode: "edit";
   isOpen: boolean;
   initialValues?: BaseTaskValues;
   onSubmit: (values: BaseTaskValues) => void;
 } & BaseTaskDialogSharedProps;
 
-export type TaskDialogProps = AddTaskDialogProps | EditTaskDialogProps;
+export type TaskDialogProps = (AddTaskDialogProps | EditTaskDialogProps) & {
+  id?: Id<"todoKanban">;
+};
 
 export type DetailsDialogProps = {
   id: Id<"todoKanban">;

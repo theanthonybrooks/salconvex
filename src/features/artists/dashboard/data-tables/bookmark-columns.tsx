@@ -45,29 +45,25 @@ interface BookmarkColumnsProps {
 }
 
 export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
-  // {
-  //   id: "select",
-  //   size: 30,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+  {
+    id: "rowNumber",
+    header: "#",
+    size: 30,
+    cell: ({ row, table }) => {
+      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
+      const pageSize =
+        table.getState().pagination?.pageSize ??
+        table.getRowModel().rows.length;
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          {pageIndex * pageSize + row.index + 1}
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+
   {
     accessorKey: "name",
     id: "name",

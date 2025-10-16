@@ -1,6 +1,6 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { Infer, v } from "convex/values";
 
 // Define a price object structure that matches your data
 const stripePriceValidator = v.object({
@@ -12,6 +12,28 @@ const stripePriceValidator = v.object({
 const stripeIntervalPricesValidator = v.object({
   usd: stripePriceValidator,
 });
+
+//TODO: Add Judge and other types to this later on.
+export const accountTypeValidator = v.union(
+  v.literal("artist"),
+  v.literal("organizer"),
+);
+export const accountTypeArrayValidator = v.array(accountTypeValidator);
+export type AccountTypeBase = Infer<typeof accountTypeValidator>;
+
+export type AccountType = Infer<typeof accountTypeArrayValidator>;
+
+export const userRoleValidator = v.union(
+  v.literal("admin"),
+  v.literal("user"),
+  v.literal("staff"),
+  v.literal("designer"),
+  v.literal("partner"),
+  v.literal("creator"),
+);
+
+export const userRoleArrayValidator = v.array(userRoleValidator);
+export type UserRole = Infer<typeof userRoleArrayValidator>;
 
 export const eventStateValidator = v.union(
   v.literal("draft"),
@@ -97,14 +119,33 @@ export const supportCategoryValidator = v.union(
   v.literal("account"),
   v.literal("artist"),
   v.literal("organization"),
+  v.literal("theList"),
   v.literal("event"),
   v.literal("openCall"),
   v.literal("other"),
 );
 
+export const supportCategoryArrayValidator = v.array(supportCategoryValidator);
+
+export const kanbanPurposeValidator = v.union(
+  v.literal("todo"),
+  v.literal("design"),
+  v.literal("general"),
+  v.literal("support"),
+);
+
 export const postStatusValidator = v.union(
   v.literal("posted"),
   v.literal("toPost"),
+);
+
+export const kanbanColumnValidator = v.union(
+  v.literal("proposed"),
+  v.literal("backlog"),
+  v.literal("todo"),
+  v.literal("doing"),
+  v.literal("done"),
+  v.literal("notPlanned"),
 );
 
 export const linksFields = {
@@ -124,8 +165,6 @@ export const linksFields = {
 
 export const linksValidator = v.object(linksFields);
 
-export const supportCategoryArrayValidator = v.array(supportCategoryValidator);
-
 const openCallFilesSchema = v.object({
   storageId: v.id("_storage"),
   uploadedBy: v.id("users"),
@@ -142,7 +181,7 @@ const openCallFilesSchema = v.object({
   uploadedAt: v.number(),
 });
 
-const customUserSchema = {
+const customUserSchema = v.object({
   // Include Convex Auth fields you want to use
   name: v.optional(v.string()),
   email: v.string(),
@@ -151,10 +190,10 @@ const customUserSchema = {
   updatedAt: v.optional(v.number()),
   firstName: v.string(),
   lastName: v.string(),
-  accountType: v.array(v.string()),
+  accountType: accountTypeArrayValidator,
   source: v.optional(v.string()),
   userId: v.string(),
-  role: v.array(v.string()),
+  role: userRoleArrayValidator,
   subscription: v.optional(v.string()),
   plan: v.optional(v.number()),
   tokenIdentifier: v.string(),
@@ -163,7 +202,19 @@ const customUserSchema = {
 
   emailVerified: v.optional(v.boolean()),
   lastActive: v.optional(v.number()),
-};
+});
+
+export type UserType = Infer<typeof customUserSchema>;
+
+const userRolesTable = v.object({
+  userId: v.id("users"),
+  role: userRoleValidator,
+});
+
+const userAccountTypesTable = v.object({
+  userId: v.id("users"),
+  accountType: accountTypeValidator,
+});
 
 const userPWSchema = v.object({
   userId: v.id("users"),
@@ -636,6 +687,35 @@ const swatchSchema = v.object({
   updatedAt: v.optional(v.number()),
 });
 
+export const kanbanCardSchema = v.object({
+  title: v.string(),
+  description: v.string(),
+  column: kanbanColumnValidator,
+
+  voters: v.array(
+    v.object({
+      userId: v.id("users"),
+      direction: v.union(v.literal("up"), v.literal("down")),
+    }),
+  ),
+
+  category: supportCategoryValidator,
+  order: v.number(),
+  createdAt: v.number(),
+  updatedAt: v.optional(v.number()),
+  completedAt: v.optional(v.number()),
+  public: v.boolean(),
+  lastUpdatedBy: v.union(v.id("users"), v.literal("guest")),
+  priority: v.optional(
+    v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+  ),
+  purpose: kanbanPurposeValidator,
+  userSuggestion: v.optional(v.string()),
+  assignedId: v.optional(v.id("users")),
+  userId: v.optional(v.id("users")),
+  ticketNumber: v.optional(v.id("support")),
+});
+
 export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
@@ -650,6 +730,16 @@ export default defineSchema({
   userLog: defineTable(userLogSchema)
     .index("by_userId", ["userId"])
     .index("by_email", ["userEmail"]),
+
+  userRoles: defineTable(userRolesTable)
+    .index("by_userId", ["userId"])
+    .index("by_role", ["role"])
+    .index("by_userId_role", ["userId", "role"]),
+
+  userAccountTypes: defineTable(userAccountTypesTable)
+    .index("by_userId", ["userId"])
+    .index("by_accountType", ["accountType"])
+    .index("by_userId_accountType", ["userId", "accountType"]),
 
   userPW: defineTable(userPWSchema)
     .index("by_userId", ["userId"])
@@ -916,47 +1006,30 @@ export default defineSchema({
     .index("stripeId", ["stripeId"])
     .index("customerId", ["customerId"]),
 
-  todoKanban: defineTable({
-    title: v.string(),
-    description: v.string(),
-    column: v.union(
-      v.literal("proposed"),
-      v.literal("backlog"),
-      v.literal("todo"),
-      v.literal("doing"),
-      v.literal("done"),
-      v.literal("notPlanned"),
-    ),
-
-    voters: v.array(
-      v.object({
-        userId: v.id("users"),
-        direction: v.union(v.literal("up"), v.literal("down")),
-      }),
-    ),
-
-    category: supportCategoryValidator,
-    order: v.number(),
-    createdAt: v.number(),
-    updatedAt: v.optional(v.number()),
-    completedAt: v.optional(v.number()),
-    public: v.boolean(),
-    lastUpdatedBy: v.union(v.id("users"), v.literal("guest")),
-    priority: v.optional(
-      v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
-    ),
-    purpose: v.optional(v.string()),
-    userSuggestion: v.optional(v.string()),
-    userId: v.optional(v.id("users")),
-    ticketNumber: v.optional(v.id("support")),
-  })
+  todoKanban: defineTable(kanbanCardSchema)
     .searchIndex("search_by_title", {
       searchField: "title",
-      filterFields: ["column", "order", "priority", "public", "purpose"],
+      filterFields: [
+        "column",
+        "order",
+        "priority",
+        "public",
+        "purpose",
+        "category",
+        "assignedId",
+      ],
     })
     .searchIndex("search_by_desc", {
       searchField: "description",
-      filterFields: ["column", "order", "priority", "public", "purpose"],
+      filterFields: [
+        "column",
+        "order",
+        "priority",
+        "public",
+        "purpose",
+        "category",
+        "assignedId",
+      ],
     })
 
     .index("by_column_completedAt", ["column", "completedAt"])

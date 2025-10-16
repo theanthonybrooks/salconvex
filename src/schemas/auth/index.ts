@@ -51,7 +51,7 @@ export const RegisterSchema = z
       })
       .min(8, { message: "Password must be at least 8 characters." }),
     accountType: z
-      .array(z.string())
+      .array(z.union([z.literal("artist"), z.literal("organizer")]))
       .min(1, { message: "At least one account type is required" }),
     name: z.string().optional(),
     organizationName: z.string().optional(),

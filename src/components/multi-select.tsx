@@ -47,6 +47,8 @@ const multiSelectVariants = cva("mx-[2px] ", {
       destructive:
         "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
       inverted: "inverted",
+      ghost:
+        "border-transparent bg-transparent text-foreground hover:bg-background/15 focus:ring-transparent",
     },
   },
   defaultVariants: {
@@ -107,6 +109,9 @@ interface MultiSelectProps
    */
 
   showArrow?: boolean;
+
+  /** Show compact version of the component without side separator and down chevron*/
+  compact?: boolean;
 
   animation?: number;
 
@@ -175,6 +180,7 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 3,
       showArrow,
+      compact = false,
       // modalPopover = false,
       shortResults = false,
       condensed = false,
@@ -343,7 +349,7 @@ export const MultiSelect = React.forwardRef<
                           >
                             {abbreviated ? option?.abbr : option?.label}
                           </p>
-                          {!lockedValue.includes(value) && (
+                          {!lockedValue.includes(value) && !condensed && (
                             <X
                               className="ml-2 h-3 w-3 cursor-pointer"
                               onClick={(event) => {
@@ -365,8 +371,8 @@ export const MultiSelect = React.forwardRef<
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {condensed ? (
-                        <> {`+ ${selectedValues.length - maxCount}`}</>
+                      {condensed || compact ? (
+                        <> {selectedValues.length - maxCount}</>
                       ) : (
                         <>
                           {`+ ${selectedValues.length - maxCount} more`}
@@ -401,14 +407,16 @@ export const MultiSelect = React.forwardRef<
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <XIcon
-                    className="mx-2 h-4 cursor-pointer text-foreground/50 hover:scale-110 hover:text-red-600"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleClear();
-                    }}
-                  />
-                  {!shortResults && (
+                  {!compact && (
+                    <XIcon
+                      className="mx-2 h-4 cursor-pointer text-foreground/50 hover:scale-110 hover:text-red-600"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleClear();
+                      }}
+                    />
+                  )}
+                  {!shortResults && !compact && (
                     <>
                       <Separator
                         orientation="vertical"

@@ -19,6 +19,39 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
+export const populateUserRoles = migrations.define({
+  table: "users",
+  migrateOne: async (ctx, user) => {
+    if (Array.isArray(user.role)) {
+      for (const role of user.role) {
+        await ctx.db.insert("userRoles", {
+          userId: user._id,
+          role,
+        });
+      }
+    }
+  },
+});
+
+export const populateUserAccountTypes = migrations.define({
+  table: "users",
+  migrateOne: async (ctx, user) => {
+    if (Array.isArray(user.accountType)) {
+      for (const accountType of user.accountType) {
+        await ctx.db.insert("userAccountTypes", {
+          userId: user._id,
+          accountType,
+        });
+      }
+    }
+  },
+});
+
+export const runPU = migrations.runner([
+  internal.migrations.populateUserRoles,
+  internal.migrations.populateUserAccountTypes,
+]);
+
 export const fixEventStartInEventLookup = migrations.define({
   table: "eventLookup",
   migrateOne: async (ctx, lookup) => {

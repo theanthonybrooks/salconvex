@@ -2,9 +2,16 @@
 
 // TODO: Add the ability for users to suggest a task to the board. This will go into the proposed column. The user will be able to add a title, category, and the priority will default to medium (I'll update it to high or low later as I see fit). I also need to add the ability to vote on the suggestion by other users. Should be pretty simple. Use the purpose prop to determine whether to show the voting buttons or not (as well as the priority toggle/display). Or maybe just disable the changing of priority for non-admins?
 import { Id } from "convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, usePreloadedQuery, useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { Eye, LucideThumbsDown, LucideThumbsUp, X } from "lucide-react";
+import {
+  Eye,
+  Filter,
+  FilterX,
+  LucideThumbsDown,
+  LucideThumbsUp,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
@@ -13,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { Pencil } from "lucide-react";
 
 import { MultiSelect } from "@/components/multi-select";
+import { StaffUserSelector } from "@/components/ui/admin/userSelector";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { FlairBadge } from "@/components/ui/flair-badge";
 import { Input } from "@/components/ui/input";
+import { KanbanUserSelector } from "@/components/ui/kanban/userSelector";
 import { Label } from "@/components/ui/label";
 import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -44,10 +53,11 @@ import {
   DetailsDialogProps,
   DropIndicatorProps,
   KanbanBoardProps,
+  KanbanPurpose,
+  KanbanPurposeOptions,
   Priority,
   PRIORITY_CONFIG,
   priorityOptions,
-  purposeOptions,
   TaskDialogProps,
   Voter,
 } from "@/constants/kanbanConsts";
@@ -56,14 +66,14 @@ import {
   SupportCategory,
   supportCategoryOptions,
 } from "@/constants/supportConsts";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { RichTextDisplay } from "@/lib/richTextFns";
+import { useDevice } from "@/providers/device-provider";
+import { User } from "@/types/user";
 import { capitalize, debounce } from "lodash";
 
-export const KanbanBoard = ({
-  userRole = ["user"],
-  purpose = "todo",
-}: KanbanBoardProps) => {
-  return <Board userRole={userRole} purpose={purpose} />;
+export const KanbanBoard = ({ purpose = "todo" }: KanbanBoardProps) => {
+  return <Board purpose={purpose} />;
 };
 
 export const getColumnColor = (column: ColumnType) => {
@@ -78,13 +88,33 @@ export const getColumnColor = (column: ColumnType) => {
   return colors[column] || "bg-neutral-500";
 };
 
-const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
+const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
+  const { preloadedUserData } = useConvexPreload();
+  const { isMobile } = useDevice();
+  const userData = usePreloadedQuery(preloadedUserData);
+  // const { isSidebarCollapsed } = useDashboard();
+  const user = userData?.user ?? null;
+  const userRole = userData?.user?.role ?? ["user"];
+  const isAdmin = userRole?.includes("admin");
+  // const isCreator = userRole?.includes("creator");
+  const [showFilters, setShowFilters] = useState(true);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState<SupportCategory[]>([]);
+  const [userFilter, setUserFilter] = useState<User | null>(
+    initialPurpose !== "todo" ? user : null,
+  );
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [purpose, setPurpose] = useState<string>(initialPurpose ?? "todo");
+  const [purpose, setPurpose] = useState<KanbanPurpose>(
+    initialPurpose ?? "todo",
+  );
+
+  // useEffect(() => {
+  //   if (!userFilter && user) {
+  //     setUserFilter(user);
+  //   }
+  // }, [userFilter, user]);
   useEffect(() => {
     const handler = debounce((value: string) => {
       setDebouncedSearch(value);
@@ -104,6 +134,9 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
           purpose,
           searchTerm: debouncedSearch,
           category,
+          assignedId: userFilter?.userId
+            ? (userFilter?.userId as Id<"users">)
+            : undefined,
         }
       : "skip",
   );
@@ -111,7 +144,16 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
   const rawResults =
     useQuery(
       api.kanban.cards.getCards,
-      debouncedSearch === "" ? { purpose, category } : "skip",
+      debouncedSearch === ""
+        ? {
+            purpose,
+            category,
+            userId: userFilter?.userId
+              ? (userFilter?.userId as Id<"users">)
+              : undefined,
+            userRole: userFilter?.role ?? [],
+          }
+        : "skip",
     ) ||
     ([] as {
       _id: Id<"todoKanban">;
@@ -132,11 +174,10 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
 
   const cards = rawCards
     .map(({ _id, public: isPublic, ...rest }) => ({
+      ...rest,
       id: _id,
       isPublic,
       purpose,
-
-      ...rest,
     }))
     .sort((a, b) => {
       const aIsDone = a.column === "done";
@@ -192,72 +233,107 @@ const Board = ({ userRole, purpose: initialPurpose }: KanbanBoardProps) => {
           "mb-6 flex flex-col-reverse items-center justify-between gap-3 md:mb-0 lg:flex-row lg:pr-4",
         )}
       >
-        <div className="flex flex-col items-center gap-3 lg:flex-row">
-          <div className="flex items-center gap-3">
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search"
-              className="w-full min-w-60 max-w-md"
-            />
+        {((isMobile && showFilters) || !isMobile) && (
+          <div className="flex flex-col items-center gap-3 lg:flex-row">
+            <div className="flex items-center gap-3">
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search"
+                className="w-full min-w-60 max-w-md"
+              />
 
-            <Button
-              variant="salWithShadowHidden"
-              onClick={() => setSearchTerm("")}
-              className={"h-11 disabled:border-foreground/40"}
-              disabled={debouncedSearch === ""}
-            >
-              Reset
-            </Button>
+              <Button
+                variant="salWithShadowHidden"
+                onClick={() => setSearchTerm("")}
+                className={"h-11 disabled:border-foreground/40"}
+                disabled={debouncedSearch === ""}
+              >
+                Reset
+              </Button>
+            </div>
+            {purpose === "todo" && (
+              <MultiSelect
+                options={[...supportCategoryOptions]}
+                onValueChange={(value) => {
+                  setCategory(value as SupportCategory[]);
+                }}
+                value={category}
+                placeholder="Select category"
+                variant="basic"
+                maxCount={1}
+                condensed
+                height={11}
+                hasSearch={false}
+                selectAll={false}
+                className={cn(
+                  "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-64",
+                )}
+                listClassName="max-h-80"
+              />
+            )}
+            {!isMobile && (
+              <StaffUserSelector
+                setCurrentUser={setUserFilter}
+                isAdmin={isAdmin}
+                currentUser={userFilter}
+                type="staff"
+                minimal
+              />
+            )}
           </div>
-          {purpose === "todo" && (
-            <MultiSelect
-              options={[...supportCategoryOptions]}
-              onValueChange={(value) => {
-                setCategory(value as SupportCategory[]);
-              }}
-              value={category}
-              placeholder="Select category"
-              variant="basic"
-              maxCount={1}
-              condensed
-              height={11}
-              hasSearch={false}
-              selectAll={false}
-              className={cn(
-                "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-80",
-              )}
-              listClassName="max-h-80"
-            />
-          )}
-        </div>
-        <div className="relative inset-y-0 z-10 my-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:my-0 lg:p-0">
-          {/* Thumb indicator */}
+        )}
+        <div className={cn("flex items-center gap-3 sm:flex-row-reverse")}>
           <div
             className={cn(
-              "absolute left-0 top-0 z-1 h-full w-1/2 bg-background transition-all duration-200 ease-out",
-              purpose === "todo" && "translate-x-0",
-              purpose === "design" && "translate-x-full bg-orange-200",
+              "relative inset-y-0 z-10 my-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:my-0 lg:p-0 xl:w-[23rem]",
+              // isSidebarCollapsed && "lg:w-60 xl:",
             )}
-          />
-
-          {/* Icon buttons */}
-          {purposeOptions?.map(({ value, Icon, label }) => (
-            <button
-              key={value}
-              onClick={() => setPurpose(value)}
+          >
+            {/* Thumb indicator */}
+            <div
               className={cn(
-                "relative z-10 flex h-8 w-1/2 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground sm:h-11",
-                purpose === value && "text-foreground",
+                "absolute left-0 top-0 z-1 h-full w-1/3 bg-background transition-all duration-200 ease-out",
+                purpose === "todo" && "translate-x-0",
+                purpose === "design" && "translate-x-full bg-orange-200",
+                purpose === "support" && "translate-x-[200%] bg-red-200",
               )}
-              type="button"
-            >
-              <span className="flex items-center gap-1">
-                <Icon className="size-5 shrink-0 lg:size-4" />
-                <p className="lg:hidden xl:block">{label}</p>
-              </span>
-            </button>
-          ))}
+            />
+
+            {/* Icon buttons */}
+
+            {KanbanPurposeOptions?.map(({ value, Icon, label }) => (
+              <button
+                key={value}
+                onClick={() => setPurpose(value)}
+                className={cn(
+                  "relative z-10 flex h-8 w-1/3 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground sm:h-11",
+                  purpose === value && "text-foreground",
+                )}
+                type="button"
+              >
+                <span className="flex items-center gap-1">
+                  <Icon className="6 size-5 shrink-0" />
+                  <p className="hidden xl:block">{label}</p>
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <Button
+            onClick={() => setShowFilters((prev) => !prev)}
+            className={cn(showFilters && "text-foreground")}
+            variant="icon"
+          >
+            <span className="flex items-center gap-1">
+              {showFilters ? (
+                <Filter className="6 size-5 shrink-0" />
+              ) : (
+                <FilterX className="6 size-5 shrink-0" />
+              )}
+              <p className="hidden xl:block">Filters</p>
+            </span>
+          </Button>
         </div>
       </div>
       <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
@@ -455,6 +531,7 @@ const Card = ({
   category,
   isPublic,
   purpose,
+  assignedId,
 }: CardProps) => {
   const [newPriority, setNewPriority] = useState<Priority>(
     priority || "medium",
@@ -462,6 +539,7 @@ const Card = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  // const [hasChanges, setHasChanges] = useState(false);
   const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user ?? null;
   const isAdmin = user?.role?.includes("admin");
@@ -478,12 +556,13 @@ const Card = ({
       : "medium") as Priority,
     column,
     isPublic,
+    assignedId,
   };
 
   // Delete function
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    await deleteCard({ id: id as Id<"todoKanban"> });
+    deleteCard({ id: id as Id<"todoKanban"> });
   };
 
   const handleTogglePriority = async () => {
@@ -544,6 +623,7 @@ const Card = ({
         {isHovered && (
           <div className="absolute right-0 top-0 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
+              id={id}
               purpose={purpose}
               mode="edit"
               isOpen={isEditing}
@@ -555,18 +635,7 @@ const Card = ({
               trigger={
                 <Pencil className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
               }
-              initialValues={{
-                title,
-                description,
-                column,
-                priority: (["low", "medium", "high"].includes(priority ?? "")
-                  ? priority
-                  : "medium") as Priority,
-                voters,
-                category:
-                  category ?? (purpose === "design" ? "ui/ux" : "general"),
-                isPublic: isPublic ?? true,
-              }}
+              initialValues={detailValues}
               onSubmit={(data) => {
                 editCard({
                   id: id as Id<"todoKanban">,
@@ -609,7 +678,7 @@ const Card = ({
             "mt-1 size-2 rounded-full p-[5px] hover:cursor-pointer",
             newPriority === "high"
               ? "bg-red-500"
-              : newPriority === "low"
+              : newPriority === "low" || column === "done"
                 ? "bg-green-500"
                 : "bg-yellow-500",
           )}
@@ -680,8 +749,11 @@ export const TaskDialog = ({
   onClick,
   onClose,
   isOpen,
+  id,
 }: TaskDialogProps) => {
+  const prevRef = useRef<User | null>(null);
   const voters = initialValues?.voters || [];
+  const assignedId = initialValues?.assignedId;
   const [title, setTitle] = useState(initialValues?.title || "");
   const [description, setDescription] = useState(
     initialValues?.description || "",
@@ -703,6 +775,23 @@ export const TaskDialog = ({
   const [isPublic, setIsPublic] = useState<boolean>(
     initialValues?.isPublic ?? true,
   );
+  const [assignedUser, setAssignedUser] = useState<User | null>(null);
+
+  const assignedUserData = useQuery(
+    api.users.getUserById,
+    assignedId ? { id: assignedId } : "skip",
+  );
+
+  useEffect(() => {
+    if (prevRef.current === assignedUserData && assignedUser === null) {
+      prevRef.current = null;
+      return;
+    }
+    if (!prevRef.current && assignedUserData) {
+      prevRef.current = assignedUserData;
+      setAssignedUser(assignedUserData);
+    }
+  }, [assignedUser, assignedUserData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -720,6 +809,9 @@ export const TaskDialog = ({
           voters: [],
           isPublic,
           category,
+          assignedId: assignedUser?.userId
+            ? (assignedUser?.userId as Id<"users">)
+            : undefined,
         });
       } else {
         await onSubmit({
@@ -739,6 +831,7 @@ export const TaskDialog = ({
       setColumn(initialValues?.column || "todo");
       setPriority(initialValues?.priority || "high");
       setCategory(initialValues?.category || "general");
+      setAssignedUser(null);
       setOrder(
         mode === "add" && initialValues?.order ? initialValues.order : "end",
       );
@@ -767,7 +860,18 @@ export const TaskDialog = ({
       </DialogTrigger>
       <DialogContent className="w-full max-w-[max(50rem,100vw)] bg-card sm:max-w-[max(40rem,50vw)]">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
+          <div className="flex items-baseline justify-between gap-3">
+            <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
+            {/* TODO: Make this possible for adding as well. Need to make it update some state for that, though. */}
+
+            <KanbanUserSelector
+              type="staff"
+              setCurrentUser={setAssignedUser}
+              currentUser={assignedUser}
+              isAdmin
+              cardId={id as Id<"todoKanban">}
+            />
+          </div>
           <DialogDescription>
             {isEdit
               ? "Update task details."
@@ -919,6 +1023,7 @@ export const DetailsDialog = ({
   onCloseAction,
   onEditAction,
 }: DetailsDialogProps) => {
+  const assignedId = initialValues?.assignedId;
   const title = initialValues?.title || "";
   const description = initialValues?.description || "";
   const category = initialValues?.category || "general";
@@ -934,6 +1039,11 @@ export const DetailsDialog = ({
 
   const priorityConfig = PRIORITY_CONFIG[priority];
   const categoryConfig = CATEGORY_CONFIG[category];
+
+  const assignedUser = useQuery(
+    api.users.getUserById,
+    assignedId ? { id: assignedId } : "skip",
+  );
 
   const voteCard = useMutation(api.kanban.cards.voteCard);
 
@@ -970,7 +1080,19 @@ export const DetailsDialog = ({
       <DialogContent className="flex h-[90dvh] w-full max-w-[max(60rem,60vw)] flex-col bg-card sm:max-h-[max(40rem,70vh)]">
         <DialogHeader>
           <div className="flex h-fit flex-col gap-4">
-            <DialogTitle>{title}</DialogTitle>
+            <div className="flex items-baseline justify-between gap-3">
+              <DialogTitle>{title}</DialogTitle>
+              {isAdmin && assignedUser && (
+                <div className="flex items-center gap-3 pr-8 text-sm">
+                  <KanbanUserSelector
+                    type="staff"
+                    currentUser={assignedUser}
+                    isAdmin
+                    cardId={id}
+                  />
+                </div>
+              )}
+            </div>
             <DialogDescription className="sr-only">
               {"View task/suggestion details"}
             </DialogDescription>

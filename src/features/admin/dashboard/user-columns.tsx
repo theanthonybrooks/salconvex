@@ -4,7 +4,6 @@
 import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";
 import { Link } from "@/components/ui/custom-link";
@@ -17,6 +16,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import {
+  ChangeUserAccountType,
+  ChangeUserRole,
+} from "@/features/admin/dashboard/components/admin-user-actions";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
@@ -24,6 +27,7 @@ import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
 import { BsRobot } from "react-icons/bs";
 import { FaEnvelope } from "react-icons/fa6";
 import { Id } from "~/convex/_generated/dataModel";
+import { AccountType, UserRole } from "~/convex/schema";
 
 export const userColumnLabels: Record<string, string> = {
   name: "Name",
@@ -61,37 +65,38 @@ interface UserColumnsProps {
   cancelReason?: string;
   canceledAt?: number;
   lastActive?: number;
-  accountType: string[];
+  accountType: AccountType;
   createdAt: number;
-  role: string[];
+  role: UserRole;
   source?: string;
   organizationNames: string[];
 }
 
 export const userColumns: ColumnDef<UserColumnsProps>[] = [
   {
-    id: "select",
-    size: 30,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
+    id: "rowNumber",
+    header: "#",
+    size: 40,
+    cell: ({ row, table }) => {
+      const { pageIndex = 0, pageSize = table.getRowModel().rows.length } =
+        table.getState().pagination ?? {};
+      const sortedRows = table.getRowModel().rows;
+      const descending = table.getState().sorting?.[0]?.desc ?? false;
+
+      const indexWithinPage = descending
+        ? sortedRows.length - row.index
+        : row.index + 1;
+
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          {pageIndex * pageSize + indexWithinPage}
+        </div>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
+
   {
     accessorKey: "name",
     id: "name",
@@ -399,7 +404,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   {
     accessorKey: "accountType",
     id: "accountType",
-    minSize: 120,
+    minSize: 180,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Account Type" />
@@ -421,13 +426,9 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       return [];
     },
     cell: ({ row }) => {
-      const accountType = row.getValue("accountType") as string[];
+      const { accountType, _id: userId } = row.original;
       return (
-        <div className="capitalize">
-          {accountType && accountType.length > 0
-            ? accountType.map((type) => type.split("|")[0]).join(", ")
-            : "-"}
-        </div>
+        <ChangeUserAccountType userId={userId} accountType={accountType} />
       );
     },
   },
@@ -459,22 +460,16 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   {
     accessorKey: "role",
     id: "role",
-    minSize: 100,
+    minSize: 180,
+    maxSize: 250,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" />
     ),
     //TODO: Add function to change roles (dropdown)
     cell: ({ row }) => {
-      const role = row.getValue("role") as string | undefined;
-      return (
-        <div className="text-center capitalize">
-          {role?.includes("admin")
-            ? "Admin"
-            : role?.includes("user")
-              ? "User"
-              : "-"}
-        </div>
-      );
+      const { role, _id: userId } = row.original;
+
+      return <ChangeUserRole userId={userId} role={role} />;
     },
   },
   {
@@ -486,7 +481,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Created" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("createdAt") as number | undefined;
+      const { createdAt: value } = row.original;
       return (
         <span className="text-sm">
           {value ? new Date(value).toLocaleString() : "-"}

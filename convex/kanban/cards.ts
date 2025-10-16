@@ -1,49 +1,69 @@
 import { ColumnType } from "@/constants/kanbanConsts";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { OrderedQuery, Query, QueryInitializer } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { DataModel } from "~/convex/_generated/dataModel";
-import { supportCategoryValidator } from "~/convex/schema";
+import {
+  kanbanColumnValidator,
+  kanbanPurposeValidator,
+  supportCategoryValidator,
+  userRoleArrayValidator,
+} from "~/convex/schema";
 import { mutation, query } from "../_generated/server";
 
 export const searchCards = query({
   args: {
-    purpose: v.optional(v.string()),
+    purpose: v.optional(kanbanPurposeValidator),
     searchTerm: v.optional(v.string()),
     category: v.array(supportCategoryValidator),
+    assignedId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
+    const searchTerm = args.searchTerm?.trim() ?? "";
+
     let q = ctx.db
       .query("todoKanban")
       .withSearchIndex("search_by_desc", (q) => {
-        let filter = q.search("description", args.searchTerm ?? "");
+        let filter = q.search("description", searchTerm);
 
         if (args.purpose && args.purpose !== "todo") {
           filter = filter.eq("purpose", args.purpose);
         }
 
+        // Use filterField for single category, post-filter for multiple
+        if (args.category.length === 1) {
+          filter = filter.eq("category", args.category[0]);
+        }
+
         return filter;
       });
 
-    // apply category filtering (if specified)
-    if (args.category && args.category.length > 0) {
-      const all = await q.collect();
-      const filtered = all.filter((item) =>
-        args.category.includes(item.category),
-      );
-      return filtered;
+    const results = await q.collect();
+    let output = results;
+
+    // Post-filter for multiple categories
+    if (args.category.length > 1) {
+      output = results.filter((q) => args.category.includes(q.category));
+    }
+    if (args.assignedId) {
+      output = output.filter((q) => q.assignedId === args.assignedId);
     }
 
-    return await q.collect();
+    return output;
   },
 });
 
 export const getCards = query({
   args: {
-    purpose: v.optional(v.string()),
+    purpose: v.optional(kanbanPurposeValidator),
     category: v.array(supportCategoryValidator),
+    userRole: userRoleArrayValidator,
+    userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
+    // console.log("user id: ", args.userId);
+    // const userIsCreator = args.userRole.includes("creator");
+
     const tableQuery: QueryInitializer<DataModel["todoKanban"]> =
       ctx.db.query("todoKanban");
     let indexedQuery: Query<DataModel["todoKanban"]> = tableQuery;
@@ -56,7 +76,12 @@ export const getCards = query({
             .collect(),
         ),
       );
-      return results.flat();
+      const flatResults = results.flat();
+      if (args.userId) {
+        return flatResults.filter((card) => card.assignedId === args.userId);
+      } else {
+        return flatResults;
+      }
     }
 
     if (args.purpose !== "todo") {
@@ -66,24 +91,27 @@ export const getCards = query({
     } else {
       if (args.category.length === 0) {
         let orderedQuery: OrderedQuery<DataModel["todoKanban"]> = indexedQuery;
-        orderedQuery = orderedQuery.filter((q) =>
-          q.neq(q.field("column"), "notPlanned"),
-        );
-        const results = await orderedQuery.collect();
 
-        return results;
+        const results = await orderedQuery.collect();
+        let filteredResults = results;
+        if (args.userId) {
+          filteredResults = results.filter(
+            (card) => card.assignedId === args.userId,
+          );
+        }
+        return filteredResults;
       }
       //   console.log("ordered query", orderedQuery);
       //   return await orderedQuery.collect();
       // }
     }
 
-    // let orderedQuery: OrderedQuery<DataModel["todoKanban"]> = indexedQuery;
-    // if (args.searchTerm) {
-    //   orderedQuery = tableQuery.withSearchIndex("search_by_desc", q => q.search("description", args.searchTerm!));
-    // }
-
-    return await indexedQuery.collect();
+    const collectedResults = await indexedQuery.collect();
+    if (args.userId) {
+      return collectedResults.filter((card) => card.assignedId === args.userId);
+    } else {
+      return collectedResults;
+    }
   },
 });
 
@@ -91,33 +119,15 @@ export const addCard = mutation({
   args: {
     title: v.string(),
     description: v.string(),
-    column: v.union(
-      v.literal("proposed"),
-      v.literal("backlog"),
-      v.literal("todo"),
-      v.literal("doing"),
-      v.literal("done"),
-      v.literal("notPlanned"),
-    ),
+    column: kanbanColumnValidator,
     order: v.optional(v.string()),
 
     priority: v.optional(
       v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
     ),
-    category: v.optional(
-      v.union(
-        v.literal("general"),
-        v.literal("ui/ux"),
-        v.literal("account"),
-        v.literal("artist"),
-        v.literal("organization"),
-        v.literal("event"),
-        v.literal("openCall"),
-        v.literal("other"),
-      ),
-    ),
+    category: v.optional(supportCategoryValidator),
     isPublic: v.boolean(),
-    purpose: v.string(),
+    purpose: kanbanPurposeValidator,
     voters: v.optional(
       v.array(
         v.object({
@@ -126,6 +136,7 @@ export const addCard = mutation({
         }),
       ),
     ),
+    assignedId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
     const {
@@ -154,6 +165,7 @@ export const addCard = mutation({
         priority,
         public: isPublic,
         purpose: cardPurpose,
+        assignedId: args.assignedId,
         completedAt: Date.now(),
       });
     }
@@ -184,6 +196,7 @@ export const addCard = mutation({
         priority,
         public: isPublic,
         purpose: cardPurpose,
+        assignedId: args.assignedId,
         userId,
       });
     }
@@ -209,6 +222,7 @@ export const addCard = mutation({
       category: category ?? "general",
       public: isPublic,
       purpose: cardPurpose,
+      assignedId: args.assignedId,
     });
   },
 });
@@ -216,14 +230,7 @@ export const addCard = mutation({
 export const moveCard = mutation({
   args: {
     id: v.id("todoKanban"),
-    column: v.union(
-      v.literal("proposed"),
-      v.literal("backlog"),
-      v.literal("todo"),
-      v.literal("doing"),
-      v.literal("done"),
-      v.literal("notPlanned"),
-    ),
+    column: kanbanColumnValidator,
     beforeId: v.optional(v.id("todoKanban")),
 
     purpose: v.string(),
@@ -322,27 +329,8 @@ export const editCard = mutation({
     priority: v.optional(
       v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
     ),
-    column: v.optional(
-      v.union(
-        v.literal("proposed"),
-        v.literal("backlog"),
-        v.literal("todo"),
-        v.literal("doing"),
-        v.literal("done"),
-        v.literal("notPlanned"),
-      ),
-    ),
-    category: v.union(
-      v.literal("general"),
-      v.literal("ui/ux"),
-
-      v.literal("account"),
-      v.literal("artist"),
-      v.literal("organization"),
-      v.literal("event"),
-      v.literal("openCall"),
-      v.literal("other"),
-    ),
+    column: v.optional(kanbanColumnValidator),
+    category: supportCategoryValidator,
     voters: v.array(
       v.object({
         userId: v.id("users"),
@@ -464,5 +452,24 @@ export const voteCard = mutation({
     const userVoted = votedUsers.includes(userId);
 
     return { upVote, downVote, userVoted };
+  },
+});
+
+export const updateAssignedUser = mutation({
+  args: {
+    id: v.id("todoKanban"),
+    userId: v.optional(v.id("users")),
+    isAdmin: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    if (!args.isAdmin) throw new ConvexError("You don't have permission");
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const kanbanCard = await ctx.db.get(args.id);
+    if (!kanbanCard) throw new ConvexError("Kanban card not found");
+
+    await ctx.db.patch(kanbanCard._id, {
+      assignedId: args.userId,
+    });
   },
 });

@@ -48,6 +48,24 @@ export interface ArtistColumnProps {
 
 export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   {
+    id: "rowNumber",
+    header: "#",
+    size: 30,
+    cell: ({ row, table }) => {
+      const pageIndex = table.getState().pagination?.pageIndex ?? 0;
+      const pageSize =
+        table.getState().pagination?.pageSize ??
+        table.getRowModel().rows.length;
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          {pageIndex * pageSize + row.index + 1}
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "name",
     id: "name",
     minSize: 120,

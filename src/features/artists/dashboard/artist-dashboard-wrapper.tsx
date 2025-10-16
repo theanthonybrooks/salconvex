@@ -1,5 +1,6 @@
 "use client";
 
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { DataTable } from "@/components/data-table/data-table";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumns } from "@/features/artists/dashboard/data-tables/bookmark-columns";
@@ -20,6 +21,7 @@ export function ArtistDashboardTableWrapper({
   page,
 }: ArtistDashboardTableWrapperProps) {
   const router = useRouter();
+  const { isSidebarCollapsed } = useDashboard();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -67,6 +69,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
+              minimalView={!isSidebarCollapsed}
               tableType="applications"
               pageType="dashboard"
               defaultSort={{ id: `applicationTime`, desc: true }}
@@ -86,6 +89,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
+              minimalView={!isSidebarCollapsed}
               tableType="applications"
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
@@ -110,6 +114,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
+              minimalView={!isSidebarCollapsed}
               tableType="bookmarks"
               pageType="dashboard"
               defaultSort={{ id: "deadline", desc: true }}
@@ -129,6 +134,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
+              minimalView={!isSidebarCollapsed}
               tableType="bookmarks"
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
@@ -151,6 +157,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
+              minimalView={!isSidebarCollapsed}
               tableType="hidden"
               pageType="dashboard"
               defaultSort={{ id: "name", desc: false }}
@@ -168,6 +175,7 @@ export function ArtistDashboardTableWrapper({
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
+              minimalView={!isSidebarCollapsed}
               tableType="hidden"
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"

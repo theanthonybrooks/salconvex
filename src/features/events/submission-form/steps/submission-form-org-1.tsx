@@ -47,6 +47,7 @@ interface SubmissionFormOrgStepProps {
   furthestStep: number;
   preloadFlag?: boolean;
   dashboardView?: boolean;
+  isSidebarCollapsed?: boolean;
 }
 
 const SubmissionFormOrgStep = ({
@@ -72,6 +73,7 @@ const SubmissionFormOrgStep = ({
   furthestStep,
   preloadFlag,
   dashboardView,
+  isSidebarCollapsed,
 }: SubmissionFormOrgStepProps) => {
   const {
     control,
@@ -80,6 +82,7 @@ const SubmissionFormOrgStep = ({
     // unregister,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
+
   // const currentValues = getValues();
   const [firstColVisible, setFirstColVisible] = useState(true);
   const [reset, setReset] = useState(false);
@@ -90,6 +93,8 @@ const SubmissionFormOrgStep = ({
   const bottomRef = useRef<HTMLParagraphElement | null>(null);
   const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
   const { scrollRef } = useStepper();
+  const sidebarCollapsed = !!isSidebarCollapsed;
+  console.log(isSidebarCollapsed, sidebarCollapsed);
 
   useEffect(() => {
     if (scrollTrigger && scrollRef.current) {
@@ -396,7 +401,9 @@ const SubmissionFormOrgStep = ({
                 state: false,
                 openCallState: false,
               }}
-              minimalView={dashboardView && firstColVisible}
+              minimalView={
+                dashboardView && firstColVisible && !sidebarCollapsed
+              }
               initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={handleRowSelect}
               selectedRow={selectedRow}
@@ -415,7 +422,9 @@ const SubmissionFormOrgStep = ({
             <DataTable
               columns={getColumns(false)}
               data={eventsData}
-              minimalView={dashboardView && firstColVisible}
+              minimalView={
+                dashboardView && firstColVisible && !sidebarCollapsed
+              }
               initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={handleRowSelect}
               selectedRow={selectedRow}
@@ -432,21 +441,26 @@ const SubmissionFormOrgStep = ({
               defaultVisibility={{
                 _id: false,
                 submissionState: false,
+                lastEditedAt: sidebarCollapsed,
+                category: sidebarCollapsed,
+                type: sidebarCollapsed,
               }}
             />
             <DataTable
               columns={getColumns(false)}
               data={eventsData}
-              minimalView={dashboardView && firstColVisible}
+              minimalView={
+                dashboardView && firstColVisible && !sidebarCollapsed
+              }
               initialSearchTerm={preloadFlag ? eventName : undefined}
               onRowSelect={handleRowSelect}
               selectedRow={selectedRow}
               defaultVisibility={{
                 _id: false,
                 submissionState: false,
-                category: !firstColVisible,
-                type: !firstColVisible,
-                lastEditedAt: !firstColVisible,
+                category: !firstColVisible && sidebarCollapsed,
+                type: !firstColVisible && sidebarCollapsed,
+                lastEditedAt: !firstColVisible && sidebarCollapsed,
               }}
               className={cn(
                 "flex w-full max-w-[45vw] overflow-x-auto",

@@ -98,24 +98,15 @@ export function UserProfile({
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className={cn("relative h-[50px] w-[50px] rounded-full", className)}
+            className={cn("size-12.5 relative rounded-full", className)}
           >
-            <Avatar
-              className={cn(
-                "h-[50px] w-[50px] border-1.5 border-border active:scale-95",
-                className,
-              )}
-            >
+            <Avatar className={cn(className)}>
               <AvatarImage
                 src={user?.image}
                 alt={user?.name || "User Profile"}
               />
 
-              <AvatarFallback
-                className={cn(
-                  "border border-border bg-userIcon font-bold text-foreground",
-                )}
-              >
+              <AvatarFallback>
                 {user?.firstName?.[0].toUpperCase()}
                 {user?.lastName?.[0].toUpperCase()}
               </AvatarFallback>

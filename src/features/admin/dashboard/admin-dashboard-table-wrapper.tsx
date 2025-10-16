@@ -179,14 +179,12 @@ export function AdminDashboardTableWrapper({
               columns={userColumns}
               data={usersData?.users ?? []}
               defaultVisibility={{
-                category: true,
-                dates_edition: true,
-                type: false,
-                role: false,
-                instagram: isSidebarCollapsed,
-                website: isSidebarCollapsed,
+                role: isSidebarCollapsed,
                 accountType: isSidebarCollapsed,
-                organizationNames: isSidebarCollapsed,
+                instagram: false,
+                website: false,
+                organizationNames: false,
+                canFeature: false,
               }}
               toolbarData={{
                 totalMonthly: usersData?.totalMonthly ?? 0,
@@ -198,6 +196,8 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="users"
               pageType="dashboard"
+              minimalView={!isSidebarCollapsed}
+              collapsedSidebar={isSidebarCollapsed}
               defaultSort={{ id: `createdAt`, desc: true }}
               pageSize={50}
             />
@@ -226,6 +226,8 @@ export function AdminDashboardTableWrapper({
                 // setExistingEvent(row.getValue("event"));
                 // setExistingOpenCall(row.getValue("openCall"));
               }}
+              minimalView
+              collapsedSidebar={isSidebarCollapsed}
               adminActions={adminActions}
               tableType="users"
               pageType="dashboard"
@@ -258,6 +260,8 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="artists"
               pageType="dashboard"
+              minimalView={true}
+              collapsedSidebar={isSidebarCollapsed}
               defaultSort={{ id: `createdAt`, desc: false }}
               pageSize={50}
             />
@@ -286,6 +290,8 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="artists"
               pageType="dashboard"
+              minimalView={true}
+              collapsedSidebar={isSidebarCollapsed}
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
             />

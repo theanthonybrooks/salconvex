@@ -49,6 +49,7 @@ import { z } from "zod";
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { getSteps } from "@/features/events/event-add-form";
 import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
 import { useDevice } from "@/providers/device-provider";
@@ -69,6 +70,7 @@ export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const { isMobile } = useDevice();
+  const { isSidebarCollapsed } = useDashboard();
 
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
@@ -2086,6 +2088,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 selectedRow={selectedRow}
                 furthestStep={furthestStep}
                 preloadFlag={preloadFlag.current}
+                isSidebarCollapsed={isSidebarCollapsed}
               />
             )}
             {/* //------ 1st Step: Organization Details  ------ */}

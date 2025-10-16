@@ -17,6 +17,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useEffect, useMemo } from "react";
+import { MdChevronRight } from "react-icons/md";
 import { RiExpandLeftRightLine } from "react-icons/ri";
 
 import { api } from "~/convex/_generated/api";
@@ -148,7 +149,11 @@ export default function DashboardSideBar({
           className="absolute right-0 top-[11%] z-10 translate-x-1/2 rounded-full border border-foreground bg-background p-0.5 hover:scale-105 hover:cursor-pointer active:scale-95"
           onClick={handleCollapseSidebar}
         >
-          <RiExpandLeftRightLine className="size-4" />
+          {collapsedSidebar ? (
+            <MdChevronRight className="size-[18px]" />
+          ) : (
+            <RiExpandLeftRightLine className="size-4" />
+          )}
         </div>
       </TooltipSimple>
 

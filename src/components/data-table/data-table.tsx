@@ -79,6 +79,7 @@ interface DataTableProps<TData, TValue> {
   defaultFilters?: ColumnFiltersState;
   pageSize?: number;
   isMobile?: boolean;
+  collapsedSidebar?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -101,6 +102,7 @@ export function DataTable<TData, TValue>({
   defaultFilters,
   pageSize = 10,
   isMobile,
+  collapsedSidebar,
 }: DataTableProps<TData, TValue>) {
   const searchParams = useSearchParams();
   const isSelectable = tableType
@@ -168,6 +170,7 @@ export function DataTable<TData, TValue>({
 
       tableType,
       pageType,
+      collapsedSidebar,
       minimalView,
       toolbarData,
     },
@@ -201,7 +204,8 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    enableMultiRowSelection: pageType === "dashboard",
+    enableMultiRowSelection:
+      pageType === "dashboard" && tableType === "events" && isAdmin,
     enableColumnResizing: true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

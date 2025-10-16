@@ -8,11 +8,40 @@ import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
 import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
 import {
+  AccountType,
+  accountTypeArrayValidator,
+  UserRole,
+  userRoleArrayValidator,
+} from "~/convex/schema";
+import {
   internalMutation,
   mutation,
   MutationCtx,
   query,
 } from "./_generated/server";
+
+const prefsArgs = v.object({
+  autoApply: v.optional(v.boolean()),
+  currency: v.optional(v.string()),
+  timezone: v.optional(v.string()),
+  theme: v.optional(v.string()),
+  fontSize: v.optional(v.string()),
+  language: v.optional(v.string()),
+  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
+});
+//TODO: THIS is what I was looking for. Infer<typeof T>
+type UpdateUserPrefsArgs = Infer<typeof prefsArgs>;
+
+export const getUserById = query({
+  args: {
+    id: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.id);
+    if (!user) return null;
+    return user;
+  },
+});
 
 export const updateUserLastActive = mutation({
   args: {
@@ -206,7 +235,7 @@ export const usersWithSubscriptions = query({
           cancelReason,
           canceledAt,
           lastActive: user.lastActive ?? 0,
-          role: user.role ?? "user",
+          role: user.role ?? ["user"],
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,
           source: user.source,
@@ -349,10 +378,17 @@ export const updateUser = mutation({
     email: v.optional(v.string()),
     name: v.optional(v.string()),
     organizationName: v.optional(v.string()),
+    accountType: v.optional(accountTypeArrayValidator),
+    role: v.optional(userRoleArrayValidator),
+    targetOtherUser: v.optional(v.boolean()),
+    otherUserId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
+    const { targetOtherUser, otherUserId } = args;
+    const userId = !targetOtherUser
+      ? await getAuthUserId(ctx)
+      : (otherUserId ?? null);
+    if (!userId) return null;
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -363,13 +399,22 @@ export const updateUser = mutation({
     }
 
     await ctx.db.patch(user._id, {
-      firstName: args.firstName,
-      lastName: args.lastName,
-      email: args.email,
-      name: args.name,
-
+      ...(args.firstName && { firstName: args.firstName }),
+      ...(args.lastName && { lastName: args.lastName }),
+      ...(args.email && { email: args.email }),
+      ...(args.name && { name: args.name }),
+      ...(args.accountType && { accountType: args.accountType }),
+      ...(args.role && { role: args.role }),
       updatedAt: Date.now(),
     });
+
+    if (args.accountType?.length) {
+      await syncAccountTypes(ctx, user._id, args.accountType);
+    }
+
+    if (args.role?.length) {
+      await syncRoles(ctx, user._id, args.role);
+    }
 
     if (args.organizationName) {
       const organization = await ctx.db
@@ -398,17 +443,6 @@ function pickDefined<T extends object>(obj: T, keys: (keyof T)[]) {
   }
   return out;
 }
-
-const prefsArgs = v.object({
-  autoApply: v.optional(v.boolean()),
-  currency: v.optional(v.string()),
-  timezone: v.optional(v.string()),
-  theme: v.optional(v.string()),
-  fontSize: v.optional(v.string()),
-  language: v.optional(v.string()),
-  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
-});
-type UpdateUserPrefsArgs = Infer<typeof prefsArgs>;
 
 export const updateUserPrefs = mutation({
   args: prefsArgs,
@@ -1125,3 +1159,62 @@ export const deleteOrphanedUserPw = internalMutation({
     }
   },
 });
+
+export async function syncAccountTypes(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  accountTypes: AccountType,
+) {
+  if (!accountTypes?.length) return;
+
+  const existingAccountTypes = await ctx.db
+    .query("userAccountTypes")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .collect();
+
+  // Add new ones
+  const newAccountTypes = accountTypes.filter(
+    (type) =>
+      !existingAccountTypes.some((existing) => existing.accountType === type),
+  );
+  for (const type of newAccountTypes) {
+    await ctx.db.insert("userAccountTypes", { userId, accountType: type });
+  }
+
+  // Remove ones no longer present
+  const toDelete = existingAccountTypes.filter(
+    (existing) => !accountTypes.includes(existing.accountType),
+  );
+  for (const item of toDelete) {
+    await ctx.db.delete(item._id);
+  }
+}
+
+export async function syncRoles(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  roles: UserRole,
+) {
+  if (!roles?.length) return;
+
+  const existingRoles = await ctx.db
+    .query("userRoles")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .collect();
+
+  // Add new ones
+  const newRoles = roles.filter(
+    (role) => !existingRoles.some((existing) => existing.role === role),
+  );
+  for (const role of newRoles) {
+    await ctx.db.insert("userRoles", { userId, role });
+  }
+
+  // Remove ones no longer present
+  const toDelete = existingRoles.filter(
+    (existing) => !roles.includes(existing.role),
+  );
+  for (const item of toDelete) {
+    await ctx.db.delete(item._id);
+  }
+}

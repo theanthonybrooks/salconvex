@@ -33,11 +33,12 @@ declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     isAdmin: boolean | undefined;
 
-    tableType: TableTypes | undefined;
+    tableType?: TableTypes;
     pageType?: PageTypes;
     getRowData?: (row: TData) => void;
-    minimalView?: boolean;
     toolbarData?: ToolbarData;
     isMobile?: boolean;
+    minimalView?: boolean;
+    collapsedSidebar?: boolean;
   }
 }
