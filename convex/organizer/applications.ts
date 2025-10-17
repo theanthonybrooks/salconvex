@@ -41,3 +41,33 @@ export const getOpenCallApplications = query({
     return applicationChartData;
   },
 });
+
+export const getAllApplications = query({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!user) return null;
+    const isAdmin = user?.role?.includes("admin");
+    const isArtist = user?.accountType?.includes("artist");
+
+    if (!isAdmin) return null;
+
+    const applications = await ctx.db.query("applications").collect();
+
+    const appChartData = applications.map((application) => {
+      const date = new Date(application._creationTime);
+      return {
+        date: date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(),
+        applied: application.applicationStatus === "applied" ? 1 : 0,
+        accepted: application.applicationStatus === "accepted" ? 1 : 0,
+        rejected: application.applicationStatus === "rejected" ? 1 : 0,
+      };
+    });
+
+    return appChartData;
+  },
+});
