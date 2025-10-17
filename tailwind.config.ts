@@ -54,6 +54,11 @@ export default {
         txtMutedForeground: "hsl(var(--txt-muted-foreground))",
         customPurple: "#5C3B58",
         toucanColor: "var(--toucan-color)",
+        chart1: "var(--chart-1)",
+        chart2: "var(--chart-2)",
+        chart3: "var(--chart-3)",
+        chart4: "var(--chart-4)",
+        chart5: "var(--chart-5)",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
