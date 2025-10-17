@@ -998,10 +998,17 @@ async function deleteRelatedDocuments(
     q.eq("userId", userId),
   );
 
-  // 3. Delete newsletter subscriptions
-  await deleteInBatches("newsletter", "by_userId", (q) =>
-    q.eq("userId", userId),
-  );
+  const newsletterSub = await ctx.db
+    .query("newsletter")
+    .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+    .first();
+
+  if (newsletterSub) {
+    await ctx.db.patch(newsletterSub._id, {
+      userId: null,
+      userPlan: 0,
+    });
+  }
 
   // 3. Delete user organizations if incomplete
   const incompleteOrgs = await ctx.db

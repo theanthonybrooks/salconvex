@@ -33,6 +33,17 @@ import { cn } from "@/lib/utils";
 import { useCallback, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 
+interface BaseOption<T extends string = string> {
+  full?: string;
+  label: string;
+  value: T;
+  group?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  abbr?: string;
+  disabled?: boolean;
+  premium?: boolean;
+}
+
 /**
  * Variants for the multi-select component to handle different styles.
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
@@ -59,27 +70,28 @@ const multiSelectVariants = cva("mx-[2px] ", {
 /**
  * Props for MultiSelect component
  */
-interface MultiSelectProps
+interface MultiSelectProps<T extends string>
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
   /**
    * An array of option objects to be displayed in the multi-select component.
    * Each option object has a label, value, and an optional icon.
    */
-  options: {
-    /** The text to display for the option. */
-    full?: string;
-    label: string;
-    /** The unique value associated with the option. */
-    value: string;
-    /** The group label associated with the option. */
-    group?: string;
-    /** Optional icon component to display alongside the option. */
-    icon?: React.ComponentType<{ className?: string }>;
-    abbr?: string;
-    disabled?: boolean;
-    premium?: boolean;
-  }[];
+  // options: {
+  //   /** The text to display for the option. */
+  //   full?: string;
+  //   label: string;
+  //   /** The unique value associated with the option. */
+  //   value: string;
+  //   /** The group label associated with the option. */
+  //   group?: string;
+  //   /** Optional icon component to display alongside the option. */
+  //   icon?: React.ComponentType<{ className?: string }>;
+  //   abbr?: string;
+  //   disabled?: boolean;
+  //   premium?: boolean;
+  // }[];
+  options: BaseOption<T>[];
 
   /**
    * Callback function triggered when the selected values change.
@@ -156,48 +168,85 @@ interface MultiSelectProps
   fallbackValue?: string[];
 }
 
-export const MultiSelect = React.forwardRef<
-  HTMLButtonElement,
-  MultiSelectProps
->(
-  (
+export const MultiSelect = React.forwardRef(
+  //   HTMLButtonElement,
+  //   MultiSelectProps
+  // >(
+  //   (
+  //     {
+  //       fallbackValue,
+  //       limit,
+  //       id,
+  //       value,
+  //       options,
+  //       onValueChange,
+  //       variant,
+  //       shiftOffset,
+  //       height = 10,
+  //       hasSearch = true,
+  //       selectAll = true,
+  //       defaultValue = [],
+  //       lockedValue = [],
+
+  //       placeholder = "Select options",
+  //       animation = 0,
+  //       maxCount = 3,
+  //       showArrow,
+  //       compact = false,
+  //       // modalPopover = false,
+  //       shortResults = false,
+  //       condensed = false,
+  //       tabIndex = 0,
+  //       // asChild = false,
+  //       className,
+  //       badgeClassName,
+  //       textClassName,
+  //       listClassName,
+  //       groupClassName,
+  //       disabled,
+  //       abbreviated = false,
+  //       showIcon = true,
+  //       ...props
+  //     },
+  //     ref,
+  //   ) => {
+  <T extends string>(
     {
-      fallbackValue,
-      limit,
-      id,
-      value,
       options,
       onValueChange,
-      variant,
-      shiftOffset,
-      height = 10,
-      hasSearch = true,
-      selectAll = true,
+      value,
       defaultValue = [],
       lockedValue = [],
-
-      placeholder = "Select options",
+      tabIndex = 0,
+      height = 10,
       animation = 0,
       maxCount = 3,
-      showArrow,
-      compact = false,
-      // modalPopover = false,
+      hasSearch = true,
+      selectAll = true,
+      abbreviated = false,
       shortResults = false,
+      compact = false,
       condensed = false,
-      tabIndex = 0,
-      // asChild = false,
+      placeholder = "Select options",
+      showIcon = true,
+      ...props
+    }: Omit<MultiSelectProps<T>, "ref">,
+    ref: React.Ref<HTMLButtonElement>,
+  ) => {
+    const {
+      variant,
+      shiftOffset,
+      showArrow,
       className,
       badgeClassName,
       textClassName,
       listClassName,
       groupClassName,
       disabled,
-      abbreviated = false,
-      showIcon = true,
-      ...props
-    },
-    ref,
-  ) => {
+      limit,
+      fallbackValue,
+      id,
+    } = props;
     const [selectedValues, setSelectedValues] =
       React.useState<string[]>(defaultValue);
 
@@ -220,7 +269,7 @@ export const MultiSelect = React.forwardRef<
     };
 
     const toggleOption = (option: string) => {
-      if (lockedValue.includes(option)) return;
+      if (lockedValue?.includes(option)) return;
       const isSelected = selectedValues.includes(option);
       if (!isSelected && limit && selectedValues.length >= limit) return;
       let newSelectedValues = selectedValues.includes(option)
@@ -307,7 +356,7 @@ export const MultiSelect = React.forwardRef<
         <PopoverTrigger asChild>
           <Button
             ref={ref}
-            {...props}
+            // {...props}
             tabIndex={tabIndex}
             onClick={handleTogglePopover}
             disabled={disabled}
@@ -349,7 +398,7 @@ export const MultiSelect = React.forwardRef<
                           >
                             {abbreviated ? option?.abbr : option?.label}
                           </p>
-                          {!lockedValue.includes(value) && !condensed && (
+                          {!lockedValue?.includes(value) && !condensed && (
                             <X
                               className="ml-2 h-3 w-3 cursor-pointer"
                               onClick={(event) => {

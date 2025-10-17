@@ -885,7 +885,7 @@ export default function SettingsPage() {
                           </p>
                         </div>
                         <Select
-                          value={String(userPrefs?.autoApply)}
+                          value={String(userPrefs?.autoApply ?? true)}
                           onValueChange={(value) =>
                             handleUpdateUserPrefs({
                               autoApply: value === "true",

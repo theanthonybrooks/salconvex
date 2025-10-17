@@ -4,7 +4,96 @@ import {
 } from "@/constants/newsletterConsts";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "~/convex/_generated/server";
+import { Id } from "~/convex/_generated/dataModel";
+import {
+  mutation,
+  MutationCtx,
+  query,
+  QueryCtx,
+} from "~/convex/_generated/server";
+
+export async function updateUserNewsletter(
+  ctx: MutationCtx,
+
+  args: {
+    userId: Id<"users">;
+    email?: string;
+    userPlan?: number;
+  },
+): Promise<void> {
+  console.log("args in updateUserNewsletter", args);
+  const { userId, userPlan, email } = args;
+
+  const sub = await ctx.db
+    .query("newsletter")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .first();
+  const emailSub =
+    !sub && email
+      ? await ctx.db
+          .query("newsletter")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .first()
+      : null;
+
+  const basePlan = Boolean(typeof userPlan === "number" && userPlan <= 1);
+
+  console.log("frequency", basePlan ? "monthly" : "weekly/monthly");
+
+  if (sub) {
+    await ctx.db.patch(sub._id, {
+      userId,
+      ...(typeof userPlan === "number" && { userPlan }),
+      ...(basePlan && { frequency: "monthly" }),
+      ...(basePlan && { type: ["general"] }),
+    });
+    console.log("patching newsletter sub by userId");
+  } else if (email && !sub) {
+    if (emailSub) {
+      console.log("patching newsletter sub by email");
+      await ctx.db.patch(emailSub._id, {
+        userId,
+        ...(typeof userPlan === "number" && { userPlan }),
+        ...(basePlan && { frequency: "monthly" }),
+        ...(basePlan && { type: ["general"] }),
+      });
+    }
+  } else {
+    console.log("no newsletter patching");
+  }
+}
+
+export async function checkNewsletterUser(
+  ctx: QueryCtx,
+  email: string,
+): Promise<{ newsletter: boolean; subscriptionId: Id<"newsletter"> | null }> {
+  const newsletterSubscription = await ctx.db
+    .query("newsletter")
+    .withIndex("by_email", (q) => q.eq("email", email))
+    .unique();
+  console.log("email: ", email, newsletterSubscription);
+  if (!newsletterSubscription) {
+    return {
+      newsletter: false,
+      subscriptionId: null,
+    };
+  }
+
+  return {
+    newsletter: true,
+    subscriptionId: newsletterSubscription?._id,
+  };
+}
+
+export async function updateNewsletterUser(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  newsletterId: Id<"newsletter">,
+) {
+  await ctx.db.patch(newsletterId, {
+    userId,
+  });
+}
 
 export const deleteSubscription = mutation({
   args: {
@@ -204,9 +293,10 @@ export const updateNewsletterStatus = mutation({
       v.array(v.union(v.literal("openCall"), v.literal("general"))),
     ),
     userPlan: v.optional(v.number()),
+    updateEmail: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { email, newsletter, frequency, type, userPlan } = args;
+    const { email, newsletter, frequency, type, userPlan, updateEmail } = args;
 
     console.log(args);
     const wasCanceled = newsletter === false;
@@ -233,11 +323,19 @@ export const updateNewsletterStatus = mutation({
       throw new ConvexError("Log in to update your newsletter preferences");
     }
 
+    console.log(
+      "newsletterSubscription",
+      Boolean(newsletterSubscription),
+      "emailSubscription",
+      Boolean(emailSubscription),
+    );
+
     if (newsletterSubscription) {
       await ctx.db.patch(newsletterSubscription._id, {
         newsletter,
         timesAttempted: 0,
         lastAttempt: Date.now(),
+        ...(email && updateEmail && { email }),
         ...(frequency && { frequency }),
         ...(type && { type }),
         ...(userPlan &&
@@ -248,6 +346,7 @@ export const updateNewsletterStatus = mutation({
         newsletter,
         timesAttempted: 0,
         lastAttempt: Date.now(),
+
         ...(frequency && { frequency }),
         ...(type && { type }),
         ...(userPlan &&

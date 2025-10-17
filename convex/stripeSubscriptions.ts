@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import Stripe from "stripe";
 import { Id } from "~/convex/_generated/dataModel";
+import { updateUserNewsletter } from "~/convex/newsletter/subscriber";
 import { api, internal } from "./_generated/api";
 import {
   action,
@@ -9,6 +10,7 @@ import {
   internalQuery,
   mutation,
   query,
+  QueryCtx,
 } from "./_generated/server";
 import schema from "./schema";
 
@@ -56,6 +58,19 @@ export const getPlanKeyByPriceId = query({
     return null;
   },
 });
+
+export async function getPlanNumberByProduct(
+  ctx: QueryCtx,
+  productKey: string,
+): Promise<{ plan: number | null; key: string | null }> {
+  const plan = await ctx.db
+    .query("userPlans")
+    .withIndex("stripeProductId", (q) => q.eq("stripeProductId", productKey))
+    .first();
+  if (!plan) return { plan: null, key: null };
+  const result = planMapping[plan.key] ?? null;
+  return { plan: result, key: plan.key };
+}
 
 export const getUserHadTrial = query({
   handler: async (ctx) => {
@@ -390,35 +405,68 @@ export const subscriptionStoreWebhook = mutation({
       data: args.body.data,
     });
 
-    console.log("args.body.data store webhook:", args.body.data);
+    // console.log("args.body.data store webhook:", args.body.data);
     // if (eventType === "checkout.session.completed") {
     //   eventType = "customer.subscription.created"
     // }
-    console.log("eventType once more: ", eventType);
-    const customerId = args.body.data.object.customer ?? null;
-    const userId = args.body.data.object.metadata?.userId ?? null;
-    const metadata = args.body.data.object.metadata;
+    console.log("event type:", eventType);
+    const base = args.body.data;
+    const baseObject = args.body.data.object;
+    const customerId = baseObject.customer ?? null;
+    const metadata = baseObject.metadata;
+    let userId = metadata?.userId ?? null;
     const metaInterval = metadata?.interval;
     const metaPlan = metadata?.plan;
     const metaNumber = planMapping[metaPlan ?? "Unknown"];
-    console.log("customer id: ", customerId);
-    console.log("userId: ", userId);
-    console.log("metaPlan: ", metaPlan);
-    console.log("metaNumber: ", metaNumber);
+    const customerSubData = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("customerId", (q) => q.eq("customerId", customerId))
+      .first();
+    const userData = customerSubData?.userId
+      ? await ctx.db.get(customerSubData.userId as Id<"users">)
+      : null;
+    const newsletterSub = userData
+      ? await ctx.db
+          .query("newsletter")
+          .withIndex("by_userId", (q) => q.eq("userId", userData._id))
+          .first()
+      : null;
+    console.log("subscription in base callback: ", customerSubData);
+    // console.log("customer id: ", customerId);
+    // console.log("userId: ", userId);
+    // console.log("metaPlan: ", metaPlan);
+    // console.log("metaNumber: ", metaNumber);
 
     switch (eventType) {
       case "checkout.session.completed":
+        //note-to-self: in this, the metadata loads something that looks like this:
+        // {
+        //   accountType: 'artist',
+        //   interval: 'month',
+        //   openCallId: '',
+        //   plan: 'original',
+        //   userEmail: 'newacc@thestreetartlist.com',
+        //   userId: 'mh7c2z6vq780jv39ac74ewkn6h7sm7fv'
+        // }
+        // Also, in the base object is a key called "client_reference_id" that has the user's _id value.
+
+        // email = baseObject.customer_details.email
+        // userId = baseObject.client_reference_id;
+        console.log(
+          "metadata.userId: ",
+          userId,
+          "client_reference_id (userId): ",
+          baseObject.client_reference_id,
+        );
+        console.log("checkout session completed:", args.body.data);
         const oneTime = metaInterval === "One-time";
         const freeCall =
-          args.body.data.object.discounts[0]?.coupon ===
-          process.env.STRIPE_FREE_COUPON;
+          baseObject.discounts[0]?.coupon === process.env.STRIPE_FREE_COUPON;
         // args.body.data.object.discounts[0]?.coupon === "KT7bnfqn";
-        const createdAt = new Date(
-          args.body.data.object.created * 1000,
-        ).getTime();
+        const createdAt = new Date(baseObject.created * 1000).getTime();
         console.log("createdAt: ", createdAt);
         console.log("metaPlan: ", metaPlan);
-        const paymentStatus = args.body.data.object.payment_status ?? "unpaid";
+        const paymentStatus = baseObject.payment_status ?? "unpaid";
         console.log("paymentStatus: ", paymentStatus);
 
         // const checkoutCustomer = await ctx.db
@@ -456,6 +504,10 @@ export const subscriptionStoreWebhook = mutation({
               metadata: args.body.data.object.metadata ?? {},
               plan: metaNumber,
               customerId: args.body.data.object.customer,
+            });
+            await updateUserNewsletter(ctx, {
+              userId,
+              userPlan: metaNumber,
             });
           } else if (checkoutCustomer) {
             await ctx.db.patch(checkoutCustomer._id, {
@@ -558,12 +610,19 @@ export const subscriptionStoreWebhook = mutation({
               subscription: `${metadata.interval}ly-${metaPlan}`,
               plan: metaNumber,
             });
+            await updateUserNewsletter(ctx, {
+              userId: existingUser._id,
+              userPlan: metaNumber,
+              email: existingUser.email,
+            });
           }
         }
 
         break;
 
       // ...
+      //!! SECTION: --------------------------------------------------------------------
+
       case "checkout.session.expired":
         const customer = await ctx.db
           .query("userSubscriptions")
@@ -584,169 +643,132 @@ export const subscriptionStoreWebhook = mutation({
         }
 
         break;
+      //!! SECTION: --------------------------------------------------------------------
+
       case "subscription_schedule.updated":
         break;
       // ...
+      //!! SECTION: --------------------------------------------------------------------
+
       case "invoice.created":
         console.log("invoice.created:", args.body);
         break;
+      //!! SECTION: --------------------------------------------------------------------
 
       case "customer.subscription.created":
-        console.log("customer.subscription.created:", args.body);
+        //! This doesn't contain the metadata in the baseObject
+        //??: What is interesting/useful in this event data:
+        //??: start dates, end dates, amount, interval, currency, nickname (product), product info, type (which may be a better use than the other subscription check below. More complicated to get to, though as it's within the product/plan info several layers deep.)
 
-        const subscription = args.body.data.object;
-        const userLogId = await ctx.db
-          .query("userLog")
-          .withIndex("by_userId", (q) => q.eq("userId", userId))
-          .first();
+        // console.log("customer.subscription.created:", args.body);
+        // console.log("subscription type: ", baseObject.object);
+        const subscription = baseObject;
+        const isOngoingSubscription = baseObject.object === "subscription";
 
         console.log("sub customerId: ", subscription.customer);
-        const existingSubscription = await ctx.db
-          .query("userSubscriptions")
-          .withIndex("customerId", (q) =>
-            q.eq("customerId", subscription.customer),
-          )
-          .first();
 
-        console.log("existing subscription: ", existingSubscription);
+        const baseData = {
+          stripeId: subscription.id,
+          stripePriceId: subscription.plan?.id,
+          currency: subscription.currency,
+          interval: subscription.plan?.interval,
+          status: subscription.status,
+          startedAt:
+            new Date(subscription.start_date * 1000).getTime() || undefined,
+          currentPeriodStart: subscription.current_period_start
+            ? new Date(subscription.current_period_start * 1000).getTime()
+            : undefined,
+          currentPeriodEnd: subscription.current_period_end
+            ? new Date(subscription.current_period_end * 1000).getTime()
+            : undefined,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          cancelAt: undefined,
+          canceledAt: undefined,
+          amount: subscription.plan?.amount,
 
-        if (existingSubscription) {
-          console.log(
-            "Updating existing subscription:",
-            existingSubscription._id,
-          );
+          endedAt: subscription.ended_at
+            ? new Date(subscription.ended_at * 1000).getTime()
+            : undefined,
+          trialEndsAt: subscription.trial_end
+            ? new Date(subscription.trial_end * 1000).getTime()
+            : undefined,
+          hadTrial: true,
+          customerCancellationComment: undefined,
+          customerCancellationReason: undefined,
+          lastEditedAt: new Date().getTime(),
+        };
 
-          const startDate =
-            existingSubscription?.startedAt ||
-            new Date(subscription.start_date * 1000).getTime() ||
-            undefined;
-
+        if (customerSubData) {
+          console.log("Updating existing subscription:", customerSubData._id);
           // Update the existing subscription
-          await ctx.db.patch(existingSubscription._id, {
-            stripeId: subscription.id,
-            stripePriceId: subscription.plan?.id,
-            currency: subscription.currency,
-            interval: subscription.plan?.interval,
-            status: subscription.status,
-            startedAt: startDate,
-            currentPeriodStart: subscription.current_period_start
-              ? new Date(subscription.current_period_start * 1000).getTime()
-              : undefined,
-            currentPeriodEnd: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000).getTime()
-              : undefined,
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            cancelAt: undefined,
-            canceledAt: undefined,
-            amount: subscription.plan?.amount,
 
-            endedAt: subscription.ended_at
-              ? new Date(subscription.ended_at * 1000).getTime()
-              : undefined,
-            trialEndsAt: subscription.trial_end
-              ? new Date(subscription.trial_end * 1000).getTime()
-              : undefined,
-            hadTrial: true,
-            customerCancellationComment: undefined,
-            customerCancellationReason: undefined,
-            lastEditedAt: new Date().getTime(),
-          });
-
-          if (userLogId) {
-            await ctx.db.patch(userLogId._id, {
-              hadTrial: true,
+          if (isOngoingSubscription)
+            await ctx.db.patch(customerSubData._id, {
+              ...baseData,
+              startedAt: customerSubData?.startedAt || baseData.startedAt,
             });
-          }
-          // TODO: Add logic to check which type of subscription was made. Org or Artist. Currently just inserts "One-time-ly" for organizers
 
           const existingUser = await ctx.db
             .query("users")
-            .withIndex("by_token", (q) => q.eq("tokenIdentifier", userId))
+            .withIndex("by_userId", (q) =>
+              q.eq("userId", customerSubData.userId ?? ""),
+            )
             .first();
-          console.log("existingUser: ", existingUser);
+
           if (existingUser) {
+            const userLogId = await ctx.db
+              .query("userLog")
+              .withIndex("by_userId", (q) => q.eq("userId", existingUser._id))
+              .first();
+            console.log("in existingUser - userLogId: ", userLogId);
+            if (userLogId) {
+              await ctx.db.patch(userLogId._id, {
+                hadTrial: true,
+              });
+            }
             await ctx.db.patch(existingUser._id, {
               subscription: `${metadata.interval}ly-${metaPlan}`,
+            });
+            await updateUserNewsletter(ctx, {
+              userId: existingUser._id,
+              userPlan: metaNumber,
             });
           }
         } else {
-          console.log("Inserting new subscription");
-
-          // Insert a new subscription
-          await ctx.db.insert("userSubscriptions", {
-            stripeId: subscription.id,
-            stripePriceId: subscription.plan?.id,
-            currency: subscription.currency,
-            interval: subscription.plan?.interval,
-            // userId: subscription.metadata?.userId,
-            status: subscription.status,
-            currentPeriodStart: subscription.current_period_start
-              ? new Date(subscription.current_period_start * 1000).getTime()
-              : undefined,
-            currentPeriodEnd: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000).getTime()
-              : undefined,
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            amount: subscription.plan?.amount,
-            startedAt: subscription.start_date
-              ? new Date(subscription.start_date * 1000).getTime()
-              : undefined,
-            endedAt: subscription.ended_at
-              ? new Date(subscription.ended_at * 1000).getTime()
-              : undefined,
-            trialEndsAt: subscription.trial_end
-              ? new Date(subscription.trial_end * 1000).getTime()
-              : undefined,
-            hadTrial: true,
-            customerId: subscription.customer,
-            lastEditedAt: new Date().getTime(),
-          });
-
-          const existingUser = await ctx.db
-            .query("users")
-            .withIndex("by_userId", (q) => q.eq("userId", userId))
-            .first();
-          console.log("updating user subscription: ", existingUser);
-          if (existingUser) {
-            await ctx.db.patch(existingUser._id, {
-              subscription: `${metadata.interval}ly-${metaPlan}`,
-            });
-          }
+          console.log(
+            "Missing subscription: " +
+              {
+                customer: subscription.customer,
+                data: subscription,
+              },
+          );
         }
+
+        //? :  Removed section that creates a new sub since it's handled prior to checkout and this should only update that existing "subscription" row in the db.
+
         break;
+      //!! SECTION: --------------------------------------------------------------------
 
       case "customer.subscription.updated":
-        console.log("customer.subscription.updated:", args.body);
-        console.log("customer id: ", args.body.data.object.customer);
-        // Find existing subscription
-        const updatedSub = await ctx.db
-          .query("userSubscriptions")
-          .withIndex("customerId", (q) =>
-            q.eq("customerId", args.body.data.object.customer),
-          )
-          .first();
+        const discountPercent = baseObject?.discount?.coupon?.percent_off;
+        const discountAmount = baseObject?.discount?.coupon?.amount_off;
+        const discountDuration = baseObject?.discount?.coupon?.duration;
+        const planData = baseObject?.plan;
+        const prevPlanData = base.previous_attributes?.plan;
+        // const couponCode = baseObject?.discount?.coupon?.name;
+        const currentAmount = planData?.amount;
+        const currentInterval = planData?.interval;
+        const prevInterval = customerSubData?.interval;
+        const prevAmount = prevPlanData?.amount;
+        const existingMetadata = customerSubData?.metadata || {};
+        const productId = planData?.product;
+        const cancellationDetails = baseObject?.cancellation_details;
 
-        const updatedUser = await ctx.db
-          .query("users")
-          .withIndex("by_id", (q) =>
-            q.eq("_id", updatedSub?.userId as Id<"users">),
-          )
-          .unique();
+        // console.log("planData: ", planData);
 
-        const base = args.body.data;
-
-        const discountPercent = base.object?.discount?.coupon?.percent_off;
-        const discountAmount = base.object?.discount?.coupon?.amount_off;
-        const discountDuration = base.object?.discount?.coupon?.duration;
-        // const couponCode = base.object?.discount?.coupon?.name;
-        const currentAmount = base.object.plan?.amount;
-        const currentInterval = base.object.plan?.interval;
-        const prevInterval = updatedSub?.interval;
-        const prevAmount = base.previous_attributes?.plan?.amount;
-        const existingMetadata = updatedSub?.metadata || {};
-        const planKey = await ctx.runQuery(
-          api.stripeSubscriptions.getPlanKeyByPriceId,
-          { priceId: base.object.plan?.id },
+        const { plan: planNumber, key: planKey } = await getPlanNumberByProduct(
+          ctx,
+          productId ?? "",
         );
 
         const updatedMetadata = {
@@ -755,8 +777,9 @@ export const subscriptionStoreWebhook = mutation({
           plan: planKey ?? "Unknown",
         };
 
-        const planNumber = planKey ? planMapping[planKey] : undefined;
-        console.log("plan key: ", planKey, "plan number: ", planNumber);
+        console.log("updatedMetadata: ", updatedMetadata);
+
+        //todo: Update this in the future. Make it a bit more readable and sure that it's working as intended.
 
         let amount: number | undefined;
         let nextAmount: number | undefined;
@@ -782,17 +805,17 @@ export const subscriptionStoreWebhook = mutation({
           interval = currentInterval;
         }
 
-        if (updatedSub) {
-          const updates: any = {
-            status: base.object.status,
-            cancelAt: base.object.cancel_at
-              ? new Date(base.object.cancel_at * 1000).getTime()
+        if (customerSubData) {
+          const updates = {
+            status: baseObject.status,
+            cancelAt: baseObject.cancel_at
+              ? new Date(baseObject.cancel_at * 1000).getTime()
               : undefined,
-            canceledAt: base.object.canceled_at
-              ? new Date(base.object.canceled_at * 1000).getTime()
+            canceledAt: baseObject.canceled_at
+              ? new Date(baseObject.canceled_at * 1000).getTime()
               : undefined,
-            endedAt: base.object.ended_at
-              ? new Date(base.object.ended_at * 1000).getTime()
+            endedAt: baseObject.ended_at
+              ? new Date(baseObject.ended_at * 1000).getTime()
               : undefined,
             interval: interval,
             intervalNext: nextInterval,
@@ -801,61 +824,58 @@ export const subscriptionStoreWebhook = mutation({
             discountPercent: discountPercent ?? undefined,
             discountDuration: discountDuration ?? undefined,
             amountNext: nextAmount,
-            currentPeriodEnd: base.object.current_period_end
-              ? new Date(base.object.current_period_end * 1000).getTime()
+            currentPeriodEnd: baseObject.current_period_end
+              ? new Date(baseObject.current_period_end * 1000).getTime()
               : undefined,
-            cancelAtPeriodEnd: base.object.cancel_at_period_end ?? false,
-            stripeId: args.body.data.object.id,
+            cancelAtPeriodEnd: baseObject.cancel_at_period_end ?? false,
+            stripeId: baseObject.id,
             metadata: updatedMetadata,
             plan: planNumber,
             //test if actually needed - the stripeId changes when the subscription is updated, but I don't know if it's able to reference/find the new one in reference to the old one or not. Wait and see.
             lastEditedAt: new Date().getTime(),
           };
 
-          const cancellationDetails =
-            args.body.data.object.cancellation_details;
-          if (cancellationDetails) {
-            if (cancellationDetails.comment) {
-              updates.customerCancellationComment = cancellationDetails.comment;
-            }
-            if (cancellationDetails.reason) {
-              updates.customerCancellationReason = cancellationDetails.reason;
-            }
-          }
-
-          await ctx.db.patch(updatedSub._id, updates);
+          await ctx.db.patch(customerSubData._id, {
+            ...updates,
+            ...(cancellationDetails.comment && {
+              customerCancellationComment: cancellationDetails.comment,
+            }),
+            ...(cancellationDetails.reason && {
+              customerCancellationReason: cancellationDetails.reason,
+            }),
+          });
         }
-        console.log("updated user: ", metaNumber, metaInterval, metaPlan);
-        if (updatedUser) {
-          await ctx.db.patch(updatedUser._id, {
-            plan: planNumber,
+
+        if (userData) {
+          console.log("patching userData");
+          await ctx.db.patch(userData._id, {
             subscription: `${currentInterval}ly-${planKey}`,
+            ...(planNumber && { plan: planNumber }),
+          });
+          await updateUserNewsletter(ctx, {
+            userId: userData._id,
+            email: userData.email,
+            ...(planNumber && { userPlan: planNumber }),
           });
         }
         break;
 
-      case "customer.subscription.deleted":
-        // Find existing subscription
-        const deletedSub = await ctx.db
-          .query("userSubscriptions")
-          .withIndex("customerId", (q) =>
-            q.eq("customerId", args.body.data.object.customer),
-          )
-          .first();
+      //!! SECTION: --------------------------------------------------------------------
 
-        const user = await ctx.db
-          .query("users")
-          .withIndex("by_id", (q) =>
-            q.eq("_id", deletedSub?.userId as Id<"users">),
-          )
-          .unique();
-        // console.log("sub deleted: ", deletedSub)
-        if (deletedSub) {
-          await ctx.db.patch(deletedSub._id, {
-            plan: undefined,
+      case "customer.subscription.deleted":
+        if (newsletterSub) {
+          await updateUserNewsletter(ctx, {
+            userId: userData?._id as Id<"users">,
+            email: userData?.email,
+            userPlan: 0,
+          });
+        }
+        if (customerSubData) {
+          await ctx.db.patch(customerSubData._id, {
+            plan: 0,
             status: args.body.data.object.status,
             cancelAt:
-              (deletedSub.cancelAt ?? args.body.data.object.canceled_at)
+              (customerSubData.cancelAt ?? args.body.data.object.canceled_at)
                 ? new Date(args.body.data.object.canceled_at * 1000).getTime()
                 : undefined,
             canceledAt: args.body.data.object.canceled_at
@@ -875,14 +895,15 @@ export const subscriptionStoreWebhook = mutation({
             adminPromoCode: undefined,
           });
         }
-        if (user) {
-          await ctx.db.patch(user._id, {
-            plan: undefined,
+        if (userData) {
+          await ctx.db.patch(userData._id, {
+            plan: 0,
             subscription: undefined,
           });
         }
         break;
 
+      //!! SECTION: --------------------------------------------------------------------
       case "customer.discount.created":
         const discountedSub = await ctx.db
           .query("userSubscriptions")
@@ -903,6 +924,8 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
         break;
+
+      //!! SECTION: --------------------------------------------------------------------
       case "customer.discount.deleted":
         const affectedSub = await ctx.db
           .query("userSubscriptions")
@@ -924,9 +947,19 @@ export const subscriptionStoreWebhook = mutation({
         }
 
         break;
+
+      //!! SECTION: --------------------------------------------------------------------
       case "invoice.payment_succeeded":
+        // console.log({
+        //   // lines: dataObject.lines,
+        //   data: dataObject.lines.data[0].plan.product,
+        // });
         const dataObject = args.body.data.object;
-        console.log(dataObject);
+        const product = dataObject?.lines?.data?.[0]?.plan?.product;
+        const productPlan = product
+          ? await getPlanNumberByProduct(ctx, product ?? "")
+          : null;
+
         // Find existing subscription
         const invoicePaid = await ctx.db
           .query("userSubscriptions")
@@ -934,13 +967,34 @@ export const subscriptionStoreWebhook = mutation({
             q.eq("customerId", args.body.data.object.customer),
           )
           .first();
-        console.log("Invoice paid: ", invoicePaid);
+        console.log("invoice.payment_succeeded (paid): ", invoicePaid?._id);
         if (invoicePaid) {
+          const newsletterSub = await ctx.db
+            .query("newsletter")
+            .withIndex("by_userId", (q) =>
+              q.eq("userId", invoicePaid.userId as Id<"users">),
+            )
+            .first();
+
+          if (newsletterSub)
+            await updateUserNewsletter(ctx, {
+              userId: invoicePaid.userId as Id<"users">,
+              userPlan: productPlan?.plan ?? undefined,
+            });
+          if (invoicePaid.userId && productPlan?.plan)
+            await ctx.db.patch(invoicePaid.userId as Id<"users">, {
+              plan: productPlan.plan,
+            });
+
           await ctx.db.patch(invoicePaid._id, {
             paidStatus: args.body.data.object.paid,
+            ...(typeof productPlan === "number" && { plan: productPlan }),
           });
         }
+
         break;
+
+      //!! SECTION: --------------------------------------------------------------------
 
       case "subscription.active":
         // Find and update subscription
@@ -956,6 +1010,8 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
         break;
+
+      //!! SECTION: --------------------------------------------------------------------
 
       case "subscription.canceled":
         // Find and update subscription
@@ -979,6 +1035,8 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
+      //!! SECTION: --------------------------------------------------------------------
+
       case "subscription.uncanceled":
         // Find and update subscription
         const uncanceledSub = await ctx.db
@@ -998,6 +1056,8 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
+      //!! SECTION: --------------------------------------------------------------------
+
       case "subscription.revoked":
         // Find and update subscription
         const revokedSub = await ctx.db
@@ -1014,6 +1074,8 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
         break;
+
+      //!! SECTION: --------------------------------------------------------------------
 
       case "order.created":
         console.log("order.created:", args.body);

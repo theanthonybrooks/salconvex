@@ -326,6 +326,7 @@ export const ArtistProfileForm = ({
                       initialImage={user?.image}
                       imageOnly
                       className="gap-0 pr-8 sm:pr-0"
+                      tabIndex={2}
                     />
                   </FormControl>
                 </FormItem>
@@ -340,7 +341,7 @@ export const ArtistProfileForm = ({
                 <FormLabel className="font-bold">Instagram </FormLabel>
                 <FormControl>
                   <DebouncedControllerInput
-                    tabIndex={1}
+                    tabIndex={3}
                     id="artistContact.instagram"
                     field={field}
                     placeholder="@username"
@@ -359,7 +360,7 @@ export const ArtistProfileForm = ({
                 <FormLabel className="font-bold">Website </FormLabel>
                 <FormControl>
                   <DebouncedControllerInput
-                    tabIndex={2}
+                    tabIndex={4}
                     id="artistContact.website"
                     field={field}
                     placeholder="yoursite.com"
@@ -410,7 +411,7 @@ export const ArtistProfileForm = ({
                         "cca3",
                         "altSpellings",
                       ]}
-                      tabIndex={2}
+                      tabIndex={5}
                       className="h-12 bg-card text-base hover:bg-card"
                     />
                     {fieldState.error && (
@@ -437,7 +438,7 @@ export const ArtistProfileForm = ({
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     reset={false}
-                    tabIndex={2}
+                    tabIndex={6}
                     placeholder="Place of residence (city, state, country, etc).."
                     className="mb-3 w-full lg:mb-0"
                     inputClassName="rounded-lg border-foreground "
@@ -457,6 +458,7 @@ export const ArtistProfileForm = ({
                     checked={field.value || false}
                     onCheckedChange={field.onChange}
                     className="text-base"
+                    tabIndex={7}
                   />
                 </FormControl>
                 <FormLabel className="font-bold leading-6 sm:leading-normal">
@@ -501,6 +503,8 @@ export const ArtistProfileForm = ({
                   type="button"
                   size="lg"
                   variant="salWithShadowHiddenYlw"
+                  tabIndex={9}
+                  className="focus:scale-95"
                 >
                   Cancel
                 </Button>
@@ -511,6 +515,8 @@ export const ArtistProfileForm = ({
                   size="lg"
                   variant="salWithShadowHidden"
                   disabled={!isValid || pending}
+                  tabIndex={8}
+                  className="focus:scale-95"
                 >
                   {!hadTrial ? (
                     "Start Trial"

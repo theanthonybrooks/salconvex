@@ -169,6 +169,8 @@ const NewsletterPage = () => {
 
   const userNewsletterSubStatusActive = userNewsletterSub?.newsletter === true;
   const newsletterSubEmail = newsletterStatusData?.email;
+  const emailDifferent = userNewsletterSub?.email !== user?.email;
+  console.log(user?.email, newsletterSubEmail, emailDifferent);
   const newsletterSubStatusActive = newsletterStatusData?.newsletter === true;
   const noActiveSubscription =
     !newsletterSubStatusActive &&
@@ -237,11 +239,12 @@ const NewsletterPage = () => {
     setPending(true);
     try {
       await updateNewsletterSubscription({
-        email: newsletterSubEmail ?? "",
+        email: newsletterSubEmail ?? user?.email ?? "",
         newsletter: true,
         frequency: values.frequency ?? "monthly",
         type: values.type ?? ["general"],
         userPlan: user?.plan ?? 0,
+        updateEmail: values.updateEmail ?? false,
       });
       setSuccess("Successfully updated newsletter preferences");
     } catch (err) {
@@ -504,6 +507,50 @@ const NewsletterPage = () => {
                           </FormItem>
                         )}
                       />
+                      {emailDifferent && (
+                        <div
+                          className={cn(
+                            "mt-4 rounded border-1.5 border-foreground bg-card/20 p-6",
+                          )}
+                        >
+                          <FormField
+                            control={subUpdateform.control}
+                            name="updateEmail"
+                            render={({ field }) => (
+                              <FormItem>
+                                <fieldset className="mb-2 flex flex-col gap-3">
+                                  <legend className="mb-4 text-sm font-medium">
+                                    Your newsletter sub email is different from
+                                    your account email. Would you like to update
+                                    your newsletter subscription with your
+                                    account email?
+                                  </legend>
+
+                                  <div className="flex items-center space-x-2">
+                                    <FormControl>
+                                      <Checkbox
+                                        id="newsletter-update-email"
+                                        checked={field.value ?? false}
+                                        onCheckedChange={(checked) =>
+                                          field.onChange(!!checked)
+                                        }
+                                      />
+                                    </FormControl>
+                                    <Label
+                                      htmlFor="newsletter-update-email"
+                                      className="text-sm font-medium text-foreground"
+                                    >
+                                      Yes, update my subscription to match!
+                                    </Label>
+                                  </div>
+                                </fieldset>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )}
+
                       <Button
                         disabled={pending || !isValidUpdate || !isDirtyUpdate}
                         variant={

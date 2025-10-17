@@ -63,6 +63,7 @@ export const newsletterUpdateSchema = z.object({
   type: z
     .array(z.enum(newsletterTypeValues))
     .min(1, "You must select at least one newsletter type"),
+  updateEmail: z.boolean().optional(),
 });
 
 export type NewsletterUpdateValues = z.infer<typeof newsletterUpdateSchema>;

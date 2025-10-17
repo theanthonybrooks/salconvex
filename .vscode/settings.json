@@ -28,7 +28,8 @@
     "Calendar",
     "Event",
     "Zeren",
-    "Data Tables"
+    "Data Tables",
+    "Account/Billing"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

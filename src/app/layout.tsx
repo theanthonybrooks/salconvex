@@ -78,7 +78,6 @@ export default async function RootLayout({
   const deviceModel = h.get("x-device-model");
   const pathname = h.get("x-pathname");
   const isDashboard = pathname?.startsWith("/dashboard");
-  console.log(pathname, isDashboard);
 
   const cookieStore = await cookies();
   const localCookiePrefs = cookieStore.get("cookie_preferences")?.value ?? null;

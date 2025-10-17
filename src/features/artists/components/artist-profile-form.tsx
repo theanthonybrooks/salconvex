@@ -242,6 +242,8 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                       initialImage={user?.image}
                       imageOnly
                       className="gap-0 pr-8"
+                      tabIndex={2}
+
                       // initialImage={field.value ? URL.createObjectURL(field.value) : undefined}
                     />
                   </FormControl>
@@ -258,7 +260,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
               <FormLabel className="font-bold">Instagram </FormLabel>
               <FormControl>
                 <DebouncedControllerInput
-                  tabIndex={1}
+                  tabIndex={3}
                   id="artistContact.instagram"
                   field={field}
                   placeholder="@username"
@@ -277,7 +279,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
               <FormLabel className="font-bold">Website </FormLabel>
               <FormControl>
                 <DebouncedControllerInput
-                  tabIndex={2}
+                  tabIndex={4}
                   id="artistContact.website"
                   field={field}
                   placeholder="yoursite.com"
@@ -310,6 +312,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                   checked={field.value || false}
                   onCheckedChange={field.onChange}
                   className="text-base"
+                  tabIndex={7}
                 />
               </FormControl>
               <FormLabel className="font-bold">
@@ -358,7 +361,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                       "cca3",
                       "altSpellings",
                     ]}
-                    tabIndex={2}
+                    tabIndex={5}
                     className="h-12 bg-card text-base hover:bg-card"
                   />
                   {fieldState.error && (
@@ -385,7 +388,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   reset={false}
-                  tabIndex={2}
+                  tabIndex={6}
                   placeholder="Place of residence (city, state, country, etc).."
                   className="mb-3 w-full lg:mb-0"
                   inputClassName="rounded-lg border-foreground "
@@ -397,6 +400,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
         </div>
 
         <Button
+          tabIndex={8}
           disabled={pending || !artistUnsavedChanges || !artistIsValid}
           type="submit"
           variant={

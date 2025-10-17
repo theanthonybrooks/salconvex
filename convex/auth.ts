@@ -5,6 +5,10 @@ import { ConvexError } from "convex/values";
 import { Scrypt } from "lucia";
 import slugify from "slugify";
 import {
+  checkNewsletterUser,
+  updateNewsletterUser,
+} from "~/convex/newsletter/subscriber";
+import {
   checkOrgStatus,
   updateOrgOwner,
 } from "~/convex/organizer/organizations";
@@ -133,11 +137,17 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         lastChanged: Date.now(),
       });
 
+      if (newUserId) {
+        console.log("newUserId: ", newUserId);
+        const result = await checkNewsletterUser(ctx, profile.email);
+        console.log("result: ", result);
+        if (result.newsletter && result.subscriptionId) {
+          await updateNewsletterUser(ctx, newUserId, result.subscriptionId);
+        }
+      }
       // console.log("newUserId: ", newUserId);
 
       const userAccountType = profile.accountType as string[];
-
-      // console.log("userAccountType: ", userAccountType);
 
       if (userAccountType.includes("organizer")) {
         const existingOrgResult = await checkOrgStatus(
@@ -180,6 +190,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         notifications: {
           general: true,
         },
+        autoApply: true,
       });
 
       await ctx.db.insert("userLog", {
