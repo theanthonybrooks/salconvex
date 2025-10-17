@@ -24,12 +24,17 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
 import { getFormattedLocationString } from "@/lib/locations";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
+const tabs = ["opencall", "event", "organizer"];
+
 export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
+  const tabParam = searchParams.get("tab");
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -46,6 +51,8 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     className,
     // organizer,
   } = props;
+
+  const tabsList = isAdmin ? [...tabs, "admin"] : tabs;
 
   const { event, organizer, openCall, application } = data;
   const {
@@ -131,6 +138,18 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
     return () => clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (tabParam === "event" && activeTab !== "event") {
+      setActiveTab("event");
+
+      params.delete("tab");
+
+      router.replace(`${pathname}?${params.toString()}`);
+    }
+  }, [tabParam, activeTab, router, pathname, searchParams]);
+
   return (
     <Card
       className={cn(
@@ -271,7 +290,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           className="flex w-full flex-col justify-center"
         >
           <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/60">
-            {["opencall", "event", "organizer"].map((tab) => (
+            {tabsList.map((tab) => (
               <TabsTrigger
                 key={tab}
                 value={tab}
@@ -297,6 +316,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                   {tab === "opencall" && "Open Call"}
                   {tab === "event" && getEventCategoryLabel(eventCategory)}
                   {tab === "organizer" && "Organizer"}
+                  {isAdmin && tab === "admin" && "Admin"}
                 </span>
               </TabsTrigger>
             ))}
@@ -352,6 +372,14 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               fontSize={fontSize}
             />
           </TabsContent>
+          {isAdmin && (
+            <TabsContent value="admin">
+              {/* <ChartAreaInteractive
+                data={appChartData ?? []}
+                loading={appChartLoading}
+              /> */}
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </Card>

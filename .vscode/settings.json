@@ -29,7 +29,8 @@
     "Event",
     "Zeren",
     "Data Tables",
-    "Account/Billing"
+    "Account/Billing",
+    "Map"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

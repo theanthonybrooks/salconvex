@@ -66,6 +66,8 @@ export default function DashboardSideBar({
     setActiveSection,
   } = useDashboard();
 
+  console.log(collapsedSidebar, openSection, activeSection);
+
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
   const userType = user?.accountType;
@@ -120,12 +122,16 @@ export default function DashboardSideBar({
   }, [pathname, filteredNavItems, setOpenSection, setActiveSection]);
 
   const handleSectionToggle = (sectionCat: string | null) => {
-    setOpenSection((prev) => {
-      if (collapsedSidebar) {
-        setTimeout(() => setCollapsedSidebar(false), 0);
+    if (collapsedSidebar) {
+      setTimeout(() => setCollapsedSidebar(false), 0);
+      if (sectionCat && openSection !== sectionCat) {
+        setOpenSection(sectionCat);
       }
-      return prev === sectionCat ? null : sectionCat;
-    });
+    } else {
+      setOpenSection((prev) => {
+        return prev === sectionCat ? null : sectionCat;
+      });
+    }
   };
 
   const handleCollapseSidebar = () => {

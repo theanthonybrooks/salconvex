@@ -3,15 +3,25 @@
 import LeafletMapIcon from "@/components/ui/map-icon";
 import ClickToZoom from "@/features/wrapper-elements/map/clickToZoom";
 import { cn } from "@/lib/utils";
+import { EventCategory, EventType } from "@/types/event";
 import "leaflet/dist/leaflet.css";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { MapContainer, TileLayer } from "react-leaflet";
 
-interface MapComponentProps {
+interface MapPoint {
   latitude: number;
   longitude: number;
   label?: string;
+  category?: EventCategory;
+  eventType?: EventType;
+}
+
+interface MapComponentProps {
+  latitude?: number;
+  longitude?: number;
+  label?: string;
+  points?: MapPoint[];
   className?: string;
   containerClassName?: string;
   hasDirections?: boolean;
@@ -21,11 +31,32 @@ export default function MapComponent({
   latitude,
   longitude,
   label,
+  points,
   className,
   containerClassName,
   hasDirections = false,
 }: MapComponentProps) {
   const [overlay, setOverlay] = useState(true);
+
+  // Determine all points (whether single or multiple)
+  const allPoints: MapPoint[] = useMemo(() => {
+    if (points && points.length > 0) return points;
+    if (latitude !== undefined && longitude !== undefined)
+      return [{ latitude, longitude, label }];
+    return [];
+  }, [points, latitude, longitude, label]);
+
+  // Determine map center — average of all points or fallback to single
+  const center = useMemo(() => {
+    if (allPoints.length === 0) return [0, 0];
+    if (allPoints.length === 1)
+      return [allPoints[0].latitude, allPoints[0].longitude];
+    const avgLat =
+      allPoints.reduce((sum, p) => sum + p.latitude, 0) / allPoints.length;
+    const avgLng =
+      allPoints.reduce((sum, p) => sum + p.longitude, 0) / allPoints.length;
+    return [avgLat, avgLng];
+  }, [allPoints]);
 
   return (
     <div className={cn(containerClassName)}>
@@ -41,8 +72,8 @@ export default function MapComponent({
           </>
         )}
         <MapContainer
-          center={[latitude, longitude]}
-          zoom={6}
+          center={center as [number, number]}
+          zoom={3}
           scrollWheelZoom={false}
           attributionControl={false}
           className={className}
@@ -52,11 +83,14 @@ export default function MapComponent({
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
 
-          <LeafletMapIcon
-            latitude={latitude}
-            longitude={longitude}
-            label={label}
-          />
+          {allPoints.map((p, i) => (
+            <LeafletMapIcon
+              key={`${p.latitude}-${p.longitude}-${i}`}
+              latitude={p.latitude}
+              longitude={p.longitude}
+              label={p.label}
+            />
+          ))}
           <ClickToZoom setOverlay={setOverlay} />
         </MapContainer>
       </div>

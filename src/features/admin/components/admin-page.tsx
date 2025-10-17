@@ -1,29 +1,31 @@
 "use client";
 
+import WorldMapComponent from "@/components/ui/map/map-component";
 import ThisweekRecapPost from "@/features/events/thisweek-recap-post";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { usePreloadedQuery } from "convex/react";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function AdminScreen() {
   const pathname = usePathname();
-  // const callbackUrl = useSearchParams().get("src")
+  const router = useRouter();
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const isAdmin = userData?.user?.role?.includes("admin");
+
+  if (!isAdmin) router.push("/thelist");
 
   // Create booleans based on the URL.
-  const weeklyPost =
-    pathname.endsWith("/thisweek") || pathname.endsWith("/nextweek");
-  const thisWeekPost = pathname.endsWith("/thisweek");
-  const individualPost = pathname.includes("/event");
-  // const isSignIn = !isRegister && !isForgotPassword // default
-
-  return (
-    <>
-      {weeklyPost ? (
-        <ThisweekRecapPost source={thisWeekPost ? "thisweek" : "nextweek"} />
-      ) : individualPost ? (
-        <p>Individual Post</p>
-      ) : (
-        <p>else</p>
-      )}
-    </>
-  );
+  switch (pathname) {
+    case "/admin/thisweek":
+      return <ThisweekRecapPost source="thisweek" />;
+    case "/admin/nextweek":
+      return <ThisweekRecapPost source="nextweek" />;
+    case "/admin/map":
+      return <WorldMapComponent />;
+    default:
+      router.push("/thelist");
+      return;
+  }
 }

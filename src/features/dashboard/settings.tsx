@@ -715,14 +715,22 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <span className="inline-flex items-baseline text-sm sm:text-base">
+                    <span
+                      className={cn(
+                        "inline-flex items-baseline text-sm",
+                        fontSize,
+                      )}
+                    >
                       <Info className="mr-1 size-4 shrink-0 translate-y-0.5" />
                       <span>
                         Note: Artist profile has moved to the{" "}
                         <Link
                           href="/dashboard/artist"
                           variant="bold"
-                          className="text-sm underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                          className={cn(
+                            "underline-offset-2 hover:underline-offset-4 active:underline-offset-1",
+                          )}
+                          fontSize={fontSize}
                         >
                           My Profile
                         </Link>{" "}

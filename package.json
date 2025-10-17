@@ -112,6 +112,7 @@
     "react-phone-number-input": "^3.4.12",
     "react-toastify": "^11.0.5",
     "react-use": "^17.6.0",
+    "recharts": "2.15.4",
     "require-in-the-middle": "^7.5.2",
     "resend": "6.0.1",
     "sanitize-html": "^2.17.0",

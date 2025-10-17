@@ -42,7 +42,7 @@ const CustomLink = ({
         linkVariants({ variant }),
         className,
         fontSize === "text-base"
-          ? "lg:text-base"
+          ? "text-base lg:text-base"
           : fontSize === "text-sm"
             ? fontSize
             : "",
