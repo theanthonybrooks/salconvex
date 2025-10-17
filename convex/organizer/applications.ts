@@ -11,15 +11,18 @@ export const getOpenCallApplications = query({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
+
     if (!user) throw new ConvexError("User not found");
-    const isAdmin = user?.role?.includes("admin");
+
+    const isAdmin = user.role?.includes("admin");
     const isOrganizer = userId === args.ownerId;
 
-    if (!isAdmin || !isOrganizer) {
+    if (!isAdmin && !isOrganizer) {
       throw new ConvexError("You don't have permission to view this");
     }
 
@@ -28,15 +31,36 @@ export const getOpenCallApplications = query({
       .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
       .collect();
 
-    const applicationChartData = applications.map((application) => {
-      const date = new Date(application._creationTime);
-      return {
-        date: date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(),
-        applied: application.applicationStatus === "applied" ? 1 : 0,
-        accepted: application.applicationStatus === "accepted" ? 1 : 0,
-        rejected: application.applicationStatus === "rejected" ? 1 : 0,
+    const totalsByDate = new Map<
+      string,
+      { applied: number; accepted: number; rejected: number }
+    >();
+
+    for (const app of applications) {
+      const date = new Date(app._creationTime);
+      const dateKey = date.toISOString().split("T")[0]; // YYYY-MM-DD
+
+      const current = totalsByDate.get(dateKey) ?? {
+        applied: 0,
+        accepted: 0,
+        rejected: 0,
       };
-    });
+
+      if (app.applicationStatus === "applied") current.applied += 1;
+      if (app.applicationStatus === "accepted") current.accepted += 1;
+      if (app.applicationStatus === "rejected") current.rejected += 1;
+
+      totalsByDate.set(dateKey, current);
+    }
+
+    const applicationChartData = Array.from(totalsByDate.entries()).map(
+      ([date, counts]) => ({
+        date,
+        ...counts,
+      }),
+    );
+
+    applicationChartData.sort((a, b) => a.date.localeCompare(b.date));
 
     return applicationChartData;
   },
@@ -46,27 +70,50 @@ export const getAllApplications = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
-    if (!user) return null;
-    const isAdmin = user?.role?.includes("admin");
-    const isArtist = user?.accountType?.includes("artist");
 
-    if (!isAdmin) return null;
+    if (!user || !user.role?.includes("admin")) return null;
 
     const applications = await ctx.db.query("applications").collect();
 
-    const appChartData = applications.map((application) => {
-      const date = new Date(application._creationTime);
-      return {
-        date: date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(),
-        applied: application.applicationStatus === "applied" ? 1 : 0,
-        accepted: application.applicationStatus === "accepted" ? 1 : 0,
-        rejected: application.applicationStatus === "rejected" ? 1 : 0,
+    // Use a Map to aggregate by date
+    const totalsByDate = new Map<
+      string,
+      { applied: number; accepted: number; rejected: number }
+    >();
+
+    for (const app of applications) {
+      const date = new Date(app._creationTime);
+      // Format: YYYY-MM-DD
+      const dateKey = date.toISOString().split("T")[0];
+
+      const current = totalsByDate.get(dateKey) ?? {
+        applied: 0,
+        accepted: 0,
+        rejected: 0,
       };
-    });
+
+      if (app.applicationStatus === "applied") current.applied += 1;
+      if (app.applicationStatus === "accepted") current.accepted += 1;
+      if (app.applicationStatus === "rejected") current.rejected += 1;
+
+      totalsByDate.set(dateKey, current);
+    }
+
+    // Convert map to array
+    const appChartData = Array.from(totalsByDate.entries()).map(
+      ([date, counts]) => ({
+        date,
+        ...counts,
+      }),
+    );
+
+    // Optional: sort by date
+    appChartData.sort((a, b) => a.date.localeCompare(b.date));
 
     return appChartData;
   },
