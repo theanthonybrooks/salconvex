@@ -1144,6 +1144,7 @@ export default defineSchema({
     cancelAt: v.optional(v.number()),
     canceledAt: v.optional(v.number()),
     customerCancellationReason: v.optional(v.string()),
+    customerCancellationFeedback: v.optional(v.string()),
     customerCancellationComment: v.optional(v.string()),
     metadata: v.optional(v.any()),
     plan: v.optional(v.number()),

@@ -15,7 +15,11 @@ import {
   openCallsAggregate,
 } from "~/convex/aggregates/eventAggregates";
 import { generateUniqueNameAndSlug } from "~/convex/events/event";
-import { eventStateValidator, openCallSchema } from "~/convex/schema";
+import {
+  eventStateValidator,
+  ocStateValidator,
+  openCallSchema,
+} from "~/convex/schema";
 
 export const getTotalNumberOfOpenCalls = query({
   handler: async (ctx) => {
@@ -281,10 +285,11 @@ export const createNewOpenCall = mutation({
 export const createOrUpdateOpenCall = mutation({
   args: {
     // orgId: v.id("organizations"),
+    ...openCallSchema,
     openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
     finalStep: v.optional(v.boolean()),
     approved: v.optional(v.boolean()),
-    ...openCallSchema,
+    state: v.optional(ocStateValidator),
   },
 
   handler: async (ctx, args) => {

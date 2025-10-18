@@ -694,6 +694,7 @@ export const subscriptionStoreWebhook = mutation({
             : undefined,
           hadTrial: true,
           customerCancellationComment: undefined,
+          customerCancellationFeedback: undefined,
           customerCancellationReason: undefined,
           lastEditedAt: new Date().getTime(),
         };
@@ -843,6 +844,9 @@ export const subscriptionStoreWebhook = mutation({
             ...(cancellationDetails.reason && {
               customerCancellationReason: cancellationDetails.reason,
             }),
+            ...(cancellationDetails.feedback && {
+              customerCancellationFeedback: cancellationDetails.feedback,
+            }),
           });
         }
 
@@ -873,18 +877,22 @@ export const subscriptionStoreWebhook = mutation({
         if (customerSubData) {
           await ctx.db.patch(customerSubData._id, {
             plan: 0,
-            status: args.body.data.object.status,
+            status: baseObject.status,
             cancelAt:
-              (customerSubData.cancelAt ?? args.body.data.object.canceled_at)
-                ? new Date(args.body.data.object.canceled_at * 1000).getTime()
+              (customerSubData.cancelAt ?? baseObject.canceled_at)
+                ? new Date(baseObject.canceled_at * 1000).getTime()
                 : undefined,
-            canceledAt: args.body.data.object.canceled_at
-              ? new Date(args.body.data.object.canceled_at * 1000).getTime()
+            canceledAt: baseObject.canceled_at
+              ? new Date(baseObject.canceled_at * 1000).getTime()
               : undefined,
             customerCancellationReason:
-              args.body.data.object.cancellation_details.reason ?? undefined,
-            endedAt: args.body.data.object.ended_at
-              ? new Date(args.body.data.object.ended_at * 1000).getTime()
+              baseObject.cancellation_details.reason ?? undefined,
+            customerCancellationComment:
+              baseObject.cancellation_details.comment ?? undefined,
+            customerCancellationFeedback:
+              baseObject.cancellation_details.feedback ?? undefined,
+            endedAt: baseObject.ended_at
+              ? new Date(baseObject.ended_at * 1000).getTime()
               : undefined,
             discount: undefined,
             promoCode: undefined,
@@ -1031,6 +1039,8 @@ export const subscriptionStoreWebhook = mutation({
               args.body.data.object.customer_cancellation_reason || undefined,
             customerCancellationComment:
               args.body.data.object.customer_cancellation_comment || undefined,
+            customerCancellationFeedback:
+              args.body.data.object.customer_cancellation_feedback || undefined,
           });
         }
         break;
@@ -1052,6 +1062,7 @@ export const subscriptionStoreWebhook = mutation({
             canceledAt: undefined,
             customerCancellationReason: undefined,
             customerCancellationComment: undefined,
+            customerCancellationFeedback: undefined,
           });
         }
         break;
@@ -1293,12 +1304,23 @@ export const pauseOrCancelSubscription = action({
     const stripeId = subscription?.stripeId;
     if (!subscription || !stripeId) {
       throw new ConvexError("No active subscription found");
-  }
-  if (pause) {
-    //what logic is there for pausing a subscription? I know that I can resume it, but what to pause?
-  } else if (atPeriodEnd) {
+    }
+    const updateBaseParams: Stripe.SubscriptionUpdateParams = {
+      cancel_at_period_end: true,
+    };
+    if (pause) {
+      const params: Stripe.SubscriptionUpdateParams = {
+        pause_collection: {
+          behavior: "void",
+        },
+        ...updateBaseParams,
+        description: "Membership paused by user",
+      };
+      await stripe.subscriptions.update(stripeId, params);
+      //what logic is there for pausing a subscription? I know that I can resume it, but what to pause?
+    } else if (atPeriodEnd) {
       await stripe.subscriptions.update(stripeId, {
-        cancel_at_period_end: true,
+        ...updateBaseParams,
       });
     } else {
       await stripe.subscriptions.cancel(stripeId);
