@@ -12,7 +12,6 @@ type ConvexPreloadContextType = {
   preloadedOrganizerData: Preloaded<
     typeof api.organizer.organizations.getUserOrgEvents
   >;
-  
 };
 
 const ConvexPreloadContext = createContext<ConvexPreloadContextType | null>(

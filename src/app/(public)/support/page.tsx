@@ -43,7 +43,8 @@ const SupportPage = () => {
   const billingIssue = categoryParam === "account";
   const existingTicketNumber = searchParams?.get("ticketNumber");
   const userData = usePreloadedQuery(preloadedUserData);
-  const { userId: id, user, userPref } = userData ?? {};
+  const { userId: id, user } = userData ?? {};
+  // const fontSize = getUserFontSizePref(userPref?.fontSize);
   const userId = id ?? null;
 
   const { isMobile } = useDevice();

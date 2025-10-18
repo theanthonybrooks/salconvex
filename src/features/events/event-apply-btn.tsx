@@ -149,7 +149,7 @@ interface ApplyButtonProps {
   user?: User | null;
   activeSub: boolean;
   callType?: CallType;
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 export const ApplyButton = ({

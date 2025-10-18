@@ -1,4 +1,4 @@
-import { currencies } from "@/app/data/currencies"
+import { currencies } from "@/app/data/currencies";
 import {
   Select,
   SelectContent,
@@ -7,12 +7,12 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 interface CurrencySelectProps {
-  value: string
-  disabled?: boolean
-  onChange: (value: string) => void
+  value: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
 }
 
 export function CurrencySelect({
@@ -22,8 +22,8 @@ export function CurrencySelect({
 }: CurrencySelectProps) {
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger className='w-[280px]'>
-        <SelectValue placeholder='Select a currency' />
+      <SelectTrigger className="w-[280px]">
+        <SelectValue placeholder="Select a currency" />
       </SelectTrigger>
       <SelectContent>
         {Object.entries(currencies[0]).map(([region, currencyList]) => (
@@ -38,5 +38,5 @@ export function CurrencySelect({
         ))}
       </SelectContent>
     </Select>
-  )
+  );
 }

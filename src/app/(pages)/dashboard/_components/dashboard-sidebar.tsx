@@ -7,6 +7,7 @@ import {
   dashboardNavItems as navItems,
 } from "@/constants/links";
 import { Search } from "@/features/Sidebar/Search";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { User, UserPref } from "@/types/user";
 
@@ -71,7 +72,7 @@ export default function DashboardSideBar({
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
   const userType = user?.accountType;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,

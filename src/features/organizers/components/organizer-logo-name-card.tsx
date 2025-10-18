@@ -15,13 +15,13 @@ interface OrganizerCardProps {
 
 interface OrganizerCardLogoNameProps extends OrganizerCardProps {
   format?: "desktop" | "mobile";
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 interface OrganizerLogoNameCardProps extends OrganizerCardProps {
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   abbr?: boolean;
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 export const OrganizerLogoNameCard = ({

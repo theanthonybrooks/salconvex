@@ -57,7 +57,7 @@ export type OrgContactProps = Pick<Organizer, "contact" | "links">;
 interface OrganizerMainContactProps {
   organizer: OrgContactProps;
   linkOnly?: boolean;
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 export const OrganizerMainContact = ({

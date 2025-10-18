@@ -21,7 +21,6 @@ import {
 } from "@/features/account/account-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
-import { useScrollToTopOnMount } from "@/hooks/use-scrollToTopOnMount";
 import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
 import { motion } from "framer-motion";
@@ -567,7 +566,7 @@ const PricingCard = ({
 //--------------------- Pricing Section  ----------------------//
 
 export default function Pricing() {
-  useScrollToTopOnMount();
+  // useScrollToTopOnMount();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type") as AccountTypeBase;
   const [isYearly, setIsYearly] = useState<boolean>(false);

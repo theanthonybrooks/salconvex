@@ -46,7 +46,6 @@ export function getCurrencySymbol(code: string): string | undefined {
   return undefined;
 }
 
-
 export const formatCurrency = (value: number, currency: string) => {
   if (value === 0) return "Not Provided";
   const currencyInfo = currencyCodes.code(currency);

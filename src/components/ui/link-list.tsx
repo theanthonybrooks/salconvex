@@ -33,7 +33,7 @@ interface LinkListProps {
   event?: MinimalEventLinks;
   organizer?: MinimalOrgLinks;
   purpose?: string;
-  fontSize?: "text-base" | "text-sm";
+  fontSize?: string;
 }
 
 export const LinkList = ({

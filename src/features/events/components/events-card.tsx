@@ -23,7 +23,7 @@ interface LinkProps {
 interface EventCardProps extends LinkProps {
   format: "mobile" | "desktop";
   aboutRef?: RefObject<HTMLDivElement | null>;
-  fontSize?: "text-base" | "text-sm";
+  fontSize?: string;
 }
 
 //TODO: Add in logic for the event dates, a structured (formatted) about section that will utilize something like Quill on the submission form. Perhaps have a specific "Dates" accordion section that just gives the event dates/times and/or artist/production dates/times.

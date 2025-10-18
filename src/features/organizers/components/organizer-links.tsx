@@ -79,7 +79,7 @@ const getLinkHref = (
 
 interface OrganizerLinksProps {
   organizer: Organizer;
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 export const OrganizerLinks = ({

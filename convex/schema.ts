@@ -213,6 +213,12 @@ export const linkFormatValidator = v.union(
 );
 export type LinkFormatType = Infer<typeof linkFormatValidator>;
 
+export const fontSizeValidator = v.union(
+  v.literal("large"),
+  v.literal("normal"),
+);
+export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
+
 const openCallFilesSchema = v.object({
   storageId: v.id("_storage"),
   uploadedBy: v.id("users"),
@@ -1149,7 +1155,7 @@ export default defineSchema({
 
     language: v.optional(v.string()),
     theme: v.optional(v.string()),
-    fontSize: v.optional(v.string()),
+    fontSize: v.optional(fontSizeValidator),
     notifications: v.optional(
       v.object({
         newsletter: v.optional(v.boolean()),

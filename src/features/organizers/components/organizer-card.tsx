@@ -14,7 +14,7 @@ interface OrganizerCardProps {
   format?: string;
   srcPage?: string;
   aboutRef?: RefObject<HTMLDivElement | null>;
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 export const OrganizerCard = ({

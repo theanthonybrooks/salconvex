@@ -1,18 +1,18 @@
-import React from "react"
+import React from "react";
 
 interface AuthLayoutProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 // Extend React.FC with a static "theme" property
 interface PageWithTheme extends React.FC<AuthLayoutProps> {
-  theme?: string
+  theme?: string;
 }
 
 const AuthLayout: PageWithTheme = ({ children }) => {
-  return <>{children}</>
-}
+  return <>{children}</>;
+};
 
-AuthLayout.theme = "sal"
+AuthLayout.theme = "sal";
 
-export default AuthLayout
+export default AuthLayout;

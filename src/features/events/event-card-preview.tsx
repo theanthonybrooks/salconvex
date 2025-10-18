@@ -23,6 +23,7 @@ import {
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
 
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { CombinedEventPreviewCardData, PostStatus } from "@/types/eventTypes";
 import { User, UserPref } from "@/types/user";
@@ -89,7 +90,7 @@ const EventCardPreview = ({
     artistNationality,
     posted,
   } = event;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
   const { opencall } = tabs;
   const compensation = event.hasActiveOpenCall
     ? opencall?.compensation

@@ -34,6 +34,3 @@ export function cleanInput(input: string): string {
     allowedAttributes: {},
   });
 }
-
-
-

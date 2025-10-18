@@ -15,6 +15,7 @@ import { Link } from "@/components/ui/custom-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/helpers/applicationFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
@@ -50,7 +51,7 @@ export default function Dashboard() {
   // const userId = userData?.userId ?? "guest";
   const user = userData?.user || null;
   const userPref = userData?.userPref ?? null;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");

@@ -13,6 +13,7 @@ import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
@@ -32,8 +33,9 @@ export default function BillingPage() {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
+  const isAdmin = userData?.user?.role?.includes("admin");
   const userPref = userData?.userPref ?? null;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
   const { subscription, hasActiveSubscription } = subData;
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
@@ -286,7 +288,7 @@ export default function BillingPage() {
                   ? "Choose Plan"
                   : "Update Membership"}
             </Button>
-            {hasActiveSubscription && (
+            {hasActiveSubscription && isAdmin && (
               <>
                 <Button
                   className="mt-3 w-full max-w-lg"

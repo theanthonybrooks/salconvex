@@ -35,7 +35,8 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const aboutRef = useRef<HTMLDivElement | null>(null);
   const user = userData?.user ?? null;
   const userPref = userData?.userPref ?? null;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
+
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;

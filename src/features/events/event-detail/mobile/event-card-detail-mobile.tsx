@@ -19,6 +19,7 @@ import { generateICSFile } from "@/helpers/addToCalendar";
 import { isValidIsoDate } from "@/helpers/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { EventCardProps } from "@/types/eventTypes";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
@@ -36,7 +37,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const userPref = userData?.userPref;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
 
   const {
     data,

@@ -21,7 +21,7 @@ export interface NavTabsProps {
   defaultTab?: string;
   activeTab?: string;
   setActiveTab?: (tabId: string) => void;
-  fontSize?: "text-sm" | "text-base";
+  fontSize?: string;
 }
 
 export default function NavTabs({

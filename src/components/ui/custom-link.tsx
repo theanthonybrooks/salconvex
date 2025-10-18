@@ -26,7 +26,7 @@ const linkVariants = cva(
 type CustomLinkProps = ComponentPropsWithRef<typeof Link> &
   VariantProps<typeof linkVariants> & {
     className?: string;
-    fontSize?: "text-sm" | "text-base";
+    fontSize?: string;
   };
 
 const CustomLink = ({

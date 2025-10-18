@@ -97,6 +97,7 @@ import {
   newsletterTypeOptions,
 } from "@/constants/newsletterConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 import { CookiePref } from "@/types/user";
@@ -128,7 +129,7 @@ export default function SettingsPage() {
   const { isMobile } = useDevice();
 
   const userPrefs = userData?.userPref;
-  const fontSize = userPrefs?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPrefs?.fontSize);
   const userId = userData?.userId;
   const activeSub = subData?.hasActiveSubscription;
   const canDelete = !subData?.subscription || subData?.subStatus === "canceled";

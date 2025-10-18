@@ -10,7 +10,7 @@ interface RichTextDisplayProps {
   html: string;
   className?: string;
   maxChars?: number;
-  fontSize?: "text-base" | "text-sm";
+  fontSize?: string;
 }
 
 export function cleanHtml(

@@ -35,6 +35,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { EventCardProps } from "@/types/eventTypes";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -48,7 +49,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
   const userPref = userData?.userPref ?? null;
-  const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  const fontSize = getUserFontSizePref(userPref?.fontSize);
+
   const isAdmin = user?.role?.includes("admin") || false;
 
   const hasActiveSubscription =
