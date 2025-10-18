@@ -125,7 +125,11 @@ export const FOOTER_LINKS: FooterSection[] = [
   {
     section: "membership",
     items: [
-      { name: "Manage", href: "/manage", sub: ["active", "trialing"] }, //only if you're logged in
+      {
+        name: "Manage",
+        href: "/dashboard/billing",
+        sub: ["active", "trialing"],
+      }, //only if you're logged in
       // { name: "Documentation", href: "/docs" },
       // { name: "Examples", href: "/examples" },
       { name: "Pricing", href: "/pricing" },

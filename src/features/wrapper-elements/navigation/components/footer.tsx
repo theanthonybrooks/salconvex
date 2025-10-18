@@ -10,7 +10,6 @@ import { footerCRText } from "@/constants/text";
 import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
 import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
 import {
@@ -63,7 +62,6 @@ export default function Footer({ className }: { className?: string }) {
   const numColumns = Object.keys(links).length;
   const [subAction, setSubAction] = useState("cta");
   const subscription = useQuery(api.subscriptions.getUserSubscription);
-  const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
   const updateNotifications = useMutation(api.users.updateUserNotifications);
   // const subscribeToNewsletter = useMutation(
   //   api.newsletter.subscriber.subscribeToNewsletter,
@@ -129,43 +127,6 @@ export default function Footer({ className }: { className?: string }) {
     }
   };
 
-  const handleManageSubscription = async () => {
-    if (!subscription?.customerId) {
-      toast.error(
-        "No membership found. Please contact support if this is incorrect.",
-      );
-      return;
-    }
-
-    try {
-      const result = await getDashboardUrl({
-        customerId: subscription.customerId,
-      });
-      if (result?.url) {
-        window.location.href = result.url;
-      }
-    } catch (err: unknown) {
-      if (err instanceof ConvexError) {
-        toast.error(
-          typeof err.data === "string" &&
-            err.data.toLowerCase().includes("no such customer")
-            ? "Your account was canceled. Contact support for assistance."
-            : err.data || "An unexpected error occurred.",
-        );
-      } else if (err instanceof Error) {
-        toast.error(
-          typeof err.message === "string" &&
-            err.message.toLowerCase().includes("no such customer")
-            ? "Your account was canceled. Contact support for assistance."
-            : err.message || "An unexpected error occurred.",
-        );
-      } else {
-        toast.error("An unknown error occurred.", { autoClose: 1000 });
-      }
-      return;
-    }
-  };
-
   return (
     <footer
       className={cn(
@@ -193,24 +154,12 @@ export default function Footer({ className }: { className?: string }) {
                   <ul className="mt-4 space-y-4">
                     {items.map((item) => (
                       <li key={item.name}>
-                        {item.name === "Manage" ? (
-                          <Button
-                            variant="link"
-                            size="link"
-                            type="button"
-                            onClick={handleManageSubscription}
-                            className="font-normal"
-                          >
-                            {item.name}
-                          </Button>
-                        ) : (
-                          <Link
-                            href={item.href}
-                            className="text-sm text-foreground underline-offset-2"
-                          >
-                            {item.name}
-                          </Link>
-                        )}
+                        <Link
+                          href={item.href}
+                          className="text-sm text-foreground underline-offset-2"
+                        >
+                          {item.name}
+                        </Link>
                       </li>
                     ))}
                   </ul>

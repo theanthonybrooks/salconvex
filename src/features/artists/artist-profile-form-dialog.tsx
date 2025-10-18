@@ -20,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-import { useManageSubscription } from "@/hooks/use-manage-subscription";
+
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { FunctionReturnType } from "convex/server";
 import { formatDate, isBefore } from "date-fns";
 import { LoaderCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { IoMdArrowRoundForward } from "react-icons/io";
@@ -61,7 +62,6 @@ export const ArtistProfileForm = ({
 
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
   const userName = user?.name ? user.name : userFullName;
-  const subscription = subData?.subscription;
   const subStatus = subData?.subStatus;
   const hadTrial = subData?.hadTrial;
   const activeSub = subStatus === "active";
@@ -124,7 +124,7 @@ export const ArtistProfileForm = ({
   // const currentValues = getValues();
   // const userNationality = currentValues.artistNationality;
   // NOTE: Generate the upload url to use Convex's storage
-  const handleManageSubscription = useManageSubscription({ subscription });
+  const router = useRouter();
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
 
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
@@ -256,12 +256,9 @@ export const ArtistProfileForm = ({
         } else {
           toast.success("Successfully created profile!");
         }
-      } else {
-        if (hasCurrentSub) {
-          toast.info("Opening Stripe in new tab...");
-        } else {
-          toast.info("Forwarding to Stripe...");
-        }
+      }
+      if (!hasCurrentSub) {
+        toast.info("Opening Stripe in new tab...");
       }
 
       reset();
@@ -272,7 +269,8 @@ export const ArtistProfileForm = ({
           console.log("onClick");
         } else {
           // console.log("handleManageSubscription");
-          handleManageSubscription();
+          // handleManageSubscription();
+          router.push("/dashboard/billing");
         }
       }, 2000);
     } catch (error) {
