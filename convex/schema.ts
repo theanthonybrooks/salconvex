@@ -2,6 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
 
+// #region ------------- Subscription Validators --------------
 // Define a price object structure that matches your data
 const stripePriceValidator = v.object({
   amount: v.number(),
@@ -12,7 +13,9 @@ const stripePriceValidator = v.object({
 const stripeIntervalPricesValidator = v.object({
   usd: stripePriceValidator,
 });
+// #endregion
 
+  // #region -------------Account Validators --------------
 //TODO: Add Judge and other types to this later on.
 export const accountTypeValidator = v.union(
   v.literal("artist"),
@@ -35,6 +38,35 @@ export const userRoleValidator = v.union(
 export const userRoleArrayValidator = v.array(userRoleValidator);
 export type UserRole = Infer<typeof userRoleArrayValidator>;
 
+
+export const fontSizeValidator = v.union(
+  v.literal("large"),
+  v.literal("normal"),
+);
+export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
+
+export const userPrefsValidator = v.object({
+  autoApply: v.optional(v.boolean()),
+  currency: v.optional(v.string()),
+  timezone: v.optional(v.string()),
+
+  language: v.optional(v.string()),
+  theme: v.optional(v.string()),
+  fontSize: v.optional(fontSizeValidator),
+  notifications: v.optional(
+    v.object({
+      newsletter: v.optional(v.boolean()),
+      general: v.optional(v.boolean()),
+      applications: v.optional(v.boolean()),
+    }),
+  ),
+  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
+});
+
+export type UserPrefsType = Infer<typeof userPrefsValidator>;
+// #endregion
+
+// #region -------------Event Validators --------------
 export const eventStateValidator = v.union(
   v.literal("draft"),
   v.literal("editing"),
@@ -44,18 +76,6 @@ export const eventStateValidator = v.union(
 );
 
 export type EventStateType = Infer<typeof eventStateValidator>;
-
-export const ocStateValidator = v.union(
-  v.literal("draft"),
-  v.literal("editing"),
-  v.literal("pending"),
-  v.literal("submitted"),
-  v.literal("published"),
-  v.literal("archived"),
-  v.literal("initial"),
-);
-
-export type OpenCallStateType = Infer<typeof ocStateValidator>;
 
 export const typeValidator = v.union(
   v.literal("gjm"),
@@ -110,6 +130,23 @@ export const hasOpenCallValidator = v.union(
   v.literal("Unknown"),
   v.literal("False"),
 );
+// #endregion
+
+// #region -------------Open Call Validators --------------
+
+export const ocStateValidator = v.union(
+  v.literal("draft"),
+  v.literal("editing"),
+  v.literal("pending"),
+  v.literal("submitted"),
+  v.literal("published"),
+  v.literal("archived"),
+  v.literal("initial"),
+);
+
+export type OpenCallStateType = Infer<typeof ocStateValidator>;
+
+
 
 export type OpenCallTypeType = Infer<typeof hasOpenCallValidator>;
 
@@ -152,6 +189,10 @@ export type CompensationCategoryType = Infer<
   typeof compensationCategoryValidator
 >;
 
+// #endregion
+
+// #region -------------Support/Kanban Validators --------------
+
 export const supportCategoryValidator = v.union(
   v.literal("general"),
   v.literal("ui/ux"),
@@ -173,13 +214,6 @@ export const kanbanPurposeValidator = v.union(
   v.literal("support"),
 );
 
-export const postStatusValidator = v.union(
-  v.literal("posted"),
-  v.literal("toPost"),
-);
-
-export type PostStatusType = Infer<typeof postStatusValidator>;
-
 export const kanbanColumnValidator = v.union(
   v.literal("proposed"),
   v.literal("backlog"),
@@ -188,6 +222,20 @@ export const kanbanColumnValidator = v.union(
   v.literal("done"),
   v.literal("notPlanned"),
 );
+// #endregion
+
+// #region -------------Post Validators --------------
+
+export const postStatusValidator = v.union(
+  v.literal("posted"),
+  v.literal("toPost"),
+);
+
+export type PostStatusType = Infer<typeof postStatusValidator>;
+
+// #endregion
+
+// #region -------------Links Validators --------------
 
 export const linksFields = {
   website: v.optional(v.string()),
@@ -213,31 +261,9 @@ export const linkFormatValidator = v.union(
 );
 export type LinkFormatType = Infer<typeof linkFormatValidator>;
 
-export const fontSizeValidator = v.union(
-  v.literal("large"),
-  v.literal("normal"),
-);
-export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
+// #endregion
 
-export const userPrefsValidator = v.object({
-  autoApply: v.optional(v.boolean()),
-  currency: v.optional(v.string()),
-  timezone: v.optional(v.string()),
-
-  language: v.optional(v.string()),
-  theme: v.optional(v.string()),
-  fontSize: v.optional(fontSizeValidator),
-  notifications: v.optional(
-    v.object({
-      newsletter: v.optional(v.boolean()),
-      general: v.optional(v.boolean()),
-      applications: v.optional(v.boolean()),
-    }),
-  ),
-  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
-});
-
-export type UserPrefsType = Infer<typeof userPrefsValidator>;
+// #region ------------- Table Schema Definitions --------------
 
 const openCallFilesSchema = v.object({
   storageId: v.id("_storage"),
@@ -750,6 +776,9 @@ export const kanbanCardSchema = v.object({
   ticketNumber: v.optional(v.id("support")),
 });
 
+// #endregion
+
+// #region ------------- Table Schemas & Indexes --------------
 export default defineSchema({
   ...authTables, // This includes other auth tables
   users: defineTable(customUserSchema)
@@ -1213,3 +1242,5 @@ export default defineSchema({
     .index("by_paletteId_value", ["paletteId", "value"])
     .index("by_value", ["value"]),
 });
+
+// #endregion

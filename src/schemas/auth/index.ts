@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userPrefsValidator } from "~/convex/schema";
 
 export const passwordValidation = new RegExp(
   /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
@@ -166,14 +167,4 @@ export const UpdatePasswordSchema = z
 
 export type UpdatePasswordSchemaValues = z.infer<typeof UpdatePasswordSchema>;
 
-export const UpdateUserPrefsSchema = z.object({
-  autoApply: z.boolean().optional(),
-  currency: z.string().optional(),
-  timezone: z.string().optional(),
-  language: z.string().optional(),
-  theme: z.string().optional(),
-  fontSize: z.string().optional(),
-  cookiePrefs: z.union([z.literal("all"), z.literal("required")]).optional(),
-});
-
-export type UpdateUserPrefsSchemaValues = z.infer<typeof UpdateUserPrefsSchema>;
+export type UpdateUserPrefsSchemaValues = z.infer<typeof userPrefsValidator>;

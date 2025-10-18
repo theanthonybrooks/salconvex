@@ -22,3 +22,11 @@ export const FeedbackLabels: Record<Feedback, string> = {
   low_quality: "Quality was less than expected",
   other: "Other reason",
 };
+
+export const BaseFeedbackOptions = [
+  { value: "switched_service", label: "I found an alternative" },
+  { value: "unused", label: "I no longer need it" },
+  { value: "too_expensive", label: "I can't afford it right now" },
+  { value: "missing_features", label: "I need more features" },
+  { value: "other", label: "Other reason" },
+] as const;

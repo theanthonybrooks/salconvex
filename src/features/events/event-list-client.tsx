@@ -713,8 +713,9 @@ const ClientEventList = () => {
       {publicView && (
         <div
           className={cn(
-            "mx-auto mb-20 max-w-[90vw] -translate-y-14",
+            "mx-auto mb-20 max-w-[90vw]",
             publicEventOnly && "translate-y-0",
+            hasResults && !publicEventOnly && "-translate-y-14",
           )}
         >
           <h2 className="text-balance text-center">

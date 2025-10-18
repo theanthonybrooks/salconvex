@@ -1,3 +1,4 @@
+import { Feedback } from "@/constants/stripe";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import Stripe from "stripe";
@@ -894,6 +895,7 @@ export const subscriptionStoreWebhook = mutation({
             endedAt: baseObject.ended_at
               ? new Date(baseObject.ended_at * 1000).getTime()
               : undefined,
+            amountNext: undefined,
             discount: undefined,
             promoCode: undefined,
             promoAppliedAt: undefined,
@@ -997,6 +999,15 @@ export const subscriptionStoreWebhook = mutation({
           await ctx.db.patch(invoicePaid._id, {
             paidStatus: args.body.data.object.paid,
             ...(typeof productPlan === "number" && { plan: productPlan }),
+            ...(invoicePaid.customerCancellationComment && {
+              customerCancellationComment: undefined,
+            }),
+            ...(invoicePaid.customerCancellationReason && {
+              customerCancellationReason: undefined,
+            }),
+            ...(invoicePaid.customerCancellationFeedback && {
+              customerCancellationFeedback: undefined,
+            }),
           });
         }
 
@@ -1288,12 +1299,17 @@ export const deleteCouponFromSubscription = action({
   },
 });
 
-export const pauseOrCancelSubscription = action({
+export const cancelSubscription = action({
   args: {
     atPeriodEnd: v.optional(v.boolean()),
-    pause: v.optional(v.boolean()),
+    detail: v.optional(
+      v.object({
+        feedback: v.optional(v.string()),
+        comment: v.optional(v.string()),
+      }),
+    ),
   },
-  handler: async (ctx, { atPeriodEnd, pause }) => {
+  handler: async (ctx, { atPeriodEnd, detail }) => {
     const userId = await getAuthUserId(ctx);
     const result = userId
       ? await ctx.runQuery(api.subscriptions.getUserSubscriptionStatus, {})
@@ -1308,22 +1324,31 @@ export const pauseOrCancelSubscription = action({
     const updateBaseParams: Stripe.SubscriptionUpdateParams = {
       cancel_at_period_end: true,
     };
-    if (pause) {
-      const params: Stripe.SubscriptionUpdateParams = {
-        pause_collection: {
-          behavior: "void",
-        },
-        ...updateBaseParams,
-        description: "Membership paused by user",
-      };
-      await stripe.subscriptions.update(stripeId, params);
-      //what logic is there for pausing a subscription? I know that I can resume it, but what to pause?
-    } else if (atPeriodEnd) {
+
+    const baseDetail: Stripe.SubscriptionCancelParams.CancellationDetails = {
+      comment: detail?.comment ?? "Too many cats.",
+      feedback: (detail?.feedback as Feedback) ?? "other",
+    };
+    // if (pause) {
+    //   const params: Stripe.SubscriptionUpdateParams = {
+    //     pause_collection: {
+    //       behavior: "void",
+    //     },
+    //     // ...updateBaseParams,
+    //     description: "Membership paused by user",
+    //   };
+    //   await stripe.subscriptions.update(stripeId, params);
+    //   //what logic is there for pausing a subscription? I know that I can resume it, but what to pause?
+    // } else
+    if (atPeriodEnd) {
       await stripe.subscriptions.update(stripeId, {
         ...updateBaseParams,
+        cancellation_details: baseDetail,
       });
     } else {
-      await stripe.subscriptions.cancel(stripeId);
+      await stripe.subscriptions.cancel(stripeId, {
+        cancellation_details: baseDetail,
+      });
     }
 
     return { success: true };

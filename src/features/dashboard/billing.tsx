@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAction, usePreloadedQuery } from "convex/react";
 import { format } from "date-fns";
 
+import { SubDialog } from "@/components/ui/account/manage-sub-dialog";
 import { CanceledBanner } from "@/components/ui/canceled-banner";
 import ConfettiBlast from "@/components/ui/confetti";
 import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
@@ -39,6 +40,7 @@ export default function BillingPage() {
   const { subscription, hasActiveSubscription } = subData;
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
   const applyCoupon = useAction(
@@ -48,9 +50,6 @@ export default function BillingPage() {
     api.stripeSubscriptions.deleteCouponFromSubscription,
   );
 
-  const pauseOrCancelSub = useAction(
-    api.stripeSubscriptions.pauseOrCancelSubscription,
-  );
   const currentPeriodEnd = new Date(
     subscription?.currentPeriodEnd ?? Date.now(),
   );
@@ -168,27 +167,6 @@ export default function BillingPage() {
     }
   };
 
-  // const handlePauseSubscription = async () => {
-  //   try {
-  //     await pauseOrCancelSub({
-  //       pause: true,
-  //     });
-  //     toast.success("Successfully paused your subscription!");
-  //   } catch (err) {
-  //     console.error("Failed to pause subscription:", err);
-  //     toast.error("Failed to pause subscription");
-  //   }
-  // };
-  const handleCancelSubscription = async () => {
-    try {
-      await pauseOrCancelSub({});
-      toast.success("Successfully canceled your subscription!");
-    } catch (err) {
-      console.error("Failed to cancel subscription:", err);
-      toast.error("Failed to cancel subscription");
-    }
-  };
-
   const handleApplyCoupon = async () => {
     if (!promoCode) return;
     if (promoAttempts >= 5) {
@@ -277,27 +255,38 @@ export default function BillingPage() {
         <div className="grid gap-6">
           {/* Subscription Details Card */}
           <div className="flex flex-col gap-6">
-            <Button
-              className="mt-3 w-full max-w-lg"
-              onClick={handleManageSubscription}
-              variant="salWithShadow"
-            >
-              {subStatus === "past_due" || (isCanceled && !currentlyCanceled)
-                ? "Resume Membership"
-                : isCanceled
-                  ? "Choose Plan"
-                  : "Update Membership"}
-            </Button>
-            {hasActiveSubscription && isAdmin && subStatus === "active" && (
+            {!hasActiveSubscription && (
+              <Button
+                className="mt-3 w-full max-w-lg"
+                onClick={handleManageSubscription}
+                variant="salWithShadow"
+              >
+                {subStatus === "past_due" || (isCanceled && !currentlyCanceled)
+                  ? "Resume Membership"
+                  : isCanceled
+                    ? "Choose Plan"
+                    : "Update Membership"}
+              </Button>
+            )}
+            {hasActiveSubscription && (
               <>
-                <Button
-                  className="mt-3 w-full max-w-lg"
-                  onClick={handleCancelSubscription}
-                  variant="salWithShadow"
+                <SubDialog
+                  dialog={{
+                    open: cancelDialogOpen,
+                    setOpen: setCancelDialogOpen,
+                  }}
+                  handleManageSub={handleManageSubscription}
                 >
-                  Cancel Membership
-                </Button>
-                {!subPromoCode ? (
+                  <Button
+                    className="mt-3 w-full max-w-lg"
+                    type="button"
+                    variant="salWithShadow"
+                  >
+                    Manage Membership
+                  </Button>
+                </SubDialog>
+
+                {!subPromoCode && !cancelAtTime ? (
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -332,7 +321,7 @@ export default function BillingPage() {
                       )}
                     </div>
                   </form>
-                ) : (
+                ) : subPromoCode ? (
                   <div className="flex items-center justify-center gap-1 rounded-lg border-2 border-dotted border-foreground/70 bg-green-600/10 px-3 py-2 sm:gap-2">
                     <CircleCheck className="size-7 shrink-0 text-emerald-600 sm:size-5" />
                     <p className="text-center text-sm italic">
@@ -358,7 +347,7 @@ export default function BillingPage() {
                       />
                     )}
                   </div>
-                )}
+                ) : null}
               </>
             )}
 
@@ -434,27 +423,30 @@ export default function BillingPage() {
                             {hasDiscount && subAmount.toFixed(0)}
                           </p>
                         </span>
-                        {nextAmount !== undefined && (
-                          <>
-                            <span className="text-sm font-light italic text-gray-400">
-                              {" "}
-                              {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
-                              (${nextAmount}/{nextInterval ?? interval} starting{" "}
-                              {format(currentPeriodEnd, "MMM do yyyy")})
-                            </span>
-                            <span className="mt-1 text-balance text-end text-sm font-light italic text-gray-400">
-                              Can be changed before start date via the{" "}
-                              <a
-                                href="#"
-                                className="font-normal text-foreground/70 underline"
-                                onClick={handleManageSubscription}
-                              >
-                                Manage Membership
-                              </a>{" "}
-                              page
-                            </span>
-                          </>
-                        )}
+                        {nextAmount !== undefined &&
+                          hasActiveSubscription &&
+                          !cancelAtTime && (
+                            <>
+                              <span className="text-sm font-light italic text-gray-400">
+                                {" "}
+                                {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
+                                (${nextAmount}/{nextInterval ?? interval}{" "}
+                                starting{" "}
+                                {format(currentPeriodEnd, "MMM do yyyy")})
+                              </span>
+                              <span className="mt-1 text-balance text-end text-sm font-light italic text-gray-400">
+                                Can be changed before start date via the{" "}
+                                <a
+                                  href="#"
+                                  className="font-normal text-foreground/70 underline"
+                                  onClick={handleManageSubscription}
+                                >
+                                  Manage Membership
+                                </a>{" "}
+                                page
+                              </span>
+                            </>
+                          )}
                       </span>
                     </div>
                     {oneTime && !isCanceled && (

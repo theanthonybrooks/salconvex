@@ -1,0 +1,259 @@
+import { FormError } from "@/components/form-error";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { SelectSimple } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { BaseFeedbackOptions, Feedback } from "@/constants/stripe";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { cn } from "@/helpers/utilsFns";
+import {
+  CancelSubDialogSchema,
+  CancelSubDialogSchemaValues,
+} from "@/schemas/subscription";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction, usePreloadedQuery } from "convex/react";
+import { LoaderCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { api } from "~/convex/_generated/api";
+
+type ManageSubDialogProps = {
+  dialog: {
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  };
+  children: React.ReactNode;
+  onSubmit?: () => void;
+  handleManageSub?: () => void;
+};
+
+export const SubDialog = ({
+  dialog,
+  children,
+  onSubmit,
+  handleManageSub,
+}: ManageSubDialogProps) => {
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  // const userData = usePreloadedQuery(preloadedUserData);
+  // const fontSize = getUserFontSizePref(userData?.userPref?.fontSize);
+  const { subscription, hasActiveSubscription } = subData;
+  const { open, setOpen } = dialog;
+  const [error, setError] = useState<string>("");
+
+  const [pending, setPending] = useState(false);
+
+  const cancelSubscription = useAction(
+    api.stripeSubscriptions.cancelSubscription,
+  );
+  const hasCanceled = Boolean(subscription?.canceledAt);
+
+  const form = useForm<CancelSubDialogSchemaValues>({
+    resolver: zodResolver(CancelSubDialogSchema),
+    defaultValues: {
+      reason: "",
+      comment: "",
+    },
+    mode: "onChange",
+    delayError: 300,
+  });
+
+  const { watch, formState, reset } = form;
+
+  const reason = watch("reason");
+
+  const handleCancelSubscription = async (
+    data: CancelSubDialogSchemaValues,
+  ) => {
+    setPending(true);
+    setError("");
+
+    const validFeedback = BaseFeedbackOptions.some(
+      (option) => option.value === data.reason,
+    );
+
+    try {
+      await cancelSubscription({
+        atPeriodEnd: true,
+        detail: {
+          feedback: validFeedback ? data.reason : "other",
+          comment: `${data.reason} ${data.comment ? `: ${data.comment}` : ""}`,
+        },
+      });
+      toast.success("Successfully canceled your subscription!");
+
+      reset();
+      setTimeout(() => {
+        setOpen(false);
+        onSubmit?.();
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to cancel subscription:", err);
+      toast.error("Failed to cancel subscription");
+      setError("Failed to cancel subscription");
+    } finally {
+      setPending(false);
+      setError("");
+    }
+  };
+
+  useEffect(() => {
+    reset();
+  }, [open, reset]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Manage Membership</DialogTitle>
+
+          <DialogDescription>
+            You can change your plan, update your payment method{" "}
+            {!hasCanceled && ", or cancel your membership at any time"}
+          </DialogDescription>
+
+          {error && <FormError message={error} />}
+        </DialogHeader>
+
+        <Form {...form}>
+          <form
+            onSubmit={form?.handleSubmit(handleCancelSubscription)}
+            className="space-y-3"
+          >
+            <Button
+              className="mt-3 w-full max-w-lg"
+              onClick={handleManageSub}
+              variant="salWithShadowHidden"
+            >
+              {/* {subStatus === "past_due" || (isCanceled && !currentlyCanceled)
+                            ? "Resume Membership"
+                            : isCanceled
+                              ? "Choose Plan"
+                              : "Update Membership"}
+                               */}
+              Update Membership
+            </Button>
+            {hasActiveSubscription && (
+              <>
+                <p className="flex items-center gap-x-3 py-8 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
+                  or
+                </p>
+                <p className="text-sm text-foreground">
+                  You can also cancel your membership and resume it again later.
+                  Canceled memberships will continue until the end of the
+                  current billing cycle.
+                </p>
+                <FormField
+                  control={form.control}
+                  name="reason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className={cn("text-right")}>Reason</FormLabel>
+
+                      <FormControl>
+                        <SelectSimple
+                          options={[...BaseFeedbackOptions]}
+                          value={field.value}
+                          onChangeAction={(value) =>
+                            field.onChange(value as Feedback)
+                          }
+                          placeholder="Select one"
+                          className="w-full min-w-15 border-1.5 bg-card text-center text-base sm:h-11"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {reason.length > 0 && (
+                  <FormField
+                    control={form.control}
+                    name="comment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={cn("text-right")}>
+                          Feedback
+                        </FormLabel>
+
+                        <FormControl>
+                          <Textarea
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Any feedback is greatly appreciated!"
+                            className="min-h-32 resize-none border-1.5 border-foreground bg-card placeholder:text-foreground/40"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                <DialogFooter className="!mt-6 flex w-full justify-end gap-2">
+                  <DialogClose asChild>
+                    <Button
+                      className="w-fit px-6"
+                      variant="salWithShadowHidden"
+                      onClick={() => {
+                        reset();
+                        setOpen(false);
+                      }}
+                      type="button"
+                      disabled={!formState?.isValid || pending}
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
+
+                  <Button
+                    disabled={!formState?.isValid}
+                    type="submit"
+                    variant={
+                      formState?.isValid
+                        ? "salWithShadow"
+                        : "salWithShadowHidden"
+                    }
+                    tabIndex={7}
+                    className="min-w-30 bg-salYellow focus:scale-95 focus:bg-salYellow/20"
+                  >
+                    {pending ? (
+                      <LoaderCircle className="size-5 animate-spin" />
+                    ) : (
+                      "Confirm"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+//!! TODO: The confirmation dialog should have:
+//!! 1. A cancel button that closes the dialog
+//!! 2. A confirm button that calls the onSubmit function
+//!! 3. A tertiary button that allows them to update their subscription (thinking that perhaps this isn't a cancel-only dialog, but just the update sub dialog).
+//!! 4. A select element with a dropdown of cancellation reasons (if they are canceling)
+//!! 5. A textarea for them to add an optional comment
