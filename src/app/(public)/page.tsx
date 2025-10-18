@@ -1,8 +1,6 @@
 "use client";
 
 import { AnimatedCounter } from "@/components/ui/animate-counter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -58,9 +56,9 @@ export default function Home() {
   );
 
   const [currentSlide, setCurrentSlide] = useState(1);
-  const [expanded, setExpanded] = useState(false);
+  // const [expanded, setExpanded] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const toggleReadMore = () => setExpanded((prev) => !prev);
+  // const toggleReadMore = () => setExpanded((prev) => !prev);
   // const { scrollY, scrollYProgress } = useScroll();
   // const smoothScrollY = useSpring(scrollY, {
   //   stiffness: 100,
@@ -403,7 +401,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {!hasActiveSubscription ? (
+      {/* {!hasActiveSubscription ? (
         <>
           <Card className="mx-auto mt-10 max-w-[90dvw] border-1.5 p-6 text-left shadow-md sm:max-w-[70dvw]">
             <CardContent className="space-y-4 !p-0 text-base text-foreground sm:!p-6">
@@ -470,37 +468,36 @@ export default function Home() {
           <Pricing />
         </>
       ) : (
-        <>
-          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4">
-            <span className="inline items-center">
-              <strong>The Street Art List&nbsp; </strong> is an initiative
-              created and run by&nbsp;
-              <Link
-                href="https://instagram.com/anthonybrooksart"
-                target="_blank"
-                className="lg:text-base"
-              >
-                Anthony Brooks
-              </Link>
-              , a Serbian-American artist based in Berlin, Germany.
-            </span>
-            <p>
-              {" "}
-              The List is the result (years in the making) of my frustration
-              with the lack of a centralized place to find open calls and to
-              know what&apos;s happening elsewhere in the street art world — a
-              real
-              <i>
-                &quot;If what you want doesn&apos;t exist, create it&quot;&nbsp;
-              </i>
-              sort of situation. It&apos;s been an ongoing project since 2019,
-              and over time, has grown from an extensive spreadsheet to a
-              fully-fledged database of street art-related projects and
-              events.{" "}
-            </p>
-          </div>
-        </>
-      )}
+        <> */}
+      <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4">
+        <span className="inline items-center">
+          <strong>The Street Art List&nbsp; </strong> is an initiative created
+          and run by&nbsp;
+          <Link
+            href="https://instagram.com/anthonybrooksart"
+            target="_blank"
+            className="lg:text-base"
+          >
+            Anthony Brooks
+          </Link>
+          , a Serbian-American artist based in Berlin, Germany.
+        </span>
+        <p>
+          {" "}
+          The List is the result (years in the making) of my frustration with
+          the lack of a centralized place to find open calls and to know
+          what&apos;s happening elsewhere in the street art world — a real
+          <i>
+            &quot;If what you want doesn&apos;t exist, create it&quot;&nbsp;
+          </i>
+          sort of situation. It&apos;s been an ongoing project since 2019, and
+          over time, has grown from an extensive spreadsheet to a fully-fledged
+          database of street art-related projects and events.{" "}
+        </p>
+      </div>
+      {!hasActiveSubscription && <Pricing />}
+      {/* </>
+      )} */}
     </>
   );
 }
