@@ -43,6 +43,7 @@ import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { formatApplicationLink } from "@/helpers/applicationFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Id } from "~/convex/_generated/dataModel";

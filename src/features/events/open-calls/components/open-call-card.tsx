@@ -39,7 +39,7 @@ interface OpenCallCardProps {
   userPref: UserPref | null;
   format: "mobile" | "desktop";
   publicPreview?: boolean;
-  fontSize: "text-sm" | "text-base";
+  fontSize: string;
 }
 
 const OpenCallCard = ({

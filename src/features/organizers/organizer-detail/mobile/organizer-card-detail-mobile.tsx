@@ -12,6 +12,7 @@ import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventDates } from "@/helpers/dateFns";
 import { getFormattedLocationString } from "@/helpers/locations";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { OrganizerCardProps } from "@/types/organizer";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";

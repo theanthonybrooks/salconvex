@@ -147,6 +147,9 @@ export const usersWithSubscriptions = query({
         const cancelComment = cancelAt
           ? subscription?.customerCancellationComment
           : undefined;
+        const cancelFeedback = cancelAt
+          ? subscription?.customerCancellationFeedback
+          : undefined;
         const interval = subscription?.interval ?? "unknown";
         const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;
         let amount = subAmount ?? 0;
@@ -221,6 +224,7 @@ export const usersWithSubscriptions = query({
           subscription: label ?? "4. none",
           subStatus: currentStatus ?? "-",
           accountType: user.accountType ?? [],
+          cancelFeedback,
           cancelComment,
           cancelReason,
           canceledAt,

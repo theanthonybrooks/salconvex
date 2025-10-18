@@ -1,3 +1,4 @@
+import { FeedbackLabels } from "@/constants/stripe";
 import { intervalToLetter, userPlans } from "@/constants/subscriptions";
 
 export function formatSubscriptionLabel(planName: string, interval: string) {
@@ -11,4 +12,9 @@ export function formatSubscriptionLabel(planName: string, interval: string) {
         ? "yearly"
         : interval;
   return `${planNumber}${intervalLetter}. ${intervalLabel}-${planName}`;
+}
+
+export function getFeedbackLabel(feedback: unknown): string | undefined {
+  if (typeof feedback !== "string") return undefined;
+  return FeedbackLabels[feedback as keyof typeof FeedbackLabels];
 }

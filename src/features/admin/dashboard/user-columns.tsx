@@ -21,6 +21,7 @@ import {
   ChangeUserRole,
 } from "@/features/admin/dashboard/components/admin-user-actions";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
+import { getFeedbackLabel } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
@@ -39,6 +40,7 @@ export const userColumnLabels: Record<string, string> = {
   subscription: "Subscription",
   subStatus: "Sub Status",
   cancelComment: "Cancel Comment",
+  cancelFeedback: "Cancel Feedback",
   cancelReason: "Cancel Reason",
   canceledAt: "Canceled At",
   lastActive: "Last Active",
@@ -62,6 +64,7 @@ interface UserColumnsProps {
   subscription: string;
   subStatus: string;
   cancelComment?: string;
+  cancelFeedback?: string;
   cancelReason?: string;
   canceledAt?: number;
   lastActive?: number;
@@ -233,6 +236,30 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             )}
           >
             {cancelReason || "-"}
+          </div>
+        </TooltipSimple>
+      );
+    },
+  },
+  {
+    accessorKey: "cancelFeedback",
+    id: "cancelFeedback",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Cancel Feedback" />
+    ),
+    cell: ({ row }) => {
+      const { cancelFeedback } = row.original;
+      return (
+        <TooltipSimple content={getFeedbackLabel(cancelFeedback)}>
+          <div
+            className={cn(
+              "truncate text-sm text-muted-foreground",
+              !cancelFeedback && "text-center",
+            )}
+          >
+            {getFeedbackLabel(cancelFeedback) || "-"}
           </div>
         </TooltipSimple>
       );

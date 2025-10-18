@@ -22,6 +22,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { formatEventDates } from "@/helpers/dateFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { OrganizerCardProps } from "@/types/organizer";
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";
