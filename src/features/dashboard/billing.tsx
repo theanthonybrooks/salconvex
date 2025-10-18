@@ -288,7 +288,7 @@ export default function BillingPage() {
                   ? "Choose Plan"
                   : "Update Membership"}
             </Button>
-            {hasActiveSubscription && isAdmin && (
+            {hasActiveSubscription && isAdmin && subStatus === "active" && (
               <>
                 <Button
                   className="mt-3 w-full max-w-lg"

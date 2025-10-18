@@ -219,6 +219,26 @@ export const fontSizeValidator = v.union(
 );
 export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
 
+export const userPrefsValidator = v.object({
+  autoApply: v.optional(v.boolean()),
+  currency: v.optional(v.string()),
+  timezone: v.optional(v.string()),
+
+  language: v.optional(v.string()),
+  theme: v.optional(v.string()),
+  fontSize: v.optional(fontSizeValidator),
+  notifications: v.optional(
+    v.object({
+      newsletter: v.optional(v.boolean()),
+      general: v.optional(v.boolean()),
+      applications: v.optional(v.boolean()),
+    }),
+  ),
+  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
+});
+
+export type UserPrefsType = Infer<typeof userPrefsValidator>;
+
 const openCallFilesSchema = v.object({
   storageId: v.id("_storage"),
   uploadedBy: v.id("users"),

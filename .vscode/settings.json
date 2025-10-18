@@ -30,7 +30,8 @@
     "Zeren",
     "Data Tables",
     "Account/Billing",
-    "Map"
+    "Map",
+    "Convex"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

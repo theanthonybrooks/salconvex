@@ -54,7 +54,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   UpdatePasswordSchema,
   UpdatePasswordSchemaValues,
-  UpdateUserPrefsSchemaValues,
   UpdateUserSchema,
   UpdateUserSchemaValues,
 } from "@/schemas/auth";
@@ -109,6 +108,7 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { FontSizeType, UserPrefsType } from "~/convex/schema";
 
 export default function SettingsPage() {
   const pathname = usePathname();
@@ -365,9 +365,7 @@ export default function SettingsPage() {
     }
   };
 
-  const handleUpdateUserPrefs = async (
-    update: Partial<UpdateUserPrefsSchemaValues>,
-  ) => {
+  const handleUpdateUserPrefs = async (update: Partial<UserPrefsType>) => {
     setPending(true);
     setError("");
 
@@ -1170,7 +1168,9 @@ export default function SettingsPage() {
                   <Select
                     value={userPrefs?.fontSize ?? "normal"}
                     onValueChange={(value) => {
-                      handleUpdateUserPrefs({ fontSize: value });
+                      handleUpdateUserPrefs({
+                        fontSize: value as FontSizeType,
+                      });
                     }}
                   >
                     <SelectTrigger

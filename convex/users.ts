@@ -3,13 +3,15 @@ import { action, QueryCtx } from "./_generated/server";
 
 import { formatSubscriptionLabel } from "@/helpers/subscriptionFns";
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
-import { ConvexError, Infer, v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
 import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
 import {
   AccountType,
   accountTypeArrayValidator,
+  UserPrefsType,
+  userPrefsValidator,
   UserRole,
   userRoleArrayValidator,
 } from "~/convex/schema";
@@ -19,18 +21,6 @@ import {
   MutationCtx,
   query,
 } from "./_generated/server";
-
-const prefsArgs = v.object({
-  autoApply: v.optional(v.boolean()),
-  currency: v.optional(v.string()),
-  timezone: v.optional(v.string()),
-  theme: v.optional(v.string()),
-  fontSize: v.optional(v.string()),
-  language: v.optional(v.string()),
-  cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
-});
-//TODO: THIS is what I was looking for. Infer<typeof T>
-type UpdateUserPrefsArgs = Infer<typeof prefsArgs>;
 
 export const getUserById = query({
   args: {
@@ -445,7 +435,7 @@ function pickDefined<T extends object>(obj: T, keys: (keyof T)[]) {
 }
 
 export const updateUserPrefs = mutation({
-  args: prefsArgs,
+  args: userPrefsValidator,
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
@@ -456,7 +446,9 @@ export const updateUserPrefs = mutation({
       .unique();
     if (!userPref) throw new ConvexError("User pref not found");
 
-    const keys = Object.keys(prefsArgs.fields) as (keyof UpdateUserPrefsArgs)[];
+    const keys = Object.keys(
+      userPrefsValidator.fields,
+    ) as (keyof UserPrefsType)[];
     const update = pickDefined(args, keys);
 
     if (Object.keys(update).length > 0) {
