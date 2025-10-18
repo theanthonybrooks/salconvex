@@ -69,6 +69,7 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  fontSize?: string;
 }
 
 export type ButtonIconProps = IconProps | IconRefProps;
@@ -80,6 +81,7 @@ const Button = React.forwardRef<
   (
     {
       className,
+      fontSize,
       variant,
       size,
       asChild = false,
@@ -92,7 +94,7 @@ const Button = React.forwardRef<
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), fontSize)}
         ref={ref}
         {...props}
       >

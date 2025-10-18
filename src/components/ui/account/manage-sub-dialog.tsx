@@ -22,7 +22,10 @@ import { SelectSimple } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { BaseFeedbackOptions, Feedback } from "@/constants/stripe";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import {
   CancelSubDialogSchema,
   CancelSubDialogSchemaValues,
@@ -42,20 +45,21 @@ type ManageSubDialogProps = {
   };
   children: React.ReactNode;
   onSubmit?: () => void;
-  handleManageSub?: () => void;
 };
 
 export const SubDialog = ({
   dialog,
   children,
   onSubmit,
-  handleManageSub,
 }: ManageSubDialogProps) => {
-  const { preloadedSubStatus } = useConvexPreload();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
-  // const userData = usePreloadedQuery(preloadedUserData);
-  // const fontSize = getUserFontSizePref(userData?.userPref?.fontSize);
+  const userData = usePreloadedQuery(preloadedUserData);
+  const fontSize = getUserFontSizePref(userData?.userPref?.fontSize, true);
   const { subscription, hasActiveSubscription } = subData;
+  const subDetails = getSubscriptionStatusVals(subscription);
+  const { status, cancelDetails } = subDetails ?? {};
+
   const { open, setOpen } = dialog;
   const [error, setError] = useState<string>("");
 
@@ -64,8 +68,7 @@ export const SubDialog = ({
   const cancelSubscription = useAction(
     api.stripeSubscriptions.cancelSubscription,
   );
-  const hasCanceled = Boolean(subscription?.canceledAt);
-
+  const handleManageSubscription = useManageSubscription({ subscription });
   const form = useForm<CancelSubDialogSchemaValues>({
     resolver: zodResolver(CancelSubDialogSchema),
     defaultValues: {
@@ -119,17 +122,18 @@ export const SubDialog = ({
     reset();
   }, [open, reset]);
 
+  const descText = status?.isCanceled
+    ? "You don't have a membership. Please choose a plan to continue using the paid features of the site"
+    : "You can update your plan or payment method and access your membership invoices at any time";
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="h-dvh sm:h-auto">
         <DialogHeader>
           <DialogTitle>Manage Membership</DialogTitle>
 
-          <DialogDescription>
-            You can change your plan, update your payment method{" "}
-            {!hasCanceled && ", or cancel your membership at any time"}
-          </DialogDescription>
+          <DialogDescription className="sr-only">{descText}</DialogDescription>
 
           {error && <FormError message={error} />}
         </DialogHeader>
@@ -139,25 +143,27 @@ export const SubDialog = ({
             onSubmit={form?.handleSubmit(handleCancelSubscription)}
             className="space-y-3"
           >
+            <p className={cn("text-sm text-foreground", fontSize)}>
+              {descText}
+            </p>
             <Button
-              className="mt-3 w-full max-w-lg"
-              onClick={handleManageSub}
+              className={cn("mt-3 w-full max-w-lg")}
+              onClick={handleManageSubscription}
               variant="salWithShadowHidden"
+              fontSize={fontSize}
             >
-              {/* {subStatus === "past_due" || (isCanceled && !currentlyCanceled)
-                            ? "Resume Membership"
-                            : isCanceled
-                              ? "Choose Plan"
-                              : "Update Membership"}
-                               */}
-              Update Membership
+              {status?.isPastDue || cancelDetails?.willCancel
+                ? "Resume Membership"
+                : status?.isCanceled
+                  ? "Choose Plan"
+                  : "Update Membership"}
             </Button>
-            {hasActiveSubscription && (
+            {hasActiveSubscription && !cancelDetails?.hasCanceled && (
               <>
                 <p className="flex items-center gap-x-3 py-8 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
                   or
                 </p>
-                <p className="text-sm text-foreground">
+                <p className={cn("text-sm text-foreground", fontSize)}>
                   You can also cancel your membership and resume it again later.
                   Canceled memberships will continue until the end of the
                   current billing cycle.
@@ -167,7 +173,7 @@ export const SubDialog = ({
                   name="reason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={cn("text-right")}>Reason</FormLabel>
+                      <FormLabel>Reason</FormLabel>
 
                       <FormControl>
                         <SelectSimple
@@ -177,7 +183,10 @@ export const SubDialog = ({
                             field.onChange(value as Feedback)
                           }
                           placeholder="Select one"
-                          className="w-full min-w-15 border-1.5 bg-card text-center text-base sm:h-11"
+                          className={cn(
+                            "w-full min-w-15 border-1.5 bg-card text-center sm:h-11",
+                          )}
+                          fontSize={fontSize}
                         />
                       </FormControl>
                       <FormMessage />
@@ -191,16 +200,17 @@ export const SubDialog = ({
                     name="comment"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className={cn("text-right")}>
-                          Feedback
-                        </FormLabel>
+                        <FormLabel>Feedback</FormLabel>
 
                         <FormControl>
                           <Textarea
                             value={field.value}
                             onChange={field.onChange}
                             placeholder="Any feedback is greatly appreciated!"
-                            className="min-h-32 resize-none border-1.5 border-foreground bg-card placeholder:text-foreground/40"
+                            className={cn(
+                              "min-h-24 resize-none border-1.5 border-foreground bg-card placeholder:text-foreground/40 sm:min-h-32",
+                              fontSize,
+                            )}
                           />
                         </FormControl>
                         <FormMessage />
@@ -208,7 +218,7 @@ export const SubDialog = ({
                     )}
                   />
                 )}
-                <DialogFooter className="!mt-6 flex w-full justify-end gap-2">
+                <DialogFooter className="!mt-6 flex w-full flex-row justify-end gap-2">
                   <DialogClose asChild>
                     <Button
                       className="w-fit px-6"
@@ -233,7 +243,7 @@ export const SubDialog = ({
                         : "salWithShadowHidden"
                     }
                     tabIndex={7}
-                    className="min-w-30 bg-salYellow focus:scale-95 focus:bg-salYellow/20"
+                    className="min-w-30 flex-1 bg-salYellow focus:scale-95 focus:bg-salYellow/20 sm:flex-auto"
                   >
                     {pending ? (
                       <LoaderCircle className="size-5 animate-spin" />

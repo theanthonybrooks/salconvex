@@ -22,8 +22,10 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    fontSize?: string;
+  }
+>(({ className, children, fontSize, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -32,7 +34,7 @@ const SelectTrigger = React.forwardRef<
     )}
     {...props}
   >
-    <div className="flex w-full justify-center">{children}</div>
+    <div className={cn("flex w-full justify-center", fontSize)}>{children}</div>
     <SelectPrimitive.Icon asChild>
       <ChevronDown className="size-4 opacity-50 group-data-[state=open]:rotate-180" />
     </SelectPrimitive.Icon>
@@ -129,28 +131,35 @@ const SelectItem = React.forwardRef<
     indicator?: boolean;
     fit?: boolean;
     center?: boolean;
+    fontSize?: string;
   }
->(({ className, children, indicator = true, center, fit, ...props }, ref) => (
-  <SelectPrimitive.Item
-    ref={ref}
-    className={cn(
-      "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 text-base focus:bg-salPinkLt focus:text-accent-foreground data-[state=checked]:bg-salPinkLt/50 data-[state=checked]:font-bold sm:text-sm",
-      indicator && !fit ? "pr-8" : fit ? "pr-2" : "justify-center pr-2",
-      center && "justify-center",
-      className,
-    )}
-    {...props}
-  >
-    {indicator && (
-      <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-        <SelectPrimitive.ItemIndicator>
-          <Check className="size-4" />
-        </SelectPrimitive.ItemIndicator>
-      </span>
-    )}
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-  </SelectPrimitive.Item>
-));
+>(
+  (
+    { className, children, indicator = true, center, fit, fontSize, ...props },
+    ref,
+  ) => (
+    <SelectPrimitive.Item
+      ref={ref}
+      className={cn(
+        "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 text-base focus:bg-salPinkLt focus:text-accent-foreground data-[state=checked]:bg-salPinkLt/50 data-[state=checked]:font-bold sm:text-sm",
+        indicator && !fit ? "pr-8" : fit ? "pr-2" : "justify-center pr-2",
+        center && "justify-center",
+        className,
+        fontSize,
+      )}
+      {...props}
+    >
+      {indicator && (
+        <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+          <SelectPrimitive.ItemIndicator>
+            <Check className="size-4" />
+          </SelectPrimitive.ItemIndicator>
+        </span>
+      )}
+      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    </SelectPrimitive.Item>
+  ),
+);
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
 const SelectSeparator = React.forwardRef<
@@ -196,6 +205,7 @@ interface SelectSimpleProps {
   tabIndex?: number;
   invalid?: boolean;
   disabled?: boolean;
+  fontSize?: string;
 }
 
 export const SelectSimple = ({
@@ -210,6 +220,7 @@ export const SelectSimple = ({
   invalid,
   disabled,
   id,
+  fontSize,
 }: SelectSimpleProps) => {
   return (
     <Select value={value} onValueChange={onChangeAction}>
@@ -222,6 +233,7 @@ export const SelectSimple = ({
           invalid && "invalid-field",
           className,
         )}
+        fontSize={fontSize}
         tabIndex={tabIndex}
       >
         <SelectValue placeholder={placeholder} />
@@ -237,6 +249,7 @@ export const SelectSimple = ({
                 itemClassName,
                 option.disabled && "pointer-events-none rounded-sm opacity-50",
               )}
+              fontSize={fontSize}
             >
               <span className="flex items-center gap-x-1">
                 {option.premium && (

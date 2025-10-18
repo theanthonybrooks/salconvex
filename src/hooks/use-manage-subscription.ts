@@ -1,31 +1,74 @@
-// hooks/useManageSubscription.ts
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { useAction } from "convex/react";
 import { ConvexError } from "convex/values";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
+import { UserSubscriptionType } from "~/convex/schema";
 
-export function useManageSubscription(subscription: { customerId?: string }) {
+export type ManageSubscriptionArgs = {
+  subscription?: UserSubscriptionType | null;
+  type?: "existing" | "new";
+  destination?: "newTab" | "window";
+};
+
+export function useManageSubscription({
+  subscription,
+  type = "existing",
+  destination = "newTab",
+}: ManageSubscriptionArgs) {
+  const { customerId, status, canceledAt } = subscription ?? {};
+  const router = useRouter();
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
+  const currentlyCanceled = status === "canceled" || canceledAt;
 
-  const handleManageSubscription = async () => {
-    if (!subscription?.customerId) {
-      toast.error(
-        "No membership found. Please contact support if this is incorrect.",
-      );
+  async function handleManageSubscription() {
+    const tabDestination = destination === "newTab";
+    let url: string | undefined;
+    let newTab: Window | null | undefined;
+
+    if (currentlyCanceled && type === "existing") {
+      router.push("/pricing?type=artist");
       return;
     }
 
+    if (tabDestination && customerId) newTab = window.open("about:blank");
+
     try {
-      const result = await getDashboardUrl({
-        customerId: subscription.customerId,
-      });
-      if (result) {
-        toast.success("Successfully forwardeing to Stripe!");
+      if (!customerId) {
+        throw new Error(
+          "No membership found. Please contact support if this is incorrect.",
+        );
       }
-      if (result?.url) {
-        window.location.href = result.url;
+      const result = await getDashboardUrl({
+        customerId,
+      });
+      if (!result.url) {
+        throw new Error("Unable to get Stripe url");
+      } else {
+        url = result.url;
+      }
+
+      if (!newTab && tabDestination) {
+        toast.error(
+          "Stripe redirect blocked. Please enable popups for this site.",
+        );
+        console.error("Popup was blocked");
+        return;
+      }
+
+      if (url) {
+        if (tabDestination && newTab) {
+          newTab.document.write(getExternalRedirectHtml(url, 1));
+          newTab.document.close();
+          newTab.location.href = url;
+        } else {
+          window.location.href = url;
+        }
       }
     } catch (err: unknown) {
+      if (!newTab?.closed) newTab?.document.close();
+
       if (err instanceof ConvexError) {
         toast.error(
           typeof err.data === "string" &&
@@ -44,7 +87,7 @@ export function useManageSubscription(subscription: { customerId?: string }) {
         toast.error("An unknown error occurred.");
       }
     }
-  };
+  }
 
   return handleManageSubscription;
 }

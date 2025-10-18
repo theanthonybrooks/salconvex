@@ -124,7 +124,7 @@ export const ArtistProfileForm = ({
   // const currentValues = getValues();
   // const userNationality = currentValues.artistNationality;
   // NOTE: Generate the upload url to use Convex's storage
-  const handleManageSubscription = useManageSubscription(subscription ?? {});
+  const handleManageSubscription = useManageSubscription({ subscription });
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
 
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
@@ -173,6 +173,8 @@ export const ArtistProfileForm = ({
 
   const onSubmit = async (data: UpdateArtistSchemaValues) => {
     setPending(true);
+    // toast.info("Opening checkout in new tab...");
+
     let timezone: string | undefined;
     let timezoneOffset: number | undefined;
     let artistLogoStorageId: Id<"_storage"> | undefined;
@@ -188,7 +190,7 @@ export const ArtistProfileForm = ({
     //   return;
     // }
     const artistLocation = data?.artistResidency?.location;
-    if (artistLocation?.length === 2) {
+    if (artistLocation?.length === 2 && isDirty) {
       const timezoneData = await getTimezone({
         latitude: artistLocation[0],
         longitude: artistLocation[1],
@@ -255,7 +257,11 @@ export const ArtistProfileForm = ({
           toast.success("Successfully created profile!");
         }
       } else {
-        toast.success("Forwarding to Stripe...");
+        if (hasCurrentSub) {
+          toast.info("Opening Stripe in new tab...");
+        } else {
+          toast.info("Forwarding to Stripe...");
+        }
       }
 
       reset();
@@ -263,7 +269,9 @@ export const ArtistProfileForm = ({
       setTimeout(() => {
         if (!hasCurrentSub) {
           onClick();
+          console.log("onClick");
         } else {
+          // console.log("handleManageSubscription");
           handleManageSubscription();
         }
       }, 2000);
@@ -272,6 +280,7 @@ export const ArtistProfileForm = ({
       toast.error("Failed to submit form");
     } finally {
       setPending(false);
+      setTimeout(() => toast.dismiss(), 2000);
     }
   };
 
@@ -461,8 +470,12 @@ export const ArtistProfileForm = ({
                     tabIndex={7}
                   />
                 </FormControl>
-                <FormLabel className="font-bold leading-6 sm:leading-normal">
+                <FormLabel className="hidden font-bold leading-6 sm:block sm:leading-normal">
                   Would you like to be considered for our artist feature?
+                  <sup>*</sup>
+                </FormLabel>
+                <FormLabel className="font-bold leading-6 sm:hidden sm:leading-normal">
+                  Would you like to be a featured artist?
                   <sup>*</sup>
                 </FormLabel>
               </FormItem>

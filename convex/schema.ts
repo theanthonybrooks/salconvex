@@ -15,7 +15,7 @@ const stripeIntervalPricesValidator = v.object({
 });
 // #endregion
 
-  // #region -------------Account Validators --------------
+// #region -------------Account Validators --------------
 //TODO: Add Judge and other types to this later on.
 export const accountTypeValidator = v.union(
   v.literal("artist"),
@@ -37,7 +37,6 @@ export const userRoleValidator = v.union(
 
 export const userRoleArrayValidator = v.array(userRoleValidator);
 export type UserRole = Infer<typeof userRoleArrayValidator>;
-
 
 export const fontSizeValidator = v.union(
   v.literal("large"),
@@ -145,8 +144,6 @@ export const ocStateValidator = v.union(
 );
 
 export type OpenCallStateType = Infer<typeof ocStateValidator>;
-
-
 
 export type OpenCallTypeType = Infer<typeof hasOpenCallValidator>;
 
@@ -776,6 +773,48 @@ export const kanbanCardSchema = v.object({
   ticketNumber: v.optional(v.id("support")),
 });
 
+const userSubscriptionSchema = {
+  userId: v.optional(v.string()),
+  stripeId: v.optional(v.string()),
+  stripePriceId: v.optional(v.string()),
+  promoCode: v.optional(v.string()),
+  adminPromoCode: v.optional(v.string()),
+  promoAppliedAt: v.optional(v.number()),
+  discount: v.optional(v.number()),
+  discountPercent: v.optional(v.number()),
+  discountAmount: v.optional(v.number()),
+  discountDuration: v.optional(v.string()),
+  currency: v.optional(v.string()),
+  interval: v.optional(v.string()),
+  intervalNext: v.optional(v.string()),
+  status: v.optional(v.string()),
+  currentPeriodStart: v.optional(v.number()),
+  currentPeriodEnd: v.optional(v.number()),
+  cancelAtPeriodEnd: v.optional(v.boolean()),
+  hadTrial: v.optional(v.boolean()),
+  amount: v.optional(v.number()),
+  amountNext: v.optional(v.number()),
+  startedAt: v.optional(v.number()),
+  trialEndsAt: v.optional(v.number()),
+  endedAt: v.optional(v.number()),
+  cancelAt: v.optional(v.number()),
+  canceledAt: v.optional(v.number()),
+  customerCancellationReason: v.optional(v.string()),
+  customerCancellationFeedback: v.optional(v.string()),
+  customerCancellationComment: v.optional(v.string()),
+  metadata: v.optional(v.any()),
+  plan: v.optional(v.number()),
+  customFieldData: v.optional(v.any()),
+  customerId: v.optional(v.string()),
+  lastEditedAt: v.optional(v.number()),
+  paidStatus: v.optional(v.boolean()),
+};
+
+const userSubscriptionSchemaValidator = v.object(userSubscriptionSchema);
+export type UserSubscriptionType = Infer<
+  typeof userSubscriptionSchemaValidator
+>;
+
 // #endregion
 
 // #region ------------- Table Schemas & Indexes --------------
@@ -1146,42 +1185,7 @@ export default defineSchema({
     .index("key", ["key"])
     .index("stripeProductId", ["stripeProductId"]),
 
-  userSubscriptions: defineTable({
-    userId: v.optional(v.string()),
-    stripeId: v.optional(v.string()),
-    stripePriceId: v.optional(v.string()),
-    promoCode: v.optional(v.string()),
-    adminPromoCode: v.optional(v.string()),
-    promoAppliedAt: v.optional(v.number()),
-    discount: v.optional(v.number()),
-    discountPercent: v.optional(v.number()),
-    discountAmount: v.optional(v.number()),
-    discountDuration: v.optional(v.string()),
-    currency: v.optional(v.string()),
-    interval: v.optional(v.string()),
-    intervalNext: v.optional(v.string()),
-    status: v.optional(v.string()),
-    currentPeriodStart: v.optional(v.number()),
-    currentPeriodEnd: v.optional(v.number()),
-    cancelAtPeriodEnd: v.optional(v.boolean()),
-    hadTrial: v.optional(v.boolean()),
-    amount: v.optional(v.number()),
-    amountNext: v.optional(v.number()),
-    startedAt: v.optional(v.number()),
-    trialEndsAt: v.optional(v.number()),
-    endedAt: v.optional(v.number()),
-    cancelAt: v.optional(v.number()),
-    canceledAt: v.optional(v.number()),
-    customerCancellationReason: v.optional(v.string()),
-    customerCancellationFeedback: v.optional(v.string()),
-    customerCancellationComment: v.optional(v.string()),
-    metadata: v.optional(v.any()),
-    plan: v.optional(v.number()),
-    customFieldData: v.optional(v.any()),
-    customerId: v.optional(v.string()),
-    lastEditedAt: v.optional(v.number()),
-    paidStatus: v.optional(v.boolean()),
-  })
+  userSubscriptions: defineTable(userSubscriptionSchema)
     .index("by_status", ["status"])
     .index("userId", ["userId"])
     .index("stripeId", ["stripeId"])

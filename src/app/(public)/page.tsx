@@ -453,8 +453,8 @@ export default function Home() {
                 </p>
                 &nbsp;
                 <p>
-                  P.s. Many of the new features are still in beta, so if you
-                  come across any bugs, please let me know!
+                  P.s. I&apos;m constantly updating the site, so if you come
+                  across any bugs, please let me know!
                 </p>
               </div>
               <Button

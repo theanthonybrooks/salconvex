@@ -15,34 +15,34 @@ import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { ConvexError } from "convex/values";
 import { CircleCheck, CreditCard, Info, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
 export default function BillingPage() {
-  // const userData = useQuery(api.users.getCurrentUser, {})
-  // const user = userData?.user // This avoids destructuring null or undefined
-  const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
-  const isAdmin = userData?.user?.role?.includes("admin");
   const userPref = userData?.userPref ?? null;
   const fontSize = getUserFontSizePref(userPref?.fontSize);
-  const { subscription, hasActiveSubscription } = subData;
+  const { subscription, hasActiveSubscription, subStatus } = subData;
+  const subDetails = getSubscriptionStatusVals(subscription);
+  const { status, cancelDetails, baseDetails } = subDetails ?? {};
+  const { discount, interval } = baseDetails ?? {};
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
-  const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
+  const handleManageSubscription = useManageSubscription({ subscription });
+
   const applyCoupon = useAction(
     api.stripeSubscriptions.applyCouponToSubscription,
   );
@@ -54,118 +54,6 @@ export default function BillingPage() {
     subscription?.currentPeriodEnd ?? Date.now(),
   );
   const subPromoCode = subscription?.promoCode;
-  const canceledAt =
-    subscription?.canceledAt !== undefined && subscription?.canceledAt;
-
-  const isCanceled = subscription?.status === "canceled";
-  // const cancelAtTime = new Date(subscription?.cancelAt ?? Date.now());
-  const cancelAtTime = subscription?.cancelAt
-    ? new Date(subscription.cancelAt)
-    : undefined;
-  const now = new Date();
-
-  const currentlyCanceled = cancelAtTime && cancelAtTime < now;
-
-  const subStatus = subscription?.status ?? "none";
-
-  let interval: string | undefined;
-  let nextInterval: string | undefined;
-  let nextAmount: string | undefined;
-  const discountDuration = subscription?.discountDuration;
-  const oneTime = discountDuration === "once";
-  const subAmount =
-    typeof subscription?.amount === "number" ? subscription.amount / 100 : 0;
-  const hasDiscountAmt = typeof subscription?.discountAmount === "number";
-  const hasDiscountPercent = typeof subscription?.discountPercent === "number";
-  const hasDiscount = hasDiscountAmt || hasDiscountPercent;
-  const discountAmt =
-    typeof subscription?.discountAmount === "number"
-      ? subscription.discountAmount / 100
-      : 0;
-  const discountPercent =
-    typeof subscription?.discountPercent === "number"
-      ? subscription.discountPercent / 100
-      : 0;
-
-  // console.log("subAmount: ", subAmount);
-  // console.log("discountAmt: ", discountAmt);
-  // console.log("discountPercent: ", discountPercent);
-
-  // console.log("intervals: ", interval, nextInterval);
-
-  // if (subscription?.intervalNext !== undefined) {
-  //   // intervalNext exists
-  //   nextInterval = subscription.intervalNext
-  // }
-  if (subscription?.amountNext !== undefined) {
-    // amountNext exists
-    nextAmount = (subscription.amountNext! / 100).toFixed(0);
-    interval = subscription.interval;
-    nextInterval = subscription.intervalNext;
-  } else {
-    interval = subscription?.interval;
-  }
-
-  const handleManageSubscription = async () => {
-    console.log(currentlyCanceled);
-    let url: string | undefined;
-
-    if (!subscription?.customerId) {
-      toast.error(
-        "No membership found. Please contact support if this is incorrect.",
-      );
-      return;
-    }
-
-    if (currentlyCanceled) {
-      router.push("/pricing?type=artist");
-      return;
-    }
-    const newTab = window.open("about:blank");
-    try {
-      const result = await getDashboardUrl({
-        customerId: subscription.customerId,
-      });
-      if (result?.url) {
-        // window.location.href = result.url;
-        url = result.url;
-      }
-      if (!newTab) {
-        toast.error(
-          "Stripe redirect blocked. Please enable popups for this site.",
-        );
-        console.error("Popup was blocked");
-        return;
-      }
-      if (url) {
-        newTab.document.write(getExternalRedirectHtml(url, 1));
-        newTab.document.close();
-        newTab.location.href = url;
-      }
-    } catch (err: unknown) {
-      if (!newTab?.closed) {
-        newTab?.document.close();
-      }
-      if (err instanceof ConvexError) {
-        toast.error(
-          typeof err.data === "string" &&
-            err.data.toLowerCase().includes("no such customer")
-            ? "Your account was canceled. Contact support for assistance."
-            : err.data || "An unexpected error occurred.",
-        );
-      } else if (err instanceof Error) {
-        toast.error(
-          typeof err.message === "string" &&
-            err.message.toLowerCase().includes("no such customer")
-            ? "Your account was canceled. Contact support for assistance."
-            : err.message || "An unexpected error occurred.",
-        );
-      } else {
-        toast.error("An unknown error occurred.");
-      }
-      return;
-    }
-  };
 
   const handleApplyCoupon = async () => {
     if (!promoCode) return;
@@ -228,6 +116,8 @@ export default function BillingPage() {
   return (
     <div className="flex w-max max-w-[100dvw] flex-col gap-6 p-6">
       {showConfetti && <ConfettiBlast active={showConfetti} />}
+      {/* //!! todo: show the canceled banner even when it's been canceled, but is still active, to let them know that they can still re-activate it */}
+
       <CanceledBanner
         activeSub={hasActiveSubscription}
         subStatus={subStatus}
@@ -261,9 +151,9 @@ export default function BillingPage() {
                 onClick={handleManageSubscription}
                 variant="salWithShadow"
               >
-                {subStatus === "past_due" || (isCanceled && !currentlyCanceled)
+                {status?.isPastDue || cancelDetails?.willCancel
                   ? "Resume Membership"
-                  : isCanceled
+                  : status?.isCanceled
                     ? "Choose Plan"
                     : "Update Membership"}
               </Button>
@@ -275,7 +165,6 @@ export default function BillingPage() {
                     open: cancelDialogOpen,
                     setOpen: setCancelDialogOpen,
                   }}
-                  handleManageSub={handleManageSubscription}
                 >
                   <Button
                     className="mt-3 w-full max-w-lg"
@@ -286,7 +175,7 @@ export default function BillingPage() {
                   </Button>
                 </SubDialog>
 
-                {!subPromoCode && !cancelAtTime ? (
+                {!subPromoCode && !cancelDetails?.hasCanceled ? (
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -405,32 +294,31 @@ export default function BillingPage() {
                       </span>
                       <span className="flex flex-col items-end justify-start font-medium">
                         <span className="flex items-center gap-2">
-                          $
-                          {hasDiscountAmt
-                            ? subAmount - discountAmt
-                            : hasDiscountPercent
-                              ? subAmount - subAmount * discountPercent
-                              : subAmount.toFixed(0)}
+                          ${baseDetails?.actualAmount}
                           {/* {subscription?.amount
                             ? (subscription.amount / 100).toFixed(0)
                             : 0} */}
                           <p
                             className={
-                              cn(hasDiscount && "text-red-600 line-through") ||
-                              ""
+                              cn(
+                                discount?.hasDiscount &&
+                                  "text-red-600 line-through",
+                              ) || ""
                             }
                           >
-                            {hasDiscount && subAmount.toFixed(0)}
+                            {discount?.hasDiscount && baseDetails?.planAmount}
                           </p>
                         </span>
-                        {nextAmount !== undefined &&
+                        {baseDetails?.nextAmount &&
                           hasActiveSubscription &&
-                          !cancelAtTime && (
+                          !cancelDetails?.hasCanceled && (
                             <>
                               <span className="text-sm font-light italic text-gray-400">
                                 {" "}
                                 {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
-                                (${nextAmount}/{nextInterval ?? interval}{" "}
+                                (${baseDetails.nextAmount}/
+                                {interval?.nextInterval ??
+                                  interval?.currentInterval}{" "}
                                 starting{" "}
                                 {format(currentPeriodEnd, "MMM do yyyy")})
                               </span>
@@ -449,12 +337,13 @@ export default function BillingPage() {
                           )}
                       </span>
                     </div>
-                    {oneTime && !isCanceled && (
+                    {discount?.type === "one-time" && !status?.isCanceled && (
                       <span className="mt-2 w-full items-center gap-3 rounded-lg border border-dashed border-foreground/30 bg-salYellowLt/30 p-2 text-sm font-light italic text-foreground/50 sm:inline-flex">
                         <Info className="size-5 shrink-0 text-sm text-foreground/50 [@media(max-width:768px)]:hidden" />
                         This discount will expire in one{" "}
-                        {nextInterval ?? interval} and your membership price
-                        will return to the original price.
+                        {interval?.nextInterval ?? interval?.currentInterval}{" "}
+                        and your membership price will return to the original
+                        price.
                       </span>
                     )}
 
@@ -469,7 +358,7 @@ export default function BillingPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Auto Renew:</span>
                       <span className="font-medium">
-                        {isCanceled || !subscription
+                        {status?.isCanceled || !subscription
                           ? "-"
                           : subscription?.cancelAtPeriodEnd
                             ? "No"
@@ -478,32 +367,47 @@ export default function BillingPage() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      {!cancelAtTime && (
+                      {!cancelDetails?.hasCanceled && (
                         <>
                           <span className="text-muted-foreground">
                             Next Due Date:
                           </span>
                           <span className="font-medium">
-                            {isCanceled
-                              ? "Canceled"
-                              : format(currentPeriodEnd, "MMM do, yyyy")}
+                            {format(currentPeriodEnd, "MMM do, yyyy")}
                           </span>
                         </>
                       )}
-                      {cancelAtTime && !isCanceled && (
+
+                      {cancelDetails?.hasCanceled && (
                         <>
                           <span className="text-muted-foreground">
-                            Cancels on:
+                            {!cancelDetails?.currentlyCanceled
+                              ? "Cancels "
+                              : "Canceled "}{" "}
+                            on:
                           </span>
                           <span className="font-medium text-red-500">
-                            {format(cancelAtTime, "MMM do, yyyy")}
+                            {cancelDetails?.cancelAtTime &&
+                            !cancelDetails?.currentlyCanceled
+                              ? format(
+                                  cancelDetails.cancelAtTime,
+                                  "MMM do, yyyy",
+                                )
+                              : subscription?.canceledAt
+                                ? format(
+                                    subscription.canceledAt,
+                                    "MMM do, yyyy",
+                                  )
+                                : null}
                           </span>
                         </>
                       )}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">
-                        {isCanceled ? "Account Created:" : "Member Since:"}
+                        {status?.isCanceled
+                          ? "Account Created:"
+                          : "Member Since:"}
                       </span>
                       <span className="font-medium">
                         {subscription?.startedAt
@@ -514,35 +418,6 @@ export default function BillingPage() {
                           : "No Membership"}
                       </span>
                     </div>
-                    {/* {!canceledAt ? (
-                    <div className='flex items-center justify-between'>
-                      <span className='text-muted-foreground'>Last Updated:</span>
-                      <span className='font-medium'>
-                        {subscription?.lastEditedAt
-                          ? format(
-                              new Date(subscription.lastEditedAt),
-                              "MMM do, yyyy @ h:mm a"
-                            )
-                          : "N/A"}
-                      </span>
-                    </div>
-                  ) :  */}
-                    {canceledAt && isCanceled && (
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="text-muted-foreground">
-                          Cancellation Date:
-                        </span>
-                        <span className="font-medium text-red-500">
-                          {subscription?.canceledAt
-                            ? format(
-                                new Date(subscription.canceledAt),
-                                // "MMM do, yyyy @ h:mm a",
-                                "MMM do, yyyy",
-                              )
-                            : "N/A"}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 )}
               </CardContent>

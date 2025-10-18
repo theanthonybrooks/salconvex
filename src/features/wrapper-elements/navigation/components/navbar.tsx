@@ -419,7 +419,7 @@ export default function NavBar(
                     subStatus={subStatus}
                     userPref={userPref}
                   />
-                  {hasActiveSubscription && (
+                  {(hasActiveSubscription || isAdmin) && (
                     <Search
                       // invisible
                       title={"Search"}

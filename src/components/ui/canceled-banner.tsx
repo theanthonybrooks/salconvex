@@ -4,7 +4,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 
 interface CanceledBannerProps {
   activeSub: boolean;
-  subStatus: string;
+  subStatus?: string;
   fontSize?: string;
 }
 

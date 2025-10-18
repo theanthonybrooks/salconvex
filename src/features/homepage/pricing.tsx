@@ -269,7 +269,7 @@ export const AccountTypeSwitch = ({
           onClick={() => {
             if (typeParam) router.replace("/pricing");
             setSelectedAccountTypeAction(isArtist ? "organizer" : "artist");
-            setIsYearlyAction(false);
+            if (!hasSub) setIsYearlyAction(false);
             // window.scrollTo({ top: 0, behavior: "smooth" });
             // const firstCard = document.querySelector(".pricing-card");
             // if (firstCard) {
@@ -343,13 +343,9 @@ const PricingCard = ({
   const isArtist = accountType === "artist";
   const isOrganizer = accountType === "organizer";
   const isFree = prices.rate === 0;
-  // const [slidingPrice, setSlidingPrice] = useState(50)
-  // const [sliderPrice, setSliderPrice] = useState(0);
   const getCheckoutUrl = useAction(
     api.stripeSubscriptions.createStripeCheckoutSession,
   );
-
-  // console.log("had trial:", hadTrial);
 
   const hadFreeCall = useQuery(
     api.stripeSubscriptions.getOrgHadFreeCall,
@@ -357,20 +353,6 @@ const PricingCard = ({
   );
 
   const isEligibleForFree = (isOrganizer && hadFreeCall === false) || !user;
-  // const slidingPrice = useMemo(() => {
-  //   switch (sliderPrice) {
-  //     case 1:
-  //       return 50;
-  //     case 33:
-  //       return 100;
-  //     case 66:
-  //       return 200;
-  //     case 100:
-  //       return 250;
-  //     default:
-  //       return 50;
-  //   }
-  // }, [sliderPrice]);
   const hadTrial = subscription?.hadTrial;
   const userSubPriceId = subscription?.stripePriceId;
   const isCurrentUserPlan =
@@ -546,6 +528,7 @@ const PricingCard = ({
           isEligibleForFree={isEligibleForFree}
         >
           <Button
+            disabled={!isCurrentUserPlan && activeSub}
             variant={
               (!activeSub && (popular || isFree)) || isCurrentUserPlan
                 ? "salWithShadowPink"
@@ -569,9 +552,6 @@ export default function Pricing() {
   // useScrollToTopOnMount();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type") as AccountTypeBase;
-  const [isYearly, setIsYearly] = useState<boolean>(false);
-  const [hasOpenCall, setHasOpenCall] = useState<boolean>(true);
-
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -579,26 +559,24 @@ export default function Pricing() {
   const hasSub = subData?.hasActiveSubscription;
   const hadTrial = subData?.hadTrial;
   const subscription = subData?.subscription;
-  const userSubPriceId = subscription?.stripePriceId;
-  const handleManageSubscription = useManageSubscription(subscription ?? {});
+  const subInterval = subscription?.intervalNext ?? subscription?.interval;
 
+  const userSubPriceId = subscription?.stripePriceId;
+  const handleManageSubscription = useManageSubscription({ subscription });
   const user = userData?.user;
-  const userAccountTypes = user?.accountType ?? [];
-  // const multiType = userAccountTypes.length > 1
   const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
     null,
   );
-  const accountType =
-    typeParam ?? urlAccountType ?? user?.accountType[0] ?? "artist";
+  const userAccountTypes = user?.accountType ?? urlAccountType ?? [];
+  const accountType = typeParam ?? user?.accountType[0] ?? "artist";
+  const [isYearly, setIsYearly] = useState<boolean>(subInterval === "year");
+  const [hasOpenCall, setHasOpenCall] = useState<boolean>(true);
+  const [selectedAccountType, setSelectedAccountType] = useState(accountType);
+
+  // const multiType = userAccountTypes.length > 1
+
   const isAdmin = user?.role?.includes("admin");
 
-  // if (hasSub) {
-  //   accountType = "organizer"
-  // }
-
-  // console.log("accountType: ", accountType)
-  const [selectedAccountType, setSelectedAccountType] = useState(accountType);
-  // const userIsArtist = userAccountTypes.includes("artist")
   const isArtist = selectedAccountType === "artist";
   const isOrganizer = selectedAccountType === "organizer";
   const orgAccountType = userAccountTypes.includes("organizer");
@@ -617,8 +595,21 @@ export default function Pricing() {
   }, [searchParams]);
 
   useEffect(() => {
-    setSelectedAccountType(accountType);
-  }, [accountType]);
+    if (user) return;
+    setSelectedAccountType("artist");
+    setIsYearly(false);
+  }, [user]);
+
+  // useEffect(() => {
+  //   if (!isArtist) return;
+  //   if (!hasSub) {
+  //     setIsYearly(false);
+  //   } else {
+  //     setIsYearly(subInterval === "year");
+  //   }
+  // }, [subInterval, hasSub, isArtist]);
+
+  // useEffect(() => setSelectedAccountType(accountType), [accountType]);
 
   const togglePricingPeriod = (value: string) =>
     setIsYearly(parseInt(value) === 1);
@@ -632,12 +623,11 @@ export default function Pricing() {
     return <div className="h-screen w-screen bg-background" />;
 
   // console.log(isArtist, hasSub, isOrganizer, orgAccountType);
-
   return (
     <section id="plans" className="price-card-cont px-4 pt-6">
       <div className="mx-auto max-w-7xl">
         {/* {isAdmin && <ExistingSubscription onClick={handleManageSubscription} />} */}
-        {((isArtist && !hasSub) || (isAdmin && !isOrganizer)) && (
+        {isArtist && !hasSub && (
           <>
             <PricingHeader
               title="Choose Your Plan"
@@ -645,6 +635,12 @@ export default function Pricing() {
             />
             <PricingSwitch onSwitchAction={togglePricingPeriod} />
           </>
+        )}
+        {isArtist && hasSub && (
+          <PricingHeader
+            title="Your Plan"
+            subtitle="Manage your plan or payment method at any time."
+          />
         )}
 
         {isOrganizer && (
@@ -692,6 +688,20 @@ export default function Pricing() {
                   ? (b.prices.year?.usd?.amount ?? Infinity)
                   : (b.prices.month?.usd?.amount ?? Infinity);
                 return priceA - priceB;
+              })
+              .filter((plan) => {
+                if (!hasSub) return true; // show all if user doesn’t have a subscription
+
+                const stripePriceId = isYearly
+                  ? plan.prices?.year?.usd?.stripeId
+                  : plan.prices?.month?.usd?.stripeId;
+
+                const isCurrentUserPlan =
+                  typeof stripePriceId === "string" &&
+                  typeof userSubPriceId === "string" &&
+                  stripePriceId === userSubPriceId;
+
+                return isCurrentUserPlan;
               })
               .map((plan) => {
                 const stripePriceId = isYearly

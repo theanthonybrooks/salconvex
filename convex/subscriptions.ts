@@ -48,7 +48,7 @@ export const getUserSubscriptionStatus = query({
     const hasActiveSubscription =
       subscription?.status === "active" ||
       subscription?.status === "trialing" ||
-      isAdmin;
+      (isAdmin && subscription?.status !== "canceled");
 
     const subStatus = subscription?.status || "none";
     const hadTrial = subscription?.hadTrial || false;
